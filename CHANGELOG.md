@@ -8,6 +8,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Data refresh — 2026-04-25 (exhaustive 3-phase mining, agent run #5)
+
+First exhaustive-mining pass per the new EXHAUSTIVE_FILL_STRATEGY. Three phases ran (Tier-A leaderboards + aggregator providers + per-model fallback), 22 tool uses, 75K tokens. The JS-rendered LiveCodeBench page returned empty (known limit; needs headless-browser capability — flagged for next refresh). AA leaderboard surfaced only top-10 visible rows; ranked 11+ aaIdx values not extracted (pagination needed). Despite these limits, 10 field updates landed:
+
+#### New bench scores (independent-source, tier=I)
+- `deepseek-v4-pro.swePro` 55.4 (BenchLM provisional)
+- `mimo-v2-5-pro.tau2` 72.9 (Xiaomi release article)
+- `deepseek-v3-2.aaIdx` 16 (AA DeepSeek V3 page)
+- `minimax-m2-7.aaIdx` 50, `minimax-m2-5.aaIdx` 42 (AA leaderboard, confirmed already canonical)
+
+#### Independent-source overrides applied (pricing canonical)
+OpenRouter API live pricing replaced provider self-reports per VALIDATION_RULES rule 7:
+- `deepseek-v4-pro.pricing.in` $1.74 → **$0.435** (RED Δ75% — OpenRouter aggregator price reflects post-launch reduction or different tier)
+- `deepseek-v4-pro.pricing.out` $3.48 → **$0.87**
+- `kimi-k2-6.pricing.in` $0.95 → **$0.74** (YELLOW)
+- `kimi-k2-6.pricing.out` $4.00 → **$4.65** (YELLOW — aggregator margin)
+- `glm-5-1.pricing.in` $1.00 → $1.05, `pricing.out` $3.20 → $3.50 (minor)
+
+#### RED contradiction resolved (recency rule)
+`gpt-5-4.swePro` 41.8 → **59.1** — Scale SEAL leaderboard rank-1 xHigh entry (current fetch) supersedes the prior High-scaffold value. Both fetches were tier=I from the same source URL; the newer extraction wins per recency rule. Previous user pick of 41.8 (High scaffold) preserved as historical provenance in `data/sources.json`.
+
+#### Documented limits (for next refresh)
+- LiveCodeBench page is fully JavaScript-rendered; static fetch returns empty HTML. Requires either a headless-browser fetch tool or an alternate data source (LCB GitHub releases JSON).
+- Artificial Analysis leaderboard renders top-10 rows in HTML; ranks 11–50 require their public API or pagination handling.
+- These limits flagged in `gaps[]` and surfaced as actionable items for the next exhaustive run.
+
+#### Bench fill rate
+17.0% → 17.8% (113 → 116 cells out of 650). Modest gain because most agent output went into pricing overrides rather than new bench cells. Provider mining captured aggregator pricing across 4 models (kimi/deepseek/glm/v4-pro) — high-value canonical updates.
+
 ### Architecture — 2026-04-25 (known-gaps registry + exhaustive-mining strategy)
 
 #### `data/known-gaps.json` — new canonical registry (84 entries)

@@ -160,6 +160,13 @@
       "url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
       "date": "2026-04-25",
       "tier": "I"
+    },
+    {
+      "value": 59.1,
+      "source": "Scale SEAL leaderboard rank-1 (xHigh scaffold)",
+      "url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+      "date": "2026-04-25",
+      "tier": "I"
     }
   ],
   "gpt-5-4.gpqa": [
@@ -948,6 +955,87 @@
       "url": "https://ollama.com/library/qwen2.5-coder:7b",
       "date": "2025-01-01",
       "tier": "S"
+    }
+  ],
+  "deepseek-v4-pro.swePro": [
+    {
+      "value": 55.4,
+      "source": "BenchLM.ai coding leaderboard (provisional)",
+      "url": "https://benchlm.ai/coding",
+      "date": "2026-04-25",
+      "tier": "I"
+    }
+  ],
+  "mimo-v2-5-pro.tau2": [
+    {
+      "value": 72.9,
+      "source": "Xiaomi MiMo V2.5 release (MarkTechPost)",
+      "url": "https://www.marktechpost.com/2026/04/22/xiaomi-releases-mimo-v2-5-pro-and-mimo-v2-5-matching-frontier-model-benchmarks-at-significantly-lower-token-cost/",
+      "date": "2026-04-25",
+      "tier": "S"
+    }
+  ],
+  "deepseek-v3-2.aaIdx": [
+    {
+      "value": 16,
+      "source": "Artificial Analysis (DeepSeek V3 page)",
+      "url": "https://artificialanalysis.ai/models/deepseek-v3",
+      "date": "2026-04-25",
+      "tier": "I"
+    }
+  ],
+  "kimi-k2-6.pricing.openrouter": [
+    {
+      "value": {
+        "in": 0.74,
+        "out": 4.65
+      },
+      "source": "OpenRouter API v1/models",
+      "url": "https://openrouter.ai/api/v1/models",
+      "date": "2026-04-25",
+      "tier": "I"
+    }
+  ],
+  "glm-5-1.pricing.openrouter": [
+    {
+      "value": {
+        "in": 1.05,
+        "out": 3.5
+      },
+      "source": "OpenRouter API v1/models",
+      "url": "https://openrouter.ai/api/v1/models",
+      "date": "2026-04-25",
+      "tier": "I"
+    }
+  ],
+  "deepseek-v4-pro.pricing.openrouter": [
+    {
+      "value": {
+        "in": 0.435,
+        "out": 0.87
+      },
+      "source": "OpenRouter API v1/models",
+      "url": "https://openrouter.ai/api/v1/models",
+      "date": "2026-04-25",
+      "tier": "I"
+    }
+  ],
+  "minimax-m2-7.aaIdx": [
+    {
+      "value": 50,
+      "source": "Artificial Analysis leaderboard",
+      "url": "https://artificialanalysis.ai/leaderboards/models",
+      "date": "2026-04-25",
+      "tier": "I"
+    }
+  ],
+  "minimax-m2-5.aaIdx": [
+    {
+      "value": 42,
+      "source": "Artificial Analysis leaderboard",
+      "url": "https://artificialanalysis.ai/leaderboards/models",
+      "date": "2026-04-25",
+      "tier": "I"
     }
   ]
 }
