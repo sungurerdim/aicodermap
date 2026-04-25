@@ -12,9 +12,10 @@ Orchestrate AI coding LLM tracker updates: invoke `aicodermap-research-agent` �
 ## CONTEXT
 - Project root: `D:\GitHub\aicodermap\`
 - Agent: `.claude/agents/aicodermap-research-agent.md`
-- Data files: `data/{models,sources,gpu-database}.json`
+- Data files: `data/{models,sources,gpu-database,known-gaps}.json`
 - i18n: `i18n/{tr,en}.json`
 - Live URL: `https://sungurerdim.github.io/aicodermap/`
+- **Known-gaps registry:** `data/known-gaps.json` — vendor opt-outs, not-applicable benchmarks, out-of-scope variants. Agent skips these during exhaustive mining; UI surfaces them as "vendor opt-out" / "not applicable" markers instead of generic "—". When the agent prompt is built, `known-gaps.json` MUST be included in the agent context so it can honor the skip rule.
 
 ## ARGS
 | arg | scope | model | typical_duration |

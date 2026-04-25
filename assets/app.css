@@ -830,6 +830,19 @@ table#comparison-table td.col-rank { color: var(--muted); }
 }
 .ollama-link:hover { text-decoration: underline; }
 
+.bench-cell.opt-out {
+  opacity: 0.55;
+}
+.bench-cell.opt-out .value {
+  color: var(--muted, #8a8d92);
+  font-size: 0.95em;
+  cursor: help;
+  border-bottom: 1px dotted var(--border, rgba(255, 255, 255, 0.15));
+}
+.bench-cell.opt-out-vendor-opt-out .value { color: var(--warn, #f0b04a); }
+.bench-cell.opt-out-not-applicable .value { color: var(--muted, #8a8d92); }
+.bench-cell.opt-out-out-of-scope .value { color: var(--muted, #6a6e74); }
+
 .open-badge, .closed-badge {
   display: inline-block;
   margin-left: var(--space-2, 8px);

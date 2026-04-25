@@ -8,6 +8,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Architecture — 2026-04-25 (known-gaps registry + exhaustive-mining strategy)
+
+#### `data/known-gaps.json` — new canonical registry (84 entries)
+A curated list of `(modelId, benchKey)` pairs that will never be filled by a refresh — vendor opt-outs (xAI on SEAL/SWE-bench, Meta on SEAL, etc.), not-applicable benchmarks (Gemma E-series edge models on agentic), and out-of-scope variants (deepseek-r1-14b distill, qwen25-coder 7B/14B, codestral bare alias). Each entry carries `reason`, `note`, and optional `recheckAfter` ISO date for vendors whose policy may change.
+
+#### Agent (`aicodermap-research-agent.md`) — `EXHAUSTIVE_FILL_STRATEGY` section
+Three-phase mining protocol:
+- **Phase A — Tier-A leaderboards** (5 parallel fetches): Artificial Analysis, Scale SEAL SWE-Pro, LiveCodeBench, Vellum, BenchLM — bench scores with tier=I.
+- **Phase B — aggregator inference providers** (≤6 parallel fetches): OpenRouter (provider count, uptime, alt pricing), Together, Fireworks, DeepInfra, Groq, Ollama library, OpenCode Zen/Go, HuggingFace trending — captures throughput, latency, alt pricing, ollama metadata.
+- **Phase C — per-model targeted follow-up** (≤3 fetches): HF cards / official blogs / tech reports for any model still <2 bench cells filled.
+
+Per-row extraction with exact-id + fuzzy-name + alias-map matching. Independent-source rule applies to all Phase A+B values. Hard budget ≤14 total fetches / ≤30 tool uses / ≤140K input tokens. Skips every `(modelId, benchKey)` in `known-gaps.json` whose `recheckAfter` has not passed — prevents burning fetches on permanent absences and keeps the agent's `gaps[]` reserved for genuinely fixable holes.
+
+#### Skill (`aicodermap/SKILL.md`) — known-gaps integration
+Skill's CONTEXT block now lists `data/known-gaps.json` as a fourth canonical data file and instructs the orchestrator to include it in the agent prompt so the skip rule is honored.
+
+#### UI (`assets/app.js` + `app.css` + `i18n/{tr,en}.json`) — opt-out indicators
+`buildBenchCell` checks the known-gaps registry when a score is null; renders 🚫 (vendor opt-out), ∅ (not applicable), or – (out-of-scope) instead of generic "—". CSS classes `.opt-out-vendor-opt-out`, `.opt-out-not-applicable`, `.opt-out-out-of-scope` differentiate the markers; tooltip carries the human-readable note. New i18n keys `ui.optOut.{vendor-opt-out,not-applicable,out-of-scope}` for both languages.
+
 ### Data refresh — 2026-04-25 (gap-fill pass for 11 underrepresented models)
 
 Targeted agent run filled the 10 confirmed-missing i18n entries plus partial bench/pricing/context data. Applied via the new schema-complete merge pipeline (MERGE_RULES); .bak → .bak2 rotation produced two backup layers; self-check verified no expected i18n entry was dropped.

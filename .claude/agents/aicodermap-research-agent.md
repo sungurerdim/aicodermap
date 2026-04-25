@@ -179,6 +179,83 @@ The research agent **must** parallelize fetches across these tiers to minimize t
 - **Snapshot first:** always read `data/external/llmfit-hf-models.json` before WebFetch — it covers ~148 models with canonical schema and is cheap. Only WebFetch what's missing.
 - **Federated contradiction:** when 2+ Tier-A leaderboards report different values for same `(model, benchmark)`, apply CONTRADICTION_LOGIC and emit `contradictions[]`.
 
+## EXHAUSTIVE_FILL_STRATEGY (leaderboard-driven mining for full bench coverage)
+
+**Trigger:** `scope=full` OR `scope=fill` OR any prompt mentioning "exhaustive coverage" / "all models" / "fill missing bench" / "tüm modellerin tüm detayları".
+
+**Why this exists:** the per-model fetch pattern (one model → one provider page) is fast for new releases but leaves bench cells empty for established models that simply don't appear on any single provider page. Independent leaderboards (AA, Scale SEAL, LCB, Vellum, BenchLM) tabulate **dozens of models on a single page** — one WebFetch yields bench scores for many models simultaneously. Mining these tables is the only way to push bench fill from ~17% toward 40%+.
+
+### Mining protocol — three phases, parallel within each phase
+
+**Phase A — Tier-A leaderboards (single-message parallel, 5 fetches):**
+- `artificialanalysis.ai/leaderboards/models` — aaIdx, aaCoding, aaAgentic, throughput, pricing
+- `labs.scale.com/leaderboard/swe_bench_pro_public` — swePro standardized
+- `livecodebench.github.io/leaderboard.html` — lcbV6
+- `vellum.ai/llm-leaderboard` — sweV (independent), gpqa, pricing
+- `benchlm.ai/coding` — verified-only sweV/swePro/tb2
+
+**Phase B — aggregator inference providers (single-message parallel, ≤6 fetches):**
+These pages tabulate **dozens of models per page** with provider counts, alt pricing, throughput, uptime, context, and sometimes provider-side bench scores. Mining them yields metadata that leaderboards don't carry.
+- `openrouter.ai/models` (full catalog) — provider count, uptime%, alt pricing, throughput, latency p50/p99, context per model
+- `together.ai/models` — quant variants, batch tier, $/1M, throughput
+- `fireworks.ai/models` — tier, throughput, batch pricing, context
+- `deepinfra.com/models` — $/1M tok, throughput
+- `groq.com/models` (or `console.groq.com/docs/models`) — extreme-fast inference rates, pricing
+- `ollama.com/library` — pullCount, tags, parameters, license, releasedISO, architecture (for `tier='ollama'` and any open-weight model with an Ollama tag)
+- `opencode.ai/docs/zen` and `opencode.ai/docs/go` — endpoints, latency, pricing (when models present)
+- `huggingface.co/models?sort=trending` — open-weight discovery + canonical license/downloads + author claims
+
+Pick the 5–6 most relevant for the current dataset; don't fetch all if budget is tight.
+
+**Phase C — per-model targeted follow-up (≤3 fetches, only after A+B):**
+For models that ended Phase A+B with <2 bench cells filled OR with missing pricing/context/license, fetch one provider-specific page (HuggingFace card, official blog, technical report PDF, llm-stats.com row).
+
+### Per-row extraction discipline
+
+For each fetched table page, extract every row that matches a model in `data/models.json` via:
+1. Exact `id` slug match
+2. Fuzzy `name` match (case-insensitive substring + version number alignment)
+3. Common alias map (e.g., "Claude Opus 4.7" → `opus-4-7`, "Gemini 2.5 Pro" → `gemini-3-1-pro` per project naming convention)
+
+For each match, record:
+- Numeric bench values → `models[].updates.bench[<key>]` with the leaderboard URL as the source (tier=I)
+- Pricing → `pricing.api.in/out/cacheHit` (use the cheapest/canonical tier), `pricing.subscription`
+- Provider count + uptime → `providers`, `uptime` (from OpenRouter)
+- Ollama metadata → full `ollama` object (only if not already complete)
+- Throughput → not yet schema'd; emit in `gaps[]` as `<id>.throughput=<value>` for future schema migration
+
+### Independent-source rule
+
+Phase A + B values are **all tier=I** (independent leaderboards or independent aggregators). Per VALIDATION_RULES rule 7, these override any S-tier provider self-reports for the same `(modelId, benchKey)`. Both sources still appear in `sourcesAdded[]` for provenance and the UI's "self-reported" indicator.
+
+### Known-gaps skip
+
+Read `data/known-gaps.json` BEFORE Phase A. For every entry whose `recheckAfter` has not passed, do not search for that `(modelId, benchKey)` value in any phase. Do not emit a `gaps[]` entry for them — the registry already explains them.
+
+### Hard budget under exhaustive mode
+
+- Total WebFetch: **≤14** (5 Phase-A + 6 Phase-B + 3 Phase-C)
+- Tool uses: ≤30 (≤4 reads + ≤14 fetches + ≤12 grep/search)
+- Token: ≤140K input
+- If any limit hit → STOP and return JSON with whatever was gathered. Partial mining > no mining.
+
+### Output expectations under exhaustive mode
+
+Even a partial pass should populate `models[].updates.bench[*]` for **every model that appears on any of the 5 leaderboards** for **every bench column on those leaderboards**. The `gaps[]` array becomes a structured "vendor never submitted to <leaderboard>" inventory — users can see at a glance which absences are policy decisions versus data we just haven't fetched.
+
+### Known-gaps registry (`data/known-gaps.json`) — skip discipline
+
+Before issuing any web fetch, **read `data/known-gaps.json`**. This file is a curated registry of `(modelId.benchKey)` pairs that will never be filled because:
+- `vendor-opt-out` — the vendor's policy is to not submit (xAI on SEAL, Meta on SEAL, etc.)
+- `not-applicable` — the model class makes the benchmark meaningless (edge models on agentic, retrieval-tuned models on SWE)
+- `out-of-scope` — distilled / quantized / aliased variants where only the canonical entry was evaluated
+
+For every `(modelId, benchKey)` in `known-gaps.json`, **do NOT search for the value** during exhaustive mining. The UI surfaces these as "vendor opt-out" / "not applicable" markers via a separate code path; the agent's job is to honor the skip.
+
+A `recheckAfter` field (ISO date) MAY override the skip — if today's date is past `recheckAfter`, attempt the fetch one more time and update the registry if the situation changed. Otherwise emit no `gaps[]` entry for these pairs (the registry already explains them).
+
+This rule prevents the agent from burning a fetch on a known-permanent absence and from emitting redundant `gaps[]` noise on every refresh.
+
 ### Local runtimes
 | Runtime | URL pattern | Extracts |
 |---------|-------------|----------|
