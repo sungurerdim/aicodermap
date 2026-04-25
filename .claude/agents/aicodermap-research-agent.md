@@ -314,7 +314,10 @@ These map directly to AICoderMap's `model.useCases[]` (future schema field) and 
     {
       "id": "<model_id>",
       "updates": {
-        // PARTIAL — only changed fields
+        // PARTIAL — emit every field for which you have a value, only omit
+        // when (a) value exactly matches current data/models.json, OR (b) no
+        // source could be found (then add to gaps[] as "<id>.<field>"). Never
+        // skip a field because it seems sparse/rare — that IS the data.
         "name"?: string,
         "released"?: ISO_date,
         "context"?: number,
@@ -322,6 +325,9 @@ These map directly to AICoderMap's `model.useCases[]` (future schema field) and 
         "bench"?: { swePro?:n, sweV?:n, tb2?:n, lcbV6?:n, aider?:n, tau2?:n, aaCoding?:n, aaAgentic?:n, mcpA?:n, gpqa?:n, sweMulti?:n, hle?:n, aaIdx?:n },
         "providers"?: number,
         "uptime"?: number,
+        "license"?: string,
+        "open"?: boolean,
+        "vramRequirement"?: number,                     // local only, GB
         "ollamaSize"?: string,                          // local only
         "ollama"?: {                                    // local only — RICH
           "pullCmd": "ollama pull <model>:<tag>",
@@ -380,7 +386,9 @@ Tier weights for weighted_avg: I=1.0, S=0.7, C=0.4.
 2. **Coverage gate**: validationCoverage = (scores_with_≥2_source) / total_scores. Target ≥0.95 (M4)
 3. **Recency**: pricing source >30d old + disagreeing source → fresher source priority (override tier)
 4. **Bias**: provider self-claim always tier="S"; require independent corroboration
-5. **i18n**: provide both `tr` + `en` strengths/weaknesses (compound moat A)
+5. **i18n**: provide both `tr` + `en` strengths/weaknesses (compound moat A) — for EVERY surveyed model, not just newly-added ones
+6. **Exhaustive per-model coverage**: For EVERY surveyed model, attempt to populate EVERY field in OUTPUT_SCHEMA (all 13 bench keys, pricing.api.in/out/cacheHit, pricing.subscription, released, context, providers, uptime, license, open, vramRequirement, ollamaSize, ollama, unslothVariants, name, tier, strengthsKey, weaknessesKey). A field goes into `gaps[]` as `<modelId>.<field>` ONLY if no source exists on the open web — never skip silently because the field is "rare" or "sparse". The user explicitly relies on dense data; gaps entries are the contract for what's truly absent.
+7. **Independent-source canonical**: when both an I-tier (independent leaderboard) and S-tier (provider self-report) value exist for the same `(modelId, bench)`, the I-tier value goes into `models[].updates.bench[<key>]`. Both sources still appear in `sourcesAdded[]` for provenance. The skill's UI surfaces an indicator when only S-tier provenance is available.
 
 ## WORKFLOW
 ```

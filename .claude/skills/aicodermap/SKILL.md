@@ -40,17 +40,21 @@ Orchestrate AI coding LLM tracker updates: invoke `aicodermap-research-agent` �
      prompt: structured(scope, query, idea_context, target_model_ids?, include_unsloth:true)
    })
    For scope=full: prompt must explicitly reference DEFAULT_TARGETS (5 families × ≥35 models) so the agent cannot drop a family silently.
+   **Exhaustive coverage contract** — the prompt must require: "For EVERY surveyed model, attempt to populate EVERY field in the OUTPUT_SCHEMA whitelist (all 13 bench keys, pricing.api.in/out/cacheHit, pricing.subscription, released, context, providers, uptime, license, open, vramRequirement, ollamaSize, ollama (rich obj when local), unslothVariants when applicable). A field is omitted from `updates` ONLY when (a) the value matches the current data/models.json exactly, OR (b) no source on web could be found — in which case it goes into `gaps[]` with the modelId.field key. Do NOT skip fields just because they're 'sparse' or 'rare' — that is exactly the data the user needs."
    Delivery contract: agent MUST return the JSON as its final text message (never write to file, never narrate). The skill parses the Task tool's return value directly via JSON.parse. Reinforce this in the prompt: "Final message = pure JSON, first char `{`, last char `}`, no markdown fences, no narration."
 5. Parse return → validate JSON schema (strip surrounding whitespace, locate first `{` and last `}` if narration leaked)
 6. Gate: validationCoverage >= 0.95 → proceed; else WARN+force-override
 7. Gate: contradictions[].severity="RED" count > 0 → BLOCK, prompt manual pick per RED
 8. Render diff (markdown table): models[].updates fields, newModels[], contradictions[], coverage%
 9. User input: approve | partial <ids> | decline | detail <id>
-10. Atomic write (.bak backup):
-    - data/models.json (merge models[].updates)
-    - data/sources.json (append sourcesAdded[])
-    - i18n/{tr,en}.json (merge i18nUpdates)
-    - lastUpdated := today (YYYY-MM-DD) per touched entry
+10. Atomic write — **SCHEMA-COMPLETE MERGE** (rotated .bak backup):
+    Merge MUST cover EVERY field in OUTPUT_SCHEMA (per agent definition), not just bench/pricing.
+    See MERGE_RULES section below for the full field list and per-field policy.
+    Outputs:
+    - data/models.json (schema-complete merge — bench[*], pricing.api.*, pricing.subscription, released, context, providers, uptime, license, open, vramRequirement, ollamaSize, ollama, unslothVariants, name, tier, strengthsKey, weaknessesKey)
+    - data/sources.json (append sourcesAdded[] + contradiction values, dedup by (key, url, value))
+    - i18n/{tr,en}.json (merge i18nUpdates into models[id]={strengths,weaknesses})
+    - lastUpdated := today (YYYY-MM-DD) per touched entry only
 11. Append CHANGELOG.md (Keep a Changelog):
     ## [Unreleased] / ### Updated|Added|Flagged
 12. Print git commands for user (DO NOT auto-commit):
@@ -71,6 +75,78 @@ DEPLOY_WAIT_SEC = 90
 AGENT_RETRY = 1
 FAMILY_BASELINE_MIN = 30    // refresh-all: |models[]+newModels[]| floor
 ```
+
+## MERGE_RULES
+
+**Why this section exists:** prior runs lost data because the merge step only touched `bench`/`pricing`/`provider`/`license`. Sparse fields (`vramRequirement`, `ollamaSize`, `pricing.api.cacheHit`, `uptime`, `subscription`) were silently skipped — visible in the resulting `data/models.json` as missing values that the user then had to flag manually. Never again.
+
+### A. Artifact reconciliation (BEFORE primary agent run merge)
+
+Before applying the current run's `models[].updates`, scan for prior artifacts that may carry data the current run omitted:
+
+```
+prior_artifacts = glob('.aicodermap-*.json') ∪ {.aicodermap-merged.json, .aicodermap-targeted-out.json, .aicodermap-agent-out{,2,3}.json, .aicodermap-agent-out-fresh.json}
+```
+
+These exist when a prior refresh failed mid-flow OR when targeted gap-fill produced a separate artifact OR when the user manually merged earlier runs. Treat their `models[].updates`, `newModels[]`, and `sourcesAdded[]` as **lower-priority backfill** candidates for any field the current run leaves null.
+
+### B. Per-field merge policy (priority order, top wins)
+
+For every `(modelId, field)` pair, walk this priority list and apply the first non-null value found:
+
+```
+1. User-resolved RED contradictions (always canonical, never overridden)
+2. Independent-source override (per memory rule: I-tier > S-tier when both exist for the same bench)
+3. Current run's models[].updates value (newest authoritative agent return)
+4. Prior artifact value (recover any field the current run omitted)
+5. Existing data/models.json value (preserve)
+```
+
+### C. Field whitelist (every refresh MUST iterate ALL of these)
+
+```
+SCALAR FIELDS:    name, provider, released, tier, open, license, context, providers, uptime, vramRequirement, ollamaSize, strengthsKey, weaknessesKey
+
+NESTED FIELDS:    pricing.api.in, pricing.api.out, pricing.api.cacheHit, pricing.subscription
+
+OBJECT FIELDS:    ollama (full pullCmd/tags/pullCount/architecture/parameters/license/releasedISO/ollamaUrl block — preserve atomically; replace only if new object has more keys)
+
+ARRAY FIELDS:     unslothVariants[] (replace if new has ≥ existing length)
+
+BENCH KEYS (13):  swePro, sweV, tb2, lcbV6, aider, tau2, aaCoding, aaAgentic, mcpA, gpqa, sweMulti, hle, aaIdx
+                  → independent-source rule applies per bench key
+```
+
+A field whose current value is `null`, `undefined`, `"?"`, or `"Unknown"` is treated as **empty** for fill purposes. Any artifact value beats empty.
+
+### D. Provenance (data/sources.json)
+
+After the field merge, every `(modelId, bench)` value that ended up in `data/models.json` must have at least one matching entry in `data/sources.json[<modelId>.<bench>]`. If the chosen value is provider-self-reported (no I-tier source) AND no sources entry exists, append the S-tier provenance pointing at the announcement URL (so UI can render the "self-reported" marker).
+
+### E. lastUpdated discipline
+
+Touch `lastUpdated := today` ONLY on models that gained at least one new field value during merge. Models with zero deltas keep their prior `lastUpdated` (the M5 freshness gate then accurately reflects what's actually fresh).
+
+### F. Backup rotation
+
+```
+data/models.json     → data/models.json.bak (most recent prior)
+data/models.json.bak → data/models.json.bak2 (the one before that)
+```
+
+Same rotation for `data/sources.json` and `i18n/*.json`. Two layers of `.bak` lets the user undo two refreshes back. Both .bak / .bak2 are gitignored via `*.bak`.
+
+### G. Self-check (BEFORE prompting the user to git commit)
+
+Run this verification pass:
+```
+for each model in data/models.json:
+  for each field in (whitelist above):
+    if field is null AND any artifact has a non-null value:
+      → MERGE BUG. Halt, log model+field+artifact path, prompt user.
+```
+
+A passing self-check is the gate for printing git commands at Step 12. If it fails, the answer is never "let the user catch it later" — fix the merge in-place.
 
 ## ERRORS
 | condition | action |
@@ -155,6 +231,9 @@ tail -50 CHANGELOG.md → parse last 5 release entries.
 - M5 ≤14 day discipline (Aider 5-month-stale antipattern defense)
 - R3 burnout: ≤4 content posts/month hard cap (separate, not skill scope)
 - Editorial integrity: contradictions surfaced, never hidden
+- **Schema-complete merge** — every refresh applies MERGE_RULES to ALL whitelisted fields, reconciles against ALL prior `.aicodermap-*.json` artifacts, and runs the self-check before printing git commands. No silent field drops.
+- **Independent-source canonical rule** — I-tier leaderboard values override S-tier provider self-reports; see memory `feedback_independent_bench_priority`
+- **Agent delivery contract** — agent returns JSON as final text message (no narration, no file write); see memory `feedback_agent_output_delivery_contract`
 - NO GitHub Actions / CI / workflows (manual only)
 - NO external monitoring (GitHub Insights Traffic = M1 source)
 - Project-scoped: skill+agent only in `D:\GitHub\aicodermap\` session
