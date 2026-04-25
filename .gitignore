@@ -1,0 +1,35 @@
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*~
+
+# Logs
+*.log
+npm-debug.log*
+
+# Local env / secrets (defensive — bu projede secret yok ama)
+.env
+.env.local
+.env.*.local
+
+# Build artifacts (vanilla — no build, ama defensive)
+node_modules/
+dist/
+build/
+.cache/
+
+# Backup / temp
+*.bak
+*.corrupt
+*.tmp
+tmp/
+
+# Coverage / test
+coverage/
+*.lcov
+
+# Local skill development
+.claude-local/
