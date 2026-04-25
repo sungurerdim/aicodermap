@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Cut coding-model selection from hours of review to seconds: ranked by your priorities, source contradictions surfaced, GPU-fitting local options labeled with the exact quant that runs. Turkish + English, refreshed every 14 days.">
+  <meta name="theme-color" content="#0b0d10">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b0d10'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' dominant-baseline='middle' font-size='34' font-family='ui-monospace, monospace' fill='%2367e8a4'%3E&gt;_%3C/text%3E%3C/svg%3E">
+  <title data-i18n-key="ui.appTitle">AICoderMap</title>
+  <meta property="og:title" content="AICoderMap — Pick the right coding model in seconds">
+  <meta property="og:description" content="Ranked by your priorities, source contradictions surfaced, exact GPU-fitting quants labeled. Turkish + English, never more than 14 days stale.">
+  <meta property="og:type" content="website">
+  <link rel="alternate" hreflang="tr" href="./?lang=tr">
+  <link rel="alternate" hreflang="en" href="./?lang=en">
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+
+<header class="app-header" data-export-section="header">
+  <div class="header-row">
+    <h1 class="app-title">
+      <span class="logo">&gt;_</span>
+      <span data-i18n-key="ui.appTitle">AICoderMap</span>
+    </h1>
+    <div class="header-actions">
+      <div class="theme-toggle" role="group" aria-label="Theme">
+        <button type="button" data-theme="light"
+                data-tip="Aydınlık tema" data-i18n-tip="ui.theme.light" data-tip-position="bottom"
+                aria-label="Light theme" aria-pressed="false">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
+        <button type="button" data-theme="dark"
+                data-tip="Karanlık tema" data-i18n-tip="ui.theme.dark" data-tip-position="bottom"
+                aria-label="Dark theme" aria-pressed="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button type="button" data-lang="tr" aria-pressed="true">TR</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+  </div>
+  <p class="app-tagline" data-i18n-key="ui.appTagline">
+    AI kodlama modellerini sizin ağırlıklarınızla karşılaştırın — çapraz doğrulanmış, çelişki işaretli.
+  </p>
+</header>
+
+<nav class="sticky-nav" aria-label="Sections" data-no-export>
+  <a href="#filters" data-i18n-key="ui.section.filters">Filtreler</a>
+  <a href="#weights" data-i18n-key="ui.section.weights">Ağırlık Editörü</a>
+  <a href="#table" data-i18n-key="ui.section.table">Karşılaştırma Tablosu</a>
+  <a href="#models" data-i18n-key="ui.section.models">Model Kartları</a>
+  <a href="#export" data-i18n-key="ui.section.export">Dışa Aktar</a>
+</nav>
+
+<main class="app-main">
+
+  <section id="weights" class="card section-card" data-export-section="weights" aria-labelledby="weights-heading">
+    <header class="section-head">
+      <h2 id="weights-heading" data-i18n-key="ui.section.weights">Ağırlık Editörü</h2>
+      <button class="btn-icon-only" type="button" data-export-trigger="weights"
+              data-i18n-tip="ui.export.weights" data-i18n-aria-label="ui.export.weights"
+              data-tip="Ağırlıkları PNG olarak kaydet" data-tip-position="bottom"
+              aria-label="Ağırlıkları PNG olarak kaydet">
+        <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+        <span class="sr-only" data-i18n-key="ui.export.weights">Ağırlıkları PNG olarak kaydet</span>
+      </button>
+    </header>
+
+    <div class="weights-controls">
+      <label class="select-row">
+        <span data-i18n-key="ui.weights.preset">Hazır Profil</span>
+        <select id="weights-preset">
+          <option value="custom">—</option>
+          <option value="balanced" data-i18n-key="verdicts.preset.balanced">Dengeli</option>
+          <option value="swe-focused" data-i18n-key="verdicts.preset.sweFocused">SWE-odaklı</option>
+          <option value="agentic-focused" data-i18n-key="verdicts.preset.agenticFocused">Agentic-odaklı</option>
+          <option value="benchmark-only" data-i18n-key="verdicts.preset.benchmarkOnly">Sadece Benchmark</option>
+        </select>
+      </label>
+      <button id="weights-reset" class="btn btn-ghost" type="button" data-i18n-key="ui.weights.reset">Varsayılana Dön</button>
+      <output id="weights-total" class="weights-total" aria-live="polite">100</output>
+    </div>
+
+    <div id="weights-grid" class="weights-grid"><!-- populated by app.js --></div>
+  </section>
+
+  <section id="filters" class="card section-card" data-export-section="filters" aria-labelledby="filters-heading">
+    <header class="section-head">
+      <h2 id="filters-heading" data-i18n-key="ui.section.filters">Filtreler</h2>
+    </header>
+
+    <div class="filters-grid">
+      <label class="select-row">
+        <span data-i18n-key="ui.filter.search">Ara</span>
+        <input type="search" id="filter-search" placeholder="model adı, sağlayıcı..." data-i18n-placeholder="ui.filter.searchPlaceholder">
+      </label>
+
+      <label class="select-row">
+        <span data-i18n-key="ui.filter.deployment">Görüntü</span>
+        <select id="filter-deployment">
+          <option value="all" data-i18n-key="ui.filter.deploymentAll">Tüm modeller</option>
+          <option value="cloud" data-i18n-key="ui.filter.cloudOnly">Yalnızca bulut/abonelik</option>
+          <option value="local" data-i18n-key="ui.filter.localFit">GPU'ma sığan yerel modeller</option>
+        </select>
+      </label>
+
+      <div class="filter-group">
+        <label class="select-row">
+          <span data-i18n-key="ui.filter.gpuLabel">GPU</span>
+          <select id="filter-gpu-select">
+            <option value="auto" data-i18n-key="ui.filter.gpuAuto">Otomatik tespit</option>
+            <!-- options populated by app.js -->
+          </select>
+        </label>
+        <label class="number-row">
+          <span data-i18n-key="ui.filter.gpuOverride">Manuel VRAM</span>
+          <input type="number" id="filter-vram-override" min="0" max="256" step="1" inputmode="numeric">
+        </label>
+      </div>
+
+      <label class="select-row">
+        <span data-i18n-key="ui.filter.tier">Tier</span>
+        <select id="filter-tier">
+          <option value="all" data-i18n-key="ui.filter.all">Tümü</option>
+          <option value="frontier" data-i18n-key="ui.tier.frontier">Frontier</option>
+          <option value="open-tier1" data-i18n-key="ui.tier.open-tier1">Açık Tier-1</option>
+          <option value="ollama" data-i18n-key="ui.tier.ollama">Ollama Yerel</option>
+        </select>
+      </label>
+
+      <label class="checkbox-row">
+        <input type="checkbox" id="filter-open-only">
+        <span data-i18n-key="ui.filter.openOnly">Sadece açık model</span>
+      </label>
+    </div>
+
+    <p id="gpu-status" class="muted-note" aria-live="polite"></p>
+  </section>
+
+  <section id="table" class="section-card" aria-labelledby="table-heading">
+    <header class="section-head">
+      <h2 id="table-heading" data-i18n-key="ui.section.table">Karşılaştırma Tablosu</h2>
+      <div class="section-head-right">
+        <span id="table-count" class="muted-note"></span>
+        <button class="btn-icon-only" type="button" data-export-trigger="comparison-table"
+                data-i18n-tip="ui.export.table" data-i18n-aria-label="ui.export.table"
+                data-tip="Karşılaştırma tablosunu PNG olarak kaydet" data-tip-position="bottom"
+                aria-label="Karşılaştırma tablosunu PNG olarak kaydet">
+          <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+          <span class="sr-only" data-i18n-key="ui.export.table">Karşılaştırma tablosunu PNG olarak kaydet</span>
+        </button>
+      </div>
+    </header>
+    <div class="table-scroll" data-export-section="comparison-table">
+      <table id="comparison-table">
+        <thead><tr></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="models" class="section-card" aria-labelledby="models-heading">
+    <header class="section-head">
+      <h2 id="models-heading" data-i18n-key="ui.section.models">Modeller</h2>
+      <span id="models-count" class="muted-note"></span>
+    </header>
+
+    <div id="models-list" class="models-list" aria-live="polite">
+      <p class="loading" data-i18n-key="ui.loading">Yükleniyor...</p>
+    </div>
+  </section>
+
+  <section id="export" class="card section-card" aria-labelledby="export-heading">
+    <header class="section-head">
+      <h2 id="export-heading" data-i18n-key="ui.section.export">Dışa Aktar</h2>
+    </header>
+    <div class="export-actions">
+      <button id="export-full" class="btn btn-primary" type="button"
+              data-i18n-tip="ui.export.fullTooltip"
+              data-tip="Tüm sayfayı PNG olarak kaydet">
+        <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+        <span data-i18n-key="ui.export.full">Tam sayfa PNG</span>
+      </button>
+      <p class="muted-note" data-i18n-key="ui.footer.privacy">
+        Bu site cookie kullanmaz, GitHub Insights ile anonim trafik ölçümü yapar.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="app-footer" data-no-export>
+  <div class="footer-row">
+    <span>AICoderMap · MIT</span>
+    <a href="https://github.com/sungurerdim/aicodermap" rel="noopener noreferrer" target="_blank" data-i18n-key="ui.footer.repo">GitHub</a>
+  </div>
+</footer>
+
+<div id="tooltip" class="tooltip" role="tooltip" hidden></div>
+
+<script src="assets/vendor/html2canvas.min.js" defer></script>
+<script src="assets/app.js" defer></script>
+</body>
+</html>

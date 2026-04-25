@@ -1,5 +1,5 @@
 ---
-description: "AICoderMap update orchestrator. Project-scoped. Manuel trigger, zero API cost."
+description: "AICoderMap update orchestrator. Project-scoped. Manual trigger, zero API cost."
 argument-hint: "[refresh-all|model <id>|new-release|validate|stale-check|changelog]"
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Agent, TaskCreate, TaskUpdate
 ---
@@ -27,6 +27,8 @@ Orchestrate AI coding LLM tracker updates: invoke `aicodermap-research-agent` �
 | `stale-check` | (no fetch) | — | <5s |
 | `changelog` | (no fetch) | — | <5s |
 
+**`refresh-all` baseline:** Agent's `DEFAULT_TARGETS` table (5 families, ≥35 models) is non-negotiable — every family must be surveyed, missing ones emit a `gaps[]` entry. Skill rejects returns whose `models[]` + `newModels[]` cardinality < 30 unless agent explains via `gaps[]`.
+
 ## WORKFLOW
 ```
 1. Read data/models.json + data/sources.json
@@ -37,7 +39,9 @@ Orchestrate AI coding LLM tracker updates: invoke `aicodermap-research-agent` �
      model: "sonnet",
      prompt: structured(scope, query, idea_context, target_model_ids?, include_unsloth:true)
    })
-5. Parse return → validate JSON schema
+   For scope=full: prompt must explicitly reference DEFAULT_TARGETS (5 families × ≥35 models) so the agent cannot drop a family silently.
+   Delivery contract: agent MUST return the JSON as its final text message (never write to file, never narrate). The skill parses the Task tool's return value directly via JSON.parse. Reinforce this in the prompt: "Final message = pure JSON, first char `{`, last char `}`, no markdown fences, no narration."
+5. Parse return → validate JSON schema (strip surrounding whitespace, locate first `{` and last `}` if narration leaked)
 6. Gate: validationCoverage >= 0.95 → proceed; else WARN+force-override
 7. Gate: contradictions[].severity="RED" count > 0 → BLOCK, prompt manual pick per RED
 8. Render diff (markdown table): models[].updates fields, newModels[], contradictions[], coverage%
@@ -65,6 +69,7 @@ COVERAGE_MIN = 0.95         // M4 release gate
 STALE_DAYS = 14             // M5 freshness gate
 DEPLOY_WAIT_SEC = 90
 AGENT_RETRY = 1
+FAMILY_BASELINE_MIN = 30    // refresh-all: |models[]+newModels[]| floor
 ```
 
 ## ERRORS
@@ -73,6 +78,7 @@ AGENT_RETRY = 1
 | Agent timeout/HTTP fail | retry 1× → fallback WebSearch → prompt "partial data, continue?" |
 | Agent return invalid JSON | log to ~/.aicodermap-debug.log, prompt retry |
 | coverage < 0.95 | display missing scores list, options: [A]force-override [B]re-research [C]manual-add |
+| refresh-all family count < 30 (FAMILY_BASELINE_MIN) | block: list missing families per DEFAULT_TARGETS, options: [A]re-research with explicit family list [B]force-override (mark gaps[]) |
 | RED contradiction (>5pp) | per-RED prompt: [1]source-A [2]source-B [3]flag-both-avg [4]skip-model |
 | User decline at step 9 | restore from .bak, no commit |
 | Git push fail (conflict) | prompt "git pull --rebase first" |
@@ -149,7 +155,7 @@ tail -50 CHANGELOG.md → parse last 5 release entries.
 - M5 ≤14 day discipline (Aider 5-month-stale antipattern defense)
 - R3 burnout: ≤4 content posts/month hard cap (separate, not skill scope)
 - Editorial integrity: contradictions surfaced, never hidden
-- NO GitHub Actions / CI / workflows (manuel only)
+- NO GitHub Actions / CI / workflows (manual only)
 - NO external monitoring (GitHub Insights Traffic = M1 source)
 - Project-scoped: skill+agent only in `D:\GitHub\aicodermap\` session
 

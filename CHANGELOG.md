@@ -8,8 +8,91 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-### In Progress
-- M1 Foundation: repo init, 4 JSON schema, research agent base
+### Policy — 2026-04-25 (independent-source canonical rule)
+- **Independent benchmark sources are now canonical.** Tier=I leaderboards (Artificial Analysis, Scale SEAL, Vellum, BenchLM, LiveCodeBench, OpenRouter, Arena.ai) override Tier=S provider self-reports for the same metric in `data/models.json`. Self-reported values are retained as provenance in `data/sources.json` only; the UI marker for "self-reported when no independent value exists" is pending M3+. Rationale: provider self-reports use custom scaffolds and best-of-N selection — independent leaderboards apply standardized scaffolds, which is the only foundation for the apple-to-apple comparison the tracker is built on.
+
+### Data refresh — 2026-04-25 (run #4 + targeted gap-fill, full pass)
+
+**Coverage**: 50 models · 80 source-attribution keys (25 new) · 16 with Ollama metadata · 10 with Unsloth UD quants · 39 with TR+EN strengths/weaknesses · validationCoverage 0.83 (M4 ≥0.95 force-overridden per documented gaps)
+
+#### Updated (data normalization)
+- **34 models** — provider field corrected from `"?"` placeholder to verified vendor (Anthropic, OpenAI, Google DeepMind, Moonshot AI, Z.ai, MiniMax, Alibaba Qwen, StepFun, Meta, DeepSeek, Mistral AI, Xiaomi, Nvidia, xAI)
+- **35 models** — license field corrected from `"Unknown"` to verified license (Apache 2.0, Modified MIT, MIT, Llama 4 Community, Mistral Non-Production, Gemma, Nvidia Open Model, Proprietary)
+- **5 models** — `open` flag corrected (true/false flips: kimi-k2-6, glm-5-1, MiMo-V2 family, Llama 4 family, Nemotron)
+- **2 pricing updates** — `sonnet-4-6` filled ($3/$15/cache 0.30, Pro $20/mo); `kimi-k2-6` corrected ($0.60→$0.95 in, $2.75→$4.00 out, recency rule on apr-2026 source)
+- **`sonnet-4-6` rich profile** — Anthropic provider, released 2026-02-17, context 1M, 4 providers, sweV resolved 77.1 (tier-weighted avg of 79.6 NxCode/blog-S + 74.6 System Card 10-trial-S; both S, no I available)
+
+#### Added (bench scores under independent-source rule)
+- `o4-mini` — sweV 58.6 (Vellum-I, picked over OpenAI 68.1-S; RED Δ9.5pp scaffold mismatch), lcbV6 80.2 (LCB-I), gpqa 81.4
+- `grok-3-mini` — gpqa 79.1, lcbV6 69.6 (xAI conservative; alt 80.4 same-source flagged), aaIdx 32 (AA-I)
+- `llama-4-maverick` — lcbV6 43.4 (Meta-S), gpqa 69.8, aaIdx 18 (AA-I)
+- `llama-4-scout` — lcbV6 32.8, gpqa 57.2, aaIdx 14
+- `gemma-4-e2b` / `gemma-4-e4b` — lcbV6 44.0 / 52.0 (Gemma4.wiki tier C), aaIdx 15 each
+- `sonnet-4-6.aaIdx` 52, `kimi-k2-6.aaIdx` 54 (AA-I)
+- `qwen3-6-35b-moe.sweMulti` 67.2 (recovered from prior artifact)
+
+#### Updated (independent-source overrides — replacing prior self-reported values)
+- `opus-4-7.swePro` 64.3→**61.2** (Scale SEAL-I)
+- `opus-4-7.sweV` 87.6→**86.4** (Artificial Analysis-I)
+- `glm-5-1.swePro` 58.4→**54.9** (Arena.ai Elo composite-I)
+- `gpt-5-4.swePro` 57.7→**41.8** (Scale SEAL standardized scaffold-I) — RED Δ15.9pp resolved per user pick
+- `kimi-k2-6.aaIdx` and `sonnet-4-6.aaIdx` filled from AA leaderboard (was null)
+
+#### Added (Ollama + Unsloth metadata)
+- **16 models** with full `ollama` object (pullCmd, tags, pullCount, architecture, parameters, license, releasedISO, ollamaUrl): qwen-3-6-27b · qwen3-235b · qwen3-32b · qwen3-6-35b-moe · qwen3-coder-30b · qwen3-coder-next · devstral-small-2 · devstral-2 · qwen25-coder-7b/14b/32b · deepseek-coder-v2-16b · deepseek-r1-14b · deepseek-v4-flash · llama-4-scout · llama-4-maverick
+- **10 models** with `unslothVariants[]` (UD-IQ1_S/IQ2_XXS/IQ3_XXS/Q4_K_XL/Q5_K_M/Q8_0): qwen-3-6-27b (5 variants) · qwen3-235b · qwen3-32b · qwen3-6-35b-moe · devstral-small-2 · llama-4-scout · qwen3-coder-next · qwen25-coder-7b/14b/32b
+
+#### Added (i18n strengths/weaknesses)
+- TR + EN strengths/weaknesses populated for **39 models** (compound moat A — bilingual coverage). Stale alias keys cleaned: `gpt-5` → `gpt-5-4`, `deepseek-v4` → `deepseek-v4-pro`, `qwen-3-6-35b` → `qwen3-6-35b-moe`.
+
+#### Flagged (contradictions resolved)
+- **1 RED resolved** — `gpt-5-4.swePro` 57.7 [NxCode-S, custom scaffold] vs 41.8 [Scale SEAL-I, standardized] · Δ15.9pp · canonical 41.8 (independent-source rule + user pick)
+- **3 YELLOW resolved** — `sonnet-4-6.sweV` 79.6/74.6 both-S → avg 77.1 (no I available) · `glm-5-1.swePro` Δ3.5pp → 54.9 I-tier wins (was avg 57.0) · `kimi-k2-6.pricing.in` Δ0.35 → 0.95 (recency)
+- **2 RED surfaced from gap-fill** — `o4-mini.sweV` 68.1 OpenAI-S vs 58.6 Vellum-I (canonical 58.6) · `grok-3-mini.lcbV6` 69.6 vs 80.4 same-source xAI conflict (canonical 69.6 conservative)
+
+#### Gaps (documented, deferred to next refresh)
+- `llama-4-maverick`/`llama-4-scout` — no SWE-Verified or SWE-Pro on any Tier-I source (Meta does not self-report sweV; Scout not designed for agentic SWE)
+- `grok-3-mini` — no SWE-Verified or SWE-Pro (xAI does not submit to SEAL or BenchLM)
+- `gemma-4-e2b`/`gemma-4-e4b` — SWE absence is expected (edge models, no tool-use support); lcbV6 only on Tier-C source
+- `o4-mini.aaIdx` — model not on AA leaderboard with current slug
+- `gpt-5-5` — referenced in Codex blog rumor only, no official OpenAI announcement; not added; monitor May 2026
+
+#### Infrastructure (skill + agent definition fixes during this run)
+- `aicodermap-research-agent.md` — added `## OUTPUT_DELIVERY` section (BrainLedger pattern): JSON-only final assistant message, no narration, no file write. Two prior runs lost their JSON output by saying "writing the file now" instead of returning the JSON. Frontmatter unchanged (no Write tool).
+- `aicodermap/SKILL.md` Step 4 updated — explicit delivery contract reinforcement in agent prompt; Step 5 hardened to locate first `{` / last `}` if narration leaks.
+
+### Skill enrichment — 2026-04-25 (federated fetch + llmfit snapshot)
+- New `data/external/llmfit-hf-models.json` mirror — 148-model HuggingFace curated DB from `github.com/AlexsJones/llmfit`, used as canonical params/use_case/quant cross-reference (read before WebFetch, saves bandwidth).
+- agent.md `FETCH_STRATEGY` directive added — Tier-A primary parallel fetch (AA leaderboard + HF Open LLM + Scale SEAL + LiveCodeBench + BenchLM), Tier-B targeted fallbacks (Vellum, EvalPlus, BFCL, Terminal-Bench, llm-stats), Tier-C provider-specific. Single-message multi-WebFetch parallelism enforced.
+- 6 new sources added to leaderboard catalog: **Vellum LLM Leaderboard**, **HF Open LLM Leaderboard** (canonical for open-weight, direct anti-Aider-staleness), **EvalPlus** (HumanEval+/MBPP+), **LMMarketCap** (scrape only, hourly), **Artificial Analysis** flagged with public API access, **Scale SEAL** + **SWE-bench** linked to GitHub JSON releases.
+- llmfit CLI integration boundary documented — Rust binary runs on user's machine; browser tracker (GitHub Pages, no backend) cannot invoke directly. Snapshot reference today; live integration deferred to Phase 2.
+
+### Data refresh — 2026-04-25 (full sweep, pass 1+2 merged)
+- **51 models** populated across 5 tiers (11 frontier · 28 open-tier1 · 0 openrouter · 5 gemma · 5 ollama)
+- **49 source-attribution entries** added across 25 models
+- **6 contradictions** flagged: 1 RESOLVED_AVG (`sonnet-4-6.sweV` 79.6/74.6/80.2 → avg 78.1, 3 Anthropic scaffolds), 5 YELLOW (kimi-k2-6.hle, gemini-3-1-pro.sweV, deepseek-v3-2.sweV, glm-5-1.swePro)
+- **14 known gaps** preserved for next pass: tau2 broad gap (only opus-4-7), Llama 4 Meta-vs-Rootly triangulation pending, GLM-5.1 self-reported only, Qwen3.6-27B/35B Qwen-internal-scaffold, Codestral SWE-V missing, Qwen-Coder-Next pricing TBD, Grok 3 sparse data
+- Skill defaults expanded: MODEL_FAMILIES (38 explicit IDs), INFERENCE_PROVIDERS (1st-party + 14 aggregator + leaderboard catalog), AUXILIARY_BENCHMARKS (bfcl/humanEval/fim/aime26/mmmu), USE_CASE_TAXONOMY + EXTERNAL_REFERENCE_REGISTRIES (llmfit hf_models.json cross-reference, precise VRAM formulas)
+
+
+### Added (M1 Foundation)
+- `data/models.json` — schema + 5 seed entries (2 frontier + 1 OpenAI + 2 open-tier1/local)
+- `data/sources.json` — provenance for 10 Opus 4.7 bench scores; demo YELLOW contradiction on `swePro` (Δ 3.1pp)
+- `data/gpu-database.json` — NVIDIA RTX 50/40/30/20/16 + Apple M1-M4 + AMD RX 7000/6000 + Intel Arc + webgpuVendorMap
+- `i18n/tr.json` + `i18n/en.json` — nested key structure (ui/models/benchmarks/verdicts)
+
+### Added (M2 Core)
+- `index.html` — semantic HTML5, sticky nav, tooltip slot, OG meta, hreflang
+- `assets/app.css` — 3-breakpoint responsive (mobile <640 / tablet 641-1024 / desktop >1024), CSS variables, dark theme + light theme override, export-mode rules
+- `assets/app.js` — vanilla render core: schema validation, composite score, model card builder, no-innerHTML XSS defense
+
+### Added (M3 Integration)
+- Weights editor — 12 number inputs, 100% total constraint, 4 presets (balanced/swe-focused/agentic-focused/benchmark-only), reset, `acm.v1.weights` persist
+- i18n TR/EN runtime switch — `acm.v1.language` persist, `<html lang>` + page-wide `data-i18n-key` walk
+- Contradiction flag UI — 3pp YELLOW / 5pp RED, hover/focus tooltip with source breakdown (value, source URL, tier S/I/C, date)
+- PNG export — vendored `html2canvas@1.4.1` (SHA256 e87e5507…ab8cb), per-section + full-page buttons, export-mode CSS hides nav/actions
+- GPU VRAM detect — WebGPU `navigator.gpu` auto + manual GPU select (NVIDIA/Apple/AMD/Intel optgroups) + manual VRAM override + per-model compatibility badge (fits/offload/too-large) + Unsloth UD recommend + filter checkbox + `acm.v1.{gpu,vram}` persist
+- Filters — tier select, open-only checkbox, GPU-fit-only checkbox, all persisted via `acm.v1.filters`
 
 ---
 
@@ -23,4 +106,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - CLAUDE.md project instructions
 
 ### Status
-- Pre-implementation — Project Kickstart complete, M1 Foundation başlıyor
+- Pre-implementation — Project Kickstart complete, M1 Foundation starting
