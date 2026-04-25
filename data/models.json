@@ -442,7 +442,7 @@
       "aaIdx": 52
     },
     "providers": 4,
-    "uptime": null,
+    "uptime": 99.7,
     "ollamaSize": null,
     "unslothVariants": null,
     "vramRequirement": null,
@@ -503,7 +503,7 @@
       "api": {
         "in": 0.28,
         "out": 0.42,
-        "cacheHit": null
+        "cacheHit": 0.028
       }
     },
     "bench": {
@@ -543,7 +543,7 @@
       "api": {
         "in": 0.14,
         "out": 0.28,
-        "cacheHit": null
+        "cacheHit": 0.03
       }
     },
     "bench": {
@@ -563,7 +563,7 @@
     },
     "providers": 3,
     "uptime": null,
-    "ollamaSize": null,
+    "ollamaSize": "cloud-only (deepseek-v4-flash:cloud)",
     "unslothVariants": null,
     "vramRequirement": null,
     "strengthsKey": "deepseek-v4-flash.strengths",
@@ -600,7 +600,7 @@
       "api": {
         "in": 1.74,
         "out": 3.48,
-        "cacheHit": null
+        "cacheHit": 0.03
       }
     },
     "bench": {
@@ -660,9 +660,9 @@
     },
     "providers": 3,
     "uptime": null,
-    "ollamaSize": null,
+    "ollamaSize": "server-grade only (123B dense)",
     "unslothVariants": null,
-    "vramRequirement": null,
+    "vramRequirement": 130,
     "strengthsKey": "devstral-2.strengths",
     "weaknessesKey": "devstral-2.weaknesses",
     "lastUpdated": "2026-04-25",
@@ -850,9 +850,9 @@
     },
     "providers": 10,
     "uptime": null,
-    "ollamaSize": null,
+    "ollamaSize": "245 GB (server-grade)",
     "unslothVariants": null,
-    "vramRequirement": null,
+    "vramRequirement": 100,
     "strengthsKey": "llama-4-maverick.strengths",
     "weaknessesKey": "llama-4-maverick.weaknesses",
     "lastUpdated": "2026-04-25",
@@ -907,7 +907,7 @@
     },
     "providers": 8,
     "uptime": null,
-    "ollamaSize": null,
+    "ollamaSize": "67 GB",
     "unslothVariants": [
       {
         "name": "UD-IQ1_78bit",
@@ -915,7 +915,7 @@
         "vram": 26
       }
     ],
-    "vramRequirement": null,
+    "vramRequirement": 26,
     "strengthsKey": "llama-4-scout.strengths",
     "weaknessesKey": "llama-4-scout.weaknesses",
     "lastUpdated": "2026-04-25",
@@ -1262,7 +1262,7 @@
     },
     "providers": 2,
     "uptime": null,
-    "ollamaSize": null,
+    "ollamaSize": "18 GB (Q4_K_M, from qwen3.6 Ollama page)",
     "unslothVariants": [
       {
         "name": "UD-IQ2_XXS",
@@ -1290,7 +1290,7 @@
         "vram": 31
       }
     ],
-    "vramRequirement": null,
+    "vramRequirement": 20,
     "strengthsKey": "qwen-3-6-27b.strengths",
     "weaknessesKey": "qwen-3-6-27b.weaknesses",
     "lastUpdated": "2026-04-25",
@@ -1680,9 +1680,9 @@
     },
     "providers": 4,
     "uptime": null,
-    "ollamaSize": null,
+    "ollamaSize": "19 GB (Q4)",
     "unslothVariants": null,
-    "vramRequirement": null,
+    "vramRequirement": 21,
     "strengthsKey": "qwen3-coder-30b.strengths",
     "weaknessesKey": "qwen3-coder-30b.weaknesses",
     "lastUpdated": "2026-04-25",
@@ -1777,7 +1777,7 @@
     },
     "providers": 2,
     "uptime": null,
-    "ollamaSize": null,
+    "ollamaSize": "23 GB (IQ2 quant)",
     "unslothVariants": [
       {
         "name": "UD-IQ2_XXS",
@@ -1795,7 +1795,7 @@
         "vram": 40
       }
     ],
-    "vramRequirement": null,
+    "vramRequirement": 25,
     "strengthsKey": "qwen3-coder-next.strengths",
     "weaknessesKey": "qwen3-coder-next.weaknesses",
     "lastUpdated": "2026-04-25",
