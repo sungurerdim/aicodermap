@@ -153,13 +153,6 @@
       "url": "https://www.nxcode.io/resources/news/gpt-5-4-complete-guide-features-pricing-models-2026",
       "date": "2026-03-01",
       "tier": "I"
-    },
-    {
-      "value": 41.8,
-      "source": "Scale SEAL standardized scaffold (GPT-5 High)",
-      "url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
-      "date": "2026-04-25",
-      "tier": "I"
     }
   ],
   "gpt-5-4.gpqa": [
@@ -293,7 +286,7 @@
   ],
   "kimi-k2-6.hle": [
     {
-      "value": 54,
+      "value": 54.0,
       "source": "Moonshot AI self-report via MarkTechPost",
       "url": "https://www.marktechpost.com/2026/04/20/moonshot-ai-releases-kimi-k2-6",
       "date": "2026-04-20",
@@ -309,9 +302,36 @@
       "tier": "I"
     }
   ],
+  "deepseek-v4.sweV": [
+    {
+      "value": 80.6,
+      "source": "DeepSeek official / buildfastwithai",
+      "url": "https://www.buildfastwithai.com/blogs/deepseek-v4-pro-review-2026",
+      "date": "2026-04-24",
+      "tier": "S"
+    }
+  ],
+  "deepseek-v4.lcbV6": [
+    {
+      "value": 93.5,
+      "source": "DeepSeek official comparison table",
+      "url": "https://evolink.ai/deepseek-api",
+      "date": "2026-04-24",
+      "tier": "S"
+    }
+  ],
+  "deepseek-v4.hle": [
+    {
+      "value": 37.7,
+      "source": "DeepSeek comparison article",
+      "url": "https://www.buildfastwithai.com/blogs/deepseek-v4-pro-review-2026",
+      "date": "2026-04-24",
+      "tier": "S"
+    }
+  ],
   "deepseek-v4-flash.sweV": [
     {
-      "value": 79,
+      "value": 79.0,
       "source": "DeepSeek official via insiderllm",
       "url": "https://insiderllm.com/guides/deepseek-v4-flash-vs-pro-guide/",
       "date": "2026-04-23",
@@ -324,6 +344,33 @@
       "source": "DeepSeek official comparison table",
       "url": "https://evolink.ai/deepseek-api",
       "date": "2026-04-23",
+      "tier": "S"
+    }
+  ],
+  "qwen3-6-27b.sweV": [
+    {
+      "value": 77.2,
+      "source": "Qwen official HuggingFace/buildfastwithai",
+      "url": "https://www.buildfastwithai.com/blogs/qwen3-6-27b-review-2026",
+      "date": "2026-04-22",
+      "tier": "S"
+    }
+  ],
+  "qwen3-6-27b.swePro": [
+    {
+      "value": 53.5,
+      "source": "Qwen official comparison table",
+      "url": "https://www.buildfastwithai.com/blogs/qwen3-6-27b-review-2026",
+      "date": "2026-04-22",
+      "tier": "S"
+    }
+  ],
+  "qwen3-6-27b.tb2": [
+    {
+      "value": 59.3,
+      "source": "Qwen official",
+      "url": "https://www.buildfastwithai.com/blogs/qwen3-6-27b-review-2026",
+      "date": "2026-04-22",
       "tier": "S"
     }
   ],
@@ -361,25 +408,18 @@
   ],
   "devstral-small-2.sweV": [
     {
-      "value": 68,
+      "value": 68.0,
       "source": "Mistral AI official via VentureBeat",
       "url": "https://venturebeat.com/ai/mistral-launches-powerful-devstral-2-coding-model-including-open-source",
       "date": "2025-12-15",
       "tier": "S"
     },
     {
-      "value": 68,
+      "value": 68.0,
       "source": "aimadetools best ollama models 2026",
       "url": "https://www.aimadetools.com/blog/best-ollama-models-coding-2026/",
       "date": "2026-01-15",
       "tier": "C"
-    },
-    {
-      "value": 68,
-      "source": "Mistral announcement + VentureBeat",
-      "url": "https://mistral.ai/news/devstral-2-vibe-cli",
-      "date": "2025-12-09",
-      "tier": "S"
     }
   ],
   "devstral-2.sweV": [
@@ -419,18 +459,11 @@
       "url": "https://www.buildfastwithai.com/blogs/qwen3-6-35b-a3b-review",
       "date": "2026-04-16",
       "tier": "S"
-    },
-    {
-      "value": 73.4,
-      "source": "Qwen HuggingFace model card",
-      "url": "https://huggingface.co/Qwen/Qwen3.6-35B-A3B",
-      "date": "2026-04-16",
-      "tier": "S"
     }
   ],
   "qwen3-coder-next.sweV": [
     {
-      "value": 70,
+      "value": 70.0,
       "source": "Qwen official blog",
       "url": "https://qwen.ai/blog?id=qwen3-coder-next",
       "date": "2026-03-01",
@@ -443,13 +476,6 @@
       "source": "Qwen official technical report (LCB v5 proxy)",
       "url": "https://qwenlm.github.io/blog/qwen3/",
       "date": "2025-04-28",
-      "tier": "S"
-    },
-    {
-      "value": 74.8,
-      "source": "Qwen3 technical report",
-      "url": "https://arxiv.org/pdf/2505.09388",
-      "date": "2025-05-15",
       "tier": "S"
     }
   ],
@@ -521,14 +547,14 @@
   ],
   "mimo-v2-pro.sweV": [
     {
-      "value": 78,
+      "value": 78.0,
       "source": "Artificial Analysis Intelligence Index context",
       "url": "https://artificialanalysis.ai",
       "date": "2026-04-25",
       "tier": "I"
     },
     {
-      "value": 78,
+      "value": 78.0,
       "source": "Xiaomi official MiMo page",
       "url": "https://mimo.xiaomi.com/mimo-v2-pro",
       "date": "2026-04-25",
@@ -565,13 +591,6 @@
       "url": "https://benchlm.ai/models/deepseek-v4-pro",
       "date": "2026-04-25",
       "tier": "I"
-    },
-    {
-      "value": 80.6,
-      "source": "DeepSeek official / buildfastwithai",
-      "url": "https://www.buildfastwithai.com/blogs/deepseek-v4-pro-review-2026",
-      "date": "2026-04-24",
-      "tier": "S"
     }
   ],
   "nemotron-3-super.sweV": [
@@ -590,364 +609,36 @@
       "tier": "C"
     }
   ],
+  "qwen-3-6-35b.sweV": [
+    {
+      "value": 73.4,
+      "source": "Qwen HuggingFace model card",
+      "url": "https://huggingface.co/Qwen/Qwen3.6-35B-A3B",
+      "date": "2026-04-16",
+      "tier": "S"
+    },
+    {
+      "value": 73.4,
+      "source": "BuildFastWithAI independent review",
+      "url": "https://www.buildfastwithai.com/blogs/qwen3-6-35b-a3b-review",
+      "date": "2026-04-20",
+      "tier": "C"
+    }
+  ],
   "gemma-4-31b.lcbV6": [
     {
-      "value": 80,
+      "value": 80.0,
       "source": "Google DeepMind Gemma 4 blog",
       "url": "https://blog.google/innovation-and-ai/technology/developers-tools/gemma-4/",
       "date": "2026-04-02",
       "tier": "S"
     },
     {
-      "value": 80,
+      "value": 80.0,
       "source": "LiveCodeBench leaderboard reference (llm-stats.com)",
       "url": "https://llm-stats.com/benchmarks/livecodebench-v6",
       "date": "2026-04-25",
       "tier": "I"
-    }
-  ],
-  "sonnet-4-6.pricing": [
-    {
-      "value": {
-        "in": 3,
-        "out": 15,
-        "cacheHit": 0.3
-      },
-      "source": "Anthropic official pricing page",
-      "url": "https://www.anthropic.com/news/claude-sonnet-4-6",
-      "date": "2026-02-17",
-      "tier": "S"
-    },
-    {
-      "value": {
-        "in": 3,
-        "out": 15
-      },
-      "source": "pricepertoken.com / evolink.ai",
-      "url": "https://pricepertoken.com/pricing-page/model/anthropic-claude-sonnet-4.6",
-      "date": "2026-04-25",
-      "tier": "I"
-    }
-  ],
-  "sonnet-4-6.context": [
-    {
-      "value": 1000000,
-      "source": "Anthropic 1M context GA",
-      "url": "https://signals.aktagon.com/articles/2026/03/claude-opus-4.6-and-sonnet-4.6-now-feature-1m-context-window-at-standard-pricing/",
-      "date": "2026-03-01",
-      "tier": "S"
-    }
-  ],
-  "sonnet-4-6.released": [
-    {
-      "value": "2026-02-17",
-      "source": "Anthropic official announcement",
-      "url": "https://www.anthropic.com/news/claude-sonnet-4-6",
-      "date": "2026-02-17",
-      "tier": "S"
-    }
-  ],
-  "kimi-k2-6.pricing": [
-    {
-      "value": {
-        "in": 0.95,
-        "out": 4
-      },
-      "source": "Apr 2026 roundup",
-      "url": "https://akitaonrails.com/en/2026/04/24/llm-benchmarks-parte-3-deepseek-kimi-mimo/",
-      "date": "2026-04-24",
-      "tier": "C"
-    }
-  ],
-  "gpt-5-4.swePro.seal": [
-    {
-      "value": 41.8,
-      "source": "Scale SEAL standardized",
-      "url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
-      "date": "2026-04-25",
-      "tier": "I"
-    }
-  ],
-  "deepseek-v4-pro.lcbV6": [
-    {
-      "value": 93.5,
-      "source": "DeepSeek official / evolink.ai",
-      "url": "https://evolink.ai/deepseek-api",
-      "date": "2026-04-24",
-      "tier": "S"
-    }
-  ],
-  "qwen-3-6-27b.sweV": [
-    {
-      "value": 77.2,
-      "source": "Qwen official / buildfastwithai",
-      "url": "https://www.buildfastwithai.com/blogs/qwen3-6-27b-review-2026",
-      "date": "2026-04-22",
-      "tier": "S"
-    }
-  ],
-  "qwen-3-6-27b.swePro": [
-    {
-      "value": 53.5,
-      "source": "Qwen official / buildfastwithai",
-      "url": "https://www.buildfastwithai.com/blogs/qwen3-6-27b-review-2026",
-      "date": "2026-04-22",
-      "tier": "S"
-    }
-  ],
-  "o4-mini.sweV": [
-    {
-      "value": 68.1,
-      "source": "DataCamp / OpenAI",
-      "url": "https://www.datacamp.com/blog/o4-mini",
-      "date": "2025-04-17",
-      "tier": "S"
-    },
-    {
-      "value": 58.6,
-      "source": "Vellum LLM Leaderboard",
-      "url": "https://www.vellum.ai/llm-leaderboard",
-      "date": "2026-04-25",
-      "tier": "I"
-    }
-  ],
-  "o4-mini.lcbV6": [
-    {
-      "value": 80.2,
-      "source": "LiveCodeBench leaderboard",
-      "url": "https://livecodebench.github.io/leaderboard.html",
-      "date": "2026-04-25",
-      "tier": "I"
-    }
-  ],
-  "o4-mini.gpqa": [
-    {
-      "value": 81.4,
-      "source": "DataCamp / OpenAI",
-      "url": "https://www.datacamp.com/blog/o4-mini",
-      "date": "2025-04-17",
-      "tier": "S"
-    }
-  ],
-  "grok-3-mini.gpqa": [
-    {
-      "value": 79.1,
-      "source": "xAI / designforonline.com",
-      "url": "https://designforonline.com/ai-models/xai-grok-3-mini/",
-      "date": "2026-04-25",
-      "tier": "S"
-    }
-  ],
-  "grok-3-mini.lcbV6": [
-    {
-      "value": 69.6,
-      "source": "xAI self-report (conservative; 80.4 alternate)",
-      "url": "https://x.ai/news/grok-3",
-      "date": "2025-02-19",
-      "tier": "S"
-    },
-    {
-      "value": 80.4,
-      "source": "xAI blog reasoning-high",
-      "url": "https://x.ai/news/grok-3",
-      "date": "2026-04-25",
-      "tier": "S"
-    }
-  ],
-  "grok-3-mini.aaIdx": [
-    {
-      "value": 32,
-      "source": "Artificial Analysis",
-      "url": "https://artificialanalysis.ai/models/grok-3-mini-reasoning",
-      "date": "2026-04-25",
-      "tier": "I"
-    }
-  ],
-  "llama-4-maverick.lcbV6": [
-    {
-      "value": 43.4,
-      "source": "Meta Llama 4 official",
-      "url": "https://www.llama.com/models/llama-4/",
-      "date": "2025-04-05",
-      "tier": "S"
-    }
-  ],
-  "llama-4-maverick.gpqa": [
-    {
-      "value": 69.8,
-      "source": "Meta Llama 4 official",
-      "url": "https://www.llama.com/models/llama-4/",
-      "date": "2025-04-05",
-      "tier": "S"
-    }
-  ],
-  "llama-4-maverick.aaIdx": [
-    {
-      "value": 18,
-      "source": "Artificial Analysis",
-      "url": "https://artificialanalysis.ai/leaderboards/models",
-      "date": "2026-04-25",
-      "tier": "I"
-    }
-  ],
-  "llama-4-scout.lcbV6": [
-    {
-      "value": 32.8,
-      "source": "Meta Llama 4 official",
-      "url": "https://www.llama.com/models/llama-4/",
-      "date": "2025-04-05",
-      "tier": "S"
-    }
-  ],
-  "llama-4-scout.gpqa": [
-    {
-      "value": 57.2,
-      "source": "Meta Llama 4 official",
-      "url": "https://www.llama.com/models/llama-4/",
-      "date": "2025-04-05",
-      "tier": "S"
-    }
-  ],
-  "llama-4-scout.aaIdx": [
-    {
-      "value": 14,
-      "source": "Artificial Analysis",
-      "url": "https://artificialanalysis.ai/leaderboards/models",
-      "date": "2026-04-25",
-      "tier": "I"
-    }
-  ],
-  "gemma-4-e2b.lcbV6": [
-    {
-      "value": 44,
-      "source": "Gemma4.wiki (third-party)",
-      "url": "https://www.gemma4.wiki/benchmark/gemma-4-benchmark-results",
-      "date": "2026-04-25",
-      "tier": "C"
-    }
-  ],
-  "gemma-4-e2b.aaIdx": [
-    {
-      "value": 15,
-      "source": "Artificial Analysis",
-      "url": "https://artificialanalysis.ai/leaderboards/models",
-      "date": "2026-04-25",
-      "tier": "I"
-    }
-  ],
-  "gemma-4-e4b.lcbV6": [
-    {
-      "value": 52,
-      "source": "Gemma4.wiki (third-party)",
-      "url": "https://www.gemma4.wiki/benchmark/gemma-4-benchmark-results",
-      "date": "2026-04-25",
-      "tier": "C"
-    }
-  ],
-  "gemma-4-e4b.aaIdx": [
-    {
-      "value": 15,
-      "source": "Artificial Analysis",
-      "url": "https://artificialanalysis.ai/leaderboards/models",
-      "date": "2026-04-25",
-      "tier": "I"
-    }
-  ],
-  "kimi-k2-6.pricing.in": [
-    {
-      "value": 0.6,
-      "source": "Prior artifact",
-      "url": "internal",
-      "date": "2026-04-25",
-      "tier": "C"
-    },
-    {
-      "value": 0.95,
-      "source": "Apr 2026 roundup",
-      "url": "https://webiano.digital/no-gpt-5-5-is-not-official-yet-and-kimi-k2-6-is-already-pressuring-openai/",
-      "date": "2026-04-25",
-      "tier": "C"
-    }
-  ],
-  "deepseek-v4-pro.hle": [
-    {
-      "value": 37.7,
-      "source": "DeepSeek comparison article",
-      "url": "https://www.buildfastwithai.com/blogs/deepseek-v4-pro-review-2026",
-      "date": "2026-04-24",
-      "tier": "S"
-    }
-  ],
-  "qwen-3-6-27b.tb2": [
-    {
-      "value": 59.3,
-      "source": "Qwen official",
-      "url": "https://www.buildfastwithai.com/blogs/qwen3-6-27b-review-2026",
-      "date": "2026-04-22",
-      "tier": "S"
-    }
-  ],
-  "gpt-4-1.sweV": [
-    {
-      "value": 54.6,
-      "source": "OpenAI announcement",
-      "url": "https://openai.com/index/gpt-4-1/",
-      "date": "2025-04-14",
-      "tier": "S"
-    }
-  ],
-  "grok-3.gpqa": [
-    {
-      "value": 84.6,
-      "source": "xAI Grok 3 announcement",
-      "url": "https://x.ai/news/grok-3",
-      "date": "2025-02-18",
-      "tier": "S"
-    }
-  ],
-  "grok-3.lcbV6": [
-    {
-      "value": 79.4,
-      "source": "xAI Grok 3 announcement (Think mode)",
-      "url": "https://x.ai/news/grok-3",
-      "date": "2025-02-18",
-      "tier": "S"
-    }
-  ],
-  "mistral-large-3.lcbV6": [
-    {
-      "value": 82.8,
-      "source": "Artificial Analysis",
-      "url": "https://artificialanalysis.ai/models/mistral-large-3",
-      "date": "2026-04-25",
-      "tier": "I"
-    }
-  ],
-  "mistral-large-3.gpqa": [
-    {
-      "value": 43.9,
-      "source": "Artificial Analysis / BenchLM",
-      "url": "https://benchlm.ai/blog/posts/best-open-source-llm",
-      "date": "2026-04-25",
-      "tier": "I"
-    }
-  ],
-  "qwen3-235b.gpqa": [
-    {
-      "value": 81.1,
-      "source": "Qwen3 technical report",
-      "url": "https://arxiv.org/pdf/2505.09388",
-      "date": "2025-05-15",
-      "tier": "S"
-    }
-  ],
-  "qwen25-coder-7b.aider": [
-    {
-      "value": 88.4,
-      "source": "Qwen2.5-Coder report / Ollama library",
-      "url": "https://ollama.com/library/qwen2.5-coder:7b",
-      "date": "2025-01-01",
-      "tier": "S"
     }
   ]
 }

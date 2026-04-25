@@ -69,10 +69,7 @@
       "vram": "VRAM",
       "lastUpdated": "UPDATED",
       "strengths": "STRENGTHS",
-      "weaknesses": "WEAKNESSES",
-      "cacheHit": "Cache hit",
-      "providers": "Providers",
-      "ollamaSize": "Ollama size"
+      "weaknesses": "WEAKNESSES"
     },
     "footer": {
       "about": "About",
@@ -110,16 +107,7 @@
       "i18nFallback": "Language file failed to load, falling back to Turkish.",
       "exportFailed": "PNG export failed. Refresh and retry.",
       "webgpuUnsupported": "Your browser does not support WebGPU. Select GPU manually."
-    },
-    "ollama": {
-      "title": "Local (Ollama)",
-      "copy": "Copy command",
-      "viewOn": "View on Ollama"
-    },
-    "openShort": "OPEN",
-    "closedShort": "CLOSED",
-    "openWeights": "Open weights",
-    "closedWeights": "Closed weights"
+    }
   },
   "models": {
     "opus-4-7": {
@@ -127,12 +115,20 @@
       "weaknesses": "Premium price ($5/$25 per MTok), aaIdx (57) matches GPT-5.4 at 5x the cost"
     },
     "sonnet-4-6": {
-      "strengths": "Office productivity leader (1633 Elo), 98% of Opus 4.7 performance at 20% of the cost, major ARC-AGI-2 leap (58.3%), 1M context, context compaction",
-      "weaknesses": "Trails Opus 4.7 on deep scientific reasoning (GPQA: 74.1% vs 94.2%), SWE-bench Pro score not published"
+      "strengths": "Cost/performance balance; large context; Claude Code compatible.",
+      "weaknesses": "Below Opus on frontier benchmarks; data pending verification."
+    },
+    "gpt-5": {
+      "strengths": "Broad ecosystem integration; mature OpenAI tooling.",
+      "weaknesses": "Coding-specific benchmark data not yet cross-verified."
     },
     "qwen-3-6-27b": {
       "strengths": "27B dense model in same family as 35B MoE variant. 262K context. Good local alternative to 35B A3B. Strong coding and general reasoning.",
       "weaknesses": "Insufficient independent benchmark data. 35B A3B MoE variant generally preferred for same use case. Pricing not disclosed."
+    },
+    "deepseek-v4": {
+      "strengths": "MIT license; low-cost API; fast iteration in agentic use.",
+      "weaknesses": "Recently released; cross-source verification still ongoing."
     },
     "kimi-k2-6": {
       "strengths": "SWE-Pro 58.6 highest among open-weight models. HLE-Full with Tools 54.0 surpasses GPT-5.4 and Claude. 300 concurrent sub-agents, 4000-step coordinated agent swarm. LiveCodeBench v6 89.6% leading.",
@@ -159,12 +155,12 @@
       "weaknesses": "GPQA Diamond 86.2% lags frontier (Claude 94.3%). No SWE-Bench Verified independent AA score. 744B total / 40B active — local deployment practically impossible."
     },
     "llama-4-scout": {
-      "strengths": "10M token context (largest open-weight Apr 2026); MoE 17B/109B; lcbV6=32.8; open weights; GPQA 57.2%",
-      "weaknesses": "Reliable context ~5-6.5M per NVIDIA RULER; no SWE-bench score; aaIdx=14 low; below Maverick across all benchmarks"
+      "strengths": "10M token context window — industry record. 17B active / 16-expert MoE runs on single H100. $0.19/1M (blended) affordable. Multimodal.",
+      "weaknesses": "SWE-Bench coding performance disappointed in independent tests (Rootly). EU users restricted. Gemma 4 31B now scores better on many tasks. Benchmark controversy unresolved."
     },
     "llama-4-maverick": {
-      "strengths": "MoE architecture (17B active / 400B total); 1M token context; lcbV6=43.4 outperforms GPT-4o (32.3); GPQA 69.8%; open weights",
-      "weaknesses": "No SWE-bench Verified score on Tier-I sources; experimental chat version vs public release controversy; aaIdx=18 below frontier median"
+      "strengths": "400B total / 17B active 128-expert MoE. 1400+ LMArena score. Multimodal and multilingual performance beating GPT-4o and Gemini 2.0. Affordable cost.",
+      "weaknesses": "Independent coding benchmark results below expectations. EU restriction. Controversy over experimental version submission to LMArena hurt credibility. Companies with 700M+ MAU need special license."
     },
     "qwen3-coder-next": {
       "strengths": "80B total / 3B active hybrid attention+MoE architecture. Runs locally on single RTX 5090. 256K context, 370+ languages. SWE-Verified 58.7% beats models with 10-20x more active params.",
@@ -219,12 +215,12 @@
       "weaknesses": "SWE-Verified 60.5% superseded by April 2026 by DeepSeek V4-Pro (80.6%) and Kimi K2.6 (80.2%). Significant 45.8% drop on non-English coding. Full BF16 weights require 3-4x H100."
     },
     "gemma-4-e2b": {
-      "strengths": "2.3B effective params (5.1B total via PLE); native multimodal (text/image/audio); offline-capable; 48 tok/s on mobile; Apache 2.0",
-      "weaknesses": "Edge model — not benchmarked on SWE-bench/agentic; lcbV6=44.0 single C-tier source; aaIdx=15 low; vLLM FlashAttention fallback slowdown"
+      "strengths": "2.3B effective params, runs on phones and edge devices (~1.5GB 4-bit). Native audio input (30s ASR). Apache 2.0 license. 128K context. Multilingual (140+ lang) and multimodal.",
+      "weaknesses": "Coding benchmark data not separately reported. Limited practical coding use as E4B or larger preferred. Pricing not yet confirmed."
     },
     "gemma-4-e4b": {
-      "strengths": "4.5B effective; native multimodal with audio ASR; M-series Mac 40+ tok/s; T4-GPU deployable; Apache 2.0; lcbV6=52.0 strong for size",
-      "weaknesses": "Edge model — not benchmarked on SWE-bench; lcbV6=52.0 single C-tier source; aaIdx=15 shared with E2B; ~9 tok/s on RTX 4090 via vLLM"
+      "strengths": "4.5B effective params, runs on 8GB RAM laptops (~5GB 4-bit). Full multimodal with audio input. Apache 2.0. Native function calling and structured JSON output.",
+      "weaknesses": "Coding benchmark score not separately published. 128K context window half of 26B/31B variants' 256K. Pricing unclear."
     },
     "gemma-4-26b-moe": {
       "strengths": "26B total / 3.8B active MoE, runs on RTX 4090 with 24GB (Q4). Arena AI global #6. AIME 2026 88.3% impressive for efficiency. Delivers 97% of 31B Dense quality at 1/8 compute.",
@@ -261,62 +257,6 @@
     "qwen-3-6-max": {
       "strengths": "AA Intelligence Index 52 strong ranking. #1 on 6 benchmarks: SWE-Pro, Terminal-Bench 2.0, SkillsBench, QwenClawBench, QwenWebBench, SciCode. preserve_thinking for agentic workflows.",
       "weaknesses": "Closed-weight (first time in Qwen history). SWE-Bench Verified independent score not published. Pricing not finalized during preview. Text-only — no image/audio."
-    },
-    "gpt-5-4": {
-      "strengths": "Foundation of GPT-5.4 series, wide context (1M token), accessible pricing, ChatGPT Plus access",
-      "weaknesses": "Superseded by GPT-5.4 and o3 in OpenAI's lineup, limited independent benchmark data available"
-    },
-    "qwen3-6-35b-moe": {
-      "strengths": "35B total / 3B active MoE, Apache 2.0. SWE-Verified 73.4% exceptional among open-weights. Runs on 24GB Apple Silicon Mac with Unsloth 4-bit. GPQA Diamond 86.0 strong multi-discipline performance.",
-      "weaknesses": "API pricing not yet disclosed. No SWE-Pro independent measurement. Full F16 model ~72GB (beyond consumer hardware)."
-    },
-    "o4-mini": {
-      "strengths": "Top-tier reasoning at 10x lower cost than o3; SWE-bench Verified 58.6% (Vellum independent) / 68.1% (OpenAI scaffold); GPQA Diamond 81.4%; LiveCodeBench 80.2%; Codeforces ELO 2719",
-      "weaknesses": "SWE-bench score varies by scaffold (OpenAI 68.1 vs Vellum 58.6 — RED, conservative 58.6 chosen); no aaIdx entry on Artificial Analysis; closed-weight, no local deployment"
-    },
-    "grok-3-mini": {
-      "strengths": "aaIdx=32 (well above price-tier median); GPQA Diamond 79.1%; LiveCodeBench 69.6% (conservative baseline); 183 tok/s; $0.30/$0.50 per 1M — strong cost-efficiency",
-      "weaknesses": "No SWE-bench Verified score on any Tier-I source; lcbV6 single-source xAI (RED — 69.6 vs 80.4 same-source conflict); xAI does not submit to SWE-bench / SEAL"
-    },
-    "gemini-3-1-flash": {
-      "strengths": "1M token context, $0.15-$0.30/M input — 4x cheaper than Pro. GPQA 86.9% strong science reasoning. Fastest Google model for high-volume production; free tier on AI Studio.",
-      "weaknesses": "No SWE-bench Verified or LiveCodeBench independent score found. Proprietary, closed-weight. Trails Pro by ~5pp on most reasoning benchmarks."
-    },
-    "gemini-3-1-pro": {
-      "strengths": "1M context, SWE-V 80.6% matches DeepSeek V4-Pro, GPQA 94.3% world-class, LCB 88.49%, SWE-Pro 46.1%, MCP-Atlas 73.9%. $2/$12 per 1M — best Google value at frontier.",
-      "weaknesses": "HLE 44.4% lags Claude Opus 4.7 (46.9%) and MiMo-V2.5-Pro (48.0%). No aaAgentic, tb2, tau2 independent scores. Proprietary closed-weight, no local deployment."
-    },
-    "gpt-4-1": {
-      "strengths": "SWE-V 54.6% strong for its tier, 1M context, $2/$8 per 1M with $0.50 cache hits. Multimodal (video+text). 83% cost reduction vs GPT-4o. ChatGPT Plus accessible.",
-      "weaknesses": "No GPQA, LCB, or SWE-Pro independent scores found. Superseded by o3 and o4-mini on reasoning tasks. Proprietary, closed-weight. Video-MME 72% is baseline not SOTA."
-    },
-    "grok-3": {
-      "strengths": "GPQA 84.6% strong science reasoning, LCB 79.4% coding, 1M token context (8x prior), AIME 2025 93.3%. Chatbot Arena Elo ~1402 at launch. $3/$15 per 1M.",
-      "weaknesses": "No SWE-bench Verified or SWE-Pro score on any Tier-I source. Benchmark controversy: multi-attempt averages inflate scores vs single-attempt peers. xAI does not submit to SEAL."
-    },
-    "mistral-large-3": {
-      "strengths": "675B total / 41B active MoE, LCB 82.8% strong coding, HumanEval 92.0%, AIME 2025 88.0%, MATH-500 93.6%. Self-hostable open-weight. $0.50/$1.50 affordable pricing.",
-      "weaknesses": "GPQA 43.9% significantly below peer open-weight models (DeepSeek 77%+, Kimi 80%+). No SWE-bench Verified independent score. Trails frontier on agentic and scientific reasoning."
-    },
-    "o3": {
-      "strengths": "SWE-V 71.7%, GPQA 87.7%, AIME 96.7%, Codeforces Elo 2727, ARC-AGI 87.5%. $2/$8 per 1M after 80% price cut March 2026. Best-in-class reasoning track model from OpenAI.",
-      "weaknesses": "Reasoning tokens billed as output (hidden cost: 500 visible tokens may consume 2000+ billed). ARC-AGI-2 only 2.9%. No SWE-Pro Tier-I score. Closed-weight, no local deployment."
-    },
-    "qwen3-235b": {
-      "strengths": "235B total / 22B active MoE, Apache 2.0. LCB 74.8%, GPQA 81.1%, AIME 2025 92.3%, AIME 2024 85.7%. Rivals Gemini 2.5 Pro. $0.20/$1.00 per 1M — 70% below GPT-5 price.",
-      "weaknesses": "LCB 74.8% trails newer frontier models (Gemini 3.1 Pro 88.5%, DeepSeek V4-Pro 93.5%). No SWE-bench Verified independent score. Local deployment requires multiple H100 nodes."
-    },
-    "qwen3-32b": {
-      "strengths": "32B dense, Apache 2.0. $0.15/$0.75 per 1M — cheapest frontier-grade dense model. 119 languages, strong multilingual coding. Fits single A100 or high-end consumer GPU at Q4.",
-      "weaknesses": "SWE-bench Pro only 3.4% (trails even GPT-4o 4.9%). No GPQA or LCB independent Tier-I score found. Smaller than 235B MoE sibling — lower ceiling on complex reasoning tasks."
-    },
-    "qwen3-6-plus": {
-      "strengths": "Rebuilt reasoning layer uses always-on chain-of-thought. 515 fewer reasoning tokens vs Qwen 3.5 Plus while producing more output. Improved consistency and production reliability over predecessor.",
-      "weaknesses": "No independent GPQA, SWE-bench, or LiveCodeBench scores found. Weaker than 3.5 Plus on multimodal audio/video tasks. Pricing not officially disclosed on major provider APIs."
-    },
-    "devstral-small-2": {
-      "strengths": "24B params, SWE-V 68.0% — strongest open-weight at size class. 256K context, Apache 2.0, multimodal image input. Runs on RTX 4090 (24GB) or 32GB Mac. 75 tok/s, TTFT 1.18s. $0.10/$0.30.",
-      "weaknesses": "4.2pp behind Devstral 2 (123B). No SWE-Pro or LCB independent score. Limited provider availability vs larger Devstral 2. Image output not supported."
     }
   },
   "benchmarks": {

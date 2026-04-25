@@ -8,6 +8,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Data refresh — 2026-04-25 (gap-fill pass for 11 underrepresented models)
+
+Targeted agent run filled the 10 confirmed-missing i18n entries plus partial bench/pricing/context data. Applied via the new schema-complete merge pipeline (MERGE_RULES); .bak → .bak2 rotation produced two backup layers; self-check verified no expected i18n entry was dropped.
+
+#### i18n added (TR + EN strengths/weaknesses)
+gemini-3-1-flash · gemini-3-1-pro · gpt-4-1 · grok-3 · mistral-large-3 · o3 · qwen3-235b · qwen3-32b · qwen3-6-plus · devstral-small-2 — 10 models. i18n coverage is now 49/50; `codestral` (the bare ID, not `codestral-22b`) does not exist in `data/models.json` and the bare-ID alias is documented in gaps.
+
+#### New bench scores (independent-source rule applied)
+- `mistral-large-3.lcbV6` 82.8 (Artificial Analysis, I-tier — canonical)
+- `mistral-large-3.gpqa` 43.9 (BenchLM, I-tier — canonical)
+- `o3.sweV` 71.7 (OpenAI, S-tier — already in sources)
+- `o3.gpqa` 87.7 (S-tier, single-source flagged in gaps for I-tier follow-up)
+- `qwen3-235b.lcbV6` 74.8 / `gpqa` 81.1 (Qwen technical report, S-tier)
+- `gemini-3-1-pro` bench backfill (swePro/sweV/lcbV6/gpqa/hle/mcpA/aaIdx all confirmed)
+- `gpt-4-1.sweV` 54.6 (OpenAI, S-tier)
+- `grok-3.gpqa` 84.6 / `lcbV6` 79.4 / `context` 1M (xAI, S-tier; lcbV6 conservative — 80.4 alt mode flagged)
+- `devstral-small-2.sweV` 68.0 + full schema fill (pricing/context/released/license/open)
+- `mimo-v2-5.pricing/context` filled
+- `qwen25-coder-7b.aider` 88.4
+- `deepseek-coder-v2-16b.context` 128000
+- `o3.pricing` $2/$8 with cacheHit $0.50, Plus $20/mo subscription
+
+#### Provenance
+9 new keys in `data/sources.json` covering the I-tier and S-tier values above. All conflicting figures preserved as separate entries for the contradiction tooltip.
+
+#### Documented gaps (28 entries, in `gaps[]`)
+SWE-bench Verified absence for grok-3, mistral-large-3, qwen3-235b, qwen3-32b, qwen3-6-plus (Qwen3 family + xAI do not submit to SEAL). Gemini-3-1-flash has no LCB v6 / aaIdx under current ID slug. Most cacheHit values for new models not officially disclosed. These remain `gaps[]` entries until next refresh.
+
 ### Docs + UI polish — 2026-04-25 (English-only repo, Ollama UI render)
 
 #### Repo English-only (memory rule: docs in English; Turkish lives only in `i18n/tr.json`)
