@@ -1,264 +1,166 @@
 ---
-description: "AICoderMap update orchestrator — research agent → cross-source validation → contradiction flagging → diff preview → JSON write → git commit → GitHub Pages deploy. Manuel update workflow, no API cost."
-argument-hint: "[refresh-all | model <id> | new-release | validate | stale-check | changelog]"
+description: "AICoderMap update orchestrator. Project-scoped. Manuel trigger, zero API cost."
+argument-hint: "[refresh-all|model <id>|new-release|validate|stale-check|changelog]"
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Agent, TaskCreate, TaskUpdate
 ---
 
 # aicodermap
 
-Manuel update orchestrator for **AICoderMap** living document. Tek komutla research agent'ı tetikler, validation gate'ler uygular, kullanıcı onayıyla `data/*.json` dosyalarını günceller, GitHub'a push eder.
+## ROLE
+Orchestrate AI coding LLM tracker updates: invoke `aicodermap-research-agent` → validate (≥2 source/score, contradiction detect) → diff preview → user approve → atomic write `data/*.json` + `i18n/*.json` + `CHANGELOG.md` → prompt git commit → verify GitHub Pages deploy.
 
-**Project root:** `D:\GitHub\aicodermap\`
-**Agent:** `.claude/agents/aicodermap-research-agent.md` (project-scoped, terzi-dikim)
-**Veri:** `data/models.json`, `data/sources.json`, `data/gpu-database.json`
-**i18n:** `i18n/tr.json`, `i18n/en.json`
-**Live:** https://sungurerdim.github.io/aicodermap/
+## CONTEXT
+- Project root: `D:\GitHub\aicodermap\`
+- Agent: `.claude/agents/aicodermap-research-agent.md`
+- Data files: `data/{models,sources,gpu-database}.json`
+- i18n: `i18n/{tr,en}.json`
+- Live URL: `https://sungurerdim.github.io/aicodermap/`
 
----
+## ARGS
+| arg | scope | model | typical_duration |
+|-----|-------|-------|------------------|
+| (none) | interactive prompt | — | — |
+| `refresh-all` | full | sonnet | 3-5min |
+| `model <id>` | specific | sonnet | 1-2min |
+| `new-release` | new-release | sonnet | 2-3min |
+| `validate` | (no fetch) | — | <10s |
+| `stale-check` | (no fetch) | — | <5s |
+| `changelog` | (no fetch) | — | <5s |
 
-## Komutlar (concrete)
-
-| Argüman | Aksiyon |
-|---------|---------|
-| (boş) | Interactive: scope sorulur (refresh-all / model <id> / new-release) |
-| `refresh-all` | Tüm modeller için agent delegation, full data refresh |
-| `model <id>` | Spesifik model deep refresh (örn `model opus-4-7`) |
-| `new-release` | Yeni model detection (provider blogs + r/LocalLLaMA + HN son 14 gün) |
-| `validate` | Sadece mevcut data/sources.json üzerinde coverage check (no fetch) |
-| `stale-check` | 14 gün+ eski model entry'leri listele (M5 disiplini) |
-| `changelog` | Son 5 release entry preview |
-
-### Concrete invocation örnekleri
-
+## WORKFLOW
 ```
-/aicodermap                          # Interactive menu
-/aicodermap refresh-all              # Full refresh
-/aicodermap model deepseek-v4-flash  # Tek model deep update
-/aicodermap new-release              # Son 14 gün yeni model var mı?
-/aicodermap stale-check              # Hangi modeller bayatladı?
-```
-
----
-
-## Workflow (14 adım)
-
-```
-1. Read project root data/ + idea state
-2. Argüman parse → scope belirle
-3. Idea context oluştur (model count, lastUpdated dates, benchmark defs)
-4. Agent delegation:
-   Agent({
+1. Read data/models.json + data/sources.json
+2. Parse arg → resolve scope + target_model_ids
+3. Build idea_context: {title:"AICoderMap", total_models:<n>, last_refresh:<iso>}
+4. Agent({
      subagent_type: "aicodermap-research-agent",
-     model: "sonnet",  // full/specific scope; "haiku" sadece search
-     prompt: STRUCTURED_PROMPT (scope/query/idea_context/target_model_ids/include_unsloth)
+     model: "sonnet",
+     prompt: structured(scope, query, idea_context, target_model_ids?, include_unsloth:true)
    })
-5. Agent return → JSON parse + schema validate
-6. Validation gate:
-   - validationCoverage >= 0.95 (M4 metric, hard gate)
-   - contradictions[] içinde severity="RED" varsa block
-7. Contradiction triage:
-   - YELLOW (3-5pp): UI'da ⚠ flag, otomatik kabul
-   - RED (>5pp): Source breakdown göster, manuel pick
-8. Diff preview (markdown table):
-   - Updated models + changed fields per model
-   - newModels[] (yeni eklenenler)
-   - Contradictions (severity + sources + delta)
-   - validationCoverage %
-9. User onay (text input: approve / partial / decline / detail <id>)
+5. Parse return → validate JSON schema
+6. Gate: validationCoverage >= 0.95 → proceed; else WARN+force-override
+7. Gate: contradictions[].severity="RED" count > 0 → BLOCK, prompt manual pick per RED
+8. Render diff (markdown table): models[].updates fields, newModels[], contradictions[], coverage%
+9. User input: approve | partial <ids> | decline | detail <id>
 10. Atomic write (.bak backup):
-    - data/models.json (merge updates)
-    - data/sources.json (append new entries)
-    - i18n/tr.json + i18n/en.json (strengthsKey/weaknessesKey content)
-    - lastUpdated auto-set today (YYYY-MM-DD)
-11. CHANGELOG.md append (Keep a Changelog format):
-    ## [Unreleased]
-    ### Updated (YYYY-MM-DD)
-    ### Added
-    ### Flagged (contradictions)
-12. Git workflow (skill prompts user, NOT auto):
+    - data/models.json (merge models[].updates)
+    - data/sources.json (append sourcesAdded[])
+    - i18n/{tr,en}.json (merge i18nUpdates)
+    - lastUpdated := today (YYYY-MM-DD) per touched entry
+11. Append CHANGELOG.md (Keep a Changelog):
+    ## [Unreleased] / ### Updated|Added|Flagged
+12. Print git commands for user (DO NOT auto-commit):
     git add data/ i18n/ CHANGELOG.md
-    git commit -m "data: <description>"
+    git commit -m "data: <gen description>"
     git push
-13. Wait 90sn for GitHub Pages deploy
-14. Post-deploy verification (curl + JSON schema check) → "✓ Live"
+13. Sleep 90s
+14. Verify: curl <live_url>/data/models.json → 200 + valid schema → "✓ Live"
 ```
 
----
-
-## Kullanıcının ne göreceği (Output snapshots)
-
-### ✓ Success (typical refresh)
-
+## CONSTANTS
 ```
-🚀 AICoderMap update başlıyor...
-📊 Mevcut state: 35 model, son update 7 gün önce (M5 ≤14gün ✓)
-🤖 Agent delegation: scope=refresh-all, sonnet model
-   ⏳ ~2-3 dk (15+ source paralel fetch)
-
-✓ Agent return:
-  • Confidence: HIGH
-  • 3 model güncellendi (opus-4-7, kimi-k2-7, deepseek-v4-pro)
-  • 1 yeni model: Qwen3.7-Coder (Alibaba, MIT)
-  • 2 contradiction: 1 YELLOW + 0 RED
-  • Validation coverage: 0.97 ✓ (M4 ≥0.95 ✓)
-
-📋 Diff preview:
-  opus-4-7:
-    bench.swePro: 64.3 → 65.1 (Δ +0.8) ✓ AA + Anthropic agree
-    pricing.api.in: 5.00 → 5.00 (no change)
-    lastUpdated: 2026-04-16 → 2026-04-25
-  kimi-k2-7:
-    bench.lcbV6: 89.6 → 91.2 (Δ +1.6)
-    bench.aaIdx: 54 → 55
-  deepseek-v4-pro:
-    pricing.api.cacheHit: 0.145 → 0.130 (Δ -0.015) ⚠ pricing change
-    bench.tb2: 67.9 → 71.4 (Δ +3.5) ⚠ YELLOW: HF 71.4 vs Scale SEAL 67.9 (Δ 3.5pp)
-  Qwen3.7-Coder (NEW):
-    SWE-Pro 58.4, LCB 92.1, MIT, Ollama: ollama pull qwen3.7-coder
-
-📝 Onay? (approve / partial <ids> / decline / detail <id>)
-> approve
-
-✓ data/models.json yazıldı (3 update + 1 add)
-✓ data/sources.json yazıldı (12 yeni source entry)
-✓ i18n yazıldı (qwen3.7-coder strengths/weaknesses TR+EN)
-✓ CHANGELOG.md eklendi: ## 2026-04-25
-✓ git önerilen komutlar:
-   git add data/ i18n/ CHANGELOG.md
-   git commit -m "data: refresh April 25 — 3 model updated, Qwen3.7-Coder added"
-   git push
-
-⏳ GitHub Pages deploy bekleniyor (~90sn)...
-✓ Live: https://sungurerdim.github.io/aicodermap/
-✓ M5 disiplin: bu update 7 gün ara (≤14 gün ✓)
+CONTRADICTION_WARN = 3.0    // pp delta → YELLOW
+CONTRADICTION_BLOCK = 5.0   // pp delta → RED (block)
+COVERAGE_MIN = 0.95         // M4 release gate
+STALE_DAYS = 14             // M5 freshness gate
+DEPLOY_WAIT_SEC = 90
+AGENT_RETRY = 1
 ```
 
-### ⚠ Coverage Düşük (M4 gate fail)
+## ERRORS
+| condition | action |
+|-----------|--------|
+| Agent timeout/HTTP fail | retry 1× → fallback WebSearch → prompt "partial data, continue?" |
+| Agent return invalid JSON | log to ~/.aicodermap-debug.log, prompt retry |
+| coverage < 0.95 | display missing scores list, options: [A]force-override [B]re-research [C]manual-add |
+| RED contradiction (>5pp) | per-RED prompt: [1]source-A [2]source-B [3]flag-both-avg [4]skip-model |
+| User decline at step 9 | restore from .bak, no commit |
+| Git push fail (conflict) | prompt "git pull --rebase first" |
+| Pages deploy >5min | suggest githubstatus.com check |
 
+## OUTPUT_TEMPLATE_SUCCESS
 ```
-⚠ Validation coverage düşük: 0.91 (M4 ≥0.95 hedefi altında)
-   Eksik source'lu skorlar (4):
-     - opus-4-7.tau2: tek kaynak (Anthropic, S tier)
-     - kimi-k2-7.aaCoding: tek kaynak (AA, I tier)
-     - deepseek-v4-pro.aider: tek kaynak (HF model card, S tier)
-     - qwen3-7-coder.mcpA: hiç kaynak yok
+🚀 AICoderMap update | scope:<scope> | last_refresh:<n>d ago (M5 ≤14d ✓)
+🤖 Agent → sonnet | ETA ~<n>min
 
-Seçenekler:
-  [A] Force-override: yine de yayınla, eksikler "S" badge ile flag'lenecek
-  [B] Re-research: agent'ı eksik (modelId, benchmark) çiftleri için yeniden tetikle (önerilen)
-  [C] Manuel ekle: data/sources.json'da entry oluştur, sonra yeniden validate
-> 
-```
+✓ Return: confidence:<HIGH|MED|LOW> | <n_updated> updated | <n_new> new | <n_yellow>Y/<n_red>R contradictions | coverage:<%>
 
-### 🚨 RED Contradiction (block)
+📋 Diff:
+  <model_id>:
+    <field>: <old> → <new> (Δ <delta>) [✓ agree | ⚠ YELLOW <Apros>vs<Bpros>]
+  <new_model_id> (NEW): <summary>
 
-```
-🚨 Critical contradiction (>5pp): opus-4-7.swePro
-   Anthropic official:    64.3  (S tier, 2026-04-16)
-   Scale SEAL:            56.8  (I tier, 2026-04-20)
-   Delta: 7.5pp 🚨 RED
+📝 approve|partial <ids>|decline|detail <id>?
 
-Manuel resolution gerekli — hangi kaynak baz alınsın?
-  [1] Anthropic 64.3 (S — self-reported, possible inflation)
-  [2] Scale SEAL 56.8 (I — independent, contamination-resistant) ⭐ ÖNERİLEN
-  [3] Both flag, ortalama (60.55) ⚠ ile göster
-  [4] Skip bu model bu update'te
-> 2
+✓ Wrote: data/models.json (<n>upd+<n>add)
+✓ Wrote: data/sources.json (<n> entries)
+✓ Wrote: i18n/{tr,en}.json (<n> entries)
+✓ Appended: CHANGELOG.md ## <date>
 
-✓ opus-4-7.swePro = 56.8 (Scale SEAL primary, Anthropic flagged secondary)
-   Devam ediyor...
-```
+📦 Run:
+  git add data/ i18n/ CHANGELOG.md
+  git commit -m "data: <description>"
+  git push
 
-### ❌ Hata Senaryoları
-
-| Hata | Skill aksiyonu |
-|------|---------------|
-| Agent timeout | Retry 1× → fallback WebSearch → "kısmi veri, devam?" |
-| JSON parse fail | "Agent return geçersiz, log: ~/.aicodermap-debug.log; tekrar dene?" |
-| Git conflict | "git pull --rebase önce, sonra yeniden çalıştır" |
-| User decline | Rollback (.bak'tan restore, no commit) |
-| Pages deploy 5dk+ | "GitHub status check: https://www.githubstatus.com/" |
-
----
-
-## Sabit konfigürasyon (kod içi, no config file)
-
-```javascript
-const CONTRADICTION_WARN = 3.0;        // ≥3pp ⚠ YELLOW
-const CONTRADICTION_BLOCK = 5.0;       // ≥5pp 🚨 RED (block)
-const VALIDATION_COVERAGE_MIN = 0.95;  // M4 metric
-const STALE_THRESHOLD_DAYS = 14;       // M5 metric
-const POST_DEPLOY_WAIT_SEC = 90;
-const AGENT_RETRY_COUNT = 1;
+⏳ Pages deploy ~90s...
+✓ Live: <url> | M5: <n>d ago (≤14d ✓)
 ```
 
----
-
-## Yardımcı komutlar
-
-### `validate` (no fetch, mevcut state check)
-
+## OUTPUT_TEMPLATE_COVERAGE_LOW
 ```
-✓ Mevcut state validation
-   Total models: 35
-   Coverage:     0.97 ✓ (M4 ≥0.95)
-   Contradictions: 1 ⚠ YELLOW, 0 🚨 RED
-     - opus-4-7.swePro: AA 65.1 vs Scale SEAL 62.4 (Δ 2.7pp)
-   Stale entries: 0 (M5 ≤14 gün ✓)
+⚠ Coverage: <%> (M4 ≥0.95 fail)
+   Missing source for <n> scores:
+     - <model_id>.<benchmark>: <n_sources> source(s), tier=<S|I|C>
+[A] force-override (mark as 'S' tier)
+[B] re-research missing pairs (recommended)
+[C] manual add to data/sources.json
+```
+
+## OUTPUT_TEMPLATE_RED_CONTRADICTION
+```
+🚨 RED contradiction (>5pp): <model_id>.<benchmark>
+   <source_A> (tier:<t>): <value_A> | <date>
+   <source_B> (tier:<t>): <value_B> | <date>
+   delta: <pp>pp 🚨
+[1] <source_A> primary | [2] <source_B> primary ⭐ if higher tier
+[3] flag both, avg = <calc> ⚠ | [4] skip model this update
+```
+
+## SUBCOMMANDS
+### `validate` (no fetch)
+Read data/sources.json → compute coverage, list contradictions, check stale entries.
+Output:
+```
+total_models:<n> | coverage:<%> | contradictions:<n>Y/<n>R | stale:<n>
 ```
 
 ### `stale-check`
-
+Iterate data/models.json → list entries with `(today - lastUpdated) > STALE_DAYS`.
+Output:
 ```
-⚠ Bayatlamış model entry'leri:
-   • aider-polyglot:  45 gün önce ⚠⚠⚠
-   • codestral-22b:   18 gün önce ⚠
-   • Diğer 33 model:  ≤14 gün ✓
+- <model_id>: <n>d ago ⚠⚠⚠ if >2× threshold
 ```
 
 ### `changelog`
+tail -50 CHANGELOG.md → parse last 5 release entries.
 
-```
-📝 Son 5 release:
-   2026-04-25: 3 update, 1 add (Qwen3.7-Coder)
-   2026-04-18: 5 update, RED resolved (opus-4-7.swePro)
-   2026-04-11: Full refresh, 35 model
-   2026-04-04: 2 add (DeepSeek V4-Pro/Flash)
-   2026-03-28: Initial v1.0 launch
-```
+## DISCIPLINES
+- M4 gate enforced; force-override requires explicit user input
+- M5 ≤14 day discipline (Aider 5-month-stale antipattern defense)
+- R3 burnout: ≤4 content posts/month hard cap (separate, not skill scope)
+- Editorial integrity: contradictions surfaced, never hidden
+- NO GitHub Actions / CI / workflows (manuel only)
+- NO external monitoring (GitHub Insights Traffic = M1 source)
+- Project-scoped: skill+agent only in `D:\GitHub\aicodermap\` session
 
----
-
-## Kabul Kriterleri (E2E acceptance test)
-
-| Test | Komut | Pass Criteria |
-|------|-------|---------------|
-| Skill invoke | `/aicodermap` | Interactive menu açılır <1sn |
-| Agent delegation | `/aicodermap model opus-4-7` | Agent <5sn başlar, sonnet model |
-| Validation gate | Force coverage <0.95 | Warning + force-override seçeneği |
-| RED contradiction | Mock 7pp delta | 🚨 + manuel pick zorunlu |
-| Diff preview | Refresh-all sonrası | Markdown table renderleniyor |
-| Atomic write | User decline mid-write | data/*.json değişmedi, .bak korundu |
-| Deploy verify | Push sonrası | 90sn sonra live URL 200 OK |
-| Stale check | 15 gün önce update edilmiş entry | ⚠ flag listede |
-
----
-
-## Disiplinler (operational)
-
-- **M4 release gate:** validationCoverage <0.95 → user explicit force-override gerek
-- **M5 update freshness:** ≤14 gün max ara, anti-Aider-stale (Aider 5 ay stale antipattern)
-- **R3 burnout savunması:** ≤4 content post/ay hard cap (separate, content workflow için)
-- **Editorial integrity:** Default weights commit message'ta rationale ile, contradiction'lar açık flag
-- **No GitHub Actions:** Skill manuel tetik, push manuel — CI/CD complexity yok ($0 sürekli)
-- **No external monitoring:** GitHub Insights Traffic built-in M1 ölçüm için yeterli
-
----
-
-## See Also
-
-- `D:\GitHub\aicodermap\docs\WORKFLOW.md` — Detaylı 14 happy + 5 exception
-- `D:\GitHub\aicodermap\docs\IMPLGUIDE.md` — Code-ready implementation
-- `D:\GitHub\aicodermap\docs\TECHSPEC.md` — System architecture
-- `.claude/agents/aicodermap-research-agent.md` — Domain-specialized research agent
-- `~/.ideas/coding-models-tracker.json` — BrainLedger idea entry (45 decisions traceable)
+## E2E_TEST_MATRIX
+| test | trigger | pass |
+|------|---------|------|
+| invoke | `/aicodermap` | menu <1s |
+| delegate | `/aicodermap model <id>` | agent start <5s, sonnet |
+| coverage_gate | force <0.95 | warn + override prompt |
+| red_block | mock 7pp delta | manual pick required |
+| diff_render | post-refresh | full markdown table |
+| atomic | decline mid-write | data/* unchanged, .bak preserved |
+| deploy_verify | post-push 90s | live URL 200 + schema valid |
+| stale | entry 15d old | listed in stale-check |
