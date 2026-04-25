@@ -1,97 +1,99 @@
-# Coding Models Tracker
+# AICoderMap
 
-> Compare AI coding models with coding-focused benchmarks weighted your way — cross-verified, contradiction-flagged, in Turkish and English.
+> Cuts the answer to "which coding model should I use today?" from hours of review to seconds. Ranked by your priorities, source contradictions surfaced, local options labeled with the exact quant that fits your GPU.
 
 ---
 
 ## Problem
 
-Coding LLM pazarı son 3 ayda **2 haftada bir yeni frontier model** çıkarıyor (Opus 4.7 → Kimi K2.6 → Qwen3.6-27B → DeepSeek V4). Manuel research yetişemiyor; mevcut karşılaştırma siteleri ya İngilizce-only (artificialanalysis.ai, llm-stats, BenchLM) ya da güncel değil (**Aider leaderboard 5 ay stale**).
+A new frontier coding LLM ships every two weeks (Opus 4.7 → Kimi K2.6 → Qwen3.6-27B → DeepSeek V4 just last month). The practical impact for any developer trying to decide:
 
-5 doğrulanmış pazar boşluğu:
-1. **Türkçe coverage SIFIR** — hiçbir TR developer-facing tracker yok
-2. Opinionated VRAM-tier verdict ("X için bu model") yok
-3. Aider 5 ay stale (Kasım 2025'ten beri)
-4. Subscription + local TCO + API pricing **unified view** yok
-5. **Cross-source contradiction flagging** yok (SWE-V 80% vs Pro 46% aynı model — hiçbir tracker göstermiyor)
+- **You spend hours reviewing scores.** Existing trackers (artificialanalysis.ai, llm-stats, BenchLM) place numbers side by side without an opinion. You see SWE-Verified 87 / SWE-Pro 64 for the same model — which do you trust?
+- **You decide from stale data.** The Aider leaderboard has been frozen since November 2025 (5 months). New models' coding performance simply is not there.
+- **No Turkish coverage anywhere.** Each benchmark description costs separate translation time.
+- **Local vs cloud?** The answer depends on "what quant runs on your GPU." No tracker shows it. You experiment manually with llama.cpp / Unsloth / Ollama.
 
 ---
 
-## Solution
+## What AICoderMap gives you
 
-**Living document** olarak coding LLM tracker:
-- **TR + EN i18n** — hiçbir rakipte yok
-- **User-editable composite weights** — "bizim default'umuz, sen değiştir" şeffaflığı (slider + presets: SWE-odaklı / Agentic-odaklı / Balanced / Benchmark-only)
-- **Cross-source contradiction flagging** — 2+ kaynak arası >3pp fark görünür ⚠ + tooltip source breakdown
-- **GPU VRAM detection + filter** — sadece GPU'nuza sığan modelleri gösterir (WebGPU auto + manuel fallback, Unsloth UD variants priority)
-- **PNG export** — section veya tam sayfa, paylaşılabilir görsel artefakt
-- **Manuel update disiplini** — solo dev, M5 metric ≤14 gün max aralık (anti-Aider-stale)
+| Your problem | AICoderMap's answer |
+|--------------|---------------------|
+| **"Which score is real?"** | Every score lists its sources with a tier (S = self-reported, I = independent, C = community). 5pp+ disagreements raise a 🚨; tooltip shows the breakdown. |
+| **"Which fits my workflow?"** | Drag the SWE-Pro weight to 30%, agentic to 5%; ranking updates instantly. Four presets + custom + reset. |
+| **"What runs on my GPU?"** | WebGPU detect on page load → every local model labeled *"Fits (10 GB · UD-IQ2_XXS)"*. If VRAM is short, you also see a *"+3 GB RAM"* offload suggestion. |
+| **"How fresh is this?"** | `lastUpdated` per row. M5 discipline: ≤14 days max gap — none of Aider's 5-month death state. |
+| **"I want to share the comparison."** | Camera icon → one-click PNG for a card / the table / the full page. |
+| **"I want to read in Turkish."** | Every UI element and every benchmark description is written in TR — zero translation tax. |
 
 ---
 
 ## Users
 
-3 eşit önemli persona:
-- **P1** Sungur — kişisel günlük model seçim referansı (Claude Code, OpenCode kararları)
-- **P2** TR developer community — 25-45 yaş, Claude Code/Cursor/Copilot kullananlar (Twitter/HN-TR/Eksisozluk aktif, ~150K aktif TR dev)
-- **P3** Global EN developer community — r/LocalLLaMA (694K), HN, opinion-driven verdict + karma kapalı/açık + lokal coverage arayan
+Three equally important personas:
+
+- **P1** Sungur — personal daily model-selection reference (Claude Code, OpenCode decisions)
+- **P2** TR developer community — 25-45 yo, Claude Code/Cursor/Copilot users (Twitter/HN-TR/Eksisozluk active, ~150K active TR devs)
+- **P3** Global EN developer community — r/LocalLLaMA (694K), HN, looking for opinionated verdict + mixed closed/open + local coverage
 
 ---
 
-## Why Now
+## Why now
 
-4 faktör birleşimi:
-- **Pazar momentum** — 2 haftada bir frontier release, manuel research yetersiz
-- **Teknik hazırlık** — BrainLedger + ledger-research-agent mimarisi olgun (template clone hazır)
-- **v0 hazır** — 35 model × 14 benchmark HTML raporu manuel olarak bitti, sadece otomasyona alma kaldı
-- **Skill ekosistem ivmesi** — Claude Code skill ekosistemi yeni; ilk kapsamlı domain-research skill'lerinden biri
+Four converging factors:
+
+- **Market momentum** — frontier release every two weeks; manual research can't keep up.
+- **Technical readiness** — the skill + research-agent architecture is mature and clone-ready for other tracker domains.
+- **v0 done** — 35 models × 14 benchmarks already compiled manually as an HTML report; only the automation layer remains.
+- **Skill ecosystem timing** — Claude Code skill ecosystem is new; this is one of the first comprehensive domain-research skills.
 
 ---
 
 ## MVP
 
-5 hafta solo part-time × 30-35 saat. **Tek external service: GitHub Pages, $0/ay sürekli.**
+5 weeks solo part-time × 30-35 hours. **Single external service: GitHub Pages, $0/mo ongoing.**
 
-13 must-have feature:
-1. Skill + research agent (manuel trigger)
+13 must-have features:
+
+1. Skill + research agent (manual trigger)
 2. JS data array auto-regeneration
 3. i18n TR/EN content + language switch
 4. GitHub Pages deploy
-5. GitHub Insights traffic ölçümü
-6. Diff/changelog otomasyonu
-7. Cross-source validation (≥2 kaynak)
+5. GitHub Insights traffic measurement
+6. Diff/changelog automation
+7. Cross-source validation (≥2 sources)
 8. README + skill installation guide
 9. **Dynamic weights editor UI + presets**
 10. **Screenshot/PNG export** (section + full page)
 11. 3-breakpoint responsive design (mobile/tablet/desktop)
-12. **Contradiction flagging** (SWE-V vs Pro vb)
+12. **Contradiction flagging** (SWE-V vs Pro etc.)
 13. **GPU VRAM detection + Unsloth UD priority + filter**
 
-5 milestone: Foundation → Core → Integration → Polish → Launch.
+5 milestones: Foundation → Core → Integration → Polish → Launch.
 
-**Launch:** Simultane TR + Global soft launch, 10-15 channel intro (AI LAB Discord 40K, YazılımaOrg 59K, Patika 200K, Eksisozluk başlık entry, key TR Twitter, HN Show, r/LocalLLaMA Show, simonw blog mention, BenchGecko PR), 2 hafta post-launch validation checkpoint (GO/PIVOT/LITE).
+**Launch:** Simultaneous TR + Global soft launch, 10-15 channel intro (AI LAB Discord 40K, YazılımaOrg 59K, Patika 200K, Eksisozluk topic entry, key TR Twitter, HN Show, r/LocalLLaMA Show, simonw blog mention, BenchGecko PR), 2-week post-launch validation checkpoint (GO / PIVOT / LITE).
 
 ---
 
-## 6 Ay Hedef
+## 6-month targets
 
-| Metric | Hedef |
-|--------|-------|
-| Trafik | ≥500 unique/ay |
+| Metric | Target |
+|--------|--------|
+| Traffic | ≥500 unique/month |
 | GitHub stars | ≥100 |
 | Organic mentions | ≥1 TR + ≥1 global |
-| Veri güvenilirliği | ≥%95 cross-source validation |
-| Update cadence | ≤14 gün max aralık |
-| Reusability | ≥1 başka domain'e clone (mobile app benchmark vs.) |
+| Data reliability | ≥95% cross-source validation |
+| Update cadence | ≤14 days max gap |
+| Reusability | ≥1 clone to another domain (mobile-app benchmark, etc.) |
 
 ---
 
 ## License
 
-**MIT** — kod ve veri public. Ücretsiz, monetization yok, sponsorship yok (bias-free editorial integrity).
+**MIT** — code and data public. Free, no monetization, no sponsorship (bias-free editorial integrity).
 
 ---
 
-🔗 **Repo:** github.com/sungurerdim/coding-models-tracker (yakında)
-🔗 **Live:** sungurerdim.github.io/coding-models-tracker (yakında)
+🔗 **Repo:** github.com/sungurerdim/aicodermap (soon)
+🔗 **Live:** sungurerdim.github.io/aicodermap (soon)
 ✉️ **Sungur Erdim** · sungurerdim@gmail.com

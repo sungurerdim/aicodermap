@@ -10,12 +10,12 @@ Thumbs.db
 *.log
 npm-debug.log*
 
-# Local env / secrets (defensive — bu projede secret yok ama)
+# Local env / secrets (defensive — no secrets in this project, but keep ignored)
 .env
 .env.local
 .env.*.local
 
-# Build artifacts (vanilla — no build, ama defensive)
+# Build artifacts (vanilla — no build step, but defensive)
 node_modules/
 dist/
 build/

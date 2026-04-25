@@ -69,7 +69,10 @@
       "vram": "VRAM",
       "lastUpdated": "UPDATED",
       "strengths": "STRENGTHS",
-      "weaknesses": "WEAKNESSES"
+      "weaknesses": "WEAKNESSES",
+      "cacheHit": "Cache hit",
+      "providers": "Providers",
+      "ollamaSize": "Ollama size"
     },
     "footer": {
       "about": "About",
@@ -107,7 +110,16 @@
       "i18nFallback": "Language file failed to load, falling back to Turkish.",
       "exportFailed": "PNG export failed. Refresh and retry.",
       "webgpuUnsupported": "Your browser does not support WebGPU. Select GPU manually."
-    }
+    },
+    "ollama": {
+      "title": "Local (Ollama)",
+      "copy": "Copy command",
+      "viewOn": "View on Ollama"
+    },
+    "openShort": "OPEN",
+    "closedShort": "CLOSED",
+    "openWeights": "Open weights",
+    "closedWeights": "Closed weights"
   },
   "models": {
     "opus-4-7": {

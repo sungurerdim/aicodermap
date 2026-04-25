@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr" data-theme="dark">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,7 +25,7 @@
     <div class="header-actions">
       <div class="theme-toggle" role="group" aria-label="Theme">
         <button type="button" data-theme="light"
-                data-tip="Aydınlık tema" data-i18n-tip="ui.theme.light" data-tip-position="bottom"
+                data-tip="Light theme" data-i18n-tip="ui.theme.light" data-tip-position="bottom"
                 aria-label="Light theme" aria-pressed="false">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
             <circle cx="12" cy="12" r="5"/>
@@ -40,7 +40,7 @@
           </svg>
         </button>
         <button type="button" data-theme="dark"
-                data-tip="Karanlık tema" data-i18n-tip="ui.theme.dark" data-tip-position="bottom"
+                data-tip="Dark theme" data-i18n-tip="ui.theme.dark" data-tip-position="bottom"
                 aria-label="Dark theme" aria-pressed="true">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
@@ -48,53 +48,53 @@
         </button>
       </div>
       <div class="lang-toggle" role="group" aria-label="Language">
-        <button type="button" data-lang="tr" aria-pressed="true">TR</button>
-        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        <button type="button" data-lang="tr" aria-pressed="false">TR</button>
+        <button type="button" data-lang="en" aria-pressed="true">EN</button>
       </div>
     </div>
   </div>
   <p class="app-tagline" data-i18n-key="ui.appTagline">
-    AI kodlama modellerini sizin ağırlıklarınızla karşılaştırın — çapraz doğrulanmış, çelişki işaretli.
+    Compare AI coding models with your own weights — cross-validated, contradiction-flagged.
   </p>
 </header>
 
 <nav class="sticky-nav" aria-label="Sections" data-no-export>
-  <a href="#filters" data-i18n-key="ui.section.filters">Filtreler</a>
-  <a href="#weights" data-i18n-key="ui.section.weights">Ağırlık Editörü</a>
-  <a href="#table" data-i18n-key="ui.section.table">Karşılaştırma Tablosu</a>
-  <a href="#models" data-i18n-key="ui.section.models">Model Kartları</a>
-  <a href="#export" data-i18n-key="ui.section.export">Dışa Aktar</a>
+  <a href="#filters" data-i18n-key="ui.section.filters">Filters</a>
+  <a href="#weights" data-i18n-key="ui.section.weights">Weights Editor</a>
+  <a href="#table" data-i18n-key="ui.section.table">Comparison Table</a>
+  <a href="#models" data-i18n-key="ui.section.models">Model Cards</a>
+  <a href="#export" data-i18n-key="ui.section.export">Export</a>
 </nav>
 
 <main class="app-main">
 
   <section id="weights" class="card section-card" data-export-section="weights" aria-labelledby="weights-heading">
     <header class="section-head">
-      <h2 id="weights-heading" data-i18n-key="ui.section.weights">Ağırlık Editörü</h2>
+      <h2 id="weights-heading" data-i18n-key="ui.section.weights">Weights Editor</h2>
       <button class="btn-icon-only" type="button" data-export-trigger="weights"
               data-i18n-tip="ui.export.weights" data-i18n-aria-label="ui.export.weights"
-              data-tip="Ağırlıkları PNG olarak kaydet" data-tip-position="bottom"
-              aria-label="Ağırlıkları PNG olarak kaydet">
+              data-tip="Save weights as PNG" data-tip-position="bottom"
+              aria-label="Save weights as PNG">
         <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
           <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
           <circle cx="12" cy="13" r="4"/>
         </svg>
-        <span class="sr-only" data-i18n-key="ui.export.weights">Ağırlıkları PNG olarak kaydet</span>
+        <span class="sr-only" data-i18n-key="ui.export.weights">Save weights as PNG</span>
       </button>
     </header>
 
     <div class="weights-controls">
       <label class="select-row">
-        <span data-i18n-key="ui.weights.preset">Hazır Profil</span>
+        <span data-i18n-key="ui.weights.preset">Preset</span>
         <select id="weights-preset">
           <option value="custom">—</option>
-          <option value="balanced" data-i18n-key="verdicts.preset.balanced">Dengeli</option>
-          <option value="swe-focused" data-i18n-key="verdicts.preset.sweFocused">SWE-odaklı</option>
-          <option value="agentic-focused" data-i18n-key="verdicts.preset.agenticFocused">Agentic-odaklı</option>
-          <option value="benchmark-only" data-i18n-key="verdicts.preset.benchmarkOnly">Sadece Benchmark</option>
+          <option value="balanced" data-i18n-key="verdicts.preset.balanced">Balanced</option>
+          <option value="swe-focused" data-i18n-key="verdicts.preset.sweFocused">SWE-focused</option>
+          <option value="agentic-focused" data-i18n-key="verdicts.preset.agenticFocused">Agentic-focused</option>
+          <option value="benchmark-only" data-i18n-key="verdicts.preset.benchmarkOnly">Benchmark only</option>
         </select>
       </label>
-      <button id="weights-reset" class="btn btn-ghost" type="button" data-i18n-key="ui.weights.reset">Varsayılana Dön</button>
+      <button id="weights-reset" class="btn btn-ghost" type="button" data-i18n-key="ui.weights.reset">Reset to default</button>
       <output id="weights-total" class="weights-total" aria-live="polite">100</output>
     </div>
 
@@ -103,21 +103,21 @@
 
   <section id="filters" class="card section-card" data-export-section="filters" aria-labelledby="filters-heading">
     <header class="section-head">
-      <h2 id="filters-heading" data-i18n-key="ui.section.filters">Filtreler</h2>
+      <h2 id="filters-heading" data-i18n-key="ui.section.filters">Filters</h2>
     </header>
 
     <div class="filters-grid">
       <label class="select-row">
-        <span data-i18n-key="ui.filter.search">Ara</span>
-        <input type="search" id="filter-search" placeholder="model adı, sağlayıcı..." data-i18n-placeholder="ui.filter.searchPlaceholder">
+        <span data-i18n-key="ui.filter.search">Search</span>
+        <input type="search" id="filter-search" placeholder="model name, provider..." data-i18n-placeholder="ui.filter.searchPlaceholder">
       </label>
 
       <label class="select-row">
-        <span data-i18n-key="ui.filter.deployment">Görüntü</span>
+        <span data-i18n-key="ui.filter.deployment">Deployment</span>
         <select id="filter-deployment">
-          <option value="all" data-i18n-key="ui.filter.deploymentAll">Tüm modeller</option>
-          <option value="cloud" data-i18n-key="ui.filter.cloudOnly">Yalnızca bulut/abonelik</option>
-          <option value="local" data-i18n-key="ui.filter.localFit">GPU'ma sığan yerel modeller</option>
+          <option value="all" data-i18n-key="ui.filter.deploymentAll">All models</option>
+          <option value="cloud" data-i18n-key="ui.filter.cloudOnly">Cloud / subscription only</option>
+          <option value="local" data-i18n-key="ui.filter.localFit">Local models that fit my GPU</option>
         </select>
       </label>
 
@@ -125,12 +125,12 @@
         <label class="select-row">
           <span data-i18n-key="ui.filter.gpuLabel">GPU</span>
           <select id="filter-gpu-select">
-            <option value="auto" data-i18n-key="ui.filter.gpuAuto">Otomatik tespit</option>
+            <option value="auto" data-i18n-key="ui.filter.gpuAuto">Auto-detect</option>
             <!-- options populated by app.js -->
           </select>
         </label>
         <label class="number-row">
-          <span data-i18n-key="ui.filter.gpuOverride">Manuel VRAM</span>
+          <span data-i18n-key="ui.filter.gpuOverride">Manual VRAM</span>
           <input type="number" id="filter-vram-override" min="0" max="256" step="1" inputmode="numeric">
         </label>
       </div>
@@ -138,16 +138,16 @@
       <label class="select-row">
         <span data-i18n-key="ui.filter.tier">Tier</span>
         <select id="filter-tier">
-          <option value="all" data-i18n-key="ui.filter.all">Tümü</option>
+          <option value="all" data-i18n-key="ui.filter.all">All</option>
           <option value="frontier" data-i18n-key="ui.tier.frontier">Frontier</option>
-          <option value="open-tier1" data-i18n-key="ui.tier.open-tier1">Açık Tier-1</option>
-          <option value="ollama" data-i18n-key="ui.tier.ollama">Ollama Yerel</option>
+          <option value="open-tier1" data-i18n-key="ui.tier.open-tier1">Open Tier-1</option>
+          <option value="ollama" data-i18n-key="ui.tier.ollama">Local Ollama</option>
         </select>
       </label>
 
       <label class="checkbox-row">
         <input type="checkbox" id="filter-open-only">
-        <span data-i18n-key="ui.filter.openOnly">Sadece açık model</span>
+        <span data-i18n-key="ui.filter.openOnly">Open weights only</span>
       </label>
     </div>
 
@@ -156,18 +156,18 @@
 
   <section id="table" class="section-card" aria-labelledby="table-heading">
     <header class="section-head">
-      <h2 id="table-heading" data-i18n-key="ui.section.table">Karşılaştırma Tablosu</h2>
+      <h2 id="table-heading" data-i18n-key="ui.section.table">Comparison Table</h2>
       <div class="section-head-right">
         <span id="table-count" class="muted-note"></span>
         <button class="btn-icon-only" type="button" data-export-trigger="comparison-table"
                 data-i18n-tip="ui.export.table" data-i18n-aria-label="ui.export.table"
-                data-tip="Karşılaştırma tablosunu PNG olarak kaydet" data-tip-position="bottom"
-                aria-label="Karşılaştırma tablosunu PNG olarak kaydet">
+                data-tip="Save comparison table as PNG" data-tip-position="bottom"
+                aria-label="Save comparison table as PNG">
           <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
             <circle cx="12" cy="13" r="4"/>
           </svg>
-          <span class="sr-only" data-i18n-key="ui.export.table">Karşılaştırma tablosunu PNG olarak kaydet</span>
+          <span class="sr-only" data-i18n-key="ui.export.table">Save comparison table as PNG</span>
         </button>
       </div>
     </header>
@@ -181,31 +181,31 @@
 
   <section id="models" class="section-card" aria-labelledby="models-heading">
     <header class="section-head">
-      <h2 id="models-heading" data-i18n-key="ui.section.models">Modeller</h2>
+      <h2 id="models-heading" data-i18n-key="ui.section.models">Models</h2>
       <span id="models-count" class="muted-note"></span>
     </header>
 
     <div id="models-list" class="models-list" aria-live="polite">
-      <p class="loading" data-i18n-key="ui.loading">Yükleniyor...</p>
+      <p class="loading" data-i18n-key="ui.loading">Loading...</p>
     </div>
   </section>
 
   <section id="export" class="card section-card" aria-labelledby="export-heading">
     <header class="section-head">
-      <h2 id="export-heading" data-i18n-key="ui.section.export">Dışa Aktar</h2>
+      <h2 id="export-heading" data-i18n-key="ui.section.export">Export</h2>
     </header>
     <div class="export-actions">
       <button id="export-full" class="btn btn-primary" type="button"
               data-i18n-tip="ui.export.fullTooltip"
-              data-tip="Tüm sayfayı PNG olarak kaydet">
+              data-tip="Save the entire page as PNG">
         <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
           <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
           <circle cx="12" cy="13" r="4"/>
         </svg>
-        <span data-i18n-key="ui.export.full">Tam sayfa PNG</span>
+        <span data-i18n-key="ui.export.full">Full page PNG</span>
       </button>
       <p class="muted-note" data-i18n-key="ui.footer.privacy">
-        Bu site cookie kullanmaz, GitHub Insights ile anonim trafik ölçümü yapar.
+        This site does not use cookies; anonymous traffic is measured via GitHub Insights only.
       </p>
     </div>
   </section>

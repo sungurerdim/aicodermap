@@ -767,6 +767,89 @@ table#comparison-table td.col-rank { color: var(--muted); }
   color: var(--text);
 }
 
+.ollama-block {
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface, rgba(255, 255, 255, 0.03));
+  border-left: 3px solid var(--accent-soft, var(--accent, #67e8a4));
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ollama-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.ollama-icon { font-size: 0.9rem; line-height: 1; }
+.ollama-title-text { color: var(--text); }
+.ollama-cmd-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg, rgba(0, 0, 0, 0.3));
+  padding: 5px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+}
+.pull-cmd {
+  flex: 1;
+  font-family: var(--font-mono, ui-monospace, "SF Mono", Menlo, monospace);
+  font-size: 0.78rem;
+  color: var(--text);
+  word-break: break-all;
+  background: transparent;
+}
+.copy-btn {
+  background: transparent;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  color: var(--muted);
+  border-radius: 3px;
+  padding: 2px 7px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.copy-btn:hover { background: var(--surface, rgba(255, 255, 255, 0.05)); color: var(--text); }
+.copy-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.ollama-meta {
+  font-size: 0.72rem;
+  color: var(--muted);
+  letter-spacing: 0.01em;
+}
+.ollama-link {
+  font-size: 0.75rem;
+  color: var(--accent);
+  text-decoration: none;
+  align-self: flex-start;
+}
+.ollama-link:hover { text-decoration: underline; }
+
+.open-badge, .closed-badge {
+  display: inline-block;
+  margin-left: var(--space-2, 8px);
+  padding: 1px 7px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+.open-badge {
+  background: var(--ok, #67e8a4);
+  color: var(--bg, #0b0d10);
+}
+.closed-badge {
+  background: var(--surface, rgba(255, 255, 255, 0.06));
+  color: var(--muted, #8a8d92);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+}
+
 .notes {
   display: grid;
   grid-template-columns: 1fr;

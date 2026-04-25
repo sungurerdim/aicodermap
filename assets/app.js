@@ -581,19 +581,33 @@ function buildModelCard(model, rank) {
   head.appendChild(composite2);
   card.appendChild(head);
 
-  // Provider + actions row
-  card.appendChild(el('div', { class: 'model-provider' },
-    `${model.provider} · ${model.released || '—'} · ${model.license || '—'}`
-  ));
+  // Provider + license + open badge row
+  const providerRow = el('div', { class: 'model-provider' });
+  providerRow.appendChild(el('span', null, `${model.provider || '—'} · ${model.released || '—'} · ${model.license || '—'}`));
+  if (model.open === true) {
+    providerRow.appendChild(el('span', { class: 'open-badge', title: t('ui.openWeights') || 'Open weights' },
+      t('ui.openShort') || 'OPEN'));
+  } else if (model.open === false) {
+    providerRow.appendChild(el('span', { class: 'closed-badge', title: t('ui.closedWeights') || 'Closed weights' },
+      t('ui.closedShort') || 'CLOSED'));
+  }
+  card.appendChild(providerRow);
 
   // Meta grid
   const meta = el('div', { class: 'model-meta' });
   meta.appendChild(metaCell(t('ui.table.context'), fmtContext(model.context)));
   meta.appendChild(metaCell(t('ui.table.pricingApi'), fmtPriceCell(model)));
+  if (model.pricing?.api?.cacheHit != null) {
+    meta.appendChild(metaCell(t('ui.table.cacheHit') || 'Cache hit', `$${model.pricing.api.cacheHit}`));
+  }
   meta.appendChild(metaCell(t('ui.table.pricingSub'), model.pricing?.subscription || '—'));
   meta.appendChild(metaCell(t('ui.table.lastUpdated'), model.lastUpdated || '—'));
-  if (model.providers != null) meta.appendChild(metaCell('Providers', `${model.providers} (uptime ${fmtScore(model.uptime, 1)}%)`));
+  if (model.providers != null) meta.appendChild(metaCell(t('ui.table.providers') || 'Providers', `${model.providers}${model.uptime != null ? ` (uptime ${fmtScore(model.uptime, 1)}%)` : ''}`));
   if (model.vramRequirement != null) meta.appendChild(metaCell(t('ui.table.vram'), `${model.vramRequirement} GB`));
+  // Legacy ollamaSize fallback — only if no rich ollama object
+  if (model.ollamaSize && !model.ollama) {
+    meta.appendChild(metaCell(t('ui.table.ollamaSize') || 'Ollama size', model.ollamaSize));
+  }
 
   // GPU compat
   const compat = gpuCompat(model, getActiveVram());
@@ -622,6 +636,53 @@ function buildModelCard(model, rank) {
       list.appendChild(li);
     }
     card.appendChild(list);
+  }
+
+  // Local Ollama metadata (rich object: pullCmd, tags, pullCount, architecture, parameters, license, releasedISO, ollamaUrl)
+  if (model.ollama && typeof model.ollama === 'object') {
+    const o = model.ollama;
+    const block = el('div', { class: 'ollama-block' });
+
+    const titleParts = [t('ui.ollama.title') || 'Local (Ollama)'];
+    if (o.architecture) titleParts.push(o.architecture);
+    if (o.parameters) titleParts.push(o.parameters);
+    const title = el('div', { class: 'ollama-title' });
+    title.appendChild(el('span', { class: 'ollama-icon' }, '💻'));
+    title.appendChild(el('span', { class: 'ollama-title-text' }, titleParts.join(' · ')));
+    block.appendChild(title);
+
+    if (o.pullCmd) {
+      const cmdRow = el('div', { class: 'ollama-cmd-row' });
+      cmdRow.appendChild(el('code', { class: 'pull-cmd' }, o.pullCmd));
+      const copyLabel = t('ui.ollama.copy') || 'Copy';
+      const copy = el('button', { class: 'copy-btn', type: 'button', 'aria-label': copyLabel }, '⧉');
+      copy.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(o.pullCmd);
+          copy.textContent = '✓';
+          setTimeout(() => copy.textContent = '⧉', 1500);
+        } catch (_) { /* clipboard unavailable */ }
+      });
+      cmdRow.appendChild(copy);
+      block.appendChild(cmdRow);
+    }
+
+    const meta = [];
+    if (o.pullCount) meta.push(o.pullCount);
+    if (o.license) meta.push(o.license);
+    if (o.releasedISO) meta.push(o.releasedISO);
+    if (meta.length) block.appendChild(el('div', { class: 'ollama-meta' }, meta.join(' · ')));
+
+    if (o.ollamaUrl) {
+      block.appendChild(el('a', {
+        class: 'ollama-link',
+        href: o.ollamaUrl,
+        target: '_blank',
+        rel: 'noopener noreferrer'
+      }, (t('ui.ollama.viewOn') || 'View on Ollama') + ' →'));
+    }
+
+    card.appendChild(block);
   }
 
   // Notes

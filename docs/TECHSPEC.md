@@ -1,20 +1,20 @@
-# Coding Models Tracker — Technical Specification
+# AICoderMap — Technical Specification
 
-**Sürüm:** 1.0 | **24 Nisan 2026**
-
----
-
-## 1. Genel Bakış
-
-Static web tracker (GitHub Pages) + local Claude Code skill orchestrator + research agent. No backend, no DB, no auth. Vanilla JS, no build step. Tek external service: GitHub Pages.
-
-**Teknoloji yığını:** HTML5 + CSS3 (3 breakpoint responsive) + Vanilla JS (no framework) + JSON data files + WebGPU API (browser-native) + html2canvas (vendored). Skill yerel `~/.claude/skills/coding-models-tracker/` + agent `~/.claude/agents/coding-models-research-agent.md`.
+**Version:** 1.0 | **April 24, 2026**
 
 ---
 
-## 2. Sistem Mimarisi
+## 1. Overview
 
-### Katmanlar
+Static web tracker (GitHub Pages) + local Claude Code skill orchestrator + research agent. No backend, no DB, no auth. Vanilla JS, no build step. Single external service: GitHub Pages.
+
+**Technology stack:** HTML5 + CSS3 (3-breakpoint responsive) + Vanilla JS (no framework) + JSON data files + WebGPU API (browser-native) + html2canvas (vendored). Skill is local at `~/.claude/skills/coding-models-tracker/` + agent at `~/.claude/agents/coding-models-research-agent.md`.
+
+---
+
+## 2. System Architecture
+
+### Layers
 
 **Frontend (GitHub Pages serves):**
 ```
@@ -29,7 +29,7 @@ data/
   sources.json         — per-score provenance (cross-source)
   gpu-database.json    — GPU → VRAM lookup
 i18n/
-  tr.json              — Türkçe content
+  tr.json              — Turkish content
   en.json              — English content
 CHANGELOG.md           — release history
 README.md              — installation guide
@@ -42,7 +42,7 @@ SKILL.md               — orchestrator definition
 
 **Research Agent (local, `~/.claude/agents/`):**
 ```
-coding-models-research-agent.md  — ledger-research-agent template clone, domain-specialized
+aicodermap-research-agent.md    — domain-specialized research-agent definition
 ```
 
 ### Communication Flow
@@ -56,7 +56,7 @@ User → Claude Code → Skill invocation
   → Skill write data/*.json
   → Skill append CHANGELOG.md
   → Git commit + push
-  → GitHub Pages auto-deploy (~1-2 dk)
+  → GitHub Pages auto-deploy (~1-2 min)
 
 Browser load:
   → fetch data/models.json + sources.json + gpu-database.json + i18n/{lang}.json
@@ -73,7 +73,7 @@ Browser load:
 
 ---
 
-## 3. Veri Modeli
+## 3. Data Model
 
 ### `data/models.json` — MODELS array entry
 
@@ -89,7 +89,7 @@ Browser load:
   "context": 1000000,
   "pricing": {
     "api": { "in": 5.00, "out": 25.00, "cacheHit": 0.50 },
-    "subscription": "Max $200/ay"
+    "subscription": "Max $200/month"
   },
   "bench": {
     "swePro": 64.3, "sweV": 87.6, "tb2": 69.4,
@@ -109,7 +109,7 @@ Browser load:
 }
 ```
 
-**Local model entry farkı:**
+**Local model entry difference:**
 ```json
 {
   "id": "qwen-3-6-27b",
@@ -136,7 +136,7 @@ Browser load:
 }
 ```
 
-**Contradiction rule:** 2+ source arasında **>3pp fark → ⚠ flag**, **>5pp → 🚨 red flag** (user manual resolution).
+**Contradiction rule:** between 2+ sources, **>3pp difference → flag**, **>5pp → red flag** (user manual resolution).
 
 ### `data/gpu-database.json` — GPU → VRAM lookup
 
@@ -170,37 +170,37 @@ Browser load:
 ```json
 {
   "ui": {
-    "compare": "Karşılaştır",
-    "weightsEditor": "Ağırlık Editörü",
-    "exportPng": "PNG Olarak İndir",
-    "vramFilter": "GPU VRAM'ime göre filtrele"
+    "compare": "Compare",
+    "weightsEditor": "Weights Editor",
+    "exportPng": "Download as PNG",
+    "vramFilter": "Filter by my GPU VRAM"
   },
   "models": {
-    "opus-4-7.strengths": "SWE-Pro lider; Agentic tool chain en olgun; Claude Code ekosistem",
-    "opus-4-7.weaknesses": "Tokenizer 1.0-1.35× token artışı; verbose output"
+    "opus-4-7.strengths": "SWE-Pro leader; most mature agentic tool chain; Claude Code ecosystem",
+    "opus-4-7.weaknesses": "Tokenizer 1.0-1.35x token inflation; verbose output"
   },
   "benchmarks": {
     "swePro.name": "SWE-bench Pro",
-    "swePro.desc": "Contamination-resistant gold standard; 1865 task, 41 repo, multi-language"
+    "swePro.desc": "Contamination-resistant gold standard; 1865 tasks, 41 repos, multi-language"
   },
   "verdicts": {
-    "preset.sweFocused": "SWE-odaklı",
-    "preset.agenticFocused": "Agentic-odaklı",
-    "preset.balanced": "Dengeli",
-    "preset.benchmarkOnly": "Sadece Benchmark"
+    "preset.sweFocused": "SWE-focused",
+    "preset.agenticFocused": "Agentic-focused",
+    "preset.balanced": "Balanced",
+    "preset.benchmarkOnly": "Benchmark-only"
   },
   "errors": {
-    "fetchFailed": "Veri yüklenemedi, sayfayı yenileyin",
-    "weightsInvalid": "Ağırlıklar toplamı 100 olmalı"
+    "fetchFailed": "Could not load data, please refresh the page",
+    "weightsInvalid": "Weights must total 100"
   }
 }
 ```
 
 ---
 
-## 4. API Tasarımı
+## 4. API Design
 
-**Public API yok.** 4 internal API boundary.
+**No public API.** 4 internal API boundaries.
 
 ### 4.1 Skill → Research Agent (Claude Code Agent tool)
 
@@ -213,7 +213,7 @@ prompt:
   query: <constructed research query>
   idea_context: <compact JSON: confirmed dim summary>
   target_model_ids: <array, optional — specific models to refresh>
-  include_unsloth: <boolean — local models için Unsloth UD variants araştır>
+  include_unsloth: <boolean — research Unsloth UD variants for local models>
 ```
 
 ### 4.2 Research Agent → Skill (return JSON)
@@ -272,37 +272,37 @@ No auth, no query params, CORS-friendly static asset.
 
 | Boundary | Failure | Action |
 |----------|---------|--------|
-| Agent fetch | HTTP fail | Retry 1× → fallback WebSearch → user "kısmi veri, devam?" |
+| Agent fetch | HTTP fail | Retry 1x → fallback WebSearch → user "partial data, continue?" |
 | Browser JSON parse | Parse error | Error banner + reload button |
 | WebGPU | Unsupported | Silent fallback to manual VRAM input + GPU dropdown |
-| html2canvas | Canvas taint / iframe | User alert: "Export failed, sayfa yenileyin veya farklı bölüm deneyin" |
+| html2canvas | Canvas taint / iframe | User alert: "Export failed, refresh the page or try a different section" |
 
 ---
 
-## 5. Güvenlik
+## 5. Security
 
 ### XSS
-- User-editable weights: sadece integer 0-100 (`type="number"` + regex whitelist)
-- Hiç `innerHTML`, sadece `textContent`
-- Hiç `eval()` veya `new Function()`
+- User-editable weights: integers 0-100 only (`type="number"` + regex whitelist)
+- No `innerHTML`, only `textContent`
+- No `eval()` or `new Function()`
 
 ### localStorage
 - Schema validation on read (wrong shape → reset-to-default)
-- Versiyonlu key: `cmt.v1.weights`, `cmt.v1.language`, `cmt.v1.vram`
-- Migration plan v2'ye geçişte mevcut
+- Versioned keys: `cmt.v1.weights`, `cmt.v1.language`, `cmt.v1.vram`
+- Migration plan to v2 already in place
 
 ### GDPR / Privacy
-- GitHub Insights traffic ölçümü (cookie-free, no PII)
+- GitHub Insights traffic measurement (cookie-free, no PII)
 - localStorage user preferences only (no analytics)
-- Footer notu: "Bu site cookie kullanmaz, GitHub Insights ile anonim trafik ölçümü yapar"
+- Footer note: "This site uses no cookies; anonymous traffic is measured via GitHub Insights"
 
 ### Data Integrity
-- Agent output strictly `JSON.parse` (no innerHTML)
-- `strengths`/`weaknesses` fields: sadece textContent render
-- URL fields: `https://` prefix enforced, allowlist yok ama scheme validated
+- Agent output strictly via `JSON.parse` (no innerHTML)
+- `strengths`/`weaknesses` fields: rendered via textContent only
+- URL fields: `https://` prefix enforced, no allowlist but scheme validated
 
 ### Supply Chain
-- `html2canvas` self-hosted (`assets/vendor/html2canvas.min.js`, SHA256 manuel verify)
+- `html2canvas` self-hosted (`assets/vendor/html2canvas.min.js`, SHA256 manually verified)
 - Content Security Policy meta tag:
   ```html
   <meta http-equiv="Content-Security-Policy"
@@ -314,42 +314,42 @@ No auth, no query params, CORS-friendly static asset.
 - `.gitignore` comprehensive (`.env`, `node_modules/`, tmp)
 - Pre-commit hook: `grep -r 'sk-\|ghp_\|api_key' src/` block
 
-**Top 3 threat mitigated:** XSS, scraped content injection, supply chain.
+**Top 3 threats mitigated:** XSS, scraped content injection, supply chain.
 
 ---
 
-## 6. Ölçeklenebilirlik
+## 6. Scalability
 
-**Static site = trivially scalable.** GitHub Pages CDN handles up to 100GB/ay bandwidth (free tier). 35 model × 14 benchmark JSON ~50KB; 1M visitor/ay = ~50GB → well within limits.
+**Static site = trivially scalable.** GitHub Pages CDN handles up to 100GB/month bandwidth (free tier). 35 models × 14 benchmarks JSON ~50KB; 1M visitors/month = ~50GB → well within limits.
 
-**Bottleneck:** Skill update workflow throughput (manuel + research agent), max ~1-2 update/gün pratik. M5 metrik (≤14 gün) bu kapasitenin çok altında.
+**Bottleneck:** Skill update workflow throughput (manual + research agent), practical max ~1-2 updates/day. The M5 metric (≤14 days) is well below this capacity.
 
-**Faz 2 ölçek noktaları:**
-- 100K+ unique/ay → Cloudflare Pages mirror düşün
-- 50+ model → JSON pagination veya per-tier files
-- Custom analytics (Plausible/GoatCounter) → 5K+ unique/ay'da değer
+**Phase 2 scale points:**
+- 100K+ unique/month → consider a Cloudflare Pages mirror
+- 50+ models → JSON pagination or per-tier files
+- Custom analytics (Plausible/GoatCounter) → worthwhile at 5K+ unique/month
 
 ---
 
 ## 7. Non-Functional Requirements
 
-| Kategori | Hedef |
+| Category | Target |
 |----------|-------|
-| **Performance** | First Contentful Paint < 1sn, Time to Interactive < 2sn, JSON fetch < 2sn |
-| **Accessibility** | Lighthouse a11y ≥ 90, keyboard navigation full, ARIA labels |
+| **Performance** | First Contentful Paint < 1s, Time to Interactive < 2s, JSON fetch < 2s |
+| **Accessibility** | Lighthouse a11y ≥ 90, full keyboard navigation, ARIA labels |
 | **SEO** | Lighthouse SEO ≥ 90, JSON-LD structured data, hreflang i18n, sitemap.xml |
-| **Browser support** | Chrome/Edge ≥ son 2 sürüm, Firefox ≥ son 2, Safari ≥ son 2, iOS Safari ≥ 17 |
-| **Responsive** | Mobile <640px, tablet 641-1024px, desktop >1024px — overflow=0 her birinde |
+| **Browser support** | Chrome/Edge ≥ last 2 versions, Firefox ≥ last 2, Safari ≥ last 2, iOS Safari ≥ 17 |
+| **Responsive** | Mobile <640px, tablet 641-1024px, desktop >1024px — overflow=0 in each |
 | **Uptime** | GitHub Pages SLA (~99.9%) |
 
 ---
 
 ## Appendix — External Dependencies
 
-| Dependency | Versiyon | Lisans | Self-host? |
-|------------|----------|--------|------------|
-| html2canvas | latest stable (1.4.x) | MIT | ✅ vendor |
+| Dependency | Version | License | Self-host? |
+|------------|---------|---------|------------|
+| html2canvas | latest stable (1.4.x) | MIT | yes (vendor) |
 | GitHub Pages | — | platform | external |
 | WebGPU API | browser-native | platform | — |
 
-**Build/runtime dependency yok** — vanilla, no npm/yarn, no node_modules.
+**No build/runtime dependencies** — vanilla, no npm/yarn, no node_modules.

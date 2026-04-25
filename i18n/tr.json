@@ -69,7 +69,10 @@
       "vram": "VRAM",
       "lastUpdated": "GÜNCELLEME",
       "strengths": "GÜÇLÜ YANLAR",
-      "weaknesses": "ZAYIF YANLAR"
+      "weaknesses": "ZAYIF YANLAR",
+      "cacheHit": "Önbellek",
+      "providers": "Sağlayıcılar",
+      "ollamaSize": "Ollama boyutu"
     },
     "footer": {
       "about": "Hakkında",
@@ -107,7 +110,16 @@
       "i18nFallback": "Dil dosyası yüklenemedi, Türkçe varsayılan kullanılıyor.",
       "exportFailed": "PNG dışa aktarma başarısız. Sayfayı yenileyin.",
       "webgpuUnsupported": "Tarayıcınız WebGPU desteklemiyor. Manuel GPU seçin."
-    }
+    },
+    "ollama": {
+      "title": "Yerel (Ollama)",
+      "copy": "Komutu kopyala",
+      "viewOn": "Ollama'da görüntüle"
+    },
+    "openShort": "AÇIK",
+    "closedShort": "KAPALI",
+    "openWeights": "Açık ağırlıklar",
+    "closedWeights": "Kapalı ağırlıklar"
   },
   "models": {
     "opus-4-7": {

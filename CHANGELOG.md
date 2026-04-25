@@ -8,6 +8,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Docs + UI polish — 2026-04-25 (English-only repo, Ollama UI render)
+
+#### Repo English-only (memory rule: docs in English; Turkish lives only in `i18n/tr.json`)
+- `index.html` — `<html lang>` set to `en`; all default fallback strings translated to English (tooltips, nav, section headings, filter options, preset names, footer note). The `data-i18n-key`/`data-i18n-tip` runtime translation continues to switch the page to Turkish via `i18n/tr.json` when the user picks TR.
+- `.gitignore` — comment lines translated to English.
+- Internal-tool name leaks removed across `README.md`, `CLAUDE.md`, `CHANGELOG.md`, `docs/PRD.md`, `docs/TECHSPEC.md`, `docs/IMPLGUIDE.md`, `docs/PITCH.md` — moat B and template references now describe the technique generically ("reusable skill+agent template").
+
+#### Ollama metadata UI (16 models with `ollama` rich object now render)
+- `assets/app.js` — model card builder gains an Ollama block between the Unsloth list and the Notes section. Renders: 💻 title with architecture + parameter count, monospace `pullCmd` with a copy-to-clipboard button, secondary line with pullCount · license · releasedISO, and a "View on Ollama" link.
+- `assets/app.css` — `.ollama-block`, `.ollama-title`, `.ollama-cmd-row`, `.pull-cmd`, `.copy-btn`, `.ollama-meta`, `.ollama-link` styles using project CSS variables, accent-soft left border, focus-visible accessibility.
+- `i18n/{tr,en}.json` — new `ui.ollama.{title,copy,viewOn}` keys for both languages.
+
 ### Policy — 2026-04-25 (independent-source canonical rule)
 - **Independent benchmark sources are now canonical.** Tier=I leaderboards (Artificial Analysis, Scale SEAL, Vellum, BenchLM, LiveCodeBench, OpenRouter, Arena.ai) override Tier=S provider self-reports for the same metric in `data/models.json`. Self-reported values are retained as provenance in `data/sources.json` only; the UI marker for "self-reported when no independent value exists" is pending M3+. Rationale: provider self-reports use custom scaffolds and best-of-N selection — independent leaderboards apply standardized scaffolds, which is the only foundation for the apple-to-apple comparison the tracker is built on.
 
@@ -58,7 +70,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `gpt-5-5` — referenced in Codex blog rumor only, no official OpenAI announcement; not added; monitor May 2026
 
 #### Infrastructure (skill + agent definition fixes during this run)
-- `aicodermap-research-agent.md` — added `## OUTPUT_DELIVERY` section (BrainLedger pattern): JSON-only final assistant message, no narration, no file write. Two prior runs lost their JSON output by saying "writing the file now" instead of returning the JSON. Frontmatter unchanged (no Write tool).
+- `aicodermap-research-agent.md` — added `## OUTPUT_DELIVERY` section (JSON-only final-message delivery pattern): the agent returns its full schema as the final assistant text, no narration, no file write. Two prior runs lost their JSON output by saying "writing the file now" instead of returning the JSON. Frontmatter unchanged (no Write tool).
 - `aicodermap/SKILL.md` Step 4 updated — explicit delivery contract reinforcement in agent prompt; Step 5 hardened to locate first `{` / last `}` if narration leaks.
 
 ### Skill enrichment — 2026-04-25 (federated fetch + llmfit snapshot)
