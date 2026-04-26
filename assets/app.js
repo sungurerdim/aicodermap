@@ -13,9 +13,11 @@ const STORAGE = {
 };
 
 const BENCH_KEYS = [
-  'swePro', 'tb2', 'lcbV6', 'sweV', 'aider',
-  'aaCoding', 'aaAgentic', 'tau2', 'mcpA',
-  'gpqa', 'sweMulti', 'hle'
+  'aaIdx',
+  'swePro', 'sweV', 'sweMulti',
+  'lcbV6', 'tb2',
+  'tau2', 'mcpA', 'aaCoding', 'aaAgentic',
+  'gpqa', 'hle', 'aider'
 ];
 
 const DEFAULT_WEIGHTS = {
