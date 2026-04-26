@@ -1,2 +1,7 @@
 timestamp	commit	status	hit_rate_at_1	hit_rate_at_3	duration	description
 2026-04-26T23:43:21Z	BASELINE	keep	0.6800	0.8400	00:00:01	baseline cycle-2 whitelist (pre-tune)
+2026-04-26T23:48:00Z	b6306a5	discard	0.4000	0.8400	00:00:01	exp1: AA claude-{id} first (broke 9 non-Anthropic models, net -8 rank1)
+2026-04-26T23:51:13Z	5206cd3	keep	0.7200	0.8400	00:00:01	exp2: AA {vendor_prefix}{id} rank1 + lite-preview/a35b-instruct
+2026-04-26T23:51:34Z	cdf74ae	keep	0.7600	0.8400	00:00:01	exp3: BenchLM {vendor_prefix}{id} rank1
+2026-04-26T23:51:55Z	4693d2b	keep	0.8000	0.9200	00:00:01	exp4: Epoch vendor_prefix + family-N (grok-4-20 -> grok-4)
+2026-04-26T23:52:17Z	f40c3bc	keep	0.8400	0.9200	00:00:01	exp5: Anthropic claude-{id_no_prefix} (haiku double-prefix fix)
