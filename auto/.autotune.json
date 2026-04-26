@@ -1,0 +1,10 @@
+{
+  "target": "data/sources-whitelist.json",
+  "metric": "hit_rate_at_1",
+  "direction": "higher",
+  "secondary": "hit_rate_at_3",
+  "bench_cmd": "bash auto/bench.sh",
+  "budget_sec": 30,
+  "tag": "2026-04-27",
+  "purpose": "Tune slugVariations / modelCardSlugVariations / postSlugVariations in data/sources-whitelist.json so the PER_MODEL_URL_EXPANSION cascade hits the right per-model URL on the FIRST attempt — reduces wasted fetches and 404s in real refresh-all cycles."
+}
