@@ -1426,11 +1426,17 @@
       "perModelFormat": "static_html_article",
       "slugStrategy": "try_variations",
       "slugVariations": [
+        "{vendor_prefix}{id}",
         "{id}",
+        "{family}-{N}",
         "{id}-may-2025",
         "{id}-0324"
       ],
-      "slugMismatchNote": "Older versions get date suffixes: deepseek-v3 → deepseek-v3-0324"
+      "slugMismatchNote": "Older versions get date suffixes: deepseek-v3 → deepseek-v3-0324",
+      "vendorPrefixMap": {
+        "anthropic": "claude-",
+        "default": ""
+      }
     },
     {
       "name": "LMCouncil Benchmarks",
