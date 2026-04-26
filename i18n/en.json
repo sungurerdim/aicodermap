@@ -324,6 +324,10 @@
     "devstral-small-2": {
       "strengths": "24B params, SWE-V 68.0% — strongest open-weight at size class. 256K context, Apache 2.0, multimodal image input. Runs on RTX 4090 (24GB) or 32GB Mac. 75 tok/s, TTFT 1.18s. $0.10/$0.30.",
       "weaknesses": "4.2pp behind Devstral 2 (123B). No SWE-Pro or LCB independent score. Limited provider availability vs larger Devstral 2. Image output not supported."
+    },
+    "gpt-5-5": {
+      "strengths": "Leads Terminal-Bench 2.0 at 82.7%; GPQA 93.6%; 1M token context; natively omnimodal; MCP-Atlas 75.3%; SWE-bench Pro 58.6%.",
+      "weaknesses": "5.7 points behind Opus 4.7 on SWE-bench Pro; HLE 41.4% (vs Opus 4.7 46.9%); expensive at $5/$30 per 1M tokens; closed weights."
     }
   },
   "benchmarks": {

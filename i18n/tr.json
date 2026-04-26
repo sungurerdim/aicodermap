@@ -324,6 +324,10 @@
     "devstral-small-2": {
       "strengths": "24B parametre, SWE-V %68.0 — boyut sınıfının en güçlü açık ağırlıklı modeli. 256K bağlam, Apache 2.0, çok modlu görüntü girişi. RTX 4090 (24GB) veya 32GB Mac'te çalışıyor. 75 tok/s, TTFT 1.18s. $0.10/$0.30.",
       "weaknesses": "Devstral 2'den (123B) 4.2pp geride. Bağımsız SWE-Pro veya LCB skoru yok. Büyük Devstral 2'ye kıyasla sınırlı sağlayıcı çeşitliliği. Görüntü çıkışı desteklenmiyor."
+    },
+    "gpt-5-5": {
+      "strengths": "Terminal-Bench 2.0'da %82.7 lider; GPQA %93.6; 1M token bağlam; natif çok modallu (omni); MCP-Atlas %75.3; SWE-bench Pro %58.6.",
+      "weaknesses": "SWE-bench Pro'da Opus 4.7'nin 5.7 puan gerisinde; HLE %41.4 (Opus 4.7 = %46.9); $5/$30 yüksek API fiyatı; kapalı ağırlıklar."
     }
   },
   "benchmarks": {

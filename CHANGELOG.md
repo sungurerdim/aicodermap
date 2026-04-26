@@ -2,6 +2,30 @@
 ## [2026-04-26] — autonomous refresh-all
 
 ### Updated
+- 46 models: `opus-4-7`, `sonnet-4-6`, `claude-haiku-4-5`, `gpt-5-5`, `gpt-5-4`, `gemini-3-1-pro`, `deepseek-v4-pro`, `deepseek-v4-flash`, `deepseek-v3-2`, `kimi-k2-6`, `glm-5-1`, `minimax-m2-7`, `minimax-m2-5`, `mimo-v2-5-pro`, `mimo-v2-5`, `mimo-v2-pro`, `mimo-v2-flash`, `qwen3-235b`, `qwen3-coder-480b`, `qwen3-coder-30b`, `qwen3-coder-next`, `qwen-3-6-27b`, `qwen3-6-35b-moe`, `qwen3-6-plus`, `qwen-3-6-max`, `qwen3-32b`, `gemma-4-31b`, `gemma-4-26b-moe`, `gemma-4-e2b`, `gemma-4-e4b`, `gemma-3-27b`, `llama-4-maverick`, `llama-4-scout`, `nemotron-3-super`, `step-3-5-flash`, `mistral-large-3`, `devstral-medium`, `grok-3`, `grok-3-mini`, `o3`, `o4-mini`, `gpt-4-1`, `gemini-3-1-flash`, `codestral-22b`, `qwen25-coder-7b`, `qwen25-coder-32b`
+
+### Resolved (auto via trustScore)
+- kimi-k2-6.pricing.api.in: winner={'value': 0.57, 'trustScore': 0.85, 'sourceUrl': 'https://platform.kimi.com/docs', 'tier': 'S'} (severity=WARN, Δ0.38)
+- llama-4-maverick.pricing.api.in: winner={'value': 0.2, 'trustScore': 0.82, 'sourceUrl': 'https://www.vellum.ai/llm-leaderboard', 'tier': 'I'} (severity=WARN, Δ0.1)
+- llama-4-scout.pricing.api.in: winner={'value': 0.11, 'trustScore': 0.82, 'sourceUrl': 'https://www.vellum.ai/open-llm-leaderboard', 'tier': 'I'} (severity=WARN, Δ0.08)
+- gemini-3-1-pro.bench.sweV: winner={'value': 80.6, 'trustScore': 0.85, 'sourceUrl': 'https://www.swebench.com/', 'tier': 'I'} (severity=WARN, Δ1.8)
+- qwen3-coder-480b.bench.sweV: winner={'value': 69.6, 'trustScore': 0.65, 'sourceUrl': 'https://llm-stats.com/benchmarks/swe-bench-verified', 'tier': 'I'} (severity=WARN, Δ3.1)
+
+### Gaps (21 entries — see data/known-gaps.json or next refresh)
+- `None`: No SWE-bench Verified submission for Qwen3-32B dense standalone (Qwen3-Max 235B = 69.6%)
+- `None`: Qwen3.6-Max-Preview API-hosted proprietary; too recent for independent eval (released 2026-04-20)
+- `None`: SWE-bench Pro submission not found
+- `None`: MiMo-V2.5 standard SWE-bench Verified score not published; V2.5-Pro available
+- `None`: Not on Scale SEAL or BenchLM; vendor opt-out for Flash variant
+- `None`: xAI vendor opt-out pattern; no submission to SWE-bench
+- `None`: xAI vendor opt-out pattern
+- `None`: Legacy 2024 model; not on current leaderboards
+- ... and 13 more
+
+
+## [2026-04-26] — autonomous refresh-all
+
+### Updated
 - 1 models: `gpt-5-4`
 
 ### Resolved (auto via trustScore)

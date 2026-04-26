@@ -435,6 +435,26 @@
       "format": "unknown",
       "lastVerifiedDate": null,
       "consecutiveFailures": 0
+    },
+    {
+      "name": "llm-stats LiveCodeBench",
+      "url": "https://llm-stats.com/benchmarks/livecodebench",
+      "tier": "I",
+      "authority": "lcbV6 mirror — closes the SPA gap on livecodebench.github.io (71 models indexed)",
+      "phase": "leaderboard",
+      "format": "static",
+      "lastVerifiedDate": "2026-04-26",
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "llm-stats SWE-bench Verified",
+      "url": "https://llm-stats.com/benchmarks/swe-bench-verified",
+      "tier": "I",
+      "authority": "sweV mirror — alternative to SPA-broken swebench.com",
+      "phase": "leaderboard",
+      "format": "static",
+      "lastVerifiedDate": "2026-04-26",
+      "consecutiveFailures": 0
     }
   ],
   "aggregators": [
@@ -884,6 +904,26 @@
       "lastVerifiedDate": "2026-04-26",
       "consecutiveFailures": 0,
       "note": "30+ models ranked across MMLU/SWE-bench/Arena Elo/Pricing"
+    },
+    {
+      "name": "Atlas Cloud Blog",
+      "url": "https://www.atlascloud.ai/blog/",
+      "type": "aggregator_blog",
+      "tier": "C",
+      "format": "static",
+      "lastVerifiedDate": "2026-04-26",
+      "consecutiveFailures": 0,
+      "note": "Multi-model Chinese frontier comparison (Kimi/GLM/MiniMax/Qwen tier); verified SWE-bench Pro and pricing data"
+    },
+    {
+      "name": "AkitaOnRails LLM Coding Benchmarks",
+      "url": "https://akitaonrails.com/en",
+      "type": "aggregator_blog",
+      "tier": "C",
+      "format": "static",
+      "lastVerifiedDate": "2026-04-26",
+      "consecutiveFailures": 0,
+      "note": "Independent April 2026 coding benchmark roundup covering DeepSeek V4, Kimi K2.6, MiMo; practitioner-grade analysis"
     }
   ],
   "_runtime": {
@@ -939,6 +979,18 @@
       "anthropic.com/news": {
         "status": "image_embedded",
         "note": "Bench tables as PNG; auxiliary text scores only; image-OCR pipeline required for full extraction"
+      },
+      "llm-stats.com/benchmarks": {
+        "status": "static",
+        "note": "Closes SPA gap on livecodebench.github.io and swebench.com; verified 2026-04-26"
+      },
+      "atlascloud.ai/blog": {
+        "status": "static",
+        "note": "Multi-model Chinese frontier comparison; verified 2026-04-26"
+      },
+      "akitaonrails.com/en": {
+        "status": "static",
+        "note": "Independent benchmark roundup; verified 2026-04-26"
       }
     },
     "lastFullCycle": "2026-04-26",
