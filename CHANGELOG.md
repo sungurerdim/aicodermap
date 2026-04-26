@@ -2,6 +2,30 @@
 ## [2026-04-26] — autonomous refresh-all
 
 ### Updated
+- 5 models: `gpt-5-4`, `gemini-3-1-pro`, `kimi-k2-6`, `minimax-m2-7`, `qwen3-coder-480b`
+
+### Resolved (auto via trustScore)
+- kimi-k2-6.lcbV6: winner=53.7 (severity=RED, Δ35.9)
+- kimi-k2-6.sweV: winner=65.8 (severity=RED, Δ14.4)
+- kimi-k2-6.tb2: winner=27.8 (severity=RED, Δ38.9)
+- minimax-m2-7.swePro: winner=36.81 (severity=RED, Δ19.39)
+- gemini-3-1-pro.hle: winner=51.4 (severity=RED, Δ7.0)
+- gpt-5-4.swePro: winner=59.1 (severity=GREEN, Δ1.4)
+
+### Gaps (8 entries — see data/known-gaps.json or next refresh)
+- `claude-haiku-4-5.gpqa`: Anthropic page lacks GPQA in text (likely PNG); needs system card or image OCR
+- `claude-haiku-4-5.tb2`: Same — bench in image
+- `claude-haiku-4-5.tau2`: Same
+- `claude-haiku-4-5.lcbV6`: Same
+- `claude-haiku-4-5.hle`: Same
+- `openai_403_block`: openai.com/index/* returned 403 — agent could not fetch o3/o4-mini/gpt-4-1/gpt-5-4 official pages this cycle
+- `lcbV6_general`: LiveCodeBench leaderboard JS-rendered; many models without lcbV6 — needs GitHub releases JSON or alternate source
+- `permanent_swePro_gaps`: Models not submitted to Scale SEAL public leaderboard — should move to known-gaps.json as vendor-opt-out
+
+
+## [2026-04-26] — autonomous refresh-all
+
+### Updated
 - 18 models: `claude-haiku-4-5`, `gpt-4-1`, `gpt-5-4`, `gemini-3-1-flash`, `gemini-3-1-pro`, `o3`, `o4-mini`, `mistral-large-3`, `minimax-m2-5`, `mimo-v2-pro`, `mimo-v2-5-pro`, `mimo-v2-5`, `mimo-v2-flash`, `step-3-5-flash`, `nemotron-3-super`, `deepseek-v3-2`, `qwen3-coder-480b`, `glm-5-1`
 
 ### Resolved (auto via trustScore)

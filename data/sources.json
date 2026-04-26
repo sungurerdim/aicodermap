@@ -269,11 +269,12 @@
     },
     {
       "value": 59.1,
-      "source": "Scale SEAL leaderboard rank-1 (xHigh scaffold)",
+      "source": "Scale SEAL",
       "url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
       "date": "2026-04-25",
       "tier": "I",
-      "trustScore": 0.333
+      "trustScore": 1.0,
+      "verifications": 1
     },
     {
       "value": 57.7,
@@ -289,9 +290,9 @@
       "source": "auto-resolution candidate",
       "url": null,
       "date": "2026-04-26",
-      "tier": "S",
+      "tier": "I",
       "verifications": 1,
-      "trustScore": 0.467,
+      "trustScore": 1.0,
       "contradictionRole": "loser"
     },
     {
@@ -301,7 +302,7 @@
       "date": "2026-04-26",
       "tier": "S",
       "verifications": 1,
-      "trustScore": 0.7,
+      "trustScore": 0.467,
       "contradictionRole": "winner"
     }
   ],
@@ -419,6 +420,35 @@
       "date": "2026-04-24",
       "tier": "C",
       "trustScore": 0.133
+    },
+    {
+      "value": 51.4,
+      "source": "Google DeepMind official",
+      "url": "https://deepmind.google/models/gemini/pro/",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    },
+    {
+      "value": 44.4,
+      "source": "auto-resolution candidate",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.467,
+      "contradictionRole": "loser"
+    },
+    {
+      "value": 51.4,
+      "source": "auto-resolution candidate",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7,
+      "contradictionRole": "winner"
     }
   ],
   "gemini-3-1-pro.swePro": [
@@ -439,6 +469,35 @@
       "date": "2026-04-20",
       "tier": "S",
       "trustScore": 0.233
+    },
+    {
+      "value": 65.8,
+      "source": "Moonshot AI HF model card (agentic single attempt)",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2-Instruct",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    },
+    {
+      "value": 80.2,
+      "source": "auto-resolution candidate",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.467,
+      "contradictionRole": "loser"
+    },
+    {
+      "value": 65.8,
+      "source": "auto-resolution candidate",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7,
+      "contradictionRole": "winner"
     }
   ],
   "kimi-k2-6.swePro": [
@@ -475,6 +534,35 @@
       "date": "2026-04-20",
       "tier": "S",
       "trustScore": 0.233
+    },
+    {
+      "value": 27.8,
+      "source": "Moonshot AI HF model card (Terminus scaffold)",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2-Instruct",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    },
+    {
+      "value": 66.7,
+      "source": "auto-resolution candidate",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.467,
+      "contradictionRole": "loser"
+    },
+    {
+      "value": 27.8,
+      "source": "auto-resolution candidate",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7,
+      "contradictionRole": "winner"
     }
   ],
   "kimi-k2-6.lcbV6": [
@@ -485,6 +573,35 @@
       "date": "2026-04-20",
       "tier": "S",
       "trustScore": 0.233
+    },
+    {
+      "value": 53.7,
+      "source": "Moonshot AI HF model card",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2-Instruct",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    },
+    {
+      "value": 89.6,
+      "source": "auto-resolution candidate",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.467,
+      "contradictionRole": "loser"
+    },
+    {
+      "value": 53.7,
+      "source": "auto-resolution candidate",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7,
+      "contradictionRole": "winner"
     }
   ],
   "kimi-k2-6.hle": [
@@ -1491,6 +1608,35 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": 1.0
+    },
+    {
+      "value": 36.81,
+      "source": "Scale SEAL",
+      "url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 1.0
+    },
+    {
+      "value": 56.2,
+      "source": "auto-resolution candidate",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.467,
+      "contradictionRole": "loser"
+    },
+    {
+      "value": 36.81,
+      "source": "auto-resolution candidate",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 1.0,
+      "contradictionRole": "winner"
     }
   ],
   "minimax-m2-7.tb2": [
@@ -1777,6 +1923,72 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": 0.333
+    }
+  ],
+  "gemini-3-1-pro.tau2": [
+    {
+      "value": 90.8,
+      "source": "Google DeepMind official",
+      "url": "https://deepmind.google/models/gemini/pro/",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "kimi-k2-6.tau2": [
+    {
+      "value": 70.6,
+      "source": "Moonshot AI HF model card (retail avg@4)",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2-Instruct",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "kimi-k2-6.gpqa": [
+    {
+      "value": 75.1,
+      "source": "Moonshot AI HF model card",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2-Instruct",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "kimi-k2-6.aider": [
+    {
+      "value": 60.0,
+      "source": "Moonshot AI HF model card",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2-Instruct",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "kimi-k2-6.sweMulti": [
+    {
+      "value": 47.3,
+      "source": "Moonshot AI HF model card",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2-Instruct",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "qwen3-coder-480b.tb2": [
+    {
+      "value": 23.9,
+      "source": "Qwen3-Coder-480B HF model card",
+      "url": "https://huggingface.co/Qwen/Qwen3-Coder-480B-A35B-Instruct",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ]
 }
