@@ -1,6 +1,26 @@
 
 ## [2026-04-26] — autonomous refresh-all
 
+### Updated
+- 1 models: `gpt-5-4`
+
+### Resolved (auto via trustScore)
+- opus-4-7.swePro: winner=64.3 (severity=YELLOW, Δ3.1)
+
+### Gaps (9 entries — see data/known-gaps.json or next refresh)
+- `aaCoding.most`: AA Coding Index sub-page SPA-only across all whitelist sources after 3 cycles + 6 alternate URLs; will retry next cycle via WebSearch primary protocol now in agent.md
+- `aaAgentic.all`: AA Agentic Index sub-page SPA-only; only GDPval-AA Elo found (which is a different metric, not a 0-100 index)
+- `bfcl.most`: BFCL leaderboard SPA; awesomeagents aggregator only carries Qwen3-235B (74.9%); no GitHub raw mirror found
+- `aime26.opus-4-7`: Anthropic did not publish AIME 2026 score for Opus 4.7
+- `aime26.sonnet-4-6`: Anthropic Sonnet 4.6 announcement no AIME 2026
+- `aime26.gpt-5-5`: GPT-5.5 launch did not publish AIME 2026
+- `grok-3.swePro`: xAI vendor opt-out from SWE-bench (data confirmed via WebSearch — no Grok 3 SWE-bench score)
+- `o3.swePro`: OpenAI does not publish o3 swePro
+- ... and 1 more
+
+
+## [2026-04-26] — autonomous refresh-all
+
 ### Added
 - `gpt-5-5` — new model from vendor lineup discovery
 

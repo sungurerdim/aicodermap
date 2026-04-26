@@ -11,7 +11,6 @@
       "community": "Aggregator blogs / expert commentary. tier='C'. Used only when no I/S source carries the value."
     }
   },
-
   "vendors": {
     "anthropic": {
       "name": "Anthropic",
@@ -168,94 +167,781 @@
       "extracts": "Devstral co-development announcements"
     }
   },
-
   "leaderboards": [
-    {"name": "Scale SEAL", "url": "https://labs.scale.com/leaderboard", "tier": "I", "authority": "SWE-bench Pro (1865 tasks), HLE", "phase": "leaderboard"},
-    {"name": "Scale SEAL SWE-bench Pro public", "url": "https://labs.scale.com/leaderboard/swe_bench_pro_public", "tier": "I", "authority": "swePro standardized", "phase": "leaderboard"},
-    {"name": "SWE-bench (canonical)", "url": "https://www.swebench.com/", "tier": "I", "authority": "SWE-bench Verified, full SWE-bench", "phase": "leaderboard"},
-    {"name": "SWE-bench experiments repo", "url": "https://github.com/SWE-bench/experiments", "tier": "I", "authority": "SWE-bench raw data"},
-    {"name": "LiveCodeBench", "url": "https://livecodebench.github.io/leaderboard.html", "tier": "I", "authority": "LCB v6 contamination-free", "phase": "leaderboard"},
-    {"name": "LiveCodeBench (alt)", "url": "https://livecodebench.com/", "tier": "I"},
-    {"name": "Terminal-Bench", "url": "https://tbench.ai/leaderboard", "tier": "I", "authority": "TB2 agentic execution", "phase": "leaderboard"},
-    {"name": "Terminal-Bench (alt)", "url": "https://terminal-bench.io/", "tier": "I"},
-    {"name": "tau-bench (canonical)", "url": "https://github.com/sierra-research/tau-bench", "tier": "I", "authority": "tau2 agentic API-use; results in README + experiments/ folder", "phase": "leaderboard", "note": "tau-bench.dev domain dead as of 2026-04-26; canonical results live in repo README"},
-    {"name": "Aider Polyglot", "url": "https://aider.chat/docs/leaderboards/", "tier": "I", "authority": "aider", "warn": "stale since Nov 2025"},
-    {"name": "MCP-Atlas", "url": "https://mcp-atlas.dev", "tier": "I", "authority": "mcpA tool-chain quality"},
-    {"name": "Artificial Analysis", "url": "https://artificialanalysis.ai/leaderboards/models", "tier": "I", "authority": "aaIdx, aaCoding, aaAgentic, throughput, pricing for ~336 models", "phase": "leaderboard"},
-    {"name": "Vellum LLM Leaderboard", "url": "https://www.vellum.ai/llm-leaderboard", "tier": "I", "authority": "sweV (independent), gpqa, cost+latency", "phase": "leaderboard"},
-    {"name": "llm-stats.com", "url": "https://llm-stats.com/", "tier": "I", "authority": "broad model catalog"},
-    {"name": "LMArena", "url": "https://lmarena.ai/", "tier": "I", "authority": "blind human preference (formerly LMSYS)"},
-    {"name": "LiveBench", "url": "https://livebench.ai/", "tier": "I", "authority": "contamination-resistant rotating evals"},
-    {"name": "Berkeley BFCL", "url": "https://gorilla.cs.berkeley.edu/leaderboard.html", "tier": "I", "authority": "function-calling v3/v4"},
-    {"name": "BigCodeBench", "url": "https://bigcode-bench.github.io/", "tier": "I", "authority": "code generation gold standard"},
-    {"name": "BigCodeBench HF Space", "url": "https://huggingface.co/spaces/bigcode/bigcode-models-leaderboard", "tier": "I"},
-    {"name": "EvalPlus", "url": "https://evalplus.github.io/leaderboard.html", "tier": "I", "authority": "HumanEval+ / MBPP+ rigorous"},
-    {"name": "HF Open LLM Leaderboard", "url": "https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard", "tier": "I", "authority": "open-weight canonical aggregation"},
-    {"name": "Klu.ai", "url": "https://klu.ai/llm-leaderboard", "tier": "I", "authority": "broader benchmark aggregator"},
-    {"name": "Papers with Code", "url": "https://paperswithcode.com/area/code-generation", "tier": "I", "authority": "peer-reviewed leaderboards"},
-    {"name": "arXiv", "url": "https://arxiv.org/", "tier": "I", "authority": "original benchmark papers, technical reports"},
-    {"name": "BenchLM", "url": "https://benchlm.ai/", "tier": "I", "authority": "verified vs provisional transparency"},
-    {"name": "AgentBench", "url": "https://agentbench.ai", "tier": "I", "authority": "multi-domain agentic"},
-    {"name": "MathArena", "url": "https://matharena.ai/", "tier": "I", "authority": "AIME math reasoning (auxiliary)"},
-    {"name": "Vals.ai", "url": "https://www.vals.ai/benchmarks/", "tier": "I", "authority": "enterprise-gated benchmark sets"},
-    {"name": "LMMarketCap", "url": "https://lmmarketcap.com/", "tier": "I", "authority": "hourly market table"}
+    {
+      "name": "Scale SEAL",
+      "url": "https://labs.scale.com/leaderboard",
+      "tier": "I",
+      "authority": "SWE-bench Pro (1865 tasks), HLE",
+      "phase": "leaderboard",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Scale SEAL SWE-bench Pro public",
+      "url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+      "tier": "I",
+      "authority": "swePro standardized",
+      "phase": "leaderboard",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "SWE-bench (canonical)",
+      "url": "https://www.swebench.com/",
+      "tier": "I",
+      "authority": "SWE-bench Verified, full SWE-bench",
+      "phase": "leaderboard",
+      "format": "spa_partial",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "SWE-bench experiments repo",
+      "url": "https://github.com/SWE-bench/experiments",
+      "tier": "I",
+      "authority": "SWE-bench raw data",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "LiveCodeBench",
+      "url": "https://livecodebench.github.io/leaderboard.html",
+      "tier": "I",
+      "authority": "LCB v6 contamination-free",
+      "phase": "leaderboard",
+      "format": "spa",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "LiveCodeBench (alt)",
+      "url": "https://livecodebench.com/",
+      "tier": "I",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Terminal-Bench",
+      "url": "https://tbench.ai/leaderboard",
+      "tier": "I",
+      "authority": "TB2 agentic execution",
+      "phase": "leaderboard",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Terminal-Bench (alt)",
+      "url": "https://terminal-bench.io/",
+      "tier": "I",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "tau-bench (canonical)",
+      "url": "https://github.com/sierra-research/tau-bench",
+      "tier": "I",
+      "authority": "tau2 agentic API-use; results in README + experiments/ folder",
+      "phase": "leaderboard",
+      "note": "tau-bench.dev domain dead as of 2026-04-26; canonical results live in repo README",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Aider Polyglot",
+      "url": "https://aider.chat/docs/leaderboards/",
+      "tier": "I",
+      "authority": "aider",
+      "warn": "stale since Nov 2025",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "MCP-Atlas",
+      "url": "https://mcp-atlas.dev",
+      "tier": "I",
+      "authority": "mcpA tool-chain quality",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Artificial Analysis",
+      "url": "https://artificialanalysis.ai/leaderboards/models",
+      "tier": "I",
+      "authority": "aaIdx, aaCoding, aaAgentic, throughput, pricing for ~336 models",
+      "phase": "leaderboard",
+      "format": "spa_partial",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Vellum LLM Leaderboard",
+      "url": "https://www.vellum.ai/llm-leaderboard",
+      "tier": "I",
+      "authority": "sweV (independent), gpqa, cost+latency",
+      "phase": "leaderboard",
+      "format": "static",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "llm-stats.com",
+      "url": "https://llm-stats.com/",
+      "tier": "I",
+      "authority": "broad model catalog",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "LMArena",
+      "url": "https://lmarena.ai/",
+      "tier": "I",
+      "authority": "blind human preference (formerly LMSYS)",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "LiveBench",
+      "url": "https://livebench.ai/",
+      "tier": "I",
+      "authority": "contamination-resistant rotating evals",
+      "format": "spa",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Berkeley BFCL",
+      "url": "https://gorilla.cs.berkeley.edu/leaderboard.html",
+      "tier": "I",
+      "authority": "function-calling v3/v4",
+      "format": "spa",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "BigCodeBench",
+      "url": "https://bigcode-bench.github.io/",
+      "tier": "I",
+      "authority": "code generation gold standard",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "BigCodeBench HF Space",
+      "url": "https://huggingface.co/spaces/bigcode/bigcode-models-leaderboard",
+      "tier": "I",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "EvalPlus",
+      "url": "https://evalplus.github.io/leaderboard.html",
+      "tier": "I",
+      "authority": "HumanEval+ / MBPP+ rigorous",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "HF Open LLM Leaderboard",
+      "url": "https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard",
+      "tier": "I",
+      "authority": "open-weight canonical aggregation",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Klu.ai",
+      "url": "https://klu.ai/llm-leaderboard",
+      "tier": "I",
+      "authority": "broader benchmark aggregator",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Papers with Code",
+      "url": "https://paperswithcode.com/area/code-generation",
+      "tier": "I",
+      "authority": "peer-reviewed leaderboards",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "arXiv",
+      "url": "https://arxiv.org/",
+      "tier": "I",
+      "authority": "original benchmark papers, technical reports",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "BenchLM",
+      "url": "https://benchlm.ai/",
+      "tier": "I",
+      "authority": "verified vs provisional transparency",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "AgentBench",
+      "url": "https://agentbench.ai",
+      "tier": "I",
+      "authority": "multi-domain agentic",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "MathArena",
+      "url": "https://matharena.ai/",
+      "tier": "I",
+      "authority": "AIME math reasoning (auxiliary)",
+      "format": "spa",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Vals.ai",
+      "url": "https://www.vals.ai/benchmarks/",
+      "tier": "I",
+      "authority": "enterprise-gated benchmark sets",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "LMMarketCap",
+      "url": "https://lmmarketcap.com/",
+      "tier": "I",
+      "authority": "hourly market table",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    }
   ],
-
   "aggregators": [
-    {"name": "OpenRouter", "url": "https://openrouter.ai", "tier": "I", "extracts": "provider count, uptime%, alt pricing, throughput", "phase": "pricing"},
-    {"name": "Together AI", "url": "https://www.together.ai/models", "tier": "I", "extracts": "quant variants, $/1M, batch tier", "phase": "pricing"},
-    {"name": "Fireworks AI", "url": "https://fireworks.ai/models", "tier": "I", "extracts": "tier, throughput, batch pricing", "phase": "pricing"},
-    {"name": "DeepInfra", "url": "https://deepinfra.com/models", "tier": "I", "extracts": "$/1M, throughput", "phase": "pricing"},
-    {"name": "Groq", "url": "https://console.groq.com/docs/models", "tier": "I", "extracts": "extreme-fast inference rates", "phase": "pricing"},
-    {"name": "Groq pricing", "url": "https://groq.com/pricing", "tier": "I"},
-    {"name": "Cerebras", "url": "https://inference-docs.cerebras.ai/", "tier": "I", "extracts": "ultra-fast inference"},
-    {"name": "Cerebras inference", "url": "https://cerebras.ai/inference", "tier": "I"},
-    {"name": "SambaNova Cloud", "url": "https://cloud.sambanova.ai/models", "tier": "I", "extracts": "catalog, throughput"},
-    {"name": "Replicate", "url": "https://replicate.com/", "tier": "I", "extracts": "open-weight hosting, $/sec"},
-    {"name": "Lepton AI", "url": "https://www.lepton.ai/pricing", "tier": "I", "extracts": "enterprise pricing"},
-    {"name": "Novita AI", "url": "https://novita.ai/model-api", "tier": "I", "extracts": "catalog + pricing"},
-    {"name": "SiliconFlow", "url": "https://siliconflow.cn/models", "tier": "I", "extracts": "Chinese providers — Qwen / DeepSeek / MiMo critical"},
-    {"name": "Anyscale", "url": "https://www.anyscale.com/endpoints", "tier": "I", "extracts": "enterprise endpoints"},
-    {"name": "Cloudflare Workers AI", "url": "https://developers.cloudflare.com/workers-ai/models/", "tier": "I", "extracts": "edge regions, free tier"},
-    {"name": "AWS Bedrock", "url": "https://aws.amazon.com/bedrock/", "tier": "I", "extracts": "enterprise + region matrix"},
-    {"name": "Azure AI Foundry", "url": "https://ai.azure.com/explore/models", "tier": "I", "extracts": "enterprise + region"},
-    {"name": "HuggingFace Inference Endpoints", "url": "https://huggingface.co/", "tier": "I", "extracts": "author canonical card"},
-    {"name": "OpenCode Zen", "url": "https://opencode.ai/docs/zen", "tier": "I", "extracts": "edge endpoints, latency"},
-    {"name": "OpenCode Go", "url": "https://opencode.ai/docs/go", "tier": "I"},
-    {"name": "Lambda Cloud", "url": "https://lambda.ai/inference", "tier": "I", "extracts": "enterprise throughput"},
-    {"name": "Tensorix", "url": "https://tensorix.ai/", "tier": "I", "extracts": "infrastructure / niche frontier hosting"}
+    {
+      "name": "OpenRouter",
+      "url": "https://openrouter.ai",
+      "tier": "I",
+      "extracts": "provider count, uptime%, alt pricing, throughput",
+      "phase": "pricing",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Together AI",
+      "url": "https://www.together.ai/models",
+      "tier": "I",
+      "extracts": "quant variants, $/1M, batch tier",
+      "phase": "pricing",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Fireworks AI",
+      "url": "https://fireworks.ai/models",
+      "tier": "I",
+      "extracts": "tier, throughput, batch pricing",
+      "phase": "pricing",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "DeepInfra",
+      "url": "https://deepinfra.com/models",
+      "tier": "I",
+      "extracts": "$/1M, throughput",
+      "phase": "pricing",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Groq",
+      "url": "https://console.groq.com/docs/models",
+      "tier": "I",
+      "extracts": "extreme-fast inference rates",
+      "phase": "pricing",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Groq pricing",
+      "url": "https://groq.com/pricing",
+      "tier": "I",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Cerebras",
+      "url": "https://inference-docs.cerebras.ai/",
+      "tier": "I",
+      "extracts": "ultra-fast inference",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Cerebras inference",
+      "url": "https://cerebras.ai/inference",
+      "tier": "I",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "SambaNova Cloud",
+      "url": "https://cloud.sambanova.ai/models",
+      "tier": "I",
+      "extracts": "catalog, throughput",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Replicate",
+      "url": "https://replicate.com/",
+      "tier": "I",
+      "extracts": "open-weight hosting, $/sec",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Lepton AI",
+      "url": "https://www.lepton.ai/pricing",
+      "tier": "I",
+      "extracts": "enterprise pricing",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Novita AI",
+      "url": "https://novita.ai/model-api",
+      "tier": "I",
+      "extracts": "catalog + pricing",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "SiliconFlow",
+      "url": "https://siliconflow.cn/models",
+      "tier": "I",
+      "extracts": "Chinese providers — Qwen / DeepSeek / MiMo critical",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Anyscale",
+      "url": "https://www.anyscale.com/endpoints",
+      "tier": "I",
+      "extracts": "enterprise endpoints",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Cloudflare Workers AI",
+      "url": "https://developers.cloudflare.com/workers-ai/models/",
+      "tier": "I",
+      "extracts": "edge regions, free tier",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "AWS Bedrock",
+      "url": "https://aws.amazon.com/bedrock/",
+      "tier": "I",
+      "extracts": "enterprise + region matrix",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Azure AI Foundry",
+      "url": "https://ai.azure.com/explore/models",
+      "tier": "I",
+      "extracts": "enterprise + region",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "HuggingFace Inference Endpoints",
+      "url": "https://huggingface.co/",
+      "tier": "I",
+      "extracts": "author canonical card",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "OpenCode Zen",
+      "url": "https://opencode.ai/docs/zen",
+      "tier": "I",
+      "extracts": "edge endpoints, latency",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "OpenCode Go",
+      "url": "https://opencode.ai/docs/go",
+      "tier": "I",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Lambda Cloud",
+      "url": "https://lambda.ai/inference",
+      "tier": "I",
+      "extracts": "enterprise throughput",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Tensorix",
+      "url": "https://tensorix.ai/",
+      "tier": "I",
+      "extracts": "infrastructure / niche frontier hosting",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    }
   ],
-
   "local": [
-    {"name": "Ollama Library", "url": "https://ollama.com/library", "tier": "I", "extracts": "tags, pullCount, architecture, parameters, license, releasedISO", "phase": "local"},
-    {"name": "HuggingFace Unsloth", "url": "https://huggingface.co/unsloth", "tier": "I", "extracts": "UD dynamic quants (UD-IQ1_S → UD-Q4_K_XL)", "phase": "local"},
-    {"name": "HuggingFace bartowski", "url": "https://huggingface.co/bartowski", "tier": "I", "extracts": "most-active quant maintainer"},
-    {"name": "HuggingFace mradermacher", "url": "https://huggingface.co/mradermacher", "tier": "I", "extracts": "high-quality quant set"},
-    {"name": "HuggingFace lmstudio-community", "url": "https://huggingface.co/lmstudio-community", "tier": "I", "extracts": "LM Studio-curated GGUFs"},
-    {"name": "LM Studio", "url": "https://lmstudio.ai/models", "tier": "I", "extracts": "desktop catalog"},
-    {"name": "llama.cpp", "url": "https://github.com/ggerganov/llama.cpp/discussions", "tier": "I", "extracts": "empirical VRAM/throughput data"},
-    {"name": "MLX (Apple Silicon)", "url": "https://huggingface.co/mlx-community", "tier": "I", "extracts": "mlx-quantized variants"},
-    {"name": "vLLM", "url": "https://docs.vllm.ai/en/latest/models/supported_models.html", "tier": "I", "extracts": "server-side support matrix"},
-    {"name": "sglang", "url": "https://github.com/sgl-project/sglang", "tier": "I", "extracts": "structured-output throughput"}
+    {
+      "name": "Ollama Library",
+      "url": "https://ollama.com/library",
+      "tier": "I",
+      "extracts": "tags, pullCount, architecture, parameters, license, releasedISO",
+      "phase": "local"
+    },
+    {
+      "name": "HuggingFace Unsloth",
+      "url": "https://huggingface.co/unsloth",
+      "tier": "I",
+      "extracts": "UD dynamic quants (UD-IQ1_S → UD-Q4_K_XL)",
+      "phase": "local"
+    },
+    {
+      "name": "HuggingFace bartowski",
+      "url": "https://huggingface.co/bartowski",
+      "tier": "I",
+      "extracts": "most-active quant maintainer"
+    },
+    {
+      "name": "HuggingFace mradermacher",
+      "url": "https://huggingface.co/mradermacher",
+      "tier": "I",
+      "extracts": "high-quality quant set"
+    },
+    {
+      "name": "HuggingFace lmstudio-community",
+      "url": "https://huggingface.co/lmstudio-community",
+      "tier": "I",
+      "extracts": "LM Studio-curated GGUFs"
+    },
+    {
+      "name": "LM Studio",
+      "url": "https://lmstudio.ai/models",
+      "tier": "I",
+      "extracts": "desktop catalog"
+    },
+    {
+      "name": "llama.cpp",
+      "url": "https://github.com/ggerganov/llama.cpp/discussions",
+      "tier": "I",
+      "extracts": "empirical VRAM/throughput data"
+    },
+    {
+      "name": "MLX (Apple Silicon)",
+      "url": "https://huggingface.co/mlx-community",
+      "tier": "I",
+      "extracts": "mlx-quantized variants"
+    },
+    {
+      "name": "vLLM",
+      "url": "https://docs.vllm.ai/en/latest/models/supported_models.html",
+      "tier": "I",
+      "extracts": "server-side support matrix"
+    },
+    {
+      "name": "sglang",
+      "url": "https://github.com/sgl-project/sglang",
+      "tier": "I",
+      "extracts": "structured-output throughput"
+    }
   ],
-
   "registries": [
-    {"name": "llmfit (local snapshot)", "url": "data/external/llmfit-hf-models.json", "tier": "I", "extracts": "148-model HF curated DB", "note": "read first; no network"},
-    {"name": "llmfit upstream", "url": "https://github.com/AlexsJones/llmfit/blob/main/data/hf_models.json", "tier": "I", "extracts": "authoritative source"},
-    {"name": "HF model index", "url": "https://huggingface.co/models?sort=trending", "tier": "S→I", "extracts": "trending + filter by license/architecture"}
+    {
+      "name": "llmfit (local snapshot)",
+      "url": "data/external/llmfit-hf-models.json",
+      "tier": "I",
+      "extracts": "148-model HF curated DB",
+      "note": "read first; no network"
+    },
+    {
+      "name": "llmfit upstream",
+      "url": "https://github.com/AlexsJones/llmfit/blob/main/data/hf_models.json",
+      "tier": "I",
+      "extracts": "authoritative source"
+    },
+    {
+      "name": "HF model index",
+      "url": "https://huggingface.co/models?sort=trending",
+      "tier": "S→I",
+      "extracts": "trending + filter by license/architecture"
+    }
   ],
-
   "community": [
-    {"name": "ApiDog Blog", "url": "https://apidog.com/blog/", "tier": "C"},
-    {"name": "The Decoder", "url": "https://the-decoder.com/", "tier": "C"},
-    {"name": "DataCamp Blog", "url": "https://www.datacamp.com/blog", "tier": "C"},
-    {"name": "Build Fast With AI", "url": "https://www.buildfastwithai.com/", "tier": "C"},
-    {"name": "Simon Willison", "url": "https://simonwillison.net/", "tier": "C"},
-    {"name": "Latent Space", "url": "https://www.latent.space/", "tier": "C"},
-    {"name": "Swyx", "url": "https://www.swyx.io/", "tier": "C"},
-    {"name": "Awesome-LLM", "url": "https://github.com/Hannibal046/Awesome-LLM", "tier": "C"},
-    {"name": "Awesome-Efficient-LLM", "url": "https://github.com/horseee/Awesome-Efficient-LLM", "tier": "C"},
-    {"name": "r/LocalLLaMA", "url": "https://www.reddit.com/r/LocalLLaMA/", "tier": "C", "note": "community VRAM reports only"},
-    {"name": "Design Arena", "url": "https://designarena.ai/leaderboard", "tier": "C", "note": "UI auxiliary"}
-  ]
+    {
+      "name": "ApiDog Blog",
+      "url": "https://apidog.com/blog/",
+      "tier": "C",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "The Decoder",
+      "url": "https://the-decoder.com/",
+      "tier": "C",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "DataCamp Blog",
+      "url": "https://www.datacamp.com/blog",
+      "tier": "C",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Build Fast With AI",
+      "url": "https://www.buildfastwithai.com/",
+      "tier": "C",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Simon Willison",
+      "url": "https://simonwillison.net/",
+      "tier": "C",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Latent Space",
+      "url": "https://www.latent.space/",
+      "tier": "C",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Swyx",
+      "url": "https://www.swyx.io/",
+      "tier": "C",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Awesome-LLM",
+      "url": "https://github.com/Hannibal046/Awesome-LLM",
+      "tier": "C",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Awesome-Efficient-LLM",
+      "url": "https://github.com/horseee/Awesome-Efficient-LLM",
+      "tier": "C",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "r/LocalLLaMA",
+      "url": "https://www.reddit.com/r/LocalLLaMA/",
+      "tier": "C",
+      "note": "community VRAM reports only",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Design Arena",
+      "url": "https://designarena.ai/leaderboard",
+      "tier": "C",
+      "note": "UI auxiliary",
+      "format": "unknown",
+      "lastVerifiedDate": null,
+      "consecutiveFailures": 0
+    },
+    {
+      "name": "Lushbinary",
+      "url": "https://lushbinary.com/blog/",
+      "type": "aggregator_blog",
+      "tier": "C",
+      "format": "static",
+      "lastVerifiedDate": "2026-04-26",
+      "consecutiveFailures": 0,
+      "note": "1:1 frontier model comparison articles (e.g., GPT-5.5 vs Opus 4.7); high-quality numeric extraction"
+    },
+    {
+      "name": "WhatLLM",
+      "url": "https://whatllm.org/blog/",
+      "type": "aggregator_blog",
+      "tier": "C",
+      "format": "static",
+      "lastVerifiedDate": "2026-04-26",
+      "consecutiveFailures": 0,
+      "note": "Per-model preview articles with extracted bench scores"
+    },
+    {
+      "name": "ALMCorp",
+      "url": "https://almcorp.com/blog/",
+      "type": "aggregator_blog",
+      "tier": "C",
+      "format": "static",
+      "lastVerifiedDate": "2026-04-26",
+      "consecutiveFailures": 0,
+      "note": "Complete guides with benchmarks/pricing per model"
+    },
+    {
+      "name": "TokenMix",
+      "url": "https://tokenmix.ai/blog/",
+      "type": "aggregator_blog",
+      "tier": "C",
+      "format": "static",
+      "lastVerifiedDate": "2026-04-26",
+      "consecutiveFailures": 0,
+      "note": "OpenAI o-series and reasoning model benchmarks"
+    },
+    {
+      "name": "Vals AI",
+      "url": "https://www.vals.ai/",
+      "type": "independent_leaderboard",
+      "tier": "I",
+      "format": "partial_static",
+      "lastVerifiedDate": "2026-04-26",
+      "consecutiveFailures": 0,
+      "note": "Independent benchmark tracker — per-model pages partially static; ranking tables visible"
+    },
+    {
+      "name": "BuildFastWithAI Blog",
+      "url": "https://www.buildfastwithai.com/blogs/",
+      "type": "aggregator_blog",
+      "tier": "C",
+      "format": "static",
+      "lastVerifiedDate": "2026-04-26",
+      "consecutiveFailures": 0,
+      "note": "Per-model review articles with full benchmarks (already used in C-tier elsewhere)"
+    },
+    {
+      "name": "Iternal LLM Selection Guide",
+      "url": "https://iternal.ai/llm-selection-guide",
+      "type": "aggregator_blog",
+      "tier": "C",
+      "format": "static",
+      "lastVerifiedDate": "2026-04-26",
+      "consecutiveFailures": 0,
+      "note": "30+ models ranked across MMLU/SWE-bench/Arena Elo/Pricing"
+    }
+  ],
+  "_runtime": {
+    "healthChecks": {
+      "artificialanalysis.ai/leaderboards": {
+        "status": "spa_partial",
+        "note": "Intelligence Index static; Coding/Agentic/Omni dynamic; use /articles/* for I-tier extraction"
+      },
+      "gorilla.cs.berkeley.edu/leaderboard.html": {
+        "status": "spa_no_data",
+        "note": "Full SPA; no static fallback found"
+      },
+      "livecodebench.github.io/leaderboard.html": {
+        "status": "spa_no_data",
+        "note": "Full SPA"
+      },
+      "swebench.com": {
+        "status": "spa_partial",
+        "note": "Truncation; per-leaderboard subpages probably static"
+      },
+      "matharena.ai": {
+        "status": "spa_no_data",
+        "note": "Full SPA"
+      },
+      "livebench.ai": {
+        "status": "spa_no_data",
+        "note": "Full SPA; HF Datasets API alt path"
+      },
+      "vellum.ai/llm-leaderboard": {
+        "status": "partial_static",
+        "note": "SPA with partial static rows; Vellum blog articles fully static and high-quality"
+      },
+      "vellum.ai/blog": {
+        "status": "static",
+        "note": "Per-article static; I-tier independent benchmark analyses"
+      },
+      "artificialanalysis.ai/articles": {
+        "status": "static",
+        "note": "Per-article static; I-tier curated comparison articles"
+      },
+      "openai.com/index": {
+        "status": "403_blocked",
+        "note": "Bot detection blocks WebFetch; use WebSearch fallback"
+      },
+      "blog.google": {
+        "status": "404_or_404",
+        "note": "Slug guesses fail; use WebSearch"
+      },
+      "x.ai/news": {
+        "status": "403_blocked",
+        "note": "Bot detection"
+      },
+      "anthropic.com/news": {
+        "status": "image_embedded",
+        "note": "Bench tables as PNG; auxiliary text scores only; image-OCR pipeline required for full extraction"
+      }
+    },
+    "lastFullCycle": "2026-04-26",
+    "schemaVersion": 2
+  }
 }

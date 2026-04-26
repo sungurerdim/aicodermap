@@ -15,6 +15,25 @@
       "date": "2026-04-20",
       "tier": "I",
       "trustScore": 0.333
+    },
+    {
+      "value": 64.3,
+      "source": "Vellum Opus 4.7 article",
+      "url": "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained",
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 1.0
+    },
+    {
+      "value": 61.2,
+      "source": "prior data/models.json",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.35,
+      "contradictionRole": "loser"
     }
   ],
   "opus-4-7.sweV": [
@@ -72,6 +91,15 @@
       "date": "2026-04-16",
       "tier": "S",
       "trustScore": 0.233
+    },
+    {
+      "value": 69.4,
+      "source": "Vellum Opus 4.7 article",
+      "url": "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained",
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 1.0
     }
   ],
   "opus-4-7.tau2": [
@@ -141,6 +169,15 @@
       "verifications": 1,
       "trustScore": 0.333,
       "contradictionRole": "winner"
+    },
+    {
+      "value": 94.2,
+      "source": "Vellum Opus 4.7 article",
+      "url": "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained",
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 1.0
     }
   ],
   "opus-4-7.sweMulti": [
@@ -218,6 +255,15 @@
       "verifications": 1,
       "trustScore": 0.333,
       "contradictionRole": "winner"
+    },
+    {
+      "value": 76.3,
+      "source": "Anthropic Sonnet 4.6 announcement",
+      "url": "https://www.anthropic.com/news/claude-sonnet-4-6",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "sonnet-4-6.tb2": [
@@ -1615,6 +1661,15 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": 0.7
+    },
+    {
+      "value": 73.3,
+      "source": "Anthropic Haiku 4.5 announcement",
+      "url": "https://www.anthropic.com/claude/haiku",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.7
     }
   ],
   "claude-haiku-4-5.swePro": [
@@ -2463,6 +2518,28 @@
       "verifications": 1,
       "trustScore": 0.4,
       "contradictionRole": "loser"
+    }
+  ],
+  "gpt-5-4.sweV": [
+    {
+      "value": 81.5,
+      "source": "Vellum LLM Leaderboard 2026",
+      "url": "https://www.vellum.ai/llm-leaderboard",
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 1.0
+    }
+  ],
+  "gemini-3-1-pro.aaIdx": [
+    {
+      "value": 57.2,
+      "source": "AA Opus 4.7 article (Gemini 3.1 Pro index)",
+      "url": "https://artificialanalysis.ai/articles/opus-4-7-everything-you-need-to-know",
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 1.0
     }
   ]
 }

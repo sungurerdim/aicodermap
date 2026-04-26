@@ -450,11 +450,22 @@ The agent NEVER emits a `gaps[]` entry on first try. Every gap candidate goes th
 
 ```
 For each (modelId, field) that ended Phase 2 still null/missing:
-  1. INTRA-WHITELIST FALLBACK:
+  0. WEBSEARCH PRIMARY DISCOVERY (NEW — top of the chain):
+     - WebSearch query: "<modelName>" benchmark "<benchmarkName>" 2026
+       (e.g., '"Claude Opus 4.7" benchmark "SWE-bench Verified" "GPQA" 2026')
+     - WebSearch returns curated summaries with extracted scores from blog/aggregator/vendor pages
+       that WebFetch cannot reach (SPA leaderboards, 403-blocked vendor blogs, image-embedded tables)
+     - Capture every (bench, score) pair in the search summary; tag tier per source domain:
+       * vellum.ai, artificialanalysis.ai/articles/* → I-tier (independent leaderboard analysis)
+       * deepmind.google/models/model-cards/*, openai.com/index/*, anthropic.com/news/* → S-tier (vendor)
+       * marktechpost.com, officechai.com, buildfastwithai.com, lushbinary.com, kingy.ai, whatllm.org, almcorp.com → C-tier (aggregator)
+     - WebSearch is the agent's PRIMARY tool for bench discovery in 2026; WebFetch is the
+       confirmation/cross-check tool. Reverse the prior order.
+  1. INTRA-WHITELIST FALLBACK (only after WebSearch exhausted):
      - If primary source was a leaderboard SPA → try the GitHub source repo URL
-       (e.g., livebench.ai SPA → github.com/LiveBench/LiveBench raw data;
-        artificialanalysis.ai/<id> SPA → main /leaderboards/models page;
-        BFCL gorilla SPA → gorilla.cs.berkeley.edu/leaderboard.html JSON view)
+       (every leaderboard entry in sources-whitelist.json now carries a `githubSource` field
+        when one exists — e.g., LiveBench → github.com/LiveBench/LiveBench;
+        SWE-bench → github.com/SWE-bench/experiments raw data)
      - If primary source was a vendor docs page → try vendor blog/news URL
      - If primary source was an aggregator → try a different aggregator from the same whitelist tier
      Cost: ≤2 additional fetches per gap pair, still within per_model_fetch_budget
@@ -462,14 +473,87 @@ For each (modelId, field) that ended Phase 2 still null/missing:
      - If a model is reported on a leaderboard for OTHER benches but not this one,
        check whether the leaderboard hosts a sister-benchmark page (e.g., LCB v6 + LCB v5;
        SWE-bench Verified + SWE-bench Pro on the same Scale page)
-  3. C-TIER COMMUNITY FALLBACK (only when I+S exhausted):
+  3. C-TIER COMMUNITY FALLBACK (only when steps 0-2 exhausted):
      - Sample 1-2 entries from `community[]` that match the (modelId, field) topic
      - Tag the resulting trustScore with C-tier weight (0.4); skill's auto-resolution will
        prefer it over null but treat it as low confidence
-  4. ONLY THEN emit a `gaps[]` entry with `triedSources: [<every URL attempted>]`
+  4. ONLY THEN emit a `gaps[]` entry with `triedSources: [<every URL attempted>]` AND
+     `triedQueries: [<every WebSearch query>]`
 ```
 
-**Cardinal rule:** an empty value in the artifact is a contract violation IF the agent never tried steps 1-3. The skill's deep-fetch loop will catch silently-skipped fields by checking gaps[] coverage against the field whitelist.
+**Cardinal rule:** an empty value in the artifact is a contract violation IF the agent never tried steps 0-3. The skill's deep-fetch loop will catch silently-skipped fields by checking gaps[] coverage against the field whitelist.
+
+## WEBSEARCH_PRIMARY_DISCIPLINE (2026 update — root-cause fix for SPA/403 walls)
+
+**Why this section exists:** In 2026, every major AI leaderboard (artificialanalysis.ai, swebench.com, livecodebench.github.io, gorilla.cs.berkeley.edu, livebench.ai, matharena.ai) is a JavaScript SPA returning empty static HTML. Direct vendor blogs (openai.com/index, blog.google, x.ai) reject Claude Code's WebFetch with 403/404 (bot detection). Anthropic vendor blogs embed bench tables as PNG images (text-only extraction misses 80%+ of scores). Text-only WebFetch hit a structural ceiling at ~25% per-page coverage.
+
+**The fix:** WebSearch (which uses Google's index + AI-summarized snippets) extracts numeric scores from cached pages, aggregator blogs, and snippet-rendered SPA content. WebSearch succeeded across all 6 frontier-model queries where WebFetch returned 403/SPA_NO_DATA.
+
+**Mandatory protocol per (modelId, field) pair:**
+
+```
+Phase 1+2+3 update — WebSearch precedes WebFetch:
+
+For each model surveyed:
+  for each empty bench cell (every key in 16-key whitelist that's null/undefined):
+    query := f'"{modelName}" benchmark "{benchKeyHumanName}" 2026'
+    results := WebSearch(query)
+    extract every (bench, value) pair the AI summary surfaces
+    tier-assign per source domain (table above)
+    emit to sourcesAdded[] with computed trustScore
+  Then ONE WebFetch per confirmed-promising URL (vendor announcement,
+  Vellum article, AA article) for triangulation/extra benches the search snippet missed.
+```
+
+**Aggregator domain tier assignments (2026 mapping):**
+- I-tier: vellum.ai/blog (independent benchmark analyses), artificialanalysis.ai/articles (curated comparison articles), benchlm.ai (independent leaderboard tracker)
+- S-tier: vendor canonical URLs (anthropic.com/news, openai.com/index, deepmind.google/models, mistral.ai/news, x.ai/news, kimi.com/blog)
+- C-tier: marktechpost.com, officechai.com, buildfastwithai.com, lushbinary.com, kingy.ai, whatllm.org, almcorp.com, awesomeagents.ai, datacamp.com, trendingtopics.eu, siray.ai, ucstrategies.com, tokenmix.ai, iternal.ai, tokencalculator.com (aggregator blogs that aggregate vendor + leaderboard data)
+
+**Minimum 2 WebSearch queries per gap pair before emitting gaps[]:**
+1. `"<modelName>" benchmark "<benchKey>" 2026`
+2. `"<modelName>" "<benchKey>" score`
+
+If both queries return zero useful (bench, score) pairs, escalate to step 1-3 of INTERNAL_RETRY_DISCIPLINE. Only then is `gaps[]` emission permitted.
+
+## DYNAMIC_WHITELIST_DISCOVERY (self-healing whitelist mutation)
+
+When the agent finds a NEW source domain that consistently provides high-quality bench data NOT in the current whitelist, it MUST emit a `whitelistAdditions[]` field in the output JSON:
+
+```jsonc
+"whitelistAdditions": [
+  {
+    "tier": "I"|"S"|"C",
+    "domain": "lushbinary.com",
+    "sampleUrl": "https://lushbinary.com/blog/gpt-5-5-vs-claude-opus-4-7-comparison-benchmarks-pricing/",
+    "extractedFields": ["gpt-5-5.swePro", "gpt-5-5.tb2", "opus-4-7.swePro"],
+    "rationale": "Curated 1:1 comparison articles with exact numeric scores for top frontier pairs"
+  }
+]
+```
+
+The skill's Step 7.5 reads `whitelistAdditions[]` and:
+1. For C-tier: appends to `data/sources-whitelist.json[community[]]` with `format:'static'`, `lastVerifiedDate:today`, `consecutiveFailures:0`.
+2. For I-tier: appends under `aggregators[]` with `phase:'discovery'` (not auto-promoted to `phase:'pricing'` or `'leaderboard'` without manual review).
+3. For S-tier: only added if matches a known vendor; ignored otherwise.
+
+Self-healing rule: if a domain in the whitelist registers `consecutiveFailures ≥ 3` across cycles (404/403/SPA_NO_DATA), the skill auto-demotes it to `_runtime.unhealthy: true` and the agent skips it for the next 2 cycles before retrying.
+
+## SOURCE_HEALTH_CHECK (per-cycle prelim, agent-internal)
+
+At the start of every refresh cycle, before Phase 0 lineup discovery, the agent quickly probes critical leaderboard URLs (sample 3 from `leaderboards[]` where `phase=='leaderboard'`):
+
+```
+for each probe_url in sample_critical_urls(3):
+  result := WebFetch(probe_url, prompt="report exactly: 'OK' if numeric table data visible, 'SPA_NO_DATA' if JS-only, '403/404' if blocked")
+  if result == 'SPA_NO_DATA' or 4xx:
+    runtime.healthChecks[domain] = "unhealthy"
+    skip this URL for current cycle's Phase 1; rely on WebSearch + alternate sources
+
+Emit runtime.healthChecks[] in the output JSON so skill can update sources-whitelist.json's
+`_runtime` block. Persistent unhealthy domains (≥3 consecutive cycles) are auto-flagged
+in the whitelist file for human review.
+```
 
 ## SPA_AUTO_FALLBACK (default behavior — no gap emission on SPA detection)
 

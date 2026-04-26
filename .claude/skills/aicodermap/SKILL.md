@@ -36,6 +36,13 @@ Orchestrate AI coding LLM tracker updates: discover **official vendor lineup** �
 
 ## WORKFLOW
 ```
+PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh):
+   - Skill instructs agent to run quick HEAD/GET probes on a 3-URL sample of leaderboards[]
+   - Agent reports `runtime.healthChecks[<domain>]: 'ok'|'unhealthy:<reason>'` per probe
+   - Skill writes results to data/sources-whitelist.json `_runtime.healthChecks` block
+   - Persistent-unhealthy domains (≥3 cycles consecutive) get `_runtime.unhealthy: true` — agent skips them in this cycle's Phase 1 until next health-check passes
+   - This step prevents wasted fetch budget on guaranteed-SPA/403 URLs
+
 0. LINEUP DISCOVERY (always run first on refresh-all):
    - Agent fetches each vendor's official "active models" page from VENDOR_LINEUP_SOURCES table
    - Returns canonical lineup: { vendorId: { active: [...], deprecated: [...], renamed: [{from,to}] } }
@@ -101,6 +108,25 @@ Orchestrate AI coding LLM tracker updates: discover **official vendor lineup** �
      append all candidates to data/sources.json with their trustScores
      log to CHANGELOG: "<modelId>.<bench>: <winner.value> (trust=<score>) over <loser.value> (trust=<score>) [Δ<delta>pp <severity>]"
    no user prompt is issued for any severity
+
+7.4. IMAGE_OCR_AUTO_TRIGGER (Anthropic-tier vendor announcements):
+   - For every vendor announcement URL fetched in this cycle from a vendor known to embed bench tables as PNG images (anthropic.com/news/*, deepmind.google/models/*, openai.com/index/*):
+     scripts/extract-images.py <url> → downloads embedded PNGs to .aicodermap-images/
+     Skill orchestrator (vision-aware Read tool) reads each PNG and extracts (modelName, benchName, score) via the alias table in agent.md EXTRACTION_DISCIPLINE
+     Extracted values get S-tier provenance pointing to the page URL
+     Merged into pending updates before Step 10
+   - Triggers automatically when artifact contains a `models[].sourcesAdded[]` entry whose source URL matches a known image-embedded vendor pattern AND that model has ≥3 null bench cells.
+   - Image OCR is opt-out per vendor via sources-whitelist.json `vendors.<v>.urls.imageOCRSkip: true`.
+
+7.5. DYNAMIC_WHITELIST_DISCOVERY (self-healing whitelist mutation):
+   - Skill reads `artifact.whitelistAdditions[]` (agent emits when it finds high-quality new sources)
+   - For each addition:
+     * tier='C' → append to data/sources-whitelist.json `community[]` with format='static', lastVerifiedDate=today, consecutiveFailures=0
+     * tier='I' → append to `aggregators[]` with phase='discovery' (not promoted without manual review)
+     * tier='S' → only if matches existing vendor; ignored otherwise
+   - Skill scans `artifact.runtime.healthChecks` and updates `data/sources-whitelist.json._runtime.healthChecks` per-domain
+   - Domains with consecutiveFailures ≥ 3 across cycles get `_runtime.unhealthy: true`; auto-skipped in next 2 cycles' Phase 1 (still tried via WebSearch fallback)
+   - Whitelist mutations are committed alongside data/* changes — versioned and reversible.
 
 8. Render diff summary (markdown table) to user-visible output: models[].updates fields, newModels[], lineup changes (NEW/DEPRECATED/RENAMED/REMOVED), contradictions auto-resolved, coverage% achieved, partialCoverage flag.
 9. AUTO-APPROVE — NO USER PROMPT. The workflow proceeds straight from Step 8 to Step 10. The only halt at this stage is schema-breaking discovery (a brand-new top-level field in a model entry not in the existing whitelist) — and even then, the unrecognized field is logged to gaps[] and merge continues with the recognized fields. RED contradictions are already auto-resolved at Step 7. REMOVED entries are auto-archived per LIFECYCLE_STATES.
