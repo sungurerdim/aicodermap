@@ -61,9 +61,22 @@ def variant(model_id: str) -> str:
     return ""
 
 
-def expand(template: str, model_id: str) -> str:
+def strip_prefix(model_id: str, prefix: str) -> str:
     return (
-        template.replace("{id}", model_id)
+        model_id[len(prefix) :] if prefix and model_id.startswith(prefix) else model_id
+    )
+
+
+def expand(template: str, model_id: str, vendor_prefix: str = "") -> str:
+    """Substitute placeholders. {vendor_prefix} resolves via leaderboard's
+    vendorPrefixMap[provider] (passed from caller). {id_no_prefix} strips the
+    leading vendor_prefix from id (so claude-haiku-4-5 with prefix='claude-'
+    becomes 'haiku-4-5'). Both enable vendor-conditional slug ordering without
+    burning all variation slots on dead alternatives."""
+    return (
+        template.replace("{vendor_prefix}", vendor_prefix)
+        .replace("{id_no_prefix}", strip_prefix(model_id, vendor_prefix))
+        .replace("{id}", model_id)
         .replace("{family}", family(model_id))
         .replace("{N}", major_version(model_id))
         .replace("{variant}", variant(model_id))
@@ -97,20 +110,26 @@ def main():
         mid = fx["modelId"]
         correct = fx["correctSlug"]
 
+        provider = fx.get("provider", "")
         if "leaderboard" in fx:
             entry = by_lb_host.get(fx["leaderboard"])
             variations = (entry or {}).get("slugVariations", []) or []
+            prefix_map = (entry or {}).get("vendorPrefixMap", {}) or {}
+            vendor_prefix = prefix_map.get(provider, prefix_map.get("default", ""))
             label = f"lb:{fx['leaderboard']}"
         elif "vendor" in fx:
             v = vendors.get(fx["vendor"], {}) or {}
             via = fx.get("via", "postSlugVariations")
             variations = v.get(via, []) or []
+            prefix_map = v.get("vendorPrefixMap", {}) or {}
+            vendor_prefix = prefix_map.get(provider, prefix_map.get("default", ""))
             label = f"vendor:{fx['vendor']}.{via}"
         else:
             variations = []
+            vendor_prefix = ""
             label = "?"
 
-        expanded = [expand(t, mid) for t in variations]
+        expanded = [expand(t, mid, vendor_prefix) for t in variations]
         try:
             rank = expanded.index(correct) + 1
         except ValueError:

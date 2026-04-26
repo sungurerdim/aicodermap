@@ -1,42 +1,43 @@
 {
-  "_note": "Verified (modelId, source, correctSlug) triples from cycle-2 audit (2026-04-27). Each entry is a confirmed-200 URL or a confirmed-404 (negative). Eval simulates slug expansion against data/sources-whitelist.json and records the rank of correctSlug.",
+  "_note": "Verified (modelId, source, correctSlug) triples from cycle-2 audit (2026-04-27). Each fixture carries `provider` so the eval can look up vendorPrefixMap[provider] for {vendor_prefix} substitution. This enables vendor-conditional slug ordering without consuming a slot for every (provider, prefix) combo.",
   "_format": {
     "modelId": "matches data/models.json[].id",
+    "provider": "vendor key (anthropic, openai, google_deepmind, xai, deepseek, mistral, alibaba_qwen, ...)",
     "leaderboard|vendor": "key into whitelist (hostname for leaderboards, vendorId for vendors)",
     "via": "for vendors only — which slugVariations array (postSlugVariations | modelCardSlugVariations)",
     "correctSlug": "the slug that produced a 200 OK",
     "verified": "URL where this was confirmed"
   },
   "fixtures": [
-    {"modelId": "opus-4-7", "leaderboard": "artificialanalysis.ai", "correctSlug": "claude-opus-4-7", "verified": "https://artificialanalysis.ai/models/claude-opus-4-7"},
-    {"modelId": "gpt-5-5", "leaderboard": "artificialanalysis.ai", "correctSlug": "gpt-5-5", "verified": "https://artificialanalysis.ai/models/gpt-5-5"},
-    {"modelId": "grok-3", "leaderboard": "artificialanalysis.ai", "correctSlug": "grok-3", "verified": "https://artificialanalysis.ai/models/grok-3"},
-    {"modelId": "grok-4-20", "leaderboard": "artificialanalysis.ai", "correctSlug": "grok-4-20", "verified": "https://artificialanalysis.ai/models/grok-4-20"},
-    {"modelId": "deepseek-v3-2", "leaderboard": "artificialanalysis.ai", "correctSlug": "deepseek-v3-2", "verified": "https://artificialanalysis.ai/models/deepseek-v3-2"},
-    {"modelId": "deepseek-v4-pro", "leaderboard": "artificialanalysis.ai", "correctSlug": "deepseek-v4-pro", "verified": "https://artificialanalysis.ai/models/deepseek-v4-pro"},
-    {"modelId": "deepseek-v4-flash", "leaderboard": "artificialanalysis.ai", "correctSlug": "deepseek-v4-flash", "verified": "https://artificialanalysis.ai/models/deepseek-v4-flash"},
-    {"modelId": "mimo-v2-5-pro", "leaderboard": "artificialanalysis.ai", "correctSlug": "mimo-v2-5-pro", "verified": "https://artificialanalysis.ai/models/mimo-v2-5-pro"},
-    {"modelId": "step-3-5-flash", "leaderboard": "artificialanalysis.ai", "correctSlug": "step-3-5-flash", "verified": "https://artificialanalysis.ai/models/step-3-5-flash"},
-    {"modelId": "qwen3-coder-480b", "leaderboard": "artificialanalysis.ai", "correctSlug": "qwen3-coder-480b-a35b-instruct", "verified": "https://artificialanalysis.ai/models/qwen3-coder-480b-a35b-instruct"},
-    {"modelId": "gemini-3-1-flash", "leaderboard": "artificialanalysis.ai", "correctSlug": "gemini-3-1-flash-lite-preview", "verified": "https://artificialanalysis.ai/models/gemini-3-1-flash-lite-preview"},
+    {"modelId": "opus-4-7", "provider": "anthropic", "leaderboard": "artificialanalysis.ai", "correctSlug": "claude-opus-4-7", "verified": "https://artificialanalysis.ai/models/claude-opus-4-7"},
+    {"modelId": "gpt-5-5", "provider": "openai", "leaderboard": "artificialanalysis.ai", "correctSlug": "gpt-5-5", "verified": "https://artificialanalysis.ai/models/gpt-5-5"},
+    {"modelId": "grok-3", "provider": "xai", "leaderboard": "artificialanalysis.ai", "correctSlug": "grok-3", "verified": "https://artificialanalysis.ai/models/grok-3"},
+    {"modelId": "grok-4-20", "provider": "xai", "leaderboard": "artificialanalysis.ai", "correctSlug": "grok-4-20", "verified": "https://artificialanalysis.ai/models/grok-4-20"},
+    {"modelId": "deepseek-v3-2", "provider": "deepseek", "leaderboard": "artificialanalysis.ai", "correctSlug": "deepseek-v3-2", "verified": "https://artificialanalysis.ai/models/deepseek-v3-2"},
+    {"modelId": "deepseek-v4-pro", "provider": "deepseek", "leaderboard": "artificialanalysis.ai", "correctSlug": "deepseek-v4-pro", "verified": "https://artificialanalysis.ai/models/deepseek-v4-pro"},
+    {"modelId": "deepseek-v4-flash", "provider": "deepseek", "leaderboard": "artificialanalysis.ai", "correctSlug": "deepseek-v4-flash", "verified": "https://artificialanalysis.ai/models/deepseek-v4-flash"},
+    {"modelId": "mimo-v2-5-pro", "provider": "xiaomi_mimo", "leaderboard": "artificialanalysis.ai", "correctSlug": "mimo-v2-5-pro", "verified": "https://artificialanalysis.ai/models/mimo-v2-5-pro"},
+    {"modelId": "step-3-5-flash", "provider": "stepfun", "leaderboard": "artificialanalysis.ai", "correctSlug": "step-3-5-flash", "verified": "https://artificialanalysis.ai/models/step-3-5-flash"},
+    {"modelId": "qwen3-coder-480b", "provider": "alibaba_qwen", "leaderboard": "artificialanalysis.ai", "correctSlug": "qwen3-coder-480b-a35b-instruct", "verified": "https://artificialanalysis.ai/models/qwen3-coder-480b-a35b-instruct"},
+    {"modelId": "gemini-3-1-flash", "provider": "google_deepmind", "leaderboard": "artificialanalysis.ai", "correctSlug": "gemini-3-1-flash-lite-preview", "verified": "https://artificialanalysis.ai/models/gemini-3-1-flash-lite-preview"},
 
-    {"modelId": "gpt-5-5", "leaderboard": "benchlm.ai", "correctSlug": "gpt-5-5", "verified": "https://benchlm.ai/models/gpt-5-5"},
-    {"modelId": "gemini-3-1-pro", "leaderboard": "benchlm.ai", "correctSlug": "gemini-3-1-pro", "verified": "https://benchlm.ai/models/gemini-3-1-pro"},
-    {"modelId": "opus-4-7", "leaderboard": "benchlm.ai", "correctSlug": "claude-opus-4-7", "verified": "https://benchlm.ai/models/claude-opus-4-7"},
+    {"modelId": "gpt-5-5", "provider": "openai", "leaderboard": "benchlm.ai", "correctSlug": "gpt-5-5", "verified": "https://benchlm.ai/models/gpt-5-5"},
+    {"modelId": "gemini-3-1-pro", "provider": "google_deepmind", "leaderboard": "benchlm.ai", "correctSlug": "gemini-3-1-pro", "verified": "https://benchlm.ai/models/gemini-3-1-pro"},
+    {"modelId": "opus-4-7", "provider": "anthropic", "leaderboard": "benchlm.ai", "correctSlug": "claude-opus-4-7", "verified": "https://benchlm.ai/models/claude-opus-4-7"},
 
-    {"modelId": "opus-4-7", "leaderboard": "epoch.ai", "correctSlug": "claude-opus-4-7", "verified": "https://epoch.ai/models/claude-opus-4-7"},
-    {"modelId": "gpt-5-4", "leaderboard": "epoch.ai", "correctSlug": "gpt-5-4", "verified": "https://epoch.ai/models/gpt-5-4"},
-    {"modelId": "gemini-3-1-pro", "leaderboard": "epoch.ai", "correctSlug": "gemini-3-1-pro", "verified": "https://epoch.ai/models/gemini-3-1-pro"},
-    {"modelId": "deepseek-v3-2", "leaderboard": "epoch.ai", "correctSlug": "deepseek-v3-2", "verified": "https://epoch.ai/models/deepseek-v3-2"},
-    {"modelId": "grok-4-20", "leaderboard": "epoch.ai", "correctSlug": "grok-4", "verified": "https://epoch.ai/models/grok-4"},
+    {"modelId": "opus-4-7", "provider": "anthropic", "leaderboard": "epoch.ai", "correctSlug": "claude-opus-4-7", "verified": "https://epoch.ai/models/claude-opus-4-7"},
+    {"modelId": "gpt-5-4", "provider": "openai", "leaderboard": "epoch.ai", "correctSlug": "gpt-5-4", "verified": "https://epoch.ai/models/gpt-5-4"},
+    {"modelId": "gemini-3-1-pro", "provider": "google_deepmind", "leaderboard": "epoch.ai", "correctSlug": "gemini-3-1-pro", "verified": "https://epoch.ai/models/gemini-3-1-pro"},
+    {"modelId": "deepseek-v3-2", "provider": "deepseek", "leaderboard": "epoch.ai", "correctSlug": "deepseek-v3-2", "verified": "https://epoch.ai/models/deepseek-v3-2"},
+    {"modelId": "grok-4-20", "provider": "xai", "leaderboard": "epoch.ai", "correctSlug": "grok-4", "verified": "https://epoch.ai/models/grok-4"},
 
-    {"modelId": "opus-4-7", "vendor": "anthropic", "via": "postSlugVariations", "correctSlug": "claude-opus-4-7", "verified": "https://www.anthropic.com/news/claude-opus-4-7"},
-    {"modelId": "claude-haiku-4-5", "vendor": "anthropic", "via": "postSlugVariations", "correctSlug": "claude-haiku-4-5", "verified": "https://www.anthropic.com/news/claude-haiku-4-5"},
+    {"modelId": "opus-4-7", "provider": "anthropic", "vendor": "anthropic", "via": "postSlugVariations", "correctSlug": "claude-opus-4-7", "verified": "https://www.anthropic.com/news/claude-opus-4-7"},
+    {"modelId": "claude-haiku-4-5", "provider": "anthropic", "vendor": "anthropic", "via": "postSlugVariations", "correctSlug": "claude-haiku-4-5", "verified": "https://www.anthropic.com/news/claude-haiku-4-5"},
 
-    {"modelId": "gpt-5-5", "vendor": "openai", "via": "postSlugVariations", "correctSlug": "introducing-gpt-5-5", "verified": "https://openai.com/index/introducing-gpt-5-5/"},
-    {"modelId": "gpt-5-4", "vendor": "openai", "via": "postSlugVariations", "correctSlug": "introducing-gpt-5-4", "verified": "https://openai.com/index/introducing-gpt-5-4/"},
+    {"modelId": "gpt-5-5", "provider": "openai", "vendor": "openai", "via": "postSlugVariations", "correctSlug": "introducing-gpt-5-5", "verified": "https://openai.com/index/introducing-gpt-5-5/"},
+    {"modelId": "gpt-5-4", "provider": "openai", "vendor": "openai", "via": "postSlugVariations", "correctSlug": "introducing-gpt-5-4", "verified": "https://openai.com/index/introducing-gpt-5-4/"},
 
-    {"modelId": "gemini-3-1-pro", "vendor": "google_deepmind", "via": "modelCardSlugVariations", "correctSlug": "gemini-3-1-pro", "verified": "https://deepmind.google/models/model-cards/gemini-3-1-pro/"},
-    {"modelId": "gemini-3-1-flash", "vendor": "google_deepmind", "via": "modelCardSlugVariations", "correctSlug": "gemini-3-1-flash-lite", "verified": "https://deepmind.google/models/model-cards/gemini-3-1-flash-lite/"}
+    {"modelId": "gemini-3-1-pro", "provider": "google_deepmind", "vendor": "google_deepmind", "via": "modelCardSlugVariations", "correctSlug": "gemini-3-1-pro", "verified": "https://deepmind.google/models/model-cards/gemini-3-1-pro/"},
+    {"modelId": "gemini-3-1-flash", "provider": "google_deepmind", "vendor": "google_deepmind", "via": "modelCardSlugVariations", "correctSlug": "gemini-3-1-flash-lite", "verified": "https://deepmind.google/models/model-cards/gemini-3-1-flash-lite/"}
   ]
 }
