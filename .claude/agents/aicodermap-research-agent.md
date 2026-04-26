@@ -135,6 +135,50 @@ For models that ended Phase 1+2 with <2 bench cells filled OR with missing prici
 - HuggingFace card (search vendors[].urls.models or `huggingface.co/<author>/<model>`)
 - Specific leaderboard for the missing bench from `leaderboards[]`
 
+## EXTRACTION_DISCIPLINE (table-aware, not summary-only)
+
+The single biggest source of data loss in prior runs: agent fetched a vendor announcement page that contained 8-15 bench scores in a table, but only extracted the 1-3 scores mentioned in the lead summary sentence. Page text had everything; agent saw a fraction.
+
+**Mandatory extraction rules per fetched page:**
+
+1. After fetching, scan the ENTIRE text body for bench score patterns:
+   ```
+   regex 1: <BENCH_NAME>\s*[:\-]?\s*(\d{1,3}(?:\.\d{1,2})?)\s*%
+   regex 2: (\d{1,3}(?:\.\d{1,2})?)\s*%\s+on\s+<BENCH_NAME>
+   regex 3: table-row pattern: <BENCH_NAME> | <SCORE> | (in markdown/HTML tables)
+   ```
+   where BENCH_NAME maps via this alias table:
+   - SWE-bench Pro / SEAL Pro / SWE Pro → swePro
+   - SWE-bench Verified / SWE-V → sweV
+   - SWE-bench Multilingual / Multi-SWE → sweMulti
+   - LiveCodeBench v6 / LCB v6 / LCBv6 → lcbV6
+   - Terminal-Bench 2 / TB2 / Terminal-Bench Hard → tb2
+   - tau-bench v2 / tau2 / tau-2 → tau2
+   - Aider Polyglot / Aider → aider
+   - MCP-Atlas / MCP Atlas → mcpA
+   - GPQA Diamond / GPQA → gpqa
+   - Humanity's Last Exam / HLE → hle
+   - Artificial Analysis Coding Index / AA Coding → aaCoding
+   - Artificial Analysis Agentic Index / AA Agentic → aaAgentic
+   - Artificial Analysis Intelligence Index / AA Index / aaIdx → aaIdx
+
+2. EVERY (bench_name, score) pair found in the text becomes a candidate value. Do NOT pre-filter to "the bench I was looking for" — if the page mentions GPQA 87.7, MMLU 89, AIME 85.4, HumanEval 92.0, capture them all even if your target was just sweV.
+
+3. Page-text snapshot in the artifact: when emitting `models[].updates.bench`, include all extracted scores, not just the ones explicitly searched.
+
+4. Score → trustScore: page is vendor blog → S-tier; leaderboard → I-tier; community → C-tier (formula in SKILL.md).
+
+## SPA_FALLBACK (when target page is JS-rendered)
+
+Some target pages render bench tables client-side; fetch returns mostly `<script>` bundles with little text. Detection: `len(text) / len(html) < 0.10` is the SPA tell.
+
+Pages known to be SPA-only (avoid as primary):
+- `artificialanalysis.ai/models/<id>` (per-model — use main `/leaderboards/models` instead)
+- `huggingface.co/spaces/open-llm-leaderboard/...` (use HF Datasets API endpoint instead)
+- `livebench.ai` (use GitHub source for raw data)
+
+Per-page fallback rule: if SPA detected (low text ratio + bench keyword absent), DO NOT emit gaps[] yet — try the main aggregator/leaderboard page first.
+
 ### Per-row extraction discipline
 For each fetched table page, extract every row matching a model in `idea_context.currentIds` via:
 1. Exact `id` slug match

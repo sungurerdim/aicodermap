@@ -178,7 +178,7 @@
     {"name": "LiveCodeBench (alt)", "url": "https://livecodebench.com/", "tier": "I"},
     {"name": "Terminal-Bench", "url": "https://tbench.ai/leaderboard", "tier": "I", "authority": "TB2 agentic execution", "phase": "leaderboard"},
     {"name": "Terminal-Bench (alt)", "url": "https://terminal-bench.io/", "tier": "I"},
-    {"name": "tau-bench", "url": "https://tau-bench.dev", "tier": "I", "authority": "tau2 agentic API-use", "phase": "leaderboard"},
+    {"name": "tau-bench (canonical)", "url": "https://github.com/sierra-research/tau-bench", "tier": "I", "authority": "tau2 agentic API-use; results in README + experiments/ folder", "phase": "leaderboard", "note": "tau-bench.dev domain dead as of 2026-04-26; canonical results live in repo README"},
     {"name": "Aider Polyglot", "url": "https://aider.chat/docs/leaderboards/", "tier": "I", "authority": "aider", "warn": "stale since Nov 2025"},
     {"name": "MCP-Atlas", "url": "https://mcp-atlas.dev", "tier": "I", "authority": "mcpA tool-chain quality"},
     {"name": "Artificial Analysis", "url": "https://artificialanalysis.ai/leaderboards/models", "tier": "I", "authority": "aaIdx, aaCoding, aaAgentic, throughput, pricing for ~336 models", "phase": "leaderboard"},
