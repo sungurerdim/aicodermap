@@ -681,7 +681,41 @@ For each empty bench cell on a model:
 | `{N}` | major numeric version | `3` |
 | `{variant}` | trailing variant token (pro/flash/lite/mini) | `pro` |
 | `{YYMMDD}` | model.released converted to YYMMDD | `260219` |
+| `{vendor_prefix}` | resolves via leaderboard/vendor `vendorPrefixMap[provider]` (e.g., `claude-` for Anthropic models on AA / BenchLM, empty for OpenAI/xAI) — enables vendor-conditional slug ordering without consuming a slot per provider | `claude-` for `provider=anthropic`, `""` otherwise |
+| `{id_no_prefix}` | strips leading `vendor_prefix` from id (handles models whose id already carries the prefix, e.g., `claude-haiku-4-5` with prefix `claude-` → `haiku-4-5`, avoids `claude-claude-haiku-4-5` double-prefix bug) | `haiku-4-5` for `model.id=claude-haiku-4-5` |
 | `{slug}` | computed slug after substitution | (final URL token) |
+
+**Whitelist schema additions for vendor-conditional substitution** (added 2026-04-27 via ds-tune; lifted hit_rate_at_1 from 0.68 → 0.84 on the audit fixture):
+
+```jsonc
+{
+  "leaderboards": [
+    {
+      "url": "https://artificialanalysis.ai/leaderboards/models",
+      "perModelUrlTemplate": "https://artificialanalysis.ai/models/{slug}",
+      "slugVariations": [
+        "{vendor_prefix}{id}",        // claude-opus-4-7 for Anthropic, opus-4-7 for default
+        "{id}",
+        "{id}-preview",
+        "{id}-lite-preview",          // gemini-3-1-flash-lite-preview corner case
+        "{id}-a35b-instruct"          // qwen3-coder-480b-a35b-instruct corner case
+      ],
+      "vendorPrefixMap": {
+        "anthropic": "claude-",
+        "default": ""
+      }
+    }
+  ],
+  "vendors": {
+    "anthropic": {
+      "postSlugVariations": ["claude-{id_no_prefix}", "{id}"],
+      "vendorPrefixMap": { "anthropic": "claude-", "default": "" }
+    }
+  }
+}
+```
+
+The same `vendorPrefixMap` mechanism applies to vendor entries (for `postSlugVariations` and `modelCardSlugVariations`). Adding a new provider-conditional prefix = appending to `vendorPrefixMap` only — never editing this spec or extending the agent procedure.
 
 **Budget impact:** Step 2 + Step 3 add up to 4 + 4 = 8 fetch attempts per model (vs prior 0). The per_model_fetch_budget MUST be raised to **12** (from 6) when `scope=full` to absorb the cascade. The skill orchestrator enforces this; the agent does not exceed `per_model_fetch_budget` regardless.
 
