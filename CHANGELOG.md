@@ -1,4 +1,21 @@
 
+## [2026-04-26] — autonomous refresh-all
+
+### Updated
+- 7 models: `claude-haiku-4-5`, `gemini-3-1-flash`, `nemotron-3-super`, `minimax-m2-7`, `mimo-v2-pro`, `step-3-5-flash`, `qwen3-coder-480b`
+
+### Gaps (11 entries — see data/known-gaps.json or next refresh)
+- `claude-haiku-4-5.gpqa`: No standalone GPQA Diamond score; benchmark image not machine-readable
+- `claude-haiku-4-5.tau2`: Not in visible rows on tau2-bench AA leaderboard
+- `claude-haiku-4-5.aaCoding`: AA only exposes composite Intelligence Index per model page
+- `claude-haiku-4-5.aaAgentic`: AA only exposes composite Intelligence Index
+- `gemini-3-1-flash.aaCoding`: Coding sub-index not separately published
+- `gemini-3-1-flash.aaAgentic`: Agentic sub-index not separately published
+- `nemotron-3-super.aaCoding`: AA bundles into composite index only
+- `nemotron-3-super.aaAgentic`: AA bundles into composite index only
+- ... and 3 more
+
+
 ## [2026-04-26] — autonomous refresh-all [WARN: partial coverage 41.0%]
 
 ### Updated

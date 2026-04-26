@@ -46,7 +46,7 @@
       "gpqa": 86.9,
       "sweMulti": null,
       "hle": null,
-      "aaIdx": null
+      "aaIdx": 21
     },
     "providers": 2,
     "uptime": null,
@@ -55,7 +55,7 @@
     "vramRequirement": null,
     "strengthsKey": "gemini-3-1-flash.strengths",
     "weaknessesKey": "gemini-3-1-flash.weaknesses",
-    "lastUpdated": "2026-04-25",
+    "lastUpdated": "2026-04-26",
     "status": "active"
   },
   {
@@ -1748,7 +1748,7 @@
       "gpqa": null,
       "sweMulti": null,
       "hle": null,
-      "aaIdx": null
+      "aaIdx": 49
     },
     "providers": 3,
     "uptime": null,
@@ -1757,7 +1757,7 @@
     "vramRequirement": null,
     "strengthsKey": "mimo-v2-pro.strengths",
     "weaknessesKey": "mimo-v2-pro.weaknesses",
-    "lastUpdated": "2026-04-25",
+    "lastUpdated": "2026-04-26",
     "status": "active"
   },
   {
@@ -1825,7 +1825,7 @@
     "released": "2026-03-18",
     "tier": "open-tier1",
     "open": true,
-    "license": "Apache 2.0",
+    "license": "Non-commercial (commercial license on request)",
     "context": 205000,
     "pricing": {
       "api": [
@@ -1835,8 +1835,8 @@
           "out": 1.2,
           "cacheHit": null,
           "throughput": null,
-          "url": "https://platform.minimaxi.com/",
-          "fetched": "2026-04-25"
+          "url": "https://artificialanalysis.ai/models/minimax-m2-7",
+          "fetched": "2026-04-26"
         }
       ],
       "range": {
@@ -1849,13 +1849,14 @@
           1.2
         ],
         "cacheHit": null
-      }
+      },
+      "subscription": null
     },
     "bench": {
       "sweV": 56.2,
       "tb2": 57,
       "aaIdx": 50,
-      "swePro": null,
+      "swePro": 56.2,
       "lcbV6": null,
       "aider": null,
       "tau2": null,
@@ -1873,7 +1874,7 @@
     "vramRequirement": null,
     "strengthsKey": "minimax-m2-7.strengths",
     "weaknessesKey": "minimax-m2-7.weaknesses",
-    "lastUpdated": "2026-04-25",
+    "lastUpdated": "2026-04-26",
     "status": "active"
   },
   {
@@ -1895,6 +1896,15 @@
           "throughput": null,
           "url": "https://build.nvidia.com/",
           "fetched": "2026-04-25"
+        },
+        {
+          "provider": "nvidia-nim",
+          "in": 0.3,
+          "out": 0.75,
+          "cacheHit": null,
+          "throughput": null,
+          "url": "https://artificialanalysis.ai/models/nvidia-nemotron-3-super-120b-a12b",
+          "fetched": "2026-04-26"
         }
       ],
       "range": {
@@ -1904,16 +1914,17 @@
         ],
         "out": [
           0.3,
-          0.3
+          0.75
         ],
         "cacheHit": null
-      }
+      },
+      "subscription": null
     },
     "bench": {
       "sweV": 60.5,
       "sweMulti": 45.8,
       "swePro": null,
-      "tb2": null,
+      "tb2": 29.0,
       "lcbV6": null,
       "aider": null,
       "tau2": null,
@@ -1922,7 +1933,7 @@
       "mcpA": null,
       "gpqa": null,
       "hle": null,
-      "aaIdx": null
+      "aaIdx": 36
     },
     "providers": 3,
     "uptime": null,
@@ -1931,7 +1942,7 @@
     "vramRequirement": 64,
     "strengthsKey": "nemotron-3-super.strengths",
     "weaknessesKey": "nemotron-3-super.weaknesses",
-    "lastUpdated": "2026-04-25",
+    "lastUpdated": "2026-04-26",
     "status": "active"
   },
   {
@@ -2567,7 +2578,7 @@
     },
     "bench": {
       "aider": 61.8,
-      "swePro": null,
+      "swePro": 38.7,
       "sweV": null,
       "tb2": null,
       "lcbV6": null,
@@ -2587,7 +2598,7 @@
     "vramRequirement": null,
     "strengthsKey": "qwen3-coder-480b.strengths",
     "weaknessesKey": "qwen3-coder-480b.weaknesses",
-    "lastUpdated": "2026-04-25",
+    "lastUpdated": "2026-04-26",
     "status": "active"
   },
   {
@@ -2683,7 +2694,7 @@
     "tier": "open-tier1",
     "open": true,
     "license": "Apache 2.0",
-    "context": 262144,
+    "context": 256000,
     "pricing": {
       "api": [
         {
@@ -2721,7 +2732,7 @@
       "gpqa": null,
       "sweMulti": null,
       "hle": null,
-      "aaIdx": null
+      "aaIdx": 38
     },
     "providers": 3,
     "uptime": null,
@@ -2730,7 +2741,7 @@
     "vramRequirement": null,
     "strengthsKey": "step-3-5-flash.strengths",
     "weaknessesKey": "step-3-5-flash.weaknesses",
-    "lastUpdated": "2026-04-25",
+    "lastUpdated": "2026-04-26",
     "status": "active"
   },
   {
@@ -3729,8 +3740,8 @@
       ]
     },
     "bench": {
-      "swePro": null,
-      "sweV": null,
+      "swePro": 39.45,
+      "sweV": 73.3,
       "tb2": null,
       "lcbV6": null,
       "aider": null,
@@ -3741,7 +3752,7 @@
       "gpqa": null,
       "sweMulti": null,
       "hle": null,
-      "aaIdx": 37
+      "aaIdx": 31
     },
     "providers": 3,
     "uptime": null,
