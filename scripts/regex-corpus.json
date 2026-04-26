@@ -1,0 +1,254 @@
+{
+  "_purpose": "Test corpus for every named pattern in data/sources-whitelist.json._schema.regexLibrary. Validated by scripts/regex-lint.js — 100% positive matches + 100% negative rejections + ReDoS timing < 50ms per trigger. A single failure blocks the commit. SSOT for pattern correctness.",
+  "_runOn": "Every pattern change; pre-commit; before initial commit; whenever a contradiction rate spikes.",
+  "patterns": {
+    "bench_score_labeled": {
+      "positive": [
+        { "input": "SWE-bench Verified: 87.6%", "expect": { "bench": "SWE-bench Verified", "value": "87.6", "unit": "%" } },
+        { "input": "GPQA Diamond — 95.4", "expect": { "bench": "GPQA Diamond", "value": "95.4" } },
+        { "input": "Terminal-Bench v2 = 69.4%", "expect": { "bench": "Terminal-Bench v2", "value": "69.4", "unit": "%" } },
+        { "input": "AIME 2025: 99,2", "expect": { "value": "99,2" } },
+        { "input": "tau-bench v2 (en) : 59.0 pts", "expect": { "bench": "tau-bench v2", "value": "59.0", "unit": "pts" } },
+        { "input": "BFCL - 88.4", "expect": { "value": "88.4" } },
+        { "input": "HLE: 24.5%", "expect": { "bench": "HLE", "value": "24.5", "unit": "%" } },
+        { "input": "MCP-Atlas = 71", "expect": { "bench": "MCP-Atlas", "value": "71" } }
+      ],
+      "negative": [
+        { "input": "Anthropic raised $7.5B in 2025", "reason": "no bench label" },
+        { "input": "Cost: $5.00 / 1M tokens", "reason": "pricing not bench" },
+        { "input": "GPU memory: 87.6 GB", "reason": "GB unit not bench score" },
+        { "input": "version 4.7", "reason": "no bench label" }
+      ],
+      "redosTriggers": [
+        { "input": "SWE-bench Verified (xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx) : 87", "maxMs": 50, "comment": "Long bounded paren content — must reject quickly (paren content > 40c bound)" },
+        { "_repeat": { "head": "AIME 2025 ", "char": "x", "n": 2000, "tail": "" }, "maxMs": 50, "comment": "Long benign string materialized by lint runner" }
+      ]
+    },
+    "bench_score_table_row": {
+      "positive": [
+        { "input": "<tr><td>87.6</td></tr>", "expect": { "cell": "87.6" } },
+        { "input": "<tr><td>SWE</td><td>87.6%</td></tr>", "expect": {} },
+        { "input": "<tr class=\"row\"><th>Bench</th><td>89</td></tr>", "expect": {} },
+        { "input": "<tr><td>opus</td><td>87</td><td>92</td></tr>", "expect": {} },
+        { "input": "<tr><td>a</td><td>b</td><td>c</td><td>d</td><td>e</td></tr>", "expect": {} }
+      ],
+      "negative": [
+        { "input": "<div>not a row</div>", "reason": "no tr tag" },
+        { "input": "<tr>plain text</tr>", "reason": "no td/th tags" },
+        { "input": "<table></table>", "reason": "no row content" }
+      ],
+      "redosTriggers": [
+        { "_repeat": { "head": "<tr><td>", "char": "a", "n": 500, "tail": "</td></tr>" }, "maxMs": 50, "comment": "Cell content over bounded length (>200c) must reject quickly" }
+      ]
+    },
+    "bench_score_uncertainty": {
+      "positive": [
+        { "input": "87.6 ± 0.3", "expect": { "value": "87.6", "sigma": "0.3" } },
+        { "input": "95.0±1.2", "expect": { "value": "95.0", "sigma": "1.2" } },
+        { "input": "90 ± 5", "expect": { "value": "90", "sigma": "5" } },
+        { "input": "12.34 ± 0.01", "expect": { "value": "12.34", "sigma": "0.01" } },
+        { "input": "76.5 ± 2.5", "expect": { "value": "76.5" } }
+      ],
+      "negative": [
+        { "input": "87.6%", "reason": "no plus-minus" },
+        { "input": "87.6 + 0.3", "reason": "wrong symbol (plus, not pm)" },
+        { "input": "value error", "reason": "no numbers" }
+      ],
+      "redosTriggers": []
+    },
+    "bench_score_range": {
+      "positive": [
+        { "input": "85-90", "expect": { "min": "85", "max": "90" } },
+        { "input": "87.5—92.0", "expect": { "min": "87.5", "max": "92.0" } },
+        { "input": "60-75", "expect": { "min": "60", "max": "75" } },
+        { "input": "0.85–0.90", "expect": { "min": "0.85", "max": "0.90" } },
+        { "input": "10 - 20", "expect": { "min": "10", "max": "20" } }
+      ],
+      "negative": [
+        { "input": "85", "reason": "no range" },
+        { "input": "85,90", "reason": "comma not dash" },
+        { "input": "85+90", "reason": "plus not dash" }
+      ],
+      "redosTriggers": []
+    },
+    "bench_score_qualified": {
+      "positive": [
+        { "input": "up to 87%", "expect": { "value": "87" } },
+        { "input": "max 87.6", "expect": { "value": "87.6" } },
+        { "input": "maximum 92.0", "expect": { "value": "92.0" } },
+        { "input": "peak 89%", "expect": { "value": "89" } },
+        { "input": "up-to 95", "expect": { "value": "95" } }
+      ],
+      "negative": [
+        { "input": "from 87", "reason": "wrong qualifier" },
+        { "input": "average 87", "reason": "wrong qualifier" },
+        { "input": "minimum 50", "reason": "wrong direction" }
+      ],
+      "redosTriggers": []
+    },
+    "bench_score_normalized_0_1": {
+      "positive": [
+        { "input": "0.876", "expect": { "frac": "876" } },
+        { "input": "0.95", "expect": { "frac": "95" } },
+        { "input": "0.42", "expect": { "frac": "42" } },
+        { "input": "0.0001", "expect": { "frac": "0001" } },
+        { "input": "0.9876", "expect": { "frac": "9876" } }
+      ],
+      "negative": [
+        { "input": "1.876", "reason": "leading 1 not 0" },
+        { "input": "0.5", "reason": "only 1 fractional digit (min 2)" },
+        { "input": "10.5", "reason": "no leading 0 dot" }
+      ],
+      "redosTriggers": []
+    },
+    "bench_score_footnote_strip": {
+      "positive": [
+        { "input": "87.6*", "expect": { "value": "87.6" } },
+        { "input": "92.0†", "expect": { "value": "92.0" } },
+        { "input": "87 [3]", "expect": { "value": "87" } },
+        { "input": "90.5‡", "expect": { "value": "90.5" } },
+        { "input": "75 [12]", "expect": { "value": "75" } }
+      ],
+      "negative": [
+        { "input": "abc", "reason": "no number" },
+        { "input": "stars [", "reason": "no leading number" }
+      ],
+      "redosTriggers": []
+    },
+    "pricing_per_million": {
+      "positive": [
+        { "input": "$5.00 / 1M tokens", "expect": { "value": "5.00" } },
+        { "input": "$0.20/M", "expect": { "value": "0.20" } },
+        { "input": "$15 / 1M tok", "expect": { "value": "15" } },
+        { "input": "$3.50/M tokens", "expect": { "value": "3.50" } },
+        { "input": "$0.05 / M token", "expect": { "value": "0.05" } }
+      ],
+      "negative": [
+        { "input": "$5", "reason": "no /M" },
+        { "input": "5/M", "reason": "no $" },
+        { "input": "$5/1B", "reason": "B unit not M" }
+      ],
+      "redosTriggers": []
+    },
+    "pricing_input_output_pair": {
+      "positive": [
+        { "input": "$3 in / $15 out", "expect": { "in": "3", "out": "15" } },
+        { "input": "$0.20 input / $0.80 output", "expect": { "in": "0.20", "out": "0.80" } },
+        { "input": "$5 in/$10 out", "expect": { "in": "5", "out": "10" } },
+        { "input": "$1.50 in / $4.00 out", "expect": { "in": "1.50", "out": "4.00" } },
+        { "input": "$0.001 input / $0.010 output", "expect": { "in": "0.001", "out": "0.010" } }
+      ],
+      "negative": [
+        { "input": "$3 / $15", "reason": "no in/out labels" },
+        { "input": "$3 in", "reason": "incomplete pair" },
+        { "input": "in $3 out $15", "reason": "wrong order" }
+      ],
+      "redosTriggers": []
+    },
+    "pricing_subscription_tier": {
+      "positive": [
+        { "input": "Pro tier $20/mo", "expect": { "tier": "Pro", "price": "20", "period": "mo" } },
+        { "input": "Plus $25/month", "expect": { "tier": "Plus", "price": "25", "period": "month" } },
+        { "input": "Enterprise tier $500/year", "expect": { "tier": "Enterprise", "price": "500", "period": "year" } },
+        { "input": "Max $50/month", "expect": { "tier": "Max", "price": "50" } },
+        { "input": "Coding $19/mo", "expect": { "tier": "Coding", "price": "19", "period": "mo" } }
+      ],
+      "negative": [
+        { "input": "Premium $20/mo", "reason": "Premium not in canonical tier list" },
+        { "input": "Pro $20", "reason": "no period" },
+        { "input": "Pro for $20", "reason": "no slash separator" }
+      ],
+      "redosTriggers": []
+    },
+    "vendor_lineup_active_id": {
+      "positive": [
+        { "input": "\n- claude-opus-4-7", "expect": { "id": "claude-opus-4-7" } },
+        { "input": "\n* gpt-5-5", "expect": { "id": "gpt-5-5" } },
+        { "input": "\n+ devstral-1-1", "expect": { "id": "devstral-1-1" } },
+        { "input": "\n`gemini-2-5-pro`", "expect": { "id": "gemini-2-5-pro" } },
+        { "input": "\nkimi-k2-7", "expect": { "id": "kimi-k2-7" } }
+      ],
+      "negative": [
+        { "input": "Claude Opus 4.7", "reason": "uppercase + spaces not slug-form" },
+        { "input": "model", "reason": "no version segment" },
+        { "input": "v1.0", "reason": "version not id" }
+      ],
+      "redosTriggers": []
+    },
+    "vendor_deprecation_notice": {
+      "positive": [
+        { "input": "deprecated 2026-04-26", "expect": { "date": "2026-04-26" } },
+        { "input": "deprecation 2025-12-01", "expect": { "date": "2025-12-01" } },
+        { "input": "deprecated on 2026-01-15", "expect": { "date": "2026-01-15" } },
+        { "input": "deprecation on 2025-09-30", "expect": { "date": "2025-09-30" } },
+        { "input": "Deprecated 2026-03-01", "expect": { "date": "2026-03-01" } }
+      ],
+      "negative": [
+        { "input": "deprecated soon", "reason": "no date" },
+        { "input": "removed 2026-04-26", "reason": "wrong verb" },
+        { "input": "in 2026", "reason": "no full date" }
+      ],
+      "redosTriggers": []
+    },
+    "next_image_proxy_url": {
+      "positive": [
+        { "input": "src=\"/_next/image?url=https%3A%2F%2Fcdn.example.com%2Ffoo.png&w=640&q=75\"", "expect": { "encoded": "https%3A%2F%2Fcdn.example.com%2Ffoo.png" } },
+        { "input": "/_next/image?url=https://cdn.example.com/foo.png", "expect": {} },
+        { "input": "/_next/image?url=foo", "expect": { "encoded": "foo" } },
+        { "input": "/_next/image?url=%2Fimg.svg", "expect": { "encoded": "%2Fimg.svg" } },
+        { "input": "<img src=\"/_next/image?url=foo.jpg&w=320\">", "expect": {} }
+      ],
+      "negative": [
+        { "input": "/_next/static/foo.png", "reason": "no image?url" },
+        { "input": "image?url=foo", "reason": "no _next prefix" },
+        { "input": "src=\"/foo.png\"", "reason": "no _next/image" }
+      ],
+      "redosTriggers": []
+    },
+    "markdown_table_row": {
+      "positive": [
+        { "input": "|cell|cell|", "expect": {} },
+        { "input": "|a|b|c|d|", "expect": {} },
+        { "input": "|opus|87|92|", "expect": {} },
+        { "input": "|model|score|notes|", "expect": {} },
+        { "input": "| spaces | ok |", "expect": {} }
+      ],
+      "negative": [
+        { "input": "no pipes here", "reason": "plain text" },
+        { "input": "single | text", "reason": "no leading/trailing pipe boundary" },
+        { "input": "", "reason": "empty string" }
+      ],
+      "redosTriggers": []
+    },
+    "meta_description_score": {
+      "positive": [
+        { "input": "<meta name=\"description\" content=\"Score: 87.6 on SWE-bench\">", "expect": { "content": "Score: 87.6 on SWE-bench" } },
+        { "input": "<meta name='description' content='GPQA: 95'>", "expect": { "content": "GPQA: 95" } },
+        { "input": "<meta name=\"description\" content=\"opus 4.7 ranked top\">", "expect": { "content": "opus 4.7 ranked top" } },
+        { "input": "<META NAME=\"DESCRIPTION\" CONTENT=\"x\">", "expect": { "content": "x" } },
+        { "input": "<meta   name=\"description\"   content=\"x\">", "expect": { "content": "x" } }
+      ],
+      "negative": [
+        { "input": "<meta name=\"keywords\" content=\"x\">", "reason": "wrong name attr" },
+        { "input": "<meta name=\"description\">", "reason": "no content attr" },
+        { "input": "description: foo", "reason": "not a meta tag" }
+      ],
+      "redosTriggers": []
+    },
+    "jsonld_score_field": {
+      "positive": [
+        { "input": "<script type=\"application/ld+json\">{\"score\": 87.6}</script>", "expect": { "json": "{\"score\": 87.6}" } },
+        { "input": "<script type='application/ld+json'>{\"@type\":\"Rating\",\"value\":95}</script>", "expect": {} },
+        { "input": "<script type=\"application/ld+json\" id=\"x\">{\"foo\": \"bar\"}</script>", "expect": { "json": "{\"foo\": \"bar\"}" } },
+        { "input": "<SCRIPT TYPE=\"application/ld+json\">{}</SCRIPT>", "expect": {} },
+        { "input": "<script  type=\"application/ld+json\">[]</script>", "expect": {} }
+      ],
+      "negative": [
+        { "input": "<script type=\"text/javascript\">x</script>", "reason": "wrong type attr" },
+        { "input": "<script>x</script>", "reason": "no type attr" },
+        { "input": "<style type=\"application/ld+json\">x</style>", "reason": "wrong tag" }
+      ],
+      "redosTriggers": []
+    }
+  }
+}

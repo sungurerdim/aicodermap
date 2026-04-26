@@ -36,12 +36,13 @@ Orchestrate AI coding LLM tracker updates: discover **official vendor lineup** �
 
 ## WORKFLOW
 ```
-PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh):
+PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
    - Skill instructs agent to run quick HEAD/GET probes on a 3-URL sample of leaderboards[]
-   - Agent reports `runtime.healthChecks[<domain>]: 'ok'|'unhealthy:<reason>'` per probe
-   - Skill writes results to data/sources-whitelist.json `_runtime.healthChecks` block
+   - Agent reports for each probe: `runtime.healthChecks[<domain>]: { status: 'ok'|'unhealthy:<reason>', observedFormat: <format-key> }`
+   - **Format consistency check:** if `entry.format` says `static_html_table` but `observedFormat` says `spa_full` (or vice versa), increment `entry.consecutiveFailures`. After 3 consecutive cycles of the same drift, auto-demote `entry.format` to the observed value (e.g., `static_*` → `spa_full`). This is self-healing format classification — the agent does not need a manual whitelist edit when a vendor migrates a leaderboard from server-rendered to SPA.
+   - Skill writes results to data/sources-whitelist.json `_runtime.healthChecks` block AND updates per-entry `format` + `format_lastVerified` when drift is confirmed
    - Persistent-unhealthy domains (≥3 cycles consecutive) get `_runtime.unhealthy: true` — agent skips them in this cycle's Phase 1 until next health-check passes
-   - This step prevents wasted fetch budget on guaranteed-SPA/403 URLs
+   - This step prevents wasted fetch budget on guaranteed-SPA/403 URLs AND keeps the whitelist's format classification accurate without human intervention
 
 0. LINEUP DISCOVERY (always run first on refresh-all):
    - Agent fetches each vendor's official "active models" page from VENDOR_LINEUP_SOURCES table
@@ -88,6 +89,7 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh):
    if validationCoverage < COVERAGE_DEEPEN_THRESHOLD (0.95):
      loop until (coverage ≥ COVERAGE_TARGET 0.85) OR (cycles == DEEP_FETCH_MAX_CYCLES 5) OR (no progress between two consecutive cycles):
        - identify (modelId, field) pairs missing ≥2 sources
+       - **Format-aware source picking** (NEW): for each missing pair, the orchestrator filters the whitelist to entries whose `format ∈ {static_html_table, static_html_article, static_markdown, github_raw_*, meta_tag_extract, pdf_report}` — i.e., formats with high signal-per-fetch — and assigns those URLs first. Entries whose format is `spa_full` or `bot_blocked` are deprioritised; their `fallbacks[].format == "websearch_snippet"` is used directly to skip the doomed primary fetch.
        - spawn DEEP-FETCH pass via SendMessage to existing agent (or fresh Agent if SendMessage fails): up to DEEP_FETCH_MAX_PAIRS_PER_CYCLE 25 pairs per cycle, ≤30s per pair
        - merge deep-fetch returns into pending updates
        - stamp the artifact with `deepFetchCycle: <n>` and `validationCoverage: <updated>`
@@ -109,14 +111,22 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh):
      log to CHANGELOG: "<modelId>.<bench>: <winner.value> (trust=<score>) over <loser.value> (trust=<score>) [Δ<delta>pp <severity>]"
    no user prompt is issued for any severity
 
-7.4. IMAGE_OCR_AUTO_TRIGGER (Anthropic-tier vendor announcements):
-   - For every vendor announcement URL fetched in this cycle from a vendor known to embed bench tables as PNG images (anthropic.com/news/*, deepmind.google/models/*, openai.com/index/*):
-     scripts/extract-images.py <url> → downloads embedded PNGs to .aicodermap-images/
-     Skill orchestrator (vision-aware Read tool) reads each PNG and extracts (modelName, benchName, score) via the alias table in agent.md EXTRACTION_DISCIPLINE
-     Extracted values get S-tier provenance pointing to the page URL
-     Merged into pending updates before Step 10
-   - Triggers automatically when artifact contains a `models[].sourcesAdded[]` entry whose source URL matches a known image-embedded vendor pattern AND that model has ≥3 null bench cells.
-   - Image OCR is opt-out per vendor via sources-whitelist.json `vendors.<v>.urls.imageOCRSkip: true`.
+7.4. IMAGE_OCR_AUTO_TRIGGER (whitelist-driven, NO hardcoded vendor list):
+   - For every artifact `models[].sourcesAdded[]` entry, the orchestrator looks up the source URL's hostname in `sourcesWhitelist.vendors.*.imageOCRPatterns[]` (or any whitelist entry whose `format == "image_embedded"`):
+     ```
+     for each addedSource in artifact.models[].sourcesAdded[]:
+       vendorEntry := find_vendor_by_hostname(addedSource.url, sourcesWhitelist.vendors)
+       imagePatterns := vendorEntry?.imageOCRPatterns
+                       || (lookup_whitelist_entry(addedSource.url).format == "image_embedded" ? [".+"] : null)
+       if imagePatterns AND any(re.match(p, addedSource.url) for p in imagePatterns)
+         AND model_null_bench_count(addedSource.modelId) >= 3:
+         dispatch scripts/extract-images.py <url>
+     ```
+   - `scripts/extract-images.py <url>` downloads embedded PNGs to `.aicodermap-images/`.
+   - Skill orchestrator (vision-aware Read tool) reads each PNG and extracts (modelName, benchName, score) via the bench alias table in agent.md EXTRACTION_DISCIPLINE.
+   - Extracted values get S-tier provenance pointing to the page URL. Merged into pending updates before Step 10.
+   - Image OCR is opt-out per vendor: omit `imageOCRPatterns` (or set to `[]`) in the vendor's whitelist entry — no flag needed.
+   - **Adding a new image-embedded vendor** = appending `imageOCRPatterns: ["<regex>"]` to that vendor's whitelist entry; no SKILL.md or agent.md change required.
 
 7.5. DYNAMIC_WHITELIST_DISCOVERY (self-healing whitelist mutation):
    - Skill reads `artifact.whitelistAdditions[]` (agent emits when it finds high-quality new sources)
@@ -463,7 +473,8 @@ Per-step error handling lives in **SILENT_FAIL_PREVENTION** above (single source
 
 ## INVARIANTS (cross-cutting rules; specifics live in their canonical sections above)
 
-- **Procedure vs data**: spec files (this file + agent.md) carry HOW; data files carry WHAT (model roster, source URLs, known gaps, GPU DB). Spec never hardcodes IDs/URLs.
+- **Procedure vs data**: spec files (this file + agent.md) carry HOW; data files carry WHAT (model roster, source URLs, known gaps, GPU DB, **format taxonomy + regex library**). Spec never hardcodes IDs/URLs/regex patterns/format keywords.
+- **Format taxonomy reference**: 12 canonical format keys + adapter selection rules + 16 named extractor patterns live in `data/sources-whitelist.json._schema.{formatTaxonomy, extractors, regexLibrary}`. Adding a new source format = appending a key there + (rare) a new extractor pattern via `scripts/regex-corpus.json` + `scripts/regex-lint.js`. No code change required in agent.md / SKILL.md.
 - **Autonomous-by-default**: orchestrator + agent iterate, retry, fall back to alternate source, emit gap[] — never deal-break on missing data. The ONE user-blocking exception is git push conflict.
 - **Loud failures, never silent**: every step has an explicit success criterion (see SILENT_FAIL_PREVENTION); failures emit log + gap[] entry + CONTINUE — never halt the workflow short of Step 12.
 - **Partial-coverage merges are normal**: low coverage marks `partialCoverage=true` + populates gaps[] for next cycle, but never blocks write/commit/push.

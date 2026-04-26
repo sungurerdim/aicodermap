@@ -20,10 +20,19 @@ import json
 import os
 import shutil
 from datetime import date
+from urllib.parse import urlparse
 
 PROJECT = "D:/GitHub/aicodermap"
 TODAY = date.today().isoformat()
 ARTIFACT = f"{PROJECT}/.aicodermap-agent-out.json"
+WHITELIST = f"{PROJECT}/data/sources-whitelist.json"
+
+# Formats whose primary fetch is "skip" — fetching their canonical URL directly
+# should be rare. A sourcesAdded entry that points at one of these formats and
+# claims a high tier deserves a non-blocking warning so an operator can verify
+# the agent reached the data via the documented fallback chain (mirror /
+# WebSearch / image OCR) rather than scraping the SPA directly.
+SKIP_PRIMARY_FORMATS = {"spa_full", "bot_blocked", "image_embedded"}
 
 
 def rotate_backup(path):
@@ -118,6 +127,57 @@ def find(models, mid):
     return None
 
 
+def build_whitelist_index():
+    """Hostname → (format, tier) lookup for format-consistency log. Non-fatal
+    on missing/malformed whitelist."""
+    try:
+        with open(WHITELIST, encoding="utf-8") as fp:
+            wl = json.load(fp)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+    idx = {}
+    for cat in ("leaderboards", "aggregators", "community", "local", "registries"):
+        for e in wl.get(cat, []) or []:
+            url = e.get("url")
+            if not url:
+                continue
+            try:
+                host = urlparse(url).hostname or ""
+            except Exception:
+                continue
+            host = host.lower().lstrip("www.")
+            if host and host not in idx:
+                idx[host] = (e.get("format"), e.get("tier"))
+    return idx
+
+
+def format_consistency_warn(source_entry, wl_idx):
+    """Log non-blocking warning when a sourcesAdded entry's URL hostname is
+    classified as a 'skip primary' format (spa_full / bot_blocked /
+    image_embedded) yet the artifact tags it as a high-tier source. Either
+    the agent reached the data via the documented fallback chain (fine — but
+    the URL recorded should reflect the mirror), or the agent fetched the
+    SPA/blocked page directly (suspect)."""
+    url = source_entry.get("url") or ""
+    if not url:
+        return None
+    try:
+        host = (urlparse(url).hostname or "").lower().lstrip("www.")
+    except Exception:
+        return None
+    info = wl_idx.get(host)
+    if not info:
+        return None
+    fmt, _wl_tier = info
+    if fmt in SKIP_PRIMARY_FORMATS and source_entry.get("tier") in ("I", "S"):
+        return (
+            f"format-consistency: url={url} format={fmt} but tier="
+            f"{source_entry.get('tier')} — confirm this came via fallback "
+            f"chain (mirror/WebSearch/OCR) and not direct SPA scrape"
+        )
+    return None
+
+
 def append_source(sources, key, entry):
     if key not in sources:
         sources[key] = []
@@ -147,6 +207,8 @@ def main():
     with open(sources_path, encoding="utf-8") as fp:
         sources = json.load(fp)
 
+    wl_idx = build_whitelist_index()
+
     log = {
         "updated": [],
         "added": [],
@@ -154,6 +216,7 @@ def main():
         "lineup_renamed": [],
         "contradictions": [],
         "sources_appended": 0,
+        "format_warnings": [],
         "gaps": [],
     }
 
@@ -166,6 +229,9 @@ def main():
         if apply_model_update(m, upd.get("updates", {})):
             log["updated"].append(mid)
         for s in upd.get("sourcesAdded", []) or []:
+            warn = format_consistency_warn(s, wl_idx)
+            if warn:
+                log["format_warnings"].append(f"{mid}: {warn}")
             if append_source(
                 sources,
                 s["key"],
@@ -327,7 +393,7 @@ def main():
         with open(cl_path, "w", encoding="utf-8") as fp:
             fp.write("# Changelog\n\n" + cl_blob)
 
-    print(f"merge complete:")
+    print("merge complete:")
     print(f"  added:      {len(log['added'])} -> {log['added']}")
     print(f"  updated:    {len(log['updated'])}")
     print(f"  deprecated: {len(log['lineup_deprecated'])}")
@@ -335,6 +401,12 @@ def main():
     print(f"  contradictions auto-resolved: {len(log['contradictions'])}")
     print(f"  sources appended: {log['sources_appended']}")
     print(f"  coverage:   {cov_pct}%{' (PARTIAL WARN)' if coverage < 0.50 else ''}")
+    if log["format_warnings"]:
+        print(f"  format warnings: {len(log['format_warnings'])} (non-blocking)")
+        for w in log["format_warnings"][:5]:
+            print(f"    - {w}")
+        if len(log["format_warnings"]) > 5:
+            print(f"    - ... and {len(log['format_warnings']) - 5} more")
     if issues:
         print("self-check issues:")
         for i in issues:

@@ -1,4 +1,33 @@
 
+## [2026-04-27] — autonomous refresh-all [WARN: partial coverage 38.0%]
+
+### Added
+- `grok-4-20` — new model from vendor lineup discovery
+
+### Updated
+- 39 models: `opus-4-7`, `sonnet-4-6`, `claude-haiku-4-5`, `gpt-5-5`, `gpt-4-1`, `gpt-5-4`, `o3`, `o4-mini`, `gemini-3-1-pro`, `gemini-3-1-flash`, `grok-3`, `grok-3-mini`, `deepseek-v4-pro`, `deepseek-v4-flash`, `deepseek-v3-2`, `glm-5-1`, `kimi-k2-6`, `llama-4-maverick`, `llama-4-scout`, `minimax-m2-5`, `minimax-m2-7`, `nemotron-3-super`, `devstral-2`, `devstral-small-2`, `codestral-22b`, `codestral`, `devstral-medium`, `qwen3-235b`, `qwen3-6-35b-moe`, `qwen-3-6-27b`, `qwen-3-6-max`, `qwen3-coder-480b`, `qwen3-coder-30b`, `qwen3-coder-next`, `mimo-v2-flash`, `mimo-v2-pro`, `mimo-v2-5`, `mimo-v2-5-pro`, `step-3-5-flash`
+
+### Deprecated
+- `codestral-22b` — vendor-marked deprecated
+- `devstral-small-2` — vendor-marked deprecated
+- `o4-mini` — vendor-marked deprecated
+- `gpt-4-1` — vendor-marked deprecated
+
+### Resolved (auto via trustScore)
+- gpt-5-5.swePro: winner={'value': 58.6, 'trustScore': 0.6, 'sourceUrl': 'https://mindwiredai.com/2026/04/24/gpt-5-5-is-here-benchmarks-pricing-and-who-should-actually-upgrade-april-2026/', 'tier': 'C'} (severity=GREEN, Δ0)
+
+### Gaps (15 entries — see data/known-gaps.json or next refresh)
+- `None`: No SWE-bench Verified data found for Gemini 3.1 Flash-Lite specifically
+- `None`: No independent SWE-bench Verified score found; only SWE-bench Pro reported
+- `None`: o3 deprecated from ChatGPT Feb 2026; no new bench data
+- `None`: o4-mini deprecated from ChatGPT Feb 2026; no new bench data
+- `None`: SWE-bench Verified not yet published for Grok 4.20; only community leak estimates
+- `None`: Qwen3-Coder-Next benchmark data not yet publicly available
+- `None`: MiMo-V2.5 (standard) bench data sparse; V2.5-Pro has data but base model unclear
+- `None`: Legacy model; no 2026 bench refresh found
+- ... and 7 more
+
+
 ## [2026-04-26] — autonomous refresh-all
 
 ### Updated

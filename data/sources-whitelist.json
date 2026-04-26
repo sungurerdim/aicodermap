@@ -9,6 +9,453 @@
       "local": "Local-runtime catalogs (Ollama, Unsloth, quants). tier='I'. Used per-model when tier='ollama' or vramRequirement is sought.",
       "registries": "Model metadata registries (HF leaderboard, llmfit). tier='I'.",
       "community": "Aggregator blogs / expert commentary. tier='C'. Used only when no I/S source carries the value."
+    },
+    "perEntryFields": {
+      "format": "One of formatTaxonomy keys (default static_html_table). Drives adapter selection.",
+      "extractor": "One of extractors keys (default inferred from format).",
+      "fallbacks": "Ordered cascade [{format, urlPattern?}]. Walked on primary failure before gaps[].",
+      "tierOverride": "Domain-tier override for WebSearch results (string I|S|C).",
+      "extractorHints": "Format-specific hints {tableSelector?, scoreColumn?, jsonPath?, patternOverride?}.",
+      "imageOCRPatterns": "Vendor-only regex strings; URL match triggers scripts/extract-images.py.",
+      "format_lastVerified": "ISO date format last confirmed.",
+      "lastVerifiedDate": "ISO date URL last verified reachable.",
+      "consecutiveFailures": "Integer; ≥3 → auto-demote to spa_full + _runtime.unhealthy."
+    },
+    "formatTaxonomy": {
+      "static_html_table": {
+        "description": "HTML page with <table> rows + scores",
+        "primaryTool": "WebFetch",
+        "extractor": "html_table",
+        "extractorPatterns": [
+          "bench_score_table_row",
+          "bench_score_labeled"
+        ],
+        "defaultFallbacks": [
+          {
+            "format": "static_html_article"
+          },
+          {
+            "format": "websearch_snippet"
+          }
+        ]
+      },
+      "static_html_article": {
+        "description": "Long-form article with inline numeric mentions",
+        "primaryTool": "WebFetch",
+        "extractor": "regex_extract",
+        "extractorPatterns": [
+          "bench_score_labeled",
+          "bench_score_uncertainty",
+          "bench_score_qualified",
+          "bench_score_footnote_strip"
+        ],
+        "defaultFallbacks": [
+          {
+            "format": "websearch_snippet"
+          }
+        ]
+      },
+      "static_markdown": {
+        "description": "Vendor blog with markdown tables (Qwen blog, Mistral news)",
+        "primaryTool": "WebFetch",
+        "extractor": "html_table",
+        "extractorPatterns": [
+          "markdown_table_row",
+          "bench_score_labeled"
+        ],
+        "defaultFallbacks": [
+          {
+            "format": "websearch_snippet"
+          }
+        ]
+      },
+      "static_json_api": {
+        "description": "Pure JSON endpoint (HF Datasets API, GitHub Releases)",
+        "primaryTool": "WebFetch",
+        "extractor": "json_path",
+        "extractorPatterns": [],
+        "defaultFallbacks": [
+          {
+            "format": "github_raw_json"
+          }
+        ]
+      },
+      "github_raw_json": {
+        "description": "raw.githubusercontent.com/.../leaderboard.json",
+        "primaryTool": "WebFetch",
+        "extractor": "json_path",
+        "extractorPatterns": [],
+        "defaultFallbacks": [
+          {
+            "format": "static_json_api"
+          }
+        ]
+      },
+      "github_raw_markdown": {
+        "description": "GitHub README with leaderboard tables",
+        "primaryTool": "WebFetch",
+        "extractor": "html_table",
+        "extractorPatterns": [
+          "markdown_table_row"
+        ],
+        "defaultFallbacks": [
+          {
+            "format": "static_markdown"
+          }
+        ]
+      },
+      "spa_partial": {
+        "description": "SPA shell with extractable static sub-pages or embedded JSON-LD",
+        "primaryTool": "WebFetch",
+        "extractor": "regex_extract",
+        "extractorPatterns": [
+          "meta_description_score",
+          "jsonld_score_field",
+          "bench_score_labeled"
+        ],
+        "defaultFallbacks": [
+          {
+            "format": "meta_tag_extract"
+          },
+          {
+            "format": "static_html_article"
+          },
+          {
+            "format": "websearch_snippet"
+          }
+        ]
+      },
+      "spa_full": {
+        "description": "Full SPA, no static fallback (BFCL, LiveCodeBench, MathArena)",
+        "primaryTool": "skip",
+        "extractor": "websearch_snippet",
+        "extractorPatterns": [
+          "bench_score_labeled"
+        ],
+        "defaultFallbacks": [
+          {
+            "format": "github_raw_json"
+          },
+          {
+            "format": "meta_tag_extract"
+          },
+          {
+            "format": "websearch_snippet"
+          }
+        ],
+        "aggregatorMirrors": [
+          "pricepertoken.com",
+          "llm-stats.com",
+          "vals.ai",
+          "benchlm.ai"
+        ]
+      },
+      "meta_tag_extract": {
+        "description": "SEO meta + JSON-LD scores (top-3 typically) — fetches the SPA URL but extracts only static head content",
+        "primaryTool": "WebFetch",
+        "extractor": "regex_extract",
+        "extractorPatterns": [
+          "meta_description_score",
+          "jsonld_score_field"
+        ],
+        "defaultFallbacks": [
+          {
+            "format": "static_html_article"
+          },
+          {
+            "format": "websearch_snippet"
+          }
+        ]
+      },
+      "image_embedded": {
+        "description": "Vendor announcement with bench tables as PNG (anthropic.com/news, deepmind.google/models)",
+        "primaryTool": "scripts/extract-images.py + vision OCR",
+        "extractor": "image_ocr",
+        "extractorPatterns": [
+          "bench_score_labeled"
+        ],
+        "defaultFallbacks": [
+          {
+            "format": "static_html_article"
+          },
+          {
+            "format": "websearch_snippet"
+          }
+        ]
+      },
+      "bot_blocked": {
+        "description": "403/404-slug-miss (openai.com/blog, x.ai/news)",
+        "primaryTool": "skip",
+        "extractor": "websearch_snippet",
+        "extractorPatterns": [
+          "bench_score_labeled"
+        ],
+        "defaultFallbacks": [
+          {
+            "format": "websearch_snippet"
+          }
+        ]
+      },
+      "pdf_report": {
+        "description": "Technical report PDFs (Nemotron, OpenAI papers)",
+        "primaryTool": "WebFetch",
+        "extractor": "regex_extract",
+        "extractorPatterns": [
+          "bench_score_labeled",
+          "bench_score_uncertainty",
+          "bench_score_footnote_strip"
+        ],
+        "defaultFallbacks": [
+          {
+            "format": "websearch_snippet"
+          }
+        ]
+      },
+      "websearch_snippet": {
+        "description": "WebSearch query + tier-assign per result domain (terminal fallback)",
+        "primaryTool": "WebSearch",
+        "extractor": "websearch_snippet",
+        "extractorPatterns": [
+          "bench_score_labeled"
+        ],
+        "defaultFallbacks": []
+      }
+    },
+    "extractors": {
+      "html_table": {
+        "description": "DOM/markdown table grep — three-pass discipline",
+        "passes": [
+          "TABLE_BOUNDARY",
+          "ROW_SPLIT",
+          "CELL_VALUE"
+        ],
+        "cleanupBeforeExtract": true
+      },
+      "regex_extract": {
+        "description": "Bench-alias-table run over plain text (cleanup → patterns)",
+        "passes": [
+          "CLEANUP",
+          "PATTERN_LOOP"
+        ],
+        "cleanupBeforeExtract": true
+      },
+      "json_path": {
+        "description": "JSON dot-path extraction",
+        "passes": [
+          "JSON_PARSE",
+          "PATH_WALK"
+        ],
+        "cleanupBeforeExtract": false
+      },
+      "image_ocr": {
+        "description": "Orchestrator-side script + vision read; agent never directly handles images",
+        "passes": [
+          "IMAGE_DOWNLOAD",
+          "VISION_READ",
+          "ALIAS_MAP"
+        ],
+        "cleanupBeforeExtract": false,
+        "orchestratorScript": "scripts/extract-images.py"
+      },
+      "websearch_snippet": {
+        "description": "Query + tier-assign per result domain (per WEBSEARCH_PRIMARY_DISCIPLINE)",
+        "passes": [
+          "QUERY",
+          "DOMAIN_TIER",
+          "PATTERN_LOOP"
+        ],
+        "cleanupBeforeExtract": false
+      }
+    },
+    "regexLibrary": {
+      "_purpose": "SSOT for all extraction patterns. Agent NEVER inlines a regex; references by name only. Patterns audited for ReDoS + Unicode + locale tolerance via scripts/regex-lint.js against scripts/regex-corpus.json. Regex syntax is ECMAScript; embed-here uses JSON-escaped backslashes.",
+      "_cleanupTags": [
+        "<script[^>]{0,200}>[\\s\\S]{0,100000}?</script>",
+        "<style[^>]{0,200}>[\\s\\S]{0,100000}?</style>",
+        "<nav[^>]{0,200}>[\\s\\S]{0,100000}?</nav>",
+        "<footer[^>]{0,200}>[\\s\\S]{0,100000}?</footer>",
+        "<aside[^>]{0,200}>[\\s\\S]{0,100000}?</aside>",
+        "<!--[\\s\\S]{0,10000}?-->"
+      ],
+      "_localeDecimalRule": "If captured number contains both '.' and ',': last occurrence is decimal, other is thousands (strip). Only ',': /^\\d{1,3},\\d{3}(,\\d{3})*$/ → thousands form (strip); else decimal (replace ',' with '.'). Handles 87.6, 87,6, 1,234.56, 1.234,56, 1 234,56.",
+      "classes": {
+        "DASH_CLASS": {
+          "regex": "[\\-\\u2010\\u2011\\u2012\\u2013\\u2014\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]",
+          "description": "9 Unicode dash variants (hyphen-minus, hyphen, NB-hyphen, figure dash, en/em dash, horizontal bar, minus sign, small/full-width hyphen)",
+          "version": "v1"
+        },
+        "WHITESPACE_CLASS": {
+          "regex": "[\\s\\u00A0\\u2009\\u202F\\u2007]",
+          "description": "Whitespace incl NBSP, thin-space, narrow-no-break-space, figure-space — BIPM thousands separator coverage",
+          "version": "v1"
+        },
+        "EMPTY_PLACEHOLDER": {
+          "regex": "(?:[\\-\\u2013\\u2014\\u2015]+|N\\/?A|n\\.a\\.|TBD)",
+          "description": "Recognized non-numeric cells; row matched but value emitted as null",
+          "version": "v1"
+        },
+        "DECIMAL_SEPARATOR_CLASS": {
+          "regex": "[.,]",
+          "description": "Locale-tolerant; disambiguation via _localeDecimalRule",
+          "version": "v1"
+        },
+        "LATIN_DIGITS": {
+          "regex": "[0-9]",
+          "description": "Latin digits only; non-Latin numerals (Arabic-Indic/Thai/Devanagari) get C-tier WebSearch fallback",
+          "version": "v1"
+        }
+      },
+      "patterns": {
+        "bench_score_labeled": {
+          "regex": "(?<bench>SWE[\\s\\-]?bench[\\s\\-]?(?:Pro|Verified|Multilingual)|Terminal[\\s\\-]?Bench(?:\\s*v?\\d{1,2})?|LiveCodeBench(?:\\s*v?\\d{1,2})?|Aider(?:\\s+Polyglot)?|tau[\\s\\-]?bench(?:\\s*v?\\d{1,2})?|MCP[\\s\\-]?Atlas|GPQA(?:\\s+Diamond)?|HLE|AIME(?:\\s*\\d{2,4})?|BFCL|aaIdx|aaCoding|aaAgentic|aaOmni|sweMulti)\\s*(?:\\([^)]{0,40}\\))?\\s*[:=\\u2013\\u2014\\u2015\\-]\\s*(?<value>\\d{1,3}(?:[.,]\\d{1,3})?)\\s*(?<unit>%|pts|pt|points?)?",
+          "flags": "i",
+          "description": "Bench name + score in same span. Bounded paren content (max 40c), Unicode dashes, decimal locale-tolerant, optional unit, version suffix v1..v99. Most-common pattern.",
+          "captures": [
+            "bench",
+            "value",
+            "unit"
+          ],
+          "version": "v2"
+        },
+        "bench_score_table_row": {
+          "regex": "<tr[^>]{0,200}>(?:\\s*<t[dh][^>]{0,200}>(?<cell>[^<]{0,200})</t[dh]>\\s*){1,30}</tr>",
+          "flags": "i",
+          "description": "HTML table row; bounded inner cell count (1-30) and cell length (0-200c). Pass-2 row split, pass-3 cell value walk paired with row-first cell as model anchor.",
+          "captures": [
+            "cell"
+          ],
+          "version": "v1"
+        },
+        "bench_score_uncertainty": {
+          "regex": "(?<value>\\d{1,3}(?:\\.\\d{1,3})?)\\s*[\\u00B1]\\s*(?<sigma>\\d{1,3}(?:\\.\\d{1,3})?)",
+          "flags": "",
+          "description": "'87.6 ± 0.3' or '87.6±0.3'. Symmetric uncertainty; primary value isolated, sigma captured.",
+          "captures": [
+            "value",
+            "sigma"
+          ],
+          "version": "v1"
+        },
+        "bench_score_range": {
+          "regex": "(?<min>\\d{1,3}(?:\\.\\d{1,3})?)\\s*[\\u2013\\u2014\\u2015\\-]\\s*(?<max>\\d{1,3}(?:\\.\\d{1,3})?)",
+          "flags": "",
+          "description": "'85-90' → max captured; agent picks max for ranges, logs delta to gaps[].",
+          "captures": [
+            "min",
+            "max"
+          ],
+          "version": "v1"
+        },
+        "bench_score_qualified": {
+          "regex": "(?:up[\\s\\-]?to|max(?:imum)?|peak)\\s+(?<value>\\d{1,3}(?:\\.\\d{1,3})?)\\s*%?",
+          "flags": "i",
+          "description": "'up to 87%' / 'max 87%'. Qualifier flags trustScore × 0.8 (less reliable).",
+          "captures": [
+            "value"
+          ],
+          "version": "v1"
+        },
+        "bench_score_normalized_0_1": {
+          "regex": "\\b0\\.(?<frac>\\d{2,4})\\b",
+          "flags": "",
+          "description": "'0.876' → multiply ×100. Only when bench typically reports 0-100 per benchSchema hint; guard against confidence-interval false positives.",
+          "captures": [
+            "frac"
+          ],
+          "version": "v1"
+        },
+        "bench_score_footnote_strip": {
+          "regex": "(?<value>\\d{1,3}(?:\\.\\d{1,3})?)\\s*[\\*\\u2020\\u2021\\u00A7\\u00B6]?\\s*(?:\\[\\d{1,3}\\])?",
+          "flags": "",
+          "description": "'87.6*', '87.6†', '87.6 [3]' — footnote markers ignored after capture.",
+          "captures": [
+            "value"
+          ],
+          "version": "v1"
+        },
+        "pricing_per_million": {
+          "regex": "\\$\\s*(?<value>\\d{1,5}(?:\\.\\d{1,4})?)\\s*\\/\\s*1?[Mm]\\s*(?:tokens?|tok)?",
+          "flags": "",
+          "description": "'$5.00 / 1M tokens', '$0.20/M'. Optional space, optional '1' prefix, plural-tolerant.",
+          "captures": [
+            "value"
+          ],
+          "version": "v1"
+        },
+        "pricing_input_output_pair": {
+          "regex": "\\$\\s*(?<in>\\d{1,5}(?:\\.\\d{1,4})?)\\s*(?:in|input)\\s*\\/\\s*\\$?\\s*(?<out>\\d{1,5}(?:\\.\\d{1,4})?)\\s*(?:out|output)",
+          "flags": "i",
+          "description": "'$3 in / $15 out'. Direction labels; optional second '$'.",
+          "captures": [
+            "in",
+            "out"
+          ],
+          "version": "v1"
+        },
+        "pricing_subscription_tier": {
+          "regex": "(?<tier>Free|Plus|Pro|Team|Enterprise|Max|Coding)[\\s\\-]+(?:tier\\s+)?\\$\\s*(?<price>\\d{1,5}(?:\\.\\d{1,4})?)\\s*\\/\\s*(?<period>mo(?:nth)?|year|annual)",
+          "flags": "i",
+          "description": "'Pro tier $20/mo'. Unicode-safe casing; common tier names.",
+          "captures": [
+            "tier",
+            "price",
+            "period"
+          ],
+          "version": "v1"
+        },
+        "vendor_lineup_active_id": {
+          "regex": "(?:^|\\n)[\\-\\*\\+]?\\s*`?(?<id>[a-z]{2}[a-z0-9\\-]{0,40}(?:[\\.\\-]\\d{1,3}){1,3}(?:[\\.\\-][a-z][a-z0-9]{0,20})?)`?\\s*(?:[\\-\\u2013].{0,80})?$",
+          "flags": "m",
+          "description": "Model id under 'active models' / 'current' heading. Code-fenced ids; semver-like; min 2 letters at start (rejects 'v1.0' false-positives) and tolerates trailing alpha suffix like '-pro' / '-mini'.",
+          "captures": [
+            "id"
+          ],
+          "version": "v2"
+        },
+        "vendor_deprecation_notice": {
+          "regex": "deprecat(?:ed|ion)\\s*(?:on\\s+)?(?<date>\\d{4}-\\d{2}-\\d{2})",
+          "flags": "i",
+          "description": "'deprecated YYYY-MM-DD' both verb + noun form.",
+          "captures": [
+            "date"
+          ],
+          "version": "v1"
+        },
+        "next_image_proxy_url": {
+          "regex": "_next\\/image\\?url=(?<encoded>[^&\"'\\s]{1,500})",
+          "flags": "",
+          "description": "Next.js _next/image proxy URL — URL-decode in post-process.",
+          "captures": [
+            "encoded"
+          ],
+          "version": "v1"
+        },
+        "markdown_table_row": {
+          "regex": "^\\|(?:[^\\|\\n]{1,200}\\|){1,30}\\s*$",
+          "flags": "m",
+          "description": "Pipe-separated row; bounded cell count (1-30) and cell length (1-200c). Post-process rejects separator rows matching ^\\|[\\s\\-:]+\\|.",
+          "captures": [],
+          "version": "v1"
+        },
+        "meta_description_score": {
+          "regex": "<meta\\s+name=[\"']description[\"']\\s+content=[\"'](?<content>[^\"']{1,2000})[\"']",
+          "flags": "i",
+          "description": "<meta name=description content=...> — then run bench_score_labeled over content. Catches SPA top-N scores in head.",
+          "captures": [
+            "content"
+          ],
+          "version": "v1"
+        },
+        "jsonld_score_field": {
+          "regex": "<script\\s+type=[\"']application\\/ld\\+json[\"'][^>]{0,200}>(?<json>[^<]{1,10000})</script>",
+          "flags": "i",
+          "description": "<script type=application/ld+json>...</script> — JSON-parse and walk for aggregateRating, score, value, mainEntity.score numeric fields.",
+          "captures": [
+            "json"
+          ],
+          "version": "v1"
+        }
+      }
     }
   },
   "vendors": {
@@ -174,9 +621,19 @@
       "tier": "I",
       "authority": "SWE-bench Pro (1865 tasks), HLE",
       "phase": "leaderboard",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Scale SEAL SWE-bench Pro public",
@@ -184,9 +641,19 @@
       "tier": "I",
       "authority": "swePro standardized",
       "phase": "leaderboard",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "SWE-bench (canonical)",
@@ -196,16 +663,39 @@
       "phase": "leaderboard",
       "format": "spa_partial",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "regex_extract",
+      "fallbacks": [
+        {
+          "format": "meta_tag_extract"
+        },
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "SWE-bench experiments repo",
       "url": "https://github.com/SWE-bench/experiments",
       "tier": "I",
       "authority": "SWE-bench raw data",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "LiveCodeBench",
@@ -213,17 +703,40 @@
       "tier": "I",
       "authority": "LCB v6 contamination-free",
       "phase": "leaderboard",
-      "format": "spa",
+      "format": "spa_full",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "websearch_snippet",
+      "fallbacks": [
+        {
+          "format": "github_raw_json"
+        },
+        {
+          "format": "meta_tag_extract"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "LiveCodeBench (alt)",
       "url": "https://livecodebench.com/",
       "tier": "I",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Terminal-Bench",
@@ -231,17 +744,37 @@
       "tier": "I",
       "authority": "TB2 agentic execution",
       "phase": "leaderboard",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Terminal-Bench (alt)",
       "url": "https://terminal-bench.io/",
       "tier": "I",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "tau-bench (canonical)",
@@ -250,9 +783,19 @@
       "authority": "tau2 agentic API-use; results in README + experiments/ folder",
       "phase": "leaderboard",
       "note": "tau-bench.dev domain dead as of 2026-04-26; canonical results live in repo README",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Aider Polyglot",
@@ -260,18 +803,38 @@
       "tier": "I",
       "authority": "aider",
       "warn": "stale since Nov 2025",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "MCP-Atlas",
       "url": "https://mcp-atlas.dev",
       "tier": "I",
       "authority": "mcpA tool-chain quality",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Artificial Analysis",
@@ -281,7 +844,20 @@
       "phase": "leaderboard",
       "format": "spa_partial",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "regex_extract",
+      "fallbacks": [
+        {
+          "format": "meta_tag_extract"
+        },
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Vellum LLM Leaderboard",
@@ -289,152 +865,334 @@
       "tier": "I",
       "authority": "sweV (independent), gpqa, cost+latency",
       "phase": "leaderboard",
-      "format": "static",
+      "format": "spa_partial",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "regex_extract",
+      "fallbacks": [
+        {
+          "format": "meta_tag_extract"
+        },
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "llm-stats.com",
       "url": "https://llm-stats.com/",
       "tier": "I",
       "authority": "broad model catalog",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "LMArena",
       "url": "https://lmarena.ai/",
       "tier": "I",
       "authority": "blind human preference (formerly LMSYS)",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "LiveBench",
       "url": "https://livebench.ai/",
       "tier": "I",
       "authority": "contamination-resistant rotating evals",
-      "format": "spa",
+      "format": "spa_full",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "websearch_snippet",
+      "fallbacks": [
+        {
+          "format": "github_raw_json"
+        },
+        {
+          "format": "meta_tag_extract"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Berkeley BFCL",
       "url": "https://gorilla.cs.berkeley.edu/leaderboard.html",
       "tier": "I",
       "authority": "function-calling v3/v4",
-      "format": "spa",
+      "format": "spa_full",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "websearch_snippet",
+      "fallbacks": [
+        {
+          "format": "github_raw_json"
+        },
+        {
+          "format": "meta_tag_extract"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "BigCodeBench",
       "url": "https://bigcode-bench.github.io/",
       "tier": "I",
       "authority": "code generation gold standard",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "BigCodeBench HF Space",
       "url": "https://huggingface.co/spaces/bigcode/bigcode-models-leaderboard",
       "tier": "I",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "EvalPlus",
       "url": "https://evalplus.github.io/leaderboard.html",
       "tier": "I",
       "authority": "HumanEval+ / MBPP+ rigorous",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "HF Open LLM Leaderboard",
       "url": "https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard",
       "tier": "I",
       "authority": "open-weight canonical aggregation",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Klu.ai",
       "url": "https://klu.ai/llm-leaderboard",
       "tier": "I",
       "authority": "broader benchmark aggregator",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Papers with Code",
       "url": "https://paperswithcode.com/area/code-generation",
       "tier": "I",
       "authority": "peer-reviewed leaderboards",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "arXiv",
       "url": "https://arxiv.org/",
       "tier": "I",
       "authority": "original benchmark papers, technical reports",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "BenchLM",
       "url": "https://benchlm.ai/",
       "tier": "I",
       "authority": "verified vs provisional transparency",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "AgentBench",
       "url": "https://agentbench.ai",
       "tier": "I",
       "authority": "multi-domain agentic",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "MathArena",
       "url": "https://matharena.ai/",
       "tier": "I",
       "authority": "AIME math reasoning (auxiliary)",
-      "format": "spa",
+      "format": "spa_full",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "websearch_snippet",
+      "fallbacks": [
+        {
+          "format": "github_raw_json"
+        },
+        {
+          "format": "meta_tag_extract"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Vals.ai",
       "url": "https://www.vals.ai/benchmarks/",
       "tier": "I",
       "authority": "enterprise-gated benchmark sets",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "LMMarketCap",
       "url": "https://lmmarketcap.com/",
       "tier": "I",
       "authority": "hourly market table",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "llm-stats LiveCodeBench",
@@ -442,9 +1200,16 @@
       "tier": "I",
       "authority": "lcbV6 mirror — closes the SPA gap on livecodebench.github.io (71 models indexed)",
       "phase": "leaderboard",
-      "format": "static",
+      "format": "static_html_article",
       "lastVerifiedDate": "2026-04-26",
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "regex_extract",
+      "fallbacks": [
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "llm-stats SWE-bench Verified",
@@ -452,9 +1217,16 @@
       "tier": "I",
       "authority": "sweV mirror — alternative to SPA-broken swebench.com",
       "phase": "leaderboard",
-      "format": "static",
+      "format": "static_html_article",
       "lastVerifiedDate": "2026-04-26",
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "regex_extract",
+      "fallbacks": [
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     }
   ],
   "aggregators": [
@@ -464,9 +1236,19 @@
       "tier": "I",
       "extracts": "provider count, uptime%, alt pricing, throughput",
       "phase": "pricing",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Together AI",
@@ -474,9 +1256,19 @@
       "tier": "I",
       "extracts": "quant variants, $/1M, batch tier",
       "phase": "pricing",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Fireworks AI",
@@ -484,9 +1276,19 @@
       "tier": "I",
       "extracts": "tier, throughput, batch pricing",
       "phase": "pricing",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "DeepInfra",
@@ -494,9 +1296,19 @@
       "tier": "I",
       "extracts": "$/1M, throughput",
       "phase": "pricing",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Groq",
@@ -504,159 +1316,354 @@
       "tier": "I",
       "extracts": "extreme-fast inference rates",
       "phase": "pricing",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Groq pricing",
       "url": "https://groq.com/pricing",
       "tier": "I",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Cerebras",
       "url": "https://inference-docs.cerebras.ai/",
       "tier": "I",
       "extracts": "ultra-fast inference",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Cerebras inference",
       "url": "https://cerebras.ai/inference",
       "tier": "I",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "SambaNova Cloud",
       "url": "https://cloud.sambanova.ai/models",
       "tier": "I",
       "extracts": "catalog, throughput",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Replicate",
       "url": "https://replicate.com/",
       "tier": "I",
       "extracts": "open-weight hosting, $/sec",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Lepton AI",
       "url": "https://www.lepton.ai/pricing",
       "tier": "I",
       "extracts": "enterprise pricing",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Novita AI",
       "url": "https://novita.ai/model-api",
       "tier": "I",
       "extracts": "catalog + pricing",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "SiliconFlow",
       "url": "https://siliconflow.cn/models",
       "tier": "I",
       "extracts": "Chinese providers — Qwen / DeepSeek / MiMo critical",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Anyscale",
       "url": "https://www.anyscale.com/endpoints",
       "tier": "I",
       "extracts": "enterprise endpoints",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Cloudflare Workers AI",
       "url": "https://developers.cloudflare.com/workers-ai/models/",
       "tier": "I",
       "extracts": "edge regions, free tier",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "AWS Bedrock",
       "url": "https://aws.amazon.com/bedrock/",
       "tier": "I",
       "extracts": "enterprise + region matrix",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Azure AI Foundry",
       "url": "https://ai.azure.com/explore/models",
       "tier": "I",
       "extracts": "enterprise + region",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "HuggingFace Inference Endpoints",
       "url": "https://huggingface.co/",
       "tier": "I",
       "extracts": "author canonical card",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "OpenCode Zen",
       "url": "https://opencode.ai/docs/zen",
       "tier": "I",
       "extracts": "edge endpoints, latency",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "OpenCode Go",
       "url": "https://opencode.ai/docs/go",
       "tier": "I",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Lambda Cloud",
       "url": "https://lambda.ai/inference",
       "tier": "I",
       "extracts": "enterprise throughput",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Tensorix",
       "url": "https://tensorix.ai/",
       "tier": "I",
       "extracts": "infrastructure / niche frontier hosting",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
+    },
+    {
+      "name": "benchlm.ai",
+      "url": "https://benchlm.ai/models/gemini-3-1-pro",
+      "tier": "I",
+      "format": "static_html_article",
+      "lastVerifiedDate": "2026-04-27",
+      "consecutiveFailures": 0,
+      "rationale": "Independent leaderboard tracker with per-model benchmark pages, verified vs provisional score transparency",
+      "extractedFields": [
+        "gemini-3-1-pro.gpqa",
+        "llama-4-maverick.gpqa",
+        "deepseek-v3-2.gpqa"
+      ],
+      "phase": "discovery"
     }
   ],
   "local": [
@@ -665,62 +1672,189 @@
       "url": "https://ollama.com/library",
       "tier": "I",
       "extracts": "tags, pullCount, architecture, parameters, license, releasedISO",
-      "phase": "local"
+      "phase": "local",
+      "format": "static_html_table",
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26",
+      "consecutiveFailures": 0,
+      "lastVerifiedDate": null
     },
     {
       "name": "HuggingFace Unsloth",
       "url": "https://huggingface.co/unsloth",
       "tier": "I",
       "extracts": "UD dynamic quants (UD-IQ1_S → UD-Q4_K_XL)",
-      "phase": "local"
+      "phase": "local",
+      "format": "static_html_table",
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26",
+      "consecutiveFailures": 0,
+      "lastVerifiedDate": null
     },
     {
       "name": "HuggingFace bartowski",
       "url": "https://huggingface.co/bartowski",
       "tier": "I",
-      "extracts": "most-active quant maintainer"
+      "extracts": "most-active quant maintainer",
+      "format": "static_html_table",
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26",
+      "consecutiveFailures": 0,
+      "lastVerifiedDate": null
     },
     {
       "name": "HuggingFace mradermacher",
       "url": "https://huggingface.co/mradermacher",
       "tier": "I",
-      "extracts": "high-quality quant set"
+      "extracts": "high-quality quant set",
+      "format": "static_html_table",
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26",
+      "consecutiveFailures": 0,
+      "lastVerifiedDate": null
     },
     {
       "name": "HuggingFace lmstudio-community",
       "url": "https://huggingface.co/lmstudio-community",
       "tier": "I",
-      "extracts": "LM Studio-curated GGUFs"
+      "extracts": "LM Studio-curated GGUFs",
+      "format": "static_html_table",
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26",
+      "consecutiveFailures": 0,
+      "lastVerifiedDate": null
     },
     {
       "name": "LM Studio",
       "url": "https://lmstudio.ai/models",
       "tier": "I",
-      "extracts": "desktop catalog"
+      "extracts": "desktop catalog",
+      "format": "static_html_table",
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26",
+      "consecutiveFailures": 0,
+      "lastVerifiedDate": null
     },
     {
       "name": "llama.cpp",
       "url": "https://github.com/ggerganov/llama.cpp/discussions",
       "tier": "I",
-      "extracts": "empirical VRAM/throughput data"
+      "extracts": "empirical VRAM/throughput data",
+      "format": "static_html_table",
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26",
+      "consecutiveFailures": 0,
+      "lastVerifiedDate": null
     },
     {
       "name": "MLX (Apple Silicon)",
       "url": "https://huggingface.co/mlx-community",
       "tier": "I",
-      "extracts": "mlx-quantized variants"
+      "extracts": "mlx-quantized variants",
+      "format": "static_html_table",
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26",
+      "consecutiveFailures": 0,
+      "lastVerifiedDate": null
     },
     {
       "name": "vLLM",
       "url": "https://docs.vllm.ai/en/latest/models/supported_models.html",
       "tier": "I",
-      "extracts": "server-side support matrix"
+      "extracts": "server-side support matrix",
+      "format": "static_html_table",
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26",
+      "consecutiveFailures": 0,
+      "lastVerifiedDate": null
     },
     {
       "name": "sglang",
       "url": "https://github.com/sgl-project/sglang",
       "tier": "I",
-      "extracts": "structured-output throughput"
+      "extracts": "structured-output throughput",
+      "format": "github_raw_markdown",
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_markdown"
+        }
+      ],
+      "format_lastVerified": "2026-04-26",
+      "consecutiveFailures": 0,
+      "lastVerifiedDate": null
     }
   ],
   "registries": [
@@ -729,19 +1863,55 @@
       "url": "data/external/llmfit-hf-models.json",
       "tier": "I",
       "extracts": "148-model HF curated DB",
-      "note": "read first; no network"
+      "note": "read first; no network",
+      "format": "static_html_table",
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26",
+      "consecutiveFailures": 0,
+      "lastVerifiedDate": null
     },
     {
       "name": "llmfit upstream",
       "url": "https://github.com/AlexsJones/llmfit/blob/main/data/hf_models.json",
       "tier": "I",
-      "extracts": "authoritative source"
+      "extracts": "authoritative source",
+      "format": "github_raw_json",
+      "extractor": "json_path",
+      "fallbacks": [
+        {
+          "format": "static_json_api"
+        }
+      ],
+      "format_lastVerified": "2026-04-26",
+      "consecutiveFailures": 0,
+      "lastVerifiedDate": null
     },
     {
       "name": "HF model index",
       "url": "https://huggingface.co/models?sort=trending",
       "tier": "S→I",
-      "extracts": "trending + filter by license/architecture"
+      "extracts": "trending + filter by license/architecture",
+      "format": "static_html_table",
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26",
+      "consecutiveFailures": 0,
+      "lastVerifiedDate": null
     }
   ],
   "community": [
@@ -749,181 +1919,360 @@
       "name": "ApiDog Blog",
       "url": "https://apidog.com/blog/",
       "tier": "C",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "The Decoder",
       "url": "https://the-decoder.com/",
       "tier": "C",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "DataCamp Blog",
       "url": "https://www.datacamp.com/blog",
       "tier": "C",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Build Fast With AI",
       "url": "https://www.buildfastwithai.com/",
       "tier": "C",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Simon Willison",
       "url": "https://simonwillison.net/",
       "tier": "C",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Latent Space",
       "url": "https://www.latent.space/",
       "tier": "C",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Swyx",
       "url": "https://www.swyx.io/",
       "tier": "C",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Awesome-LLM",
       "url": "https://github.com/Hannibal046/Awesome-LLM",
       "tier": "C",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Awesome-Efficient-LLM",
       "url": "https://github.com/horseee/Awesome-Efficient-LLM",
       "tier": "C",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "r/LocalLLaMA",
       "url": "https://www.reddit.com/r/LocalLLaMA/",
       "tier": "C",
       "note": "community VRAM reports only",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Design Arena",
       "url": "https://designarena.ai/leaderboard",
       "tier": "C",
       "note": "UI auxiliary",
-      "format": "unknown",
+      "format": "static_html_table",
       "lastVerifiedDate": null,
-      "consecutiveFailures": 0
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
+      "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Lushbinary",
       "url": "https://lushbinary.com/blog/",
       "type": "aggregator_blog",
       "tier": "C",
-      "format": "static",
+      "format": "static_html_article",
       "lastVerifiedDate": "2026-04-26",
       "consecutiveFailures": 0,
-      "note": "1:1 frontier model comparison articles (e.g., GPT-5.5 vs Opus 4.7); high-quality numeric extraction"
+      "note": "1:1 frontier model comparison articles (e.g., GPT-5.5 vs Opus 4.7); high-quality numeric extraction",
+      "extractor": "regex_extract",
+      "fallbacks": [
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "WhatLLM",
       "url": "https://whatllm.org/blog/",
       "type": "aggregator_blog",
       "tier": "C",
-      "format": "static",
+      "format": "static_html_article",
       "lastVerifiedDate": "2026-04-26",
       "consecutiveFailures": 0,
-      "note": "Per-model preview articles with extracted bench scores"
+      "note": "Per-model preview articles with extracted bench scores",
+      "extractor": "regex_extract",
+      "fallbacks": [
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "ALMCorp",
       "url": "https://almcorp.com/blog/",
       "type": "aggregator_blog",
       "tier": "C",
-      "format": "static",
+      "format": "static_html_article",
       "lastVerifiedDate": "2026-04-26",
       "consecutiveFailures": 0,
-      "note": "Complete guides with benchmarks/pricing per model"
+      "note": "Complete guides with benchmarks/pricing per model",
+      "extractor": "regex_extract",
+      "fallbacks": [
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "TokenMix",
       "url": "https://tokenmix.ai/blog/",
       "type": "aggregator_blog",
       "tier": "C",
-      "format": "static",
+      "format": "static_html_article",
       "lastVerifiedDate": "2026-04-26",
       "consecutiveFailures": 0,
-      "note": "OpenAI o-series and reasoning model benchmarks"
+      "note": "OpenAI o-series and reasoning model benchmarks",
+      "extractor": "regex_extract",
+      "fallbacks": [
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Vals AI",
       "url": "https://www.vals.ai/",
       "type": "independent_leaderboard",
       "tier": "I",
-      "format": "partial_static",
+      "format": "spa_partial",
       "lastVerifiedDate": "2026-04-26",
       "consecutiveFailures": 0,
-      "note": "Independent benchmark tracker — per-model pages partially static; ranking tables visible"
+      "note": "Independent benchmark tracker — per-model pages partially static; ranking tables visible",
+      "extractor": "regex_extract",
+      "fallbacks": [
+        {
+          "format": "meta_tag_extract"
+        },
+        {
+          "format": "static_html_article"
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "BuildFastWithAI Blog",
       "url": "https://www.buildfastwithai.com/blogs/",
       "type": "aggregator_blog",
       "tier": "C",
-      "format": "static",
+      "format": "static_html_article",
       "lastVerifiedDate": "2026-04-26",
       "consecutiveFailures": 0,
-      "note": "Per-model review articles with full benchmarks (already used in C-tier elsewhere)"
+      "note": "Per-model review articles with full benchmarks (already used in C-tier elsewhere)",
+      "extractor": "regex_extract",
+      "fallbacks": [
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Iternal LLM Selection Guide",
       "url": "https://iternal.ai/llm-selection-guide",
       "type": "aggregator_blog",
       "tier": "C",
-      "format": "static",
+      "format": "static_html_article",
       "lastVerifiedDate": "2026-04-26",
       "consecutiveFailures": 0,
-      "note": "30+ models ranked across MMLU/SWE-bench/Arena Elo/Pricing"
+      "note": "30+ models ranked across MMLU/SWE-bench/Arena Elo/Pricing",
+      "extractor": "regex_extract",
+      "fallbacks": [
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "Atlas Cloud Blog",
       "url": "https://www.atlascloud.ai/blog/",
       "type": "aggregator_blog",
       "tier": "C",
-      "format": "static",
+      "format": "static_html_article",
       "lastVerifiedDate": "2026-04-26",
       "consecutiveFailures": 0,
-      "note": "Multi-model Chinese frontier comparison (Kimi/GLM/MiniMax/Qwen tier); verified SWE-bench Pro and pricing data"
+      "note": "Multi-model Chinese frontier comparison (Kimi/GLM/MiniMax/Qwen tier); verified SWE-bench Pro and pricing data",
+      "extractor": "regex_extract",
+      "fallbacks": [
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     },
     {
       "name": "AkitaOnRails LLM Coding Benchmarks",
       "url": "https://akitaonrails.com/en",
       "type": "aggregator_blog",
       "tier": "C",
-      "format": "static",
+      "format": "static_html_article",
       "lastVerifiedDate": "2026-04-26",
       "consecutiveFailures": 0,
-      "note": "Independent April 2026 coding benchmark roundup covering DeepSeek V4, Kimi K2.6, MiMo; practitioner-grade analysis"
+      "note": "Independent April 2026 coding benchmark roundup covering DeepSeek V4, Kimi K2.6, MiMo; practitioner-grade analysis",
+      "extractor": "regex_extract",
+      "fallbacks": [
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-04-26"
     }
   ],
   "_runtime": {
@@ -942,7 +2291,11 @@
       },
       "swebench.com": {
         "status": "spa_partial",
-        "note": "Truncation; per-leaderboard subpages probably static"
+        "note": "Truncation; per-leaderboard subpages probably static",
+        "consecutiveFailures": 1,
+        "lastStatus": "SPA_NO_DATA",
+        "lastObservedFormat": "spa_full",
+        "lastProbedAt": "2026-04-27"
       },
       "matharena.ai": {
         "status": "spa_no_data",
@@ -991,9 +2344,39 @@
       "akitaonrails.com/en": {
         "status": "static",
         "note": "Independent benchmark roundup; verified 2026-04-26"
+      },
+      "llm-stats.com": {
+        "consecutiveFailures": 1,
+        "lastStatus": "OK",
+        "lastObservedFormat": "static_html_article",
+        "lastProbedAt": "2026-04-27"
+      },
+      "artificialanalysis.ai": {
+        "consecutiveFailures": 1,
+        "lastStatus": "SPA_NO_DATA",
+        "lastObservedFormat": "spa_full",
+        "lastProbedAt": "2026-04-27"
+      },
+      "benchlm.ai": {
+        "consecutiveFailures": 1,
+        "lastStatus": "OK",
+        "lastObservedFormat": "static_html_article",
+        "lastProbedAt": "2026-04-27"
+      },
+      "openrouter.ai": {
+        "consecutiveFailures": 1,
+        "lastStatus": "SPA_NO_DATA",
+        "lastObservedFormat": "spa_full",
+        "lastProbedAt": "2026-04-27"
+      },
+      "livecodebench.github.io": {
+        "consecutiveFailures": 1,
+        "lastStatus": "SPA_NO_DATA",
+        "lastObservedFormat": "spa_full",
+        "lastProbedAt": "2026-04-27"
       }
     },
-    "lastFullCycle": "2026-04-26",
+    "lastFullCycle": "2026-04-27",
     "schemaVersion": 2
   }
 }

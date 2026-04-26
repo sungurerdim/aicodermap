@@ -59,7 +59,12 @@ trust_score_required: <bool default:true>
 
 ## TRUSTED_SOURCE_WHITELIST (`trusted_sources_only=true` enforces these)
 
-**The agent NEVER hardcodes URLs.** The complete whitelist lives in `data/sources-whitelist.json` (single source of truth). The skill loads it and passes via `idea_context.sourcesWhitelist`. README "Data Sources" mirrors the same data for user-facing transparency.
+**The agent NEVER hardcodes URLs, format keywords, or regex patterns.** All three live in `data/sources-whitelist.json` (single source of truth):
+- URLs in the per-category arrays (`leaderboards[]`, `aggregators[]`, `community[]`, `local[]`, `registries[]`) and per-vendor `vendors.<v>.urls`.
+- Format taxonomy in `_schema.formatTaxonomy[]` (12 keys — see FORMAT_DISPATCH below).
+- Extractor patterns in `_schema.regexLibrary.patterns[]` (16 named patterns; agent references by name only — never inlines a regex).
+
+The skill loads the whole file and passes it via `idea_context.sourcesWhitelist`. README "Data Sources" mirrors the same data for user-facing transparency.
 
 ### Procedural rules (HOW to use the whitelist)
 
@@ -134,19 +139,24 @@ For models that ended Phase 1+2 with <2 bench cells filled OR with missing prici
 - HuggingFace card (search vendors[].urls.models or `huggingface.co/<author>/<model>`)
 - Specific leaderboard for the missing bench from `leaderboards[]`
 
-## EXTRACTION_DISCIPLINE (table-aware, not summary-only)
+## EXTRACTION_DISCIPLINE (named-pattern dispatch, three-pass discipline)
 
-The single biggest source of data loss in prior runs: agent fetched a vendor announcement page that contained 8-15 bench scores in a table, but only extracted the 1-3 scores mentioned in the lead summary sentence. Page text had everything; agent saw a fraction.
+The single biggest source of data loss in prior runs was a single mega-regex doing row + cell + value detection in one shot — when one pass mis-fired, the page silently returned zero. The fix: every extraction is **format-driven, named-pattern, three-pass**. The agent NEVER inlines a regex; every pattern is referenced by name from `idea_context.sourcesWhitelist._schema.regexLibrary.patterns`.
 
 **Mandatory extraction rules per fetched page:**
 
-1. After fetching, scan the ENTIRE text body for bench score patterns:
-   ```
-   regex 1: <BENCH_NAME>\s*[:\-]?\s*(\d{1,3}(?:\.\d{1,2})?)\s*%
-   regex 2: (\d{1,3}(?:\.\d{1,2})?)\s*%\s+on\s+<BENCH_NAME>
-   regex 3: table-row pattern: <BENCH_NAME> | <SCORE> | (in markdown/HTML tables)
-   ```
-   where BENCH_NAME maps via this alias table:
+1. **Pre-extract cleanup** (when `extractors[<extractor>].cleanupBeforeExtract == true`): strip `<script>`, `<style>`, `<nav>`, `<footer>`, `<aside>`, and HTML comments using the patterns in `_schema.regexLibrary._cleanupTags[]`. This halves the false-positive surface (script blocks contain numeric literals like version strings, timestamps, ports).
+
+2. **Three-pass dispatch** (for `extractor == "html_table"` or `"regex_extract"`):
+   - **Pass 1 — TABLE_BOUNDARY**: locate the relevant table or section block in the cleaned body.
+   - **Pass 2 — ROW_SPLIT**: split the table into rows; reject markdown separator rows (`^\|[\s\-:]+\|`) and header rows.
+   - **Pass 3 — CELL_VALUE**: apply `bench_score_*` patterns from `_schema.regexLibrary.patterns` to each cell, paired with the row's first cell (model name) for anchoring.
+
+3. **Pattern lookup, not inline regex**: for every fetch, the agent reads `entry.format` → `formatTaxonomy[<format>].extractorPatterns[]` (an ordered list of pattern names) → for each name, reads `regexLibrary.patterns[<name>].regex` + `flags`, then runs in sequence until the first non-empty match. The pattern NAME — not the regex source — is recorded in `sourcesAdded[].extractedVia` so the lint/audit pipeline can correlate captures back to corpus regressions.
+
+4. **Locale decimal disambiguation** (post-capture, not in pattern): per `regexLibrary._localeDecimalRule` — handles `87.6`, `87,6`, `1,234.56`, `1.234,56`, `1 234,56` (BIPM thin-space + EU decimal). Apply ONLY to captured numeric strings, never inside the pattern.
+
+5. **Bench alias table** (the only hardcoded discrimination still permitted in the agent — keeps human-readable bench names mapped to the 16-key schema):
    - SWE-bench Pro / SEAL Pro / SWE Pro → swePro
    - SWE-bench Verified / SWE-V → sweV
    - SWE-bench Multilingual / Multi-SWE → sweMulti
@@ -160,12 +170,11 @@ The single biggest source of data loss in prior runs: agent fetched a vendor ann
    - Artificial Analysis Coding Index / AA Coding → aaCoding
    - Artificial Analysis Agentic Index / AA Agentic → aaAgentic
    - Artificial Analysis Intelligence Index / AA Index / aaIdx → aaIdx
+   - BFCL → bfcl, AIME 2026 → aime26, AA Omni → aaOmni
 
-2. EVERY (bench_name, score) pair found in the text becomes a candidate value. Do NOT pre-filter to "the bench I was looking for" — if the page mentions GPQA 87.7, MMLU 89, AIME 85.4, HumanEval 92.0, capture them all even if your target was just sweV.
+6. EVERY (bench_name, score) pair the patterns surface becomes a candidate value. Do NOT pre-filter to "the bench I was looking for" — if the page mentions GPQA 87.7, MMLU 89, AIME 85.4, HumanEval 92.0, capture them all even if your target was just sweV.
 
-3. Page-text snapshot in the artifact: when emitting `models[].updates.bench`, include all extracted scores, not just the ones explicitly searched.
-
-4. Score → trustScore: page is vendor blog → S-tier; leaderboard → I-tier; community → C-tier (formula in SKILL.md).
+7. Score → trustScore: page is vendor blog → S-tier; leaderboard → I-tier; community → C-tier (formula in SKILL.md). Per-domain `tierOverride` (when set on the whitelist entry) wins over the entry's category-level tier.
 
 ## IMAGE_OCR_FALLBACK (when bench data lives in PNG charts)
 
@@ -185,16 +194,63 @@ Some vendor announcement pages (notably Anthropic, OpenAI, DeepMind) embed bench
 
 For the standard 13-key benches, prefer text extraction + leaderboards over image OCR.
 
-## SPA_FALLBACK (when target page is JS-rendered)
+## FORMAT_DISPATCH (data-driven adapter selection — replaces hardcoded SPA detection)
 
-Some target pages render bench tables client-side; fetch returns mostly `<script>` bundles with little text. Detection: `len(text) / len(html) < 0.10` is the SPA tell.
+Each whitelist entry carries a `format` field naming one of the 12 keys in `_schema.formatTaxonomy`. The agent NEVER infers format from URL keywords or response heuristics; it reads `entry.format` and dispatches to the corresponding extractor.
 
-Pages known to be SPA-only (avoid as primary):
-- `artificialanalysis.ai/models/<id>` (per-model — use main `/leaderboards/models` instead)
-- `huggingface.co/spaces/open-llm-leaderboard/...` (use HF Datasets API endpoint instead)
-- `livebench.ai` (use GitHub source for raw data)
+**Format keys** (canonical list — defined in `_schema.formatTaxonomy`):
 
-Per-page fallback rule: if SPA detected (low text ratio + bench keyword absent), DO NOT emit gaps[] yet — try the main aggregator/leaderboard page first.
+| Format key | When primary | Fallback chain |
+|---|---|---|
+| `static_html_table` | HTML table → `html_table` extractor (3-pass) | `static_html_article` → `websearch_snippet` |
+| `static_html_article` | Long-form article → `regex_extract` | `websearch_snippet` |
+| `static_markdown` | Markdown tables → `html_table` | `websearch_snippet` |
+| `static_json_api` | JSON endpoint → `json_path` | `github_raw_json` |
+| `github_raw_json` | raw.githubusercontent.com `*.json` → `json_path` | `static_json_api` |
+| `github_raw_markdown` | GitHub README → `html_table` (markdown rows) | `static_markdown` |
+| `spa_partial` | SPA shell → `regex_extract` on meta + JSON-LD | `meta_tag_extract` → `static_html_article` → `websearch_snippet` |
+| `spa_full` | **skip primary** (full SPA, no static fallback) | aggregator mirrors (pricepertoken/llm-stats/vals.ai/benchlm) → `meta_tag_extract` → `websearch_snippet` |
+| `meta_tag_extract` | SEO meta + JSON-LD → `regex_extract` (catches SPA top-N scores) | `static_html_article` → `websearch_snippet` |
+| `image_embedded` | **skip primary** (orchestrator handles via `scripts/extract-images.py`) | `static_html_article` → `websearch_snippet` |
+| `bot_blocked` | **skip primary** (403/404) | `websearch_snippet` |
+| `pdf_report` | PDF → `regex_extract` (limited fetch) | `websearch_snippet` |
+| `websearch_snippet` | Terminal fallback — query + tier-assign per result domain | (none) |
+
+**Dispatch protocol per (modelId, field) target**:
+
+```
+entry := lookup_whitelist_entry_for_target(modelId, field)
+format := entry.format
+extractor := entry.extractor || formatTaxonomy[format].extractor
+patterns := entry.extractorHints?.patternOverride
+              || formatTaxonomy[format].extractorPatterns
+
+if formatTaxonomy[format].primaryTool == "skip":
+    skip_primary = true
+else:
+    body := WebFetch(entry.url) (or scripts/extract-images.py for image_embedded — orchestrator-side)
+    cleaned := cleanup(body) if extractors[extractor].cleanupBeforeExtract
+    captured := run_three_pass(cleaned, patterns) for html_table
+                 or run_pattern_loop(cleaned, patterns) for regex_extract
+                 or json_path_walk(parse(body), entry.extractorHints?.jsonPath) for json_path
+    if captured: emit
+                 sourcesAdded[].extractedVia := "<patternName>@<version>"
+
+if not captured:
+    for fb in (entry.fallbacks || formatTaxonomy[format].defaultFallbacks):
+        recurse with format = fb.format on entry.url (or fb.urlPattern resolved against the
+        entry's domain for aggregator-mirror cascade)
+        if captured: break
+
+if still not captured:
+    emit gaps[] with triedFormats: [<format>, <fb1>, <fb2>, ...],
+                    triedPatterns: [<patternName>, ...],
+                    triedSources: [<urls>]
+```
+
+**Aggregator-mirror cascade** (special-case for `spa_full`): the SPA URL is skipped; the agent constructs a mirror URL from `formatTaxonomy.spa_full.aggregatorMirrors[]` (e.g., `https://pricepertoken.com/leaderboards/benchmark/<slug>`) and fetches that as `static_html_table` instead. The mirror URLs are I-tier even when the original SPA carried a different tier; trustScore is computed from the mirror's own whitelist tier.
+
+**SPA_NO_DATA detection at fetch time**: `len(text)/len(html) < 0.10` after cleanup is the SPA tell. If the entry's declared format is `static_*` but the fetch returns SPA markup, the agent treats this as a format-classification drift signal: emit a `formatDrift[]` entry in the output JSON so the skill's PRELIM `source_health_check` can demote the entry's `format` after 3 consecutive cycles (auto-self-healing per SKILL.md).
 
 ### Per-row extraction discipline
 For each fetched table page, extract every row matching a model in `idea_context.currentIds` via:
@@ -470,44 +526,38 @@ expected: ≤30s, single-pair fill, returns one models[].updates entry + sources
 - **Delivery contract** — JSON-only final message, no narration, no file write, no truncation
 - **Project boundary** — only AICoderMap session
 
-## INTERNAL_RETRY_DISCIPLINE (DEFAULT, mandatory before emitting gaps[])
+## INTERNAL_RETRY_DISCIPLINE (format-driven cascade — replaces hardcoded escalation)
 
-The agent NEVER emits a `gaps[]` entry on first try. Every gap candidate goes through this internal escalation chain BEFORE being declared a gap:
+The agent NEVER emits a `gaps[]` entry on first try. Every gap candidate goes through the **format-driven cascade** described in FORMAT_DISPATCH above before being declared a gap. The cascade is fully data-driven — no hardcoded URL patterns or domain lists.
 
 ```
-For each (modelId, field) that ended Phase 2 still null/missing:
-  0. WEBSEARCH PRIMARY DISCOVERY (NEW — top of the chain):
-     - WebSearch query: "<modelName>" benchmark "<benchmarkName>" 2026
-       (e.g., '"Claude Opus 4.7" benchmark "SWE-bench Verified" "GPQA" 2026')
-     - WebSearch returns curated summaries with extracted scores from blog/aggregator/vendor pages
-       that WebFetch cannot reach (SPA leaderboards, 403-blocked vendor blogs, image-embedded tables)
-     - Capture every (bench, score) pair in the search summary; tag tier per source domain:
-       * vellum.ai, artificialanalysis.ai/articles/* → I-tier (independent leaderboard analysis)
-       * deepmind.google/models/model-cards/*, openai.com/index/*, anthropic.com/news/* → S-tier (vendor)
-       * marktechpost.com, officechai.com, buildfastwithai.com, lushbinary.com, kingy.ai, whatllm.org, almcorp.com → C-tier (aggregator)
-     - WebSearch is the agent's PRIMARY tool for bench discovery in 2026; WebFetch is the
-       confirmation/cross-check tool. Reverse the prior order.
-  1. INTRA-WHITELIST FALLBACK (only after WebSearch exhausted):
-     - If primary source was a leaderboard SPA → try the GitHub source repo URL
-       (every leaderboard entry in sources-whitelist.json now carries a `githubSource` field
-        when one exists — e.g., LiveBench → github.com/LiveBench/LiveBench;
-        SWE-bench → github.com/SWE-bench/experiments raw data)
-     - If primary source was a vendor docs page → try vendor blog/news URL
-     - If primary source was an aggregator → try a different aggregator from the same whitelist tier
-     Cost: ≤2 additional fetches per gap pair, still within per_model_fetch_budget
-  2. CROSS-VENDOR LATERAL:
-     - If a model is reported on a leaderboard for OTHER benches but not this one,
-       check whether the leaderboard hosts a sister-benchmark page (e.g., LCB v6 + LCB v5;
-       SWE-bench Verified + SWE-bench Pro on the same Scale page)
-  3. C-TIER COMMUNITY FALLBACK (only when steps 0-2 exhausted):
-     - Sample 1-2 entries from `community[]` that match the (modelId, field) topic
-     - Tag the resulting trustScore with C-tier weight (0.4); skill's auto-resolution will
-       prefer it over null but treat it as low confidence
-  4. ONLY THEN emit a `gaps[]` entry with `triedSources: [<every URL attempted>]` AND
-     `triedQueries: [<every WebSearch query>]`
+For each (modelId, field) still null after the primary fetch:
+  walk the entry's fallback chain:
+    fallbacks := entry.fallbacks || formatTaxonomy[entry.format].defaultFallbacks
+    for fb in fallbacks:
+      candidateUrl := fb.urlPattern
+        ? resolve_url_pattern(fb.urlPattern, entry)         // e.g., aggregator mirrors
+        : entry.url                                          // re-fetch with different extractor
+      attempt fetch + extract per fb.format's extractor + extractorPatterns
+      if captured: emit + break
+      cost += 1 fetch (counted against per_model_fetch_budget)
+
+  if still not captured AND a websearch_snippet step exists in the chain:
+    run WebSearch queries (minimum 2 — see WEBSEARCH_PRIMARY_DISCIPLINE)
+    tier-assign per result domain via whitelist lookup
+    if any result yields a (bench, score) pair: emit + break
+
+  if still not captured:
+    emit gaps[] entry with:
+      triedFormats:  [<format>, <fb1.format>, <fb2.format>, ...]
+      triedPatterns: [<patternName1>, <patternName2>, ...]
+      triedSources:  [<every URL attempted, including aggregator mirrors>]
+      triedQueries:  [<every WebSearch query>]
 ```
 
-**Cardinal rule:** an empty value in the artifact is a contract violation IF the agent never tried steps 0-3. The skill's deep-fetch loop will catch silently-skipped fields by checking gaps[] coverage against the field whitelist.
+**Cardinal rule:** an empty value in the artifact is a contract violation IF the agent did not walk the fallback chain. The skill's deep-fetch loop catches silently-skipped fields by checking gaps[] coverage against the field whitelist AND verifying `triedFormats[]` has at least 2 entries (one primary + one fallback) per gap.
+
+**No hardcoded "if SPA → try GitHub" / "if blog → try news" branches** — those mappings now live in each entry's `fallbacks[]` (populated by `scripts/whitelist-format-migration.js`) and in `formatTaxonomy[<format>].defaultFallbacks`. Adding a new fallback path = editing the whitelist, never the agent.
 
 ## WEBSEARCH_PRIMARY_DISCIPLINE (2026 update — root-cause fix for SPA/403 walls)
 
@@ -525,22 +575,30 @@ For each model surveyed:
     query := f'"{modelName}" benchmark "{benchKeyHumanName}" 2026'
     results := WebSearch(query)
     extract every (bench, value) pair the AI summary surfaces
-    tier-assign per source domain (table above)
+    tier-assign per source domain via whitelist_tier_lookup(domain)  // NO hardcoded list
     emit to sourcesAdded[] with computed trustScore
   Then ONE WebFetch per confirmed-promising URL (vendor announcement,
   Vellum article, AA article) for triangulation/extra benches the search snippet missed.
 ```
 
-**Aggregator domain tier assignments (2026 mapping):**
-- I-tier: vellum.ai/blog (independent benchmark analyses), artificialanalysis.ai/articles (curated comparison articles), benchlm.ai (independent leaderboard tracker)
-- S-tier: vendor canonical URLs (anthropic.com/news, openai.com/index, deepmind.google/models, mistral.ai/news, x.ai/news, kimi.com/blog)
-- C-tier: marktechpost.com, officechai.com, buildfastwithai.com, lushbinary.com, kingy.ai, whatllm.org, almcorp.com, awesomeagents.ai, datacamp.com, trendingtopics.eu, siray.ai, ucstrategies.com, tokenmix.ai, iternal.ai, tokencalculator.com (aggregator blogs that aggregate vendor + leaderboard data)
+**Tier assignment for WebSearch results — whitelist-driven (NO hardcoded domain list):**
+
+```
+function whitelist_tier_lookup(domain):
+    for each entry in (vendors.* + leaderboards + aggregators + community + local + registries):
+        if domain matches entry.url's hostname (or entry.alt URL hosts):
+            return entry.tierOverride ?? entry.tier
+    return 'C'   // unknown domain → conservative C-tier (skill discovery loop may
+                 //                   later promote via whitelistAdditions[])
+```
+
+This replaces the prior hardcoded I/S/C domain tables. Adding a new aggregator = appending to `community[]` (or `aggregators[]`) in `data/sources-whitelist.json` with the appropriate `tier` (and optional `tierOverride` if it should override its category default). The agent never edits its own tier assumptions.
 
 **Minimum 2 WebSearch queries per gap pair before emitting gaps[]:**
 1. `"<modelName>" benchmark "<benchKey>" 2026`
 2. `"<modelName>" "<benchKey>" score`
 
-If both queries return zero useful (bench, score) pairs, escalate to step 1-3 of INTERNAL_RETRY_DISCIPLINE. Only then is `gaps[]` emission permitted.
+If both queries return zero useful (bench, score) pairs, the agent has already exhausted the fallback chain (per FORMAT_DISPATCH cascade). Only then is `gaps[]` emission permitted, and the entry MUST carry `triedFormats[]` + `triedPatterns[]` + `triedSources[]` + `triedQueries[]`.
 
 ## DYNAMIC_WHITELIST_DISCOVERY (self-healing whitelist mutation)
 
