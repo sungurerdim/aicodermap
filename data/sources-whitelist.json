@@ -2498,6 +2498,35 @@
         }
       ],
       "format_lastVerified": "2026-04-26"
+    },
+    {
+      "name": "mindwiredai.com",
+      "url": "https://mindwiredai.com/2026/04/24/gpt-5-5-is-here-benchmarks-pricing-and-who-should-actually-upgrade-april-2026/",
+      "tier": "C",
+      "format": "static_html_article",
+      "lastVerifiedDate": "2026-04-27",
+      "consecutiveFailures": 0,
+      "rationale": "Curated head-to-head comparison articles with exact numeric scores for frontier model pairs",
+      "extractedFields": [
+        "gpt-5-5.bench.swePro",
+        "gpt-5-5.bench.gpqa",
+        "gpt-5-5.bench.hle",
+        "gpt-5-5.bench.tb2"
+      ]
+    },
+    {
+      "name": "gemma4.wiki",
+      "url": "https://www.gemma4.wiki/benchmark/gemma-4-benchmark-results",
+      "tier": "C",
+      "format": "static_html_article",
+      "lastVerifiedDate": "2026-04-27",
+      "consecutiveFailures": 0,
+      "rationale": "Dedicated Gemma 4 wiki with benchmark tables for all variants",
+      "extractedFields": [
+        "gemma-4-31b.bench.sweV",
+        "gemma-4-31b.bench.lcbV6",
+        "gemma-4-26b-moe.bench.gpqa"
+      ]
     }
   ],
   "_runtime": {
@@ -2577,8 +2606,8 @@
         "lastProbedAt": "2026-04-27"
       },
       "artificialanalysis.ai": {
-        "consecutiveFailures": 1,
-        "lastStatus": "SPA_NO_DATA",
+        "consecutiveFailures": 2,
+        "lastStatus": "unhealthy:spa_no_data",
         "lastObservedFormat": "spa_full",
         "lastProbedAt": "2026-04-27"
       },
@@ -2595,9 +2624,30 @@
         "lastProbedAt": "2026-04-27"
       },
       "livecodebench.github.io": {
-        "consecutiveFailures": 1,
-        "lastStatus": "SPA_NO_DATA",
+        "consecutiveFailures": 2,
+        "lastStatus": "unhealthy:spa_no_data",
         "lastObservedFormat": "spa_full",
+        "lastProbedAt": "2026-04-27"
+      },
+      "deepmind.google": {
+        "consecutiveFailures": 0,
+        "unhealthy": false,
+        "lastStatus": "ok",
+        "lastObservedFormat": "static_html_article",
+        "lastProbedAt": "2026-04-27"
+      },
+      "arxiv.org": {
+        "consecutiveFailures": 0,
+        "unhealthy": false,
+        "lastStatus": "ok",
+        "lastObservedFormat": "static_html_article",
+        "lastProbedAt": "2026-04-27"
+      },
+      "labs.scale.com": {
+        "consecutiveFailures": 0,
+        "unhealthy": false,
+        "lastStatus": "ok",
+        "lastObservedFormat": "static_html_table",
         "lastProbedAt": "2026-04-27"
       }
     },

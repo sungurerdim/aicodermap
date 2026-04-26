@@ -1,4 +1,26 @@
 
+## [2026-04-27] — autonomous refresh-all
+
+### Updated
+- 26 models: `gpt-5-5`, `claude-haiku-4-5`, `grok-4-20`, `sonnet-4-6`, `gemini-3-1-pro`, `gemini-3-1-flash`, `kimi-k2-6`, `glm-5-1`, `devstral-2`, `devstral-medium`, `mimo-v2-5-pro`, `minimax-m2-5`, `minimax-m2-7`, `nemotron-3-super`, `qwen-3-6-27b`, `qwen3-6-plus`, `qwen3-coder-30b`, `qwen3-coder-480b`, `qwen3-coder-next`, `qwen3-235b`, `step-3-5-flash`, `gemma-4-26b-moe`, `gemma-3-27b`, `deepseek-r1-14b`, `codestral`, `deepseek-coder-v2-16b`
+
+### Resolved (auto via trustScore)
+- kimi-k2-6.lcbV6: winner={'value': 89.6, 'trustScore': 0.65, 'sourceUrl': 'https://www.latent.space/p/ainews-moonshot-kimi-k26-the-worlds', 'tier': 'C'} (severity=RED, Δ35.9)
+- gpt-5-5.swePro: winner={'value': 58.6, 'trustScore': 0.65, 'sourceUrl': 'https://mindwiredai.com/2026/04/24/gpt-5-5-is-here-benchmarks-pricing-and-who-should-actually-upgrade-april-2026/', 'tier': 'C'} (severity=GREEN, Δ0.9)
+- gemma-4-26b-moe.gpqa: winner={'value': 82.3, 'trustScore': 0.62, 'sourceUrl': 'https://tokenmix.ai/blog/gemma-4-review-open-source-benchmarks-2026', 'tier': 'C'} (severity=YELLOW, Δ3.1)
+
+### Gaps (13 entries — see data/known-gaps.json or next refresh)
+- `None`: Gemini 3.1 Flash model card not found separately from Flash-Lite; sweep data not in available search snippets
+- `None`: No TB2 score found for Gemini 3.1 Flash specifically
+- `None`: Grok 3 sweV not in available 2026 search results
+- `None`: Grok 3 Mini sweV not found
+- `None`: MiMo-V2-Flash sweV numeric score not surfaced, only qualitative #1 claim
+- `None`: MiMo-V2-Pro sweV score not in available search snippets
+- `None`: SWE-bench V score for 16B Lite variant not in official paper; full 236B model score only
+- `None`: GPQA not reported for DeepSeek-Coder-V2 in official paper (code-focused)
+- ... and 5 more
+
+
 ## [2026-04-27] — autonomous refresh-all [WARN: partial coverage 38.0%]
 
 ### Added
