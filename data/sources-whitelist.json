@@ -979,15 +979,21 @@
       "perModelFormat": "spa_partial",
       "slugStrategy": "try_variations",
       "slugVariations": [
+        "{vendor_prefix}{id}",
         "{id}",
-        "claude-{id}",
         "{id}-preview",
+        "{id}-lite-preview",
+        "{id}-a35b-instruct",
         "{id}-reasoning",
         "{id}-high",
         "{id}-fast",
         "{id}-mini"
       ],
-      "slugMismatchNote": "Uses own slug system: opus-4-7 → claude-opus-4-7; gemini-3-1-flash → gemini-3-1-flash-lite-preview"
+      "slugMismatchNote": "Uses own slug system: opus-4-7 → claude-opus-4-7; gemini-3-1-flash → gemini-3-1-flash-lite-preview",
+      "vendorPrefixMap": {
+        "anthropic": "claude-",
+        "default": ""
+      }
     },
     {
       "name": "Vellum LLM Leaderboard",
