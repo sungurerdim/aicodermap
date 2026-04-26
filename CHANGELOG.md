@@ -1,5 +1,5 @@
 
-## [2026-04-26] — autonomous v2 refresh-all [WARN: partial coverage 41.0%]
+## [2026-04-26] — autonomous refresh-all [WARN: partial coverage 41.0%]
 
 ### Added
 - `claude-haiku-4-5` — new model from vendor lineup discovery

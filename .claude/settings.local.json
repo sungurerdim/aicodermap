@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(taskkill //F //FI \"WindowTitle eq python*\")",
+      "Bash(pkill -f \"python -m http.server 8765\")",
+      "Bash(start http://localhost:8765)",
+      "Bash(cmd //c start http://localhost:8765)",
+      "Skill(aicodermap)",
+      "Bash(PYTHONIOENCODING=utf-8 python)",
+      "mcp__plugin_context-mode_context-mode__ctx_execute_file",
+      "mcp__plugin_context-mode_context-mode__ctx_execute"
+    ]
+  }
+}

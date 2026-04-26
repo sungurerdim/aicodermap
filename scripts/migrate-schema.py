@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AICoderMap schema v1 -> v2 migration:
+AICoderMap schema migration (one-shot, idempotent):
 - pricing.api {in, out, cacheHit} -> array of provider entries + computed pricing.range
 - pricing.subscription string -> array of {tier, price, currency, billing, notes}
 - Add status: "active" default

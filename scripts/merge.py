@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Merge an aicodermap-research-agent v2 return into data/{models,sources}.json
+Merge an aicodermap-research-agent return into data/{models,sources}.json
 + append CHANGELOG entry.
 
-Reads .aicodermap-v2-out.json (the agent's return JSON saved by the skill).
+Reads .aicodermap-agent-out.json (the agent's return JSON saved by the skill).
 Performs schema-complete merge per SKILL.md MERGE_RULES:
 - Multi-provider pricing.api array dedupe by provider
 - Recompute pricing.range from merged api[]
@@ -23,7 +23,7 @@ from datetime import date
 
 PROJECT = "D:/GitHub/aicodermap"
 TODAY = date.today().isoformat()
-ARTIFACT = f"{PROJECT}/.aicodermap-v2-out.json"
+ARTIFACT = f"{PROJECT}/.aicodermap-agent-out.json"
 
 
 def rotate_backup(path):
@@ -271,7 +271,7 @@ def main():
         coverage_warn = f" [WARN: partial coverage {cov_pct}%]"
 
     cl_path = f"{PROJECT}/CHANGELOG.md"
-    cl_lines = [f"\n## [{TODAY}] — autonomous v2 refresh-all{coverage_warn}\n"]
+    cl_lines = [f"\n## [{TODAY}] — autonomous refresh-all{coverage_warn}\n"]
     if log["added"]:
         cl_lines.append("\n### Added\n")
         for mid in log["added"]:

@@ -94,11 +94,13 @@ Orchestrate AI coding LLM tracker updates: discover **official vendor lineup** �
     - lastUpdated := today (YYYY-MM-DD) per touched entry only
 11. Append CHANGELOG.md (Keep a Changelog):
     ## [Unreleased] / ### Updated|Added|Deprecated|Removed|Flagged
-12. Print git commands for user (DO NOT auto-commit):
-    git add data/ i18n/ CHANGELOG.md
-    git commit -m "data: <gen description>"
+12. AUTO-EXECUTE git (no user prompt):
+    git add data/ i18n/ CHANGELOG.md scripts/
+    git commit -m "data: <generated description>"
     git push
-13. Sleep 90s
+    On hook failure: fix root cause + new commit (NEVER --amend, NEVER --no-verify)
+    On push conflict: prompt user "git pull --rebase first"
+13. Sleep DEPLOY_WAIT_SEC (90s)
 14. Verify: curl <live_url>/data/models.json → 200 + valid schema → "✓ Live"
 ```
 
@@ -407,6 +409,7 @@ tail -50 CHANGELOG.md → parse last 5 release entries.
 
 ## DISCIPLINES
 - **Lineup-first** — every refresh-all begins with Step 0 vendor lineup discovery; the survey is driven by the discovered lineup, not by stale data state
+- **Auto-push** — Step 12 runs `git add+commit+push` automatically on a clean self-check; user is never prompted to copy-paste git commands
 - **Autonomous resolution** — coverage triggers deeper research (not a block); contradictions auto-resolve via trustScore (not user prompts); rename + deprecate auto-execute when ≥2 sources verify
 - **Schema-complete merge** — every refresh applies MERGE_RULES to ALL whitelisted fields, including pricing.api[] array, pricing.subscription[] array, status field. Self-check before commit
 - **Trust scoring** — every value in data/sources.json carries a computed trustScore; contradictions resolved via argmax(trustScore)

@@ -129,25 +129,9 @@ The agent **MUST NOT** fetch URLs outside this whitelist when `trusted_sources_o
 | llmfit (local) | data/external/llmfit-hf-models.json | 148-model HF curated DB (read first!) |
 | llmfit (upstream) | github.com/AlexsJones/llmfit | authoritative source |
 
-### S-tier — Vendor official (always permitted, but ranked below I-tier)
-| Vendor | URLs |
-|--------|------|
-| Anthropic | anthropic.com/news, docs.claude.com/en/docs/about-claude/models, platform.claude.com/docs/en/about-claude/pricing |
-| OpenAI | openai.com/blog, platform.openai.com/docs/models |
-| Google DeepMind | deepmind.google/discover, ai.google.dev/gemini-api/docs/models |
-| Mistral | mistral.ai/news, docs.mistral.ai/getting-started/models/models_overview |
-| DeepSeek | deepseek.com/news, api-docs.deepseek.com |
-| xAI | x.ai/news, docs.x.ai/docs/models |
-| Alibaba (Qwen) | qwenlm.github.io/blog, qwen-lm.github.io |
-| Moonshot (Kimi) | kimi.com/blog, platform.moonshot.cn |
-| Z.ai (GLM) | z.ai/news, docs.z.ai |
-| Xiaomi (MiMo) | mimo.xiaomi.com, xiaomimimo.github.io |
-| MiniMax | minimaxi.com/news, platform.minimaxi.com |
-| Nvidia | build.nvidia.com, blogs.nvidia.com |
-| Meta (Llama) | huggingface.co/meta-llama, ai.meta.com/blog |
-| Google (Gemma) | huggingface.co/google, ai.google.dev/gemma |
-| StepFun | stepfun.com |
-| All Hands AI (Devstral) | all-hands.dev |
+### S-tier — Vendor official
+
+Vendor URLs are listed canonically in **`SKILL.md → VENDOR_LINEUP_SOURCES`** (used both for Phase 0 lineup discovery and S-tier per-model fallback). The agent treats every URL in that table as S-tier (vendor self-report, weight 0.7); if a vendor publishes a separate pricing page distinct from its docs page, both are valid S-tier sources for the same model. README's "Data Sources" section is the user-facing presentation of this same list.
 
 ### C-tier — Aggregator/blog (only when 0 I/S source available for a value)
 | Source | URL |
@@ -167,26 +151,9 @@ The agent **MUST NOT** fetch URLs outside this whitelist when `trusted_sources_o
 ### U-tier — Forum/social (NEVER written to data; cross-check signal only)
 - Reddit (general), Twitter/X, Hacker News, Discord servers
 
-## TRUST_SCORE_FORMULA (computed for every value the agent emits)
+## TRUST_SCORE_FORMULA
 
-```
-trustScore(value) = tierWeight × min(verifications, 3)/3 × recencyDecay(date)
-
-tierWeight: I=1.0, S=0.7, C=0.4, U=0.1 (never written)
-
-verifications: number of distinct whitelist sources reporting the same value (capped at 3)
-
-recencyDecay(date):
-  age <  30d → 1.00
-  age <  90d → 0.85
-  age < 180d → 0.70
-  age < 365d → 0.50
-  age ≥ 365d → 0.30
-
-Tiebreak (within 0.05): prefer I-tier, then most recent, then highest verifications.
-```
-
-Every entry in the agent's `sourcesAdded[]` MUST carry a computed `trustScore` field. The skill's auto-resolution layer uses these for argmax-winner selection on contradictions.
+Canonical definition lives in **`SKILL.md → TRUST_SCORE_FORMULA`** (single source of truth). The agent computes `trustScore` per the formula there and emits it on every `sourcesAdded[]` entry. The skill's auto-resolution layer uses these for argmax-winner selection on contradictions.
 
 ## MODEL_FAMILIES (vendor × family research scope, for `scope=full`)
 
