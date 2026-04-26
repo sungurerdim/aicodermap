@@ -314,6 +314,15 @@
       "date": "2026-03-01",
       "tier": "S",
       "trustScore": 0.198
+    },
+    {
+      "value": 92.8,
+      "source": "GPT-5.4 release",
+      "url": "https://almcorp.com/blog/gpt-5-4/",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "gpt-5-4.hle": [
@@ -498,6 +507,15 @@
       "verifications": 1,
       "trustScore": 0.7,
       "contradictionRole": "winner"
+    },
+    {
+      "value": 80.2,
+      "source": "Kimi K2.6 blog",
+      "url": "https://www.kimi.com/blog/kimi-k2-5",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "kimi-k2-6.swePro": [
@@ -524,6 +542,15 @@
       "date": "2026-04-25",
       "tier": "C",
       "trustScore": 0.4
+    },
+    {
+      "value": 58.6,
+      "source": "Moonshot K2.6",
+      "url": "https://www.marktechpost.com/2026/04/20/moonshot-ai-releases-kimi-k2-6-with-long-horizon-coding-agent-swarm-scaling-to-300-sub-agents-and-4000-coordinated-steps/",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "kimi-k2-6.tb2": [
@@ -563,6 +590,15 @@
       "verifications": 1,
       "trustScore": 0.7,
       "contradictionRole": "winner"
+    },
+    {
+      "value": 66.7,
+      "source": "Kimi K2.6",
+      "url": "https://www.marktechpost.com/2026/04/20/moonshot-ai-releases-kimi-k2-6",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "kimi-k2-6.lcbV6": [
@@ -602,16 +638,26 @@
       "verifications": 1,
       "trustScore": 0.7,
       "contradictionRole": "winner"
+    },
+    {
+      "value": 89.6,
+      "source": "benchlm.ai",
+      "url": "https://benchlm.ai/benchmarks/liveCodeBenchV6",
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 1
     }
   ],
   "kimi-k2-6.hle": [
     {
       "value": 54,
-      "source": "Moonshot AI self-report via MarkTechPost",
+      "source": "Kimi K2.6 HLE-with-tools",
       "url": "https://www.marktechpost.com/2026/04/20/moonshot-ai-releases-kimi-k2-6",
       "date": "2026-04-20",
       "tier": "S",
-      "trustScore": 0.233
+      "trustScore": 0.7,
+      "verifications": 1
     }
   ],
   "kimi-k2-6.aaIdx": [
@@ -849,6 +895,15 @@
       "date": "2026-04-25",
       "tier": "I",
       "trustScore": 0.667
+    },
+    {
+      "value": 78,
+      "source": "MiniMax M2.7",
+      "url": "https://www.marktechpost.com/2026/04/12/minimax-just-open-sourced-minimax-m2-7",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "minimax-m2-5.sweV": [
@@ -1322,6 +1377,15 @@
       "date": "2026-04-24",
       "tier": "S",
       "trustScore": 0.233
+    },
+    {
+      "value": 37.7,
+      "source": "officechai",
+      "url": "https://officechai.com/ai/deepseek-v4-pro-deepseek-v4-flash-benchmarks-pricing/",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "qwen-3-6-27b.tb2": [
@@ -1531,6 +1595,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": 0.333
+    },
+    {
+      "value": 72.2,
+      "source": "Mistral Devstral 2",
+      "url": "https://mistral.ai/news/devstral-2-vibe-cli",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "claude-haiku-4-5.sweV": [
@@ -1637,6 +1710,15 @@
       "verifications": 1,
       "trustScore": 1.0,
       "contradictionRole": "winner"
+    },
+    {
+      "value": 56.22,
+      "source": "MiniMax M2.7",
+      "url": "https://www.marktechpost.com/2026/04/12/minimax-just-open-sourced-minimax-m2-7",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "minimax-m2-7.tb2": [
@@ -1956,6 +2038,15 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": 0.7
+    },
+    {
+      "value": 90.5,
+      "source": "Kimi K2.6",
+      "url": "https://www.marktechpost.com/2026/04/20/moonshot-ai-releases-kimi-k2-6",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "kimi-k2-6.aider": [
@@ -2000,6 +2091,378 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": 0.5
+    }
+  ],
+  "gpt-5-4.tb2": [
+    {
+      "value": 75.1,
+      "source": "GPT-5.4 release",
+      "url": "https://almcorp.com/blog/gpt-5-4/",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "gpt-5-4.aime26": [
+    {
+      "value": 99,
+      "source": "awesomeagents math reasoning",
+      "url": "https://awesomeagents.ai/capabilities/math-reasoning/",
+      "date": "2026-04-26",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.4
+    }
+  ],
+  "kimi-k2-6.aime26": [
+    {
+      "value": 96.4,
+      "source": "Kimi K2.6",
+      "url": "https://kingy.ai/ai/meet-kimi-k2-6-moonshot-ais-open-source-bet-on-long-horizon-agentic-coding/",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    },
+    {
+      "value": 96.4,
+      "source": "awesomeagents math reasoning",
+      "url": "https://awesomeagents.ai/capabilities/math-reasoning/",
+      "date": "2026-04-26",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.4
+    }
+  ],
+  "minimax-m2-7.gpqa": [
+    {
+      "value": 87.4,
+      "source": "MiniMax M2.7",
+      "url": "https://www.minimax.io/models/text/m27",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "minimax-m2-7.hle": [
+    {
+      "value": 28.1,
+      "source": "MiniMax M2.7",
+      "url": "https://www.minimax.io/models/text/m27",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "mimo-v2-5-pro.hle": [
+    {
+      "value": 34,
+      "source": "marktechpost MiMo V2.5-Pro",
+      "url": "https://www.marktechpost.com/2026/04/22/xiaomi-releases-mimo-v2-5-pro-and-mimo-v2-5",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "mimo-v2-5-pro.aaIdx": [
+    {
+      "value": 54,
+      "source": "AA Intelligence Index",
+      "url": "https://artificialanalysis.ai/models/mimo-v2-5-pro",
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 1
+    }
+  ],
+  "deepseek-v4-pro.gpqa": [
+    {
+      "value": 90.1,
+      "source": "officechai",
+      "url": "https://officechai.com/ai/deepseek-v4-pro-deepseek-v4-flash-benchmarks-pricing/",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "deepseek-v4-pro.tb2": [
+    {
+      "value": 67.9,
+      "source": "officechai",
+      "url": "https://officechai.com/ai/deepseek-v4-pro-deepseek-v4-flash-benchmarks-pricing/",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "deepseek-v4-pro.mcpA": [
+    {
+      "value": 73.6,
+      "source": "buildfastwithai",
+      "url": "https://www.buildfastwithai.com/blogs/deepseek-v4-pro-review-2026",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "deepseek-v4-pro.sweMulti": [
+    {
+      "value": 76.2,
+      "source": "officechai",
+      "url": "https://officechai.com/ai/deepseek-v4-pro-deepseek-v4-flash-benchmarks-pricing/",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "deepseek-v4-flash.gpqa": [
+    {
+      "value": 88.1,
+      "source": "officechai",
+      "url": "https://officechai.com/ai/deepseek-v4-pro-deepseek-v4-flash-benchmarks-pricing/",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "qwen3-6-35b-moe.aime26": [
+    {
+      "value": 92.7,
+      "source": "officechai Qwen3.6-35B",
+      "url": "https://officechai.com/ai/qwen3-6-35b-a3b-benchmarks/",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "qwen3-coder-480b.sweV": [
+    {
+      "value": 66.5,
+      "source": "Qwen3-Coder blog",
+      "url": "https://qwenlm.github.io/blog/qwen3-coder/",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "gemma-4-31b.aime26": [
+    {
+      "value": 89.2,
+      "source": "HF Gemma 4",
+      "url": "https://huggingface.co/blog/gemma4",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "gemma-4-31b.tau2": [
+    {
+      "value": 86.4,
+      "source": "aurigait",
+      "url": "https://aurigait.com/blog/gemma-4-features-benchmarks-guide/",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "gemma-4-26b-moe.aime26": [
+    {
+      "value": 88.3,
+      "source": "HF Gemma 4",
+      "url": "https://huggingface.co/blog/gemma4",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "gemma-4-26b-moe.gpqa": [
+    {
+      "value": 82.3,
+      "source": "HF Gemma 4",
+      "url": "https://huggingface.co/blog/gemma4",
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "opus-4-7.aaOmni": [
+    {
+      "value": 26,
+      "source": "AA Opus 4.7 article",
+      "url": "https://artificialanalysis.ai/articles/opus-4-7-everything-you-need-to-know",
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 1
+    }
+  ],
+  "gemini-3-1-pro.aaOmni": [
+    {
+      "value": 33,
+      "source": "AA Opus 4.7 article",
+      "url": "https://artificialanalysis.ai/articles/opus-4-7-everything-you-need-to-know",
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 1
+    }
+  ],
+  "gemini-3-1-pro.aime26": [
+    {
+      "value": 98.1,
+      "source": "awesomeagents math reasoning",
+      "url": "https://awesomeagents.ai/capabilities/math-reasoning/",
+      "date": "2026-04-26",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.4
+    }
+  ],
+  "glm-5-1.aime26": [
+    {
+      "value": 95.3,
+      "source": "awesomeagents math reasoning",
+      "url": "https://awesomeagents.ai/capabilities/math-reasoning/",
+      "date": "2026-04-26",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.4
+    }
+  ],
+  "qwen3-235b.bfcl": [
+    {
+      "value": 74.9,
+      "source": "awesomeagents BFCL",
+      "url": "https://awesomeagents.ai/leaderboards/function-calling-benchmarks-leaderboard/",
+      "date": "2026-04-26",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.4
+    }
+  ],
+  "kimi-k2-6.bench.swePro": [
+    {
+      "value": 27.67,
+      "source": "prior data",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.35,
+      "contradictionRole": "loser"
+    },
+    {
+      "value": 58.6,
+      "source": "marktechpost K2.6 release",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7,
+      "contradictionRole": "winner"
+    }
+  ],
+  "kimi-k2-6.bench.sweV": [
+    {
+      "value": 65.8,
+      "source": "prior data",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.35,
+      "contradictionRole": "loser"
+    },
+    {
+      "value": 80.2,
+      "source": "K2.6 blog",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7,
+      "contradictionRole": "winner"
+    }
+  ],
+  "devstral-medium.bench.sweV": [
+    {
+      "value": 61.6,
+      "source": "prior data",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.35,
+      "contradictionRole": "loser"
+    },
+    {
+      "value": 72.2,
+      "source": "mistral.ai/news/devstral-2-vibe-cli",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7,
+      "contradictionRole": "winner"
+    }
+  ],
+  "minimax-m2-7.bench.sweV": [
+    {
+      "value": 56.2,
+      "source": "prior data",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.35,
+      "contradictionRole": "loser"
+    },
+    {
+      "value": 78,
+      "source": "marktechpost M2.7",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7,
+      "contradictionRole": "winner"
+    }
+  ],
+  "opus-4-7.bench.sweV": [
+    {
+      "value": 87.6,
+      "source": "Vellum",
+      "url": "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained",
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 1,
+      "contradictionRole": "winner"
+    },
+    {
+      "value": 82,
+      "source": "lmcouncil.ai",
+      "url": "https://lmcouncil.ai/benchmarks",
+      "date": "2026-04-26",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.4,
+      "contradictionRole": "loser"
     }
   ]
 }

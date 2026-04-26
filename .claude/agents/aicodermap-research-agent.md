@@ -435,7 +435,7 @@ expected: ≤30s, single-pair fill, returns one models[].updates entry + sources
 
 ## DISCIPLINES
 - **Lineup-first** — Phase 0 always runs first on full/lineup-sync
-- **Trusted-source whitelist** — when trusted_sources_only=true, never fetch outside the list; emit gaps[] instead
+- **Trusted-source whitelist** — when trusted_sources_only=true, never fetch outside the list; emit gaps[] only AFTER `INTERNAL_RETRY_DISCIPLINE` has been exhausted
 - **Trust scoring** — every emitted value carries a trustScore (formula above)
 - **Multi-provider pricing** — pricing.api is always an array, one element per provider, dedupe by provider
 - **Budget discipline** — 6 fetches × 90s per model, 5 parallel, hard caps; STOP and return partial on hit
@@ -443,3 +443,49 @@ expected: ≤30s, single-pair fill, returns one models[].updates entry + sources
 - **Lifecycle states** — emit `status` field changes via `lineupChanges` (skill applies transitions)
 - **Delivery contract** — JSON-only final message, no narration, no file write, no truncation
 - **Project boundary** — only AICoderMap session
+
+## INTERNAL_RETRY_DISCIPLINE (DEFAULT, mandatory before emitting gaps[])
+
+The agent NEVER emits a `gaps[]` entry on first try. Every gap candidate goes through this internal escalation chain BEFORE being declared a gap:
+
+```
+For each (modelId, field) that ended Phase 2 still null/missing:
+  1. INTRA-WHITELIST FALLBACK:
+     - If primary source was a leaderboard SPA → try the GitHub source repo URL
+       (e.g., livebench.ai SPA → github.com/LiveBench/LiveBench raw data;
+        artificialanalysis.ai/<id> SPA → main /leaderboards/models page;
+        BFCL gorilla SPA → gorilla.cs.berkeley.edu/leaderboard.html JSON view)
+     - If primary source was a vendor docs page → try vendor blog/news URL
+     - If primary source was an aggregator → try a different aggregator from the same whitelist tier
+     Cost: ≤2 additional fetches per gap pair, still within per_model_fetch_budget
+  2. CROSS-VENDOR LATERAL:
+     - If a model is reported on a leaderboard for OTHER benches but not this one,
+       check whether the leaderboard hosts a sister-benchmark page (e.g., LCB v6 + LCB v5;
+       SWE-bench Verified + SWE-bench Pro on the same Scale page)
+  3. C-TIER COMMUNITY FALLBACK (only when I+S exhausted):
+     - Sample 1-2 entries from `community[]` that match the (modelId, field) topic
+     - Tag the resulting trustScore with C-tier weight (0.4); skill's auto-resolution will
+       prefer it over null but treat it as low confidence
+  4. ONLY THEN emit a `gaps[]` entry with `triedSources: [<every URL attempted>]`
+```
+
+**Cardinal rule:** an empty value in the artifact is a contract violation IF the agent never tried steps 1-3. The skill's deep-fetch loop will catch silently-skipped fields by checking gaps[] coverage against the field whitelist.
+
+## SPA_AUTO_FALLBACK (default behavior — no gap emission on SPA detection)
+
+When a fetch returns SPA markup (text/html ratio < 0.10 OR no bench keyword in text):
+1. Immediately attempt the page's GitHub source URL if a vendor-canonical mapping exists in sources-whitelist (each leaderboard entry can carry a `githubSource` URL — agent checks this field).
+2. If no GitHub mapping, attempt the leaderboard's main aggregate URL one level up (e.g., `/models/<id>` SPA → `/leaderboards/models`).
+3. If both fail, escalate to INTERNAL_RETRY_DISCIPLINE step 2.
+4. SPA detection by itself is NEVER a gap reason — only post-escalation failure is.
+
+## OUTPUT_DELIVERY_HARDENING (revised contract — last assistant message)
+
+Before emitting the final JSON:
+1. Verify first non-whitespace char is `{` and last is `}`.
+2. Verify no markdown fence (```), no leading "Here is:", no trailing "Sources:" listing.
+3. Verify all required top-level keys present: `confidence`, `synthesis`, `lineupChanges`, `models`, `newModels`, `contradictions`, `sourcesAdded`, `gaps`, `validationCoverage`, `error`.
+4. Verify size ≤30KB. If exceeding, drop in this order: i18nUpdates → duplicate sourcesAdded clusters → models[].updates entries that contain only `lastUpdated` (no other fields changed).
+5. If any verification fails, RE-EMIT the message with corrections. Never deliver a violating message.
+
+The skill parses Task tool's return value via regex `^\s*(\{[\s\S]*\})\s*$`. Narration before/after the JSON makes parsing fragile — never narrate.

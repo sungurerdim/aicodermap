@@ -118,8 +118,8 @@
       "hle": 51.4,
       "aaIdx": 57,
       "bfcl": null,
-      "aime26": null,
-      "aaOmni": null
+      "aime26": 98.1,
+      "aaOmni": 33
     },
     "providers": 2,
     "uptime": null,
@@ -259,21 +259,21 @@
       }
     },
     "bench": {
-      "swePro": 59.1,
+      "swePro": 57.7,
       "sweV": 80,
-      "tb2": null,
+      "tb2": 75.1,
       "lcbV6": null,
       "aider": null,
       "tau2": null,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": 68.1,
-      "gpqa": 94.4,
+      "gpqa": 92.8,
       "sweMulti": null,
       "hle": 39.8,
       "aaIdx": 57,
       "bfcl": null,
-      "aime26": null,
+      "aime26": 99,
       "aaOmni": null
     },
     "providers": 2,
@@ -691,7 +691,7 @@
       "aaIdx": 57,
       "bfcl": null,
       "aime26": null,
-      "aaOmni": null
+      "aaOmni": 26
     },
     "providers": 4,
     "uptime": 99.8,
@@ -975,7 +975,7 @@
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": null,
+      "gpqa": 88.1,
       "sweMulti": null,
       "hle": null,
       "aaIdx": 47,
@@ -1083,9 +1083,9 @@
       "tau2": null,
       "aaCoding": null,
       "aaAgentic": null,
-      "mcpA": null,
-      "gpqa": null,
-      "sweMulti": null,
+      "mcpA": 73.6,
+      "gpqa": 90.1,
+      "sweMulti": 76.2,
       "hle": 37.7,
       "aaIdx": 52,
       "bfcl": null,
@@ -1136,7 +1136,7 @@
       }
     },
     "bench": {
-      "sweV": 46.8,
+      "sweV": 68,
       "swePro": null,
       "tb2": null,
       "lcbV6": null,
@@ -1184,26 +1184,28 @@
       "releasedISO": "2025-07-01",
       "ollamaUrl": "https://ollama.com/library/devstral"
     },
-    "status": "active"
+    "status": "deprecated",
+    "deprecatedAt": "2026-02-27",
+    "successor": "devstral-medium"
   },
   {
     "id": "devstral-medium",
-    "name": "Devstral Medium",
+    "name": "Devstral 2",
     "provider": "Mistral AI",
-    "released": "2025-07-10",
+    "released": "2025-12-09",
     "tier": "open-tier1",
-    "open": false,
-    "license": "Proprietary",
-    "context": 131072,
+    "open": true,
+    "license": "Modified MIT",
+    "context": 262144,
     "pricing": {
       "api": [
         {
           "provider": "official",
           "in": 0.4,
-          "out": 2.0,
+          "out": 2,
           "cacheHit": null,
           "throughput": null,
-          "url": "https://docs.mistral.ai/getting-started/models/models_overview/",
+          "url": "https://mistral.ai/news/devstral-2-vibe-cli",
           "fetched": "2026-04-26"
         },
         {
@@ -1222,15 +1224,15 @@
           0.4
         ],
         "out": [
-          2.0,
-          2.0
+          2,
+          2
         ],
         "cacheHit": null
       },
       "subscription": null
     },
     "bench": {
-      "sweV": 61.6,
+      "sweV": 72.2,
       "swePro": null,
       "tb2": null,
       "lcbV6": null,
@@ -1306,7 +1308,7 @@
       "hle": 31.0,
       "aaIdx": null,
       "bfcl": null,
-      "aime26": null,
+      "aime26": 95.3,
       "aaOmni": null
     },
     "providers": 2,
@@ -1372,21 +1374,21 @@
       "subscription": null
     },
     "bench": {
-      "swePro": 27.67,
-      "sweV": 65.8,
-      "tb2": 27.8,
-      "lcbV6": 53.7,
+      "swePro": 58.6,
+      "sweV": 80.2,
+      "tb2": 66.7,
+      "lcbV6": 89.6,
       "hle": 54,
       "aider": 60.0,
       "tau2": 70.6,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": 75.1,
+      "gpqa": 90.5,
       "sweMulti": 47.3,
       "aaIdx": 54,
       "bfcl": null,
-      "aime26": null,
+      "aime26": 96.4,
       "aaOmni": null
     },
     "providers": 5,
@@ -1668,8 +1670,8 @@
       "mcpA": null,
       "gpqa": null,
       "sweMulti": null,
-      "hle": null,
-      "aaIdx": null,
+      "hle": 34,
+      "aaIdx": 54,
       "bfcl": null,
       "aime26": null,
       "aaOmni": null
@@ -1869,7 +1871,7 @@
     "tier": "open-tier1",
     "open": true,
     "license": "Non-commercial (commercial license on request)",
-    "context": 205000,
+    "context": 196608,
     "pricing": {
       "api": [
         {
@@ -1896,19 +1898,19 @@
       "subscription": null
     },
     "bench": {
-      "sweV": 56.2,
+      "sweV": 78,
       "tb2": 57,
       "aaIdx": 50,
-      "swePro": 36.81,
+      "swePro": 56.22,
       "lcbV6": null,
       "aider": null,
       "tau2": null,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": null,
-      "sweMulti": null,
-      "hle": null,
+      "gpqa": 87.4,
+      "sweMulti": 76.5,
+      "hle": 28.1,
       "bfcl": null,
       "aime26": null,
       "aaOmni": null
@@ -2225,7 +2227,7 @@
       "sweMulti": null,
       "hle": null,
       "aaIdx": null,
-      "bfcl": null,
+      "bfcl": 74.9,
       "aime26": null,
       "aaOmni": null
     },
@@ -2426,7 +2428,7 @@
       "hle": null,
       "aaIdx": null,
       "bfcl": null,
-      "aime26": null,
+      "aime26": 92.7,
       "aaOmni": null
     },
     "providers": 3,
@@ -2658,7 +2660,7 @@
     "bench": {
       "aider": 61.8,
       "swePro": 38.7,
-      "sweV": null,
+      "sweV": 66.5,
       "tb2": 23.9,
       "lcbV6": null,
       "tau2": null,
@@ -2930,12 +2932,12 @@
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": null,
+      "gpqa": 82.3,
       "sweMulti": null,
       "hle": null,
       "aaIdx": null,
       "bfcl": null,
-      "aime26": null,
+      "aime26": 88.3,
       "aaOmni": null
     },
     "providers": 5,
@@ -3032,7 +3034,7 @@
       "hle": null,
       "aaIdx": null,
       "bfcl": null,
-      "aime26": null,
+      "aime26": 89.2,
       "aaOmni": null
     },
     "providers": 6,
@@ -3805,7 +3807,7 @@
     "vramRequirement": 17,
     "strengthsKey": "devstral-small-2.strengths",
     "weaknessesKey": "devstral-small-2.weaknesses",
-    "lastUpdated": "2026-04-25",
+    "lastUpdated": "2026-04-26",
     "ollama": {
       "pullCmd": "ollama run devstral-small-2",
       "tags": [
@@ -3829,7 +3831,9 @@
       "releasedISO": "2025-12-15",
       "ollamaUrl": "https://ollama.com/library/devstral-small-2"
     },
-    "status": "active"
+    "status": "deprecated",
+    "deprecatedAt": "2026-02-27",
+    "successor": "devstral-medium"
   },
   {
     "id": "claude-haiku-4-5",
@@ -3895,5 +3899,83 @@
     "strengthsKey": "claude-haiku-4-5.strengths",
     "weaknessesKey": "claude-haiku-4-5.weaknesses",
     "lastUpdated": "2026-04-26"
+  },
+  {
+    "id": "gpt-5-5",
+    "name": "GPT-5.5",
+    "provider": "OpenAI",
+    "released": "2026-04-23",
+    "tier": "frontier",
+    "open": false,
+    "license": "Proprietary",
+    "context": 1048576,
+    "pricing": {
+      "api": [
+        {
+          "provider": "official",
+          "in": 5,
+          "out": 30,
+          "cacheHit": null,
+          "throughput": null,
+          "url": "https://openai.com/index/introducing-gpt-5-5/",
+          "fetched": "2026-04-26"
+        }
+      ],
+      "subscription": [
+        {
+          "tier": "Plus",
+          "price": 20,
+          "currency": "USD",
+          "billing": "monthly",
+          "notes": null
+        }
+      ],
+      "range": {
+        "in": [
+          5,
+          5
+        ],
+        "out": [
+          30,
+          30
+        ],
+        "cacheHit": null
+      }
+    },
+    "bench": {
+      "swePro": 58.6,
+      "tb2": 82.7,
+      "mcpA": 75.3,
+      "gpqa": 93.6,
+      "hle": 41.4,
+      "aaIdx": 60
+    },
+    "providers": 2,
+    "strengthsKey": "gpt-5-5.strengths",
+    "weaknessesKey": "gpt-5-5.weaknesses",
+    "lastUpdated": "2026-04-26",
+    "status": "active",
+    "sourcesAdded": [
+      {
+        "key": "gpt-5-5.tb2",
+        "value": 82.7,
+        "source": "OpenAI GPT-5.5",
+        "url": "https://openai.com/index/introducing-gpt-5-5/",
+        "tier": "S",
+        "fetched": "2026-04-26",
+        "verifications": 1,
+        "trustScore": 0.7
+      },
+      {
+        "key": "gpt-5-5.swePro",
+        "value": 58.6,
+        "source": "OpenAI GPT-5.5",
+        "url": "https://openai.com/index/introducing-gpt-5-5/",
+        "tier": "S",
+        "fetched": "2026-04-26",
+        "verifications": 1,
+        "trustScore": 0.7
+      }
+    ]
   }
 ]

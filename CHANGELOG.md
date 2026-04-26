@@ -1,6 +1,50 @@
 
 ## [2026-04-26] — autonomous refresh-all
 
+### Added
+- `gpt-5-5` — new model from vendor lineup discovery
+
+### Updated
+- 17 models: `gpt-5-4`, `devstral-medium`, `devstral-2`, `devstral-small-2`, `kimi-k2-6`, `minimax-m2-7`, `mimo-v2-5-pro`, `deepseek-v4-pro`, `deepseek-v4-flash`, `qwen3-6-35b-moe`, `qwen3-coder-480b`, `gemma-4-31b`, `gemma-4-26b-moe`, `opus-4-7`, `gemini-3-1-pro`, `glm-5-1`, `qwen3-235b`
+
+### Deprecated
+- `devstral-small-2` — vendor-marked deprecated
+
+### Renamed
+- devstral-medium -> devstral-2-123b
+
+### Resolved (auto via trustScore)
+- kimi-k2-6.bench.swePro: winner=58.6 (severity=RED, Δ30.93)
+- kimi-k2-6.bench.sweV: winner=80.2 (severity=RED, Δ14.4)
+- devstral-medium.bench.sweV: winner=72.2 (severity=RED, Δ10.6)
+- minimax-m2-7.bench.sweV: winner=78 (severity=RED, Δ21.8)
+- opus-4-7.bench.sweV: winner=87.6 (severity=RED, Δ5.6)
+
+### Gaps (19 entries — see data/known-gaps.json or next refresh)
+- `aaCoding.*`: AA coding leaderboard JS-SPA
+- `aaAgentic.*`: AA agentic JS-SPA
+- `bfcl.*`: BFCL Berkeley page not parseable
+- `aaOmni.*`: AA omni leaderboard not fetched
+- `mimo-v2-5.bench`: MiMo V2.5 standard bench not publicly published
+- `qwen3-coder-next.sweV`: prior 58.7 unverified — needs triangulation
+- `step-3-5-flash.swePro`: no swePro found
+- `o3.swePro`: OpenAI does not publish o3 swePro
+- ... and 11 more
+
+
+## [2026-04-26] — autonomous refresh-all
+
+### Updated
+- 1 models: `grok-3`
+
+### Gaps (3 entries — see data/known-gaps.json or next refresh)
+- `grok-3.sweV`: S-tier value 63.8 found but custom-scaffold; needs I-tier corroboration; recheckAfter 2026-10-01
+- `llama-4-maverick.sweV`: Confirmed permanent vendor-opt-out — Meta does not submit
+- `mimo-v2-5.swePro`: Confirmed — only V2.5-Pro variant has SWE-Pro 57.2; base V2.5 has no public bench
+
+
+## [2026-04-26] — autonomous refresh-all
+
 ### Updated
 - 5 models: `gpt-5-4`, `gemini-3-1-pro`, `kimi-k2-6`, `minimax-m2-7`, `qwen3-coder-480b`
 

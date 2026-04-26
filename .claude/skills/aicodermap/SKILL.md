@@ -9,7 +9,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Agent, TaskCreate, TaskUpdat
 ## ROLE
 Orchestrate AI coding LLM tracker updates: discover **official vendor lineup** → reconcile current data → invoke `aicodermap-research-agent` (lineup-driven, trusted-source whitelist, parallel) → auto-resolve contradictions via `trustScore` → atomic schema-complete merge → atomic write `data/*.json` + `i18n/*.json` + `CHANGELOG.md` → prompt git commit → verify GitHub Pages deploy.
 
-**Autonomy principle:** the skill must NOT pause for user input on routine decisions. Every edge case below has a default behavior; the user is asked only when a default cannot be resolved (e.g., new schema-breaking discovery).
+**Autonomy principle (HARD DEFAULT — non-negotiable):** the skill NEVER pauses for user input on data-quality decisions. Missing data, weak coverage, contradicted scores, unreachable sources, partial vendor reachability — none of these are deal-breakers. Every uncertainty path resolves to: **iterate → retry → fall back to alternate source → emit `gaps[]` entry → CONTINUE writing/committing/pushing**. The only halts are: (a) git push conflict (user must resolve via `git pull --rebase`), (b) full schema-breaking discovery never seen before. All other "halt" cases in prior versions of this spec are now "log warning + continue".
 
 ## CONTEXT
 - Project root: `D:\GitHub\aicodermap\`
@@ -77,20 +77,22 @@ Orchestrate AI coding LLM tracker updates: discover **official vendor lineup** �
    })
 5. Parse return → validate JSON schema (strip surrounding whitespace, locate first `{` and last `}` if narration leaked)
 
-6. COVERAGE TRIGGER — **MANDATORY when fired** (not a block, not a "may"):
+6. COVERAGE TRIGGER — **MANDATORY iteration, NEVER a halt**:
    if validationCoverage < COVERAGE_DEEPEN_THRESHOLD (0.95):
-     MUST identify (modelId, field) pairs missing ≥2 sources
-     MUST spawn DEEP-FETCH agent pass: targeted, single-pair retrieval per gap
-     budget: ≤30s per pair, ≤10 pairs total per cycle, ≤2 cycles
-     MUST merge deep-fetch returns into pending updates
-     MUST stamp the deep-fetch artifact with `deepFetchCycle: <n>` (1, then 2 if a 2nd cycle ran)
-   if validationCoverage still < COVERAGE_PARTIAL_WARN after deep-fetch cycles:
-     write anyway, append "⚠ partial coverage: <%>" warning to CHANGELOG
+     loop until (coverage ≥ COVERAGE_TARGET 0.85) OR (cycles == DEEP_FETCH_MAX_CYCLES 5) OR (no progress between two consecutive cycles):
+       - identify (modelId, field) pairs missing ≥2 sources
+       - spawn DEEP-FETCH pass via SendMessage to existing agent (or fresh Agent if SendMessage fails): up to DEEP_FETCH_MAX_PAIRS_PER_CYCLE 25 pairs per cycle, ≤30s per pair
+       - merge deep-fetch returns into pending updates
+       - stamp the artifact with `deepFetchCycle: <n>` and `validationCoverage: <updated>`
+       - on a cycle-N agent failure (network, JSON parse, anything): retry once via fresh Agent dispatch; on second failure log to gaps[] with reason and break loop early — never halt the workflow
+   if validationCoverage still below COVERAGE_TARGET after the loop terminates:
+     write anyway, set artifact.partialCoverage=true, append "⚠ partial coverage: <%>" line to CHANGELOG
+     EVERY remaining gap pair stays in artifact.gaps[] with `triedSources: [<urls>]` so next refresh re-attempts
    else proceed.
 
-   ENFORCEMENT: `scripts/merge.py` HALTS the commit if `validationCoverage < 0.95`
-   in the artifact AND `deepFetchCycle` is absent — proving Step 6 was skipped.
-   Orchestrator never silently bypasses Step 6.
+   ENFORCEMENT: `scripts/merge.py` MUST NOT halt the commit on low coverage. Its job is to validate schema and merge; coverage is advisory. The deepFetchCycle stamp is informational, not gating.
+
+   **Hard rule:** missing data is NEVER a reason to skip Step 10–12 (write+commit+push). Partial coverage merges are normal; the next cycle picks up where this one left off.
 
 7. CONTRADICTION AUTO-RESOLUTION (NOT manual prompt):
    for each contradiction in contradictions[]:
@@ -100,9 +102,8 @@ Orchestrate AI coding LLM tracker updates: discover **official vendor lineup** �
      log to CHANGELOG: "<modelId>.<bench>: <winner.value> (trust=<score>) over <loser.value> (trust=<score>) [Δ<delta>pp <severity>]"
    no user prompt is issued for any severity
 
-8. Render diff (markdown table): models[].updates fields, newModels[], lineup changes (NEW/DEPRECATED/RENAMED), contradictions auto-resolved, coverage% achieved
-9. User input: approve | partial <ids> | decline | detail <id>
-   default behavior: auto-approve when (no schema-breaking change) AND (no RED unresolved-by-trustScore) AND (lineup-discovery had no REMOVED entries)
+8. Render diff summary (markdown table) to user-visible output: models[].updates fields, newModels[], lineup changes (NEW/DEPRECATED/RENAMED/REMOVED), contradictions auto-resolved, coverage% achieved, partialCoverage flag.
+9. AUTO-APPROVE — NO USER PROMPT. The workflow proceeds straight from Step 8 to Step 10. The only halt at this stage is schema-breaking discovery (a brand-new top-level field in a model entry not in the existing whitelist) — and even then, the unrecognized field is logged to gaps[] and merge continues with the recognized fields. RED contradictions are already auto-resolved at Step 7. REMOVED entries are auto-archived per LIFECYCLE_STATES.
 
 10. ATOMIC WRITE — schema-complete merge per MERGE_RULES (rotated .bak backup):
     Outputs:
@@ -114,13 +115,13 @@ Orchestrate AI coding LLM tracker updates: discover **official vendor lineup** �
 11. Append CHANGELOG.md (Keep a Changelog):
     ## [Unreleased] / ### Updated|Added|Deprecated|Removed|Flagged
 12. AUTO-EXECUTE git (no user prompt):
-    git add data/ i18n/ CHANGELOG.md scripts/
+    git add data/ i18n/ CHANGELOG.md scripts/ .claude/skills/aicodermap/SKILL.md .claude/agents/aicodermap-research-agent.md
     git commit -m "data: <generated description>"
     git push
     On hook failure: fix root cause + new commit (NEVER --amend, NEVER --no-verify)
-    On push conflict: prompt user "git pull --rebase first"
+    On push conflict (only halt path in entire workflow): prompt user "git pull --rebase first" — this is the sole user-blocking step because remote-state reconciliation is genuinely outside skill authority.
 13. Sleep DEPLOY_WAIT_SEC (90s)
-14. Verify: curl <live_url>/data/models.json → 200 + valid schema → "✓ Live"
+14. Verify: curl <live_url>/data/models.json → 200 + valid schema → "✓ Live". On non-200: log warning, declare workflow done — Pages will eventually finish, no halt.
 ```
 
 ## CONSTANTS
@@ -129,7 +130,7 @@ CONTRADICTION_WARN              = 3.0   // pp delta → YELLOW (auto-resolve via
 CONTRADICTION_BLOCK             = 5.0   // pp delta → RED (auto-resolve via trustScore, log loudly)
 COVERAGE_TARGET                 = 0.85  // hard floor — Step 6 cycles run until reached
 COVERAGE_DEEPEN_THRESHOLD       = 0.95  // ideal — Step 6 also triggers below this
-COVERAGE_HARD_BLOCK             = 0.50  // <0.50 BLOCKS commit; orchestrator MUST iterate
+COVERAGE_HARD_BLOCK             = 0.50  // ADVISORY ONLY — never blocks commit. <0.50 logs a "⚠ very low coverage, investigate sources-whitelist coverage" note in CHANGELOG and proceeds; gaps[] preserved for next cycle
 STALE_DAYS                      = 14    // M5 freshness gate
 DEPRECATION_GRACE_DAYS          = 60    // vendor "deprecated" → still listed for 60d before archive
 DEPLOY_WAIT_SEC                 = 90
@@ -143,19 +144,19 @@ DEEP_FETCH_MAX_CYCLES           = 5     // up from 2 — keep iterating until CO
 SINGLE_ARTIFACT_PATH            = ".aicodermap-agent-out.json"  // ONE artifact, overwritten each run
 ```
 
-## SILENT_FAIL_PREVENTION (every step completes or halts loudly)
+## SILENT_FAIL_PREVENTION (loud failures + auto-recovery, halts only at git push conflict)
 
-| Step | Success criterion | On failure |
-|------|-------------------|------------|
-| 0 Lineup discovery | ≥10 vendor pages successfully parsed; `lineupChanges` populated (even if all empty) | Retry once with narrower target; if still failing, halt with the unreachable vendor list — never proceed with stale lineup |
-| 4 Agent survey | Pure JSON return; `models[]+newModels[]` ≥ FAMILY_BASELINE_MIN OR explicit gaps[] entries | Retry once with reinforced delivery contract; if still bad, log to `~/.aicodermap-debug.log` + halt |
-| 6 Deep-fetch loop | `coverage ≥ COVERAGE_TARGET (0.85)` OR `cycles == DEEP_FETCH_MAX_CYCLES (5)` OR no progress between two consecutive cycles | Run until terminal condition; on exhausted cycles below 0.85, halt with per-pair "tried these N sources, none had it" report — every gap is re-attempted next refresh, never silently skipped |
-| 7 Contradiction auto-resolve | Every contradiction has `autoResolveWinner` written to data + all candidates in sources | If trustScores tie within 0.05 AND no I-tier present: halt with manual-pick prompt (only escape hatch) |
-| 10 Atomic write | `data/{models,sources}.json` parse-valid + self-check passes | Restore from `.bak`, halt with diff of what failed |
-| 12 git push | Exit code 0 AND remote ref advanced | On hook fail: fix root cause + new commit (NEVER --amend, NEVER --no-verify); on push conflict: halt with "git pull --rebase first" |
-| 14 Live deploy verify | `curl <live_url>/data/models.json` returns 200 AND parses as JSON | Wait + retry up to 5min; if still failing, halt with githubstatus.com pointer |
+| Step | Success criterion | On failure (auto-recovery, never user prompt unless noted) |
+|------|-------------------|------------------------------------------------------------|
+| 0 Lineup discovery | ≥10 vendor pages successfully parsed OR all reachable vendors attempted | Retry each unreachable URL once with shorter timeout. Then log unreachable vendors to artifact.gaps[] as `lineup:<vendor>: unreachable`. CONTINUE with whatever lineup data was gathered — never block on stale lineup |
+| 4 Agent survey | JSON return parseable (first `{`, last `}`); `models[]+newModels[]` ≥ FAMILY_BASELINE_MIN OR explicit gaps[] entries explaining shortfall | Retry once with reinforced delivery contract. On second failure: extract whatever JSON fragment is recoverable + log debug to `~/.aicodermap-debug.log` + CONTINUE merge with available data. Family-count shortfall logged to gaps[], never halts. |
+| 6 Deep-fetch loop | `coverage ≥ COVERAGE_TARGET (0.85)` OR `cycles == DEEP_FETCH_MAX_CYCLES (5)` OR no-progress termination | Loop until any terminal condition. Below-target final coverage → set artifact.partialCoverage=true + emit per-pair gaps[] with triedSources[] + CONTINUE to Step 7. Coverage is never a halt — gaps[] are the bookmarks for next cycle |
+| 7 Contradiction auto-resolve | Every contradiction has autoResolveWinner | TrustScore ties within 0.05 with no I-tier present: prefer most-recent value, then most-verified, then alphabetical-by-source as deterministic tiebreaker — never user prompt |
+| 10 Atomic write | `data/{models,sources}.json` parse-valid + self-check passes | On parse failure: restore from `.bak` + log root cause + retry the merge once with relaxed self-check. On second failure: write the artifact's known-good fields only, mark unhealable fields in gaps[]. CONTINUE — never leave repo in restored-only state |
+| 12 git push | Exit code 0 AND remote ref advanced | On hook fail: fix root cause + new commit (NEVER --amend, NEVER --no-verify). On push conflict: SOLE USER-BLOCKING step — print "git pull --rebase first" and exit cleanly so user can resolve. This is the only halt in the entire workflow because remote state is genuinely outside skill authority |
+| 14 Live deploy verify | `curl <live_url>/data/models.json` returns 200 AND parses as JSON | Wait + retry up to 5min. On still-not-live: log warning + declare workflow done (commit was successful; Pages will eventually catch up). Never halt on Pages latency |
 
-**Cardinal rule:** a step never returns "OK" while having silently skipped its work. The artifact's machine-checkable flags (`deepFetchCycle`, `error`, etc.) are the source of truth, not the orchestrator's narration.
+**Cardinal rule (revised):** the workflow ALWAYS reaches Step 12 (git push) as long as Step 0+4 produced any usable JSON. Halts above Step 12 are eliminated by design. The artifact's machine-checkable flags (`deepFetchCycle`, `partialCoverage`, `error`, `gaps[]`) record what was incomplete so the next cycle picks it up.
 
 ## VENDOR_LINEUP_SOURCES (Step 0 — official "what models exist now")
 
@@ -370,14 +371,14 @@ A passing self-check is the gate for printing git commands at Step 12.
 
 ## ERRORS
 
-Per-step error handling lives in **SILENT_FAIL_PREVENTION** above (single source). Cross-cutting failure modes not tied to a specific step:
+Per-step error handling lives in **SILENT_FAIL_PREVENTION** above (single source). Cross-cutting failure modes not tied to a specific step — all auto-recovered, never deal-breakers:
 
 | Condition | Action |
 |-----------|--------|
-| Agent return invalid JSON | log to `~/.aicodermap-debug.log`, retry 1× with stricter delivery contract; on second fail halt with the raw return |
-| `refresh-all` family count < `FAMILY_BASELINE_MIN` | halt with the missing-family list; orchestrator either re-runs with explicit families or marks `gaps[]` |
-| User decline at Step 9 | restore from `.bak`, no commit |
-| Git push conflict | prompt user "git pull --rebase first"; do NOT force-push |
+| Agent return invalid JSON | log to `~/.aicodermap-debug.log`, retry 1× with stricter delivery contract; on second fail extract any recoverable fragment via regex `\{.*\}` + CONTINUE with what's recoverable + log uncovered models to gaps[] |
+| `refresh-all` family count < `FAMILY_BASELINE_MIN` | log shortfall to gaps[] with `family:<name>: undersampled`, CONTINUE merge — orchestrator does NOT re-run; next refresh re-attempts |
+| Step 9 (no longer interactive) | n/a — Step 9 is auto-approve; no decline path |
+| Git push conflict | SOLE user-blocking exception: print "git pull --rebase first" once and exit cleanly (do NOT force-push). User resolves remote state and re-runs `/aicodermap`. |
 
 ## OUTPUT_TEMPLATE_SUCCESS
 ```
@@ -417,7 +418,9 @@ Per-step error handling lives in **SILENT_FAIL_PREVENTION** above (single source
 ## INVARIANTS (cross-cutting rules; specifics live in their canonical sections above)
 
 - **Procedure vs data**: spec files (this file + agent.md) carry HOW; data files carry WHAT (model roster, source URLs, known gaps, GPU DB). Spec never hardcodes IDs/URLs.
-- **No silent fails**: every step has an explicit success criterion (see SILENT_FAIL_PREVENTION); failure halts with diagnostic, never proceeds quietly with partial data.
+- **Autonomous-by-default**: orchestrator + agent iterate, retry, fall back to alternate source, emit gap[] — never deal-break on missing data. The ONE user-blocking exception is git push conflict.
+- **Loud failures, never silent**: every step has an explicit success criterion (see SILENT_FAIL_PREVENTION); failures emit log + gap[] entry + CONTINUE — never halt the workflow short of Step 12.
+- **Partial-coverage merges are normal**: low coverage marks `partialCoverage=true` + populates gaps[] for next cycle, but never blocks write/commit/push.
 - **No GitHub Actions / CI / workflows** (manual orchestration is the contract).
 - **M5 ≤14-day freshness gate** (Aider 5-month-stale antipattern defense).
 - **Project-scoped**: skill + agent only in `D:\GitHub\aicodermap\` session.
