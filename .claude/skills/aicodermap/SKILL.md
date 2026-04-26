@@ -77,8 +77,8 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
        scope, query, idea_context, target_model_ids?,
        include_unsloth: true,
        trusted_sources_only: true,           // per FETCH_WHITELIST
-       per_model_fetch_budget: 6,            // max fetches per model
-       per_model_wallclock_budget: 90,       // seconds
+       per_model_fetch_budget: 12,           // max fetches per model (raised 2026-04-27 for PER_MODEL_URL_EXPANSION cascade)
+       per_model_wallclock_budget: 120,      // seconds (raised 2026-04-27 to absorb per-model + model-card lookups)
        parallel_models: 5,                   // concurrent model surveys
        trust_score_required: true            // every value carries a trustScore
      )
@@ -89,7 +89,8 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
    if validationCoverage < COVERAGE_DEEPEN_THRESHOLD (0.95):
      loop until (coverage ≥ COVERAGE_TARGET 0.85) OR (cycles == DEEP_FETCH_MAX_CYCLES 5) OR (no progress between two consecutive cycles):
        - identify (modelId, field) pairs missing ≥2 sources
-       - **Format-aware source picking** (NEW): for each missing pair, the orchestrator filters the whitelist to entries whose `format ∈ {static_html_table, static_html_article, static_markdown, github_raw_*, meta_tag_extract, pdf_report}` — i.e., formats with high signal-per-fetch — and assigns those URLs first. Entries whose format is `spa_full` or `bot_blocked` are deprioritised; their `fallbacks[].format == "websearch_snippet"` is used directly to skip the doomed primary fetch.
+       - **Format-aware source picking**: for each missing pair, the orchestrator filters the whitelist to entries whose `format ∈ {static_html_table, static_html_article, static_markdown, github_raw_*, meta_tag_extract, pdf_report}` — i.e., formats with high signal-per-fetch — and assigns those URLs first. Entries whose format is `spa_full` or `bot_blocked` are deprioritised; their `fallbacks[].format == "websearch_snippet"` is used directly to skip the doomed primary fetch.
+       - **Per-model URL cascade** (NEW 2026-04-27, see agent.md PER_MODEL_URL_EXPANSION): when an aggregate leaderboard row is empty for a model, the agent expands `entry.perModelUrlTemplate` against `entry.slugVariations` (e.g., `https://artificialanalysis.ai/models/{slug}` × `["{id}", "claude-{id}", "{id}-preview", "{id}-lite-preview"]`) — first 200 wins. Then the agent tries the model's vendor `urls.modelCardUrlTemplate` (DeepMind: `/models/model-cards/{slug}/`) and `urls.postUrlPattern` (Google: `blog.google/innovation-and-ai/models-and-research/gemini-models/{slug}/`). Bot-blocked vendor blogs (openai.com/index, x.ai/news, klu.ai) skip direct fetch and route to `site:<host>` WebSearch. Every URL attempted (including 404s) is logged in `triedSources[]` with status, satisfying GAP_VALIDITY_GATE.
        - spawn DEEP-FETCH pass via SendMessage to existing agent (or fresh Agent if SendMessage fails): up to DEEP_FETCH_MAX_PAIRS_PER_CYCLE 25 pairs per cycle, ≤30s per pair
        - merge deep-fetch returns into pending updates
        - stamp the artifact with `deepFetchCycle: <n>` and `validationCoverage: <updated>`
@@ -172,8 +173,8 @@ DEPRECATION_GRACE_DAYS          = 60    // vendor "deprecated" → still listed 
 DEPLOY_WAIT_SEC                 = 90
 AGENT_RETRY                     = 1
 FAMILY_BASELINE_MIN             = 30    // refresh-all: |models[]+newModels[]| floor
-PER_MODEL_FETCH_BUDGET          = 6     // max fetches per model in agent
-PER_MODEL_WALLCLOCK_BUDGET      = 90    // seconds per model in agent
+PER_MODEL_FETCH_BUDGET          = 12    // max fetches per model in agent (raised 2026-04-27: 6 aggregate + ≤4 per-model + ≤4 vendor-card/post per PER_MODEL_URL_EXPANSION cascade)
+PER_MODEL_WALLCLOCK_BUDGET      = 120   // seconds per model in agent (raised 2026-04-27 to absorb cascade)
 PARALLEL_MODELS                 = 5     // concurrent model surveys in agent
 DEEP_FETCH_MAX_PAIRS_PER_CYCLE  = 25    // up from 10 — user feedback "data definitely exists somewhere"
 DEEP_FETCH_MAX_CYCLES           = 5     // up from 2 — keep iterating until COVERAGE_TARGET hit OR no progress

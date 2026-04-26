@@ -627,6 +627,76 @@ A gap entry that fails any of these three counts is a **fabricated gap** and is 
 
 A legacy/deprecated model still gets the same treatment: try the canonical historical leaderboards (Papers with Code, Epoch AI, llm-stats archive, marc0.dev historical entries, BigCodeBench archive) before declaring a gap. "Model is old" is never a sufficient reason to skip the attempt.
 
+## PER_MODEL_URL_EXPANSION (cascade — added 2026-04-27)
+
+**Why this section exists:** the 2026-04-27 audit found that several whitelisted leaderboards (artificialanalysis.ai, benchlm.ai, epoch.ai, llm-stats.com) and most vendor blogs (blog.google, anthropic.com/news, deepmind.google/models/model-cards/) host **per-model pages** with rich bench tables that the prior cascade never visited. The agent only fetched aggregate leaderboard URLs, missing model-specific content like `https://artificialanalysis.ai/models/gemini-3-1-flash-lite-preview` or `https://deepmind.google/models/model-cards/gemini-3-1-pro/`. Those per-model pages frequently contain 14+ benchmarks for a single model — exactly what fills sparse cells.
+
+**Mandatory cascade per (modelId, benchKey) pair (replaces prior 3-step fallback):**
+
+```
+For each empty bench cell on a model:
+
+  Step 1 — Aggregate leaderboard (existing):
+    Fetch entry.url for every leaderboard whose publishes[] includes <benchKey>.
+    Tier-assign per whitelist; emit if found.
+
+  Step 2 — Per-model leaderboard page (NEW — load-bearing):
+    For every leaderboard entry that has a non-null `perModelUrlTemplate`:
+      For each variant in `slugVariations` (ordered):
+        slug := variant.replace('{id}', model.id)
+                       .replace('{family}', stripVersion(model.id))
+                       .replace('{N}', majorVersion(model.id))
+        url := perModelUrlTemplate.replace('{slug}', slug)
+        fetch(url) — count toward triedSources[]
+        if 200 + extractable: emit + break (this leaderboard done)
+        if 404: continue to next variation
+      if all variations 404: log to triedSources[] with status, move on
+    Cap: max 4 variations per leaderboard per model (cost control).
+
+  Step 3 — Vendor model card / blog post (NEW):
+    For the model's vendor (resolved via model.provider → vendors.<vid>):
+      a) If vendor.urls.modelCardUrlTemplate exists:
+         Try modelCardSlugVariations against the template (same {id}/{family}/{N} substitution).
+         Fetch first 200 — emit if extractable.
+      b) If vendor.urls.postUrlPattern exists AND modelCardUrl yielded nothing:
+         Try postSlugVariations against the postUrlPattern.
+         If postFormat == 'image_embedded' or 'bot_blocked': skip direct fetch, go to step 4.
+         Otherwise fetch first 200 — emit if extractable.
+
+  Step 4 — WebSearch fallback (existing, mandatory ≥2 queries before gap):
+    Per WEBSEARCH_PRIMARY_DISCIPLINE (2 queries minimum).
+    Use site:<domain> qualifier when targeting a known bot-blocked vendor blog
+    (openai.com/index, x.ai/news, klu.ai).
+
+  Step 5 — Emit gap[] only after all steps exhausted (per GAP_VALIDITY_GATE):
+    triedSources[] MUST list every URL attempted in Steps 1-4 (including 404s)
+```
+
+**Slug variable substitution rules:**
+
+| Token | Meaning | Example (model.id = `gemini-3-1-pro`) |
+|-------|---------|---------------------------------------|
+| `{id}` | model.id verbatim | `gemini-3-1-pro` |
+| `{family}` | id with version + variant suffix stripped | `gemini` |
+| `{N}` | major numeric version | `3` |
+| `{variant}` | trailing variant token (pro/flash/lite/mini) | `pro` |
+| `{YYMMDD}` | model.released converted to YYMMDD | `260219` |
+| `{slug}` | computed slug after substitution | (final URL token) |
+
+**Budget impact:** Step 2 + Step 3 add up to 4 + 4 = 8 fetch attempts per model (vs prior 0). The per_model_fetch_budget MUST be raised to **12** (from 6) when `scope=full` to absorb the cascade. The skill orchestrator enforces this; the agent does not exceed `per_model_fetch_budget` regardless.
+
+**404 logging:** Every 404 from Step 2-3 is logged to `triedSources[]` with status `404` so the next cycle does NOT retry that exact URL (saves budget). The orchestrator inspects `triedSources[].status` and skips known-404 variants for 30 days, then re-attempts (vendors may publish post later).
+
+**Slug-mismatch examples (from 2026-04-27 audit — refer when designing slugVariations):**
+
+- AA `model.id=opus-4-7` → tries `opus-4-7` (404), `claude-opus-4-7` (200) — `claude-{id}` variant wins for Anthropic models on AA
+- AA `gemini-3-1-flash` → tries `gemini-3-1-flash` (404), `gemini-3-1-flash-preview` (404), `gemini-3-1-flash-lite-preview` (200) — needs vendor-specific variant
+- Epoch `deepseek-v3-2` → 200 directly; `deepseek-v3` → would 404 (older versions get date suffixes)
+- DeepMind model-card `gemini-3-1-pro` → tries `{id}` directly (200) — straightforward
+- Anthropic news `opus-4-7` → tries `claude-opus-4-7` (200); slug rule: `claude-{id}`
+
+The agent NEVER hardcodes these mappings — they live in each whitelist entry's `slugVariations[]` array and are extended via `whitelistAdditions[].slugVariations` when the agent discovers a new working slug pattern.
+
 ## DYNAMIC_WHITELIST_DISCOVERY (self-healing whitelist mutation)
 
 When the agent finds a NEW source domain that consistently provides high-quality bench data NOT in the current whitelist, it MUST emit a `whitelistAdditions[]` field in the output JSON:

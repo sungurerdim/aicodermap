@@ -456,6 +456,24 @@
           "version": "v1"
         }
       }
+    },
+    "perModelExpansion": {
+      "description": "Cascade discovery: when leaderboard aggregate has sparse cells for a model, agent attempts perModelUrlTemplate using slugVariations against model.id. Each {id} in a variation is replaced with the model.id. {family} = model.id with version suffix stripped (e.g., grok-3-mini → grok). {N} = numeric major version. {YYMMDD} = released-date condensed. {variant} = vendor-specific subfamily token (pro/flash/lite).",
+      "fields": {
+        "perModelUrlTemplate": "URL with {slug} placeholder for per-model page",
+        "perModelFormat": "Format key for per-model page (may differ from leaderboard format)",
+        "slugStrategy": "try_variations | model_id_kebab | descriptive_kebab | date_coded | websearch_required",
+        "slugVariations": "Ordered array of slug variants to try; first 200 wins",
+        "postUrlPattern": "Vendor blog post URL pattern; agent uses postSlugVariations",
+        "modelCardUrlTemplate": "Vendor model-card URL pattern (e.g., DeepMind /models/model-cards/{slug}/)"
+      },
+      "cascadeOrder": [
+        "1. leaderboard aggregate (existing url)",
+        "2. perModelUrlTemplate × slugVariations (NEW; for entries that have one)",
+        "3. vendor modelCardUrlTemplate × modelCardSlugVariations (NEW)",
+        "4. vendor postUrlPattern × postSlugVariations (NEW)",
+        "5. WebSearch with site:<domain> \"<modelName>\" \"<benchKey>\" 2026 (existing)"
+      ]
     }
   },
   "vendors": {
@@ -466,9 +484,21 @@
         "lineup": "https://docs.claude.com/en/docs/about-claude/models",
         "news": "https://www.anthropic.com/news",
         "docs": "https://docs.claude.com",
-        "pricing": "https://platform.claude.com/docs/en/about-claude/pricing"
+        "pricing": "https://platform.claude.com/docs/en/about-claude/pricing",
+        "blog": "https://www.anthropic.com/news",
+        "postUrlPattern": "https://www.anthropic.com/news/{slug}"
       },
-      "extracts": "Active model IDs, deprecation dates, pricing, bench"
+      "extracts": "Active model IDs, deprecation dates, pricing, bench",
+      "postSlugStrategy": "try_variations",
+      "postSlugVariations": [
+        "claude-{id}",
+        "{id}"
+      ],
+      "postFormat": "image_embedded",
+      "imageOCRPatterns": [
+        "^https://www\\.anthropic\\.com/news/"
+      ],
+      "lastVerifiedDate": "2026-04-27"
     },
     "openai": {
       "name": "OpenAI",
@@ -476,9 +506,20 @@
       "urls": {
         "lineup": "https://platform.openai.com/docs/models",
         "news": "https://openai.com/blog",
-        "pricing": "https://openai.com/api/pricing/"
+        "pricing": "https://openai.com/api/pricing/",
+        "blog": "https://openai.com/index",
+        "postUrlPattern": "https://openai.com/index/{slug}/"
       },
-      "extracts": "Active models + deprecation table"
+      "extracts": "Active models + deprecation table",
+      "postSlugStrategy": "try_variations",
+      "postSlugVariations": [
+        "introducing-{id}",
+        "{id}",
+        "{id}-system-card"
+      ],
+      "postFormat": "bot_blocked",
+      "fallback": "websearch_snippet",
+      "lastVerifiedDate": "2026-04-27"
     },
     "google_deepmind": {
       "name": "Google DeepMind",
@@ -487,18 +528,46 @@
         "lineup": "https://ai.google.dev/gemini-api/docs/models",
         "news": "https://deepmind.google/discover",
         "pricing": "https://ai.google.dev/gemini-api/docs/pricing",
-        "model_pages": "https://deepmind.google/models/gemini/"
+        "model_pages": "https://deepmind.google/models/gemini/",
+        "blog": "https://blog.google",
+        "postUrlPattern": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/{slug}/",
+        "modelCardsBase": "https://deepmind.google/models/model-cards/",
+        "modelCardUrlTemplate": "https://deepmind.google/models/model-cards/{slug}/",
+        "modelPagesPerVariant": "https://deepmind.google/models/gemini/{variant}/"
       },
-      "extracts": "Gemini active list, bench, pricing"
+      "extracts": "Gemini active list, bench, pricing",
+      "postSlugStrategy": "descriptive_kebab",
+      "postFormat": "static_html_article",
+      "modelCardSlugStrategy": "try_variations",
+      "modelCardSlugVariations": [
+        "{id}",
+        "{id}-preview",
+        "{id}-lite",
+        "{id}-pro",
+        "{id}-flash"
+      ],
+      "modelCardFormat": "static_html_article",
+      "urlsNote": "Model cards at deepmind.google/models/model-cards/{slug}/ contain 14+ benchmarks (HLE, ARC-AGI-2, GPQA, TB2, sweV, swePro, lcbV6, tau2, mcpA, MMMU). RICH source for Gemini bench data.",
+      "lastVerifiedDate": "2026-04-27"
     },
     "mistral": {
       "name": "Mistral AI",
       "tier": "S",
       "urls": {
         "lineup": "https://docs.mistral.ai/getting-started/models/models_overview/",
-        "news": "https://mistral.ai/news"
+        "news": "https://mistral.ai/news",
+        "blog": "https://mistral.ai/news",
+        "postUrlPattern": "https://mistral.ai/news/{slug}"
       },
-      "extracts": "Mistral + Devstral + Codestral lineup"
+      "extracts": "Mistral + Devstral + Codestral lineup",
+      "postSlugStrategy": "websearch_required",
+      "postSlugVariations": [
+        "{id}",
+        "{id}-2407"
+      ],
+      "postFormat": "image_embedded",
+      "urlsNote": "Slug rarely matches model.id directly; WebSearch needed to discover canonical slug",
+      "lastVerifiedDate": "2026-04-27"
     },
     "deepseek": {
       "name": "DeepSeek",
@@ -506,18 +575,38 @@
       "urls": {
         "lineup": "https://api-docs.deepseek.com/quick_start/pricing",
         "news": "https://www.deepseek.com/news",
-        "docs": "https://api-docs.deepseek.com"
+        "docs": "https://api-docs.deepseek.com",
+        "blog": "https://api-docs.deepseek.com/news",
+        "postUrlPattern": "https://api-docs.deepseek.com/news/news{date}"
       },
-      "extracts": "Active API model IDs, pricing"
+      "extracts": "Active API model IDs, pricing",
+      "postSlugStrategy": "date_coded",
+      "postSlugVariations": [
+        "news{YYMMDD}"
+      ],
+      "postFormat": "image_embedded",
+      "urlsNote": "Date-coded slugs (e.g., news260424 = 2026-04-24); use model.released field to derive",
+      "lastVerifiedDate": "2026-04-27"
     },
     "xai": {
       "name": "xAI",
       "tier": "S",
       "urls": {
         "lineup": "https://docs.x.ai/docs/models",
-        "news": "https://x.ai/news"
+        "news": "https://x.ai/news",
+        "blog": "https://x.ai/news",
+        "postUrlPattern": "https://x.ai/news/{slug}"
       },
-      "extracts": "Grok active models"
+      "extracts": "Grok active models",
+      "postSlugStrategy": "try_variations",
+      "postSlugVariations": [
+        "{id}",
+        "{family}",
+        "grok-{N}"
+      ],
+      "postFormat": "bot_blocked",
+      "fallback": "websearch_snippet",
+      "lastVerifiedDate": "2026-04-27"
     },
     "alibaba_qwen": {
       "name": "Alibaba (Qwen)",
@@ -525,9 +614,21 @@
       "urls": {
         "lineup": "https://qwenlm.github.io/blog",
         "models": "https://huggingface.co/Qwen",
-        "alt": "https://qwen-lm.github.io"
+        "alt": "https://qwen-lm.github.io",
+        "blog": "https://qwenlm.github.io/blog",
+        "postUrlPattern": "https://qwenlm.github.io/blog/{slug}/"
       },
-      "extracts": "Qwen series releases"
+      "extracts": "Qwen series releases",
+      "postSlugStrategy": "try_variations",
+      "postSlugVariations": [
+        "{family}",
+        "{id}",
+        "qwen3-coder",
+        "qwen3"
+      ],
+      "postFormat": "static_markdown",
+      "urlsNote": "Migrating to qwen.ai/blog?id={slug}; bench data shown as images",
+      "lastVerifiedDate": "2026-04-27"
     },
     "moonshot_kimi": {
       "name": "Moonshot AI (Kimi)",
@@ -583,9 +684,19 @@
       "tier": "S",
       "urls": {
         "lineup": "https://huggingface.co/meta-llama",
-        "news": "https://ai.meta.com/blog"
+        "news": "https://ai.meta.com/blog",
+        "blog": "https://ai.meta.com/blog",
+        "postUrlPattern": "https://ai.meta.com/blog/{slug}/"
       },
-      "extracts": "Released Llama models"
+      "extracts": "Released Llama models",
+      "postSlugStrategy": "descriptive_kebab",
+      "postSlugVariations": [
+        "{id}",
+        "llama-{N}-multimodal-intelligence",
+        "{family}"
+      ],
+      "postFormat": "image_embedded",
+      "lastVerifiedDate": "2026-04-27"
     },
     "google_gemma": {
       "name": "Google (Gemma)",
@@ -609,9 +720,15 @@
       "name": "All Hands AI (Devstral co-developer)",
       "tier": "S",
       "urls": {
-        "news": "https://www.all-hands.dev"
+        "news": "https://www.all-hands.dev",
+        "blog": "https://openhands.dev/blog",
+        "indexPage": "https://index.openhands.dev/home",
+        "blogPattern": "https://openhands.dev/blog/{slug}",
+        "redirectFrom": "https://www.all-hands.dev"
       },
-      "extracts": "Devstral co-development announcements"
+      "extracts": "Devstral co-development announcements",
+      "postFormat": "static_html_article",
+      "lastVerifiedDate": "2026-04-27"
     }
   },
   "leaderboards": [
@@ -843,7 +960,7 @@
       "authority": "aaIdx, aaCoding, aaAgentic, throughput, pricing for ~336 models",
       "phase": "leaderboard",
       "format": "spa_partial",
-      "lastVerifiedDate": null,
+      "lastVerifiedDate": "2026-04-27",
       "consecutiveFailures": 0,
       "extractor": "regex_extract",
       "fallbacks": [
@@ -857,7 +974,20 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "perModelUrlTemplate": "https://artificialanalysis.ai/models/{slug}",
+      "perModelFormat": "spa_partial",
+      "slugStrategy": "try_variations",
+      "slugVariations": [
+        "{id}",
+        "claude-{id}",
+        "{id}-preview",
+        "{id}-reasoning",
+        "{id}-high",
+        "{id}-fast",
+        "{id}-mini"
+      ],
+      "slugMismatchNote": "Uses own slug system: opus-4-7 → claude-opus-4-7; gemini-3-1-flash → gemini-3-1-flash-lite-preview"
     },
     {
       "name": "Vellum LLM Leaderboard",
@@ -888,7 +1018,7 @@
       "tier": "I",
       "authority": "broad model catalog",
       "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "lastVerifiedDate": "2026-04-27",
       "consecutiveFailures": 0,
       "extractor": "html_table",
       "fallbacks": [
@@ -899,7 +1029,14 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "perModelUrlTemplate": "https://llm-stats.com/models/{slug}",
+      "perModelFormat": "static_html_article",
+      "slugStrategy": "try_variations",
+      "slugVariations": [
+        "{id}",
+        "claude-{id}"
+      ]
     },
     {
       "name": "LMArena",
@@ -1102,7 +1239,7 @@
       "tier": "I",
       "authority": "verified vs provisional transparency",
       "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "lastVerifiedDate": "2026-04-27",
       "consecutiveFailures": 0,
       "extractor": "html_table",
       "fallbacks": [
@@ -1113,7 +1250,15 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "perModelUrlTemplate": "https://benchlm.ai/models/{slug}",
+      "perModelFormat": "static_html_table",
+      "slugStrategy": "try_variations",
+      "slugVariations": [
+        "{id}",
+        "claude-{id}",
+        "{id}-preview"
+      ]
     },
     {
       "name": "AgentBench",
@@ -1201,7 +1346,7 @@
       "authority": "lcbV6 mirror — closes the SPA gap on livecodebench.github.io (71 models indexed)",
       "phase": "leaderboard",
       "format": "static_html_article",
-      "lastVerifiedDate": "2026-04-26",
+      "lastVerifiedDate": "2026-04-27",
       "consecutiveFailures": 0,
       "extractor": "regex_extract",
       "fallbacks": [
@@ -1209,7 +1354,14 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "perModelUrlTemplate": "https://llm-stats.com/models/{slug}",
+      "perModelFormat": "static_html_article",
+      "slugStrategy": "try_variations",
+      "slugVariations": [
+        "{id}",
+        "claude-{id}"
+      ]
     },
     {
       "name": "llm-stats SWE-bench Verified",
@@ -1218,7 +1370,7 @@
       "authority": "sweV mirror — alternative to SPA-broken swebench.com",
       "phase": "leaderboard",
       "format": "static_html_article",
-      "lastVerifiedDate": "2026-04-26",
+      "lastVerifiedDate": "2026-04-27",
       "consecutiveFailures": 0,
       "extractor": "regex_extract",
       "fallbacks": [
@@ -1226,7 +1378,14 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "perModelUrlTemplate": "https://llm-stats.com/models/{slug}",
+      "perModelFormat": "static_html_article",
+      "slugStrategy": "try_variations",
+      "slugVariations": [
+        "{id}",
+        "claude-{id}"
+      ]
     },
     {
       "name": "Epoch AI Benchmarks",
@@ -1252,7 +1411,16 @@
           "format": "static_html_article",
           "url": "https://epoch.ai/blog"
         }
-      ]
+      ],
+      "perModelUrlTemplate": "https://epoch.ai/models/{slug}",
+      "perModelFormat": "static_html_article",
+      "slugStrategy": "try_variations",
+      "slugVariations": [
+        "{id}",
+        "{id}-may-2025",
+        "{id}-0324"
+      ],
+      "slugMismatchNote": "Older versions get date suffixes: deepseek-v3 → deepseek-v3-0324"
     },
     {
       "name": "LMCouncil Benchmarks",
