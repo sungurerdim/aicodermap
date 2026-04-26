@@ -155,58 +155,30 @@ Vendor URLs are listed canonically in **`SKILL.md → VENDOR_LINEUP_SOURCES`** (
 
 Canonical definition lives in **`SKILL.md → TRUST_SCORE_FORMULA`** (single source of truth). The agent computes `trustScore` per the formula there and emits it on every `sourcesAdded[]` entry. The skill's auto-resolution layer uses these for argmax-winner selection on contradictions.
 
-## MODEL_FAMILIES (vendor × family research scope, for `scope=full`)
+## SCOPE_CATEGORIES (taxonomy only — actual model list is data-driven)
 
-Every `full` scope must survey **each row below** AFTER Phase 0 lineup discovery refines/expands the list. A family skipped without a `gaps[]` entry is a validation failure.
+The agent NEVER hardcodes model IDs. The actual roster is derived at runtime from:
+1. **`data/models.json`** — every active/deprecated entry the project currently tracks (single source of truth for "what models exist in our dataset")
+2. **Phase 0 lineup discovery** — vendor docs surface NEW models, RENAMED ids, DEPRECATED entries, REMOVED entries
+3. **`data/known-gaps.json`** — per-pair skip list (vendor opt-out / not-applicable / out-of-scope)
 
-### Frontier — closed-weight, API-first · `tier='frontier'`
-| Vendor | Family | Concrete IDs |
-|--------|--------|--------------|
-| Anthropic | Claude Opus | `opus-4-7`, `opus-4-6` |
-| Anthropic | Claude Sonnet | `sonnet-4-6` |
-| Anthropic | Claude Haiku | latest if released |
-| OpenAI | GPT-5 | `gpt-5-4`, `gpt-5-5` (April 2026) |
-| OpenAI | o-series | latest `o3-x`, `o4-x` |
-| Google | Gemini Pro | `gemini-3-1-pro` |
-| Google | Gemini Flash | latest `gemini-3-x-flash` |
-| xAI | Grok | `grok-3`, `grok-3-mini` |
+The skill passes `idea_context.currentIds` (the full id list from `data/models.json`) into every agent run. The agent groups them by `(provider, tier)` for parallel batch dispatch.
 
-### Open Tier-1 — frontier-grade open weights · `tier='open-tier1'`
-| Vendor | Concrete IDs |
-|--------|--------------|
-| Moonshot | `kimi-k2-6` |
-| Z.ai | `glm-5-1` |
-| MiniMax | `minimax-m2-7`, `minimax-m2-5` |
-| Alibaba | `qwen-3-6-max`, `qwen-3-6-27b`, `qwen3-6-35b-moe`, `qwen3-235b`, `qwen3-32b` |
-| StepFun | `step-3-5-flash` |
-| Meta | `llama-4-scout`, `llama-4-maverick` |
+### Tier taxonomy (these labels are invariant; concrete IDs change run-to-run)
 
-### Coder-specialized — `tier='open-tier1'` or `'openrouter'`
-| Vendor | Concrete IDs |
-|--------|--------------|
-| Alibaba | `qwen3-coder-480b`, `qwen3-coder-next`, `qwen3-coder-30b` |
-| DeepSeek | `deepseek-v3-2`, `deepseek-v4-pro`, `deepseek-v4-flash` |
-| DeepSeek (R) | `deepseek-r1-14b` |
-| DeepSeek (Coder) | `deepseek-coder-v2-16b` |
-| Xiaomi | `mimo-v2-pro`, `mimo-v2-5-pro`, `mimo-v2-5`, `mimo-v2-flash` |
-| Mistral | `codestral-22b` |
-| Mistral / All Hands AI | `devstral-2`, `devstral-small-2`, `devstral-medium` (proprietary, distinct) |
-| Nvidia | `nemotron-3-super` |
+| `tier` value | Description | Per-model survey priority |
+|--------------|-------------|---------------------------|
+| `frontier` | Closed-weight, API-first (Anthropic, OpenAI, Google, xAI, Mistral premium) | Vendor blog + 2 leaderboards + multi-provider pricing |
+| `open-tier1` | Frontier-grade open weights (Moonshot, Z.ai, MiniMax, Alibaba Qwen, StepFun, Meta, Xiaomi MiMo) | HF model card + leaderboards + Ollama + multi-provider |
+| `open-tier1` (coder) | Code-specialized open weights (Qwen-Coder, Codestral, Devstral, DeepSeek-Coder, Nemotron) | Same + bigcode-bench / EvalPlus |
+| `gemma` | Google open-weight family (Gemma 3.x, 4.x — Dense + MoE + E-variants) | HF + Ollama + tech report |
+| `ollama` | Locally-runnable open weights packaged for Ollama runtime | Ollama page + Unsloth GGUF + community VRAM reports |
 
-### Gemma — `tier='gemma'`
-| Family | Variants |
-|--------|----------|
-| Gemma 4 | E2B, E4B, 26B-A4B (MoE), 31B Dense |
-| Gemma 3 | 27B (legacy reference) |
+### Cardinality contract
 
-### Local Ollama — `tier='ollama'`
-| Vendor | Ollama tags |
-|--------|-------------|
-| Alibaba | `qwen25-coder-7b`, `qwen25-coder-14b`, `qwen25-coder-32b` |
-| DeepSeek | `deepseek-coder-v2-16b`, `deepseek-r1-14b` |
-| Google | `gemma-3-27b`, `gemma-4-e2b`, `gemma-4-e4b`, `gemma-4-26b-moe`, `gemma-4-31b` |
+`refresh-all` cardinality floor: `|currentIds| - 5` (skill enforces; allows ≤5 family timeouts before halting per SILENT_FAIL_PREVENTION).
 
-**Cardinality target:** ≥35 entries per `full` run after Phase 0 expansion.
+Anytime the agent sees a newly-discovered model in Phase 0 not present in `currentIds`, it MUST add a full `newModels[]` entry with the same schema as `models[]` updates (see OUTPUT_SCHEMA).
 
 ## RESEARCH_STRATEGY (`scope=full`)
 

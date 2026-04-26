@@ -47,7 +47,17 @@ Orchestrate AI coding LLM tracker updates: discover **official vendor lineup** �
 
 1. Read data/{models,sources,known-gaps}.json + lineup result from Step 0
 2. Parse arg → resolve scope + target_model_ids
-3. Build idea_context: {title:"AICoderMap", total_models:<n>, last_refresh:<iso>, lineup:<step0-result>}
+3. Build idea_context (DATA-DRIVEN — never hardcode model lists):
+   {
+     title: "AICoderMap",
+     total_models: <count from data/models.json>,
+     last_refresh: <max(lastUpdated) from data/models.json>,
+     currentIds: [<every id in data/models.json, including status='deprecated'>],
+     familyGrouping: <models grouped by (provider, tier) for parallel batches>,
+     knownGaps: <inline data/known-gaps.json>,
+     lineup: <Step 0 result>
+   }
+   The agent NEVER hardcodes model IDs in its prompt. data/models.json is SSOT for "what we track".
 4. Agent({
      subagent_type: "aicodermap-research-agent",
      model: "sonnet",
@@ -63,15 +73,20 @@ Orchestrate AI coding LLM tracker updates: discover **official vendor lineup** �
    })
 5. Parse return → validate JSON schema (strip surrounding whitespace, locate first `{` and last `}` if narration leaked)
 
-6. COVERAGE TRIGGER (NOT a block):
+6. COVERAGE TRIGGER — **MANDATORY when fired** (not a block, not a "may"):
    if validationCoverage < COVERAGE_DEEPEN_THRESHOLD (0.95):
-     identify (modelId, field) pairs missing ≥2 sources
-     spawn DEEP-FETCH agent pass: targeted, single-pair retrieval per gap
+     MUST identify (modelId, field) pairs missing ≥2 sources
+     MUST spawn DEEP-FETCH agent pass: targeted, single-pair retrieval per gap
      budget: ≤30s per pair, ≤10 pairs total per cycle, ≤2 cycles
-     merge deep-fetch returns into pending updates
-   if validationCoverage still < 0.50 after deep-fetch cycles:
+     MUST merge deep-fetch returns into pending updates
+     MUST stamp the deep-fetch artifact with `deepFetchCycle: <n>` (1, then 2 if a 2nd cycle ran)
+   if validationCoverage still < COVERAGE_PARTIAL_WARN after deep-fetch cycles:
      write anyway, append "⚠ partial coverage: <%>" warning to CHANGELOG
-   else: proceed silently — coverage is an optimization knob, not a gate
+   else proceed.
+
+   ENFORCEMENT: `scripts/merge.py` HALTS the commit if `validationCoverage < 0.95`
+   in the artifact AND `deepFetchCycle` is absent — proving Step 6 was skipped.
+   Orchestrator never silently bypasses Step 6.
 
 7. CONTRADICTION AUTO-RESOLUTION (NOT manual prompt):
    for each contradiction in contradictions[]:
@@ -108,8 +123,9 @@ Orchestrate AI coding LLM tracker updates: discover **official vendor lineup** �
 ```
 CONTRADICTION_WARN              = 3.0   // pp delta → YELLOW (auto-resolve via trustScore)
 CONTRADICTION_BLOCK             = 5.0   // pp delta → RED (auto-resolve via trustScore, log loudly)
-COVERAGE_DEEPEN_THRESHOLD       = 0.95  // <0.95 triggers deep-fetch agent loop, not a block
-COVERAGE_PARTIAL_WARN           = 0.50  // <0.50 still writes but flags CHANGELOG
+COVERAGE_TARGET                 = 0.85  // hard floor — Step 6 cycles run until reached
+COVERAGE_DEEPEN_THRESHOLD       = 0.95  // ideal — Step 6 also triggers below this
+COVERAGE_HARD_BLOCK             = 0.50  // <0.50 BLOCKS commit; orchestrator MUST iterate
 STALE_DAYS                      = 14    // M5 freshness gate
 DEPRECATION_GRACE_DAYS          = 60    // vendor "deprecated" → still listed for 60d before archive
 DEPLOY_WAIT_SEC                 = 90
@@ -118,9 +134,24 @@ FAMILY_BASELINE_MIN             = 30    // refresh-all: |models[]+newModels[]| f
 PER_MODEL_FETCH_BUDGET          = 6     // max fetches per model in agent
 PER_MODEL_WALLCLOCK_BUDGET      = 90    // seconds per model in agent
 PARALLEL_MODELS                 = 5     // concurrent model surveys in agent
-DEEP_FETCH_MAX_PAIRS_PER_CYCLE  = 10
-DEEP_FETCH_MAX_CYCLES           = 2
+DEEP_FETCH_MAX_PAIRS_PER_CYCLE  = 25    // up from 10 — user feedback "data definitely exists somewhere"
+DEEP_FETCH_MAX_CYCLES           = 5     // up from 2 — keep iterating until COVERAGE_TARGET hit OR no progress
+SINGLE_ARTIFACT_PATH            = ".aicodermap-agent-out.json"  // ONE artifact, overwritten each run
 ```
+
+## SILENT_FAIL_PREVENTION (every step completes or halts loudly)
+
+| Step | Success criterion | On failure |
+|------|-------------------|------------|
+| 0 Lineup discovery | ≥10 vendor pages successfully parsed; `lineupChanges` populated (even if all empty) | Retry once with narrower target; if still failing, halt with the unreachable vendor list — never proceed with stale lineup |
+| 4 Agent survey | Pure JSON return; `models[]+newModels[]` ≥ FAMILY_BASELINE_MIN OR explicit gaps[] entries | Retry once with reinforced delivery contract; if still bad, log to `~/.aicodermap-debug.log` + halt |
+| 6 Deep-fetch loop | `coverage ≥ COVERAGE_TARGET (0.85)` OR all remaining gaps in `data/known-gaps.json` OR `cycles == DEEP_FETCH_MAX_CYCLES (5)` | Run until terminal condition; if cycles exhausted with coverage <0.85, halt with explicit per-pair "tried these N sources, none had it" report |
+| 7 Contradiction auto-resolve | Every contradiction has `autoResolveWinner` written to data + all candidates in sources | If trustScores tie within 0.05 AND no I-tier present: halt with manual-pick prompt (only escape hatch) |
+| 10 Atomic write | `data/{models,sources}.json` parse-valid + self-check passes | Restore from `.bak`, halt with diff of what failed |
+| 12 git push | Exit code 0 AND remote ref advanced | On hook fail: fix root cause + new commit (NEVER --amend, NEVER --no-verify); on push conflict: halt with "git pull --rebase first" |
+| 14 Live deploy verify | `curl <live_url>/data/models.json` returns 200 AND parses as JSON | Wait + retry up to 5min; if still failing, halt with githubstatus.com pointer |
+
+**Cardinal rule:** a step never returns "OK" while having silently skipped its work. The artifact's machine-checkable flags (`deepFetchCycle`, `error`, etc.) are the source of truth, not the orchestrator's narration.
 
 ## VENDOR_LINEUP_SOURCES (Step 0 — official "what models exist now")
 
@@ -264,15 +295,13 @@ User is NOT prompted for the rename. Default is auto-execute when verified ≥2 
 
 **Why this section exists:** prior runs lost data because the merge step only touched `bench`/`pricing`/`provider`/`license`. Sparse fields (`vramRequirement`, `ollamaSize`, `pricing.api.cacheHit`, `uptime`, `subscription`) were silently skipped. Never again.
 
-### A. Artifact reconciliation (BEFORE primary agent run merge)
+### A. Single-artifact policy (replaces prior multi-artifact reconciliation)
 
-Before applying the current run's `models[].updates`, scan for prior artifacts:
+There is ONE artifact: `.aicodermap-agent-out.json` (gitignored). Every agent run overwrites it. No `.aicodermap-merged.json`, no `.aicodermap-targeted-out.json`, no numbered suffixes — those legacy filenames are deleted; never re-created.
 
-```
-prior_artifacts = glob('.aicodermap-*.json') ∪ {.aicodermap-merged.json, .aicodermap-targeted-out.json, .aicodermap-agent-out{,2,3}.json, .aicodermap-agent-out-fresh.json}
-```
-
-Treat their `models[].updates`, `newModels[]`, and `sourcesAdded[]` as **lower-priority backfill** candidates for any field the current run leaves null.
+Reconciliation against the FILE SYSTEM (`data/models.json`) replaces the prior multi-artifact dance:
+- Existing values in `data/models.json` are preserved unless the current run has a higher-trustScore replacement
+- A field that was non-null before but is null in the current return is NOT cleared — it stays. Additionally, the field's `(modelId, field)` key is added to a deep-fetch retry queue: the next cycle MUST attempt to re-find that value from a different source. Existing data is never silently lost.
 
 ### B. Per-field merge policy (priority order, top wins)
 
