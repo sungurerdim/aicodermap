@@ -1,0 +1,261 @@
+{
+  "_schema": {
+    "version": "1.0",
+    "purpose": "Single source of truth for every URL the research agent is allowed to fetch. Skill loads this and passes via idea_context.sourcesWhitelist; agent uses it for trusted_sources_only=true enforcement, Phase 0 lineup discovery, Phase 1+2+3 mining, and per-model fallback. Tier weights drive trustScore (I=1.0, S=0.7, C=0.4, U=never-written).",
+    "structure": {
+      "vendors": "Per-vendor URL bundles. tier='S' (vendor self-report). Used by both Phase 0 lineup discovery (urls.lineup) and per-model S-tier fallback (urls.news/docs/pricing).",
+      "leaderboards": "Independent benchmark sources. tier='I'. Used by Phase 1 mining.",
+      "aggregators": "Multi-provider inference catalogs. tier='I'. Used by Phase 2 multi-provider pricing mining.",
+      "local": "Local-runtime catalogs (Ollama, Unsloth, quants). tier='I'. Used per-model when tier='ollama' or vramRequirement is sought.",
+      "registries": "Model metadata registries (HF leaderboard, llmfit). tier='I'.",
+      "community": "Aggregator blogs / expert commentary. tier='C'. Used only when no I/S source carries the value."
+    }
+  },
+
+  "vendors": {
+    "anthropic": {
+      "name": "Anthropic",
+      "tier": "S",
+      "urls": {
+        "lineup": "https://docs.claude.com/en/docs/about-claude/models",
+        "news": "https://www.anthropic.com/news",
+        "docs": "https://docs.claude.com",
+        "pricing": "https://platform.claude.com/docs/en/about-claude/pricing"
+      },
+      "extracts": "Active model IDs, deprecation dates, pricing, bench"
+    },
+    "openai": {
+      "name": "OpenAI",
+      "tier": "S",
+      "urls": {
+        "lineup": "https://platform.openai.com/docs/models",
+        "news": "https://openai.com/blog",
+        "pricing": "https://openai.com/api/pricing/"
+      },
+      "extracts": "Active models + deprecation table"
+    },
+    "google_deepmind": {
+      "name": "Google DeepMind",
+      "tier": "S",
+      "urls": {
+        "lineup": "https://ai.google.dev/gemini-api/docs/models",
+        "news": "https://deepmind.google/discover",
+        "pricing": "https://ai.google.dev/gemini-api/docs/pricing",
+        "model_pages": "https://deepmind.google/models/gemini/"
+      },
+      "extracts": "Gemini active list, bench, pricing"
+    },
+    "mistral": {
+      "name": "Mistral AI",
+      "tier": "S",
+      "urls": {
+        "lineup": "https://docs.mistral.ai/getting-started/models/models_overview/",
+        "news": "https://mistral.ai/news"
+      },
+      "extracts": "Mistral + Devstral + Codestral lineup"
+    },
+    "deepseek": {
+      "name": "DeepSeek",
+      "tier": "S",
+      "urls": {
+        "lineup": "https://api-docs.deepseek.com/quick_start/pricing",
+        "news": "https://www.deepseek.com/news",
+        "docs": "https://api-docs.deepseek.com"
+      },
+      "extracts": "Active API model IDs, pricing"
+    },
+    "xai": {
+      "name": "xAI",
+      "tier": "S",
+      "urls": {
+        "lineup": "https://docs.x.ai/docs/models",
+        "news": "https://x.ai/news"
+      },
+      "extracts": "Grok active models"
+    },
+    "alibaba_qwen": {
+      "name": "Alibaba (Qwen)",
+      "tier": "S",
+      "urls": {
+        "lineup": "https://qwenlm.github.io/blog",
+        "models": "https://huggingface.co/Qwen",
+        "alt": "https://qwen-lm.github.io"
+      },
+      "extracts": "Qwen series releases"
+    },
+    "moonshot_kimi": {
+      "name": "Moonshot AI (Kimi)",
+      "tier": "S",
+      "urls": {
+        "lineup": "https://platform.moonshot.cn/docs",
+        "news": "https://www.kimi.com/blog"
+      },
+      "extracts": "Kimi K-series catalog"
+    },
+    "zai_glm": {
+      "name": "Z.ai (GLM)",
+      "tier": "S",
+      "urls": {
+        "lineup": "https://docs.z.ai/api-reference",
+        "news": "https://z.ai/news",
+        "docs": "https://docs.z.ai"
+      },
+      "extracts": "GLM active list"
+    },
+    "xiaomi_mimo": {
+      "name": "Xiaomi (MiMo)",
+      "tier": "S",
+      "urls": {
+        "lineup": "https://xiaomimimo.github.io",
+        "news": "https://mimo.xiaomi.com",
+        "models": "https://huggingface.co/XiaomiMiMo"
+      },
+      "extracts": "MiMo series"
+    },
+    "minimax": {
+      "name": "MiniMax",
+      "tier": "S",
+      "urls": {
+        "lineup": "https://platform.minimaxi.com/document",
+        "news": "https://www.minimaxi.com/news",
+        "models": "https://huggingface.co/MiniMaxAI"
+      },
+      "extracts": "M-series"
+    },
+    "nvidia": {
+      "name": "Nvidia",
+      "tier": "S",
+      "urls": {
+        "lineup": "https://build.nvidia.com",
+        "news": "https://blogs.nvidia.com",
+        "models": "https://huggingface.co/nvidia"
+      },
+      "extracts": "Nemotron variants, NIM catalog"
+    },
+    "meta_llama": {
+      "name": "Meta (Llama)",
+      "tier": "S",
+      "urls": {
+        "lineup": "https://huggingface.co/meta-llama",
+        "news": "https://ai.meta.com/blog"
+      },
+      "extracts": "Released Llama models"
+    },
+    "google_gemma": {
+      "name": "Google (Gemma)",
+      "tier": "S",
+      "urls": {
+        "lineup": "https://huggingface.co/google",
+        "docs": "https://ai.google.dev/gemma"
+      },
+      "extracts": "Gemma releases"
+    },
+    "stepfun": {
+      "name": "StepFun",
+      "tier": "S",
+      "urls": {
+        "lineup": "https://www.stepfun.com",
+        "models": "https://huggingface.co/stepfun-ai"
+      },
+      "extracts": "Step series"
+    },
+    "all_hands_ai": {
+      "name": "All Hands AI (Devstral co-developer)",
+      "tier": "S",
+      "urls": {
+        "news": "https://www.all-hands.dev"
+      },
+      "extracts": "Devstral co-development announcements"
+    }
+  },
+
+  "leaderboards": [
+    {"name": "Scale SEAL", "url": "https://labs.scale.com/leaderboard", "tier": "I", "authority": "SWE-bench Pro (1865 tasks), HLE", "phase": "leaderboard"},
+    {"name": "Scale SEAL SWE-bench Pro public", "url": "https://labs.scale.com/leaderboard/swe_bench_pro_public", "tier": "I", "authority": "swePro standardized", "phase": "leaderboard"},
+    {"name": "SWE-bench (canonical)", "url": "https://www.swebench.com/", "tier": "I", "authority": "SWE-bench Verified, full SWE-bench", "phase": "leaderboard"},
+    {"name": "SWE-bench experiments repo", "url": "https://github.com/SWE-bench/experiments", "tier": "I", "authority": "SWE-bench raw data"},
+    {"name": "LiveCodeBench", "url": "https://livecodebench.github.io/leaderboard.html", "tier": "I", "authority": "LCB v6 contamination-free", "phase": "leaderboard"},
+    {"name": "LiveCodeBench (alt)", "url": "https://livecodebench.com/", "tier": "I"},
+    {"name": "Terminal-Bench", "url": "https://tbench.ai/leaderboard", "tier": "I", "authority": "TB2 agentic execution", "phase": "leaderboard"},
+    {"name": "Terminal-Bench (alt)", "url": "https://terminal-bench.io/", "tier": "I"},
+    {"name": "tau-bench", "url": "https://tau-bench.dev", "tier": "I", "authority": "tau2 agentic API-use", "phase": "leaderboard"},
+    {"name": "Aider Polyglot", "url": "https://aider.chat/docs/leaderboards/", "tier": "I", "authority": "aider", "warn": "stale since Nov 2025"},
+    {"name": "MCP-Atlas", "url": "https://mcp-atlas.dev", "tier": "I", "authority": "mcpA tool-chain quality"},
+    {"name": "Artificial Analysis", "url": "https://artificialanalysis.ai/leaderboards/models", "tier": "I", "authority": "aaIdx, aaCoding, aaAgentic, throughput, pricing for ~336 models", "phase": "leaderboard"},
+    {"name": "Vellum LLM Leaderboard", "url": "https://www.vellum.ai/llm-leaderboard", "tier": "I", "authority": "sweV (independent), gpqa, cost+latency", "phase": "leaderboard"},
+    {"name": "llm-stats.com", "url": "https://llm-stats.com/", "tier": "I", "authority": "broad model catalog"},
+    {"name": "LMArena", "url": "https://lmarena.ai/", "tier": "I", "authority": "blind human preference (formerly LMSYS)"},
+    {"name": "LiveBench", "url": "https://livebench.ai/", "tier": "I", "authority": "contamination-resistant rotating evals"},
+    {"name": "Berkeley BFCL", "url": "https://gorilla.cs.berkeley.edu/leaderboard.html", "tier": "I", "authority": "function-calling v3/v4"},
+    {"name": "BigCodeBench", "url": "https://bigcode-bench.github.io/", "tier": "I", "authority": "code generation gold standard"},
+    {"name": "BigCodeBench HF Space", "url": "https://huggingface.co/spaces/bigcode/bigcode-models-leaderboard", "tier": "I"},
+    {"name": "EvalPlus", "url": "https://evalplus.github.io/leaderboard.html", "tier": "I", "authority": "HumanEval+ / MBPP+ rigorous"},
+    {"name": "HF Open LLM Leaderboard", "url": "https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard", "tier": "I", "authority": "open-weight canonical aggregation"},
+    {"name": "Klu.ai", "url": "https://klu.ai/llm-leaderboard", "tier": "I", "authority": "broader benchmark aggregator"},
+    {"name": "Papers with Code", "url": "https://paperswithcode.com/area/code-generation", "tier": "I", "authority": "peer-reviewed leaderboards"},
+    {"name": "arXiv", "url": "https://arxiv.org/", "tier": "I", "authority": "original benchmark papers, technical reports"},
+    {"name": "BenchLM", "url": "https://benchlm.ai/", "tier": "I", "authority": "verified vs provisional transparency"},
+    {"name": "AgentBench", "url": "https://agentbench.ai", "tier": "I", "authority": "multi-domain agentic"},
+    {"name": "MathArena", "url": "https://matharena.ai/", "tier": "I", "authority": "AIME math reasoning (auxiliary)"},
+    {"name": "Vals.ai", "url": "https://www.vals.ai/benchmarks/", "tier": "I", "authority": "enterprise-gated benchmark sets"},
+    {"name": "LMMarketCap", "url": "https://lmmarketcap.com/", "tier": "I", "authority": "hourly market table"}
+  ],
+
+  "aggregators": [
+    {"name": "OpenRouter", "url": "https://openrouter.ai", "tier": "I", "extracts": "provider count, uptime%, alt pricing, throughput", "phase": "pricing"},
+    {"name": "Together AI", "url": "https://www.together.ai/models", "tier": "I", "extracts": "quant variants, $/1M, batch tier", "phase": "pricing"},
+    {"name": "Fireworks AI", "url": "https://fireworks.ai/models", "tier": "I", "extracts": "tier, throughput, batch pricing", "phase": "pricing"},
+    {"name": "DeepInfra", "url": "https://deepinfra.com/models", "tier": "I", "extracts": "$/1M, throughput", "phase": "pricing"},
+    {"name": "Groq", "url": "https://console.groq.com/docs/models", "tier": "I", "extracts": "extreme-fast inference rates", "phase": "pricing"},
+    {"name": "Groq pricing", "url": "https://groq.com/pricing", "tier": "I"},
+    {"name": "Cerebras", "url": "https://inference-docs.cerebras.ai/", "tier": "I", "extracts": "ultra-fast inference"},
+    {"name": "Cerebras inference", "url": "https://cerebras.ai/inference", "tier": "I"},
+    {"name": "SambaNova Cloud", "url": "https://cloud.sambanova.ai/models", "tier": "I", "extracts": "catalog, throughput"},
+    {"name": "Replicate", "url": "https://replicate.com/", "tier": "I", "extracts": "open-weight hosting, $/sec"},
+    {"name": "Lepton AI", "url": "https://www.lepton.ai/pricing", "tier": "I", "extracts": "enterprise pricing"},
+    {"name": "Novita AI", "url": "https://novita.ai/model-api", "tier": "I", "extracts": "catalog + pricing"},
+    {"name": "SiliconFlow", "url": "https://siliconflow.cn/models", "tier": "I", "extracts": "Chinese providers — Qwen / DeepSeek / MiMo critical"},
+    {"name": "Anyscale", "url": "https://www.anyscale.com/endpoints", "tier": "I", "extracts": "enterprise endpoints"},
+    {"name": "Cloudflare Workers AI", "url": "https://developers.cloudflare.com/workers-ai/models/", "tier": "I", "extracts": "edge regions, free tier"},
+    {"name": "AWS Bedrock", "url": "https://aws.amazon.com/bedrock/", "tier": "I", "extracts": "enterprise + region matrix"},
+    {"name": "Azure AI Foundry", "url": "https://ai.azure.com/explore/models", "tier": "I", "extracts": "enterprise + region"},
+    {"name": "HuggingFace Inference Endpoints", "url": "https://huggingface.co/", "tier": "I", "extracts": "author canonical card"},
+    {"name": "OpenCode Zen", "url": "https://opencode.ai/docs/zen", "tier": "I", "extracts": "edge endpoints, latency"},
+    {"name": "OpenCode Go", "url": "https://opencode.ai/docs/go", "tier": "I"},
+    {"name": "Lambda Cloud", "url": "https://lambda.ai/inference", "tier": "I", "extracts": "enterprise throughput"},
+    {"name": "Tensorix", "url": "https://tensorix.ai/", "tier": "I", "extracts": "infrastructure / niche frontier hosting"}
+  ],
+
+  "local": [
+    {"name": "Ollama Library", "url": "https://ollama.com/library", "tier": "I", "extracts": "tags, pullCount, architecture, parameters, license, releasedISO", "phase": "local"},
+    {"name": "HuggingFace Unsloth", "url": "https://huggingface.co/unsloth", "tier": "I", "extracts": "UD dynamic quants (UD-IQ1_S → UD-Q4_K_XL)", "phase": "local"},
+    {"name": "HuggingFace bartowski", "url": "https://huggingface.co/bartowski", "tier": "I", "extracts": "most-active quant maintainer"},
+    {"name": "HuggingFace mradermacher", "url": "https://huggingface.co/mradermacher", "tier": "I", "extracts": "high-quality quant set"},
+    {"name": "HuggingFace lmstudio-community", "url": "https://huggingface.co/lmstudio-community", "tier": "I", "extracts": "LM Studio-curated GGUFs"},
+    {"name": "LM Studio", "url": "https://lmstudio.ai/models", "tier": "I", "extracts": "desktop catalog"},
+    {"name": "llama.cpp", "url": "https://github.com/ggerganov/llama.cpp/discussions", "tier": "I", "extracts": "empirical VRAM/throughput data"},
+    {"name": "MLX (Apple Silicon)", "url": "https://huggingface.co/mlx-community", "tier": "I", "extracts": "mlx-quantized variants"},
+    {"name": "vLLM", "url": "https://docs.vllm.ai/en/latest/models/supported_models.html", "tier": "I", "extracts": "server-side support matrix"},
+    {"name": "sglang", "url": "https://github.com/sgl-project/sglang", "tier": "I", "extracts": "structured-output throughput"}
+  ],
+
+  "registries": [
+    {"name": "llmfit (local snapshot)", "url": "data/external/llmfit-hf-models.json", "tier": "I", "extracts": "148-model HF curated DB", "note": "read first; no network"},
+    {"name": "llmfit upstream", "url": "https://github.com/AlexsJones/llmfit/blob/main/data/hf_models.json", "tier": "I", "extracts": "authoritative source"},
+    {"name": "HF model index", "url": "https://huggingface.co/models?sort=trending", "tier": "S→I", "extracts": "trending + filter by license/architecture"}
+  ],
+
+  "community": [
+    {"name": "ApiDog Blog", "url": "https://apidog.com/blog/", "tier": "C"},
+    {"name": "The Decoder", "url": "https://the-decoder.com/", "tier": "C"},
+    {"name": "DataCamp Blog", "url": "https://www.datacamp.com/blog", "tier": "C"},
+    {"name": "Build Fast With AI", "url": "https://www.buildfastwithai.com/", "tier": "C"},
+    {"name": "Simon Willison", "url": "https://simonwillison.net/", "tier": "C"},
+    {"name": "Latent Space", "url": "https://www.latent.space/", "tier": "C"},
+    {"name": "Swyx", "url": "https://www.swyx.io/", "tier": "C"},
+    {"name": "Awesome-LLM", "url": "https://github.com/Hannibal046/Awesome-LLM", "tier": "C"},
+    {"name": "Awesome-Efficient-LLM", "url": "https://github.com/horseee/Awesome-Efficient-LLM", "tier": "C"},
+    {"name": "r/LocalLLaMA", "url": "https://www.reddit.com/r/LocalLLaMA/", "tier": "C", "note": "community VRAM reports only"},
+    {"name": "Design Arena", "url": "https://designarena.ai/leaderboard", "tier": "C", "note": "UI auxiliary"}
+  ]
+}

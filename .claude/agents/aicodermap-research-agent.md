@@ -60,96 +60,25 @@ trust_score_required: <bool default:true>
 
 ## TRUSTED_SOURCE_WHITELIST (`trusted_sources_only=true` enforces these)
 
-The agent **MUST NOT** fetch URLs outside this whitelist when `trusted_sources_only=true`. If a value cannot be found within the whitelist, emit a `gaps[]` entry — do NOT fall back to open web search. This is the discipline that bounds research time and keeps source quality high.
+**The agent NEVER hardcodes URLs.** The complete whitelist lives in `data/sources-whitelist.json` (single source of truth). The skill loads it and passes via `idea_context.sourcesWhitelist`. README "Data Sources" mirrors the same data for user-facing transparency.
 
-### I-tier — Bench/leaderboard (independent, authoritative)
-| Source | URL | Authority for |
-|--------|-----|---------------|
-| Scale SEAL | labs.scale.com/leaderboard, github.com/scaleapi/swe-bench-pro | SWE-bench Pro (1865 tasks), HLE |
-| SWE-bench (canonical) | swebench.com, github.com/SWE-bench/experiments | SWE-bench Verified, full SWE-bench |
-| LiveCodeBench | livecodebench.github.io/leaderboard.html, livecodebench.com | LCB v6 contamination-free |
-| Terminal-Bench | tbench.ai/leaderboard, terminal-bench.io | TB2 agentic execution |
-| tau-bench | tau-bench.dev | tau2 agentic API-use |
-| Aider Polyglot | aider.chat/docs/leaderboards | aider (warn: stale since Nov 2025) |
-| MCP-Atlas | mcp-atlas.dev | mcpA tool-chain quality |
-| Artificial Analysis | artificialanalysis.ai/leaderboards/models | aaIdx, aaCoding, aaAgentic, throughput, pricing |
-| Vellum | vellum.ai/llm-leaderboard | sweV (independent), gpqa, cost+latency |
-| llm-stats.com | llm-stats.com | broad catalog, ad-monetized |
-| LMArena | lmarena.ai (formerly chat.lmsys.org) | blind human preference |
-| LiveBench | livebench.ai | contamination-resistant rotating evals |
-| Berkeley BFCL | gorilla.cs.berkeley.edu/leaderboard.html | function-calling v3/v4 |
-| BigCodeBench | bigcode-bench.github.io, huggingface.co/spaces/bigcode/bigcode-models-leaderboard | code generation gold standard |
-| EvalPlus | evalplus.github.io/leaderboard.html | HumanEval+ / MBPP+ rigorous |
-| HF Open LLM Leaderboard | huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard | open-weight canonical aggregation |
-| Klu.ai | klu.ai/llm-leaderboard | broader benchmark aggregator |
-| Papers with Code | paperswithcode.com/area/code-generation | peer-reviewed leaderboards |
-| arXiv | arxiv.org | original benchmark papers |
-| BenchLM | benchlm.ai | verified vs provisional transparency |
-| AgentBench | agentbench.ai | multi-domain agentic |
-| MathArena | matharena.ai | AIME math reasoning (auxiliary) |
-| Vals.ai | vals.ai/benchmarks | enterprise-gated benchmark sets |
-| LMMarketCap | lmmarketcap.com | hourly market table (scrape) |
+### Procedural rules (HOW to use the whitelist)
 
-### I-tier — Pricing/availability (provider listings, multi-provider critical)
-| Source | URL | Extracts |
-|--------|-----|----------|
-| OpenRouter | openrouter.ai, openrouter.ai/<author>/<model> | provider count, uptime%, alt pricing, throughput |
-| Together AI | api.together.ai/models, together.ai/models | quant variants, $/1M, batch tier |
-| Fireworks AI | fireworks.ai/models | tier, throughput, batch pricing |
-| DeepInfra | deepinfra.com/models | $/1M tok, throughput |
-| Groq | console.groq.com/docs/models, groq.com/pricing | extreme-fast inference rates, pricing |
-| Cerebras | inference-docs.cerebras.ai, cerebras.ai/inference | ultra-fast inference |
-| SambaNova Cloud | cloud.sambanova.ai/models | catalog, throughput |
-| Replicate | replicate.com/<owner>/<model> | open-weights hosting, $/sec |
-| Lepton AI | lepton.ai/pricing | enterprise pricing |
-| Novita AI | novita.ai/model-api | catalog + pricing |
-| SiliconFlow | siliconflow.cn/models | Chinese providers (Qwen/DeepSeek/MiMo critical) |
-| Anyscale | anyscale.com/endpoints | enterprise endpoints |
-| Cloudflare Workers AI | developers.cloudflare.com/workers-ai/models | edge regions, free tier |
-| AWS Bedrock | aws.amazon.com/bedrock | enterprise + region matrix |
-| Azure AI Foundry | ai.azure.com/explore/models | enterprise + region |
-| HF Inference Endpoints | huggingface.co/<author>/<model> | author canonical card |
-| OpenCode Zen / Go | opencode.ai/docs/zen, opencode.ai/docs/go | edge endpoints, latency |
-| Lambda Cloud | lambda.ai/inference | enterprise throughput |
-| Tensorix | tensorix.ai | infrastructure / niche frontier hosting |
+1. When `trusted_sources_only=true` (default for full/specific/deep-fetch), the agent MUST NOT fetch URLs outside the whitelist. If a value cannot be found there, emit `gaps[]` with `triedSources: [<urls>]` — do NOT fall back to open web search.
 
-### I-tier — Local/quant (GGUF + VRAM)
-| Source | URL | Extracts |
-|--------|-----|----------|
-| Ollama Library | ollama.com/library, ollama.com/library/<id> | tags, pullCount, architecture, params, license, releasedISO |
-| HuggingFace Unsloth | huggingface.co/unsloth, huggingface.co/unsloth/<model>-GGUF | UD dynamic quants |
-| HuggingFace bartowski | huggingface.co/bartowski | most active quant maintainer |
-| HuggingFace mradermacher | huggingface.co/mradermacher | high-quality quants |
-| HuggingFace lmstudio-community | huggingface.co/lmstudio-community | LM Studio curated GGUFs |
-| LM Studio | lmstudio.ai/models | catalog |
-| llama.cpp | github.com/ggerganov/llama.cpp/discussions | empirical VRAM data |
-| MLX (Apple) | huggingface.co/mlx-community | mlx-quantized variants |
-| vLLM | docs.vllm.ai/en/latest/models/supported_models | server-side support matrix |
-| sglang | github.com/sgl-project/sglang | structured-output throughput |
-| llmfit (local) | data/external/llmfit-hf-models.json | 148-model HF curated DB (read first!) |
-| llmfit (upstream) | github.com/AlexsJones/llmfit | authoritative source |
+2. Tier weights for `trustScore`: **I=1.0** (leaderboards, aggregators, local-runtime catalogs), **S=0.7** (vendor URLs from `vendors.<vendor>.urls.*`), **C=0.4** (community blogs — only when no I/S source carries the value), **U=never written** (forum/social signal only).
 
-### S-tier — Vendor official
+3. Per-phase URL selection from whitelist:
+   - **Phase 0 lineup discovery**: iterate `vendors.<vendor>.urls.lineup` for every vendor entry; parallel single-message dispatch
+   - **Phase 1 leaderboard mining**: select 5-7 entries from `leaderboards[]` where `phase=='leaderboard'` (those flagged for multi-model batch extraction)
+   - **Phase 2 multi-provider pricing mining**: select 5-7 entries from `aggregators[]` where `phase=='pricing'`
+   - **Phase 3 per-model targeted**: per-model fallback from `vendors.<vendor>.urls.{news,docs,model_pages}` + `local[]` (when applicable) + one specific leaderboard for missing bench
 
-Vendor URLs are listed canonically in **`SKILL.md → VENDOR_LINEUP_SOURCES`** (used both for Phase 0 lineup discovery and S-tier per-model fallback). The agent treats every URL in that table as S-tier (vendor self-report, weight 0.7); if a vendor publishes a separate pricing page distinct from its docs page, both are valid S-tier sources for the same model. README's "Data Sources" section is the user-facing presentation of this same list.
+4. Vendor URL bundles per vendor live under `vendors.<vendor>.urls.{lineup, news, docs, pricing, model_pages, models}` — each is S-tier when emitted. Both the lineup URL AND any separate pricing/blog URL are valid S-tier sources for the same model.
 
-### C-tier — Aggregator/blog (only when 0 I/S source available for a value)
-| Source | URL |
-|--------|-----|
-| llm-stats.com | llm-stats.com |
-| ApiDog Blog | apidog.com/blog |
-| The Decoder | the-decoder.com |
-| DataCamp Blog | datacamp.com/blog |
-| Build Fast With AI | buildfastwithai.com |
-| Simon Willison | simonwillison.net |
-| Latent Space | latent.space |
-| Swyx | swyx.io |
-| Awesome-LLM lists | github.com/Hannibal046/Awesome-LLM, github.com/horseee/Awesome-Efficient-LLM |
-| r/LocalLLaMA | reddit.com/r/LocalLLaMA (community VRAM reports) |
-| Design Arena | designarena.ai/leaderboard (UI/design auxiliary) |
+5. C-tier sources from `community[]` are only emitted when the agent has tried every vendor + leaderboard + aggregator option for the (modelId, field) pair AND found nothing — they are last-resort, not mid-tier.
 
-### U-tier — Forum/social (NEVER written to data; cross-check signal only)
-- Reddit (general), Twitter/X, Hacker News, Discord servers
+The agent receives the loaded whitelist as a single JSON blob in `idea_context.sourcesWhitelist`. No URL appears in this spec file outside this procedural description.
 
 ## TRUST_SCORE_FORMULA
 
@@ -192,31 +121,19 @@ total_webfetch ≤ 70               // skill-level WebFetch budget (≈14 phase-
 ```
 If budget hit → STOP, return JSON with whatever gathered, list incomplete models in `gaps[]`.
 
-### Phase 1 — Leaderboard mining (single-message parallel, 5-6 fetches)
+### Phase 1 — Leaderboard mining (single-message parallel, 5-7 fetches)
 Mine multi-model tables once; extract scores for all relevant models in one pass.
-- artificialanalysis.ai/leaderboards/models — aaIdx, aaCoding, aaAgentic, throughput, pricing for ~336 models
-- labs.scale.com/leaderboard — swePro standardized
-- livecodebench.github.io/leaderboard.html — lcbV6
-- vellum.ai/llm-leaderboard — sweV (independent), gpqa, pricing
-- benchlm.ai/coding — verified-only sweV/swePro/tb2
-- lmarena.ai — blind preference (broad coverage)
-- livebench.ai — contamination-resistant
+URLs: select from `idea_context.sourcesWhitelist.leaderboards[]` (filter `phase=='leaderboard'`). Top picks by coverage breadth: Scale SEAL, LiveCodeBench, Vellum, Artificial Analysis, BenchLM, LMArena, LiveBench.
 
 ### Phase 2 — Multi-provider pricing mining (single-message parallel, ≤6 fetches)
-Mine inference aggregators for the new pricing.api[] schema:
-- openrouter.ai/models (full catalog) — provider count, uptime, alt pricing
-- together.ai/models — quant variants, batch tier
-- fireworks.ai/models — tier, throughput
-- deepinfra.com/models — $/1M
-- groq.com/pricing — extreme-fast tier
-- siliconflow.cn/models — Chinese providers (Qwen/DeepSeek/MiMo)
-- ollama.com/library — pullCount, tags, params, license, releasedISO
+Mine inference aggregators for the `pricing.api[]` array schema.
+URLs: select from `idea_context.sourcesWhitelist.aggregators[]` (filter `phase=='pricing'`) + Ollama (from `local[]` when local models in scope). Prioritize: OpenRouter (provider count + uptime), Together, Fireworks, DeepInfra, Groq, SiliconFlow (for Chinese-vendor pricing).
 
 ### Phase 3 — Per-model targeted fill (≤3 fetches per gap-model, parallel across 5 models)
 For models that ended Phase 1+2 with <2 bench cells filled OR with missing pricing/context/license:
-- Vendor official model card (from S-tier list)
-- HuggingFace canonical card
-- Specific leaderboard for missing bench (from I-tier list)
+- Vendor URL bundle from `idea_context.sourcesWhitelist.vendors.<vendor>.urls.*`
+- HuggingFace card (search vendors[].urls.models or `huggingface.co/<author>/<model>`)
+- Specific leaderboard for the missing bench from `leaderboards[]`
 
 ### Per-row extraction discipline
 For each fetched table page, extract every row matching a model in `idea_context.currentIds` via:

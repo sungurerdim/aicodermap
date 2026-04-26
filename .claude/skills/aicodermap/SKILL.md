@@ -18,6 +18,7 @@ Orchestrate AI coding LLM tracker updates: discover **official vendor lineup** �
 - i18n: `i18n/{tr,en}.json`
 - Live URL: `https://sungurerdim.github.io/aicodermap/`
 - **Known-gaps registry:** `data/known-gaps.json` — vendor opt-outs, not-applicable benchmarks, out-of-scope variants. Agent skips these during exhaustive mining; UI surfaces them as "vendor opt-out" / "not applicable" markers instead of generic "—". When the agent prompt is built, `known-gaps.json` MUST be included in the agent context.
+- **Sources whitelist:** `data/sources-whitelist.json` — single source of truth for every URL the research agent is allowed to fetch (vendors / leaderboards / aggregators / local-runtime catalogs / registries / community). Skill loads this and injects it into `idea_context.sourcesWhitelist` for every agent run. Agent NEVER hardcodes URLs.
 
 ## ARGS
 | arg | scope | model | typical_duration |
@@ -47,7 +48,7 @@ Orchestrate AI coding LLM tracker updates: discover **official vendor lineup** �
 
 1. Read data/{models,sources,known-gaps}.json + lineup result from Step 0
 2. Parse arg → resolve scope + target_model_ids
-3. Build idea_context (DATA-DRIVEN — never hardcode model lists):
+3. Build idea_context (DATA-DRIVEN — agent never hardcodes data, only procedure):
    {
      title: "AICoderMap",
      total_models: <count from data/models.json>,
@@ -55,9 +56,13 @@ Orchestrate AI coding LLM tracker updates: discover **official vendor lineup** �
      currentIds: [<every id in data/models.json, including status='deprecated'>],
      familyGrouping: <models grouped by (provider, tier) for parallel batches>,
      knownGaps: <inline data/known-gaps.json>,
+     sourcesWhitelist: <inline data/sources-whitelist.json>,
      lineup: <Step 0 result>
    }
-   The agent NEVER hardcodes model IDs in its prompt. data/models.json is SSOT for "what we track".
+   - `data/models.json` is SSOT for "what models we track"
+   - `data/sources-whitelist.json` is SSOT for "what URLs the agent is allowed to fetch"
+   - `data/known-gaps.json` is SSOT for per-pair skip rules
+   - The agent file (.claude/agents/aicodermap-research-agent.md) only carries PROCEDURE (how) — every list of URLs, vendors, or model IDs lives in data files
 4. Agent({
      subagent_type: "aicodermap-research-agent",
      model: "sonnet",
@@ -155,30 +160,14 @@ SINGLE_ARTIFACT_PATH            = ".aicodermap-agent-out.json"  // ONE artifact,
 
 ## VENDOR_LINEUP_SOURCES (Step 0 — official "what models exist now")
 
-Authoritative pages for the lineup discovery phase. Each must be fetched on `refresh-all` and `lineup-sync`.
+The vendor URL list is canonical in **`data/sources-whitelist.json`** under `vendors.<vendor>.urls.lineup`. Every entry there with a `lineup` URL is fetched on `refresh-all` and `lineup-sync`.
 
-| Vendor | URL | Extracts |
-|--------|-----|----------|
-| Anthropic | docs.claude.com/en/docs/about-claude/models | Active model IDs, deprecation dates |
-| OpenAI | platform.openai.com/docs/models | Active models + deprecation table |
-| Google DeepMind | ai.google.dev/gemini-api/docs/models | Gemini active list |
-| Mistral | docs.mistral.ai/getting-started/models/models_overview | Mistral + Devstral + Codestral lineup |
-| DeepSeek | api-docs.deepseek.com/api/list-models | Active API model IDs |
-| xAI | docs.x.ai/docs/models | Grok active models |
-| Alibaba (Qwen) | qwenlm.github.io/blog + huggingface.co/Qwen | Qwen series |
-| Moonshot (Kimi) | platform.moonshot.cn/docs | Kimi K-series |
-| Z.ai (GLM) | docs.z.ai/api-reference | GLM active list |
-| Xiaomi (MiMo) | xiaomimimo.github.io | MiMo series |
-| MiniMax | platform.minimaxi.com/document | M-series |
-| Nvidia | build.nvidia.com (NIM catalog) | Nemotron variants |
-| Meta (Llama) | huggingface.co/meta-llama | Released Llama models |
-| Google (Gemma) | huggingface.co/google + ai.google.dev/gemma | Gemma releases |
-| StepFun | stepfun.com | Step series |
+The skill iterates `sourcesWhitelist.vendors` and dispatches one parallel fetch per vendor.lineup URL. New vendors are added by editing `data/sources-whitelist.json` only — never by editing this spec.
 
-Lineup return shape:
+Lineup return shape (per vendor):
 ```json
 {
-  "vendorId": {
+  "<vendorId>": {
     "active": [{ "id": "<official-id>", "name": "...", "released": "YYYY-MM-DD", "context": <int>, "open": <bool> }],
     "deprecated": [{ "id": "...", "deprecationDate": "YYYY-MM-DD", "successor": "<id>?" }],
     "renamed": [{ "from": "<old-id>", "to": "<new-id>", "evidenceUrl": "..." }]
