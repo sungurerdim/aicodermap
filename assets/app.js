@@ -16,8 +16,8 @@ const BENCH_KEYS = [
   'aaIdx',
   'swePro', 'sweV', 'sweMulti',
   'lcbV6', 'tb2',
-  'tau2', 'mcpA', 'aaCoding', 'aaAgentic',
-  'gpqa', 'hle', 'aider'
+  'tau2', 'mcpA', 'bfcl', 'aaCoding', 'aaAgentic',
+  'gpqa', 'aime26', 'hle', 'aider', 'aaOmni'
 ];
 
 const DEFAULT_WEIGHTS = {

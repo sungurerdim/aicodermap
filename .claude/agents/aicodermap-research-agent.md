@@ -259,7 +259,7 @@ No pair is ever pre-skipped. Every (modelId, benchKey) pair currently null in da
           ]
         },
 
-        "bench"?: { swePro?:n, sweV?:n, tb2?:n, lcbV6?:n, aider?:n, tau2?:n, aaCoding?:n, aaAgentic?:n, mcpA?:n, gpqa?:n, sweMulti?:n, hle?:n, aaIdx?:n },
+        "bench"?: { swePro?:n, sweV?:n, tb2?:n, lcbV6?:n, aider?:n, tau2?:n, aaCoding?:n, aaAgentic?:n, mcpA?:n, bfcl?:n, aime26?:n, aaOmni?:n, gpqa?:n, sweMulti?:n, hle?:n, aaIdx?:n },
 
         "providers"?: number,
         "uptime"?: number,
