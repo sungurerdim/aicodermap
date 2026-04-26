@@ -1079,3 +1079,21 @@ body.exporting { background: var(--bg); }
   font-size: 0.9em;
 }
 .prov-link:hover { opacity: 1; }
+
+/* Inline GPU status note (sits next to the auto-detect select) */
+.muted-note.inline {
+  display: inline-block;
+  margin-left: var(--space-2);
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-style: italic;
+}
+.muted-note.inline:empty { display: none; }
+
+#filters-reset {
+  margin-left: auto;
+}
+#filter-gpu-select option:disabled {
+  color: var(--muted);
+  font-style: italic;
+}

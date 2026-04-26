@@ -104,6 +104,7 @@
   <section id="filters" class="card section-card" data-export-section="filters" aria-labelledby="filters-heading">
     <header class="section-head">
       <h2 id="filters-heading" data-i18n-key="ui.section.filters">Filters</h2>
+      <button id="filters-reset" class="btn btn-ghost" type="button" data-i18n-key="ui.filter.reset">Reset filters</button>
     </header>
 
     <div class="filters-grid">
@@ -128,6 +129,7 @@
             <option value="auto" data-i18n-key="ui.filter.gpuAuto">Auto-detect</option>
             <!-- options populated by app.js -->
           </select>
+          <small id="gpu-status" class="muted-note inline" aria-live="polite"></small>
         </label>
         <label class="number-row">
           <span data-i18n-key="ui.filter.gpuOverride">Manual VRAM</span>
@@ -150,8 +152,6 @@
         <span data-i18n-key="ui.filter.openOnly">Open weights only</span>
       </label>
     </div>
-
-    <p id="gpu-status" class="muted-note" aria-live="polite"></p>
   </section>
 
   <section id="table" class="section-card" aria-labelledby="table-heading">

@@ -1164,11 +1164,31 @@ function effectiveVram(info) {
 
 function updateGpuStatus() {
   const status = document.getElementById('gpu-status');
-  if (!status) return;
+  const sel = document.getElementById('filter-gpu-select');
+  if (!status || !sel) return;
+
+  const autoOpt = sel.querySelector('option[value="auto"]');
+  const detected = State.detectedGpu;
+
+  // Disable auto-detect when no detection is available
+  if (autoOpt) {
+    if (detected && Number.isFinite(detected.vram)) {
+      autoOpt.disabled = false;
+      autoOpt.title = `${detected.id || detected.raw || ''} (~${detected.vram} GB)`;
+    } else {
+      autoOpt.disabled = true;
+      autoOpt.title = t('ui.filter.gpuAutoUnavailable') || 'Auto-detect unavailable in this browser';
+      // If currently selected and unavailable, fall back to manual VRAM hint state
+      if (sel.value === 'auto') sel.value = '';
+    }
+  }
+
   if (State.vram == null) {
-    status.textContent = State.selectedGpu === 'auto' ? t('ui.errors.webgpuUnsupported') : '';
+    status.textContent = autoOpt && autoOpt.disabled
+      ? (t('ui.filter.gpuAutoUnavailable') || 'Auto-detect unavailable')
+      : '';
   } else {
-    status.textContent = `VRAM: ~${State.vram} GB`;
+    status.textContent = `~${State.vram} GB`;
   }
 }
 
@@ -1233,6 +1253,35 @@ function wireEvents() {
   });
 
   // Reset
+  const filtersReset = document.getElementById('filters-reset');
+  if (filtersReset) {
+    filtersReset.addEventListener('click', () => {
+      const search = document.getElementById('filter-search');
+      const deployment = document.getElementById('filter-deployment');
+      const gpuSel = document.getElementById('filter-gpu-select');
+      const vramOverride = document.getElementById('filter-vram-override');
+      const tier = document.getElementById('filter-tier');
+      const openOnly = document.getElementById('filter-open-only');
+      if (search) search.value = '';
+      if (deployment) deployment.value = 'all';
+      if (vramOverride) vramOverride.value = '';
+      if (tier) tier.value = 'all';
+      if (openOnly) openOnly.checked = false;
+      // GPU: prefer 'auto' if detection works, else first available manual GPU, else empty
+      if (gpuSel) {
+        const autoOpt = gpuSel.querySelector('option[value="auto"]');
+        if (autoOpt && !autoOpt.disabled) gpuSel.value = 'auto';
+        else gpuSel.selectedIndex = 0;
+      }
+      State.filters = { search: '', deployment: 'all', tier: 'all', openOnly: false };
+      State.selectedGpu = gpuSel ? gpuSel.value : 'auto';
+      resolveGpuVram();
+      updateGpuStatus();
+      saveState();
+      renderAll();
+    });
+  }
+
   document.getElementById('weights-reset').addEventListener('click', () => {
     resetWeights();
     syncPresetSelect();
