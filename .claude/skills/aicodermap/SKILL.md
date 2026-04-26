@@ -370,88 +370,55 @@ for each model in data/models.json:
 A passing self-check is the gate for printing git commands at Step 12.
 
 ## ERRORS
-| condition | action |
+
+Per-step error handling lives in **SILENT_FAIL_PREVENTION** above (single source). Cross-cutting failure modes not tied to a specific step:
+
+| Condition | Action |
 |-----------|--------|
-| Agent timeout/HTTP fail | retry 1× → fallback narrower-scope re-prompt → write partial |
-| Agent return invalid JSON | log to ~/.aicodermap-debug.log, retry 1× with stricter delivery contract reinforcement |
-| coverage < COVERAGE_DEEPEN_THRESHOLD | **trigger deep-fetch loop (NOT a block)**; if still <COVERAGE_PARTIAL_WARN after cycles, write + CHANGELOG warning |
-| refresh-all family count < FAMILY_BASELINE_MIN | block: list missing families per MODEL_FAMILIES, options: [A]re-research with explicit family list [B]force-override (mark gaps[]) |
-| RED contradiction (>5pp) | **auto-resolve via trustScore (NOT manual prompt)**; log all candidates loudly to CHANGELOG |
-| Lineup discovery: REMOVED entry | move to data/archive/, append to CHANGELOG ### Removed |
-| Lineup discovery: RENAMED with single-source-only | leave id unchanged, emit gaps[] entry, surface in diff |
-| User decline at step 9 | restore from .bak, no commit |
-| Git push fail (conflict) | prompt "git pull --rebase first" |
-| Pages deploy >5min | suggest githubstatus.com check |
+| Agent return invalid JSON | log to `~/.aicodermap-debug.log`, retry 1× with stricter delivery contract; on second fail halt with the raw return |
+| `refresh-all` family count < `FAMILY_BASELINE_MIN` | halt with the missing-family list; orchestrator either re-runs with explicit families or marks `gaps[]` |
+| User decline at Step 9 | restore from `.bak`, no commit |
+| Git push conflict | prompt user "git pull --rebase first"; do NOT force-push |
 
 ## OUTPUT_TEMPLATE_SUCCESS
 ```
 🚀 AICoderMap update | scope:<scope> | last_refresh:<n>d ago (M5 ≤14d ✓)
-📋 Lineup sync: <new>+<deprecated>+<renamed>+<removed> changes detected
-🤖 Agent → sonnet | trusted-source whitelist | parallel:5 | budget:6×90s/model | ETA ~<n>min
+📋 Lineup sync: <new>+<deprecated>+<renamed>+<removed>
+🤖 Agent → sonnet | parallel:5 | budget:6×90s/model | cycle:<n>/5
 
-✓ Return: confidence:<HIGH|MED|LOW> | <n_updated> updated | <n_new> new | <n_yellow>Y/<n_red>R contradictions auto-resolved | coverage:<%>
+✓ Return: confidence:<HIGH|MED|LOW> | <n_updated> updated | <n_new> new
+          | <n_resolved> contradictions auto-resolved | coverage:<%>
 
 📋 Diff:
   <model_id>:
-    <field>: <old> → <new> (Δ <delta>) [✓ trust=<score> | ⚠ over <loser>:trust=<score>]
+    <field>: <old> → <new> (Δ <delta>) [trust=<score>]
   <new_model_id> (NEW): <summary>
   <deprecated_id> (DEPRECATED): successor=<id?>
   <renamed_id> (RENAMED): <old> → <new>
 
 ✓ Wrote: data/models.json (<n>upd+<n>add+<n>renamed+<n>deprecated)
-✓ Wrote: data/sources.json (<n> entries with trustScore)
+✓ Wrote: data/sources.json (<n> entries)
 ✓ Wrote: i18n/{tr,en}.json (<n> entries)
-✓ Appended: CHANGELOG.md ## <date>
+✓ Appended: CHANGELOG.md
 
-📦 Run:
-  git add data/ i18n/ CHANGELOG.md
-  git commit -m "data: <description>"
-  git push
-
+✓ Pushed: <commit-hash> → main
 ⏳ Pages deploy ~90s...
 ✓ Live: <url> | M5: <n>d ago (≤14d ✓)
 ```
 
 ## SUBCOMMANDS
-### `lineup-sync` (Step 0 only — fast lineup audit)
-Agent runs only the LINEUP DISCOVERY phase. Output: vendor diff (NEW/DEPRECATED/RENAMED/REMOVED) without bench/pricing survey. Useful for weekly lineup audits.
 
-### `validate` (no fetch)
-Read data/sources.json → compute coverage, list contradictions awaiting auto-resolve, check stale entries.
+| Arg | Action |
+|-----|--------|
+| `lineup-sync` | Phase 0 only — vendor diff (NEW/DEPRECATED/RENAMED/REMOVED) without bench/pricing survey |
+| `validate` (no fetch) | Read `data/sources.json` → compute coverage + list contradictions + stale entries |
+| `stale-check` | List `data/models.json` entries with `today - lastUpdated > STALE_DAYS` |
+| `changelog` | tail -50 CHANGELOG.md → last 5 release entries |
 
-### `stale-check`
-Iterate data/models.json → list entries with `(today - lastUpdated) > STALE_DAYS`.
+## INVARIANTS (cross-cutting rules; specifics live in their canonical sections above)
 
-### `changelog`
-tail -50 CHANGELOG.md → parse last 5 release entries.
-
-## DISCIPLINES
-- **Lineup-first** — every refresh-all begins with Step 0 vendor lineup discovery; the survey is driven by the discovered lineup, not by stale data state
-- **Auto-push** — Step 12 runs `git add+commit+push` automatically on a clean self-check; user is never prompted to copy-paste git commands
-- **Autonomous resolution** — coverage triggers deeper research (not a block); contradictions auto-resolve via trustScore (not user prompts); rename + deprecate auto-execute when ≥2 sources verify
-- **Schema-complete merge** — every refresh applies MERGE_RULES to ALL whitelisted fields, including pricing.api[] array, pricing.subscription[] array, status field. Self-check before commit
-- **Trust scoring** — every value in data/sources.json carries a computed trustScore; contradictions resolved via argmax(trustScore)
-- **Independent-source canonical** — I-tier > S-tier > C-tier > U-tier (never written); see TRUST_SCORE_FORMULA
-- **Multi-provider pricing** — pricing.api is an array of provider entries; UI shows per-provider in card, range in table
-- **Lifecycle states** — active/deprecated/archived with auto-transitions on grace period
-- **Agent delivery contract** — agent returns JSON as final text message (no narration, no file write)
-- **Trusted-source whitelist** — agent fetches only from FETCH_WHITELIST; per-model budget 6 fetches × 90s
-- **M5 ≤14 day discipline** (Aider 5-month-stale antipattern defense)
-- NO GitHub Actions / CI / workflows (manual only)
-- NO external monitoring (GitHub Insights Traffic = M1 source)
-- Project-scoped: skill+agent only in `D:\GitHub\aicodermap\` session
-
-## E2E_TEST_MATRIX
-| test | trigger | pass |
-|------|---------|------|
-| invoke | `/aicodermap` | menu <1s |
-| lineup_sync | `/aicodermap lineup-sync` | vendor diff <2min, no bench fetch |
-| delegate | `/aicodermap model <id>` | agent start <5s, sonnet |
-| coverage_deepen | force <0.95 | auto-trigger deep-fetch, no user prompt |
-| red_auto_resolve | mock 7pp delta | trustScore winner written, no user prompt, CHANGELOG logged |
-| schema_migration | run on legacy flat-pricing model | auto-migrate to array, self-check passes |
-| deprecated_transition | mock vendor-deprecated entry | status="deprecated" + UI gray-out |
-| renamed_auto | mock rename ≥2-source verified | auto-rename, archive old, CHANGELOG ### Renamed |
-| diff_render | post-refresh | full markdown table with trustScore column |
-| atomic | decline mid-write | data/* unchanged, .bak preserved |
-| deploy_verify | post-push 90s | live URL 200 + schema valid |
+- **Procedure vs data**: spec files (this file + agent.md) carry HOW; data files carry WHAT (model roster, source URLs, known gaps, GPU DB). Spec never hardcodes IDs/URLs.
+- **No silent fails**: every step has an explicit success criterion (see SILENT_FAIL_PREVENTION); failure halts with diagnostic, never proceeds quietly with partial data.
+- **No GitHub Actions / CI / workflows** (manual orchestration is the contract).
+- **M5 ≤14-day freshness gate** (Aider 5-month-stale antipattern defense).
+- **Project-scoped**: skill + agent only in `D:\GitHub\aicodermap\` session.
