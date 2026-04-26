@@ -46,7 +46,6 @@ idea_context: {
   total_models: <n>,
   last_refresh: <iso>,
   currentIds: <string[]>,
-  knownGaps: <object — passed inline from data/known-gaps.json>
 }
 target_model_ids: <string[] | required for 'specific' or 'deep-fetch'>
 target_field: <string | required for 'deep-fetch'>
@@ -89,7 +88,7 @@ Canonical definition lives in **`SKILL.md → TRUST_SCORE_FORMULA`** (single sou
 The agent NEVER hardcodes model IDs. The actual roster is derived at runtime from:
 1. **`data/models.json`** — every active/deprecated entry the project currently tracks (single source of truth for "what models exist in our dataset")
 2. **Phase 0 lineup discovery** — vendor docs surface NEW models, RENAMED ids, DEPRECATED entries, REMOVED entries
-3. **`data/known-gaps.json`** — per-pair skip list (vendor opt-out / not-applicable / out-of-scope)
+3. (No skip registry — every pair is tested every cycle so closing gaps surface immediately)
 
 The skill passes `idea_context.currentIds` (the full id list from `data/models.json`) into every agent run. The agent groups them by `(provider, tier)` for parallel batch dispatch.
 
@@ -197,7 +196,7 @@ For each match, record:
 Phase 1+2 values are tier=I. Per VALIDATION_RULES rule 7, these have higher trustScore than S-tier provider self-reports for the same `(modelId, benchKey)`. Both sources still appear in `sourcesAdded[]` for provenance. The skill's Step 7 will pick the winner via argmax(trustScore) at merge time.
 
 ### Known-gaps skip
-Read `idea_context.knownGaps` BEFORE Phase 1. For every entry whose `recheckAfter` has not passed, do NOT search for that `(modelId, benchKey)` in any phase. Do not emit `gaps[]` for them.
+No pair is ever pre-skipped. Every (modelId, benchKey) pair currently null in data/models.json gets a fetch attempt. When all whitelist sources for a pair have been tried and none carry the value, emit a `gaps[]` entry with `triedSources` — this is informational for the next cycle (which still re-tries), never a permanent skip.
 
 ## OUTPUT_SCHEMA (NEW — multi-provider pricing array)
 ```jsonc

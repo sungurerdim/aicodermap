@@ -181,23 +181,14 @@ async function fetchJson(path) {
 }
 
 async function loadData() {
-  const [models, sources, gpu, knownGaps] = await Promise.all([
+  const [models, sources, gpu] = await Promise.all([
     fetchJson('./data/models.json'),
     fetchJson('./data/sources.json'),
-    fetchJson('./data/gpu-database.json'),
-    fetchJson('./data/known-gaps.json').catch(() => ({}))
+    fetchJson('./data/gpu-database.json')
   ]);
   State.models = validateModels(models);
   State.sources = (sources && typeof sources === 'object') ? sources : {};
   if (gpu && typeof gpu === 'object') State.gpu = { ...State.gpu, ...gpu };
-  // known-gaps: drop the _schema metadata key, keep only `<modelId>.<benchKey>` entries
-  State.knownGaps = {};
-  if (knownGaps && typeof knownGaps === 'object') {
-    for (const [k, v] of Object.entries(knownGaps)) {
-      if (k === '_schema' || !v || typeof v !== 'object') continue;
-      State.knownGaps[k] = v;
-    }
-  }
 }
 
 /* ---------- composite score ---------- */
@@ -585,31 +576,12 @@ function fmtContext(n) {
 
 function buildBenchCell(model, key) {
   const score = model.bench?.[key];
-  // known-gaps registry — vendor opt-out, not-applicable, out-of-scope cells
-  const optOut = (score == null) ? (State.knownGaps?.[`${model.id}.${key}`] || null) : null;
   const cellClasses = ['bench-cell'];
-  if (score == null && !optOut) cellClasses.push('empty');
-  if (optOut) cellClasses.push('opt-out', `opt-out-${optOut.reason}`);
+  if (score == null) cellClasses.push('empty');
   const cell = el('div', { class: cellClasses.join(' ') });
   cell.appendChild(el('span', { class: 'name' }, t(`benchmarks.${key}.name`)));
-
-  let valueText, valueAria;
-  if (score != null) {
-    valueText = fmtScore(score);
-  } else if (optOut) {
-    // Compact glyph by reason; tooltip carries the human-readable note
-    const glyph = optOut.reason === 'vendor-opt-out' ? '🚫' : optOut.reason === 'not-applicable' ? '∅' : '–';
-    valueText = glyph;
-    valueAria = (t(`ui.optOut.${optOut.reason}`) || optOut.reason) + ': ' + (optOut.note || '');
-  } else {
-    valueText = '—';
-  }
+  const valueText = score != null ? fmtScore(score) : '—';
   const valueSpan = el('span', { class: 'value' }, valueText);
-  if (optOut) {
-    valueSpan.setAttribute('title', valueAria);
-    valueSpan.setAttribute('aria-label', valueAria);
-    valueSpan.classList.add('opt-out-value');
-  }
   cell.appendChild(valueSpan);
 
   const contradiction = contradictionFor(model.id, key);
