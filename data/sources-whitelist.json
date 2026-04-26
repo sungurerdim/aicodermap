@@ -491,14 +491,18 @@
       "extracts": "Active model IDs, deprecation dates, pricing, bench",
       "postSlugStrategy": "try_variations",
       "postSlugVariations": [
-        "claude-{id}",
+        "claude-{id_no_prefix}",
         "{id}"
       ],
       "postFormat": "image_embedded",
       "imageOCRPatterns": [
         "^https://www\\.anthropic\\.com/news/"
       ],
-      "lastVerifiedDate": "2026-04-27"
+      "lastVerifiedDate": "2026-04-27",
+      "vendorPrefixMap": {
+        "anthropic": "claude-",
+        "default": ""
+      }
     },
     "openai": {
       "name": "OpenAI",
