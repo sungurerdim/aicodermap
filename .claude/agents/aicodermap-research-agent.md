@@ -167,6 +167,24 @@ The single biggest source of data loss in prior runs: agent fetched a vendor ann
 
 4. Score → trustScore: page is vendor blog → S-tier; leaderboard → I-tier; community → C-tier (formula in SKILL.md).
 
+## IMAGE_OCR_FALLBACK (when bench data lives in PNG charts)
+
+Some vendor announcement pages (notably Anthropic, OpenAI, DeepMind) embed benchmark tables as PNG/JPG images rendered server-side. Page text contains 1-3 summary scores from the lead paragraph, but the embedded charts carry 5-15 additional numbers. Text-only extraction misses these.
+
+**Pipeline (skill-orchestrator-side, NOT agent — agent has no image fetch + Read; orchestrator does):**
+
+1. `scripts/extract-images.py <page-url1> [<page-url2> ...]` — fetches the page, extracts all `<img src=...>` URLs (incl. Next.js `_next/image` → underlying CDN URL via `url=` param decode), downloads each unique image to `.aicodermap-images/aicodermap-img-<sha8>.<ext>`, prints JSON map.
+2. Skill orchestrator (vision-aware Claude Code session) Reads each local image file. Read tool processes images via Claude vision and returns the chart's textual interpretation (titles + axis labels + per-bar values + legends).
+3. Orchestrator extracts `(model_name, score)` pairs from the vision output via the same alias table as text extraction (EXTRACTION_DISCIPLINE).
+4. Extracted values get S-tier provenance pointing at the page URL (vendor self-report).
+5. Orchestrator writes findings into `.aicodermap-agent-out.json` for normal merge.py flow.
+
+**Empirical finding (2026-04-26):** Anthropic announcement blog charts mostly carry vendor-AUXILIARY benchmarks (OfficeQA Pro, GraphWalks, ScreenSpot-Pro, GDPVal-AA Elo, Vending-Bench, STEM win-rate). Standard cross-vendor benches (SWE-bench Verified, GPQA, HLE, Terminal-Bench, LCB v6, tau-bench, MCP-Atlas) are typically in the page TEXT (lead summary) or on independent leaderboards, not these images. Image OCR is therefore most valuable for:
+- New-release auxiliary benchmarks the user wants tracked outside the 13-key schema
+- Edge cases where vendor publishes ONLY the chart and no text summary
+
+For the standard 13-key benches, prefer text extraction + leaderboards over image OCR.
+
 ## SPA_FALLBACK (when target page is JS-rendered)
 
 Some target pages render bench tables client-side; fetch returns mostly `<script>` bundles with little text. Detection: `len(text) / len(html) < 0.10` is the SPA tell.
