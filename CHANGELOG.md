@@ -2,6 +2,26 @@
 ## [2026-04-26] — autonomous refresh-all
 
 ### Updated
+- 18 models: `claude-haiku-4-5`, `gpt-4-1`, `gpt-5-4`, `gemini-3-1-flash`, `gemini-3-1-pro`, `o3`, `o4-mini`, `mistral-large-3`, `minimax-m2-5`, `mimo-v2-pro`, `mimo-v2-5-pro`, `mimo-v2-5`, `mimo-v2-flash`, `step-3-5-flash`, `nemotron-3-super`, `deepseek-v3-2`, `qwen3-coder-480b`, `glm-5-1`
+
+### Resolved (auto via trustScore)
+- gemini-3-1-pro.gpqa: winner=94.3 (severity=GREEN, Δ2.4)
+- gpt-5-4.swePro: winner=57.7 (severity=GREEN, Δ1.4)
+
+### Gaps (8 entries — see data/known-gaps.json or next refresh)
+- `claude-haiku-4-5.swePro`: Not on SEAL board
+- `claude-haiku-4-5.lcbV6`: No LCB v6 score for Haiku 4.5
+- `gpt-4-1.swePro`: Non-reasoning model; no SWE-bench Pro published
+- `o3.swePro`: o3 predates SWE-bench Pro
+- `o4-mini.swePro`: No SWE-bench Pro for o4-mini
+- `mistral-large-3.swePro`: No SEAL submission for Mistral Large 3
+- `qwen3-coder-30b.bench`: Only 480B variant has published bench
+- `minimax-m2-5.pricing`: M2.5 pricing not in standard per-1M format
+
+
+## [2026-04-26] — autonomous refresh-all
+
+### Updated
 - 7 models: `claude-haiku-4-5`, `gemini-3-1-flash`, `nemotron-3-super`, `minimax-m2-7`, `mimo-v2-pro`, `step-3-5-flash`, `qwen3-coder-480b`
 
 ### Gaps (11 entries — see data/known-gaps.json or next refresh)
