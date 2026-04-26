@@ -178,6 +178,52 @@ def format_consistency_warn(source_entry, wl_idx):
     return None
 
 
+def validate_gaps(out):
+    """GAP_VALIDITY_GATE per agent spec (2026-04-27).
+
+    Every gaps[] entry MUST carry triedSources>=2 + triedQueries>=2 + triedFormats>=2.
+    Entries failing the gate are fabricated (agent emitted "no data" without
+    attempting). They are stripped from out.gaps[] so they don't pollute the
+    next-cycle retry queue, logged loudly, and counted under
+    runtime.contractViolations so the violation surfaces in the diff summary.
+
+    Returns: list of stripped fabricated-gap descriptors for caller logging.
+    """
+    raw = out.get("gaps", []) or []
+    valid = []
+    fabricated = []
+    for g in raw:
+        ts = g.get("triedSources") or []
+        tq = g.get("triedQueries") or []
+        tf = g.get("triedFormats") or []
+        ts_n, tq_n, tf_n = len(ts), len(tq), len(tf)
+        # Permissive: accept if at least one effort signal has >=2 entries.
+        # Strict: require triedSources>=2 (the load-bearing one for "I tried").
+        if ts_n < 2:
+            fabricated.append(
+                {
+                    "modelId": g.get("modelId"),
+                    "field": g.get("field"),
+                    "reason": g.get("reason"),
+                    "counts": {
+                        "triedSources": ts_n,
+                        "triedQueries": tq_n,
+                        "triedFormats": tf_n,
+                    },
+                }
+            )
+        else:
+            valid.append(g)
+    out["gaps"] = valid
+    runtime = out.setdefault("runtime", {})
+    if fabricated:
+        runtime["contractViolations"] = runtime.get("contractViolations", 0) + len(
+            fabricated
+        )
+        runtime.setdefault("fabricatedGaps", []).extend(fabricated)
+    return fabricated
+
+
 def append_source(sources, key, entry):
     if key not in sources:
         sources[key] = []
@@ -196,6 +242,8 @@ def append_source(sources, key, entry):
 def main():
     with open(ARTIFACT, encoding="utf-8") as fp:
         out = json.load(fp)
+
+    fabricated_gaps = validate_gaps(out)
 
     models_path = f"{PROJECT}/data/models.json"
     sources_path = f"{PROJECT}/data/sources.json"
@@ -218,6 +266,7 @@ def main():
         "sources_appended": 0,
         "format_warnings": [],
         "gaps": [],
+        "fabricated_gaps": fabricated_gaps,
     }
 
     for upd in out.get("models", []):
@@ -407,6 +456,19 @@ def main():
             print(f"    - {w}")
         if len(log["format_warnings"]) > 5:
             print(f"    - ... and {len(log['format_warnings']) - 5} more")
+    if log.get("fabricated_gaps"):
+        n = len(log["fabricated_gaps"])
+        print(
+            f"  fabricated gaps stripped: {n} (agent claimed 'no data' without "
+            f"triedSources>=2 — see GAP_VALIDITY_GATE)"
+        )
+        for fg in log["fabricated_gaps"][:6]:
+            print(
+                f"    - {fg['modelId']}.{fg['field']}: "
+                f"triedSources={fg['counts']['triedSources']} reason='{fg['reason']}'"
+            )
+        if n > 6:
+            print(f"    - ... and {n - 6} more")
     if issues:
         print("self-check issues:")
         for i in issues:

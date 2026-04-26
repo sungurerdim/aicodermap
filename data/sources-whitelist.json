@@ -1227,6 +1227,63 @@
         }
       ],
       "format_lastVerified": "2026-04-26"
+    },
+    {
+      "name": "Epoch AI Benchmarks",
+      "url": "https://epoch.ai/benchmarks",
+      "tier": "I",
+      "format": "spa_full",
+      "publishes": [
+        "sweV",
+        "lcbV6",
+        "gpqa",
+        "hle",
+        "aaIdx"
+      ],
+      "lastVerifiedDate": "2026-04-27",
+      "consecutiveFailures": 0,
+      "rationale": "Independent research org running their own evaluations on 50+ benchmarks (Epoch Capabilities Index combining 42). SWE-bench Verified internal runs (484 samples), cross-references external leaderboards. Updated daily.",
+      "fallbacks": [
+        {
+          "format": "websearch_snippet",
+          "query": "site:epoch.ai/benchmarks \"<modelName>\""
+        },
+        {
+          "format": "static_html_article",
+          "url": "https://epoch.ai/blog"
+        }
+      ]
+    },
+    {
+      "name": "LMCouncil Benchmarks",
+      "url": "https://lmcouncil.ai/benchmarks",
+      "tier": "I",
+      "format": "static_html_table",
+      "publishes": [
+        "sweV",
+        "tb2",
+        "aider",
+        "gpqa",
+        "hle"
+      ],
+      "lastVerifiedDate": "2026-04-27",
+      "consecutiveFailures": 0,
+      "rationale": "18-benchmark independent aggregator (AI Explained / SimpleBench creator). Sources: Epoch AI + Scale AI independent runs (NOT vendor self-reports). Covers SWE-bench Verified, Terminal-Bench 2.0, METR Time Horizons. 70+ models, updated monthly."
+    },
+    {
+      "name": "marc0.dev SWE-bench Leaderboard",
+      "url": "https://www.marc0.dev/en/leaderboard",
+      "tier": "I",
+      "format": "static_html_table",
+      "publishes": [
+        "sweV",
+        "swePro",
+        "tb2",
+        "aider"
+      ],
+      "lastVerifiedDate": "2026-04-27",
+      "consecutiveFailures": 0,
+      "rationale": "Independent community tracker — single-page cross-view for SWE-bench Verified + SWE-bench Pro + Terminal-Bench 2.0 + Aider Polyglot, 100 entries. Monthly cadence; April 2026 includes Claude Opus 4.7."
     }
   ],
   "aggregators": [

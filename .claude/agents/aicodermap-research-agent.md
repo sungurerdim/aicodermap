@@ -600,6 +600,33 @@ This replaces the prior hardcoded I/S/C domain tables. Adding a new aggregator =
 
 If both queries return zero useful (bench, score) pairs, the agent has already exhausted the fallback chain (per FORMAT_DISPATCH cascade). Only then is `gaps[]` emission permitted, and the entry MUST carry `triedFormats[]` + `triedPatterns[]` + `triedSources[]` + `triedQueries[]`.
 
+## GAP_VALIDITY_GATE (hard contract — added 2026-04-27)
+
+**Why this section exists:** The 2026-04-27 cycle 1 emitted 6 gaps with `triedSources: []` and 9 more with only 1–2 entries. Several "no data found" claims for legacy/deprecated models (`o3.sweV`, `deepseek-r1-14b.sweV`, `qwen25-coder-7b.sweV`, `gemma-4-31b.sweV`, etc.) were emitted without any fetch attempt — i.e., fabricated based on prior assumption. **This is a contract violation.**
+
+**Hard rule — every `gaps[]` entry MUST satisfy:**
+
+```
+gap.triedSources.length      >= 2     (at least 2 fetched URLs OR WebSearch result URLs)
+gap.triedQueries.length      >= 2     (the 2 mandatory WebSearch queries above)
+gap.triedFormats.length      >= 2     (primary format + ≥1 documented fallback)
+```
+
+A gap entry that fails any of these three counts is a **fabricated gap** and is REJECTED by the orchestrator's defensive validator (`scripts/merge.py` `validate_gaps()`). The orchestrator's behaviour on rejection:
+
+1. **Strip the fabricated gap from `out.gaps[]`** so it does not pollute the next-cycle retry queue.
+2. **Log the violation** to `~/.aicodermap-debug.log` with the (modelId, field) pair and counts.
+3. **Force-queue that pair into the deep-fetch retry list** for the SAME cycle — the orchestrator dispatches a fresh deep-fetch agent to actually attempt the pair before moving on.
+4. **Increment `runtime.contractViolations`** in the artifact so violations surface in the diff summary.
+
+**Status of "data does not exist" claims:** the agent NEVER asserts non-existence. Its only honest options are:
+
+- **Found a value** → emit to `models[].updates` + `sourcesAdded[]`.
+- **Walked the entire fallback chain (≥2 sources, ≥2 queries) and found no value** → emit `gaps[]` with full provenance. This is a *bookkeeping* statement ("we tried these N sources and could not extract this pair"), NOT an assertion that the value doesn't exist.
+- **Cannot try because tooling failed** (e.g., all WebSearch calls 500'd) → emit `runtime.fetchErrors[]` with the failure reason; do NOT emit a gap.
+
+A legacy/deprecated model still gets the same treatment: try the canonical historical leaderboards (Papers with Code, Epoch AI, llm-stats archive, marc0.dev historical entries, BigCodeBench archive) before declaring a gap. "Model is old" is never a sufficient reason to skip the attempt.
+
 ## DYNAMIC_WHITELIST_DISCOVERY (self-healing whitelist mutation)
 
 When the agent finds a NEW source domain that consistently provides high-quality bench data NOT in the current whitelist, it MUST emit a `whitelistAdditions[]` field in the output JSON:
