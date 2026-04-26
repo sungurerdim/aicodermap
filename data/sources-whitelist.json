@@ -1261,10 +1261,14 @@
       "perModelFormat": "static_html_table",
       "slugStrategy": "try_variations",
       "slugVariations": [
+        "{vendor_prefix}{id}",
         "{id}",
-        "claude-{id}",
         "{id}-preview"
-      ]
+      ],
+      "vendorPrefixMap": {
+        "anthropic": "claude-",
+        "default": ""
+      }
     },
     {
       "name": "AgentBench",
