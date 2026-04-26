@@ -306,6 +306,26 @@ When Step 0 lineup discovery flags an `id` mismatch (current data carries wrong-
 
 User is NOT prompted for the rename. Default is auto-execute when verified ≥2 sources.
 
+## DATA_CONTRACT (canonical — agent ⇄ skill ⇄ data ⇄ frontend)
+
+Single source of truth for the unified shape between every layer. Mirrored verbatim in `.claude/agents/aicodermap-research-agent.md → DATA_CONTRACT`. Updates to either file MUST update both.
+
+| Layer        | File / channel        | Shape                                                                                                                         |
+|--------------|-----------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| **Storage**  | `data/models.json`    | Flat scalars. `bench.<key>` = number, `context` = number, `pricing.api[].in/out/cacheHit/throughput` = number. NO `{value, trustScore}` wrappers. |
+| **Provenance** | `data/sources.json` | Wrapped: `{value, source, url, tier, date, verifications, trustScore, contradictionRole?}`. Sole on-disk home of `trustScore`. |
+| **Transit**  | agent → skill JSON    | `models[].updates.<field>` = Storage shape; `models[].sourcesAdded[]` = Provenance shape; NEVER cross-mix.                    |
+| **Render**   | `assets/app.js`       | Reads Storage scalars; looks up Provenance for tooltips by `<modelId>.<field>`.                                              |
+
+Contradictions: `field` = **bare** bench key (`swePro`, never `bench.swePro`); `candidates[]` wrapped; `autoResolveWinner` wrapped dict — skill extracts `.value` for Storage, keeps full dict for Provenance.
+
+**Enforcement** (3 layers, defense in depth):
+1. Agent self-check before emit (Storage-shape validation on every `updates.bench.<k>`)
+2. `scripts/merge.py` defensive unwrap (graceful degrade if a wrapper slips through — see MERGE_RULES section H)
+3. Frontend render guard (warn on non-scalar bench cells)
+
+The 2026-04-26 cycle 2 regression (live table blanked) was a contract violation at layer 1 + missing defense at layer 2. Both are now patched.
+
 ## MERGE_RULES
 
 **Why this section exists:** prior runs lost data because the merge step only touched `bench`/`pricing`/`provider`/`license`. Sparse fields (`vramRequirement`, `ollamaSize`, `pricing.api.cacheHit`, `uptime`, `subscription`) were silently skipped. Never again.

@@ -100,9 +100,35 @@ function isValidModel(m) {
   return true;
 }
 
+/**
+ * DATA_CONTRACT render guard.
+ * Storage layer says bench.<k> must be number|null. If a {value, trustScore} wrapper
+ * slips through (agent contract violation), unwrap defensively and log a warning so
+ * the regression surfaces in DevTools instead of silently blanking the table.
+ * See SKILL.md → DATA_CONTRACT and agent.md → DATA_CONTRACT.
+ */
+function unwrapBenchGuard(arr) {
+  let unwrapped = 0;
+  for (const m of arr) {
+    if (!m.bench || typeof m.bench !== 'object') continue;
+    for (const k of Object.keys(m.bench)) {
+      const v = m.bench[k];
+      if (v && typeof v === 'object' && !Array.isArray(v) && 'value' in v) {
+        m.bench[k] = (typeof v.value === 'number' ? v.value : null);
+        unwrapped++;
+      }
+    }
+  }
+  if (unwrapped > 0) {
+    console.warn(`[aicodermap] DATA_CONTRACT violation: ${unwrapped} bench cell(s) arrived wrapped — defensively unwrapped. Check agent emit shape (must be scalar in models.json).`);
+  }
+}
+
 function validateModels(arr) {
   if (!Array.isArray(arr)) return [];
-  return arr.filter(isValidModel);
+  const filtered = arr.filter(isValidModel);
+  unwrapBenchGuard(filtered);
+  return filtered;
 }
 
 function validateWeights(w) {

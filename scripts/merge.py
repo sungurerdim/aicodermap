@@ -92,6 +92,8 @@ def apply_model_update(model, updates):
             if "bench" not in model:
                 model["bench"] = {}
             for bk, bv in v.items():
+                if isinstance(bv, dict) and "value" in bv:
+                    bv = bv["value"]
                 if bv is not None and model["bench"].get(bk) != bv:
                     model["bench"][bk] = bv
                     touched = True
@@ -184,36 +186,46 @@ def main():
             models.append(nm)
             log["added"].append(nm["id"])
 
+    BENCH_KEYS = {
+        "sweV",
+        "swePro",
+        "tb2",
+        "lcbV6",
+        "aider",
+        "tau2",
+        "aaCoding",
+        "aaAgentic",
+        "mcpA",
+        "bfcl",
+        "aime26",
+        "aaOmni",
+        "gpqa",
+        "sweMulti",
+        "hle",
+        "aaIdx",
+    }
     for c in out.get("contradictions", []) or []:
         mid = c["modelId"]
         field = c["field"]
         winner = c.get("autoResolveWinner")
         if winner is None:
             continue
+        # DATA_CONTRACT defensive unwrap: winner may arrive as wrapped dict {value, trustScore, sourceUrl, tier}.
+        # Storage shape is scalar; extract .value before writing to models.json.
+        winner_value = (
+            winner["value"]
+            if isinstance(winner, dict) and "value" in winner
+            else winner
+        )
+        # Bare-key normalize: agent contract says field is bare ("swePro"), but tolerate "bench.swePro" too.
+        bench_field = field.split(".", 1)[1] if field.startswith("bench.") else field
         m = find(models, mid)
-        if m is not None and field in (
-            "sweV",
-            "swePro",
-            "tb2",
-            "lcbV6",
-            "aider",
-            "tau2",
-            "aaCoding",
-            "aaAgentic",
-            "mcpA",
-            "bfcl",
-            "aime26",
-            "aaOmni",
-            "gpqa",
-            "sweMulti",
-            "hle",
-            "aaIdx",
-        ):
+        if m is not None and bench_field in BENCH_KEYS:
             if "bench" not in m:
                 m["bench"] = {}
-            m["bench"][field] = winner
+            m["bench"][bench_field] = winner_value
             m["lastUpdated"] = TODAY
-        key = f"{mid}.{field}"
+        key = f"{mid}.{bench_field}"
         for cand in c.get("candidates", []) or []:
             append_source(
                 sources,
@@ -227,7 +239,7 @@ def main():
                     "verifications": cand.get("verifications", 1),
                     "trustScore": cand.get("trustScore"),
                     "contradictionRole": "winner"
-                    if cand.get("value") == winner
+                    if cand.get("value") == winner_value
                     else "loser",
                 },
             )

@@ -216,6 +216,29 @@ Phase 1+2 values are tier=I. Per VALIDATION_RULES rule 7, these have higher trus
 ### Known-gaps skip
 No pair is ever pre-skipped. Every (modelId, benchKey) pair currently null in data/models.json gets a fetch attempt. When all whitelist sources for a pair have been tried and none carry the value, emit a `gaps[]` entry with `triedSources` — this is informational for the next cycle (which still re-tries), never a permanent skip.
 
+## DATA_CONTRACT (unified shape — agent ⇄ skill ⇄ data ⇄ frontend)
+
+Three layers, three shapes — never mix them. Violating this contract is the regression that cycle 2026-04-26-cycle-2 hit (bench wrapped objects leaked into `data/models.json`, blanking the live table).
+
+| Layer        | File / channel        | Shape                                                                                                                                                                          |
+|--------------|-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Storage**  | `data/models.json`    | **Flat scalars.** `bench.<key>` = number, `context` = number, `pricing.api[].in/out/cacheHit/throughput` = number. NEVER `{value, trustScore}` wrappers, NEVER nested objects. |
+| **Provenance** | `data/sources.json` | **Wrapped entries:** `{value, source, url, tier, date, verifications, trustScore, contradictionRole?}`. This is the *only* place `trustScore` lives on disk.                 |
+| **Transit**  | agent → skill JSON    | `models[].updates.<field>` = Storage shape (scalars). `models[].sourcesAdded[]` = Provenance shape (wrapped). NEVER emit wrappers inside `updates`.                            |
+| **Render**   | frontend `assets/app.js` | Reads Storage scalars. Looks up Provenance from sources.json by `<modelId>.<field>` for tooltips / source links.                                                            |
+
+**Contradictions** sit between Transit and Provenance:
+- `field`: **bare** bench key (e.g., `swePro`, NOT `bench.swePro`); non-bench paths use dotted form (`pricing.api.in`).
+- `candidates[]`: wrapped (Provenance shape).
+- `autoResolveWinner`: wrapped dict `{value, trustScore, sourceUrl, tier}`. The skill extracts `.value` for Storage, keeps the full dict in Provenance.
+
+**Enforcement points:**
+1. Agent self-check before emit (verify every `updates.bench.<k>` is `number|null`, never an object).
+2. `scripts/merge.py` defensive unwrap (gracefully reduces a `{value, trustScore}` slip-through to its scalar).
+3. Frontend render guard (logs `console.warn` and treats non-scalar bench cells as null).
+
+When in doubt: **scalar in storage, wrapped in provenance, contract spelled here.**
+
 ## OUTPUT_SCHEMA (NEW — multi-provider pricing array)
 ```jsonc
 {
@@ -259,6 +282,7 @@ No pair is ever pre-skipped. Every (modelId, benchKey) pair currently null in da
           ]
         },
 
+        // bench: every value MUST be number|null (Storage shape per DATA_CONTRACT). Wrapped {value, trustScore} belongs in sourcesAdded[], not here.
         "bench"?: { swePro?:n, sweV?:n, tb2?:n, lcbV6?:n, aider?:n, tau2?:n, aaCoding?:n, aaAgentic?:n, mcpA?:n, bfcl?:n, aime26?:n, aaOmni?:n, gpqa?:n, sweMulti?:n, hle?:n, aaIdx?:n },
 
         "providers"?: number,
@@ -306,13 +330,15 @@ No pair is ever pre-skipped. Every (modelId, benchKey) pair currently null in da
   "contradictions": [
     {
       "modelId": "<id>",
-      "field": "<bench key | pricing.api.in | etc>",
+      // field: BARE bench key ("swePro" — never "bench.swePro"); non-bench paths use dotted form ("pricing.api.in")
+      "field": "<bare bench key | pricing.api.in | etc>",
       "candidates": [
         { "value", "source", "url", "tier", "fetched", "verifications", "trustScore" }
       ],
       "delta": <number>,
       "severity": "GREEN"|"YELLOW"|"RED",
-      "autoResolveWinner": "<source>"  // skill will use this; agent computes via argmax(trustScore)
+      // autoResolveWinner: wrapped dict; skill extracts .value for Storage, keeps full dict for Provenance
+      "autoResolveWinner": { "value": <scalar>, "trustScore": <0..1>, "sourceUrl": "<url>", "tier": "I"|"S"|"C" }
     }
   ],
 
