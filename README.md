@@ -62,6 +62,125 @@ AICoderMap answers the questions that actually shape the decision:
 
 ---
 
+## 📚 Data Sources
+
+Every value the tracker shows comes from one of the sources below. Each value carries a `trustScore` based on its tier (I > S > C > U), the number of confirming sources, and recency. Independent sources outweigh vendor self-reports; community sources are used only when no independent or official source exists; forum/social signals are never written into the data.
+
+### I-tier — Independent benchmarks & leaderboards
+
+| Source | URL | Authority for |
+|--------|-----|---------------|
+| Scale SEAL | [labs.scale.com/leaderboard](https://labs.scale.com/leaderboard) | SWE-bench Pro (1865 tasks), HLE |
+| SWE-bench (canonical) | [swebench.com](https://www.swebench.com/) · [github.com/SWE-bench/experiments](https://github.com/SWE-bench/experiments) | SWE-bench Verified, full SWE-bench |
+| LiveCodeBench | [livecodebench.github.io](https://livecodebench.github.io/leaderboard.html) · [livecodebench.com](https://livecodebench.com/) | LCB v6 (contamination-free) |
+| Terminal-Bench | [tbench.ai](https://tbench.ai/leaderboard) · [terminal-bench.io](https://terminal-bench.io/) | TB2 agentic execution |
+| tau-bench | [tau-bench.dev](https://tau-bench.dev/) | tau2 agentic API-use |
+| Aider Polyglot | [aider.chat/docs/leaderboards](https://aider.chat/docs/leaderboards/) | aider (warn: stale since Nov 2025) |
+| MCP-Atlas | mcp-atlas.dev | mcpA tool-chain quality |
+| Artificial Analysis | [artificialanalysis.ai/leaderboards](https://artificialanalysis.ai/leaderboards/models) | aaIdx, aaCoding, aaAgentic, throughput, pricing |
+| Vellum Leaderboard | [vellum.ai/llm-leaderboard](https://www.vellum.ai/llm-leaderboard) | independent SWE-V, GPQA, cost+latency |
+| llm-stats | [llm-stats.com](https://llm-stats.com/) | broad model catalog |
+| LMArena | [lmarena.ai](https://lmarena.ai/) | blind human preference (formerly LMSYS) |
+| LiveBench | [livebench.ai](https://livebench.ai/) | contamination-resistant rotating evals |
+| Berkeley BFCL | [gorilla.cs.berkeley.edu](https://gorilla.cs.berkeley.edu/leaderboard.html) | function-calling v3/v4 |
+| BigCodeBench | [bigcode-bench.github.io](https://bigcode-bench.github.io/) · [HF leaderboard](https://huggingface.co/spaces/bigcode/bigcode-models-leaderboard) | code generation gold standard |
+| EvalPlus | [evalplus.github.io](https://evalplus.github.io/leaderboard.html) | HumanEval+ / MBPP+ rigorous |
+| HF Open LLM Leaderboard | [huggingface.co/spaces/open-llm-leaderboard](https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard) | open-weight canonical aggregation |
+| Klu.ai | [klu.ai/llm-leaderboard](https://klu.ai/llm-leaderboard) | broader benchmark aggregator |
+| Papers with Code | [paperswithcode.com/area/code-generation](https://paperswithcode.com/area/code-generation) | peer-reviewed leaderboards |
+| arXiv | [arxiv.org](https://arxiv.org/) | original benchmark papers |
+| BenchLM | [benchlm.ai](https://benchlm.ai/) | verified vs provisional transparency |
+| AgentBench | agentbench.ai | multi-domain agentic |
+| MathArena | [matharena.ai](https://matharena.ai/) | AIME math reasoning (auxiliary) |
+| Vals.ai | [vals.ai/benchmarks](https://www.vals.ai/benchmarks/) | enterprise-gated benchmark sets |
+| LMMarketCap | [lmmarketcap.com](https://lmmarketcap.com/) | hourly market table |
+
+### I-tier — Multi-provider pricing & availability
+
+Models are often hosted on multiple providers at different prices. The tracker shows per-provider pricing in each card and a price range in the comparison table — these are the sources surveyed.
+
+| Source | URL | Extracts |
+|--------|-----|----------|
+| OpenRouter | [openrouter.ai](https://openrouter.ai/) | provider count, uptime%, alt pricing, throughput |
+| Together AI | [together.ai/models](https://www.together.ai/models) | quant variants, $/1M, batch tier |
+| Fireworks AI | [fireworks.ai/models](https://fireworks.ai/models) | tier, throughput, batch pricing |
+| DeepInfra | [deepinfra.com/models](https://deepinfra.com/models) | $/1M, throughput |
+| Groq | [console.groq.com/docs/models](https://console.groq.com/docs/models) · [groq.com/pricing](https://groq.com/pricing) | extreme-fast inference rates |
+| Cerebras | [inference-docs.cerebras.ai](https://inference-docs.cerebras.ai/) · [cerebras.ai/inference](https://cerebras.ai/inference) | ultra-fast inference |
+| SambaNova Cloud | [cloud.sambanova.ai/models](https://cloud.sambanova.ai/models) | catalog, throughput |
+| Replicate | [replicate.com](https://replicate.com/) | open-weight hosting, $/sec |
+| Lepton AI | [lepton.ai/pricing](https://www.lepton.ai/pricing) | enterprise pricing |
+| Novita AI | [novita.ai/model-api](https://novita.ai/model-api) | catalog + pricing |
+| SiliconFlow | [siliconflow.cn/models](https://siliconflow.cn/models) | Chinese providers — Qwen / DeepSeek / MiMo |
+| Anyscale | [anyscale.com/endpoints](https://www.anyscale.com/endpoints) | enterprise endpoints |
+| Cloudflare Workers AI | [developers.cloudflare.com/workers-ai/models](https://developers.cloudflare.com/workers-ai/models/) | edge regions, free tier |
+| AWS Bedrock | [aws.amazon.com/bedrock](https://aws.amazon.com/bedrock/) | enterprise + region matrix |
+| Azure AI Foundry | [ai.azure.com/explore/models](https://ai.azure.com/explore/models) | enterprise + region |
+| HuggingFace Inference Endpoints | [huggingface.co](https://huggingface.co/) | author canonical card |
+| OpenCode Zen / Go | [opencode.ai](https://opencode.ai/) | edge endpoints, latency |
+| Lambda Cloud | [lambda.ai/inference](https://lambda.ai/inference) | enterprise throughput |
+| Tensorix | [tensorix.ai](https://tensorix.ai/) | infrastructure / niche frontier hosting |
+
+### I-tier — Local runtimes, quants, GPU compatibility
+
+| Source | URL | Extracts |
+|--------|-----|----------|
+| Ollama Library | [ollama.com/library](https://ollama.com/library) | tags, pullCount, architecture, parameters, license, releasedISO |
+| HuggingFace Unsloth | [huggingface.co/unsloth](https://huggingface.co/unsloth) | UD dynamic quants (UD-IQ1_S → UD-Q4_K_XL) |
+| HuggingFace bartowski | [huggingface.co/bartowski](https://huggingface.co/bartowski) | most-active quant maintainer |
+| HuggingFace mradermacher | [huggingface.co/mradermacher](https://huggingface.co/mradermacher) | high-quality quant set |
+| HuggingFace lmstudio-community | [huggingface.co/lmstudio-community](https://huggingface.co/lmstudio-community) | LM Studio-curated GGUFs |
+| LM Studio | [lmstudio.ai/models](https://lmstudio.ai/models) | desktop catalog |
+| llama.cpp | [github.com/ggerganov/llama.cpp/discussions](https://github.com/ggerganov/llama.cpp/discussions) | empirical VRAM/throughput data |
+| MLX (Apple Silicon) | [huggingface.co/mlx-community](https://huggingface.co/mlx-community) | mlx-quantized variants |
+| vLLM | [docs.vllm.ai/en/latest/models/supported_models](https://docs.vllm.ai/en/latest/models/supported_models.html) | server-side support matrix |
+| sglang | [github.com/sgl-project/sglang](https://github.com/sgl-project/sglang) | structured-output throughput |
+| llmfit | [github.com/AlexsJones/llmfit](https://github.com/AlexsJones/llmfit) | 148-model HF curated DB (mirrored locally) |
+
+### S-tier — Vendor official sources
+
+These are the canonical announcements, model cards, pricing pages, and API docs from each model's maker. Used as primary source for release dates, license, context window, and API pricing — and as cross-check against independent benchmarks.
+
+| Vendor | Sources |
+|--------|---------|
+| Anthropic | [anthropic.com/news](https://www.anthropic.com/news) · [docs.claude.com](https://docs.claude.com/en/docs/about-claude/models) · [pricing](https://platform.claude.com/docs/en/about-claude/pricing) |
+| OpenAI | [openai.com/blog](https://openai.com/blog/) · [platform.openai.com/docs/models](https://platform.openai.com/docs/models) |
+| Google DeepMind | [deepmind.google/discover](https://deepmind.google/discover/) · [ai.google.dev/gemini-api/docs/models](https://ai.google.dev/gemini-api/docs/models) |
+| Mistral | [mistral.ai/news](https://mistral.ai/news) · [docs.mistral.ai](https://docs.mistral.ai/getting-started/models/models_overview/) |
+| DeepSeek | [deepseek.com/news](https://www.deepseek.com/) · [api-docs.deepseek.com](https://api-docs.deepseek.com/) |
+| xAI | [x.ai/news](https://x.ai/news) · [docs.x.ai/docs/models](https://docs.x.ai/docs/models) |
+| Alibaba (Qwen) | [qwenlm.github.io/blog](https://qwenlm.github.io/blog/) · [qwen-lm.github.io](https://qwen-lm.github.io/) |
+| Moonshot (Kimi) | [kimi.com/blog](https://www.kimi.com/blog) · [platform.moonshot.cn](https://platform.moonshot.cn/) |
+| Z.ai (GLM) | [z.ai/news](https://z.ai/news) · [docs.z.ai](https://docs.z.ai/) |
+| Xiaomi (MiMo) | [mimo.xiaomi.com](https://mimo.xiaomi.com/) · [xiaomimimo.github.io](https://xiaomimimo.github.io/) |
+| MiniMax | [minimaxi.com/news](https://www.minimaxi.com/news) · [platform.minimaxi.com](https://platform.minimaxi.com/) |
+| Nvidia | [build.nvidia.com](https://build.nvidia.com/) · [blogs.nvidia.com](https://blogs.nvidia.com/) |
+| Meta (Llama) | [huggingface.co/meta-llama](https://huggingface.co/meta-llama) · [ai.meta.com/blog](https://ai.meta.com/blog/) |
+| Google (Gemma) | [huggingface.co/google](https://huggingface.co/google) · [ai.google.dev/gemma](https://ai.google.dev/gemma) |
+| StepFun | [stepfun.com](https://www.stepfun.com/) |
+| All Hands AI (Devstral) | [all-hands.dev](https://www.all-hands.dev/) |
+
+### C-tier — Aggregators & expert commentary (used only when I/S sources absent)
+
+[ApiDog Blog](https://apidog.com/blog/) · [The Decoder](https://the-decoder.com/) · [DataCamp Blog](https://www.datacamp.com/blog) · [Build Fast With AI](https://www.buildfastwithai.com/) · [Simon Willison](https://simonwillison.net/) · [Latent Space](https://www.latent.space/) · [Swyx](https://www.swyx.io/) · [Awesome-LLM](https://github.com/Hannibal046/Awesome-LLM) · [Awesome-Efficient-LLM](https://github.com/horseee/Awesome-Efficient-LLM) · [r/LocalLLaMA](https://www.reddit.com/r/LocalLLaMA/) (community VRAM reports only) · [Design Arena](https://designarena.ai/leaderboard) (UI auxiliary)
+
+### Trust hierarchy at a glance
+
+```
+trustScore = tierWeight × min(verifications, 3)/3 × recencyDecay(date)
+
+  I-tier (independent)  weight 1.0
+  S-tier (vendor)       weight 0.7
+  C-tier (community)    weight 0.4
+  U-tier (forum/social) weight 0.1   ← never written, cross-check only
+
+  recency: <30d=1.0 · <90d=0.85 · <180d=0.70 · <365d=0.50 · ≥365d=0.30
+```
+
+When two sources disagree on a value, the one with the higher `trustScore` wins. The losing value still appears in `data/sources.json` with its tier and score, so you can audit every decision.
+
+---
+
 ## 🤝 Contributing
 
 Currently pre-launch / solo development. Issues and discussions will open in Phase 2. For now:

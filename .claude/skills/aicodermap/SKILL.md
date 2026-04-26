@@ -1,13 +1,15 @@
 ---
 description: "AICoderMap update orchestrator. Project-scoped. Manual trigger, zero API cost."
-argument-hint: "[refresh-all|model <id>|new-release|validate|stale-check|changelog]"
+argument-hint: "[refresh-all|model <id>|new-release|validate|stale-check|changelog|lineup-sync]"
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Agent, TaskCreate, TaskUpdate
 ---
 
 # aicodermap
 
 ## ROLE
-Orchestrate AI coding LLM tracker updates: invoke `aicodermap-research-agent` → validate (≥2 source/score, contradiction detect) → diff preview → user approve → atomic write `data/*.json` + `i18n/*.json` + `CHANGELOG.md` → prompt git commit → verify GitHub Pages deploy.
+Orchestrate AI coding LLM tracker updates: discover **official vendor lineup** → reconcile current data → invoke `aicodermap-research-agent` (lineup-driven, trusted-source whitelist, parallel) → auto-resolve contradictions via `trustScore` → atomic schema-complete merge → atomic write `data/*.json` + `i18n/*.json` + `CHANGELOG.md` → prompt git commit → verify GitHub Pages deploy.
+
+**Autonomy principle:** the skill must NOT pause for user input on routine decisions. Every edge case below has a default behavior; the user is asked only when a default cannot be resolved (e.g., new schema-breaking discovery).
 
 ## CONTEXT
 - Project root: `D:\GitHub\aicodermap\`
@@ -15,49 +17,83 @@ Orchestrate AI coding LLM tracker updates: invoke `aicodermap-research-agent` �
 - Data files: `data/{models,sources,gpu-database,known-gaps}.json`
 - i18n: `i18n/{tr,en}.json`
 - Live URL: `https://sungurerdim.github.io/aicodermap/`
-- **Known-gaps registry:** `data/known-gaps.json` — vendor opt-outs, not-applicable benchmarks, out-of-scope variants. Agent skips these during exhaustive mining; UI surfaces them as "vendor opt-out" / "not applicable" markers instead of generic "—". When the agent prompt is built, `known-gaps.json` MUST be included in the agent context so it can honor the skip rule.
+- **Known-gaps registry:** `data/known-gaps.json` — vendor opt-outs, not-applicable benchmarks, out-of-scope variants. Agent skips these during exhaustive mining; UI surfaces them as "vendor opt-out" / "not applicable" markers instead of generic "—". When the agent prompt is built, `known-gaps.json` MUST be included in the agent context.
 
 ## ARGS
 | arg | scope | model | typical_duration |
 |-----|-------|-------|------------------|
 | (none) | interactive prompt | — | — |
-| `refresh-all` | full | sonnet | 3-5min |
+| `refresh-all` | full (lineup + bench + pricing + local) | sonnet | 4-7min |
+| `lineup-sync` | vendor lineup discovery only (Step 0) | sonnet | 1-2min |
 | `model <id>` | specific | sonnet | 1-2min |
-| `new-release` | new-release | sonnet | 2-3min |
+| `new-release` | new-release detection | sonnet | 2-3min |
 | `validate` | (no fetch) | — | <10s |
 | `stale-check` | (no fetch) | — | <5s |
 | `changelog` | (no fetch) | — | <5s |
 
-**`refresh-all` baseline:** Agent's `DEFAULT_TARGETS` table (5 families, ≥35 models) is non-negotiable — every family must be surveyed, missing ones emit a `gaps[]` entry. Skill rejects returns whose `models[]` + `newModels[]` cardinality < 30 unless agent explains via `gaps[]`.
+**`refresh-all` baseline:** Agent's `MODEL_FAMILIES` table is non-negotiable — every family must be surveyed, missing ones emit a `gaps[]` entry. Skill rejects returns whose `models[]` + `newModels[]` cardinality < 30 unless agent explains via `gaps[]`.
 
 ## WORKFLOW
 ```
-1. Read data/models.json + data/sources.json
+0. LINEUP DISCOVERY (always run first on refresh-all):
+   - Agent fetches each vendor's official "active models" page from VENDOR_LINEUP_SOURCES table
+   - Returns canonical lineup: { vendorId: { active: [...], deprecated: [...], renamed: [{from,to}] } }
+   - Skill diffs against current data/models.json:
+     * NEW (in lineup, not in data) → flag for newModels[] survey in Step 4
+     * DEPRECATED (in data, marked deprecated by vendor) → set status="deprecated", retain entry, gray-out in UI
+     * RENAMED (vendor changed canonical id) → auto-rename per WRONG_ID_AUTO_FIX rule
+     * REMOVED (no longer on vendor page after grace period) → archive to data/archive/<id>.json
+   - This step CANNOT be skipped on refresh-all; it's the source of truth for "what models exist".
+
+1. Read data/{models,sources,known-gaps}.json + lineup result from Step 0
 2. Parse arg → resolve scope + target_model_ids
-3. Build idea_context: {title:"AICoderMap", total_models:<n>, last_refresh:<iso>}
+3. Build idea_context: {title:"AICoderMap", total_models:<n>, last_refresh:<iso>, lineup:<step0-result>}
 4. Agent({
      subagent_type: "aicodermap-research-agent",
      model: "sonnet",
-     prompt: structured(scope, query, idea_context, target_model_ids?, include_unsloth:true)
+     prompt: structured(
+       scope, query, idea_context, target_model_ids?,
+       include_unsloth: true,
+       trusted_sources_only: true,           // per FETCH_WHITELIST
+       per_model_fetch_budget: 6,            // max fetches per model
+       per_model_wallclock_budget: 90,       // seconds
+       parallel_models: 5,                   // concurrent model surveys
+       trust_score_required: true            // every value carries a trustScore
+     )
    })
-   For scope=full: prompt must explicitly reference DEFAULT_TARGETS (5 families × ≥35 models) so the agent cannot drop a family silently.
-   **Exhaustive coverage contract** — the prompt must require: "For EVERY surveyed model, attempt to populate EVERY field in the OUTPUT_SCHEMA whitelist (all 13 bench keys, pricing.api.in/out/cacheHit, pricing.subscription, released, context, providers, uptime, license, open, vramRequirement, ollamaSize, ollama (rich obj when local), unslothVariants when applicable). A field is omitted from `updates` ONLY when (a) the value matches the current data/models.json exactly, OR (b) no source on web could be found — in which case it goes into `gaps[]` with the modelId.field key. Do NOT skip fields just because they're 'sparse' or 'rare' — that is exactly the data the user needs."
-   Delivery contract: agent MUST return the JSON as its final text message (never write to file, never narrate). The skill parses the Task tool's return value directly via JSON.parse. Reinforce this in the prompt: "Final message = pure JSON, first char `{`, last char `}`, no markdown fences, no narration."
 5. Parse return → validate JSON schema (strip surrounding whitespace, locate first `{` and last `}` if narration leaked)
-6. Gate: validationCoverage >= 0.95 → proceed; else WARN+force-override
-7. Gate: contradictions[].severity="RED" count > 0 → BLOCK, prompt manual pick per RED
-8. Render diff (markdown table): models[].updates fields, newModels[], contradictions[], coverage%
+
+6. COVERAGE TRIGGER (NOT a block):
+   if validationCoverage < COVERAGE_DEEPEN_THRESHOLD (0.95):
+     identify (modelId, field) pairs missing ≥2 sources
+     spawn DEEP-FETCH agent pass: targeted, single-pair retrieval per gap
+     budget: ≤30s per pair, ≤10 pairs total per cycle, ≤2 cycles
+     merge deep-fetch returns into pending updates
+   if validationCoverage still < 0.50 after deep-fetch cycles:
+     write anyway, append "⚠ partial coverage: <%>" warning to CHANGELOG
+   else: proceed silently — coverage is an optimization knob, not a gate
+
+7. CONTRADICTION AUTO-RESOLUTION (NOT manual prompt):
+   for each contradiction in contradictions[]:
+     winner = argmax(trustScore(value) for value in candidates)
+     write winner.value to data/models.json
+     append all candidates to data/sources.json with their trustScores
+     log to CHANGELOG: "<modelId>.<bench>: <winner.value> (trust=<score>) over <loser.value> (trust=<score>) [Δ<delta>pp <severity>]"
+   no user prompt is issued for any severity
+
+8. Render diff (markdown table): models[].updates fields, newModels[], lineup changes (NEW/DEPRECATED/RENAMED), contradictions auto-resolved, coverage% achieved
 9. User input: approve | partial <ids> | decline | detail <id>
-10. Atomic write — **SCHEMA-COMPLETE MERGE** (rotated .bak backup):
-    Merge MUST cover EVERY field in OUTPUT_SCHEMA (per agent definition), not just bench/pricing.
-    See MERGE_RULES section below for the full field list and per-field policy.
+   default behavior: auto-approve when (no schema-breaking change) AND (no RED unresolved-by-trustScore) AND (lineup-discovery had no REMOVED entries)
+
+10. ATOMIC WRITE — schema-complete merge per MERGE_RULES (rotated .bak backup):
     Outputs:
-    - data/models.json (schema-complete merge — bench[*], pricing.api.*, pricing.subscription, released, context, providers, uptime, license, open, vramRequirement, ollamaSize, ollama, unslothVariants, name, tier, strengthsKey, weaknessesKey)
-    - data/sources.json (append sourcesAdded[] + contradiction values, dedup by (key, url, value))
+    - data/models.json (multi-provider pricing array, subscription array, status field, full bench, ollama, unslothVariants, etc.)
+    - data/sources.json (append sourcesAdded[] + every contradiction's losing candidate, dedup by (key, url, value), include trustScore per entry)
     - i18n/{tr,en}.json (merge i18nUpdates into models[id]={strengths,weaknesses})
+    - data/archive/<id>.json (when REMOVED from vendor lineup past grace period)
     - lastUpdated := today (YYYY-MM-DD) per touched entry only
 11. Append CHANGELOG.md (Keep a Changelog):
-    ## [Unreleased] / ### Updated|Added|Flagged
+    ## [Unreleased] / ### Updated|Added|Deprecated|Removed|Flagged
 12. Print git commands for user (DO NOT auto-commit):
     git add data/ i18n/ CHANGELOG.md
     git commit -m "data: <gen description>"
@@ -68,37 +104,182 @@ Orchestrate AI coding LLM tracker updates: invoke `aicodermap-research-agent` �
 
 ## CONSTANTS
 ```
-CONTRADICTION_WARN = 3.0    // pp delta → YELLOW
-CONTRADICTION_BLOCK = 5.0   // pp delta → RED (block)
-COVERAGE_MIN = 0.95         // M4 release gate
-STALE_DAYS = 14             // M5 freshness gate
-DEPLOY_WAIT_SEC = 90
-AGENT_RETRY = 1
-FAMILY_BASELINE_MIN = 30    // refresh-all: |models[]+newModels[]| floor
+CONTRADICTION_WARN              = 3.0   // pp delta → YELLOW (auto-resolve via trustScore)
+CONTRADICTION_BLOCK             = 5.0   // pp delta → RED (auto-resolve via trustScore, log loudly)
+COVERAGE_DEEPEN_THRESHOLD       = 0.95  // <0.95 triggers deep-fetch agent loop, not a block
+COVERAGE_PARTIAL_WARN           = 0.50  // <0.50 still writes but flags CHANGELOG
+STALE_DAYS                      = 14    // M5 freshness gate
+DEPRECATION_GRACE_DAYS          = 60    // vendor "deprecated" → still listed for 60d before archive
+DEPLOY_WAIT_SEC                 = 90
+AGENT_RETRY                     = 1
+FAMILY_BASELINE_MIN             = 30    // refresh-all: |models[]+newModels[]| floor
+PER_MODEL_FETCH_BUDGET          = 6     // max fetches per model in agent
+PER_MODEL_WALLCLOCK_BUDGET      = 90    // seconds per model in agent
+PARALLEL_MODELS                 = 5     // concurrent model surveys in agent
+DEEP_FETCH_MAX_PAIRS_PER_CYCLE  = 10
+DEEP_FETCH_MAX_CYCLES           = 2
 ```
+
+## VENDOR_LINEUP_SOURCES (Step 0 — official "what models exist now")
+
+Authoritative pages for the lineup discovery phase. Each must be fetched on `refresh-all` and `lineup-sync`.
+
+| Vendor | URL | Extracts |
+|--------|-----|----------|
+| Anthropic | docs.claude.com/en/docs/about-claude/models | Active model IDs, deprecation dates |
+| OpenAI | platform.openai.com/docs/models | Active models + deprecation table |
+| Google DeepMind | ai.google.dev/gemini-api/docs/models | Gemini active list |
+| Mistral | docs.mistral.ai/getting-started/models/models_overview | Mistral + Devstral + Codestral lineup |
+| DeepSeek | api-docs.deepseek.com/api/list-models | Active API model IDs |
+| xAI | docs.x.ai/docs/models | Grok active models |
+| Alibaba (Qwen) | qwenlm.github.io/blog + huggingface.co/Qwen | Qwen series |
+| Moonshot (Kimi) | platform.moonshot.cn/docs | Kimi K-series |
+| Z.ai (GLM) | docs.z.ai/api-reference | GLM active list |
+| Xiaomi (MiMo) | xiaomimimo.github.io | MiMo series |
+| MiniMax | platform.minimaxi.com/document | M-series |
+| Nvidia | build.nvidia.com (NIM catalog) | Nemotron variants |
+| Meta (Llama) | huggingface.co/meta-llama | Released Llama models |
+| Google (Gemma) | huggingface.co/google + ai.google.dev/gemma | Gemma releases |
+| StepFun | stepfun.com | Step series |
+
+Lineup return shape:
+```json
+{
+  "vendorId": {
+    "active": [{ "id": "<official-id>", "name": "...", "released": "YYYY-MM-DD", "context": <int>, "open": <bool> }],
+    "deprecated": [{ "id": "...", "deprecationDate": "YYYY-MM-DD", "successor": "<id>?" }],
+    "renamed": [{ "from": "<old-id>", "to": "<new-id>", "evidenceUrl": "..." }]
+  }
+}
+```
+
+## TRUST_SCORE_FORMULA (used by Step 7 auto-resolution + every sources.json entry)
+
+```
+trustScore(value) = tierWeight × min(verifications, 3)/3 × recencyDecay(date)
+
+tierWeight:
+  I = 1.0   (independent leaderboard: Scale SEAL, SWE-bench Verified, Terminal-Bench, Aider, tau-bench, MCP-Atlas, Artificial Analysis, Vellum, livecodebench.com, lmarena.ai, livebench.ai, BFCL, BigCodeBench, EvalPlus, paperswithcode.com, BenchLM, Open LLM Leaderboard, swebench.com)
+  S = 0.7   (vendor self-report: official blog, docs, model card, technical report)
+  C = 0.4   (community/3rd-party: aggregator blog, walkthrough, review)
+  U = 0.1   (forum/social: Reddit, Twitter — never written to data, only as cross-check signal)
+
+verifications: number of distinct sources reporting the same value (capped at 3)
+
+recencyDecay(date):
+  age <  30d → 1.00
+  age <  90d → 0.85
+  age < 180d → 0.70
+  age < 365d → 0.50
+  age ≥ 365d → 0.30
+
+Tiebreak (when trustScores within 0.05): prefer I-tier, then most recent, then highest verifications.
+```
+
+**Application:**
+- Every entry in `data/sources.json` MUST carry a `trustScore` field (computed at write time).
+- For multi-source same-value cluster: aggregate verifications, take the max recency.
+- For multi-source disagreement (a contradiction): each candidate gets its own trustScore; winner has max(trustScore).
+
+## PRICING_SCHEMA (multi-provider array — replaces flat numbers)
+
+```json
+{
+  "pricing": {
+    "api": [
+      {
+        "provider": "<official|openrouter|together|fireworks|deepinfra|groq|cerebras|...>",
+        "in": <number $/1M>,
+        "out": <number $/1M>,
+        "cacheHit": <number $/1M | null>,
+        "throughput": <number tok/s | null>,
+        "url": "<source url>",
+        "fetched": "YYYY-MM-DD"
+      }
+    ],
+    "range": {
+      "in":  [<min>, <max>],            // computed from api[]
+      "out": [<min>, <max>],
+      "cacheHit": [<min>, <max>] | null
+    },
+    "subscription": [
+      {
+        "tier": "Free|Plus|Pro|Team|Enterprise|Max|Coding|...",
+        "price": <number>,
+        "currency": "USD",
+        "billing": "monthly|annual",
+        "notes": "..."
+      }
+    ]
+  }
+}
+```
+
+**UI rendering rules:**
+- **Card view:** show `pricing.api[]` as a per-provider list (provider name + price + url chip).
+- **Table view:** show `pricing.range.in` / `pricing.range.out` as `$<min>–$<max>` (or single number if min==max).
+- **Sort by price:** sort by `pricing.range.in[0]` (cheapest input price).
+- **Subscription:** card shows lowest paid tier + a "see all tiers" expandable.
+
+**Migration policy** (one-time + every refresh until done):
+- If `pricing.api` is a flat object `{in, out, cacheHit}` (legacy schema), wrap it as `[{provider:"official", in, out, cacheHit, url:"<vendor docs>", fetched:"<lastUpdated>"}]` and compute `pricing.range`.
+- If `pricing.subscription` is a string (legacy), parse to `[{tier:<extracted>, price:<extracted>, billing:"monthly"}]`.
+- Self-check at end of every refresh validates all entries are in new schema.
+
+## LIFECYCLE_STATES (deprecated/active/archived handling per #2A)
+
+Every model carries a `status` field:
+
+| Status | When set | UI behavior | Survey behavior |
+|--------|----------|-------------|-----------------|
+| `active` | Default; vendor lineup includes it | Normal rendering | Full bench/pricing refresh every cycle |
+| `deprecated` | Vendor lineup explicitly marks it deprecated OR vendor has named a successor and grace period started | Gray-out, "⚠ Deprecated <date>" badge, sortable but visually de-emphasized; tooltip points to successor | Pricing/availability refresh only (no bench re-survey unless user requests) |
+| `archived` | Vendor removed from lineup AND > DEPRECATION_GRACE_DAYS (60d) since deprecation | Hidden by default; visible only via "Show archived" filter | Skip in refresh; data/archive/<id>.json holds full last-known snapshot |
+
+**Transition rules (auto, no user prompt):**
+- `active` → `deprecated`: when Step 0 lineup marks deprecated. Set `deprecatedAt: today`, `successor: <id>?` from vendor announcement.
+- `deprecated` → `archived`: when `today - deprecatedAt > DEPRECATION_GRACE_DAYS`. Move full entry to `data/archive/<id>.json`, leave only stub `{ id, name, status:"archived", archivedAt, deprecatedAt }` in main models.json.
+- `deprecated` → `active`: when vendor re-lists. Restore from main entry, clear `deprecatedAt`.
+- `archived` → `active`: never automatic; requires manual `/aicodermap restore <id>`.
+
+## WRONG_ID_AUTO_FIX (handles cases like devstral-medium holding Devstral Small 2 data)
+
+When Step 0 lineup discovery flags an `id` mismatch (current data carries wrong-canonical id):
+
+```
+1. Verify with ≥2 vendor-official sources that the official id differs from current data id
+2. If verified:
+   a. Move current entry to data/archive/<old-id>.json
+   b. Create new entry with official id, populate from current data + lineup info
+   c. Append rename to data/sources.json: { "key": "rename:<old-id>→<new-id>", "evidence": [<urls>], "date": today }
+   d. Append to CHANGELOG: "### Renamed\n- `<old-id>` → `<new-id>` (vendor canonical, evidence: <url>)"
+3. If single-source-only (cannot verify): emit `gaps[]` entry, leave id unchanged, surface in diff for user awareness
+```
+
+User is NOT prompted for the rename. Default is auto-execute when verified ≥2 sources.
 
 ## MERGE_RULES
 
-**Why this section exists:** prior runs lost data because the merge step only touched `bench`/`pricing`/`provider`/`license`. Sparse fields (`vramRequirement`, `ollamaSize`, `pricing.api.cacheHit`, `uptime`, `subscription`) were silently skipped — visible in the resulting `data/models.json` as missing values that the user then had to flag manually. Never again.
+**Why this section exists:** prior runs lost data because the merge step only touched `bench`/`pricing`/`provider`/`license`. Sparse fields (`vramRequirement`, `ollamaSize`, `pricing.api.cacheHit`, `uptime`, `subscription`) were silently skipped. Never again.
 
 ### A. Artifact reconciliation (BEFORE primary agent run merge)
 
-Before applying the current run's `models[].updates`, scan for prior artifacts that may carry data the current run omitted:
+Before applying the current run's `models[].updates`, scan for prior artifacts:
 
 ```
 prior_artifacts = glob('.aicodermap-*.json') ∪ {.aicodermap-merged.json, .aicodermap-targeted-out.json, .aicodermap-agent-out{,2,3}.json, .aicodermap-agent-out-fresh.json}
 ```
 
-These exist when a prior refresh failed mid-flow OR when targeted gap-fill produced a separate artifact OR when the user manually merged earlier runs. Treat their `models[].updates`, `newModels[]`, and `sourcesAdded[]` as **lower-priority backfill** candidates for any field the current run leaves null.
+Treat their `models[].updates`, `newModels[]`, and `sourcesAdded[]` as **lower-priority backfill** candidates for any field the current run leaves null.
 
 ### B. Per-field merge policy (priority order, top wins)
 
 For every `(modelId, field)` pair, walk this priority list and apply the first non-null value found:
 
 ```
-1. User-resolved RED contradictions (always canonical, never overridden)
-2. Independent-source override (per memory rule: I-tier > S-tier when both exist for the same bench)
-3. Current run's models[].updates value (newest authoritative agent return)
+1. Step 7 contradiction-auto-resolved value (winner via trustScore)
+2. Highest-trustScore source from current run's sourcesAdded[]
+3. Current run's models[].updates value (when no contradiction)
 4. Prior artifact value (recover any field the current run omitted)
 5. Existing data/models.json value (preserve)
 ```
@@ -106,57 +287,78 @@ For every `(modelId, field)` pair, walk this priority list and apply the first n
 ### C. Field whitelist (every refresh MUST iterate ALL of these)
 
 ```
-SCALAR FIELDS:    name, provider, released, tier, open, license, context, providers, uptime, vramRequirement, ollamaSize, strengthsKey, weaknessesKey
+SCALAR FIELDS:    name, provider, released, tier, status, deprecatedAt, archivedAt, successor,
+                  open, license, context, providers, uptime, vramRequirement, ollamaSize,
+                  strengthsKey, weaknessesKey
 
-NESTED FIELDS:    pricing.api.in, pricing.api.out, pricing.api.cacheHit, pricing.subscription
+ARRAY FIELDS (NEW SCHEMA):
+                  pricing.api[]            (per-provider {provider, in, out, cacheHit, throughput, url, fetched})
+                  pricing.subscription[]   (per-tier {tier, price, currency, billing, notes})
+                  unslothVariants[]        (replace if new has ≥ existing length)
+
+COMPUTED FIELDS:  pricing.range            (computed from pricing.api[] at write time)
 
 OBJECT FIELDS:    ollama (full pullCmd/tags/pullCount/architecture/parameters/license/releasedISO/ollamaUrl block — preserve atomically; replace only if new object has more keys)
 
-ARRAY FIELDS:     unslothVariants[] (replace if new has ≥ existing length)
-
 BENCH KEYS (13):  swePro, sweV, tb2, lcbV6, aider, tau2, aaCoding, aaAgentic, mcpA, gpqa, sweMulti, hle, aaIdx
-                  → independent-source rule applies per bench key
+                  → trustScore-driven contradiction resolution per bench key
 ```
 
 A field whose current value is `null`, `undefined`, `"?"`, or `"Unknown"` is treated as **empty** for fill purposes. Any artifact value beats empty.
 
-### D. Provenance (data/sources.json)
+### D. Pricing array merge
 
-After the field merge, every `(modelId, bench)` value that ended up in `data/models.json` must have at least one matching entry in `data/sources.json[<modelId>.<bench>]`. If the chosen value is provider-self-reported (no I-tier source) AND no sources entry exists, append the S-tier provenance pointing at the announcement URL (so UI can render the "self-reported" marker).
+When current run returns `pricing.api[]` for a model:
+- For each new entry, dedupe by `provider` against existing array
+- If `provider` matches: replace if new `fetched` date is newer, OR if new `in/out/cacheHit` differ AND new is from higher-tier source
+- Append new providers as new array elements
+- Recompute `pricing.range` after merge
 
-### E. lastUpdated discipline
+Same dedupe-by-tier-name discipline for `pricing.subscription[]`.
 
-Touch `lastUpdated := today` ONLY on models that gained at least one new field value during merge. Models with zero deltas keep their prior `lastUpdated` (the M5 freshness gate then accurately reflects what's actually fresh).
+### E. Provenance (data/sources.json)
 
-### F. Backup rotation
+After the field merge, every value in `data/models.json` must have at least one matching entry in `data/sources.json[<modelId>.<field>]` with computed `trustScore`. Contradiction losers are also written so the UI can surface "alternate-source" indicators.
+
+### F. lastUpdated discipline
+
+Touch `lastUpdated := today` ONLY on models that gained at least one new field value during merge.
+
+### G. Backup rotation
 
 ```
 data/models.json     → data/models.json.bak (most recent prior)
 data/models.json.bak → data/models.json.bak2 (the one before that)
 ```
 
-Same rotation for `data/sources.json` and `i18n/*.json`. Two layers of `.bak` lets the user undo two refreshes back. Both .bak / .bak2 are gitignored via `*.bak`.
+Same for `data/sources.json` and `i18n/*.json`. Two layers of `.bak`. Both gitignored via `*.bak`.
 
-### G. Self-check (BEFORE prompting the user to git commit)
+### H. Self-check (BEFORE prompting the user to git commit)
 
-Run this verification pass:
 ```
 for each model in data/models.json:
   for each field in (whitelist above):
     if field is null AND any artifact has a non-null value:
       → MERGE BUG. Halt, log model+field+artifact path, prompt user.
+  validate pricing.api is an array (not flat object) — auto-migrate if not
+  validate pricing.subscription is an array (not string) — auto-migrate if not
+  validate pricing.range is computed and matches min/max of pricing.api[]
+  validate every (model, bench) value has a sources.json entry with trustScore
+  validate status is one of {active, deprecated, archived}
 ```
 
-A passing self-check is the gate for printing git commands at Step 12. If it fails, the answer is never "let the user catch it later" — fix the merge in-place.
+A passing self-check is the gate for printing git commands at Step 12.
 
 ## ERRORS
 | condition | action |
 |-----------|--------|
-| Agent timeout/HTTP fail | retry 1× → fallback WebSearch → prompt "partial data, continue?" |
-| Agent return invalid JSON | log to ~/.aicodermap-debug.log, prompt retry |
-| coverage < 0.95 | display missing scores list, options: [A]force-override [B]re-research [C]manual-add |
-| refresh-all family count < 30 (FAMILY_BASELINE_MIN) | block: list missing families per DEFAULT_TARGETS, options: [A]re-research with explicit family list [B]force-override (mark gaps[]) |
-| RED contradiction (>5pp) | per-RED prompt: [1]source-A [2]source-B [3]flag-both-avg [4]skip-model |
+| Agent timeout/HTTP fail | retry 1× → fallback narrower-scope re-prompt → write partial |
+| Agent return invalid JSON | log to ~/.aicodermap-debug.log, retry 1× with stricter delivery contract reinforcement |
+| coverage < COVERAGE_DEEPEN_THRESHOLD | **trigger deep-fetch loop (NOT a block)**; if still <COVERAGE_PARTIAL_WARN after cycles, write + CHANGELOG warning |
+| refresh-all family count < FAMILY_BASELINE_MIN | block: list missing families per MODEL_FAMILIES, options: [A]re-research with explicit family list [B]force-override (mark gaps[]) |
+| RED contradiction (>5pp) | **auto-resolve via trustScore (NOT manual prompt)**; log all candidates loudly to CHANGELOG |
+| Lineup discovery: REMOVED entry | move to data/archive/, append to CHANGELOG ### Removed |
+| Lineup discovery: RENAMED with single-source-only | leave id unchanged, emit gaps[] entry, surface in diff |
 | User decline at step 9 | restore from .bak, no commit |
 | Git push fail (conflict) | prompt "git pull --rebase first" |
 | Pages deploy >5min | suggest githubstatus.com check |
@@ -164,19 +366,20 @@ A passing self-check is the gate for printing git commands at Step 12. If it fai
 ## OUTPUT_TEMPLATE_SUCCESS
 ```
 🚀 AICoderMap update | scope:<scope> | last_refresh:<n>d ago (M5 ≤14d ✓)
-🤖 Agent → sonnet | ETA ~<n>min
+📋 Lineup sync: <new>+<deprecated>+<renamed>+<removed> changes detected
+🤖 Agent → sonnet | trusted-source whitelist | parallel:5 | budget:6×90s/model | ETA ~<n>min
 
-✓ Return: confidence:<HIGH|MED|LOW> | <n_updated> updated | <n_new> new | <n_yellow>Y/<n_red>R contradictions | coverage:<%>
+✓ Return: confidence:<HIGH|MED|LOW> | <n_updated> updated | <n_new> new | <n_yellow>Y/<n_red>R contradictions auto-resolved | coverage:<%>
 
 📋 Diff:
   <model_id>:
-    <field>: <old> → <new> (Δ <delta>) [✓ agree | ⚠ YELLOW <Apros>vs<Bpros>]
+    <field>: <old> → <new> (Δ <delta>) [✓ trust=<score> | ⚠ over <loser>:trust=<score>]
   <new_model_id> (NEW): <summary>
+  <deprecated_id> (DEPRECATED): successor=<id?>
+  <renamed_id> (RENAMED): <old> → <new>
 
-📝 approve|partial <ids>|decline|detail <id>?
-
-✓ Wrote: data/models.json (<n>upd+<n>add)
-✓ Wrote: data/sources.json (<n> entries)
+✓ Wrote: data/models.json (<n>upd+<n>add+<n>renamed+<n>deprecated)
+✓ Wrote: data/sources.json (<n> entries with trustScore)
 ✓ Wrote: i18n/{tr,en}.json (<n> entries)
 ✓ Appended: CHANGELOG.md ## <date>
 
@@ -189,52 +392,30 @@ A passing self-check is the gate for printing git commands at Step 12. If it fai
 ✓ Live: <url> | M5: <n>d ago (≤14d ✓)
 ```
 
-## OUTPUT_TEMPLATE_COVERAGE_LOW
-```
-⚠ Coverage: <%> (M4 ≥0.95 fail)
-   Missing source for <n> scores:
-     - <model_id>.<benchmark>: <n_sources> source(s), tier=<S|I|C>
-[A] force-override (mark as 'S' tier)
-[B] re-research missing pairs (recommended)
-[C] manual add to data/sources.json
-```
-
-## OUTPUT_TEMPLATE_RED_CONTRADICTION
-```
-🚨 RED contradiction (>5pp): <model_id>.<benchmark>
-   <source_A> (tier:<t>): <value_A> | <date>
-   <source_B> (tier:<t>): <value_B> | <date>
-   delta: <pp>pp 🚨
-[1] <source_A> primary | [2] <source_B> primary ⭐ if higher tier
-[3] flag both, avg = <calc> ⚠ | [4] skip model this update
-```
-
 ## SUBCOMMANDS
+### `lineup-sync` (Step 0 only — fast lineup audit)
+Agent runs only the LINEUP DISCOVERY phase. Output: vendor diff (NEW/DEPRECATED/RENAMED/REMOVED) without bench/pricing survey. Useful for weekly lineup audits.
+
 ### `validate` (no fetch)
-Read data/sources.json → compute coverage, list contradictions, check stale entries.
-Output:
-```
-total_models:<n> | coverage:<%> | contradictions:<n>Y/<n>R | stale:<n>
-```
+Read data/sources.json → compute coverage, list contradictions awaiting auto-resolve, check stale entries.
 
 ### `stale-check`
 Iterate data/models.json → list entries with `(today - lastUpdated) > STALE_DAYS`.
-Output:
-```
-- <model_id>: <n>d ago ⚠⚠⚠ if >2× threshold
-```
 
 ### `changelog`
 tail -50 CHANGELOG.md → parse last 5 release entries.
 
 ## DISCIPLINES
-- M4 gate enforced; force-override requires explicit user input
-- M5 ≤14 day discipline (Aider 5-month-stale antipattern defense)
-- R3 burnout: ≤4 content posts/month hard cap (separate, not skill scope)
-- Editorial integrity: contradictions surfaced, never hidden
-- **Schema-complete merge** — every refresh applies MERGE_RULES to ALL whitelisted fields, reconciles against ALL prior `.aicodermap-*.json` artifacts, and runs the self-check before printing git commands. No silent field drops.
-- **Independent-source canonical rule** — I-tier leaderboard values override S-tier provider self-reports; see memory `feedback_independent_bench_priority`
-- **Agent delivery contract** — agent returns JSON as final text message (no narration, no file write); see memory `feedback_agent_output_delivery_contract`
+- **Lineup-first** — every refresh-all begins with Step 0 vendor lineup discovery; the survey is driven by the discovered lineup, not by stale data state
+- **Autonomous resolution** — coverage triggers deeper research (not a block); contradictions auto-resolve via trustScore (not user prompts); rename + deprecate auto-execute when ≥2 sources verify
+- **Schema-complete merge** — every refresh applies MERGE_RULES to ALL whitelisted fields, including pricing.api[] array, pricing.subscription[] array, status field. Self-check before commit
+- **Trust scoring** — every value in data/sources.json carries a computed trustScore; contradictions resolved via argmax(trustScore)
+- **Independent-source canonical** — I-tier > S-tier > C-tier > U-tier (never written); see TRUST_SCORE_FORMULA
+- **Multi-provider pricing** — pricing.api is an array of provider entries; UI shows per-provider in card, range in table
+- **Lifecycle states** — active/deprecated/archived with auto-transitions on grace period
+- **Agent delivery contract** — agent returns JSON as final text message (no narration, no file write)
+- **Trusted-source whitelist** — agent fetches only from FETCH_WHITELIST; per-model budget 6 fetches × 90s
+- **M5 ≤14 day discipline** (Aider 5-month-stale antipattern defense)
 - NO GitHub Actions / CI / workflows (manual only)
 - NO external monitoring (GitHub Insights Traffic = M1 source)
 - Project-scoped: skill+agent only in `D:\GitHub\aicodermap\` session
@@ -243,10 +424,13 @@ tail -50 CHANGELOG.md → parse last 5 release entries.
 | test | trigger | pass |
 |------|---------|------|
 | invoke | `/aicodermap` | menu <1s |
+| lineup_sync | `/aicodermap lineup-sync` | vendor diff <2min, no bench fetch |
 | delegate | `/aicodermap model <id>` | agent start <5s, sonnet |
-| coverage_gate | force <0.95 | warn + override prompt |
-| red_block | mock 7pp delta | manual pick required |
-| diff_render | post-refresh | full markdown table |
+| coverage_deepen | force <0.95 | auto-trigger deep-fetch, no user prompt |
+| red_auto_resolve | mock 7pp delta | trustScore winner written, no user prompt, CHANGELOG logged |
+| schema_migration | run on legacy flat-pricing model | auto-migrate to array, self-check passes |
+| deprecated_transition | mock vendor-deprecated entry | status="deprecated" + UI gray-out |
+| renamed_auto | mock rename ≥2-source verified | auto-rename, archive old, CHANGELOG ### Renamed |
+| diff_render | post-refresh | full markdown table with trustScore column |
 | atomic | decline mid-write | data/* unchanged, .bak preserved |
 | deploy_verify | post-push 90s | live URL 200 + schema valid |
-| stale | entry 15d old | listed in stale-check |

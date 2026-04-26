@@ -993,3 +993,89 @@ body.exporting { background: var(--bg); }
   align-items: center;
   gap: var(--space-2);
 }
+
+/* ---------- v2 schema additions ---------- */
+
+/* Lifecycle states */
+.model-card.is-deprecated {
+  opacity: 0.62;
+  filter: grayscale(0.45);
+}
+.model-card.is-deprecated:hover { opacity: 0.85; }
+.model-card.is-archived { display: none; }
+
+.deprecated-badge,
+.archived-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: var(--space-2);
+}
+.deprecated-badge {
+  background: rgba(255, 175, 80, 0.15);
+  color: #ffaf50;
+  border: 1px solid rgba(255, 175, 80, 0.45);
+}
+.archived-badge {
+  background: rgba(180, 180, 180, 0.18);
+  color: var(--muted);
+  border: 1px solid rgba(180, 180, 180, 0.4);
+}
+
+/* Multi-provider pricing breakdown */
+.pricing-providers {
+  margin: var(--space-2) 0;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-2);
+  border-radius: 8px;
+  font-size: 0.86rem;
+}
+.pricing-providers > summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 600;
+  list-style: none;
+  user-select: none;
+}
+.pricing-providers > summary::-webkit-details-marker { display: none; }
+.pricing-providers > summary::before {
+  content: '▸ ';
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+.pricing-providers[open] > summary::before {
+  transform: rotate(90deg);
+}
+.pricing-providers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: var(--space-2);
+}
+.pricing-provider-row {
+  display: grid;
+  grid-template-columns: minmax(80px, 0.4fr) 1fr auto;
+  gap: var(--space-2);
+  align-items: baseline;
+  padding: 2px 0;
+}
+.prov-name {
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: lowercase;
+}
+.prov-price {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.prov-link {
+  color: var(--accent-2);
+  text-decoration: none;
+  opacity: 0.7;
+  font-size: 0.9em;
+}
+.prov-link:hover { opacity: 1; }

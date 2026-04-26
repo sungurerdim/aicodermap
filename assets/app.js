@@ -524,11 +524,53 @@ function tierLabel(tier) {
   return t(`ui.tier.${tier}`) || tier;
 }
 
+/**
+ * Read pricing in schema v2 (multi-provider array). Returns a normalized view
+ * with computed ranges, per-provider list, and subscription tiers. Backward-
+ * compatible with legacy flat schema (single `{in, out, cacheHit}` object).
+ */
+function pricingView(model) {
+  const p = model.pricing || {};
+  let api = p.api;
+  // Legacy bridge: wrap flat object as single-element array.
+  if (api && !Array.isArray(api) && typeof api === 'object') {
+    api = [{ provider: 'official', in: api.in ?? null, out: api.out ?? null,
+             cacheHit: api.cacheHit ?? null, throughput: null, url: null,
+             fetched: model.lastUpdated }];
+  }
+  api = Array.isArray(api) ? api : [];
+  const ins = api.map(e => e?.in).filter(v => v != null);
+  const outs = api.map(e => e?.out).filter(v => v != null);
+  const chs = api.map(e => e?.cacheHit).filter(v => v != null);
+  const range = p.range || {
+    in: ins.length ? [Math.min(...ins), Math.max(...ins)] : null,
+    out: outs.length ? [Math.min(...outs), Math.max(...outs)] : null,
+    cacheHit: chs.length ? [Math.min(...chs), Math.max(...chs)] : null,
+  };
+  let subs = p.subscription;
+  if (typeof subs === 'string' && subs) subs = [{ tier: subs, price: null, billing: 'monthly', notes: subs }];
+  if (!Array.isArray(subs)) subs = [];
+  return { providers: api, range, subscriptions: subs };
+}
+
+function fmtPriceMoney(v) {
+  if (v == null) return '—';
+  return `$${Number(v).toString()}`;
+}
+
+function fmtPriceRange(pair) {
+  if (!pair) return '—';
+  const [a, b] = pair;
+  if (a == null && b == null) return '—';
+  if (a === b || b == null) return fmtPriceMoney(a);
+  return `${fmtPriceMoney(a)}–${fmtPriceMoney(b)}`;
+}
+
 function fmtPriceCell(model) {
-  const api = model.pricing?.api;
-  if (!api || (api.in == null && api.out == null)) return '—';
-  const inS = api.in != null ? `$${api.in}` : '—';
-  const outS = api.out != null ? `$${api.out}` : '—';
+  const v = pricingView(model);
+  const inS = fmtPriceRange(v.range?.in);
+  const outS = fmtPriceRange(v.range?.out);
+  if (inS === '—' && outS === '—') return '—';
   return `${inS} / ${outS}`;
 }
 
@@ -590,9 +632,11 @@ function buildBenchCell(model, key) {
 
 function buildModelCard(model, rank) {
   const composite = compositeScore(model, State.weights);
+  const status = model.status || 'active';
+  const statusClass = status === 'active' ? '' : ` is-${status}`;
   const card = el('article', {
-    class: 'model-card',
-    dataset: { modelId: model.id, tier: model.tier },
+    class: `model-card${statusClass}`,
+    dataset: { modelId: model.id, tier: model.tier, status },
     'data-export-section': `model-${model.id}`,
     'aria-label': model.name
   });
@@ -623,16 +667,29 @@ function buildModelCard(model, rank) {
     providerRow.appendChild(el('span', { class: 'closed-badge', title: t('ui.closedWeights') || 'Closed weights' },
       t('ui.closedShort') || 'CLOSED'));
   }
+  if (model.status === 'deprecated') {
+    const tip = model.successor ? `Successor: ${model.successor}` : 'Deprecated by vendor';
+    const dateTxt = model.deprecatedAt ? ` ${model.deprecatedAt}` : '';
+    providerRow.appendChild(el('span', { class: 'deprecated-badge', title: tip },
+      `${t('ui.deprecated') || 'DEPRECATED'}${dateTxt}`));
+  } else if (model.status === 'archived') {
+    providerRow.appendChild(el('span', { class: 'archived-badge', title: 'Archived' },
+      t('ui.archived') || 'ARCHIVED'));
+  }
   card.appendChild(providerRow);
 
   // Meta grid
   const meta = el('div', { class: 'model-meta' });
+  const pview = pricingView(model);
   meta.appendChild(metaCell(t('ui.table.context'), fmtContext(model.context)));
   meta.appendChild(metaCell(t('ui.table.pricingApi'), fmtPriceCell(model)));
-  if (model.pricing?.api?.cacheHit != null) {
-    meta.appendChild(metaCell(t('ui.table.cacheHit') || 'Cache hit', `$${model.pricing.api.cacheHit}`));
+  if (pview.range?.cacheHit) {
+    meta.appendChild(metaCell(t('ui.table.cacheHit') || 'Cache hit', fmtPriceRange(pview.range.cacheHit)));
   }
-  meta.appendChild(metaCell(t('ui.table.pricingSub'), model.pricing?.subscription || '—'));
+  const subText = pview.subscriptions.length
+    ? pview.subscriptions.map(s => s.price != null ? `${s.tier} $${s.price}/${s.billing === 'annual' ? 'yr' : 'mo'}` : (s.notes || s.tier)).join(' · ')
+    : '—';
+  meta.appendChild(metaCell(t('ui.table.pricingSub'), subText));
   meta.appendChild(metaCell(t('ui.table.lastUpdated'), model.lastUpdated || '—'));
   if (model.providers != null) meta.appendChild(metaCell(t('ui.table.providers') || 'Providers', `${model.providers}${model.uptime != null ? ` (uptime ${fmtScore(model.uptime, 1)}%)` : ''}`));
   if (model.vramRequirement != null) meta.appendChild(metaCell(t('ui.table.vram'), `${model.vramRequirement} GB`));
@@ -647,6 +704,32 @@ function buildModelCard(model, rank) {
   meta.appendChild(metaCell(t('ui.table.gpu'), compatWrap));
 
   card.appendChild(meta);
+
+  // Multi-provider pricing breakdown (only when ≥2 providers)
+  if (pview.providers.length >= 2) {
+    const provBlock = el('details', { class: 'pricing-providers' });
+    provBlock.appendChild(el('summary', null, t('ui.pricing.byProvider') || 'Pricing by provider'));
+    const list = el('div', { class: 'pricing-providers-list' });
+    for (const e of pview.providers) {
+      const row = el('div', { class: 'pricing-provider-row' });
+      row.appendChild(el('span', { class: 'prov-name' }, e.provider || '—'));
+      const priceTxt = `${fmtPriceMoney(e.in)} / ${fmtPriceMoney(e.out)}${e.cacheHit != null ? ` · cache ${fmtPriceMoney(e.cacheHit)}` : ''}${e.throughput != null ? ` · ${e.throughput} tok/s` : ''}`;
+      row.appendChild(el('span', { class: 'prov-price' }, priceTxt));
+      if (e.url) {
+        const link = document.createElement('a');
+        link.href = e.url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.className = 'prov-link';
+        link.textContent = '↗';
+        link.title = e.url;
+        row.appendChild(link);
+      }
+      list.appendChild(row);
+    }
+    provBlock.appendChild(list);
+    card.appendChild(provBlock);
+  }
 
   // Bench grid
   const benchHead = el('div', { class: 'meta-cell' },
@@ -819,11 +902,11 @@ function buildTableColumns() {
       get: (m) => m.context,
       render: (m) => fmtContext(m.context) },
     { key: 'priceIn', i18n: 'ui.table.priceIn', sortable: true, num: true,
-      get: (m) => m.pricing?.api?.in,
-      render: (m) => m.pricing?.api?.in != null ? `$${m.pricing.api.in}` : '—' },
+      get: (m) => pricingView(m).range?.in?.[0] ?? null,
+      render: (m) => fmtPriceRange(pricingView(m).range?.in) },
     { key: 'priceOut', i18n: 'ui.table.priceOut', sortable: true, num: true,
-      get: (m) => m.pricing?.api?.out,
-      render: (m) => m.pricing?.api?.out != null ? `$${m.pricing.api.out}` : '—' },
+      get: (m) => pricingView(m).range?.out?.[0] ?? null,
+      render: (m) => fmtPriceRange(pricingView(m).range?.out) },
     { key: 'vram', i18n: 'ui.table.vram', sortable: true, num: true,
       get: (m) => m.vramRequirement,
       render: (m) => m.vramRequirement != null ? `${m.vramRequirement} GB` : '—' },
