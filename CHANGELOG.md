@@ -1,3 +1,28 @@
+
+## [2026-04-26] — autonomous v2 refresh-all [WARN: partial coverage 41.0%]
+
+### Added
+- `claude-haiku-4-5` — new model from vendor lineup discovery
+
+### Updated
+- 26 models: `opus-4-7`, `sonnet-4-6`, `gemini-3-1-pro`, `gpt-5-4`, `grok-3`, `deepseek-v4-pro`, `deepseek-v4-flash`, `deepseek-v3-2`, `devstral-medium`, `devstral-2`, `kimi-k2-6`, `glm-5-1`, `qwen3-235b`, `qwen3-32b`, `qwen3-6-35b-moe`, `gemma-4-26b-moe`, `gemma-4-31b`, `gemma-4-e2b`, `gemma-4-e4b`, `deepseek-r1-14b`, `qwen25-coder-32b`, `qwen25-coder-14b`, `qwen25-coder-7b`, `codestral-22b`, `llama-4-maverick`, `llama-4-scout`
+
+### Resolved (auto via trustScore)
+- opus-4-7.sweV: winner=87.6 (severity=GREEN, Δ1.2)
+- opus-4-7.gpqa: winner=95.4 (severity=GREEN, Δ1.2)
+- sonnet-4-6.sweV: winner=82 (severity=YELLOW, Δ4.9)
+
+### Gaps (11 entries — see data/known-gaps.json or next refresh)
+- `claude-haiku-4-5.swePro`: No SEAL submission
+- `claude-haiku-4-5.sweV`: Not on bench leaderboards
+- `minimax-m2-7.all`: MiniMax platform unreachable
+- `minimax-m2-5.all`: MiniMax platform unreachable
+- `mimo-v2-pro.all`: Xiaomi MiMo fetch failed
+- `mimo-v2-5-pro.all`: Xiaomi MiMo fetch failed
+- `step-3-5-flash.all`: StepFun login wall
+- `nemotron-3-super.all`: Nvidia NIM timeout
+- ... and 3 more
+
 # Changelog
 
 All notable changes to AICoderMap will be documented here.

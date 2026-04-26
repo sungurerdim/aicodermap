@@ -33,6 +33,35 @@
       "date": "2026-04-20",
       "tier": "I",
       "trustScore": 0.333
+    },
+    {
+      "value": 87.6,
+      "source": "Vellum LLM Leaderboard",
+      "url": "https://vellum.ai/llm-leaderboard",
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.333
+    },
+    {
+      "value": 86.4,
+      "source": "auto-resolution candidate",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.467,
+      "contradictionRole": "loser"
+    },
+    {
+      "value": 87.6,
+      "source": "auto-resolution candidate",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.333,
+      "contradictionRole": "winner"
     }
   ],
   "opus-4-7.tb2": [
@@ -83,6 +112,35 @@
       "date": "2026-04-16",
       "tier": "S",
       "trustScore": 0.233
+    },
+    {
+      "value": 95.4,
+      "source": "Vellum LLM Leaderboard",
+      "url": "https://vellum.ai/llm-leaderboard",
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.333
+    },
+    {
+      "value": 94.2,
+      "source": "auto-resolution candidate",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.467,
+      "contradictionRole": "loser"
+    },
+    {
+      "value": 95.4,
+      "source": "auto-resolution candidate",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.333,
+      "contradictionRole": "winner"
     }
   ],
   "opus-4-7.sweMulti": [
@@ -131,6 +189,35 @@
       "date": "2026-02-17",
       "tier": "S",
       "trustScore": 0.198
+    },
+    {
+      "value": 82,
+      "source": "Vellum LLM Leaderboard",
+      "url": "https://vellum.ai/llm-leaderboard",
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.333
+    },
+    {
+      "value": 77.1,
+      "source": "auto-resolution candidate",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.467,
+      "contradictionRole": "loser"
+    },
+    {
+      "value": 82,
+      "source": "auto-resolution candidate",
+      "url": null,
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.333,
+      "contradictionRole": "winner"
     }
   ],
   "sonnet-4-6.tb2": [
@@ -255,6 +342,15 @@
       "date": "2026-02-19",
       "tier": "S",
       "trustScore": 0.198
+    },
+    {
+      "value": 91.9,
+      "source": "Vellum LLM Leaderboard",
+      "url": "https://vellum.ai/llm-leaderboard",
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.333
     }
   ],
   "gemini-3-1-pro.hle": [
@@ -1155,6 +1251,28 @@
       "url": "https://artificialanalysis.ai/leaderboards/models",
       "date": "2026-04-25",
       "tier": "I",
+      "trustScore": 0.333
+    }
+  ],
+  "deepseek-v3-2.swePro": [
+    {
+      "value": 15.56,
+      "source": "Scale SEAL",
+      "url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.333
+    }
+  ],
+  "devstral-medium.sweV": [
+    {
+      "value": 61.6,
+      "source": "OpenRouter model card",
+      "url": "https://openrouter.ai/mistralai/devstral-medium",
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
       "trustScore": 0.333
     }
   ]
