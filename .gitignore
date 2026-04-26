@@ -32,7 +32,9 @@ tmp/
 coverage/
 *.lcov
 
-# Local skill development
+# Local Claude Code settings (per-user permission allowlists, etc.)
+.claude/settings.local.json
+.claude/*.local.json
 .claude-local/
 
 # AICoderMap skill artifacts (research-agent intermediate outputs)
