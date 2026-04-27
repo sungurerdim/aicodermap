@@ -757,7 +757,11 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "sweV",
+        "swePro"
+      ]
     },
     {
       "name": "Scale SEAL SWE-bench Pro public",
@@ -777,7 +781,10 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "swePro"
+      ]
     },
     {
       "name": "SWE-bench (canonical)",
@@ -1069,7 +1076,14 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "sweV",
+        "gpqa",
+        "aime26",
+        "hle",
+        "aaIdx"
+      ]
     },
     {
       "name": "llm-stats.com",
@@ -1095,6 +1109,13 @@
       "slugVariations": [
         "{id}",
         "claude-{id}"
+      ],
+      "publishes": [
+        "sweV",
+        "gpqa",
+        "hle",
+        "lcbV6",
+        "aime26"
       ]
     },
     {
@@ -1114,7 +1135,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": []
     },
     {
       "name": "LiveBench",
@@ -1136,7 +1158,11 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "gpqa",
+        "lcbV6"
+      ]
     },
     {
       "name": "Berkeley BFCL",
@@ -1180,7 +1206,10 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "lcbV6"
+      ]
     },
     {
       "name": "BigCodeBench HF Space",
@@ -1198,7 +1227,10 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "lcbV6"
+      ]
     },
     {
       "name": "EvalPlus",
@@ -1217,7 +1249,10 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "lcbV6"
+      ]
     },
     {
       "name": "HF Open LLM Leaderboard",
@@ -1236,7 +1271,12 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "gpqa",
+        "hle",
+        "aime26"
+      ]
     },
     {
       "name": "Klu.ai",
@@ -1255,7 +1295,12 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "gpqa",
+        "sweV",
+        "hle"
+      ]
     },
     {
       "name": "Papers with Code",
@@ -1274,7 +1319,12 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "sweV",
+        "lcbV6",
+        "gpqa"
+      ]
     },
     {
       "name": "arXiv",
@@ -1293,7 +1343,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": []
     },
     {
       "name": "BenchLM",
@@ -1406,7 +1457,11 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "sweV",
+        "tb2"
+      ]
     },
     {
       "name": "LMMarketCap",
@@ -1425,7 +1480,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": []
     },
     {
       "name": "llm-stats LiveCodeBench",
