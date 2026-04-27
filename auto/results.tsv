@@ -7,3 +7,9 @@ timestamp	commit	status	hit_rate_at_1	hit_rate_at_3	duration	description
 2026-04-26T23:52:17Z	f40c3bc	keep	0.8400	0.9200	00:00:01	exp5: Anthropic claude-{id_no_prefix} (haiku double-prefix fix)
 2026-04-27T00:28:36Z	d25659c	keep	0.9200	1.0000	00:00:01	exp6: AA vendorSuffixMap (Google flash + Qwen coder)
 2026-04-27T00:29:31Z	51d0c89	keep	0.9600	1.0000	00:00:01	exp7: DeepMind modelCard vendor_suffix (Google flash -lite)
+2026-04-27T00:50:45Z	BASELINE2	keep	0.4125	0.9600	00:00:01	phase2 baseline (predicted_reach metric, 3/34 leaderboards have publishes[])
+2026-04-27T00:51:21Z	ac6482a	keep	0.6250	0.9600	00:00:01	exp8: AA publishes full audit set (12 keys)
+2026-04-27T00:51:40Z	54b4ab8	keep	1.0000	0.9600	00:00:01	exp9: BenchLM publishes all 16 (meta-aggregator)
+2026-04-27T00:53:34Z	38ae634	keep	1.0000/0.5208	0.9600	00:00:01	BASELINE3: redundancy_score primary (after EXP9 saturated predicted_reach)
+2026-04-27T00:54:30Z	5c2d79f	keep	1.0000/0.6458	0.9600	00:00:01	exp10: canonical bench sites publishes[] (8 sites, redundancy +)
+2026-04-27T00:55:04Z	0060f97	keep	1.0000/0.7500	0.9600	00:00:01	exp11: aggregator publishes[]
