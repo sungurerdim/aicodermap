@@ -544,15 +544,18 @@
       "postFormat": "static_html_article",
       "modelCardSlugStrategy": "try_variations",
       "modelCardSlugVariations": [
+        "{id}{vendor_suffix}",
         "{id}",
         "{id}-preview",
-        "{id}-lite",
-        "{id}-pro",
-        "{id}-flash"
+        "{id}-pro"
       ],
       "modelCardFormat": "static_html_article",
       "urlsNote": "Model cards at deepmind.google/models/model-cards/{slug}/ contain 14+ benchmarks (HLE, ARC-AGI-2, GPQA, TB2, sweV, swePro, lcbV6, tau2, mcpA, MMMU). RICH source for Gemini bench data.",
-      "lastVerifiedDate": "2026-04-27"
+      "lastVerifiedDate": "2026-04-27",
+      "vendorSuffixMap": {
+        "google_deepmind:flash": "-lite",
+        "default": ""
+      }
     },
     "mistral": {
       "name": "Mistral AI",
