@@ -1003,7 +1003,21 @@
         "google_deepmind:flash": "-lite-preview",
         "alibaba_qwen:coder": "-a35b-instruct",
         "default": ""
-      }
+      },
+      "publishes": [
+        "aaIdx",
+        "aaCoding",
+        "aaAgentic",
+        "aaOmni",
+        "gpqa",
+        "sweV",
+        "tb2",
+        "tau2",
+        "hle",
+        "mcpA",
+        "aime26",
+        "lcbV6"
+      ]
     },
     {
       "name": "Vellum LLM Leaderboard",
