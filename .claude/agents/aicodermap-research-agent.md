@@ -604,13 +604,35 @@ If both queries return zero useful (bench, score) pairs, the agent has already e
 
 **Why this section exists:** The 2026-04-27 cycle 1 emitted 6 gaps with `triedSources: []` and 9 more with only 1–2 entries. Several "no data found" claims for legacy/deprecated models (`o3.sweV`, `deepseek-r1-14b.sweV`, `qwen25-coder-7b.sweV`, `gemma-4-31b.sweV`, etc.) were emitted without any fetch attempt — i.e., fabricated based on prior assumption. **This is a contract violation.**
 
-**Hard rule — every `gaps[]` entry MUST satisfy:**
+**Hard rule — every `gaps[]` entry MUST satisfy (adaptive 2026-04-27 rev):**
 
 ```
-gap.triedSources.length      >= 2     (at least 2 fetched URLs OR WebSearch result URLs)
+gap.triedSources.length      >= clamp(advertised_high_weight_for_bench, 3, 5)
 gap.triedQueries.length      >= 2     (the 2 mandatory WebSearch queries above)
 gap.triedFormats.length      >= 2     (primary format + ≥1 documented fallback)
 ```
+
+**Adaptive triedSources floor**: prior contract used a flat `>=2`. With 31 of
+34 leaderboards now carrying populated `publishes[]`, a flat 2 was a fiction —
+agent could declare "no data" while leaving 6+ advertised high-weight sources
+untouched. The new rule scales effort with available routing options:
+
+| advertised_high_weight | required triedSources |
+|---|---|
+| 0–3 (rare/proprietary bench, e.g. aaCoding/aaAgentic/bfcl) | 3 (general low bar) |
+| 4 (e.g. swePro, aider) | 4 |
+| 5+ (sweV=10, lcbV6=8, gpqa=6, tb2=6, hle=5) | 5 (cap) |
+
+Per-bench advertised counts are computed at gate-evaluation time from
+`data/sources-whitelist.json` `leaderboards[].publishes[]` × `format` weight
+(>=0.7 = high-weight). The orchestrator's `scripts/merge.py` `validate_gaps()`
+performs the lookup and strips entries failing the adaptive floor.
+
+Practical effect: when the agent is about to emit a gap for `lcbV6` (8
+advertised high-weight sources), it MUST have tried at least 5 of them
+(BenchLM, Epoch, llm-stats, llm-stats LCB, EvalPlus, Papers with Code,
+LiveBench, BigCodeBench, etc.). Only then is "data not found" a defensible
+bookkeeping claim.
 
 A gap entry that fails any of these three counts is a **fabricated gap** and is REJECTED by the orchestrator's defensive validator (`scripts/merge.py` `validate_gaps()`). The orchestrator's behaviour on rejection:
 

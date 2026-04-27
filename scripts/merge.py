@@ -178,17 +178,68 @@ def format_consistency_warn(source_entry, wl_idx):
     return None
 
 
+_FORMAT_WEIGHTS = {
+    "static_html_table": 1.0,
+    "static_html_article": 1.0,
+    "static_markdown": 1.0,
+    "static_json_api": 1.0,
+    "github_raw_json": 1.0,
+    "github_raw_markdown": 1.0,
+    "meta_tag_extract": 1.0,
+    "pdf_report": 0.7,
+    "spa_partial": 0.5,
+    "image_embedded": 0.5,
+    "spa_full": 0.3,
+    "bot_blocked": 0.1,
+}
+
+
+def _build_bench_advertised_count():
+    """For each bench key, count high-weight (>=0.7) leaderboards advertising
+    it in publishes[]. Used by adaptive gate."""
+    try:
+        with open(WHITELIST, encoding="utf-8") as fp:
+            wl = json.load(fp)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+    counts = {}
+    for lb in wl.get("leaderboards", []) or []:
+        fmt = lb.get("format", "static_html_table")
+        if _FORMAT_WEIGHTS.get(fmt, 0.5) < 0.7:
+            continue
+        for k in lb.get("publishes", []) or []:
+            counts[k] = counts.get(k, 0) + 1
+    return counts
+
+
+def _extract_bench_key(g):
+    """Gap may carry `field` (bare or 'bench.X' form) or legacy `key` of
+    'modelId.bench.X'. Normalize to bare bench key."""
+    field = g.get("field") or ""
+    if not field and g.get("key"):
+        field = g["key"].split(".")[-1]
+    return field.replace("bench.", "") if field.startswith("bench.") else field
+
+
 def validate_gaps(out):
-    """GAP_VALIDITY_GATE per agent spec (2026-04-27).
+    """GAP_VALIDITY_GATE per agent spec (2026-04-27, adaptive 2026-04-27 rev).
 
-    Every gaps[] entry MUST carry triedSources>=2 + triedQueries>=2 + triedFormats>=2.
-    Entries failing the gate are fabricated (agent emitted "no data" without
-    attempting). They are stripped from out.gaps[] so they don't pollute the
-    next-cycle retry queue, logged loudly, and counted under
-    runtime.contractViolations so the violation surfaces in the diff summary.
+    Adaptive gate: every gaps[] entry MUST carry triedSources >=
+        clamp(advertised_high_weight_sources_for_bench, 3, 5)
+    (plus triedQueries>=2, triedFormats>=2 from the original contract).
 
-    Returns: list of stripped fabricated-gap descriptors for caller logging.
+    Rationale: with 31 of 34 leaderboards now carrying populated publishes[],
+    a flat "tried 2 sources" floor lets the agent declare "no data" while
+    leaving 6+ advertised high-weight leaderboards untouched. The adaptive
+    floor scales effort with available routing options:
+      - rare bench (1 advertised): require 3 attempts (general low bar)
+      - common bench (5+ advertised): require 5 attempts (cap)
+      - cap=5 to avoid runaway fetch budget on saturated benches.
+
+    Entries failing the gate are stripped, logged to runtime.fabricatedGaps,
+    and counted under runtime.contractViolations.
     """
+    bench_advertised = _build_bench_advertised_count()
     raw = out.get("gaps", []) or []
     valid = []
     fabricated = []
@@ -197,19 +248,26 @@ def validate_gaps(out):
         tq = g.get("triedQueries") or []
         tf = g.get("triedFormats") or []
         ts_n, tq_n, tf_n = len(ts), len(tq), len(tf)
-        # Permissive: accept if at least one effort signal has >=2 entries.
-        # Strict: require triedSources>=2 (the load-bearing one for "I tried").
-        if ts_n < 2:
+
+        bench_key = _extract_bench_key(g)
+        n_advertised = bench_advertised.get(bench_key, 0)
+        # adaptive floor: 3 minimum, scale with advertised, cap at 5
+        min_required = min(max(n_advertised, 3), 5)
+
+        if ts_n < min_required:
             fabricated.append(
                 {
                     "modelId": g.get("modelId"),
                     "field": g.get("field"),
+                    "bench_key": bench_key,
                     "reason": g.get("reason"),
                     "counts": {
                         "triedSources": ts_n,
                         "triedQueries": tq_n,
                         "triedFormats": tf_n,
                     },
+                    "n_advertised": n_advertised,
+                    "min_required": min_required,
                 }
             )
         else:
@@ -459,16 +517,18 @@ def main():
     if log.get("fabricated_gaps"):
         n = len(log["fabricated_gaps"])
         print(
-            f"  fabricated gaps stripped: {n} (agent claimed 'no data' without "
-            f"triedSources>=2 — see GAP_VALIDITY_GATE)"
+            f"  fabricated gaps stripped: {n} (adaptive GAP_VALIDITY_GATE — "
+            f"required triedSources = clamp(advertised_high_weight, 3, 5))"
         )
-        for fg in log["fabricated_gaps"][:6]:
+        for fg in log["fabricated_gaps"][:8]:
             print(
-                f"    - {fg['modelId']}.{fg['field']}: "
-                f"triedSources={fg['counts']['triedSources']} reason='{fg['reason']}'"
+                f"    - {fg.get('modelId')}.{fg.get('bench_key', fg.get('field'))}: "
+                f"triedSources={fg['counts']['triedSources']} "
+                f"required>={fg.get('min_required', 3)} "
+                f"(advertised_high_weight={fg.get('n_advertised', 0)})"
             )
-        if n > 6:
-            print(f"    - ... and {n - 6} more")
+        if n > 8:
+            print(f"    - ... and {n - 8} more")
     if issues:
         print("self-check issues:")
         for i in issues:
