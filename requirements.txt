@@ -1,0 +1,10 @@
+# AICoderMap intentionally uses ONLY the Python standard library.
+# Every script under scripts/ and auto/ runs against a vanilla Python 3.10+
+# interpreter — no `pip install` step on a fresh clone.
+#
+# This file exists as a discoverability marker: if someone scans for
+# requirements.txt to gauge complexity, they find this comment and know
+# stdlib is the contract.
+#
+# If a future change introduces an external dependency, pin it here AND
+# update README.md "Development setup" section.
