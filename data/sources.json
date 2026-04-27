@@ -37,12 +37,22 @@
     },
     {
       "value": 64.3,
-      "source": "Scale AI SWE-bench Pro",
+      "source": "Scale SEAL SWE-Bench Pro (Anthropic-reported)",
       "url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
       "date": "2026-04-26",
       "tier": "I",
-      "verifications": 1,
-      "trustScore": null
+      "verifications": 4,
+      "trustScore": 0.93
+    },
+    {
+      "value": 61.2,
+      "source": "prior cycle source",
+      "url": "https://benchlm.ai/benchmarks/swePro",
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.8,
+      "contradictionRole": "loser"
     }
   ],
   "opus-4-7.sweV": [
@@ -282,6 +292,26 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": 0.7
+    },
+    {
+      "value": 79.6,
+      "source": "marc0.dev SWE-Bench Leaderboard",
+      "url": "https://www.marc0.dev/en/leaderboard",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 3,
+      "trustScore": 0.87,
+      "contradictionRole": "winner"
+    },
+    {
+      "value": 82,
+      "source": "prior cycle aggregator report",
+      "url": "https://artificialanalysis.ai/leaderboards/models",
+      "date": "2026-04-26",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72,
+      "contradictionRole": "loser"
     }
   ],
   "sonnet-4-6.tb2": [
@@ -1101,11 +1131,12 @@
   "deepseek-v4-pro.sweV": [
     {
       "value": 80.6,
-      "source": "DeepSeek technical report (HuggingFace)",
+      "source": "existing data/models.json value",
       "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
       "date": "2026-04-24",
       "tier": "S",
-      "trustScore": 0.7
+      "trustScore": 0.7,
+      "verifications": 1
     },
     {
       "value": 80.6,
@@ -1122,6 +1153,16 @@
       "date": "2026-04-24",
       "tier": "S",
       "trustScore": 0.7
+    },
+    {
+      "value": 80.6,
+      "source": "Artificial Analysis DeepSeek V4 Pro analysis",
+      "url": "https://artificialanalysis.ai/articles/deepseek-is-back-among-the-leading-open-weights-models-with-v4-pro-and-v4-flash",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.8,
+      "contradictionRole": "winner"
     }
   ],
   "nemotron-3-super.sweV": [
@@ -2589,6 +2630,15 @@
       "tier": "S",
       "verifications": 2,
       "trustScore": 0.75
+    },
+    {
+      "value": 58.6,
+      "source": "BenchLM Chinese models comparison",
+      "url": "https://benchlm.ai/blog/posts/best-chinese-llm",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72
     }
   ],
   "kimi-k2-6.bench.sweV": [
@@ -2713,6 +2763,15 @@
       "tier": "I",
       "verifications": 2,
       "trustScore": 0.95
+    },
+    {
+      "value": 87.6,
+      "source": "marc0.dev SWE-Bench Leaderboard (independent corroboration)",
+      "url": "https://www.marc0.dev/en/leaderboard",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 4,
+      "trustScore": 0.93
     }
   ],
   "gpt-5-4.sweV": [
@@ -2985,6 +3044,15 @@
       "tier": "I",
       "verifications": 2,
       "trustScore": 0.9
+    },
+    {
+      "value": 80.6,
+      "source": "marc0.dev SWE-Bench Leaderboard",
+      "url": "https://www.marc0.dev/en/leaderboard",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 3,
+      "trustScore": 0.87
     }
   ],
   "qwen3-coder-480b.bench.sweV": [
@@ -3027,6 +3095,15 @@
       "tier": "I",
       "verifications": 2,
       "trustScore": 0.9
+    },
+    {
+      "value": 64.3,
+      "source": "Scale SEAL SWE-Bench Pro leaderboard",
+      "url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 4,
+      "trustScore": 0.93
     }
   ],
   "opus-4-7.bench.tb2": [
@@ -3038,6 +3115,15 @@
       "tier": "I",
       "verifications": 2,
       "trustScore": 0.9
+    },
+    {
+      "value": 69.4,
+      "source": "Terminal-Bench 2.0 leaderboard (pricepertoken / tbench.ai)",
+      "url": "https://www.tbench.ai/leaderboard/terminal-bench/2.0",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "opus-4-7.bench.gpqa": [
@@ -3096,6 +3182,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": 0.8
+    },
+    {
+      "value": 79.6,
+      "source": "marc0.dev SWE-Bench Leaderboard",
+      "url": "https://www.marc0.dev/en/leaderboard",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 3,
+      "trustScore": 0.87
     }
   ],
   "sonnet-4-6.pricing.api": [
@@ -3155,6 +3250,15 @@
       "tier": "I",
       "verifications": 2,
       "trustScore": 0.9
+    },
+    {
+      "value": 82.7,
+      "source": "Terminal-Bench 2.0 / OpenAI GPT-5.5 announcement",
+      "url": "https://www.tbench.ai/leaderboard/terminal-bench/2.0",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "gpt-5-5.bench.gpqa": [
@@ -3188,6 +3292,15 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": 0.6
+    },
+    {
+      "value": 98,
+      "source": "GPT-5.5 vendor announcement / BenchLM tau2 snapshot",
+      "url": "https://benchlm.ai/benchmarks/tauBench",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72
     }
   ],
   "gpt-5-5.pricing.api": [
@@ -3234,6 +3347,15 @@
       "date": "2026-04-27",
       "tier": "I",
       "verifications": 1,
+      "trustScore": 0.8
+    },
+    {
+      "value": 75.1,
+      "source": "Terminal-Bench 2.0 leaderboard / BenchLM snapshot",
+      "url": "https://www.tbench.ai/leaderboard/terminal-bench/2.0",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 2,
       "trustScore": 0.8
     }
   ],
@@ -3313,6 +3435,15 @@
       "tier": "S",
       "verifications": 2,
       "trustScore": 0.85
+    },
+    {
+      "value": 68.5,
+      "source": "tbench.ai Terminal-Bench 2.0 leaderboard",
+      "url": "https://www.tbench.ai/leaderboard/terminal-bench/2.0",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "gemini-3-1-pro.bench.gpqa": [
@@ -3324,6 +3455,15 @@
       "tier": "I",
       "verifications": 2,
       "trustScore": 0.9
+    },
+    {
+      "value": 94.3,
+      "source": "Artificial Analysis GPQA Diamond leaderboard",
+      "url": "https://artificialanalysis.ai/evaluations/gpqa-diamond",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 3,
+      "trustScore": 0.87
     }
   ],
   "gemini-3-1-pro.bench.hle": [
@@ -3334,6 +3474,15 @@
       "date": "2026-04-27",
       "tier": "I",
       "verifications": 1,
+      "trustScore": 0.8
+    },
+    {
+      "value": 44.4,
+      "source": "Vellum / pricepertoken GPQA leaderboard 2026",
+      "url": "https://www.vellum.ai/llm-leaderboard",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 2,
       "trustScore": 0.8
     }
   ],
@@ -3399,6 +3548,15 @@
       "tier": "C",
       "verifications": 2,
       "trustScore": 0.7
+    },
+    {
+      "value": 80.6,
+      "source": "Artificial Analysis DeepSeek V4 Pro analysis",
+      "url": "https://artificialanalysis.ai/articles/deepseek-is-back-among-the-leading-open-weights-models-with-v4-pro-and-v4-flash",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "deepseek-v4-pro.bench.swePro": [
@@ -3410,6 +3568,15 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": 0.6
+    },
+    {
+      "value": 55.4,
+      "source": "Scale SEAL / BenchLM DeepSeek V4 Pro benchmarks",
+      "url": "https://benchlm.ai/models/deepseek-v4-pro",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72
     }
   ],
   "deepseek-v4-pro.bench.tb2": [
@@ -3421,6 +3588,15 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": 0.6
+    },
+    {
+      "value": 67.9,
+      "source": "BuildFastWithAI DeepSeek V4 Pro review / BenchLM",
+      "url": "https://www.buildfastwithai.com/blogs/deepseek-v4-pro-review-2026",
+      "date": "2026-04-27",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.44
     }
   ],
   "deepseek-v4-pro.bench.gpqa": [
@@ -3479,6 +3655,15 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": 0.7
+    },
+    {
+      "value": 79,
+      "source": "DeepSeek V4 Flash / Artificial Analysis",
+      "url": "https://artificialanalysis.ai/articles/deepseek-is-back-among-the-leading-open-weights-models-with-v4-pro-and-v4-flash",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72
     }
   ],
   "deepseek-v4-flash.bench.gpqa": [
@@ -3537,6 +3722,15 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": 0.7
+    },
+    {
+      "value": 70,
+      "source": "llm-stats SWE-bench Verified + marc0.dev",
+      "url": "https://llm-stats.com/benchmarks/swe-bench-verified",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "deepseek-v3-2.bench.gpqa": [
@@ -3559,6 +3753,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": 0.8
+    },
+    {
+      "value": 83.3,
+      "source": "llm-stats LiveCodeBench v6",
+      "url": "https://llm-stats.com/benchmarks/livecodebench-v6",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72
     }
   ],
   "glm-5-1.bench.sweV": [
@@ -3570,6 +3773,15 @@
       "tier": "C",
       "verifications": 2,
       "trustScore": 0.65
+    },
+    {
+      "value": 77.8,
+      "source": "llm-stats SWE-bench Verified leaderboard",
+      "url": "https://llm-stats.com/benchmarks/swe-bench-verified",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "glm-5-1.bench.swePro": [
@@ -3725,6 +3937,15 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": 0.65
+    },
+    {
+      "value": 89.6,
+      "source": "llm-stats LiveCodeBench v6 leaderboard (Kimi K2.6 #1)",
+      "url": "https://llm-stats.com/benchmarks/livecodebench-v6",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "kimi-k2-6.pricing.api": [
@@ -3750,6 +3971,15 @@
       "tier": "I",
       "verifications": 2,
       "trustScore": 0.85
+    },
+    {
+      "value": 74.2,
+      "source": "llm-stats SWE-bench Verified leaderboard",
+      "url": "https://llm-stats.com/benchmarks/swe-bench-verified",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72
     }
   ],
   "llama-4-maverick.bench.gpqa": [
@@ -3805,6 +4035,15 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": 0.77
+    },
+    {
+      "value": 80.2,
+      "source": "llm-stats SWE-bench Verified leaderboard",
+      "url": "https://llm-stats.com/benchmarks/swe-bench-verified",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 3,
+      "trustScore": 0.87
     }
   ],
   "minimax-m2-5.bench.sweMulti": [
@@ -3850,6 +4089,15 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": 0.77
+    },
+    {
+      "value": 56.22,
+      "source": "MiniMax M2.7 vendor / BenchLM comparison",
+      "url": "https://benchlm.ai/compare/glm-5-1-vs-minimax-m2-7",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72
     }
   ],
   "minimax-m2-7.bench.tb2": [
@@ -3870,6 +4118,15 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": 0.62
+    },
+    {
+      "value": 57,
+      "source": "MiniMax M2.7 vendor benchmark self-report",
+      "url": "https://www.maniac.ai/blog/chinese-frontier-models-compared-glm5-minimax-kimi-qwen",
+      "date": "2026-04-27",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.44
     }
   ],
   "minimax-m2-7.bench.lcbV6": [
@@ -4100,6 +4357,15 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": 0.5
+    },
+    {
+      "value": 43.9,
+      "source": "IntuitionLabs Mistral Large 3 article",
+      "url": "https://intuitionlabs.ai/articles/mistral-large-3-moe-llm-explained",
+      "date": "2026-04-27",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.42
     }
   ],
   "mistral-large-3.bench.lcbV6": [
@@ -4162,6 +4428,15 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": 0.77
+    },
+    {
+      "value": 70.8,
+      "source": "Qwen3 technical report / BFCL v3 leaderboard",
+      "url": "https://arxiv.org/html/2505.09388v1",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72
     }
   ],
   "qwen3-32b.bench.lcbV6": [
@@ -4285,12 +4560,12 @@
     },
     {
       "value": 38.7,
-      "source": "Scale SEAL SWE-bench Pro",
+      "source": "Scale SEAL SWE-Bench Pro leaderboard (qwen3-coder-480b-a35b leading)",
       "url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
       "date": "2026-04-27",
       "tier": "I",
       "verifications": 2,
-      "trustScore": 0.9
+      "trustScore": 0.8
     }
   ],
   "qwen3-coder-30b.bench.sweV": [
@@ -4322,6 +4597,15 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": 0.7
+    },
+    {
+      "value": 73.4,
+      "source": "MiMo-V2-Flash technical report / marktechpost",
+      "url": "https://arxiv.org/pdf/2601.02780",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72
     }
   ],
   "mimo-v2-flash.bench.sweMulti": [
@@ -4333,6 +4617,15 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": 0.65
+    },
+    {
+      "value": 71.7,
+      "source": "MiMo-V2-Flash technical report",
+      "url": "https://arxiv.org/pdf/2601.02780",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72
     }
   ],
   "mimo-v2-flash.bench.aime26": [
@@ -4378,6 +4671,15 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": 0.55
+    },
+    {
+      "value": 57.2,
+      "source": "Xiaomi MiMo-V2.5-Pro vendor announcement / buildfastwithai",
+      "url": "https://www.buildfastwithai.com/blogs/xiaomi-mimo-v2-5-pro-review-2026",
+      "date": "2026-04-27",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.77
     }
   ],
   "mimo-v2-5-pro.bench.aaIdx": [
@@ -4463,6 +4765,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": 0.82
+    },
+    {
+      "value": 88.2,
+      "source": "BenchLM tau-bench snapshot (Step 3.5 Flash rank 19)",
+      "url": "https://benchlm.ai/benchmarks/tauBench",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72
     }
   ],
   "grok-4-20.bench.gpqa": [
@@ -4507,6 +4818,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": 0.8
+    },
+    {
+      "value": 93,
+      "source": "BenchLM tau-bench snapshot (Grok 4.20 entry)",
+      "url": "https://benchlm.ai/benchmarks/tauBench",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72
     }
   ],
   "grok-4-20.bench.aaCoding": [
@@ -4596,6 +4916,15 @@
       "tier": "S",
       "verifications": 3,
       "trustScore": 0.85
+    },
+    {
+      "value": 73.3,
+      "source": "Anthropic / morphllm Claude benchmarks 2026",
+      "url": "https://www.morphllm.com/claude-benchmarks",
+      "date": "2026-04-27",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.42
     }
   ],
   "claude-haiku-4-5.bench.swePro": [
@@ -4700,11 +5029,11 @@
   "gemini-3-1-flash.bench.swePro": [
     {
       "value": 34.63,
-      "source": "Scale SEAL SWE-bench Pro leaderboard",
+      "source": "Scale SEAL SWE-Bench Pro public leaderboard",
       "url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
       "date": "2026-04-27",
       "tier": "I",
-      "verifications": 1,
+      "verifications": 2,
       "trustScore": 0.8
     }
   ],
@@ -4739,6 +5068,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": 0.82
+    },
+    {
+      "value": 89.7,
+      "source": "BenchLM tau-bench snapshot + Chinese model comparison",
+      "url": "https://benchlm.ai/benchmarks/tauBench",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72
     }
   ],
   "mimo-v2-5-pro.bench.hle": [
@@ -4860,6 +5198,15 @@
       "tier": "I",
       "verifications": 2,
       "trustScore": 0.88
+    },
+    {
+      "value": 70.6,
+      "source": "marc0.dev SWE-Bench Leaderboard",
+      "url": "https://www.marc0.dev/en/leaderboard",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "qwen3-coder-next.bench.swePro": [
@@ -4871,6 +5218,15 @@
       "tier": "I",
       "verifications": 2,
       "trustScore": 0.88
+    },
+    {
+      "value": 44.3,
+      "source": "marc0.dev best AI for coding 2026 blog",
+      "url": "https://www.marc0.dev/en/blog/best-ai-for-coding-2026-swe-bench-breakdown-opus-4-6-qwen3-coder-next-gpt-5-3-and-what-actually-matters-1770387434111",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72
     }
   ],
   "qwen3-coder-next.bench.sweMulti": [
@@ -4882,6 +5238,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": 0.82
+    },
+    {
+      "value": 62.8,
+      "source": "marc0.dev / SWE-bench multilingual context",
+      "url": "https://www.swebench.com/multilingual-leaderboard.html",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72
     }
   ],
   "qwen3-235b.bench.aime26": [
@@ -4937,6 +5302,15 @@
       "tier": "C",
       "verifications": 2,
       "trustScore": 0.68
+    },
+    {
+      "value": 80,
+      "source": "Gemma 4 benchmarks summary / AA",
+      "url": "https://artificialanalysis.ai/models/gemma-4-31b",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "gemma-4-31b.bench.gpqa": [
@@ -4959,6 +5333,15 @@
       "tier": "S",
       "verifications": 2,
       "trustScore": 0.85
+    },
+    {
+      "value": 89.2,
+      "source": "Gemma 4 benchmark table (tech-insider 2026)",
+      "url": "https://tech-insider.org/google-gemma-4-open-model-benchmarks-2026/",
+      "date": "2026-04-27",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.44
     }
   ],
   "gemma-4-26b-moe.bench.gpqa": [
@@ -4981,6 +5364,15 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": 0.62
+    },
+    {
+      "value": 77.1,
+      "source": "Gemma 4 benchmarks summary (tech-insider / BenchLM)",
+      "url": "https://tech-insider.org/google-gemma-4-open-model-benchmarks-2026/",
+      "date": "2026-04-27",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.44
     }
   ],
   "gemma-4-26b-moe.bench.aime26": [
@@ -5509,6 +5901,15 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": 0.4
+    },
+    {
+      "value": 76.7,
+      "source": "marc0.dev SWE-Bench Leaderboard / llm-stats",
+      "url": "https://www.marc0.dev/en/leaderboard",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72
     }
   ],
   "grok-4-20.bench.tb2": [
@@ -5520,6 +5921,15 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": 0.4
+    },
+    {
+      "value": 47.1,
+      "source": "Terminal-Bench 2.0 leaderboard / BenchLM",
+      "url": "https://benchlm.ai/benchmarks/terminalBench2",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72
     }
   ],
   "gpt-4-1.bench.gpqa": [
@@ -5740,6 +6150,125 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": 0.4
+    },
+    {
+      "value": 86.4,
+      "source": "Gemma 4 benchmarks table (tech-insider / BenchLM)",
+      "url": "https://benchlm.ai/models/gemma-4-31b",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.8
+    }
+  ],
+  "gpt-5-5.bench.sweV": [
+    {
+      "value": 81.5,
+      "source": "marc0.dev SWE-Bench Leaderboard",
+      "url": "https://www.marc0.dev/en/leaderboard",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72
+    }
+  ],
+  "deepseek-v3-2.bench.swePro": [
+    {
+      "value": 15.56,
+      "source": "Scale SEAL SWE-Bench Pro public leaderboard",
+      "url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.8
+    }
+  ],
+  "minimax-m2-5.bench.bfcl": [
+    {
+      "value": 76.8,
+      "source": "MiniMax M2.5 analysis / BenchLM agent benchmarks",
+      "url": "https://benchlm.ai/llm-agent-benchmarks",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.8
+    }
+  ],
+  "minimax-m2-5.bench.swePro": [
+    {
+      "value": 36.81,
+      "source": "Scale SEAL SWE-Bench Pro public leaderboard",
+      "url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.8
+    }
+  ],
+  "mimo-v2-5-pro.bench.tau2": [
+    {
+      "value": 72.9,
+      "source": "Xiaomi MiMo-V2.5-Pro τ³-Bench (tau2 equivalent)",
+      "url": "https://mimo.xiaomi.com/mimo-v2-5-pro",
+      "date": "2026-04-27",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "mimo-v2-pro.bench.sweV": [
+    {
+      "value": 78,
+      "source": "OpenRouter MiMo-V2-Pro benchmarks / designforonline",
+      "url": "https://openrouter.ai/xiaomi/mimo-v2-pro/benchmarks",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72
+    }
+  ],
+  "mimo-v2-pro.bench.tb2": [
+    {
+      "value": 86.7,
+      "source": "Xiaomi MiMo-V2-Pro vendor self-report",
+      "url": "https://mimo.xiaomi.com/mimo-v2-pro",
+      "date": "2026-04-27",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "qwen3-235b.bench.swePro": [
+    {
+      "value": 21.41,
+      "source": "Scale SEAL SWE-Bench Pro public leaderboard",
+      "url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.8
+    }
+  ],
+  "qwen3-32b.bench.bfcl": [
+    {
+      "value": 75.7,
+      "source": "BFCL v3 leaderboard (pricepertoken / llm-stats)",
+      "url": "https://llm-stats.com/benchmarks/bfcl-v3",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.8
+    }
+  ],
+  "qwen3-6-plus.bench.tau2": [
+    {
+      "value": 76.8,
+      "source": "BenchLM tau-bench snapshot (Qwen3.6 Plus rank 17)",
+      "url": "https://benchlm.ai/benchmarks/tauBench",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.72
     }
   ]
 }
