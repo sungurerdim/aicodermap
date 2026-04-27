@@ -3007,6 +3007,15 @@
       "verifications": 1,
       "trustScore": 0.65,
       "contradictionRole": "loser"
+    },
+    {
+      "value": 69.6,
+      "source": "llm-stats.com",
+      "url": "https://llm-stats.com/models/qwen3-coder-480b-a35b-instruct",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.84
     }
   ],
   "opus-4-7.bench.swePro": [
@@ -4304,6 +4313,15 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": 0.65
+    },
+    {
+      "value": 73.4,
+      "source": "MiMo-V2-Flash technical report",
+      "url": "https://arxiv.org/html/2601.02780v2",
+      "date": "2026-04-27",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "mimo-v2-flash.bench.sweMulti": [
@@ -4326,6 +4344,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": 0.8
+    },
+    {
+      "value": 94.1,
+      "source": "MiMo-V2-Flash technical report",
+      "url": "https://arxiv.org/html/2601.02780v2",
+      "date": "2026-04-27",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "mimo-v2-pro.pricing.api": [
@@ -4387,6 +4414,15 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": 0.65
+    },
+    {
+      "value": 74.4,
+      "source": "step-3-5-flash arXiv tech report",
+      "url": "https://arxiv.org/html/2602.10604v1",
+      "date": "2026-04-27",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.84
     }
   ],
   "step-3-5-flash.bench.tb2": [
@@ -5429,6 +5465,281 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": 0.9
+    }
+  ],
+  "gpt-5-5.bench.aaIdx": [
+    {
+      "value": 59,
+      "source": "Artificial Analysis",
+      "url": "https://artificialanalysis.ai/models/gpt-5-5",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "claude-haiku-4-5.bench.tb2": [
+    {
+      "value": 41,
+      "source": "datalearner.com",
+      "url": "https://www.datalearner.com/en/ai-models/pretrained-models/claude-haiku-4-5/analysis",
+      "date": "2026-04-27",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.4
+    }
+  ],
+  "claude-haiku-4-5.bench.aime26": [
+    {
+      "value": 96.3,
+      "source": "datalearner.com",
+      "url": "https://www.datalearner.com/en/ai-models/pretrained-models/claude-haiku-4-5/analysis",
+      "date": "2026-04-27",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.4
+    }
+  ],
+  "grok-4-20.bench.sweV": [
+    {
+      "value": 76.7,
+      "source": "benchlm.ai compare",
+      "url": "https://benchlm.ai/compare/grok-4-20-beta-vs-grok-code-fast-1",
+      "date": "2026-04-27",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.4
+    }
+  ],
+  "grok-4-20.bench.tb2": [
+    {
+      "value": 47.1,
+      "source": "benchlm.ai compare",
+      "url": "https://benchlm.ai/compare/grok-4-20-beta-vs-kimi-2-6",
+      "date": "2026-04-27",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.4
+    }
+  ],
+  "gpt-4-1.bench.gpqa": [
+    {
+      "value": 66.3,
+      "source": "rdworldonline OpenAI MMLU coverage",
+      "url": "https://www.rdworldonline.com/openai-claims-gpt-4-1-sets-new-90-standard-in-mmlu-reasoning-benchmark/",
+      "date": "2026-04-27",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.4
+    }
+  ],
+  "codestral-22b.bench.swePro": [
+    {
+      "value": 2,
+      "source": "ucstrategies search snippet",
+      "url": "https://ucstrategies.com/news/codestral-guide-specs-benchmarks-local-deployment-2026/",
+      "date": "2026-04-27",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.4
+    }
+  ],
+  "codestral-22b.bench.lcbV6": [
+    {
+      "value": 37.9,
+      "source": "lmstats",
+      "url": "https://llm-stats.com/models/codestral-22b",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "codestral.bench.lcbV6": [
+    {
+      "value": 37.9,
+      "source": "llm-stats search snippet",
+      "url": "https://llm-stats.com",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "deepseek-r1-14b.bench.aime26": [
+    {
+      "value": 80,
+      "source": "deepseek-r1 technical report",
+      "url": "https://arxiv.org/html/2501.12948v1",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "qwen25-coder-7b.bench.lcbV6": [
+    {
+      "value": 37.6,
+      "source": "qwen2.5-coder family blog",
+      "url": "https://qwenlm.github.io/blog/qwen2.5-coder-family/",
+      "date": "2026-04-27",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "qwen25-coder-32b.bench.sweV": [
+    {
+      "value": 69.6,
+      "source": "qwen2.5-coder family blog",
+      "url": "https://qwenlm.github.io/blog/qwen2.5-coder-family/",
+      "date": "2026-04-27",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.84
+    }
+  ],
+  "qwen3-coder-480b.bench.aider": [
+    {
+      "value": 61.8,
+      "source": "llm-stats.com",
+      "url": "https://llm-stats.com/models/qwen3-coder-480b-a35b-instruct",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "qwen3-coder-480b.bench.bfcl": [
+    {
+      "value": 68.7,
+      "source": "llm-stats.com",
+      "url": "https://llm-stats.com/models/qwen3-coder-480b-a35b-instruct",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "qwen3-6-35b-moe.bench.swePro": [
+    {
+      "value": 49.5,
+      "source": "buildfastwithai review",
+      "url": "https://www.buildfastwithai.com/blogs/qwen3-6-35b-a3b-review",
+      "date": "2026-04-27",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.4
+    }
+  ],
+  "qwen3-6-35b-moe.bench.lcbV6": [
+    {
+      "value": 80.4,
+      "source": "buildfastwithai review",
+      "url": "https://www.buildfastwithai.com/blogs/qwen3-6-35b-a3b-review",
+      "date": "2026-04-27",
+      "tier": "C",
+      "verifications": 2,
+      "trustScore": 0.48
+    }
+  ],
+  "minimax-m2-5.bench.gpqa": [
+    {
+      "value": 85.2,
+      "source": "HuggingFace model card",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-M2.5",
+      "date": "2026-04-27",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.84
+    }
+  ],
+  "minimax-m2-5.bench.hle": [
+    {
+      "value": 19.4,
+      "source": "HuggingFace model card",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-M2.5",
+      "date": "2026-04-27",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.84
+    }
+  ],
+  "minimax-m2-5.bench.lcbV6": [
+    {
+      "value": 71,
+      "source": "GitHub MiniMax-M2 comparison table",
+      "url": "https://github.com/MiniMax-AI/MiniMax-M2",
+      "date": "2026-04-27",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "mimo-v2-flash.bench.gpqa": [
+    {
+      "value": 83.7,
+      "source": "MiMo-V2-Flash technical report",
+      "url": "https://arxiv.org/html/2601.02780v2",
+      "date": "2026-04-27",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.84
+    }
+  ],
+  "mimo-v2-flash.bench.hle": [
+    {
+      "value": 22.1,
+      "source": "MiMo-V2-Flash technical report",
+      "url": "https://arxiv.org/html/2601.02780v2",
+      "date": "2026-04-27",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.84
+    }
+  ],
+  "mimo-v2-flash.bench.lcbV6": [
+    {
+      "value": 80.6,
+      "source": "MiMo-V2-Flash technical report",
+      "url": "https://arxiv.org/html/2601.02780v2",
+      "date": "2026-04-27",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.84
+    }
+  ],
+  "mimo-v2-flash.bench.tb2": [
+    {
+      "value": 30.5,
+      "source": "MiMo-V2-Flash technical report (Terminal-Bench Hard)",
+      "url": "https://arxiv.org/html/2601.02780v2",
+      "date": "2026-04-27",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "mimo-v2-pro.bench.gpqa": [
+    {
+      "value": 86.6,
+      "source": "designforonline review",
+      "url": "https://designforonline.com/ai-models/xiaomi-mimo-v2-pro/",
+      "date": "2026-04-27",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.4
+    }
+  ],
+  "gemma-4-31b.bench.tau2": [
+    {
+      "value": 86.4,
+      "source": "gemma4.wiki benchmark",
+      "url": "https://www.gemma4.wiki/benchmark/gemma-4-benchmark-results",
+      "date": "2026-04-27",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.4
     }
   ]
 }

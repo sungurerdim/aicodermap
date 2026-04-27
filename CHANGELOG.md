@@ -1,4 +1,21 @@
 
+## [2026-04-27] — autonomous refresh-all [WARN: partial coverage 42.0%]
+
+### Updated
+- 14 models: `gpt-5-5`, `claude-haiku-4-5`, `grok-4-20`, `gpt-4-1`, `codestral-22b`, `codestral`, `deepseek-r1-14b`, `qwen25-coder-7b`, `qwen3-coder-480b`, `qwen3-6-35b-moe`, `minimax-m2-5`, `mimo-v2-flash`, `mimo-v2-pro`, `mimo-v2-5-pro`
+
+### Gaps (10 entries — see data/known-gaps.json or next refresh)
+- `None`: No public sweV score for Codestral-22B; tried 5 sources; deprecated coder focused on FIM not SWE-bench agent tasks
+- `None`: LCB v6 for 14B specifically not extracted from technical report images; 7B and 32B extracted
+- `None`: SWE-bench Verified not reported for Lite 16B; main paper reports full 236B model only
+- `None`: MiMo-V2.5 (base) sweV not confirmed separately from Pro/Flash variants
+- `None`: sweV for MiMo-V2.5-Pro not explicitly stated; V2-Pro has 78% but V2.5-Pro upgrade unclear
+- `None`: GPQA for step-3-5-flash not in search snippets; arXiv table shows samples but exact % not extracted
+- `None`: HLE for Mistral Large 3 not found in any source
+- `None`: HLE for GPT-4.1 not available; model released Apr 2025, HLE benchmark newer
+- ... and 2 more
+
+
 ## [2026-04-27] — autonomous refresh-all
 
 ### Updated

@@ -2717,6 +2717,19 @@
         "qwen-3-6-max.bench.gpqa",
         "qwen-3-6-max.bench.hle"
       ]
+    },
+    {
+      "name": "datalearner.com",
+      "url": "https://www.datalearner.com/en/ai-models/pretrained-models/claude-haiku-4-5/analysis",
+      "tier": "C",
+      "format": "static_html_article",
+      "lastVerifiedDate": "2026-04-27",
+      "consecutiveFailures": 0,
+      "rationale": "Per-model analysis pages with structured benchmark tables, Asia-region focus.",
+      "extractedFields": [
+        "claude-haiku-4-5.bench.tb2",
+        "claude-haiku-4-5.bench.aime26"
+      ]
     }
   ],
   "_runtime": {
@@ -2790,10 +2803,11 @@
         "note": "Independent benchmark roundup; verified 2026-04-26"
       },
       "llm-stats.com": {
-        "consecutiveFailures": 1,
-        "lastStatus": "OK",
+        "consecutiveFailures": 0,
+        "lastStatus": "ok",
         "lastObservedFormat": "static_html_article",
-        "lastProbedAt": "2026-04-27"
+        "lastProbedAt": "2026-04-27",
+        "unhealthy": false
       },
       "artificialanalysis.ai": {
         "consecutiveFailures": 0,
@@ -2844,12 +2858,19 @@
         "lastProbedAt": "2026-04-27"
       },
       "openai.com": {
-        "consecutiveFailures": 1,
+        "consecutiveFailures": 2,
         "lastStatus": "unhealthy:bot_blocked_403",
         "lastObservedFormat": "bot_blocked",
         "lastProbedAt": "2026-04-27"
       },
       "designforonline.com": {
+        "consecutiveFailures": 0,
+        "unhealthy": false,
+        "lastStatus": "ok",
+        "lastObservedFormat": "static_html_article",
+        "lastProbedAt": "2026-04-27"
+      },
+      "huggingface.co": {
         "consecutiveFailures": 0,
         "unhealthy": false,
         "lastStatus": "ok",
