@@ -800,7 +800,11 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "sweV",
+        "sweMulti"
+      ]
     },
     {
       "name": "SWE-bench experiments repo",
@@ -819,7 +823,11 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "sweV",
+        "sweMulti"
+      ]
     },
     {
       "name": "LiveCodeBench",
@@ -842,7 +850,10 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "lcbV6"
+      ]
     },
     {
       "name": "LiveCodeBench (alt)",
@@ -860,7 +871,10 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "lcbV6"
+      ]
     },
     {
       "name": "Terminal-Bench",
@@ -880,7 +894,10 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "tb2"
+      ]
     },
     {
       "name": "Terminal-Bench (alt)",
@@ -898,7 +915,10 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "tb2"
+      ]
     },
     {
       "name": "tau-bench (canonical)",
@@ -919,7 +939,10 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "tau2"
+      ]
     },
     {
       "name": "Aider Polyglot",
@@ -939,7 +962,10 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "aider"
+      ]
     },
     {
       "name": "MCP-Atlas",
@@ -958,7 +984,10 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "mcpA"
+      ]
     },
     {
       "name": "Artificial Analysis",
@@ -1129,7 +1158,10 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "bfcl"
+      ]
     },
     {
       "name": "BigCodeBench",
@@ -1329,7 +1361,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": []
     },
     {
       "name": "MathArena",
@@ -1351,7 +1384,10 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": [
+        "aime26"
+      ]
     },
     {
       "name": "Vals.ai",
@@ -1413,6 +1449,9 @@
       "slugVariations": [
         "{id}",
         "claude-{id}"
+      ],
+      "publishes": [
+        "lcbV6"
       ]
     },
     {
@@ -1437,6 +1476,10 @@
       "slugVariations": [
         "{id}",
         "claude-{id}"
+      ],
+      "publishes": [
+        "sweV",
+        "sweMulti"
       ]
     },
     {
