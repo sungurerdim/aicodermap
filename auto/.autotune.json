@@ -1,10 +1,10 @@
 {
   "target": "data/sources-whitelist.json",
-  "metric": "hit_rate_at_1",
+  "metric": "predicted_reach",
   "direction": "higher",
-  "secondary": "hit_rate_at_3",
+  "secondary": "hit_rate_at_1",
   "bench_cmd": "bash auto/bench.sh",
   "budget_sec": 30,
-  "tag": "2026-04-27",
-  "purpose": "Tune slugVariations / modelCardSlugVariations / postSlugVariations in data/sources-whitelist.json so the PER_MODEL_URL_EXPANSION cascade hits the right per-model URL on the FIRST attempt — reduces wasted fetches and 404s in real refresh-all cycles."
+  "tag": "2026-04-27-coverage",
+  "purpose": "Phase 2 of ds-tune: tune `publishes[]` arrays across leaderboards in data/sources-whitelist.json so every (modelId, benchKey) pair has at least one fetchable advertised source. Higher predicted_reach = more routing options for the orchestrator's deep-fetch loop = more coverage in real refresh-all cycles. Slug correctness (hit_rate_at_1) is the secondary guard so coverage experiments don't accidentally regress slug ordering."
 }

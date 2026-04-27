@@ -1,17 +1,26 @@
 #!/usr/bin/env python3
-"""ds-tune eval for aicodermap PER_MODEL_URL_EXPANSION cascade.
+"""ds-tune eval for aicodermap. Outputs TWO metrics in one run (the bench
+runs once; ds-tune reads whichever metric .autotune.json points at).
 
-Reads data/sources-whitelist.json + auto/fixtures.json. For each fixture
-(modelId, source, correctSlug), expands the source's slugVariations[] using
-{id}/{family}/{N}/{variant} substitution and finds the rank of correctSlug.
+PRIMARY (configurable via .autotune.json):
+  predicted_reach: weighted fraction of (modelId, benchKey) pairs in
+    data/models.json that have AT LEAST ONE whitelist leaderboard advertising
+    the bench in its `publishes[]` AND a fetchable format. Format weight:
+      1.0 for static_*, github_raw_*, meta_tag_extract, static_json_api
+      0.7 for pdf_report
+      0.5 for spa_partial / image_embedded
+      0.3 for spa_full
+      0.1 for bot_blocked
+    Higher = more (model, bench) cells routable through high-quality paths
+    in the orchestrator's deep-fetch loop. This is a PROXY for actual
+    coverage — the necessary (not sufficient) condition for fill.
 
-Output (grep-able):
-  hit_rate_at_1:    <float 0..1>   ← primary metric (higher better)
-  hit_rate_at_3:    <float 0..1>   ← secondary
-  total_fixtures:   <int>
-  Misses (top N):   ← list of fixtures not at rank 1, with expanded chain
+SECONDARY:
+  hit_rate_at_1: slug-correctness on auto/fixtures.json (already optimized
+    to 0.96 in the prior tuning phase). Kept as monitoring guard so coverage
+    experiments don't accidentally regress slug ordering.
 
-No network calls. Runs in ~1s. Used by ds-tune autonomous loop.
+No network calls. Runs in ~1s.
 """
 
 import json
@@ -21,6 +30,41 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 WHITELIST = ROOT / "data" / "sources-whitelist.json"
 FIXTURES = ROOT / "auto" / "fixtures.json"
+MODELS = ROOT / "data" / "models.json"
+
+BENCH_KEYS = [
+    "swePro",
+    "sweV",
+    "tb2",
+    "lcbV6",
+    "aider",
+    "tau2",
+    "aaCoding",
+    "aaAgentic",
+    "mcpA",
+    "gpqa",
+    "sweMulti",
+    "hle",
+    "aaIdx",
+    "bfcl",
+    "aime26",
+    "aaOmni",
+]
+
+FORMAT_WEIGHTS = {
+    "static_html_table": 1.0,
+    "static_html_article": 1.0,
+    "static_markdown": 1.0,
+    "static_json_api": 1.0,
+    "github_raw_json": 1.0,
+    "github_raw_markdown": 1.0,
+    "meta_tag_extract": 1.0,
+    "pdf_report": 0.7,
+    "spa_partial": 0.5,
+    "image_embedded": 0.5,
+    "spa_full": 0.3,
+    "bot_blocked": 0.1,
+}
 
 
 def family(model_id: str) -> str:
@@ -107,10 +151,53 @@ def hostname(url: str) -> str:
     return url.split("//", 1)[-1].split("/", 1)[0].lstrip("www.").lower()
 
 
+def compute_predicted_reach(wl, models):
+    """For each (modelId, benchKey) pair, find the BEST format-weighted
+    leaderboard that advertises the bench in its publishes[]. Sum of weights
+    divided by total pairs = predicted_reach (0..1).
+
+    Also reports per-bench-key reach so an experiment can target the worst
+    bench keys directly. A pair with no advertised source contributes 0.
+    """
+    leaderboards = wl.get("leaderboards", []) or []
+
+    # Per-bench: best-weight leaderboard advertising it
+    bench_best_weight = {k: 0.0 for k in BENCH_KEYS}
+    bench_source_count = {k: 0 for k in BENCH_KEYS}
+    for lb in leaderboards:
+        publishes = lb.get("publishes", []) or []
+        fmt = lb.get("format", "static_html_table")
+        w = FORMAT_WEIGHTS.get(fmt, 0.5)
+        for k in publishes:
+            if k in bench_best_weight:
+                bench_source_count[k] += 1
+                if w > bench_best_weight[k]:
+                    bench_best_weight[k] = w
+
+    # Pair sum: every (model, bench) pair gets the bench's best-weight, so
+    # predicted_reach = mean(bench_best_weight) (uniform across models).
+    # Justification: bench's reach is the same for every model in the catalog
+    # (the leaderboard either covers the bench or it doesn't). Per-model
+    # variation kicks in via slug resolvability — captured by hit_rate_at_1.
+    total_pairs = len(models) * len(BENCH_KEYS)
+    pair_sum = sum(bench_best_weight[k] for k in BENCH_KEYS) * len(models)
+    predicted_reach = pair_sum / total_pairs if total_pairs else 0.0
+
+    # Per-bench coverage report
+    zero_source_keys = [k for k in BENCH_KEYS if bench_source_count[k] == 0]
+
+    return predicted_reach, bench_best_weight, bench_source_count, zero_source_keys
+
+
 def main():
     wl = json.loads(WHITELIST.read_text(encoding="utf-8"))
     fx_doc = json.loads(FIXTURES.read_text(encoding="utf-8"))
     fixtures = fx_doc["fixtures"]
+    models = json.loads(MODELS.read_text(encoding="utf-8"))
+
+    # Coverage proxy
+    pr, bench_weights, bench_counts, zero_keys = compute_predicted_reach(wl, models)
+    print(f"predicted_reach:  {pr:.4f}")
 
     by_lb_host = {}
     for e in wl.get("leaderboards", []) or []:
@@ -192,6 +279,18 @@ def main():
         )
         for mid, label, correct, expanded in not_found[:8]:
             print(f"  [{label}] {mid} -> '{correct}' MISSING; chain={expanded}")
+
+    print("\n=== Coverage proxy (predicted_reach per bench key) ===")
+    for k in BENCH_KEYS:
+        w = bench_weights[k]
+        c = bench_counts[k]
+        marker = " <-- ZERO SOURCE" if c == 0 else ""
+        print(f"  {k:<10} weight={w:.2f} sources={c}{marker}")
+    if zero_keys:
+        print(
+            f"\nBench keys with NO advertised source ({len(zero_keys)}): "
+            f"{', '.join(zero_keys)}"
+        )
 
 
 if __name__ == "__main__":
