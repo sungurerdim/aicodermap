@@ -28,14 +28,16 @@ Aggregate AI coding LLM data: bench scores, multi-provider pricing, Ollama metad
 Phase 0 fetches do NOT count against the per-model fetch budget; they are skill-level overhead.
 
 ## SCOPE
-| scope | task | model | parallel_models | typical |
-|-------|------|-------|-----------------|---------|
-| `full` | Phase 0 lineup + Phase 1 trusted-source mining + Phase 2 per-model fill | sonnet | 5 | 4-7min |
-| `lineup-sync` | Phase 0 only | sonnet | — | 1-2min |
-| `specific` | Phase 2 only for target_model_ids | sonnet | 3 | 1-2min |
-| `new-release` | new-model detection (subset of Phase 0) | sonnet | 4 | 2-3min |
-| `search` | quick single lookup | haiku | 1-2 | <30s |
-| `deep-fetch` | targeted single (modelId, field) backfill (skill-spawned) | sonnet | — | <30s/pair |
+| scope | task | model | parallelism |
+|-------|------|-------|-------------|
+| `full` | Phase 0 lineup + Phase 1 SOURCE_FIRST_SWEEP + Phase 2 per-model fill | sonnet | 5 sources, 5 models |
+| `lineup-sync` | Phase 0 only | sonnet | — |
+| `specific` | Phase 2 only for target_model_ids | sonnet | 3 |
+| `new-release` | new-model detection (subset of Phase 0) | sonnet | 4 |
+| `search` | quick single lookup | haiku | 1-2 |
+| `deep-fetch` | targeted single (modelId, field) backfill (skill-spawned) | sonnet | — |
+
+**No `typical duration` column** — the agent runs to completeness, not to a clock. A `full` scope cycle takes as long as walking every advertised source + every per-model URL + every vendor card + every WebSearch fallback for unfilled cells requires. Saturation termination + verification-map confirmed-cell skip make subsequent cycles incremental (most cells already confirmed across 3+ sources skip the sweep entirely).
 
 ## INPUTS
 ```
@@ -51,10 +53,16 @@ target_model_ids: <string[] | required for 'specific' or 'deep-fetch'>
 target_field: <string | required for 'deep-fetch'>
 include_unsloth: <bool default:true>
 trusted_sources_only: <bool default:true>
-per_model_fetch_budget: <int default:6>
-per_model_wallclock_budget: <int seconds default:90>
-parallel_models: <int default:5>
+parallel_sources: <int default:5>          # parallelism, NOT a cap
+parallel_models: <int default:5>           # parallelism, NOT a cap
+confirmed_skip_threshold: <int default:3>  # cells with >=3 cross-source verifications skip re-verify
+verification_map_path: ".aicodermap-verification-map.json"
 trust_score_required: <bool default:true>
+termination: "completeness"                # explicit doctrine — see SKILL.md COMPLETENESS_TERMINATION
+# UNCAPPED RESEARCH: no fetch_budget, no wallclock_budget. Agent walks every
+# advertised source, attempts every reachable per-model URL + vendor card,
+# exhausts every documented fallback, and only stops when COMPLETENESS_TERMINATION
+# holds (all sources visited + all reachable cells attempted + all gaps documented).
 ```
 
 ## TRUSTED_SOURCE_WHITELIST (`trusted_sources_only=true` enforces these)
@@ -652,7 +660,7 @@ A legacy/deprecated model still gets the same treatment: try the canonical histo
 
 ## SOURCE_FIRST_SWEEP (Phase 1 primary mining — added 2026-04-27 rev2)
 
-**Why this section exists:** prior phases iterated **per-model** (for each model, walk all sources). With 53 models × 5+ sources × 16 benches, this scaled poorly: per-model cascade was verification-blind and cache-unaware. Cycle 4 used only ~32 of a possible 600+ fetches before exhausting wall-clock; agent kept re-visiting the same source page once per model. Inverted strategy: walk **each source ONCE**, extract every (modelId, benchKey, value) tuple visible on that page in one pass.
+**Why this section exists:** prior phases iterated **per-model** (for each model, walk all sources). With 53 models × 5+ sources × 16 benches, this scaled poorly: per-model cascade was verification-blind and cache-unaware. Cycle 4 used only ~32 of a possible 600+ fetches because effort caps fired before saturation; cycle 5 used only 8 fetches because per-source caps capped the sweep. **2026-04-27 rev3 retires all effort caps**: the agent now walks **each source ONCE**, extracts every (modelId, benchKey, value) tuple visible on that page in one pass, then chases unfilled cells through the full Phase 2 cascade until COMPLETENESS_TERMINATION holds. No fetch budget, no wallclock budget — research runs until structurally complete.
 
 **Mandatory protocol on `scope=full`:**
 
@@ -676,9 +684,14 @@ A legacy/deprecated model still gets the same treatment: try the canonical histo
 
 2. For each source in tier order (parallel batches of PARALLEL_SOURCES = 5):
 
-   a) Fetch the aggregate URL (entry.url) ONCE.
-      Budget: PER_SOURCE_FETCH_BUDGET = 2 fetches max per source (aggregate + 1 fallback).
-      Wallclock: PER_SOURCE_WALLCLOCK = 60s.
+   a) Fetch the aggregate URL (entry.url). NO budget cap (uncapped doctrine).
+      The agent fetches the aggregate ONCE for efficiency, then any number of
+      documented fallbacks (mirror, websearch_snippet, alternate URL) until
+      either:
+        - all expected (model, bench) tuples are extracted, OR
+        - the fallback chain is exhausted (every documented alternative tried).
+      No wallclock or fetch-count limit. The agent only stops when extraction
+      is structurally complete on this source.
 
    b) Extract every (modelId, benchKey, value) tuple visible on the page.
       Match modelId against active_models[] using SLUG_RESOLUTION (vendorPrefixMap +
@@ -696,20 +709,36 @@ A legacy/deprecated model still gets the same treatment: try the canonical histo
    d) After processing this source: if every active_model now has all-cells confirmed
       (no target_cells remaining), STOP early (saturation termination).
 
-3. Per-source fallback (only used if aggregate fetch yields zero (model, bench) tuples
-   AND the source has a documented mirror):
-      try entry.fallbacks[0].url (e.g., websearch_snippet or static_html_table mirror)
-      counted against the same per-source budget.
+3. Per-source fallback (uncapped — exhaust the documented chain):
+      try entry.fallbacks[*].url in order (e.g., websearch_snippet, mirror,
+      static_html_table alternative, image_embedded OCR via scripts/extract-images.py)
+      No fetch-count cap. Stop only when extraction is structurally complete
+      OR every documented fallback has been tried (status: 200 + extracted /
+      404 / unreachable). Log every attempt to runtime.fetchLog[].
 
-4. Saturation rules (model-level skip in subsequent sources):
+4. Saturation rules (efficiency optimization, NOT effort cap):
    - Once a model has ALL 16 bench cells confirmed (verifications >= 3 for each),
      do NOT search its name in remaining tier-C sources. Big efficiency win for
      well-covered frontier models (opus-4-7, gemini-3-1-pro, gpt-5-5, kimi-k2-6).
+   - Saturated does NOT mean "skip the source entirely" — the source is still
+     walked for OTHER models that need verification.
 
-5. After Phase 1, target_cells now contains only:
-   - Cells with < CONFIRMED_SKIP_THRESHOLD (=3) verifications, OR
-   - Cells the agent has not seen advertised on any walked source.
-   These flow to Phase 2 (PER_MODEL_URL_EXPANSION).
+5. COMPLETENESS_TERMINATION (sole exit condition — replaces all prior caps):
+   The agent emits final JSON and stops only when ALL of these hold:
+     a) Every leaderboard in sources-whitelist.json has been visited
+        (status: extracted / unhealthy-skip / fallback-exhausted).
+     b) Every vendor with perModelUrl/modelCardUrl/postUrl has been attempted
+        for every model in that vendor's family (Phase 2 cascade).
+     c) Every (modelId, benchKey) cell currently null AND with >= 1 advertised
+        high-weight source has been attempted via the full cascade.
+     d) For every still-empty cell, a gaps[] entry is emitted satisfying
+        adaptive GAP_VALIDITY_GATE (triedSources >= clamp(advertised, 3, 5)).
+
+   No wallclock limit, no fetch-count limit. The agent terminates when the
+   research is structurally complete, not when a budget runs out.
+
+6. After Phase 1, residual cells flow to Phase 2 (PER_MODEL_URL_EXPANSION) and
+   Phase 3 (WebSearch fallback) until COMPLETENESS_TERMINATION holds.
 ```
 
 **Verification map update (post-extraction):**
@@ -738,11 +767,11 @@ A legacy/deprecated model still gets the same treatment: try the canonical histo
 
 | Metric | Per-model (prior) | SOURCE_FIRST_SWEEP |
 |---|---|---|
-| Total fetches per cycle (estimate) | 53 × 12 = 636 ceiling | 34 + 22 + ~10 = ~66 |
+| Total fetches per cycle (estimate) | 53 × 12 = 636 capped at wallclock | unlimited — agent fetches until COMPLETENESS_TERMINATION |
 | Verification-aware skip | no (each model from scratch) | yes (3+ verified = skip rest of cycle, persists across cycles) |
-| Same source re-visited | up to 53× | exactly 1× |
-| Wallclock dependence | high (each model burns budget) | low (saturates fast on confirmed cells) |
-| Coverage trajectory | linear-ish, plateaus around 30-35% | step-function: each new source adds many cells in one shot |
+| Same source re-visited | up to 53× | exactly 1× per cycle (agent may re-try documented fallbacks) |
+| Termination | wallclock cap | COMPLETENESS_TERMINATION (research structurally exhausted) |
+| Coverage trajectory | linear-ish, plateaus around 30-35% (capped) | step-function: each cycle approaches reachable ceiling |
 
 ## PER_MODEL_URL_EXPANSION (Phase 2 fallback — for cells still empty after SOURCE_FIRST_SWEEP)
 

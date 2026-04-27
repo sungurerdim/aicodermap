@@ -79,18 +79,15 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
        scope, query, idea_context, target_model_ids?,
        include_unsloth: true,
        trusted_sources_only: true,           // per FETCH_WHITELIST
-       // Phase 1 SOURCE_FIRST_SWEEP (primary, see agent.md)
-       per_source_fetch_budget: 2,           // aggregate + 1 fallback per source
-       per_source_wallclock: 60,             // seconds per source max
-       parallel_sources: 5,                  // concurrent source fetches
-       total_agent_wallclock: 1800,          // 30 min agent budget total
-       confirmed_skip_threshold: 3,          // verifications -> cell becomes confirmed, skipped
+       // UNCAPPED doctrine — no fetch/wallclock caps. Agent terminates ONLY on
+       // COMPLETENESS_TERMINATION (every source walked, every reachable cell
+       // attempted, every gap documented). See SKILL.md CONSTANTS.
+       parallel_sources: 5,                  // parallelism (not a cap)
+       parallel_models: 5,                   // parallelism (not a cap)
+       confirmed_skip_threshold: 3,          // efficiency: confirmed cells skip re-verify
        verification_map_path: ".aicodermap-verification-map.json",
-       // Phase 2 PER_MODEL_URL_EXPANSION (fallback for cells still empty)
-       per_model_fetch_budget: 12,
-       per_model_wallclock_budget: 120,
-       parallel_models: 5,
-       trust_score_required: true            // every value carries a trustScore
+       trust_score_required: true,           // every value carries a trustScore
+       termination: "completeness"           // explicit: not "wallclock", not "fetch_budget"
      )
    })
 5. Parse return → validate JSON schema (strip surrounding whitespace, locate first `{` and last `}` if narration leaked)
@@ -199,24 +196,50 @@ DEPRECATION_GRACE_DAYS          = 60    // vendor "deprecated" → still listed 
 DEPLOY_WAIT_SEC                 = 90
 AGENT_RETRY                     = 1
 FAMILY_BASELINE_MIN             = 30    // refresh-all: |models[]+newModels[]| floor
-// Phase 1 — SOURCE_FIRST_SWEEP budgets (primary mining; replaces per-model loop)
-PER_SOURCE_FETCH_BUDGET         = 2     // pages per source (aggregate + 1 documented fallback)
-PER_SOURCE_WALLCLOCK            = 60    // seconds per source max
-PARALLEL_SOURCES                = 5     // concurrent source fetches
-TOTAL_AGENT_WALLCLOCK           = 1800  // 30 min total per agent dispatch (was de facto ~600s; raised 2026-04-27 to fit ~66 source full sweep)
-CONFIRMED_SKIP_THRESHOLD        = 3     // verifications across distinct sources before a cell is skipped in subsequent sources + future cycles
+// =====================================================================
+// UNCAPPED RESEARCH DOCTRINE (added 2026-04-27 rev3)
+// User policy: "do not put budget/limit/cap on the agent's research effort.
+// Use every available capacity to find every available data point. No
+// timeout. Stop only when research is structurally complete."
+//
+// All previous fetch/wallclock budgets are REMOVED. The agent walks every
+// advertised source, attempts every reachable per-model URL + vendor card,
+// runs every fallback chain, and only terminates on COMPLETENESS_TERMINATION.
+// =====================================================================
+
+// Quality controls (kept — these are correctness rules, not effort caps)
+CONFIRMED_SKIP_THRESHOLD        = 3     // verifications agreeing within VERIFICATION_AGREEMENT_PP -> cell becomes "confirmed"; agent skips re-verifying it (efficiency, not a cap — agent could still re-check if needed)
 VERIFICATION_AGREEMENT_PP       = 1.5   // values within 1.5pp count as agreement; otherwise contradiction[]
-SATURATION_TERMINATE            = true  // stop sweep early if all active models have all 16 cells confirmed
-VERIFICATION_MAP_PATH           = ".aicodermap-verification-map.json"  // gitignored cross-cycle cache
+PARALLEL_SOURCES                = 5     // concurrent source fetches (parallelism, NOT a cap — agent may go higher if useful)
+PARALLEL_MODELS                 = 5     // concurrent model surveys (parallelism only)
 
-// Phase 2 — PER_MODEL_URL_EXPANSION (fallback for cells still empty after Phase 1)
-PER_MODEL_FETCH_BUDGET          = 12    // applies ONLY to Phase 2 fallback per (model, bench) cell
-PER_MODEL_WALLCLOCK_BUDGET      = 120   // applies ONLY to Phase 2
-PARALLEL_MODELS                 = 5     // applies ONLY to Phase 2
+// Termination — ONLY way the agent stops research:
+// All four conditions MUST hold before agent emits final JSON:
+//   1. Every leaderboard in sources-whitelist.json `leaderboards[]` has been
+//      visited (status: 200 + extract attempted, OR documented unreachable
+//      with fallback chain exhausted, OR _runtime.unhealthy auto-skip).
+//   2. Every vendor in `vendors[]` with a perModelUrl/modelCardUrl/postUrl
+//      has been attempted for every model in that vendor's family.
+//   3. Every (modelId, benchKey) cell currently null AND with >=1 advertised
+//      high-weight source has been attempted via SOURCE_FIRST_SWEEP +
+//      PER_MODEL_URL_EXPANSION + WebSearch fallback chain.
+//   4. For every still-empty cell, a gaps[] entry is emitted satisfying
+//      adaptive GAP_VALIDITY_GATE (triedSources >= clamp(advertised, 3, 5)).
+COMPLETENESS_TERMINATION        = true  // sole termination condition
 
-// Deep-fetch loop (Phase 3 — WebSearch / cross-cycle retry)
-DEEP_FETCH_MAX_PAIRS_PER_CYCLE  = 25    // user feedback "data definitely exists somewhere"
-DEEP_FETCH_MAX_CYCLES           = 5     // keep iterating until COVERAGE_TARGET hit OR no progress
+// Saturation termination (efficiency optimization, not effort cap):
+// If during the sweep every active model becomes fully confirmed (all 16
+// cells confirmed), the agent may stop early — there is nothing left to
+// research this cycle. This rarely fires because sparse benches keep some
+// cells unconfirmed indefinitely.
+SATURATION_TERMINATE            = true
+
+// Cross-cycle persistence (efficiency, not cap):
+VERIFICATION_MAP_PATH           = ".aicodermap-verification-map.json"  // gitignored
+
+// Deep-fetch loop (UNCAPPED — prior cycle/pair limits removed):
+DEEP_FETCH_PAIRS_PER_CYCLE      = "unlimited"  // was 25 — removed
+DEEP_FETCH_CYCLES               = "until_complete"  // was 5 — loop runs until COMPLETENESS_TERMINATION holds OR validationCoverage stops improving for 2 consecutive iterations (no-progress detect)
 
 SINGLE_ARTIFACT_PATH            = ".aicodermap-agent-out.json"  // ONE artifact, overwritten each run
 ```
