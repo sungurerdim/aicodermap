@@ -2,6 +2,26 @@
 ## [2026-04-27] — autonomous refresh-all
 
 ### Updated
+- 14 models: `qwen25-coder-14b`, `qwen25-coder-7b`, `deepseek-coder-v2-16b`, `devstral-2`, `devstral-medium`, `mimo-v2-5`, `qwen-3-6-max`, `qwen3-32b`, `gpt-4-1`, `o3`, `qwen3-6-plus`, `gemma-4-e2b`, `gemma-4-e4b`, `devstral-small-2`
+
+### Resolved (auto via trustScore)
+- devstral-medium.sweV: winner={'value': 68, 'trustScore': 0.9, 'sourceUrl': 'https://designforonline.com/ai-models/mistral-devstral-medium/', 'tier': 'I'} (severity=GREEN, Δ0)
+
+### Gaps (11 entries — see data/known-gaps.json or next refresh)
+- `None`: Only 2024-era LCB v1-v4 score 23.4 found; LCB v6 not published for 14B
+- `None`: LCB v6 not published for 7B
+- `None`: Codestral 22B 2024-era; no v6 evaluation found
+- `None`: Codestral is code-focused; GPQA not reported
+- `None`: MiMo-V2.5 base sweV not independently published; Pro variant 77.2 unconfirmed for base
+- `None`: MiMo-V2.5 base not on LCB v6
+- `None`: AIME 2026 score for Qwen3.6-Max-Preview not in aggregator sources
+- `None`: No official GPQA Diamond for Gemma 4 E2B; only 31B/26B have GPQA
+- ... and 3 more
+
+
+## [2026-04-27] — autonomous refresh-all
+
+### Updated
 - 26 models: `gpt-5-5`, `claude-haiku-4-5`, `grok-4-20`, `sonnet-4-6`, `gemini-3-1-pro`, `gemini-3-1-flash`, `kimi-k2-6`, `glm-5-1`, `devstral-2`, `devstral-medium`, `mimo-v2-5-pro`, `minimax-m2-5`, `minimax-m2-7`, `nemotron-3-super`, `qwen-3-6-27b`, `qwen3-6-plus`, `qwen3-coder-30b`, `qwen3-coder-480b`, `qwen3-coder-next`, `qwen3-235b`, `step-3-5-flash`, `gemma-4-26b-moe`, `gemma-3-27b`, `deepseek-r1-14b`, `codestral`, `deepseek-coder-v2-16b`
 
 ### Resolved (auto via trustScore)

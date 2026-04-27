@@ -2684,6 +2684,39 @@
         "gemma-4-31b.bench.lcbV6",
         "gemma-4-26b-moe.bench.gpqa"
       ]
+    },
+    {
+      "name": "designforonline.com",
+      "url": "https://designforonline.com/ai-models/mistral-devstral-medium/",
+      "tier": "C",
+      "format": "static_html_article",
+      "lastVerifiedDate": "2026-04-27",
+      "consecutiveFailures": 0,
+      "rationale": "Per-model review pages aggregating Artificial Analysis + HF Open LLM data. High extraction yield: 5 bench fields per page with verified numeric values.",
+      "extractedFields": [
+        "devstral-medium.bench.lcbV6",
+        "devstral-medium.bench.gpqa",
+        "devstral-medium.bench.hle",
+        "devstral-medium.bench.tau2",
+        "devstral-medium.bench.tb2",
+        "qwen3-32b.bench.gpqa",
+        "qwen3-32b.bench.hle",
+        "qwen3-32b.bench.lcbV6"
+      ]
+    },
+    {
+      "name": "automatio.ai",
+      "url": "https://automatio.ai/models/qwen3-6-max-preview",
+      "tier": "C",
+      "format": "static_html_article",
+      "lastVerifiedDate": "2026-04-27",
+      "consecutiveFailures": 0,
+      "rationale": "Model review pages with structured benchmark tables for new proprietary/preview models.",
+      "extractedFields": [
+        "qwen-3-6-max.bench.lcbV6",
+        "qwen-3-6-max.bench.gpqa",
+        "qwen-3-6-max.bench.hle"
+      ]
     }
   ],
   "_runtime": {
@@ -2763,16 +2796,18 @@
         "lastProbedAt": "2026-04-27"
       },
       "artificialanalysis.ai": {
-        "consecutiveFailures": 2,
-        "lastStatus": "unhealthy:spa_no_data",
-        "lastObservedFormat": "spa_full",
-        "lastProbedAt": "2026-04-27"
+        "consecutiveFailures": 0,
+        "lastStatus": "ok",
+        "lastObservedFormat": "spa_partial",
+        "lastProbedAt": "2026-04-27",
+        "unhealthy": false
       },
       "benchlm.ai": {
-        "consecutiveFailures": 1,
-        "lastStatus": "OK",
-        "lastObservedFormat": "static_html_article",
-        "lastProbedAt": "2026-04-27"
+        "consecutiveFailures": 0,
+        "lastStatus": "ok",
+        "lastObservedFormat": "spa_partial",
+        "lastProbedAt": "2026-04-27",
+        "unhealthy": false
       },
       "openrouter.ai": {
         "consecutiveFailures": 1,
@@ -2781,10 +2816,11 @@
         "lastProbedAt": "2026-04-27"
       },
       "livecodebench.github.io": {
-        "consecutiveFailures": 2,
+        "consecutiveFailures": 3,
         "lastStatus": "unhealthy:spa_no_data",
         "lastObservedFormat": "spa_full",
-        "lastProbedAt": "2026-04-27"
+        "lastProbedAt": "2026-04-27",
+        "unhealthy": true
       },
       "deepmind.google": {
         "consecutiveFailures": 0,
@@ -2805,6 +2841,19 @@
         "unhealthy": false,
         "lastStatus": "ok",
         "lastObservedFormat": "static_html_table",
+        "lastProbedAt": "2026-04-27"
+      },
+      "openai.com": {
+        "consecutiveFailures": 1,
+        "lastStatus": "unhealthy:bot_blocked_403",
+        "lastObservedFormat": "bot_blocked",
+        "lastProbedAt": "2026-04-27"
+      },
+      "designforonline.com": {
+        "consecutiveFailures": 0,
+        "unhealthy": false,
+        "lastStatus": "ok",
+        "lastObservedFormat": "static_html_article",
         "lastProbedAt": "2026-04-27"
       }
     },
