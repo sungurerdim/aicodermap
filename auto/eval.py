@@ -186,7 +186,30 @@ def compute_predicted_reach(wl, models):
     # Per-bench coverage report
     zero_source_keys = [k for k in BENCH_KEYS if bench_source_count[k] == 0]
 
-    return predicted_reach, bench_best_weight, bench_source_count, zero_source_keys
+    # Redundancy: counts high-weight sources (>=0.7) per bench, capped at 3 to
+    # avoid runaway when a meta-aggregator claims all keys. Mean / 3 = score.
+    REDUNDANCY_CAP = 3
+    high_weight_count = {k: 0 for k in BENCH_KEYS}
+    for lb in leaderboards:
+        publishes = lb.get("publishes", []) or []
+        fmt = lb.get("format", "static_html_table")
+        w = FORMAT_WEIGHTS.get(fmt, 0.5)
+        if w >= 0.7:
+            for k in publishes:
+                if k in high_weight_count:
+                    high_weight_count[k] += 1
+    redundancy_score = sum(
+        min(high_weight_count[k], REDUNDANCY_CAP) for k in BENCH_KEYS
+    ) / (len(BENCH_KEYS) * REDUNDANCY_CAP)
+
+    return (
+        predicted_reach,
+        bench_best_weight,
+        bench_source_count,
+        zero_source_keys,
+        redundancy_score,
+        high_weight_count,
+    )
 
 
 def main():
@@ -195,9 +218,17 @@ def main():
     fixtures = fx_doc["fixtures"]
     models = json.loads(MODELS.read_text(encoding="utf-8"))
 
-    # Coverage proxy
-    pr, bench_weights, bench_counts, zero_keys = compute_predicted_reach(wl, models)
+    # Coverage proxies
+    (
+        pr,
+        bench_weights,
+        bench_counts,
+        zero_keys,
+        redundancy,
+        bench_high_count,
+    ) = compute_predicted_reach(wl, models)
     print(f"predicted_reach:  {pr:.4f}")
+    print(f"redundancy_score: {redundancy:.4f}")
 
     by_lb_host = {}
     for e in wl.get("leaderboards", []) or []:
@@ -280,12 +311,15 @@ def main():
         for mid, label, correct, expanded in not_found[:8]:
             print(f"  [{label}] {mid} -> '{correct}' MISSING; chain={expanded}")
 
-    print("\n=== Coverage proxy (predicted_reach per bench key) ===")
+    print("\n=== Coverage proxy (predicted_reach + redundancy per bench key) ===")
     for k in BENCH_KEYS:
         w = bench_weights[k]
         c = bench_counts[k]
-        marker = " <-- ZERO SOURCE" if c == 0 else ""
-        print(f"  {k:<10} weight={w:.2f} sources={c}{marker}")
+        hc = bench_high_count[k]
+        marker = " <-- ZERO" if c == 0 else (" <-- ONLY ONE HIGH-W" if hc < 2 else "")
+        print(
+            f"  {k:<10} best_weight={w:.2f} total_sources={c} high_weight_sources={hc}{marker}"
+        )
     if zero_keys:
         print(
             f"\nBench keys with NO advertised source ({len(zero_keys)}): "

@@ -1,10 +1,10 @@
 {
   "target": "data/sources-whitelist.json",
-  "metric": "predicted_reach",
+  "metric": "redundancy_score",
   "direction": "higher",
   "secondary": "hit_rate_at_1",
   "bench_cmd": "bash auto/bench.sh",
   "budget_sec": 30,
   "tag": "2026-04-27-coverage",
-  "purpose": "Phase 2 of ds-tune: tune `publishes[]` arrays across leaderboards in data/sources-whitelist.json so every (modelId, benchKey) pair has at least one fetchable advertised source. Higher predicted_reach = more routing options for the orchestrator's deep-fetch loop = more coverage in real refresh-all cycles. Slug correctness (hit_rate_at_1) is the secondary guard so coverage experiments don't accidentally regress slug ordering."
+  "purpose": "Phase 2 of ds-tune (redundancy variant): predicted_reach saturated at 1.0 after EXP9 because BenchLM as a meta-aggregator covers all 16 bench keys. The new primary is redundancy_score — counts high-weight (>=0.7) sources per bench, capped at 3, normalized 0..1. Higher = more robust routing if any single source is down/refused. Tunes publishes[] arrays on canonical bench sites (SWE-bench, Terminal-Bench, Aider, BFCL, tau-bench, MCP-Atlas, etc.) and aggregators (Vellum, llm-stats, Klu, HF Open LLM, Papers with Code, Scale SEAL, Vals.ai). Slug correctness (hit_rate_at_1) remains the secondary regression guard."
 }
