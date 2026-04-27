@@ -983,11 +983,9 @@
       "perModelFormat": "spa_partial",
       "slugStrategy": "try_variations",
       "slugVariations": [
-        "{vendor_prefix}{id}",
+        "{vendor_prefix}{id}{vendor_suffix}",
         "{id}",
         "{id}-preview",
-        "{id}-lite-preview",
-        "{id}-a35b-instruct",
         "{id}-reasoning",
         "{id}-high",
         "{id}-fast",
@@ -996,6 +994,11 @@
       "slugMismatchNote": "Uses own slug system: opus-4-7 → claude-opus-4-7; gemini-3-1-flash → gemini-3-1-flash-lite-preview",
       "vendorPrefixMap": {
         "anthropic": "claude-",
+        "default": ""
+      },
+      "vendorSuffixMap": {
+        "google_deepmind:flash": "-lite-preview",
+        "alibaba_qwen:coder": "-a35b-instruct",
         "default": ""
       }
     },
