@@ -64,8 +64,10 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
      currentIds: [<every id in data/models.json, including status='deprecated'>],
      familyGrouping: <models grouped by (provider, tier) for parallel batches>,
      sourcesWhitelist: <inline data/sources-whitelist.json>,
+     verificationMap: <inline .aicodermap-verification-map.json (or {} on first run)>,
      lineup: <Step 0 result>
    }
+   - `.aicodermap-verification-map.json` is SSOT for "which (model, bench) cells are already confirmed". The agent uses it during SOURCE_FIRST_SWEEP to skip cells with verifications>=CONFIRMED_SKIP_THRESHOLD. Skill creates it (empty {}) on first cycle if missing.
    - `data/models.json` is SSOT for "what models we track"
    - `data/sources-whitelist.json` is SSOT for "what URLs the agent is allowed to fetch"
    - No skip registry: every (modelId, benchKey) pair is re-attempted every cycle so vendor opt-outs that close are surfaced immediately
@@ -77,9 +79,17 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
        scope, query, idea_context, target_model_ids?,
        include_unsloth: true,
        trusted_sources_only: true,           // per FETCH_WHITELIST
-       per_model_fetch_budget: 12,           // max fetches per model (raised 2026-04-27 for PER_MODEL_URL_EXPANSION cascade)
-       per_model_wallclock_budget: 120,      // seconds (raised 2026-04-27 to absorb per-model + model-card lookups)
-       parallel_models: 5,                   // concurrent model surveys
+       // Phase 1 SOURCE_FIRST_SWEEP (primary, see agent.md)
+       per_source_fetch_budget: 2,           // aggregate + 1 fallback per source
+       per_source_wallclock: 60,             // seconds per source max
+       parallel_sources: 5,                  // concurrent source fetches
+       total_agent_wallclock: 1800,          // 30 min agent budget total
+       confirmed_skip_threshold: 3,          // verifications -> cell becomes confirmed, skipped
+       verification_map_path: ".aicodermap-verification-map.json",
+       // Phase 2 PER_MODEL_URL_EXPANSION (fallback for cells still empty)
+       per_model_fetch_budget: 12,
+       per_model_wallclock_budget: 120,
+       parallel_models: 5,
        trust_score_required: true            // every value carries a trustScore
      )
    })
@@ -88,9 +98,10 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
 6. COVERAGE TRIGGER — **MANDATORY iteration, NEVER a halt**:
    if validationCoverage < COVERAGE_DEEPEN_THRESHOLD (0.95):
      loop until (coverage ≥ COVERAGE_TARGET 0.85) OR (cycles == DEEP_FETCH_MAX_CYCLES 5) OR (no progress between two consecutive cycles):
-       - identify (modelId, field) pairs missing ≥2 sources
+       - identify (modelId, field) pairs missing ≥2 sources (excluding cells already `confirmed` in verification map)
+       - **SOURCE_FIRST_SWEEP coverage** (Phase 1, see agent.md): primary mining already walked every advertised source once during the main agent dispatch. Deep-fetch loop targets only the residue — cells empty after sweep AND not yet 3-verified.
        - **Format-aware source picking**: for each missing pair, the orchestrator filters the whitelist to entries whose `format ∈ {static_html_table, static_html_article, static_markdown, github_raw_*, meta_tag_extract, pdf_report}` — i.e., formats with high signal-per-fetch — and assigns those URLs first. Entries whose format is `spa_full` or `bot_blocked` are deprioritised; their `fallbacks[].format == "websearch_snippet"` is used directly to skip the doomed primary fetch.
-       - **Per-model URL cascade** (NEW 2026-04-27, see agent.md PER_MODEL_URL_EXPANSION): when an aggregate leaderboard row is empty for a model, the agent expands `entry.perModelUrlTemplate` against `entry.slugVariations` (e.g., `https://artificialanalysis.ai/models/{slug}` × `["{id}", "claude-{id}", "{id}-preview", "{id}-lite-preview"]`) — first 200 wins. Then the agent tries the model's vendor `urls.modelCardUrlTemplate` (DeepMind: `/models/model-cards/{slug}/`) and `urls.postUrlPattern` (Google: `blog.google/innovation-and-ai/models-and-research/gemini-models/{slug}/`). Bot-blocked vendor blogs (openai.com/index, x.ai/news, klu.ai) skip direct fetch and route to `site:<host>` WebSearch. Every URL attempted (including 404s) is logged in `triedSources[]` with status, satisfying GAP_VALIDITY_GATE.
+       - **Per-model URL cascade** (Phase 2 fallback, see agent.md PER_MODEL_URL_EXPANSION): only invoked for cells the SOURCE_FIRST_SWEEP couldn't fill. The agent expands `entry.perModelUrlTemplate` against `entry.slugVariations` (e.g., `https://artificialanalysis.ai/models/{slug}` × `["{id}", "claude-{id}", "{id}-preview", "{id}-lite-preview"]`) — first 200 wins. Then the agent tries the model's vendor `urls.modelCardUrlTemplate` (DeepMind: `/models/model-cards/{slug}/`) and `urls.postUrlPattern` (Google: `blog.google/innovation-and-ai/models-and-research/gemini-models/{slug}/`). Bot-blocked vendor blogs (openai.com/index, x.ai/news, klu.ai) skip direct fetch and route to `site:<host>` WebSearch. Every URL attempted (including 404s) is logged in `triedSources[]` with status, satisfying GAP_VALIDITY_GATE.
        - spawn DEEP-FETCH pass via SendMessage to existing agent (or fresh Agent if SendMessage fails): up to DEEP_FETCH_MAX_PAIRS_PER_CYCLE 25 pairs per cycle, ≤30s per pair
        - merge deep-fetch returns into pending updates
        - stamp the artifact with `deepFetchCycle: <n>` and `validationCoverage: <updated>`
@@ -139,6 +150,21 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
    - Domains with consecutiveFailures ≥ 3 across cycles get `_runtime.unhealthy: true`; auto-skipped in next 2 cycles' Phase 1 (still tried via WebSearch fallback)
    - Whitelist mutations are committed alongside data/* changes — versioned and reversible.
 
+7.6. VERIFICATION_MAP_UPDATE (cross-cycle confirmed-cell cache, added 2026-04-27):
+   - After merge writes data/models.json, run `python scripts/verification-map.py update`
+   - The script reads `.aicodermap-agent-out.json` sourcesAdded[] entries, groups by (modelId, benchKey), and rebuilds the verification map:
+     ```
+     for each (modelId, benchKey) cell across all sources this cycle:
+       map.cells[modelId.benchKey].verifications[].append({source, url, tier, fetched})
+       if all values agree within VERIFICATION_AGREEMENT_PP (=1.5pp) AND len >= CONFIRMED_SKIP_THRESHOLD (=3):
+         map.cells[modelId.benchKey].confirmed = true
+       else if values disagree:
+         map.cells[modelId.benchKey].confirmed = false  // contradiction[] handled separately at Step 7
+     ```
+   - Persists `.aicodermap-verification-map.json` (gitignored — local cache, regenerated from sources.json on demand)
+   - Confirmed cells skip Phase 1 SOURCE_FIRST_SWEEP in next cycle, freeing budget for unfilled cells.
+   - This is what makes coverage incremental: each cycle only fetches what isn't already 3-verified.
+
 8. Render diff summary (markdown table) to user-visible output: models[].updates fields, newModels[], lineup changes (NEW/DEPRECATED/RENAMED/REMOVED), contradictions auto-resolved, coverage% achieved, partialCoverage flag.
 9. AUTO-APPROVE — NO USER PROMPT. The workflow proceeds straight from Step 8 to Step 10. The only halt at this stage is schema-breaking discovery (a brand-new top-level field in a model entry not in the existing whitelist) — and even then, the unrecognized field is logged to gaps[] and merge continues with the recognized fields. RED contradictions are already auto-resolved at Step 7. REMOVED entries are auto-archived per LIFECYCLE_STATES.
 
@@ -173,11 +199,25 @@ DEPRECATION_GRACE_DAYS          = 60    // vendor "deprecated" → still listed 
 DEPLOY_WAIT_SEC                 = 90
 AGENT_RETRY                     = 1
 FAMILY_BASELINE_MIN             = 30    // refresh-all: |models[]+newModels[]| floor
-PER_MODEL_FETCH_BUDGET          = 12    // max fetches per model in agent (raised 2026-04-27: 6 aggregate + ≤4 per-model + ≤4 vendor-card/post per PER_MODEL_URL_EXPANSION cascade)
-PER_MODEL_WALLCLOCK_BUDGET      = 120   // seconds per model in agent (raised 2026-04-27 to absorb cascade)
-PARALLEL_MODELS                 = 5     // concurrent model surveys in agent
-DEEP_FETCH_MAX_PAIRS_PER_CYCLE  = 25    // up from 10 — user feedback "data definitely exists somewhere"
-DEEP_FETCH_MAX_CYCLES           = 5     // up from 2 — keep iterating until COVERAGE_TARGET hit OR no progress
+// Phase 1 — SOURCE_FIRST_SWEEP budgets (primary mining; replaces per-model loop)
+PER_SOURCE_FETCH_BUDGET         = 2     // pages per source (aggregate + 1 documented fallback)
+PER_SOURCE_WALLCLOCK            = 60    // seconds per source max
+PARALLEL_SOURCES                = 5     // concurrent source fetches
+TOTAL_AGENT_WALLCLOCK           = 1800  // 30 min total per agent dispatch (was de facto ~600s; raised 2026-04-27 to fit ~66 source full sweep)
+CONFIRMED_SKIP_THRESHOLD        = 3     // verifications across distinct sources before a cell is skipped in subsequent sources + future cycles
+VERIFICATION_AGREEMENT_PP       = 1.5   // values within 1.5pp count as agreement; otherwise contradiction[]
+SATURATION_TERMINATE            = true  // stop sweep early if all active models have all 16 cells confirmed
+VERIFICATION_MAP_PATH           = ".aicodermap-verification-map.json"  // gitignored cross-cycle cache
+
+// Phase 2 — PER_MODEL_URL_EXPANSION (fallback for cells still empty after Phase 1)
+PER_MODEL_FETCH_BUDGET          = 12    // applies ONLY to Phase 2 fallback per (model, bench) cell
+PER_MODEL_WALLCLOCK_BUDGET      = 120   // applies ONLY to Phase 2
+PARALLEL_MODELS                 = 5     // applies ONLY to Phase 2
+
+// Deep-fetch loop (Phase 3 — WebSearch / cross-cycle retry)
+DEEP_FETCH_MAX_PAIRS_PER_CYCLE  = 25    // user feedback "data definitely exists somewhere"
+DEEP_FETCH_MAX_CYCLES           = 5     // keep iterating until COVERAGE_TARGET hit OR no progress
+
 SINGLE_ARTIFACT_PATH            = ".aicodermap-agent-out.json"  // ONE artifact, overwritten each run
 ```
 
@@ -326,16 +366,18 @@ Single source of truth for the unified shape between every layer. Mirrored verba
 | **Storage**  | `data/models.json`    | Flat scalars. `bench.<key>` = number, `context` = number, `pricing.api[].in/out/cacheHit/throughput` = number. NO `{value, trustScore}` wrappers. |
 | **Provenance** | `data/sources.json` | Wrapped: `{value, source, url, tier, date, verifications, trustScore, contradictionRole?}`. Sole on-disk home of `trustScore`. |
 | **Transit**  | agent → skill JSON    | `models[].updates.<field>` = Storage shape; `models[].sourcesAdded[]` = Provenance shape; NEVER cross-mix.                    |
+| **Verification** | `.aicodermap-verification-map.json` (gitignored) | **Cross-cycle cache:** `cells.<modelId>.<benchKey> = {value, verifications[], confirmed, lastChecked}`. Skill reads at cycle start (skip confirmed cells), updates post-merge from sourcesAdded[]. NOT a render input — purely orchestrator state. |
 | **Render**   | `assets/app.js`       | Reads Storage scalars; looks up Provenance for tooltips by `<modelId>.<field>`.                                              |
 
 Contradictions: `field` = **bare** bench key (`swePro`, never `bench.swePro`); `candidates[]` wrapped; `autoResolveWinner` wrapped dict — skill extracts `.value` for Storage, keeps full dict for Provenance.
 
-**Enforcement** (3 layers, defense in depth):
+**Enforcement** (4 layers, defense in depth):
 1. Agent self-check before emit (Storage-shape validation on every `updates.bench.<k>`)
 2. `scripts/merge.py` defensive unwrap (graceful degrade if a wrapper slips through — see MERGE_RULES section H)
-3. Frontend render guard (warn on non-scalar bench cells)
+3. `scripts/verification-map.py update` post-merge (rebuilds verification cells from sourcesAdded[]; computes `confirmed` flag per VERIFICATION_AGREEMENT_PP rule)
+4. Frontend render guard (warn on non-scalar bench cells)
 
-The 2026-04-26 cycle 2 regression (live table blanked) was a contract violation at layer 1 + missing defense at layer 2. Both are now patched.
+The 2026-04-26 cycle 2 regression (live table blanked) was a contract violation at layer 1 + missing defense at layer 2. Both are now patched. Verification map (added 2026-04-27) is the cross-cycle persistence layer that powers SOURCE_FIRST_SWEEP's confirmed-cell skip.
 
 ## MERGE_RULES
 

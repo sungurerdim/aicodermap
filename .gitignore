@@ -37,9 +37,10 @@ coverage/
 .claude/*.local.json
 .claude-local/
 
-# AICoderMap skill artifacts (research-agent intermediate outputs)
+# AICoderMap skill artifacts (research-agent intermediate outputs + verification cache)
 .aicodermap-*.json
 .aicodermap-images/
+.aicodermap-verification-map.json
 
 # ds-tune state
 .audit/

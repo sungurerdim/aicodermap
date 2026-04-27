@@ -1,0 +1,267 @@
+#!/usr/bin/env python3
+"""Verification-map manager for SOURCE_FIRST_SWEEP cross-cycle cache.
+
+Two operations:
+  - `update`: read .aicodermap-agent-out.json sourcesAdded[] across all
+    models, group by (modelId, benchKey), append fresh provenance entries
+    to the verification map, recompute `confirmed` flag per cell.
+  - `read`:  print the map (for skill orchestrator inline injection into
+    idea_context).
+
+Cell becomes confirmed when:
+  - verifications.length >= CONFIRMED_SKIP_THRESHOLD (3)
+  - all values agree within VERIFICATION_AGREEMENT_PP (1.5pp absolute)
+
+Map shape (canonical, mirrored in agent.md DATA_CONTRACT):
+  {
+    "lastUpdate": "YYYY-MM-DD",
+    "stats": {"totalCells": N, "confirmed": N, "contested": N},
+    "cells": {
+      "<modelId>.<benchKey>": {
+        "value": <number | null>,            // last consensus value (null on contradiction)
+        "verifications": [{source, url, tier, fetched}, ...],
+        "confirmed": <bool>,
+        "lastChecked": "YYYY-MM-DD"
+      }
+    }
+  }
+"""
+
+import json
+import sys
+from datetime import date
+from pathlib import Path
+
+PROJECT = Path(__file__).resolve().parent.parent
+ARTIFACT = PROJECT / ".aicodermap-agent-out.json"
+MAP_PATH = PROJECT / ".aicodermap-verification-map.json"
+
+CONFIRMED_SKIP_THRESHOLD = 3
+VERIFICATION_AGREEMENT_PP = 1.5
+TODAY = date.today().isoformat()
+
+
+def parse_cell_key(source_added_key: str):
+    """sourcesAdded entry keys come as `<modelId>.bench.<benchKey>` or
+    `<modelId>.<benchKey>` (legacy). Returns (modelId, benchKey) or None."""
+    parts = source_added_key.split(".")
+    if len(parts) >= 3 and parts[-2] == "bench":
+        return parts[0] if len(parts) == 3 else ".".join(parts[:-2]), parts[-1]
+    if len(parts) >= 2:
+        # Treat second-to-last segments as modelId, last as benchKey
+        return ".".join(parts[:-1]), parts[-1]
+    return None
+
+
+def values_agree(values, threshold_pp=VERIFICATION_AGREEMENT_PP):
+    """All numeric values agree within `threshold_pp` of the median."""
+    nums = [v for v in values if isinstance(v, (int, float))]
+    if not nums:
+        return False
+    nums_sorted = sorted(nums)
+    median = nums_sorted[len(nums_sorted) // 2]
+    return all(abs(v - median) <= threshold_pp for v in nums)
+
+
+def update_map():
+    if not ARTIFACT.exists():
+        print(f"no artifact at {ARTIFACT}; nothing to update", file=sys.stderr)
+        return 1
+
+    artifact = json.loads(ARTIFACT.read_text(encoding="utf-8"))
+    if MAP_PATH.exists():
+        m = json.loads(MAP_PATH.read_text(encoding="utf-8"))
+        cells = m.get("cells", {})
+    else:
+        cells = {}
+
+    appended = 0
+    for model in artifact.get("models", []) or []:
+        for src in model.get("sourcesAdded", []) or []:
+            key = src.get("key")
+            if not key or "bench" not in key:
+                continue
+            parsed = parse_cell_key(key)
+            if not parsed:
+                continue
+            mid, bk = parsed
+            cell_key = f"{mid}.{bk}"
+            cell = cells.setdefault(
+                cell_key,
+                {
+                    "value": None,
+                    "verifications": [],
+                    "confirmed": False,
+                    "lastChecked": TODAY,
+                },
+            )
+            # Append this verification (dedupe by url)
+            url = src.get("url", "")
+            existing_urls = {v.get("url") for v in cell["verifications"]}
+            if url not in existing_urls:
+                cell["verifications"].append(
+                    {
+                        "value": src.get("value"),
+                        "source": src.get("source"),
+                        "url": url,
+                        "tier": src.get("tier"),
+                        "fetched": src.get("fetched") or TODAY,
+                    }
+                )
+                appended += 1
+            cell["lastChecked"] = TODAY
+
+    # Recompute confirmed flag per cell
+    confirmed_count = 0
+    contested_count = 0
+    for cell_key, cell in cells.items():
+        verifs = cell.get("verifications", [])
+        values = [v.get("value") for v in verifs if v.get("value") is not None]
+        if len(verifs) >= CONFIRMED_SKIP_THRESHOLD and values_agree(values):
+            cell["confirmed"] = True
+            # Use median as canonical value
+            nums = sorted(v for v in values if isinstance(v, (int, float)))
+            cell["value"] = nums[len(nums) // 2] if nums else None
+            confirmed_count += 1
+        elif len(verifs) >= 2 and not values_agree(values):
+            cell["confirmed"] = False
+            cell["value"] = None
+            contested_count += 1
+        else:
+            cell["confirmed"] = False
+
+    m_out = {
+        "lastUpdate": TODAY,
+        "stats": {
+            "totalCells": len(cells),
+            "confirmed": confirmed_count,
+            "contested": contested_count,
+        },
+        "cells": cells,
+    }
+    MAP_PATH.write_text(json.dumps(m_out, indent=2) + "\n", encoding="utf-8")
+    print(
+        f"verification-map: appended {appended} verifications | "
+        f"{confirmed_count}/{len(cells)} cells confirmed, "
+        f"{contested_count} contested"
+    )
+    return 0
+
+
+def read_map():
+    if not MAP_PATH.exists():
+        print("{}")
+        return 0
+    print(MAP_PATH.read_text(encoding="utf-8"))
+    return 0
+
+
+def bootstrap_from_sources():
+    """Rebuild verification map from data/sources.json (the on-disk provenance
+    log accumulated across all prior cycles). Use once when introducing the
+    map mid-project, then incremental updates take over."""
+    sources_path = PROJECT / "data" / "sources.json"
+    if not sources_path.exists():
+        print("no data/sources.json — nothing to bootstrap from", file=sys.stderr)
+        return 1
+    sources = json.loads(sources_path.read_text(encoding="utf-8"))
+    cells = {}
+    for key, entries in sources.items():
+        # key: "<modelId>.<benchKey>" or "<modelId>.bench.<benchKey>" or other (pricing.api etc.)
+        if not isinstance(entries, list):
+            continue
+        parts = key.split(".")
+        # Bench keys live as "modelId.benchKey" (sources.json schema) — only those interest us here
+        if len(parts) != 2:
+            continue
+        mid, bk = parts
+        # Skip non-bench fields — only known bench keys go in the verification map
+        BENCH_KEYS = {
+            "swePro",
+            "sweV",
+            "tb2",
+            "lcbV6",
+            "aider",
+            "tau2",
+            "aaCoding",
+            "aaAgentic",
+            "mcpA",
+            "gpqa",
+            "sweMulti",
+            "hle",
+            "aaIdx",
+            "bfcl",
+            "aime26",
+            "aaOmni",
+        }
+        if bk not in BENCH_KEYS:
+            continue
+        cell = cells.setdefault(
+            f"{mid}.{bk}",
+            {
+                "value": None,
+                "verifications": [],
+                "confirmed": False,
+                "lastChecked": TODAY,
+            },
+        )
+        seen_urls = set()
+        for e in entries:
+            url = e.get("url", "")
+            if url in seen_urls:
+                continue
+            seen_urls.add(url)
+            cell["verifications"].append(
+                {
+                    "value": e.get("value"),
+                    "source": e.get("source"),
+                    "url": url,
+                    "tier": e.get("tier"),
+                    "fetched": e.get("date") or e.get("fetched") or TODAY,
+                }
+            )
+    # Recompute confirmed
+    confirmed = contested = 0
+    for cell in cells.values():
+        verifs = cell["verifications"]
+        values = [v["value"] for v in verifs if v["value"] is not None]
+        if len(verifs) >= CONFIRMED_SKIP_THRESHOLD and values_agree(values):
+            cell["confirmed"] = True
+            nums = sorted(v for v in values if isinstance(v, (int, float)))
+            cell["value"] = nums[len(nums) // 2] if nums else None
+            confirmed += 1
+        elif len(verifs) >= 2 and not values_agree(values):
+            cell["confirmed"] = False
+            cell["value"] = None
+            contested += 1
+    m_out = {
+        "lastUpdate": TODAY,
+        "stats": {
+            "totalCells": len(cells),
+            "confirmed": confirmed,
+            "contested": contested,
+        },
+        "cells": cells,
+    }
+    MAP_PATH.write_text(json.dumps(m_out, indent=2) + "\n", encoding="utf-8")
+    print(
+        f"verification-map: bootstrapped from data/sources.json — "
+        f"{len(cells)} cells, {confirmed} confirmed, {contested} contested"
+    )
+    return 0
+
+
+def main():
+    op = sys.argv[1] if len(sys.argv) > 1 else "update"
+    if op == "update":
+        return update_map()
+    if op == "read":
+        return read_map()
+    if op == "bootstrap":
+        return bootstrap_from_sources()
+    print(f"usage: verification-map.py [update|read|bootstrap]", file=sys.stderr)
+    return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())

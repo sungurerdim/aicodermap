@@ -281,6 +281,7 @@ Three layers, three shapes — never mix them. Violating this contract is the re
 | **Storage**  | `data/models.json`    | **Flat scalars.** `bench.<key>` = number, `context` = number, `pricing.api[].in/out/cacheHit/throughput` = number. NEVER `{value, trustScore}` wrappers, NEVER nested objects. |
 | **Provenance** | `data/sources.json` | **Wrapped entries:** `{value, source, url, tier, date, verifications, trustScore, contradictionRole?}`. This is the *only* place `trustScore` lives on disk.                 |
 | **Transit**  | agent → skill JSON    | `models[].updates.<field>` = Storage shape (scalars). `models[].sourcesAdded[]` = Provenance shape (wrapped). NEVER emit wrappers inside `updates`.                            |
+| **Verification** | `.aicodermap-verification-map.json` (gitignored) | **Cross-cycle cache:** `cells.<modelId>.<benchKey> = {value, verifications[], confirmed, lastChecked}`. Skill reads at cycle start (skip confirmed cells), updates post-merge from sourcesAdded[]. NOT a render input — purely orchestrator state. |
 | **Render**   | frontend `assets/app.js` | Reads Storage scalars. Looks up Provenance from sources.json by `<modelId>.<field>` for tooltips / source links.                                                            |
 
 **Contradictions** sit between Transit and Provenance:
@@ -649,7 +650,101 @@ A gap entry that fails any of these three counts is a **fabricated gap** and is 
 
 A legacy/deprecated model still gets the same treatment: try the canonical historical leaderboards (Papers with Code, Epoch AI, llm-stats archive, marc0.dev historical entries, BigCodeBench archive) before declaring a gap. "Model is old" is never a sufficient reason to skip the attempt.
 
-## PER_MODEL_URL_EXPANSION (cascade — added 2026-04-27)
+## SOURCE_FIRST_SWEEP (Phase 1 primary mining — added 2026-04-27 rev2)
+
+**Why this section exists:** prior phases iterated **per-model** (for each model, walk all sources). With 53 models × 5+ sources × 16 benches, this scaled poorly: per-model cascade was verification-blind and cache-unaware. Cycle 4 used only ~32 of a possible 600+ fetches before exhausting wall-clock; agent kept re-visiting the same source page once per model. Inverted strategy: walk **each source ONCE**, extract every (modelId, benchKey, value) tuple visible on that page in one pass.
+
+**Mandatory protocol on `scope=full`:**
+
+```
+0. Load priors:
+   verification_map := READ (project_root)/.aicodermap-verification-map.json
+                       (gitignored cache; per-cell { value, verifications[], confirmed })
+   active_models    := from idea_context.currentIds
+   target_cells     := { (model.id, benchKey) | bench is empty in models.json
+                                                AND not confirmed in verification_map }
+
+1. Build tier-prioritised source queue from sources-whitelist.json:
+   tier I  (independent leaderboard, format-weight >= 0.7):
+            iterate leaderboards[] sorted by (publishes.length desc, lastVerifiedDate desc)
+   tier S  (vendor model-cards/news, format-weight >= 0.7):
+            iterate vendors.*.urls.modelCardUrlTemplate first, then postUrlPattern
+   tier C  (community blogs, format-weight >= 0.7):
+            iterate community[]
+   skip:    sources with _runtime.unhealthy == true; persistent bot_blocked / spa_full
+            with no fallback chain.
+
+2. For each source in tier order (parallel batches of PARALLEL_SOURCES = 5):
+
+   a) Fetch the aggregate URL (entry.url) ONCE.
+      Budget: PER_SOURCE_FETCH_BUDGET = 2 fetches max per source (aggregate + 1 fallback).
+      Wallclock: PER_SOURCE_WALLCLOCK = 60s.
+
+   b) Extract every (modelId, benchKey, value) tuple visible on the page.
+      Match modelId against active_models[] using SLUG_RESOLUTION (vendorPrefixMap +
+      vendorSuffixMap + slugVariations); match benchKey against entry.publishes[]
+      (or, if publishes[] is empty/unknown, against the canonical 16-key set).
+
+   c) For each extracted tuple:
+      key := f"{modelId}.{benchKey}"
+      if verification_map[key].confirmed:
+        SKIP (don't even emit — already 3+ verified)
+      else:
+        emit to sourcesAdded[] with this source's tier+url+trustScore
+        increment verification_map[key].verifications[].count
+
+   d) After processing this source: if every active_model now has all-cells confirmed
+      (no target_cells remaining), STOP early (saturation termination).
+
+3. Per-source fallback (only used if aggregate fetch yields zero (model, bench) tuples
+   AND the source has a documented mirror):
+      try entry.fallbacks[0].url (e.g., websearch_snippet or static_html_table mirror)
+      counted against the same per-source budget.
+
+4. Saturation rules (model-level skip in subsequent sources):
+   - Once a model has ALL 16 bench cells confirmed (verifications >= 3 for each),
+     do NOT search its name in remaining tier-C sources. Big efficiency win for
+     well-covered frontier models (opus-4-7, gemini-3-1-pro, gpt-5-5, kimi-k2-6).
+
+5. After Phase 1, target_cells now contains only:
+   - Cells with < CONFIRMED_SKIP_THRESHOLD (=3) verifications, OR
+   - Cells the agent has not seen advertised on any walked source.
+   These flow to Phase 2 (PER_MODEL_URL_EXPANSION).
+```
+
+**Verification map update (post-extraction):**
+
+```jsonc
+// .aicodermap-verification-map.json
+{
+  "cells": {
+    "opus-4-7.swePro": {
+      "value": 64.3,
+      "verifications": [
+        {"source": "Scale SEAL",    "url": "...", "tier": "I", "fetched": "2026-04-27"},
+        {"source": "BenchLM",       "url": "...", "tier": "I", "fetched": "2026-04-27"},
+        {"source": "AA per-model",  "url": "...", "tier": "I", "fetched": "2026-04-27"}
+      ],
+      "confirmed": true,
+      "lastChecked": "2026-04-27"
+    }
+  }
+}
+```
+
+`confirmed = (verifications.length >= 3) AND (all verifications agree on value within 1.5pp)`. If multiple sources disagree, the cell is NOT confirmed even with 3+ verifications — it goes to contradictions[] for trustScore-based resolution.
+
+**Why this beats per-model cascade:**
+
+| Metric | Per-model (prior) | SOURCE_FIRST_SWEEP |
+|---|---|---|
+| Total fetches per cycle (estimate) | 53 × 12 = 636 ceiling | 34 + 22 + ~10 = ~66 |
+| Verification-aware skip | no (each model from scratch) | yes (3+ verified = skip rest of cycle, persists across cycles) |
+| Same source re-visited | up to 53× | exactly 1× |
+| Wallclock dependence | high (each model burns budget) | low (saturates fast on confirmed cells) |
+| Coverage trajectory | linear-ish, plateaus around 30-35% | step-function: each new source adds many cells in one shot |
+
+## PER_MODEL_URL_EXPANSION (Phase 2 fallback — for cells still empty after SOURCE_FIRST_SWEEP)
 
 **Why this section exists:** the 2026-04-27 audit found that several whitelisted leaderboards (artificialanalysis.ai, benchlm.ai, epoch.ai, llm-stats.com) and most vendor blogs (blog.google, anthropic.com/news, deepmind.google/models/model-cards/) host **per-model pages** with rich bench tables that the prior cascade never visited. The agent only fetched aggregate leaderboard URLs, missing model-specific content like `https://artificialanalysis.ai/models/gemini-3-1-flash-lite-preview` or `https://deepmind.google/models/model-cards/gemini-3-1-pro/`. Those per-model pages frequently contain 14+ benchmarks for a single model — exactly what fills sparse cells.
 
