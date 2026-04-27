@@ -56,6 +56,10 @@ def variant(model_id: str) -> str:
             "plus",
             "fast",
             "high",
+            "coder",
+            "instruct",
+            "chat",
+            "moe",
         }:
             return p
     return ""
@@ -67,20 +71,36 @@ def strip_prefix(model_id: str, prefix: str) -> str:
     )
 
 
-def expand(template: str, model_id: str, vendor_prefix: str = "") -> str:
-    """Substitute placeholders. {vendor_prefix} resolves via leaderboard's
-    vendorPrefixMap[provider] (passed from caller). {id_no_prefix} strips the
+def expand(
+    template: str, model_id: str, vendor_prefix: str = "", vendor_suffix: str = ""
+) -> str:
+    """Substitute placeholders. {vendor_prefix} / {vendor_suffix} resolve via
+    leaderboard's vendorPrefixMap[provider] / vendorSuffixMap[provider:variant
+    | provider | default] (passed from caller). {id_no_prefix} strips the
     leading vendor_prefix from id (so claude-haiku-4-5 with prefix='claude-'
-    becomes 'haiku-4-5'). Both enable vendor-conditional slug ordering without
-    burning all variation slots on dead alternatives."""
+    becomes 'haiku-4-5'). All three enable vendor-conditional slug ordering
+    without burning a slot per (provider, variant) combo."""
     return (
         template.replace("{vendor_prefix}", vendor_prefix)
+        .replace("{vendor_suffix}", vendor_suffix)
         .replace("{id_no_prefix}", strip_prefix(model_id, vendor_prefix))
         .replace("{id}", model_id)
         .replace("{family}", family(model_id))
         .replace("{N}", major_version(model_id))
         .replace("{variant}", variant(model_id))
     )
+
+
+def lookup_vendor_value(map_obj: dict, provider: str, var: str) -> str:
+    """Compound-key lookup: tries `provider:variant`, then `provider`, then
+    `default`. Returns empty string when no match."""
+    if not map_obj:
+        return ""
+    if provider and var and (key := f"{provider}:{var}") in map_obj:
+        return map_obj[key]
+    if provider and provider in map_obj:
+        return map_obj[provider]
+    return map_obj.get("default", "")
 
 
 def hostname(url: str) -> str:
@@ -111,25 +131,35 @@ def main():
         correct = fx["correctSlug"]
 
         provider = fx.get("provider", "")
+        var = variant(mid)
         if "leaderboard" in fx:
             entry = by_lb_host.get(fx["leaderboard"])
             variations = (entry or {}).get("slugVariations", []) or []
-            prefix_map = (entry or {}).get("vendorPrefixMap", {}) or {}
-            vendor_prefix = prefix_map.get(provider, prefix_map.get("default", ""))
+            vendor_prefix = lookup_vendor_value(
+                (entry or {}).get("vendorPrefixMap", {}), provider, var
+            )
+            vendor_suffix = lookup_vendor_value(
+                (entry or {}).get("vendorSuffixMap", {}), provider, var
+            )
             label = f"lb:{fx['leaderboard']}"
         elif "vendor" in fx:
             v = vendors.get(fx["vendor"], {}) or {}
             via = fx.get("via", "postSlugVariations")
             variations = v.get(via, []) or []
-            prefix_map = v.get("vendorPrefixMap", {}) or {}
-            vendor_prefix = prefix_map.get(provider, prefix_map.get("default", ""))
+            vendor_prefix = lookup_vendor_value(
+                v.get("vendorPrefixMap", {}), provider, var
+            )
+            vendor_suffix = lookup_vendor_value(
+                v.get("vendorSuffixMap", {}), provider, var
+            )
             label = f"vendor:{fx['vendor']}.{via}"
         else:
             variations = []
             vendor_prefix = ""
+            vendor_suffix = ""
             label = "?"
 
-        expanded = [expand(t, mid, vendor_prefix) for t in variations]
+        expanded = [expand(t, mid, vendor_prefix, vendor_suffix) for t in variations]
         try:
             rank = expanded.index(correct) + 1
         except ValueError:
