@@ -682,10 +682,11 @@ For each empty bench cell on a model:
 | `{variant}` | trailing variant token (pro/flash/lite/mini) | `pro` |
 | `{YYMMDD}` | model.released converted to YYMMDD | `260219` |
 | `{vendor_prefix}` | resolves via leaderboard/vendor `vendorPrefixMap[provider]` (e.g., `claude-` for Anthropic models on AA / BenchLM, empty for OpenAI/xAI) — enables vendor-conditional slug ordering without consuming a slot per provider | `claude-` for `provider=anthropic`, `""` otherwise |
+| `{vendor_suffix}` | symmetric to `{vendor_prefix}`; resolves via `vendorSuffixMap[provider:variant \| provider \| default]` with compound-key fallback. Used for vendor-specific suffixes that depend on the model's variant (e.g., `-lite-preview` for Google flash variants on AA, `-a35b-instruct` for Alibaba Qwen MoE coder models on AA, `-lite` for Google flash modelCards on DeepMind) | `-lite-preview` for `google_deepmind:flash`, `-a35b-instruct` for `alibaba_qwen:coder`, `""` otherwise |
 | `{id_no_prefix}` | strips leading `vendor_prefix` from id (handles models whose id already carries the prefix, e.g., `claude-haiku-4-5` with prefix `claude-` → `haiku-4-5`, avoids `claude-claude-haiku-4-5` double-prefix bug) | `haiku-4-5` for `model.id=claude-haiku-4-5` |
 | `{slug}` | computed slug after substitution | (final URL token) |
 
-**Whitelist schema additions for vendor-conditional substitution** (added 2026-04-27 via ds-tune; lifted hit_rate_at_1 from 0.68 → 0.84 on the audit fixture):
+**Whitelist schema additions for vendor-conditional substitution** (added 2026-04-27 via ds-tune; lifted hit_rate_at_1 from 0.68 → 0.96 and hit_rate_at_3 to 1.00 on the audit fixture):
 
 ```jsonc
 {
@@ -694,15 +695,22 @@ For each empty bench cell on a model:
       "url": "https://artificialanalysis.ai/leaderboards/models",
       "perModelUrlTemplate": "https://artificialanalysis.ai/models/{slug}",
       "slugVariations": [
-        "{vendor_prefix}{id}",        // claude-opus-4-7 for Anthropic, opus-4-7 for default
-        "{id}",
+        "{vendor_prefix}{id}{vendor_suffix}",  // claude-opus-4-7 / gemini-3-1-flash-lite-preview / qwen3-coder-480b-a35b-instruct
+        "{id}",                                 // gpt-5-5, grok-3, deepseek-v4-pro fall through here
         "{id}-preview",
-        "{id}-lite-preview",          // gemini-3-1-flash-lite-preview corner case
-        "{id}-a35b-instruct"          // qwen3-coder-480b-a35b-instruct corner case
+        "{id}-reasoning",
+        "{id}-high",
+        "{id}-fast",
+        "{id}-mini"
       ],
       "vendorPrefixMap": {
         "anthropic": "claude-",
         "default": ""
+      },
+      "vendorSuffixMap": {
+        "google_deepmind:flash": "-lite-preview",   // gemini-3-1-flash → gemini-3-1-flash-lite-preview
+        "alibaba_qwen:coder":    "-a35b-instruct",  // qwen3-coder-480b → qwen3-coder-480b-a35b-instruct
+        "default":               ""
       }
     }
   ],
@@ -710,12 +718,44 @@ For each empty bench cell on a model:
     "anthropic": {
       "postSlugVariations": ["claude-{id_no_prefix}", "{id}"],
       "vendorPrefixMap": { "anthropic": "claude-", "default": "" }
+    },
+    "google_deepmind": {
+      "modelCardSlugVariations": ["{id}{vendor_suffix}", "{id}", "{id}-preview", "{id}-pro"],
+      "vendorSuffixMap": { "google_deepmind:flash": "-lite", "default": "" }
     }
   }
 }
 ```
 
-The same `vendorPrefixMap` mechanism applies to vendor entries (for `postSlugVariations` and `modelCardSlugVariations`). Adding a new provider-conditional prefix = appending to `vendorPrefixMap` only — never editing this spec or extending the agent procedure.
+**Key compound-lookup semantics** (applies to both `vendorPrefixMap` and `vendorSuffixMap`):
+
+```
+lookup(map, provider, variant):
+  1. try `<provider>:<variant>`  (e.g., google_deepmind:flash)
+  2. try `<provider>`            (e.g., anthropic → "claude-")
+  3. try `default`
+  4. else ""
+```
+
+`{variant}` is the trailing matched token from `model.id` against the recognized set `{pro, flash, lite, mini, max, plus, fast, high, coder, instruct, chat, moe}`. So `gemini-3-1-flash` → variant=`flash`; `qwen3-coder-480b` → variant=`coder`; `mimo-v2-5-pro` → variant=`pro`.
+
+**Adding a new provider-conditional rule** (data-only, no spec change):
+
+- New prefix (e.g., `cohere-` for Cohere models on a leaderboard) → append `"cohere": "cohere-"` to that leaderboard's `vendorPrefixMap`.
+- New suffix (e.g., `-instruct` for Mistral instruct variants) → append `"mistral:instruct": "-instruct"` to `vendorSuffixMap`.
+- New variant token (e.g., recognize `experimental` as a variant) → eval already supports the list above; if a new token is genuinely needed, add it once to `auto/eval.py:variant()` and to this table.
+
+**Coverage status (post-tune 2026-04-27):**
+
+| Family | Quirk | Resolved by |
+|---|---|---|
+| Anthropic | `claude-` prefix on AA/BenchLM/Epoch/news | `vendorPrefixMap.anthropic` (DONE) |
+| Anthropic | `claude-haiku-4-5` already prefixed | `claude-{id_no_prefix}` (DONE) |
+| xAI | Epoch canonicalizes `grok-4-20` → `grok-4` | `{family}-{N}` variant (rank 3, hit_rate_at_3=1.00) |
+| Google DeepMind | flash variants need `-lite-preview` (AA) / `-lite` (modelCard) | `vendorSuffixMap.google_deepmind:flash` (DONE) |
+| Alibaba Qwen | coder MoE needs `-a35b-instruct` (AA) | `vendorSuffixMap.alibaba_qwen:coder` (DONE) |
+| OpenAI / DeepSeek / Moonshot / Z.ai / Xiaomi / MiniMax / Nvidia / StepFun / all_hands_ai | no quirk — `{id}` directly resolves | default empty (covered) |
+| Mistral / Meta | blog post slug uses descriptive kebab (`mistral-large-2407`, `llama-4-multimodal-intelligence`) — NOT derivable from model.id | WebSearch-driven discovery (out of scope for slug-tune; agent fallback chain handles) |
 
 **Budget impact:** Step 2 + Step 3 add up to 4 + 4 = 8 fetch attempts per model (vs prior 0). The per_model_fetch_budget MUST be raised to **12** (from 6) when `scope=full` to absorb the cascade. The skill orchestrator enforces this; the agent does not exceed `per_model_fetch_budget` regardless.
 

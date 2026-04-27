@@ -5,3 +5,5 @@ timestamp	commit	status	hit_rate_at_1	hit_rate_at_3	duration	description
 2026-04-26T23:51:34Z	cdf74ae	keep	0.7600	0.8400	00:00:01	exp3: BenchLM {vendor_prefix}{id} rank1
 2026-04-26T23:51:55Z	4693d2b	keep	0.8000	0.9200	00:00:01	exp4: Epoch vendor_prefix + family-N (grok-4-20 -> grok-4)
 2026-04-26T23:52:17Z	f40c3bc	keep	0.8400	0.9200	00:00:01	exp5: Anthropic claude-{id_no_prefix} (haiku double-prefix fix)
+2026-04-27T00:28:36Z	d25659c	keep	0.9200	1.0000	00:00:01	exp6: AA vendorSuffixMap (Google flash + Qwen coder)
+2026-04-27T00:29:31Z	51d0c89	keep	0.9600	1.0000	00:00:01	exp7: DeepMind modelCard vendor_suffix (Google flash -lite)
