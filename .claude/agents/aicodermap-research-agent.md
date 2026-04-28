@@ -970,8 +970,9 @@ For each empty bench cell on a model:
     Fetch entry.url for every leaderboard whose publishes[] includes <benchKey>.
     Tier-assign per whitelist; emit if found.
 
-  Step 2 — Per-model leaderboard / local-catalog page (NEW — load-bearing):
-    Iterate two source families with `perModelUrlTemplate`:
+  Step 2 — Per-model URL discovery, dynamic-first (load-bearing):
+    Iterate two source families with `perModelUrlTemplate` (sources that
+    publish per-model detail pages):
       a. Every `leaderboards[]` entry with a non-null `perModelUrlTemplate`.
       b. Every `local[]` entry (e.g., Ollama Library) with a non-null
          `perModelUrlTemplate` AND `publishes[]` includes <benchKey>.
@@ -980,16 +981,53 @@ For each empty bench cell on a model:
          tab — high-recall source for open-weight models. Apply step 2 to
          them for any model whose `tier ∈ {open-flagship, coder-specialized,
          gemma, ollama-local}` OR whose `open === true`.
-    For each iterated entry:
-      For each variant in `slugVariations` (ordered):
-        slug := variant.replace('{id}', model.id)
-                       .replace('{family}', stripVersion(model.id))
-                       .replace('{N}', majorVersion(model.id))
-        url := perModelUrlTemplate.replace('{slug}', slug)
-        fetch(url) — count toward triedSources[]
-        if 200 + extractable: emit + break (this entry done)
-        if 404: continue to next variation
-      if all variations 404: log to triedSources[] with status, move on
+
+    For each iterated entry, RESOLVE THE PER-MODEL URL DYNAMICALLY (prior
+    cycles guessed slugs first, missing models when the slug rule didn't
+    match — reform 2026-04-28 rev4 makes guessing the LAST resort):
+
+      2a (PRIMARY) — Catalog index discovery:
+        On the first per-model lookup against this source in the cycle,
+        fetch entry.url ONCE (the catalog index, e.g.
+        https://ollama.com/library, https://artificialanalysis.ai/models).
+        Parse every `<a href>` anchor; build a map
+        catalogIndex[entry.url] = { <slug>: <absolute_url>, ... }.
+        Cache in `runtime.catalogIndexes` and emit it in
+        whitelistAdditions[] so subsequent cycles inherit the map without
+        re-scraping. Look up the model by:
+          1. exact match on model.id
+          2. case-insensitive match on model.name
+          3. fuzzy match: tokenize model.name, match anchor text containing
+             every required token (vendor + version)
+        If a match is found, fetch its URL and proceed to extraction. If
+        the same catalog index has been scraped earlier this cycle, use
+        the cached map — do NOT re-fetch.
+
+      2b (FALLBACK) — WebSearch site-scoped discovery:
+        If the catalog index lookup failed (model not listed, or anchor
+        text doesn't disambiguate), run a WebSearch query:
+            `"<model.name>" site:<entry.host>`
+        Take the first result whose URL hostname matches entry.host AND
+        whose path looks like a model detail page (e.g., contains the
+        model.id slug or `/library/` / `/models/` segment). Fetch that URL.
+
+      2c (LAST RESORT) — Slug substitution:
+        Only when 2a + 2b both produced no candidate, fall back to the
+        legacy guess-and-try path using `slugVariations` from the entry:
+          For each variant in `slugVariations` (ordered):
+            slug := variant.replace('{id}', model.id)
+                           .replace('{family}', stripVersion(model.id))
+                           .replace('{N}', majorVersion(model.id))
+            url := perModelUrlTemplate.replace('{slug}', slug)
+            fetch(url); if 200 + extractable, emit + break
+        slugVariations is a hint, not authoritative — sources without it
+        still go through 2a + 2b first. **The agent does NOT hardcode
+        per-model URLs anywhere; every URL is either discovered from a
+        catalog index, surfaced by WebSearch, or templated from data.**
+
+    Status logging: every URL attempted (2a hit, 2b hit, 2c hit, 404, 5xx,
+    parse miss) is logged to `triedSources[]` with its status code so the
+    next cycle's catalogIndex map skips known-dead branches.
 
   Step 3 — Vendor model card / blog post (NEW):
     For the model's vendor (resolved via model.provider → vendors.<vid>):

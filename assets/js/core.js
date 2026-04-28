@@ -35,6 +35,16 @@ export const PRESETS = {
     tb2: 22, mcpA: 18, tau2: 13, aaAgentic: 12, swePro: 10, lcbV6: 10,
     bfcl: 10, gpqa: 5, sweV: 0, aider: 0, aaCoding: 0, sweMulti: 0, hle: 0,
   },
+  // Reasoning / knowledge breadth — covers the bench keys (aaIdx, aime26,
+  // aaOmni) the coding-centric presets above leave at zero. Anchors on the
+  // independent-evaluator composite (gpqa diamond + AIME 2026 math
+  // reasoning + Humanity's Last Exam + AA-Omniscience knowledge breadth
+  // + AA Intelligence Index), with a lighter coding tail so the score
+  // still falls back on swePro / lcbV6 verification.
+  'reasoning-focused': {
+    gpqa: 25, aime26: 20, hle: 20, aaOmni: 15, aaIdx: 10,
+    swePro: 5, lcbV6: 5,
+  },
   'benchmark-only': {
     swePro: 20, sweV: 15, tb2: 15, lcbV6: 15, aider: 10, gpqa: 10,
     sweMulti: 10, hle: 5, aaCoding: 0, aaAgentic: 0, tau2: 0, mcpA: 0,
