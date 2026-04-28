@@ -76,8 +76,10 @@ export function updateWeightsTotal() {
 export function applyPreset(name, onChange) {
   const preset = PRESETS[name];
   if (!preset) return;
-  State.weights = { ...DEFAULT_WEIGHTS, ...preset };
-  for (const k of BENCH_KEYS) if (State.weights[k] == null) State.weights[k] = 0;
+  // Zero-base merge: every preset is the full intended distribution.
+  // Spreading DEFAULT_WEIGHTS underneath would leak its values for any
+  // key the preset omits, pushing the runtime sum well above 100.
+  State.weights = Object.fromEntries(BENCH_KEYS.map(k => [k, preset[k] || 0]));
   writeStorage(STORAGE.weights, State.weights);
   renderWeightsEditor(onChange);
   if (typeof onChange === 'function') onChange();

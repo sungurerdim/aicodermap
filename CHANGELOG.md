@@ -1,4 +1,29 @@
 
+## [2026-04-29.c] — preset weight bug fix + bench taxonomy expansion
+
+### Fixed
+- `applyPreset` weight leak: prior `{...DEFAULT_WEIGHTS, ...preset}` spread leaked DEFAULT keys for every key the preset omitted, pushing runtime sums to 123–160 instead of 100. Switched to zero-base merge `Object.fromEntries(BENCH_KEYS.map(k => [k, preset[k] || 0]))`. Every preset now sums to exactly 100 at runtime.
+
+### Added (3 new bench keys, 22 → 25)
+- `nl2Repo` — Natural-language → full repository generation (multi-file, dependency resolution); 7/9 vendor adoption per recent flagship reports, complementary to SWE-bench.
+- `tau3` — τ³-bench, longer-horizon multi-turn tool-calling successor to τ²-bench; 9/9 vendor adoption.
+- `toolDec` — Tool-Decathlon, 10-task multi-tool agent benchmark; 9/9 vendor adoption, complements MCP-Atlas.
+
+### Reweighted (all 5 presets — every preset still sums to 100)
+- `balanced`: 16 → 19 keys (added nl2Repo:5, tau3:1, toolDec:1; trimmed swePro 20→18, tb2 13→12, lcb 13→12, sweV 10→9, mcpA 5→4, tau2 4→3)
+- `swe-focused`: 8 → 9 keys (added nl2Repo:9; trimmed swePro 25→23, sweV 18→16, sweMulti 15→13, lcb 12→11, tb2 10→9, tbHard 10→9)
+- `agentic-focused`: 9 → 11 keys (added tau3:8, toolDec:7; trimmed tb2 18→15, mcpA 15→13, tbHard 12→10, browseComp 12→10, aaAgentic 12→10, tau2 10→8, swePro 8→7, lcb 8→7)
+- `reasoning-focused`: unchanged (no reasoning-domain additions)
+- `benchmark-only`: 10 → 13 keys (added nl2Repo:5, tau3:3, toolDec:3; trimmed swePro 18→17, sweV 15→13, tb2 13→11, lcb 13→11, tbHard 10→9, cfElo 8→7, sweMulti 8→7, gpqa 7→6)
+
+### Skipped (analyzed user-supplied bench table, rejected for project scope)
+- `HLE w/Tools` — variant of `hle`; tool-augmented branch adds noise without distinct signal.
+- `HMMT Nov 2025`, `HMMT Feb 2026`, `IMOAnswerBench` — math/Olympiad domain already covered by `aime26`; coding-tracker overweighting math is an anti-pattern.
+- `Terminal-Bench 2.0 (best self-reported)` — same bench as `tb2`, vendor-favored harness is provenance noise.
+- `CyberGym` — niche security domain, 5/9 vendor adoption.
+- `BrowseComp w/Context Manage` — variant of `browseComp`; vendor-reported context-management addon, single source of truth maintained.
+- `Vending Bench 2` — $-denominated agentic business simulation, scale incompatible with 0–100 normalization.
+
 ## [2026-04-29] — autonomous refresh-all [WARN: very low cumulative provenance coverage 41.0%] [WARN: coverageMatrix invariant violated — 824 cell(s) silently missing (filled=347 + gaps=17 ≠ total=1188)]
 
 ### Updated

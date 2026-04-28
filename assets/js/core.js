@@ -13,9 +13,9 @@ export const STORAGE = {
 
 export const BENCH_KEYS = [
   'aaIdx',
-  'swePro', 'sweV', 'sweMulti',
+  'swePro', 'sweV', 'sweMulti', 'nl2Repo',
   'lcb', 'tb2', 'tbHard',
-  'tau2', 'mcpA', 'bfcl', 'aaCoding', 'aaAgentic', 'browseComp',
+  'tau2', 'tau3', 'mcpA', 'bfcl', 'toolDec', 'aaCoding', 'aaAgentic', 'browseComp',
   'cfElo',
   'gpqa', 'aime26', 'hle', 'aaOmni',
   'mmluPro', 'simpleQa', 'mrcr', 'arcAgi2',
@@ -35,21 +35,21 @@ export function normalizeBenchScore(key, value) {
 }
 
 export const DEFAULT_WEIGHTS = {
-  swePro: 20, tb2: 13, lcb: 13, sweV: 10, tbHard: 7, cfElo: 7,
-  aaCoding: 5, mcpA: 5, aaAgentic: 4, tau2: 4,
-  browseComp: 3, arcAgi2: 3,
-  gpqa: 2, sweMulti: 2, hle: 1, mmluPro: 1,
+  swePro: 18, tb2: 12, lcb: 12, sweV: 9, tbHard: 7, cfElo: 7,
+  nl2Repo: 5, aaCoding: 5, mcpA: 4, aaAgentic: 4,
+  tau2: 3, browseComp: 3, arcAgi2: 3,
+  gpqa: 2, sweMulti: 2, hle: 1, mmluPro: 1, tau3: 1, toolDec: 1,
 };
 
 export const PRESETS = {
   'balanced': { ...DEFAULT_WEIGHTS },
   'swe-focused': {
-    swePro: 25, sweV: 18, sweMulti: 15, lcb: 12, tb2: 10, tbHard: 10,
-    cfElo: 5, aaCoding: 5,
+    swePro: 23, sweV: 16, sweMulti: 13, lcb: 11, tb2: 9, tbHard: 9,
+    nl2Repo: 9, cfElo: 5, aaCoding: 5,
   },
   'agentic-focused': {
-    tb2: 18, mcpA: 15, tbHard: 12, browseComp: 12, aaAgentic: 12, tau2: 10,
-    swePro: 8, lcb: 8, bfcl: 5,
+    tb2: 15, mcpA: 13, tbHard: 10, browseComp: 10, aaAgentic: 10,
+    tau2: 8, tau3: 8, toolDec: 7, swePro: 7, lcb: 7, bfcl: 5,
   },
   // Reasoning / knowledge breadth — covers the bench keys (aaIdx, aime26,
   // aaOmni, mmluPro, simpleQa, mrcr, arcAgi2) the coding-centric presets
@@ -62,8 +62,8 @@ export const PRESETS = {
     swePro: 3, lcb: 2,
   },
   'benchmark-only': {
-    swePro: 18, sweV: 15, tb2: 13, lcb: 13, tbHard: 10, cfElo: 8,
-    sweMulti: 8, gpqa: 7, hle: 5, mmluPro: 3,
+    swePro: 17, sweV: 13, tb2: 11, lcb: 11, tbHard: 9, sweMulti: 7, cfElo: 7,
+    gpqa: 6, hle: 5, nl2Repo: 5, mmluPro: 3, tau3: 3, toolDec: 3,
   },
 };
 
