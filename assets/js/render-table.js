@@ -175,6 +175,22 @@ function renderTableHeader(thead, cols) {
         th.setAttribute('data-tip-position', 'bottom');
       }
     }
+    // Bench column: dynamic weight badge + dim out when excluded by preset.
+    if (col.benchKey) {
+      const weight = Number(State.weights?.[col.benchKey]) || 0;
+      if (weight > 0) {
+        const badge = document.createElement('span');
+        badge.className = 'th-weight';
+        badge.textContent = String(weight);
+        badge.title = `${t('ui.weights.weightLabel') || 'Weight'}: ${weight}`;
+        th.appendChild(document.createTextNode(' '));
+        th.appendChild(badge);
+      } else {
+        th.classList.add('th-excluded');
+        th.setAttribute('data-tip', t('ui.weights.excluded') || 'Excluded by active preset');
+        th.setAttribute('data-tip-position', 'bottom');
+      }
+    }
     thead.appendChild(th);
   }
 }
@@ -209,6 +225,12 @@ function renderTableBody(tbody, ranked, cols) {
       if (col.num) td.classList.add('num');
       if (col.sticky) td.classList.add('col-name');
       if (col.cls) td.classList.add(col.cls);
+      // Bench column body cells dim out when the preset excludes the bench
+      // (weight === 0). Keeps them visible (data is real) but visually
+      // de-emphasises so the user sees what's actually counted.
+      if (col.benchKey && (Number(State.weights?.[col.benchKey]) || 0) === 0) {
+        td.classList.add('excluded');
+      }
       const out = col.render(entry.model, ctx);
       if (out instanceof Node) td.appendChild(out);
       else td.textContent = String(out ?? '—');

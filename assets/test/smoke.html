@@ -26,7 +26,7 @@
   </table>
   <script type="module">
     import {
-      State, BENCH_KEYS, DEFAULT_WEIGHTS, validateModels, validateWeights, isValidModel,
+      State, BENCH_KEYS, DEFAULT_WEIGHTS, PRESETS, validateModels, validateWeights, isValidModel,
     } from '../js/core.js';
     import {
       compositeScore, coverageOf, disputedCount, contradictionFor, pricingView, fmtPriceRange, fmtContext,
@@ -205,6 +205,44 @@
     assertTrue('markdown includes S-tier row', md.includes('**S-tier**'));
     assertTrue('markdown includes URL angle-brackets', md.includes('<https://y.example>'));
     assertTrue('markdown includes per-bench section', md.includes('### SWE-bench Pro'));
+
+    // 13c. coverage formula matches preset semantics — exhaustive
+    // (model.bench × preset.weights → covered/active rule)
+    const fakeModel = { id: 'test', bench: {
+      swePro: 60, sweV: 80, lcbV6: 90, // present
+      tb2: null, aider: null,           // absent
+      gpqa: 50, sweMulti: 70, hle: 40,  // present (low-weight in default)
+    } };
+    // Default (balanced): swePro:22 sweV:10 lcbV6:15 → 47 covered;
+    // tb2:15 aider:10 → 25 missing;
+    // aaCoding:7 aaAgentic:5 tau2:5 mcpA:5 → 22 missing;
+    // gpqa:2 sweMulti:2 hle:2 → 6 covered.
+    // Active = 100 (sum of DEFAULT_WEIGHTS), covered = 47 + 6 = 53.
+    const covBalanced = coverageOf(fakeModel, DEFAULT_WEIGHTS);
+    assertEq('coverage(balanced)=53/100=0.53', Math.round(covBalanced * 100), 53);
+    // benchmark-only preset: only structured bench keys count.
+    const covBO = coverageOf(fakeModel, PRESETS['benchmark-only']);
+    // BO weights: swePro:20 sweV:15 tb2:15 lcbV6:15 aider:10 gpqa:10 sweMulti:10 hle:5
+    // covered = 20+15+0+15+0+10+10+5 = 75; active = 100.
+    assertEq('coverage(benchmark-only)=75%', Math.round(covBO * 100), 75);
+    // All-zero weights → null
+    const allZero = Object.fromEntries(BENCH_KEYS.map(k => [k, 0]));
+    assertEq('coverage(all-zero)=null', coverageOf(fakeModel, allZero), null);
+    // Coverage of fully-empty model → 0 in any preset (active>0, covered=0)
+    const empty = { id: 't2', bench: {} };
+    assertEq('coverage(empty model, default)=0', coverageOf(empty, DEFAULT_WEIGHTS), 0);
+    // SSOT: every PRESETS key is in BENCH_KEYS
+    const benchSet0 = new Set(BENCH_KEYS);
+    for (const [pname, pweights] of Object.entries(PRESETS)) {
+      const rogue = Object.keys(pweights).filter(k => !benchSet0.has(k));
+      assertTrue(`PRESET '${pname}' uses only BENCH_KEYS`, rogue.length === 0,
+        rogue.length ? rogue.join(',') : '');
+    }
+    // SSOT: every PRESET sums to 100 (presets must be normalised)
+    for (const [pname, pweights] of Object.entries(PRESETS)) {
+      const sum = Object.values(pweights).reduce((a, b) => a + b, 0);
+      assertEq(`PRESET '${pname}' weights sum to 100`, sum, 100);
+    }
 
     // 14. integration: live data load (requires HTTP)
     try {

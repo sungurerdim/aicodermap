@@ -228,6 +228,29 @@ table#comparison-table .coverage-mini.cov-low { color: var(--danger); border-col
 }
 .bench-cell.flag-warn { border-color: var(--warn-soft); }
 .bench-cell.flag-danger { border-color: var(--danger-soft); }
+
+/* Excluded by active preset (weight === 0) — dim + grayscale. Cell stays
+ * visible because the underlying data is real; the dim signals the preset
+ * isn't ranking on it. Weight overlay sits next to the bench label. */
+.bench-cell.excluded {
+  opacity: 0.45;
+  filter: grayscale(0.55);
+}
+.bench-cell.excluded .name { font-style: italic; }
+.bench-cell .bench-weight {
+  display: inline-block;
+  margin-left: 5px;
+  padding: 0 5px;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+  background: var(--accent-tint);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  vertical-align: 1px;
+}
 .bench-cell.opt-out {
   opacity: 0.55;
 }

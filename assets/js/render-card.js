@@ -33,8 +33,26 @@ function metaCell(label, value) {
 
 export function buildBenchCell(model, key) {
   const score = model.bench?.[key];
-  const cell = el('div', { class: score == null ? 'bench-cell empty' : 'bench-cell' });
-  cell.appendChild(el('span', { class: 'name' }, t(`benchmarks.${key}.name`)));
+  const weight = Number(State.weights?.[key]) || 0;
+  // Excluded = current preset gives this bench zero weight; the cell still
+  // shows the value (so the user knows the data exists) but visually dims
+  // out so it's obvious the preset is ignoring it for ranking purposes.
+  const classes = ['bench-cell'];
+  if (score == null) classes.push('empty');
+  if (weight === 0) classes.push('excluded');
+  const cell = el('div', { class: classes.join(' ') });
+
+  const nameWrap = el('span', { class: 'name' }, t(`benchmarks.${key}.name`));
+  // Weight overlay on the bench label — dynamic per active preset.
+  if (weight > 0) {
+    nameWrap.appendChild(el('span', {
+      class: 'bench-weight',
+      title: `${t('ui.weights.weightLabel') || 'Weight'}: ${weight}`,
+    }, String(weight)));
+  } else {
+    nameWrap.title = t('ui.weights.excluded') || 'Excluded by active preset';
+  }
+  cell.appendChild(nameWrap);
   cell.appendChild(el('span', { class: 'value' }, score != null ? fmtScore(score) : '—'));
 
   const c = contradictionFor(model.id, key);
