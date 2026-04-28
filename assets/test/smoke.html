@@ -29,7 +29,7 @@
       State, BENCH_KEYS, DEFAULT_WEIGHTS, validateModels, validateWeights, isValidModel,
     } from '../js/core.js';
     import {
-      compositeScore, coverageOf, contradictionFor, pricingView, fmtPriceRange, fmtContext,
+      compositeScore, coverageOf, disputedCount, contradictionFor, pricingView, fmtPriceRange, fmtContext,
       isLocalRunnable, scoreClass, fmtScore, loadData,
     } from '../js/data.js';
     import { gpuCompat } from '../js/gpu.js';
@@ -110,6 +110,28 @@
     // 6e. compositeScore: no overlap → null
     const mNone = { id: 'n', name: 'N', tier: 'frontier', bench: { hle: 50 } };
     assertEq('compositeScore null when no active key has score', compositeScore(mNone, w), null);
+
+    // 6f. confidence haircut: same-tier dispute on swePro
+    const mSameTier = { id: 'sm', name: 'SM', tier: 'frontier', bench: { swePro: 80, sweV: 60 } };
+    State.sources['sm.swePro'] = [
+      { tier: 'I', trustScore: 0.9, source: 'a', value: 76 },
+      { tier: 'I', trustScore: 0.9, source: 'b', value: 84 }, // intra-tier Δ=8
+    ];
+    const csSame = compositeScore(mSameTier, w);
+    // expected: weightedSum = 22*80+10*60 = 2360, haircut = 22 * min((8-3)/2, 5) = 22*2.5=55
+    // raw = (2360 - 55) / 32 = 72.03, coverage=1, score=72.03
+    assertTrue('same-tier dispute applies confidence haircut', Math.abs(csSame - ((22*80 + 10*60 - 22*2.5) / 32)) < 0.01);
+    assertEq('disputedCount sees the same-tier dispute', disputedCount(mSameTier, w), 1);
+
+    // 6g. cross-tier-only dispute: no haircut (autoResolveWinner already conservative)
+    const mCross = { id: 'cx', name: 'CX', tier: 'frontier', bench: { swePro: 80, sweV: 60 } };
+    State.sources['cx.swePro'] = [
+      { tier: 'I', trustScore: 1.0, source: 'a', value: 80 },
+      { tier: 'S', trustScore: 0.5, source: 'b', value: 86 }, // total Δ=6 but cross-tier only
+    ];
+    const csCross = compositeScore(mCross, w);
+    assertTrue('cross-tier-only dispute applies NO haircut', Math.abs(csCross - ((22*80 + 10*60) / 32)) < 0.01);
+    assertEq('disputedCount excludes cross-tier-only', disputedCount(mCross, w), 0);
 
     // 7. data: scoreClass thresholds
     assertEq('scoreClass(85) → high', scoreClass(85), 'score-high');

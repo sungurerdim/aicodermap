@@ -92,6 +92,21 @@
 .composite-score .coverage.cov-full { color: var(--ok); border-color: var(--accent-soft); }
 .composite-score .coverage.cov-partial { color: var(--warn); border-color: var(--warn-soft); }
 .composite-score .coverage.cov-low { color: var(--danger); border-color: var(--danger-soft); }
+.composite-score .disputed {
+  display: inline-block;
+  margin-top: 2px;
+  margin-left: 4px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border: 1px solid var(--warn-soft);
+  background: var(--surface-2);
+  color: var(--warn);
+  cursor: help;
+}
 
 table#comparison-table .coverage-mini {
   margin-left: 4px;

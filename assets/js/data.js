@@ -37,20 +37,52 @@ export function scoreClass(v) {
   return 'score-low';
 }
 
-// Weighted composite with sqrt-coverage penalty so a model with one cherry-
-// picked high score does not outrank a broader model with more verified data.
+// Worst within-tier disagreement for a contested cell. We separate same-tier
+// disputes (real residual uncertainty: two equally-trusted observers landing
+// on different numbers) from cross-tier disputes (already settled by the
+// autoResolveWinner picking the higher-trust tier). Returns 0 when every
+// disagreement is purely between tiers.
+function intraTierMaxDelta(contradiction) {
+  const byTier = {};
+  for (const s of contradiction.sources) {
+    const v = Number(s.value);
+    if (!Number.isFinite(v)) continue;
+    const tier = s.tier || '?';
+    (byTier[tier] = byTier[tier] || []).push(v);
+  }
+  let maxDelta = 0;
+  for (const tier of Object.keys(byTier)) {
+    const vs = byTier[tier];
+    if (vs.length < 2) continue;
+    const d = Math.max(...vs) - Math.min(...vs);
+    if (d > maxDelta) maxDelta = d;
+  }
+  return maxDelta;
+}
+
+// Weighted composite combining three honesty mechanisms:
 //
-//   raw      = weightedSum / coveredWeight   (avg of available scores)
-//   coverage = coveredWeight / activeWeight  (fraction of profile covered, 0..1)
-//   score    = raw × √coverage               (smoother than raw × coverage)
+//   raw       = weightedSum / coveredWeight   (avg of available scores, minus
+//                                              a confidence haircut on cells
+//                                              with same-tier disagreement)
+//   coverage  = coveredWeight / activeWeight  (fraction of profile covered)
+//   score     = raw × √coverage               (sparse data pulls score down)
 //
-// Decay: 100% cov → ×1.00, 50% → ×0.71, 25% → ×0.50, 10% → ×0.32. Active weight
-// is the sum of weights[k] for benchmarks the *current profile* enables (>0);
-// missing scores within an active profile pull the score down without zeroing.
+// Coverage penalty: 100% → ×1.00, 50% → ×0.71, 25% → ×0.50. Stops a 1-test
+// cherry-picked high score from outranking a broader, verified model.
+//
+// Confidence haircut: applied only when the *same tier* disagrees by ≥3pp.
+// Cross-tier disputes (e.g. I-tier 80 vs S-tier 85) are already resolved by
+// autoResolveWinner picking the higher-trust source — counting them again
+// here would be double-counting. Same-tier disputes (e.g. I-tier 80 vs
+// I-tier 86) reflect genuine measurement uncertainty: subtract
+// `min((intra − 3) / 2, 5)` from that cell's score. Cap = 5pp/cell so a
+// single extreme outlier cannot dominate the composite.
 export function compositeScore(model, weights) {
   let coveredWeight = 0;
   let activeWeight = 0;
   let weightedSum = 0;
+  let confidenceHaircut = 0;
   for (const k of BENCH_KEYS) {
     const w = weights[k];
     if (!w) continue;
@@ -59,9 +91,19 @@ export function compositeScore(model, weights) {
     if (s == null || !Number.isFinite(s)) continue;
     coveredWeight += w;
     weightedSum += w * s;
+
+    const c = contradictionFor(model.id, k);
+    if (c && c.delta >= CONTRADICTION_BLOCK) {
+      const intra = intraTierMaxDelta(c);
+      if (intra >= CONTRADICTION_WARN) {
+        const excess = intra - CONTRADICTION_WARN;
+        const haircut = Math.min(excess / 2, 5);
+        confidenceHaircut += w * haircut;
+      }
+    }
   }
   if (activeWeight === 0 || coveredWeight === 0) return null;
-  const raw = weightedSum / coveredWeight;
+  const raw = (weightedSum - confidenceHaircut) / coveredWeight;
   const coverage = coveredWeight / activeWeight;
   return raw * Math.sqrt(coverage);
 }
@@ -82,6 +124,26 @@ export function coverageOf(model, weights) {
   }
   if (activeWeight === 0) return null;
   return coveredWeight / activeWeight;
+}
+
+// Count of cells in the active preset that actually trigger a confidence
+// haircut — same-tier disputes with ≥3pp intra-tier disagreement on top of
+// the ≥5pp BLOCK threshold. Cells with cross-tier-only disagreement are
+// excluded because autoResolveWinner already settled them, so a UI badge
+// based on them would mislead the user about score reductions.
+export function disputedCount(model, weights) {
+  let n = 0;
+  for (const k of BENCH_KEYS) {
+    const w = weights[k];
+    if (!w) continue;
+    const s = model.bench?.[k];
+    if (s == null || !Number.isFinite(s)) continue;
+    const c = contradictionFor(model.id, k);
+    if (!c || c.delta < CONTRADICTION_BLOCK) continue;
+    const intra = intraTierMaxDelta(c);
+    if (intra >= CONTRADICTION_WARN) n++;
+  }
+  return n;
 }
 
 export function fmtScore(v, digits = 1) {

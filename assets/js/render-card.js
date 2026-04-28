@@ -4,8 +4,8 @@
 
 import { State, BENCH_KEYS } from './core.js';
 import {
-  compositeScore, coverageOf, fmtScore, contradictionFor, pricingView,
-  fmtPriceMoney, fmtPriceRange, fmtPriceCell, fmtContext,
+  compositeScore, coverageOf, disputedCount, fmtScore, contradictionFor,
+  pricingView, fmtPriceMoney, fmtPriceRange, fmtPriceCell, fmtContext,
 } from './data.js';
 import { gpuCompat, getActiveVram } from './gpu.js';
 import { el, cameraIconButton } from './dom.js';
@@ -55,7 +55,7 @@ export function buildBenchCell(model, key) {
   return cell;
 }
 
-function cardHead(model, composite, coverage) {
+function cardHead(model, composite, coverage, disputed) {
   const head = el('div', { class: 'model-card-head' });
   head.appendChild(el('div', { class: 'model-name' },
     el('span', { class: 'model-rank' }, `#${model.__rank}`),
@@ -69,11 +69,16 @@ function cardHead(model, composite, coverage) {
   if (coverage != null) {
     const pct = Math.round(coverage * 100);
     const covClass = `coverage cov-${pct >= 75 ? 'full' : pct >= 40 ? 'partial' : 'low'}`;
-    const covEl = el('span', {
+    score.appendChild(el('span', {
       class: covClass,
       title: t('ui.coverageTip'),
-    }, `${t('ui.coverage')} ${pct}%`);
-    score.appendChild(covEl);
+    }, `${t('ui.coverage')} ${pct}%`));
+  }
+  if (disputed > 0) {
+    score.appendChild(el('span', {
+      class: 'disputed',
+      title: t('ui.disputedTip'),
+    }, `${disputed} ${t('ui.disputed')}`));
   }
   head.appendChild(score);
   return head;
@@ -255,6 +260,7 @@ export function buildModelCard(model, rank) {
   model.__rank = rank;
   const composite = compositeScore(model, State.weights);
   const coverage = coverageOf(model, State.weights);
+  const disputed = disputedCount(model, State.weights);
   const status = model.status || 'active';
   const statusClass = status === 'active' ? '' : ` is-${status}`;
   const card = el('article', {
@@ -265,7 +271,7 @@ export function buildModelCard(model, rank) {
   });
   const compat = gpuCompat(model, getActiveVram());
 
-  card.appendChild(cardHead(model, composite, coverage));
+  card.appendChild(cardHead(model, composite, coverage, disputed));
   card.appendChild(providerRow(model));
   card.appendChild(cardMeta(model, compat));
 

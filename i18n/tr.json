@@ -128,7 +128,9 @@
       "out-of-scope": "Kapsam dışı varyant"
     },
     "coverage": "Kapsam",
-    "coverageTip": "Aktif profil ağırlığının ne kadarı mevcut benchmark skorlarıyla destekleniyor. Composite, √kapsam ile çarpılarak az test alıp yüksek skor çıkan modelleri ezmeyen ama avantajını da silen bir ceza uygular."
+    "coverageTip": "Aktif profil ağırlığının ne kadarı mevcut benchmark skorlarıyla destekleniyor. Composite, √kapsam ile çarpılarak az test alıp yüksek skor çıkan modelleri ezmeyen ama avantajını da silen bir ceza uygular.",
+    "disputed": "tartışmalı",
+    "disputedTip": "Aktif preset'te aynı-tier kaynaklar arasında uyumsuzluk taşıyan hücre sayısı (≥5pp BLOCK eşiğinin üstünde, tek bir tier içinde ≥3pp). Composite bu hücreler için güven kesintisi içerir — hücre başına maks 5pp, böylece tek bir outlier composite'i ezemez. Cross-tier uyumsuzluklar (örn. I-tier ↔ S-tier) sayılmaz, çünkü autoResolveWinner zaten yüksek-tier kaynağı seçti."
   },
   "models": {
     "opus-4-7": {
