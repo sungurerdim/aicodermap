@@ -7,18 +7,18 @@
   gap: var(--space-2);
 }
 
-/* Card uses a 2-column grid: variable-width main on the left, fixed-min
- * sidebar on the right for the composite score. Score is align-self:start
- * so its small height never pushes main content down — content starts at
- * the top of the left column regardless. The bottom-spanning actions row
- * gives camera/doc buttons their own track so they don't collide with the
- * sources footer. Mobile collapses to a single column (responsive.css). */
+/* Card grid: composite score sits ONLY beside the head row, not down the
+ * full height. Main + actions span the full card width below the head, so
+ * bench-grid / ollama / sources can use 100% of the card instead of being
+ * squeezed into the left column. Score keeps its sidebar look at the top
+ * (and align-self: start so a tall head doesn't stretch the score box).
+ * Mobile collapses to a single column (responsive.css). */
 .model-card {
   display: grid;
   grid-template-columns: 1fr auto;
   grid-template-areas:
     "head    score"
-    "main    score"
+    "main    main"
     "actions actions";
   column-gap: var(--space-3);
   row-gap: var(--space-2);
