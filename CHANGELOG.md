@@ -1,4 +1,12 @@
 
+## [2026-04-28] — autonomous refresh-all [WARN: partial coverage 48.0%]
+
+### Resolved (auto via trustScore)
+- sonnet-4-6.sweV: winner={'value': 79.6, 'trustScore': 0.87, 'sourceUrl': 'https://www.marc0.dev/en/leaderboard', 'tier': 'I'} (severity=GREEN, Δ2.4)
+- opus-4-7.swePro: winner={'value': 64.3, 'trustScore': 0.93, 'sourceUrl': 'https://labs.scale.com/leaderboard/swe_bench_pro_public', 'tier': 'I'} (severity=YELLOW, Δ3.1)
+- deepseek-v4-pro.sweV: winner={'value': 80.6, 'trustScore': 0.8, 'sourceUrl': 'https://artificialanalysis.ai/articles/deepseek-is-back-among-the-leading-open-weights-models-with-v4-pro-and-v4-flash', 'tier': 'I'} (severity=GREEN, Δ0)
+
+
 ## [2026-04-27] — autonomous refresh-all [WARN: partial coverage 48.0%]
 
 ### Updated
