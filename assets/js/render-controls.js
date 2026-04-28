@@ -121,6 +121,34 @@ export function switchTheme(theme) {
   writeStorage(STORAGE.theme, theme);
 }
 
+// Provider/vendor filter dropdown — options derived at bootstrap time from
+// data/models.json so adding a new vendor surfaces in the filter without UI
+// edits. Sorted by descending model count, ties alphabetical.
+export function populateProviderFilter() {
+  const sel = document.getElementById('filter-provider');
+  if (!sel) return;
+  while (sel.options.length > 1) sel.remove(1);
+  const counts = new Map();
+  for (const m of State.models) {
+    const p = m.provider;
+    if (!p) continue;
+    counts.set(p, (counts.get(p) || 0) + 1);
+  }
+  const sorted = [...counts.entries()].sort(
+    (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]),
+  );
+  for (const [name, n] of sorted) {
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = `${name} (${n})`;
+    sel.appendChild(opt);
+  }
+  if (State.filters.provider && State.filters.provider !== 'all'
+      && [...sel.options].some(o => o.value === State.filters.provider)) {
+    sel.value = State.filters.provider;
+  }
+}
+
 export function syncLangToggleUi() {
   document.querySelectorAll('.lang-toggle button[data-lang]').forEach((btn) => {
     const active = btn.dataset.lang === State.lang;

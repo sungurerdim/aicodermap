@@ -6,7 +6,7 @@ import { State, STORAGE, writeStorage } from './core.js';
 import { applyI18n, loadI18n } from './i18n.js';
 import {
   applyPreset, resetWeights, syncPresetSelect, switchTheme, syncLangToggleUi,
-  renderWeightsEditor, renderDeployStamp,
+  renderWeightsEditor, renderDeployStamp, populateProviderFilter,
 } from './render-controls.js';
 import { renderAll, renderTable } from './render-table.js';
 import { resolveGpuVram, updateGpuStatus, populateGpuSelect } from './gpu.js';
@@ -23,6 +23,7 @@ export async function switchLanguage(lang) {
   renderWeightsEditor(renderAll);
   renderAll();
   populateGpuSelect();
+  populateProviderFilter();
   syncPresetSelect();
   renderDeployStamp();
 }
@@ -69,12 +70,14 @@ function wireFiltersReset() {
     const gpuSel = document.getElementById('filter-gpu-select');
     const vramOverride = document.getElementById('filter-vram-override');
     const tier = document.getElementById('filter-tier');
+    const provider = document.getElementById('filter-provider');
     const openOnly = document.getElementById('filter-open-only');
 
     if (search) search.value = '';
     if (deployment) deployment.value = 'all';
     if (vramOverride) vramOverride.value = '';
     if (tier) tier.value = 'all';
+    if (provider) provider.value = 'all';
     if (openOnly) openOnly.checked = false;
 
     if (gpuSel) {
@@ -82,7 +85,7 @@ function wireFiltersReset() {
       if (autoOpt && !autoOpt.disabled) gpuSel.value = 'auto';
       else gpuSel.selectedIndex = 0;
     }
-    State.filters = { search: '', deployment: 'all', tier: 'all', openOnly: false };
+    State.filters = { search: '', deployment: 'all', tier: 'all', provider: 'all', openOnly: false };
     State.selectedGpu = gpuSel ? gpuSel.value : 'auto';
     resolveGpuVram();
     updateGpuStatus();
@@ -128,6 +131,14 @@ function wireFilterControls() {
   if (tier) {
     tier.addEventListener('change', (e) => {
       State.filters.tier = e.target.value;
+      writeStorage(STORAGE.filters, State.filters);
+      renderAll();
+    });
+  }
+  const provider = document.getElementById('filter-provider');
+  if (provider) {
+    provider.addEventListener('change', (e) => {
+      State.filters.provider = e.target.value;
       writeStorage(STORAGE.filters, State.filters);
       renderAll();
     });

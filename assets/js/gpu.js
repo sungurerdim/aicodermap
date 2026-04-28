@@ -189,6 +189,7 @@ export function passesFilters(model) {
   const f = State.filters;
   if (f.openOnly && !model.open) return false;
   if (f.tier !== 'all' && model.tier !== f.tier) return false;
+  if (f.provider && f.provider !== 'all' && model.provider !== f.provider) return false;
 
   if (f.search) {
     const q = f.search.toLowerCase();

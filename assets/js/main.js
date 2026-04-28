@@ -12,7 +12,7 @@ import {
 import { el, clear } from './dom.js';
 import {
   applyTheme, syncLangToggleUi, renderWeightsEditor, syncPresetSelect,
-  renderDeployStamp,
+  renderDeployStamp, populateProviderFilter,
 } from './render-controls.js';
 import { renderAll } from './render-table.js';
 import { wireEvents } from './events.js';
@@ -110,6 +110,11 @@ function restoreFilterUi() {
   if (open) open.checked = !!State.filters.openOnly;
   const tier = document.getElementById('filter-tier');
   if (tier) tier.value = State.filters.tier;
+  const provider = document.getElementById('filter-provider');
+  if (provider && State.filters.provider
+      && [...provider.options].some(o => o.value === State.filters.provider)) {
+    provider.value = State.filters.provider;
+  }
   const searchEl = document.getElementById('filter-search');
   if (searchEl) searchEl.value = State.filters.search || '';
 }
@@ -155,6 +160,7 @@ async function bootstrap() {
   if (!ok) return;
 
   renderDeployStamp();
+  populateProviderFilter();
   restoreFilterUi();
   await bootstrapGpu();
 

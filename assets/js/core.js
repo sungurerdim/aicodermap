@@ -54,7 +54,7 @@ export const State = {
   i18nFallback: null,
   lang: 'tr',
   weights: { ...DEFAULT_WEIGHTS },
-  filters: { deployment: 'all', openOnly: false, tier: 'all', search: '' },
+  filters: { deployment: 'all', openOnly: false, tier: 'all', provider: 'all', search: '' },
   sort: { col: 'composite', dir: 'desc' },
   vram: null,
   selectedGpu: 'auto',

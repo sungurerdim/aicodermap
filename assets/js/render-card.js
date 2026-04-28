@@ -62,6 +62,29 @@ function cardHead(model) {
   head.appendChild(el('span', { class: 'model-rank' }, `#${model.__rank}`));
   head.appendChild(el('h3', { class: 'model-name-title' }, model.name));
   head.appendChild(el('span', { class: `tier-badge ${model.tier}` }, tierLabel(model.tier)));
+
+  // Provider line — was its own row beneath the title; now folded into the
+  // head as a small separator-prefixed span. Wraps below on narrow widths
+  // because the head is `flex-wrap: wrap`.
+  const providerText = `${model.provider || '—'} · ${model.released || '—'} · ${model.license || '—'}`;
+  head.appendChild(el('span', { class: 'model-provider-inline' }, providerText));
+
+  if (model.open === true) {
+    head.appendChild(el('span', { class: 'open-badge', title: t('ui.openWeights') || 'Open weights' },
+      t('ui.openShort') || 'OPEN'));
+  } else if (model.open === false) {
+    head.appendChild(el('span', { class: 'closed-badge', title: t('ui.closedWeights') || 'Closed weights' },
+      t('ui.closedShort') || 'CLOSED'));
+  }
+  if (model.status === 'deprecated') {
+    const tip = model.successor ? `Successor: ${model.successor}` : 'Deprecated by vendor';
+    const dateTxt = model.deprecatedAt ? ` ${model.deprecatedAt}` : '';
+    head.appendChild(el('span', { class: 'deprecated-badge', title: tip },
+      `${t('ui.deprecated') || 'DEPRECATED'}${dateTxt}`));
+  } else if (model.status === 'archived') {
+    head.appendChild(el('span', { class: 'archived-badge', title: 'Archived' },
+      t('ui.archived') || 'ARCHIVED'));
+  }
   return head;
 }
 
@@ -81,30 +104,6 @@ function compositeBlock(composite, coverage, disputed) {
       `${disputed} ${t('ui.disputed')}`));
   }
   return score;
-}
-
-function providerRow(model) {
-  const row = el('div', { class: 'model-provider' });
-  row.appendChild(el('span', null, `${model.provider || '—'} · ${model.released || '—'} · ${model.license || '—'}`));
-
-  if (model.open === true) {
-    row.appendChild(el('span', { class: 'open-badge', title: t('ui.openWeights') || 'Open weights' },
-      t('ui.openShort') || 'OPEN'));
-  } else if (model.open === false) {
-    row.appendChild(el('span', { class: 'closed-badge', title: t('ui.closedWeights') || 'Closed weights' },
-      t('ui.closedShort') || 'CLOSED'));
-  }
-
-  if (model.status === 'deprecated') {
-    const tip = model.successor ? `Successor: ${model.successor}` : 'Deprecated by vendor';
-    const dateTxt = model.deprecatedAt ? ` ${model.deprecatedAt}` : '';
-    row.appendChild(el('span', { class: 'deprecated-badge', title: tip },
-      `${t('ui.deprecated') || 'DEPRECATED'}${dateTxt}`));
-  } else if (model.status === 'archived') {
-    row.appendChild(el('span', { class: 'archived-badge', title: 'Archived' },
-      t('ui.archived') || 'ARCHIVED'));
-  }
-  return row;
 }
 
 function cardMeta(model, compat) {
@@ -314,7 +313,6 @@ export function buildModelCard(model, rank) {
   card.appendChild(compositeBlock(composite, coverage, disputed));
 
   const main = el('div', { class: 'model-card-main' });
-  main.appendChild(providerRow(model));
   main.appendChild(cardMeta(model, compat));
 
   const provBlock = pricingProvidersBlock(pricingView(model));

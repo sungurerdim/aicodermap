@@ -10,36 +10,56 @@
   margin-left: auto;
   font-family: var(--font-mono);
   font-weight: 600;
-  font-size: 1rem;
-  padding: 4px 10px;
+  font-size: 0.95rem;
+  padding: 3px 9px;
   border-radius: var(--radius-sm);
   background: var(--surface-2);
   border: 1px solid var(--border);
   color: var(--accent);
 }
+
+/* Compact section header — used by Weights to fold preset/reset/total/export
+ * trigger into the same row as the H2, eliminating an entire toolbar row. */
+.section-head-compact {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  row-gap: 6px;
+}
+.section-title-compact {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  flex: 0 0 auto;
+}
+.section-head-compact .weights-total { margin-left: auto; }
+.select-row.inline-compact { gap: 6px; font-size: 0.82rem; }
+.select-row.inline-compact > span { color: var(--muted); font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.select-row.inline-compact select { flex: 0 0 auto; min-width: 130px; padding: 3px 6px; font-size: 0.85rem; }
+.btn-compact { padding: 3px 10px; font-size: 0.82rem; }
 .weights-total.invalid {
   color: var(--danger);
   border-color: var(--danger);
 }
 .weights-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--space-2);
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+  gap: 6px;
 }
 .weight-row {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: var(--space-2) var(--space-3);
+  gap: 3px;
+  padding: 6px 10px;
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
 }
-.weight-row .label { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+.weight-row .label { font-size: 0.74rem; color: var(--muted); font-weight: 600; line-height: 1.2; }
 .weight-row .controls {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 .weight-row .controls input[type="range"] { flex: 1; min-width: 0; }
 .weight-row .controls input[type="number"] {
@@ -49,43 +69,61 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Filter toolbar — compact horizontal grid that wraps when needed.
+ * Each control is a single row (label + input/select). The reset button
+ * and gpu-status hint fold into the same wrap so users see all filters
+ * at a glance instead of scanning a tall column. */
 .filters-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--space-3);
-  align-items: start;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 6px var(--space-2);
+  align-items: center;
 }
 .checkbox-row, .select-row, .number-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: var(--space-2);
-  font-size: 0.9rem;
+  gap: 6px;
+  font-size: 0.85rem;
   color: var(--muted);
   min-width: 0;
 }
-.select-row > span, .number-row > span { flex: 0 0 auto; }
+.select-row > span, .number-row > span {
+  flex: 0 0 auto;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
 .select-row select,
 .number-row input,
 .select-row input[type="search"] {
-  flex: 1 1 140px;
-  min-width: 140px;
+  flex: 1 1 auto;
+  min-width: 0;
   max-width: 100%;
+  padding: 3px 6px;
+  font-size: 0.85rem;
 }
-.select-row .muted-note.inline {
-  flex: 0 1 auto;
-  margin: 0;
+.checkbox-row {
+  font-size: 0.82rem;
+}
+.checkbox-row > span {
   font-size: 0.78rem;
-  line-height: 1.3;
-  word-break: break-word;
-  min-width: 0;
+  text-transform: none;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--text);
 }
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  min-width: 0;
+.gpu-status-line {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 0.74rem;
+  color: var(--muted);
+  font-style: italic;
+  text-align: right;
 }
+.gpu-status-line:empty { display: none; }
+#filters-reset.btn-compact { justify-self: end; }
 .muted-note {
   margin: 0;
   color: var(--muted);

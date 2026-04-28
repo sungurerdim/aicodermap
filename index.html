@@ -33,6 +33,7 @@
       <span data-i18n-key="ui.appTitle">AICoderMap</span>
     </h1>
     <div class="header-actions">
+      <div class="header-toggles">
       <div class="theme-toggle" role="group" aria-label="Theme">
         <button type="button" data-theme="light"
                 data-tip="Light theme" data-i18n-tip="ui.theme.light" data-tip-position="bottom"
@@ -61,6 +62,7 @@
         <button type="button" data-lang="tr" aria-pressed="false">TR</button>
         <button type="button" data-lang="en" aria-pressed="true">EN</button>
       </div>
+      </div>
       <span id="deployed-at" class="deploy-stamp" hidden></span>
     </div>
   </div>
@@ -85,75 +87,19 @@
 
 <main class="app-main">
 
-  <section id="weights" class="card section-card" data-export-section="weights" aria-labelledby="weights-heading">
-    <header class="section-head">
-      <h2 id="weights-heading" data-i18n-key="ui.section.weights">Weights Editor</h2>
-      <button class="btn-icon-only" type="button" data-export-trigger="weights"
-              data-i18n-tip="ui.export.weights" data-i18n-aria-label="ui.export.weights"
-              data-tip="Save weights as PNG" data-tip-position="bottom"
-              aria-label="Save weights as PNG">
-        <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-          <circle cx="12" cy="13" r="4"/>
-        </svg>
-        <span class="sr-only" data-i18n-key="ui.export.weights">Save weights as PNG</span>
-      </button>
-    </header>
-
-    <div class="weights-controls">
-      <label class="select-row">
-        <span data-i18n-key="ui.weights.preset">Preset</span>
-        <select id="weights-preset">
-          <option value="custom">—</option>
-          <option value="balanced" data-i18n-key="verdicts.preset.balanced">Balanced</option>
-          <option value="swe-focused" data-i18n-key="verdicts.preset.sweFocused">SWE-focused</option>
-          <option value="agentic-focused" data-i18n-key="verdicts.preset.agenticFocused">Agentic-focused</option>
-          <option value="benchmark-only" data-i18n-key="verdicts.preset.benchmarkOnly">Benchmark only</option>
-        </select>
-      </label>
-      <button id="weights-reset" class="btn btn-ghost" type="button" data-i18n-key="ui.weights.reset">Reset to default</button>
-      <output id="weights-total" class="weights-total" aria-live="polite">100</output>
-    </div>
-
-    <div id="weights-grid" class="weights-grid"><!-- populated by app.js --></div>
-  </section>
-
   <section id="filters" class="card section-card" data-export-section="filters" aria-labelledby="filters-heading">
-    <header class="section-head">
-      <h2 id="filters-heading" data-i18n-key="ui.section.filters">Filters</h2>
-      <button id="filters-reset" class="btn btn-ghost" type="button" data-i18n-key="ui.filter.reset">Reset filters</button>
-    </header>
-
     <div class="filters-grid">
       <label class="select-row">
         <span data-i18n-key="ui.filter.search">Search</span>
         <input type="search" id="filter-search" placeholder="model name, provider..." data-i18n-placeholder="ui.filter.searchPlaceholder">
       </label>
-
       <label class="select-row">
-        <span data-i18n-key="ui.filter.deployment">Deployment</span>
-        <select id="filter-deployment">
-          <option value="all" data-i18n-key="ui.filter.deploymentAll">All models</option>
-          <option value="cloud" data-i18n-key="ui.filter.cloudOnly">Cloud / subscription only</option>
-          <option value="local" data-i18n-key="ui.filter.localFit">Local models that fit my GPU</option>
+        <span data-i18n-key="ui.filter.provider">Vendor</span>
+        <select id="filter-provider">
+          <option value="all" data-i18n-key="ui.filter.providerAll">All vendors</option>
+          <!-- options populated by app.js from data/models.json -->
         </select>
       </label>
-
-      <div class="filter-group">
-        <label class="select-row">
-          <span data-i18n-key="ui.filter.gpuLabel">GPU</span>
-          <select id="filter-gpu-select">
-            <option value="auto" data-i18n-key="ui.filter.gpuAuto">Auto-detect</option>
-            <!-- options populated by app.js -->
-          </select>
-          <small id="gpu-status" class="muted-note inline" aria-live="polite"></small>
-        </label>
-        <label class="number-row">
-          <span data-i18n-key="ui.filter.gpuOverride">Manual VRAM</span>
-          <input type="number" id="filter-vram-override" min="0" max="256" step="1" inputmode="numeric">
-        </label>
-      </div>
-
       <label class="select-row">
         <span data-i18n-key="ui.filter.tier">Tier</span>
         <select id="filter-tier">
@@ -165,12 +111,60 @@
           <option value="ollama-local" data-i18n-key="ui.tier.ollama-local">Local Ollama</option>
         </select>
       </label>
-
+      <label class="select-row">
+        <span data-i18n-key="ui.filter.deployment">Deploy</span>
+        <select id="filter-deployment">
+          <option value="all" data-i18n-key="ui.filter.deploymentAll">All</option>
+          <option value="cloud" data-i18n-key="ui.filter.cloudOnly">Cloud only</option>
+          <option value="local" data-i18n-key="ui.filter.localFit">Fits my GPU</option>
+        </select>
+      </label>
+      <label class="select-row">
+        <span data-i18n-key="ui.filter.gpuLabel">GPU</span>
+        <select id="filter-gpu-select">
+          <option value="auto" data-i18n-key="ui.filter.gpuAuto">Auto-detect</option>
+        </select>
+      </label>
+      <label class="number-row">
+        <span data-i18n-key="ui.filter.gpuOverride">VRAM</span>
+        <input type="number" id="filter-vram-override" min="0" max="256" step="1" inputmode="numeric" placeholder="GB">
+      </label>
       <label class="checkbox-row">
         <input type="checkbox" id="filter-open-only">
-        <span data-i18n-key="ui.filter.openOnly">Open weights only</span>
+        <span data-i18n-key="ui.filter.openOnly">Open only</span>
       </label>
+      <small id="gpu-status" class="muted-note inline gpu-status-line" aria-live="polite"></small>
+      <button id="filters-reset" class="btn btn-ghost btn-compact" type="button" data-i18n-key="ui.filter.reset">Reset filters</button>
     </div>
+  </section>
+
+  <section id="weights" class="card section-card" data-export-section="weights" aria-labelledby="weights-heading">
+    <header class="section-head section-head-compact">
+      <h2 id="weights-heading" class="section-title-compact" data-i18n-key="ui.section.weights">Weights Editor</h2>
+      <label class="select-row inline-compact">
+        <span data-i18n-key="ui.weights.preset">Preset</span>
+        <select id="weights-preset">
+          <option value="custom">—</option>
+          <option value="balanced" data-i18n-key="verdicts.preset.balanced">Balanced</option>
+          <option value="swe-focused" data-i18n-key="verdicts.preset.sweFocused">SWE-focused</option>
+          <option value="agentic-focused" data-i18n-key="verdicts.preset.agenticFocused">Agentic-focused</option>
+          <option value="benchmark-only" data-i18n-key="verdicts.preset.benchmarkOnly">Benchmark only</option>
+        </select>
+      </label>
+      <button id="weights-reset" class="btn btn-ghost btn-compact" type="button" data-i18n-key="ui.weights.reset">Reset</button>
+      <output id="weights-total" class="weights-total" aria-live="polite">100</output>
+      <button class="btn-icon-only" type="button" data-export-trigger="weights"
+              data-i18n-tip="ui.export.weights" data-i18n-aria-label="ui.export.weights"
+              data-tip="Save weights as PNG" data-tip-position="bottom"
+              aria-label="Save weights as PNG">
+        <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+        <span class="sr-only" data-i18n-key="ui.export.weights">Save weights as PNG</span>
+      </button>
+    </header>
+    <div id="weights-grid" class="weights-grid"><!-- populated by app.js --></div>
   </section>
 
   <section id="table" class="section-card" aria-labelledby="table-heading">
