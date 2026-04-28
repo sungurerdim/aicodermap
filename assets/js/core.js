@@ -14,40 +14,56 @@ export const STORAGE = {
 export const BENCH_KEYS = [
   'aaIdx',
   'swePro', 'sweV', 'sweMulti',
-  'lcbV6', 'tb2',
-  'tau2', 'mcpA', 'bfcl', 'aaCoding', 'aaAgentic',
-  'gpqa', 'aime26', 'hle', 'aider', 'aaOmni',
+  'lcb', 'tb2', 'tbHard',
+  'tau2', 'mcpA', 'bfcl', 'aaCoding', 'aaAgentic', 'browseComp',
+  'cfElo',
+  'gpqa', 'aime26', 'hle', 'aaOmni',
+  'mmluPro', 'simpleQa', 'mrcr', 'arcAgi2',
 ];
 
+// cfElo stores raw Codeforces ELO (~1000-3500). compositeScore() needs every
+// bench on a 0-100 scale, so this helper normalizes ELO into a percentile.
+// (elo - 1000) / 25 → 1500=20, 2500=60, 3000=80, 3500=100. Clamped at edges.
+// Every other bench is already 0-100, so it's returned as-is.
+export function normalizeBenchScore(key, value) {
+  if (value == null || !Number.isFinite(value)) return null;
+  if (key === 'cfElo') {
+    const pct = (value - 1000) / 25;
+    return Math.max(0, Math.min(100, pct));
+  }
+  return value;
+}
+
 export const DEFAULT_WEIGHTS = {
-  swePro: 22, tb2: 15, lcbV6: 15, sweV: 10, aider: 10,
-  aaCoding: 7, aaAgentic: 5, tau2: 5, mcpA: 5,
-  gpqa: 2, sweMulti: 2, hle: 2,
+  swePro: 20, tb2: 13, lcb: 13, sweV: 10, tbHard: 7, cfElo: 7,
+  aaCoding: 5, mcpA: 5, aaAgentic: 4, tau2: 4,
+  browseComp: 3, arcAgi2: 3,
+  gpqa: 2, sweMulti: 2, hle: 1, mmluPro: 1,
 };
 
 export const PRESETS = {
   'balanced': { ...DEFAULT_WEIGHTS },
   'swe-focused': {
-    swePro: 30, sweV: 20, sweMulti: 15, tb2: 10, lcbV6: 10, aider: 10,
-    aaCoding: 5, aaAgentic: 0, tau2: 0, mcpA: 0, gpqa: 0, hle: 0,
+    swePro: 25, sweV: 18, sweMulti: 15, lcb: 12, tb2: 10, tbHard: 10,
+    cfElo: 5, aaCoding: 5,
   },
   'agentic-focused': {
-    tb2: 22, mcpA: 18, tau2: 13, aaAgentic: 12, swePro: 10, lcbV6: 10,
-    bfcl: 10, gpqa: 5, sweV: 0, aider: 0, aaCoding: 0, sweMulti: 0, hle: 0,
+    tb2: 18, mcpA: 15, tbHard: 12, browseComp: 12, aaAgentic: 12, tau2: 10,
+    swePro: 8, lcb: 8, bfcl: 5,
   },
   // Reasoning / knowledge breadth — covers the bench keys (aaIdx, aime26,
-  // aaOmni) the coding-centric presets above leave at zero. Anchors on the
-  // independent-evaluator composite (gpqa diamond + AIME 2026 math
-  // reasoning + Humanity's Last Exam + AA-Omniscience knowledge breadth
-  // + AA Intelligence Index), with a lighter coding tail so the score
-  // still falls back on swePro / lcbV6 verification.
+  // aaOmni, mmluPro, simpleQa, mrcr, arcAgi2) the coding-centric presets
+  // above leave at zero. Anchors on independent-evaluator composites
+  // (GPQA Diamond + AIME 2026 + HLE + ARC-AGI-2) plus knowledge breadth
+  // (MMLU-Pro + AA-Omniscience + SimpleQA + MRCR long-context).
   'reasoning-focused': {
-    gpqa: 25, aime26: 20, hle: 20, aaOmni: 15, aaIdx: 10,
-    swePro: 5, lcbV6: 5,
+    gpqa: 18, aime26: 15, hle: 15, arcAgi2: 12, mmluPro: 10,
+    aaIdx: 7, aaOmni: 8, simpleQa: 5, mrcr: 5,
+    swePro: 3, lcb: 2,
   },
   'benchmark-only': {
-    swePro: 20, sweV: 15, tb2: 15, lcbV6: 15, aider: 10, gpqa: 10,
-    sweMulti: 10, hle: 5, aaCoding: 0, aaAgentic: 0, tau2: 0, mcpA: 0,
+    swePro: 18, sweV: 15, tb2: 13, lcb: 13, tbHard: 10, cfElo: 8,
+    sweMulti: 8, gpqa: 7, hle: 5, mmluPro: 3,
   },
 };
 

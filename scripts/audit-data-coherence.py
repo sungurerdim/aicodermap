@@ -106,24 +106,34 @@ def main():
 
     # === 1. core.js BENCH_KEYS ===
     core_bench = set(parse_bench_keys_from_core(core_src))
-    only_core, only_canon = fmt_set_diff(core_bench, canonical_bench, "core.js", "whitelist")
+    only_core, only_canon = fmt_set_diff(
+        core_bench, canonical_bench, "core.js", "whitelist"
+    )
     if only_core:
-        failures.append(f"core.js BENCH_KEYS has keys NOT in whitelist coreBenchKeys: {only_core}")
+        failures.append(
+            f"core.js BENCH_KEYS has keys NOT in whitelist coreBenchKeys: {only_core}"
+        )
     if only_canon:
-        failures.append(f"whitelist coreBenchKeys has keys NOT in core.js BENCH_KEYS: {only_canon}")
+        failures.append(
+            f"whitelist coreBenchKeys has keys NOT in core.js BENCH_KEYS: {only_canon}"
+        )
 
     # === 2. DEFAULT_WEIGHTS subset ===
     dw_keys = set(parse_default_weights_from_core(core_src))
     extra_dw = dw_keys - canonical_bench
     if extra_dw:
-        failures.append(f"DEFAULT_WEIGHTS has keys NOT in canonical: {sorted(extra_dw)}")
+        failures.append(
+            f"DEFAULT_WEIGHTS has keys NOT in canonical: {sorted(extra_dw)}"
+        )
 
     # === 3. PRESETS subset ===
     presets = parse_presets_from_core(core_src)
     for pname, pkeys in presets.items():
         extra = set(pkeys) - canonical_bench
         if extra:
-            failures.append(f"PRESET '{pname}' has keys NOT in canonical: {sorted(extra)}")
+            failures.append(
+                f"PRESET '{pname}' has keys NOT in canonical: {sorted(extra)}"
+            )
 
     # === 4-5. i18n benchmarks keys ===
     en_bench = set((en.get("benchmarks") or {}).keys())
@@ -131,15 +141,23 @@ def main():
     if en_bench != canonical_bench:
         only_en, only_canon = fmt_set_diff(en_bench, canonical_bench, "en", "canonical")
         if only_en:
-            failures.append(f"i18n/en.json benchmarks has keys NOT in canonical: {only_en}")
+            failures.append(
+                f"i18n/en.json benchmarks has keys NOT in canonical: {only_en}"
+            )
         if only_canon:
-            failures.append(f"canonical has keys NOT in i18n/en.json benchmarks: {only_canon}")
+            failures.append(
+                f"canonical has keys NOT in i18n/en.json benchmarks: {only_canon}"
+            )
     if tr_bench != canonical_bench:
         only_tr, only_canon = fmt_set_diff(tr_bench, canonical_bench, "tr", "canonical")
         if only_tr:
-            failures.append(f"i18n/tr.json benchmarks has keys NOT in canonical: {only_tr}")
+            failures.append(
+                f"i18n/tr.json benchmarks has keys NOT in canonical: {only_tr}"
+            )
         if only_canon:
-            failures.append(f"canonical has keys NOT in i18n/tr.json benchmarks: {only_canon}")
+            failures.append(
+                f"canonical has keys NOT in i18n/tr.json benchmarks: {only_canon}"
+            )
     # i18n EN ↔ TR drift (label sets must be identical)
     en_tr_diff = en_bench ^ tr_bench
     if en_tr_diff:
@@ -152,9 +170,16 @@ def main():
             for sub in ("short", "name"):
                 v = entry.get(sub)
                 if not isinstance(v, str) or not v.strip():
-                    failures.append(f"i18n/{locale_label}.json benchmarks.{k}.{sub} missing/empty")
+                    failures.append(
+                        f"i18n/{locale_label}.json benchmarks.{k}.{sub} missing/empty"
+                    )
 
     # === 6. data/models.json bench cells ===
+    # Most bench cells are percentages (0-100). cfElo stores raw Codeforces
+    # ELO, range 0-3500 (see whitelist _benchKeyNotes).
+    def _bench_max(key):
+        return 3500 if key == "cfElo" else 100
+
     data_bench_cells = set()
     bad_cells = []
     for m in models:
@@ -163,11 +188,15 @@ def main():
             if v is not None:
                 if not isinstance(v, (int, float)):
                     bad_cells.append(f"{m['id']}.{k}={v!r} (non-numeric)")
-                elif v < 0 or v > 100:
-                    bad_cells.append(f"{m['id']}.{k}={v} (out of [0,100])")
+                else:
+                    hi = _bench_max(k)
+                    if v < 0 or v > hi:
+                        bad_cells.append(f"{m['id']}.{k}={v} (out of [0,{hi}])")
     rogue = data_bench_cells - canonical_bench
     if rogue:
-        failures.append(f"data/models.json has bench cells with NON-canonical keys: {sorted(rogue)}")
+        failures.append(
+            f"data/models.json has bench cells with NON-canonical keys: {sorted(rogue)}"
+        )
     if bad_cells:
         failures.append(
             f"data/models.json has {len(bad_cells)} bench cell(s) with bad values: {bad_cells[:5]}"
@@ -185,7 +214,11 @@ def main():
         if mid not in canonical_ids:
             src_unknown_models.append(key)
         # Bench-suffix keys (single-segment suffix) must be in canonical
-        if suffix and "." not in suffix and suffix in (canonical_bench | data_bench_cells):
+        if (
+            suffix
+            and "." not in suffix
+            and suffix in (canonical_bench | data_bench_cells)
+        ):
             if suffix not in canonical_bench:
                 src_rogue_bench.append(key)
     if src_unknown_models:
@@ -199,7 +232,17 @@ def main():
         )
 
     # === Required model fields ===
-    required = ["id", "name", "provider", "license", "tier", "status", "open", "context", "lastUpdated"]
+    required = [
+        "id",
+        "name",
+        "provider",
+        "license",
+        "tier",
+        "status",
+        "open",
+        "context",
+        "lastUpdated",
+    ]
     missing_fields = []
     for m in models:
         for f in required:
@@ -212,7 +255,13 @@ def main():
         )
 
     # === Tier values must use the canonical taxonomy ===
-    canonical_tiers = {"frontier", "open-flagship", "coder-specialized", "gemma", "ollama-local"}
+    canonical_tiers = {
+        "frontier",
+        "open-flagship",
+        "coder-specialized",
+        "gemma",
+        "ollama-local",
+    }
     bad_tiers = [
         f"{m['id']}={m.get('tier')!r}"
         for m in models

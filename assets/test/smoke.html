@@ -209,22 +209,21 @@
     // 13c. coverage formula matches preset semantics — exhaustive
     // (model.bench × preset.weights → covered/active rule)
     const fakeModel = { id: 'test', bench: {
-      swePro: 60, sweV: 80, lcbV6: 90, // present
-      tb2: null, aider: null,           // absent
-      gpqa: 50, sweMulti: 70, hle: 40,  // present (low-weight in default)
+      swePro: 60, sweV: 80, lcb: 90,     // present
+      tb2: null, tbHard: null,            // absent
+      gpqa: 50, sweMulti: 70, hle: 40,    // present (low-weight in default)
     } };
-    // Default (balanced): swePro:22 sweV:10 lcbV6:15 → 47 covered;
-    // tb2:15 aider:10 → 25 missing;
-    // aaCoding:7 aaAgentic:5 tau2:5 mcpA:5 → 22 missing;
-    // gpqa:2 sweMulti:2 hle:2 → 6 covered.
-    // Active = 100 (sum of DEFAULT_WEIGHTS), covered = 47 + 6 = 53.
+    // Default (balanced) — DEFAULT_WEIGHTS:
+    //   swePro:20 sweV:10 lcb:13 → 43 covered (present);
+    //   gpqa:2 sweMulti:2 hle:1 → 5 covered (present, low weight).
+    //   Active = 100 (every preset sums to 100), covered = 43 + 5 = 48.
     const covBalanced = coverageOf(fakeModel, DEFAULT_WEIGHTS);
-    assertEq('coverage(balanced)=53/100=0.53', Math.round(covBalanced * 100), 53);
-    // benchmark-only preset: only structured bench keys count.
+    assertEq('coverage(balanced)=48/100=0.48', Math.round(covBalanced * 100), 48);
+    // benchmark-only preset:
+    //   swePro:18 sweV:15 lcb:13 → 46 covered;
+    //   gpqa:7 sweMulti:8 hle:5 → 20 covered. Total covered = 66.
     const covBO = coverageOf(fakeModel, PRESETS['benchmark-only']);
-    // BO weights: swePro:20 sweV:15 tb2:15 lcbV6:15 aider:10 gpqa:10 sweMulti:10 hle:5
-    // covered = 20+15+0+15+0+10+10+5 = 75; active = 100.
-    assertEq('coverage(benchmark-only)=75%', Math.round(covBO * 100), 75);
+    assertEq('coverage(benchmark-only)=66%', Math.round(covBO * 100), 66);
     // All-zero weights → null
     const allZero = Object.fromEntries(BENCH_KEYS.map(k => [k, 0]));
     assertEq('coverage(all-zero)=null', coverageOf(fakeModel, allZero), null);

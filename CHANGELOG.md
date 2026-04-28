@@ -1,3 +1,35 @@
+## [2026-04-29.b] — bench taxonomy refactor
+
+### Removed
+- `aider` (Aider Polyglot): leaderboard frozen 2025-08-25; no Opus 4.7, Gemini 3.1 Pro, GPT-5.5 entries; vendors stopped self-reporting. 13 historical scores dropped from data, 12 sources entries dropped.
+
+### Renamed
+- `lcbV6` → `lcb`: pinned v6 dataset frozen Apr 2025 (12-month contamination window); switched to rolling LiveCodeBench leaderboard (May 2023 → present). 49 sources entries renamed.
+
+### Added (7 new bench keys)
+- `tbHard` — Terminal-Bench Hard (44-task subset, AA Index v4 component)
+- `cfElo` — Codeforces ELO (raw 1000-3500 scale; normalized in composite)
+- `mmluPro` — MMLU-Pro (57-discipline reasoning)
+- `simpleQa` — SimpleQA-Verified (factuality / hallucination resistance)
+- `mrcr` — MRCR 1M (long-context multi-needle retrieval)
+- `arcAgi2` — ARC-AGI-2 (the only frontier bench below human baseline)
+- `browseComp` — BrowseComp (web research agent benchmark)
+
+### Reweighted
+- DEFAULT_WEIGHTS rebalanced (16 → 16 active keys; aider:10pp redistributed across new keys)
+- All 5 PRESETS rewritten — `swe-focused` adds `tbHard`+`cfElo`; `agentic-focused` adds `tbHard`+`browseComp`; `reasoning-focused` adds `arcAgi2`+`mmluPro`+`simpleQa`+`mrcr`; `benchmark-only` adds `tbHard`+`cfElo`+`mmluPro`
+- Each preset still sums to 100
+
+### Fixed
+- `grok-4-3` entry — merge.py left envelope (`updates`/`sourcesAdded`) un-flattened from previous refresh; fields hoisted to top-level
+- `audit-data-coherence.py` — cfElo cell-value range relaxed to 0-3500 (raw ELO)
+
+### Migrated
+- `data/models.json` — 54 models updated (rename + drop + 7 nullable adds per model)
+- `data/sources.json` — 12 aider provenance entries dropped, 49 lcbV6 keys renamed to lcb
+- `i18n/{tr,en}.json` — bench label sets aligned to new taxonomy
+- `auto/eval.py` BENCH_KEYS list aligned
+
 
 ## [2026-04-29] — autonomous refresh-all [WARN: cumulative provenance coverage 52.0% below 85% target] [WARN: coverageMatrix invariant violated — 428 cell(s) silently missing (filled=332 + gaps=8 ≠ total=768)]
 

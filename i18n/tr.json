@@ -358,25 +358,45 @@
       "short": "SWE-V",
       "desc": "İnsan doğrulamalı 500 task. Pro ile çelişki sık görülür."
     },
+    "sweMulti": {
+      "name": "SWE-bench Multilingual",
+      "short": "SWE-M",
+      "desc": "9 programlama dilinde yazılım hata düzeltme."
+    },
     "tb2": {
       "name": "TerminalBench 2",
       "short": "TB2",
       "desc": "Terminal CLI agentic execution; tool kullanım kalitesi."
     },
-    "lcbV6": {
-      "name": "LiveCodeBench v6",
-      "short": "LCB",
-      "desc": "Contamination-free; 750+ son tarihli LeetCode/Codeforces/AtCoder problemi."
+    "tbHard": {
+      "name": "Terminal-Bench Hard",
+      "short": "TB-HARD",
+      "desc": "Terminal-Bench'in en zor 44 task subseti; AA Index v4 bileşeni."
     },
-    "aider": {
-      "name": "Aider Polyglot",
-      "short": "AIDER",
-      "desc": "Çok dilde diff-tabanlı edit kalitesi."
+    "lcb": {
+      "name": "LiveCodeBench",
+      "short": "LCB",
+      "desc": "Sürekli güncellenen contamination-free yarışmacı kodlama leaderboard'ı (May 2023→bugün)."
     },
     "tau2": {
       "name": "τ²-bench",
       "short": "τ²",
-      "desc": "Multi-turn tool calling + plan execution."
+      "desc": "Multi-turn tool calling + plan execution (telekom track)."
+    },
+    "mcpA": {
+      "name": "MCP-Atlas",
+      "short": "MCP-A",
+      "desc": "Model Context Protocol tool zinciri kalitesi."
+    },
+    "bfcl": {
+      "name": "BFCL v3/v4",
+      "short": "BFCL",
+      "desc": "Berkeley Function-Calling Leaderboard — fonksiyon/araç seçim doğruluğu."
+    },
+    "browseComp": {
+      "name": "BrowseComp",
+      "short": "BROWSE",
+      "desc": "Web araştırma agent benchmark'ı; çok-adımlı tarama + sentez."
     },
     "aaCoding": {
       "name": "AA Coding",
@@ -388,45 +408,55 @@
       "short": "AA-AGT",
       "desc": "Artificial Analysis agentic kullanım skoru."
     },
-    "bfcl": {
-      "name": "BFCL v3/v4",
-      "short": "BFCL",
-      "desc": "Berkeley Function-Calling Leaderboard — fonksiyon/araç seçim doğruluğu."
-    },
-    "aime26": {
-      "name": "AIME 2026",
-      "short": "AIME26",
-      "desc": "AIME 2026 — ileri düzey matematik akıl yürütme."
+    "aaIdx": {
+      "name": "AA Index",
+      "short": "AA-IDX",
+      "desc": "Artificial Analysis genel composite (referans, ağırlıkta kullanılmaz)."
     },
     "aaOmni": {
       "name": "AA-Omniscience",
       "short": "AA-OMNI",
       "desc": "Artificial Analysis omniscience / hizasızlık skoru (düşük daha iyi)."
     },
-    "mcpA": {
-      "name": "MCP-Atlas",
-      "short": "MCP-A",
-      "desc": "Model Context Protocol tool zinciri kalitesi."
+    "cfElo": {
+      "name": "Codeforces ELO",
+      "short": "CF-ELO",
+      "desc": "Codeforces yarışmacı kodlama ELO puanı; 1000-3500 ham skala."
+    },
+    "mmluPro": {
+      "name": "MMLU-Pro",
+      "short": "MMLU-PRO",
+      "desc": "57 disiplinde akıl yürütme; sert dikkat dağıtıcılı sorular."
+    },
+    "simpleQa": {
+      "name": "SimpleQA-Verified",
+      "short": "SIMPLE-QA",
+      "desc": "Faktüellik / kısa soruda halüsinasyon direnci."
+    },
+    "mrcr": {
+      "name": "MRCR 1M",
+      "short": "MRCR",
+      "desc": "1M token uzun bağlamda retrieval; çoklu iğne (needle) testi."
+    },
+    "arcAgi2": {
+      "name": "ARC-AGI-2",
+      "short": "ARC-2",
+      "desc": "Soyut akıl yürütme; insan altı tek frontier benchmark."
     },
     "gpqa": {
       "name": "GPQA Diamond",
       "short": "GPQA",
       "desc": "Lisansüstü seviye genel akıl yürütme (188 zor soru)."
     },
-    "sweMulti": {
-      "name": "SWE-bench Multilingual",
-      "short": "SWE-M",
-      "desc": "Çoklu dil yazılım hata düzeltme."
+    "aime26": {
+      "name": "AIME 2026",
+      "short": "AIME26",
+      "desc": "AIME 2026 — ileri düzey matematik akıl yürütme."
     },
     "hle": {
       "name": "Humanity's Last Exam",
       "short": "HLE",
       "desc": "Kapsamlı ileri düzey çoklu disiplin testi."
-    },
-    "aaIdx": {
-      "name": "AA Index",
-      "short": "AA-IDX",
-      "desc": "Artificial Analysis genel composite (referans, ağırlıkta kullanılmaz)."
     }
   },
   "verdicts": {

@@ -3,7 +3,7 @@
 
 import {
   State, BENCH_KEYS, CONTRADICTION_WARN, CONTRADICTION_BLOCK,
-  validateModels,
+  validateModels, normalizeBenchScore,
 } from './core.js';
 
 // Resolve data URLs against this module's location so loadData() works whether
@@ -107,7 +107,8 @@ export function compositeScore(model, weights) {
     const w = weights[k];
     if (!w) continue;
     activeWeight += w;
-    const s = model.bench?.[k];
+    const raw = model.bench?.[k];
+    const s = normalizeBenchScore(k, raw);
     if (s == null || !Number.isFinite(s)) continue;
     coveredWeight += w;
     weightedSum += w * s;

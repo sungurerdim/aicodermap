@@ -358,25 +358,45 @@
       "short": "SWE-V",
       "desc": "Human-verified 500 tasks. Often contradicts Pro."
     },
+    "sweMulti": {
+      "name": "SWE-bench Multilingual",
+      "short": "SWE-M",
+      "desc": "Multilingual software bug-fixing across 9 languages."
+    },
     "tb2": {
       "name": "TerminalBench 2",
       "short": "TB2",
       "desc": "Terminal CLI agentic execution; tool-use quality."
     },
-    "lcbV6": {
-      "name": "LiveCodeBench v6",
-      "short": "LCB",
-      "desc": "Contamination-free; 750+ recent LeetCode/Codeforces/AtCoder problems."
+    "tbHard": {
+      "name": "Terminal-Bench Hard",
+      "short": "TB-HARD",
+      "desc": "Hardest 44-task subset of Terminal-Bench; AA Index v4 component."
     },
-    "aider": {
-      "name": "Aider Polyglot",
-      "short": "AIDER",
-      "desc": "Multilingual diff-based edit quality."
+    "lcb": {
+      "name": "LiveCodeBench",
+      "short": "LCB",
+      "desc": "Rolling contamination-free competitive programming leaderboard (May 2023→present)."
     },
     "tau2": {
       "name": "τ²-bench",
       "short": "τ²",
-      "desc": "Multi-turn tool calling + plan execution."
+      "desc": "Multi-turn tool calling + plan execution (telecom track)."
+    },
+    "mcpA": {
+      "name": "MCP-Atlas",
+      "short": "MCP-A",
+      "desc": "Model Context Protocol tool-chain quality."
+    },
+    "bfcl": {
+      "name": "BFCL v3/v4",
+      "short": "BFCL",
+      "desc": "Berkeley Function-Calling Leaderboard. Function/tool selection accuracy."
+    },
+    "browseComp": {
+      "name": "BrowseComp",
+      "short": "BROWSE",
+      "desc": "Web research agent benchmark; multi-hop browsing + synthesis."
     },
     "aaCoding": {
       "name": "AA Coding",
@@ -388,45 +408,55 @@
       "short": "AA-AGT",
       "desc": "Artificial Analysis agentic-use score."
     },
-    "mcpA": {
-      "name": "MCP-Atlas",
-      "short": "MCP-A",
-      "desc": "Model Context Protocol tool-chain quality."
-    },
-    "bfcl": {
-      "name": "BFCL v3/v4",
-      "short": "BFCL",
-      "desc": "Berkeley Function-Calling Leaderboard. Measures function/tool selection accuracy."
-    },
-    "aime26": {
-      "name": "AIME 2026",
-      "short": "AIME26",
-      "desc": "American Invitational Mathematics Examination 2026; advanced math reasoning."
+    "aaIdx": {
+      "name": "AA Index",
+      "short": "AA-IDX",
+      "desc": "Artificial Analysis general composite (reference; not used in weighting)."
     },
     "aaOmni": {
       "name": "AA-Omniscience",
       "short": "AA-OMNI",
       "desc": "Artificial Analysis omniscience / misaligned-behavior score (lower is better)."
     },
+    "cfElo": {
+      "name": "Codeforces ELO",
+      "short": "CF-ELO",
+      "desc": "Codeforces competitive-programming ELO rating; 1000-3500 raw scale."
+    },
+    "mmluPro": {
+      "name": "MMLU-Pro",
+      "short": "MMLU-PRO",
+      "desc": "Multi-discipline reasoning across 57 subjects with hard distractors."
+    },
+    "simpleQa": {
+      "name": "SimpleQA-Verified",
+      "short": "SIMPLE-QA",
+      "desc": "Factuality / hallucination resistance on short factoid questions."
+    },
+    "mrcr": {
+      "name": "MRCR 1M",
+      "short": "MRCR",
+      "desc": "Long-context retrieval at 1M tokens; multi-needle in haystack."
+    },
+    "arcAgi2": {
+      "name": "ARC-AGI-2",
+      "short": "ARC-2",
+      "desc": "Abstract reasoning; the only frontier benchmark below human baseline."
+    },
     "gpqa": {
       "name": "GPQA Diamond",
       "short": "GPQA",
       "desc": "Graduate-level general reasoning (188 hard questions)."
     },
-    "sweMulti": {
-      "name": "SWE-bench Multilingual",
-      "short": "SWE-M",
-      "desc": "Multilingual software bug-fixing."
+    "aime26": {
+      "name": "AIME 2026",
+      "short": "AIME26",
+      "desc": "American Invitational Mathematics Examination 2026; advanced math reasoning."
     },
     "hle": {
       "name": "Humanity's Last Exam",
       "short": "HLE",
       "desc": "Comprehensive advanced multi-discipline test."
-    },
-    "aaIdx": {
-      "name": "AA Index",
-      "short": "AA-IDX",
-      "desc": "Artificial Analysis general composite (reference; not used in weighting)."
     }
   },
   "verdicts": {
