@@ -8,7 +8,7 @@
 
 Static web tracker (GitHub Pages) + local Claude Code skill orchestrator + research agent. No backend, no DB, no auth. Vanilla JS, no build step. Single external service: GitHub Pages.
 
-**Technology stack:** HTML5 + CSS3 (3-breakpoint responsive) + Vanilla JS (no framework) + JSON data files + WebGPU API (browser-native) + html2canvas (vendored). Skill is local at `~/.claude/skills/coding-models-tracker/` + agent at `~/.claude/agents/coding-models-research-agent.md`.
+**Technology stack:** HTML5 + CSS3 (3-breakpoint responsive) + Vanilla JS (no framework) + JSON data files + WebGPU API (browser-native) + html2canvas (vendored). Skill is local at `.claude/skills/aicodermap/` + agent at `.claude/agents/aicodermap-research-agent.md`.
 
 ---
 
@@ -35,7 +35,7 @@ CHANGELOG.md           — release history
 README.md              — installation guide
 ```
 
-**Skill (local, `~/.claude/skills/coding-models-tracker/`):**
+**Skill (local, `.claude/skills/aicodermap/`):**
 ```
 SKILL.md               — orchestrator definition
 ```
@@ -205,7 +205,7 @@ Browser load:
 ### 4.1 Skill → Research Agent (Claude Code Agent tool)
 
 ```
-subagent_type: "coding-models-research-agent"
+subagent_type: "aicodermap-research-agent"
 model: "sonnet"  // full scope (default)
         "haiku"  // search/local scope (faster, cheaper)
 prompt:
@@ -320,7 +320,7 @@ No auth, no query params, CORS-friendly static asset.
 
 ## 6. Scalability
 
-**Static site = trivially scalable.** GitHub Pages CDN handles up to 100GB/month bandwidth (free tier). 35 models × 14 benchmarks JSON ~50KB; 1M visitors/month = ~50GB → well within limits.
+**Static site = trivially scalable.** GitHub Pages CDN handles up to 100GB/month bandwidth (free tier). ~50 models × 16 benchmarks JSON ~95KB; 1M visitors/month = ~95GB → within free tier limits.
 
 **Bottleneck:** Skill update workflow throughput (manual + research agent), practical max ~1-2 updates/day. The M5 metric (≤14 days) is well below this capacity.
 

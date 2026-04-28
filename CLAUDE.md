@@ -22,22 +22,45 @@
 
 ```
 aicodermap/
-├── index.html          # Main page (structure + interactive UI)
+├── index.html              # Main page (structure + interactive UI)
 ├── assets/
-│   ├── app.js          # data fetch + render + weights + filters + GPU detect + table + theme + PNG
-│   ├── app.css         # 3-breakpoint responsive, dark/light themes
+│   ├── js/                 # ES modules (browser-loaded, no build)
+│   │   ├── main.js         # bootstrap entry (split-phase init)
+│   │   ├── core.js         # State + constants + STORAGE + schema validation
+│   │   ├── i18n.js         # t() + applyI18n + loadI18n
+│   │   ├── data.js         # fetch + score + contradiction + pricing + format
+│   │   ├── gpu.js          # gpuCompat + WebGPU detect + filter predicate
+│   │   ├── dom.js          # el + clear + cameraIconButton + showToast
+│   │   ├── overlay.js      # tooltip + html2canvas export
+│   │   ├── render-controls.js  # weights editor + theme/lang sync
+│   │   ├── render-card.js  # buildModelCard (split into 9 sub-builders)
+│   │   ├── render-table.js # comparison table + model list + renderAll
+│   │   └── events.js       # wireEvents (split by concern) + switchLanguage
+│   ├── css/                # 3-breakpoint responsive, dark/light themes
+│   │   ├── base.css        # vars, themes, reset, form controls, toggles
+│   │   ├── layout.css      # header, nav, main, cards, footer, export
+│   │   ├── table.css       # comparison table
+│   │   ├── controls.css    # weights editor + filters
+│   │   ├── models.css      # model cards, bench cells, badges, tooltip
+│   │   ├── toast.css       # toast notification host
+│   │   └── responsive.css  # tablet + desktop + reduced-motion
+│   ├── test/
+│   │   └── smoke.html      # vanilla in-browser unit harness (no deps)
 │   └── vendor/
 │       └── html2canvas.min.js
 ├── data/
-│   ├── models.json     # MODELS array (skill auto-regenerates)
-│   ├── sources.json    # per-score provenance
+│   ├── models.json         # MODELS array (skill auto-regenerates)
+│   ├── sources.json        # per-score provenance
 │   └── gpu-database.json
 ├── i18n/
 │   ├── tr.json
 │   └── en.json
-├── docs/               # PRD, TechSpec, ImplGuide, Tasks, Workflow, Pitch
+├── docs/                   # PRD, TechSpec, ImplGuide, Tasks, Workflow, Pitch, TestPlan
 ├── README.md
 ├── CHANGELOG.md
+├── LICENSE
+├── CONTRIBUTING.md
+├── .editorconfig
 └── .gitignore
 ```
 
@@ -111,3 +134,91 @@ MIT — code and data are public. Attribution appreciated.
 - `docs/IMPLGUIDE.md` — ⭐ Coding-ready implementation guide (for Claude Code sessions)
 - `docs/TASKS.md` — 23-task / 5-milestone breakdown
 - `docs/WORKFLOW.md` — Update workflow (14 happy-path + 5 exception steps)
+
+## Blueprint Profile
+
+**Project:** AICoderMap | **Type:** Frontend (vanilla SPA) | **Stack:** HTML5 + CSS3 + Vanilla JS + JSON | **Target:** Production
+
+### Config
+- **Priorities:** Security, Code Quality, Architecture, Documentation
+- **Constraints:** Vanilla JS only, no build step, no runtime dependencies
+- **Data:** No sensitive data (public model metadata only) | **Regulations:** none
+- **Audience:** Public users | **Deploy:** GitHub Pages (main-branch auto-deploy)
+
+### Project Map
+```
+Entry: index.html → assets/vendor/html2canvas.min.js (defer, SRI)
+                  + assets/js/main.js (type="module")
+
+Modules:
+  assets/js/        → 11 ES modules (browser-loaded, no build, every file <300L)
+    main.js         → bootstrap orchestrator (split-phase init)
+    core.js         → State + STORAGE + BENCH_KEYS + DEFAULTS + PRESETS + schema validation
+    i18n.js         → t() + applyI18n + loadI18n
+    data.js         → fetch + score + contradiction + pricing + format
+    gpu.js          → gpuCompat + WebGPU detect + filter predicate
+    dom.js          → el + clear + cameraIconButton + showToast
+    overlay.js      → contradiction tooltip + html2canvas export
+    render-controls.js  → weights editor + theme/lang sync
+    render-card.js  → buildModelCard split into 9 sub-builders (orchestrator 34L)
+    render-table.js → comparison table + model list + renderAll
+    events.js       → wireEvents (split into wireXxx by concern) + switchLanguage
+  assets/css/       → 7 stylesheets (cascade-ordered in index.html)
+    base / layout / table / controls / models / toast / responsive
+  assets/test/      → smoke.html — vanilla in-browser unit harness (14 tests, no deps)
+  assets/vendor/    → html2canvas.min.js (1.4.1, SHA256 e87e5507…8cb)
+  data/             → JSON SSOT (3 canonical + whitelist + external/)
+    models.json     → 53 models, schema v2 multi-provider pricing
+    sources.json    → per-(modelId,benchKey) provenance with trustScore
+    gpu-database.json     → NVIDIA / Apple / AMD / Intel + webgpuVendorMap
+    sources-whitelist.json → research-agent allowed-fetch list
+  i18n/             → content translations (tr.json + en.json, 249 keys each, 0 drift)
+  scripts/          → skill helpers (stdlib-only Python + 2 Node scripts)
+  auto/             → ds-tune harness (eval.py + bench.sh/bat + fixtures.json)
+  docs/             → 7 spec docs (PRD, TECHSPEC, IMPLGUIDE, TASKS, WORKFLOW, PITCH, TEST_PLAN)
+  .claude/          → project-scoped skill + agent
+
+Data Flow:
+  Page load → main.js bootstrapTheme → bootstrapPrefs → bootstrapI18n
+            → bootstrapData (fetch + schema-validate) → restoreFilterUi → bootstrapGpu
+            → renderWeightsEditor + renderAll (renderTable + renderModelCards) → wireEvents
+  User input → writeStorage(localStorage) → debounced renderAll (search 200ms)
+  Update cycle: /aicodermap → research-agent (WebSearch+WebFetch) → .aicodermap-agent-out.json
+              → scripts/merge.py → data/*.json + CHANGELOG.md → git push → GitHub Pages deploy
+
+External: html2canvas (vendored, SRI-pinned); WebGPU API (browser-native); localStorage (prefs);
+          GitHub Pages (deploy); Anthropic Claude Code (skill+agent runtime, dev-time only)
+
+Toolchain: Python 3.10+ stdlib only | Node for regex-lint + module syntax check
+           bash + bat (cross-platform bench) | No CI/CD by design (CLAUDE.md policy)
+           Tests: assets/test/smoke.html + docs/TEST_PLAN.md (manual runbook)
+```
+
+### Ideal Metrics
+| Metric | Target |
+|--------|--------|
+| Coupling (avg deps per module) | ≤ 4 |
+| Cohesion (LCOM low) | ≥ 0.7 |
+| Cyclomatic Complexity / function | ≤ 15 |
+| Function lines | ≤ 50 |
+| File lines | ≤ 500 |
+| Test coverage (lines) | ≥ 70% |
+
+### Current Scores
+| Dimension | Score | Status |
+|-----------|-------|--------|
+| Security & Privacy | 95 | OK |
+| Code Quality | 92 | OK |
+| Architecture | 90 | OK |
+| Performance | 95 | OK |
+| Resilience | 92 | OK |
+| Testing | 70 | OK |
+| Stack Health | 95 | OK |
+| DX | 90 | OK |
+| Documentation | 95 | OK |
+| Overall | 90 | OK |
+
+### Last Run
+- 2026-04-28: ds-review --strategic --force-approve | Applied 15 (ES module split into 11 files + CSS split into 7 files + buildModelCard decomposed into 9 sub-builders + toast component replaces alert + smoke harness + TEST_PLAN.md) | Overall 75→90
+
+## End Blueprint Profile

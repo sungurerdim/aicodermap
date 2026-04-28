@@ -17,7 +17,7 @@
 │    - Full refresh → all models                                   │
 │    - Specific model → single-model deep                          │
 │    - New release → new model detection + full profile            │
-│ 5. Skill → coding-models-research-agent (structured prompt)      │
+│ 5. Skill → aicodermap-research-agent (structured prompt)         │
 │ 6. Agent: web scraping + cross-source + validation               │
 │ 7. Agent returns JSON {models[], contradictions[], coverage}     │
 │ 8. Skill validation:                                             │
@@ -164,7 +164,7 @@
     - Kimi K2.7 (Moonshot AI) — SWE-Pro 60.2, LCB 89.4, MIT license
 12. User: git commit -m "data: add Kimi K2.7" && git push
 13. GitHub Pages deploy ~1.5 min
-14. Skill: "Live: https://sungurerdim.github.io/coding-models-tracker/"
+14. Skill: "Live: https://sungurerdim.github.io/aicodermap/"
 ```
 
 ---
@@ -173,7 +173,7 @@
 
 | Problem | Solution |
 |---------|----------|
-| Skill not running | Check that `~/.claude/skills/coding-models-tracker/SKILL.md` exists |
+| Skill not running | Check that `.claude/skills/aicodermap/SKILL.md` exists (project-scoped — only visible inside the repo) |
 | Agent timeout | Retry, then fallback WebSearch (skill does this automatically) |
 | GitHub Pages 404 | Verify Settings → Pages → Source `main` branch / `/ (root)` |
 | Weights editor not 100% | Use reset-to-default button, clear localStorage |

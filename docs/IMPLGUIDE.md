@@ -9,19 +9,20 @@
 ```bash
 # 1. Repo init
 cd ~/projects
-git init coding-models-tracker
-cd coding-models-tracker
-gh repo create coding-models-tracker --public --description "Compare AI coding models with coding-focused benchmarks weighted your way"
+git init aicodermap
+cd aicodermap
+gh repo create aicodermap --public --description "Compare AI coding models with coding-focused benchmarks weighted your way"
 
 # 2. Skill setup (local)
-mkdir -p ~/.claude/skills/coding-models-tracker
+mkdir -p .claude/skills/aicodermap
 mkdir -p ~/.claude/agents
 
 # Copy SKILL.md and agent.md from export (see Project Kickstart)
 
 # 3. Folder structure
 mkdir -p assets/vendor data i18n
-touch index.html assets/app.js assets/app.css
+mkdir -p assets/js assets/css assets/test assets/vendor && \
+  touch index.html assets/js/main.js assets/css/base.css
 touch data/models.json data/sources.json data/gpu-database.json
 touch i18n/tr.json i18n/en.json
 touch CHANGELOG.md README.md .gitignore
@@ -30,7 +31,7 @@ touch CHANGELOG.md README.md .gitignore
 curl -o assets/vendor/html2canvas.min.js \
   https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js
 # SHA256 verify (security)
-echo "<expected_sha>  assets/vendor/html2canvas.min.js" | sha256sum -c
+echo "e87e550794322e574a1fda0c1549a3c70dae5a93d9113417a429016838eab8cb  assets/vendor/html2canvas.min.js" | sha256sum -c
 
 # 5. GitHub Pages
 # Settings → Pages → Source: main branch / root → Save
@@ -149,7 +150,7 @@ type I18n = {
 **Invocation:**
 ```typescript
 Agent({
-  subagent_type: "coding-models-research-agent",
+  subagent_type: "aicodermap-research-agent",
   model: "sonnet",  // or "haiku" for search/local scope
   prompt: `
     scope: full
@@ -212,13 +213,13 @@ async function loadData() {
 
 **Phase 2 — Core (T5, T6, T13, parallel after Phase 1)**
 
-6. **T5 [2 hr]** — `index.html` structure + `assets/app.css` 3-breakpoint responsive
+6. **T5 [2 hr]** — `index.html` structure + `assets/css/{base,layout,table,controls,models,toast,responsive}.css` 3-breakpoint responsive (split into 7 cascade-ordered stylesheets)
    - Mobile <640px, tablet 641-1024px, desktop >1024px
    - Copy CSS variables from existing HTML report (`--bg`, `--surface`, `--accent`, etc.)
-7. **T6 [1 hr]** — `assets/app.js` data fetch + render MODELS
+7. **T6 [1 hr]** — `assets/js/{main,core,data,i18n,gpu,dom,overlay,render-card,render-table,render-controls,events}.js` ES modules: data fetch + render MODELS (entry: `<script type="module" src="assets/js/main.js">`)
    - `loadData()` (see §4.3), render to `<table>` or `<div class="models-grid">`
    - Reactive: data load → render → user interactions trigger re-render
-8. **T13 [2 hr]** — `~/.claude/skills/coding-models-tracker/SKILL.md` orchestrator
+8. **T13 [2 hr]** — `.claude/skills/aicodermap/SKILL.md` orchestrator
    - 14 happy path steps (see WORKFLOW.md)
    - User scope selection (full/specific/new), agent delegation, validation gate, diff preview, write JSON, append CHANGELOG, git commit prompt
 
@@ -304,7 +305,7 @@ async function loadData() {
 1. Push to `main` branch
 2. GitHub Settings → Pages → Source: `main` branch / root → Save
 3. Wait ~1-2 min for first deploy
-4. Verify at `https://<username>.github.io/coding-models-tracker/`
+4. Verify at `https://<username>.github.io/aicodermap/`
 
 ### Update Deploy (every skill run)
 1. Skill writes data/*.json + CHANGELOG.md
@@ -370,7 +371,7 @@ const STALE_THRESHOLD_DAYS = 14;       // M5 metric: ≤14 days max update inter
 
 | Library | Version | URL | SHA256 |
 |---------|---------|-----|--------|
-| html2canvas | 1.4.1 (Apr 2024 latest) | https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js | manual verify on download |
+| html2canvas | 1.4.1 (Apr 2024 latest) | https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js | `e87e550794322e574a1fda0c1549a3c70dae5a93d9113417a429016838eab8cb` (SRI: `sha256-6H5VB5QyLldKH9oMFUmjxw2uWpPZETQXpCkBaDjquMs=`) |
 
 **Action:** Run `Agent` with `scope: dependency` to verify the latest stable version before T10 implementation.
 
@@ -407,11 +408,11 @@ const STALE_THRESHOLD_DAYS = 14;       // M5 metric: ≤14 days max update inter
 
 After all 23 tasks complete + M4 polish:
 
-- [ ] Public repo created (`gh repo create coding-models-tracker --public`)
+- [ ] Public repo created (`gh repo create aicodermap --public`)
 - [ ] All files in `main` branch
 - [ ] GitHub Pages enabled, live URL verified
-- [ ] `~/.claude/skills/coding-models-tracker/SKILL.md` installed
-- [ ] `~/.claude/agents/coding-models-research-agent.md` installed
+- [ ] `.claude/skills/aicodermap/SKILL.md` installed
+- [ ] `.claude/agents/aicodermap-research-agent.md` installed
 - [ ] First skill run successful (validation passes)
 - [ ] CHANGELOG v1.0 entry committed
 - [ ] README TR+EN reviewed

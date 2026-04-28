@@ -290,7 +290,7 @@ Three layers, three shapes — never mix them. Violating this contract is the re
 | **Provenance** | `data/sources.json` | **Wrapped entries:** `{value, source, url, tier, date, verifications, trustScore, contradictionRole?}`. This is the *only* place `trustScore` lives on disk.                 |
 | **Transit**  | agent → skill JSON    | `models[].updates.<field>` = Storage shape (scalars). `models[].sourcesAdded[]` = Provenance shape (wrapped). NEVER emit wrappers inside `updates`.                            |
 | **Verification** | `.aicodermap-verification-map.json` (gitignored) | **Cross-cycle cache:** `cells.<modelId>.<benchKey> = {value, verifications[], confirmed, lastChecked}`. Skill reads at cycle start (skip confirmed cells), updates post-merge from sourcesAdded[]. NOT a render input — purely orchestrator state. |
-| **Render**   | frontend `assets/app.js` | Reads Storage scalars. Looks up Provenance from sources.json by `<modelId>.<field>` for tooltips / source links.                                                            |
+| **Render**   | frontend `assets/js/render-card.js` + `render-table.js` (entry `assets/js/main.js`) | Reads Storage scalars. Looks up Provenance from sources.json by `<modelId>.<field>` for tooltips / source links. |
 
 **Contradictions** sit between Transit and Provenance:
 - `field`: **bare** bench key (e.g., `swePro`, NOT `bench.swePro`); non-bench paths use dotted form (`pricing.api.in`).

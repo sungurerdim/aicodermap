@@ -13,7 +13,7 @@
 | **T2** | data/models.json schema + migrate from HTML | M1 | 1 hr | T1 | Foundation |
 | **T3** | data/sources.json provenance migrate | M1 | 1 hr | T1 | Foundation |
 | **T4** | data/gpu-database.json (NVIDIA + Apple + AMD + Intel) | M1 | 1.5 hr | T1 | Foundation |
-| **T12** | coding-models-research-agent.md (clone ledger template + specialize) | M1 | 1.5 hr | T1 | Foundation |
+| **T12** | aicodermap-research-agent.md (clone ledger template + specialize) | M1 | 1.5 hr | T1 | Foundation |
 | **T5** | index.html structure + 3-breakpoint responsive CSS | M2 | 2 hr | T1 | Core |
 | **T6** | app.js data fetch + render MODELS | M2 | 1 hr | T2, T5 | Core |
 | **T13** | SKILL.md orchestrator (14 happy + 5 exception) | M2 | 2 hr | T12, T2, T3 | Core |
@@ -47,7 +47,7 @@
 ### M2 — Core (Week 2, 4-5 hr)
 **Deliverable:** Live tracker static render
 **Tasks:** T5, T6, T13
-**Go criteria:** 35 models render, TR/EN toggle works, data fetch <2s (AC5)
+**Go criteria:** 50+ models render, TR/EN toggle works, data fetch <2s (AC5)
 **Demo:** GitHub Pages URL live
 **Rollback:** `git revert` to M1
 

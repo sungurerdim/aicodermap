@@ -164,7 +164,7 @@ N1 API endpoint (programmatic JSON), N2 model browser (per-model deep-dive), N3 
 | Milestone | Week | Hours | Deliverable | Go/No-go |
 |-----------|------|-------|-------------|----------|
 | **M1 Foundation** | 1 | 3-4 | Public repo + 4 JSON schemas + research-agent base | T1-T4 + T12 complete |
-| **M2 Core** | 2 | 4-5 | Live tracker static render | 35 models render, TR/EN toggle, fetch <2s |
+| **M2 Core** | 2 | 4-5 | Live tracker static render | 50+ models render, TR/EN toggle, fetch <2s |
 | **M3 Integration** | 3 | 6-8 | All 13 must-have features working | Weights 100% constraint, contradiction flag, GPU VRAM detect |
 | **M4 Polish** | 4 | 3-4 | Production-ready | SEO meta, CHANGELOG, E2E 13 AC pass, Lighthouse ≥90 |
 | **M5 Launch** | 5 | — | Public launch + content bootstrap + 2-week validation | Launch-day 10-15 channels, 2-week GO/PIVOT/LITE |
@@ -220,7 +220,7 @@ MIT — code and data public. If competitors reuse this data, attribution reques
 
 ## Appendix C — Decision Log
 
-41 decisions (d1-d41) tracked in `~/.ideas/coding-models-tracker.json`, traceable through a supersedes chain. Important refinements:
+41 decisions (d1-d41) tracked in `~/.ideas/aicodermap.json`, traceable through a supersedes chain. Important refinements:
 - **d13 (supersedes d9):** Compound moat C component "opinionated verdict" → "user-editable weights".
 - **d16/d22 (supersedes chain):** MVP scope 9 → 13 components (PNG export + responsive + GPU VRAM).
 - **d31:** Stack reduced from 11 tools to 1 external (GitHub Pages) minimum.

@@ -390,7 +390,7 @@ Single source of truth for the unified shape between every layer. Mirrored verba
 | **Provenance** | `data/sources.json` | Wrapped: `{value, source, url, tier, date, verifications, trustScore, contradictionRole?}`. Sole on-disk home of `trustScore`. |
 | **Transit**  | agent → skill JSON    | `models[].updates.<field>` = Storage shape; `models[].sourcesAdded[]` = Provenance shape; NEVER cross-mix.                    |
 | **Verification** | `.aicodermap-verification-map.json` (gitignored) | **Cross-cycle cache:** `cells.<modelId>.<benchKey> = {value, verifications[], confirmed, lastChecked}`. Skill reads at cycle start (skip confirmed cells), updates post-merge from sourcesAdded[]. NOT a render input — purely orchestrator state. |
-| **Render**   | `assets/app.js`       | Reads Storage scalars; looks up Provenance for tooltips by `<modelId>.<field>`.                                              |
+| **Render**   | `assets/js/render-card.js` + `render-table.js` | Reads Storage scalars; looks up Provenance for tooltips by `<modelId>.<field>`. Entry: `assets/js/main.js` (ES module). |
 
 Contradictions: `field` = **bare** bench key (`swePro`, never `bench.swePro`); `candidates[]` wrapped; `autoResolveWinner` wrapped dict — skill extracts `.value` for Storage, keeps full dict for Provenance.
 
