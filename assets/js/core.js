@@ -32,8 +32,8 @@ export const PRESETS = {
     aaCoding: 5, aaAgentic: 0, tau2: 0, mcpA: 0, gpqa: 0, hle: 0,
   },
   'agentic-focused': {
-    tb2: 25, mcpA: 20, tau2: 15, aaAgentic: 15, swePro: 10, lcbV6: 10,
-    gpqa: 5, sweV: 0, aider: 0, aaCoding: 0, sweMulti: 0, hle: 0,
+    tb2: 22, mcpA: 18, tau2: 13, aaAgentic: 12, swePro: 10, lcbV6: 10,
+    bfcl: 10, gpqa: 5, sweV: 0, aider: 0, aaCoding: 0, sweMulti: 0, hle: 0,
   },
   'benchmark-only': {
     swePro: 20, sweV: 15, tb2: 15, lcbV6: 15, aider: 10, gpqa: 10,

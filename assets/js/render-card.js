@@ -4,7 +4,7 @@
 
 import { State, BENCH_KEYS } from './core.js';
 import {
-  compositeScore, fmtScore, contradictionFor, pricingView,
+  compositeScore, coverageOf, fmtScore, contradictionFor, pricingView,
   fmtPriceMoney, fmtPriceRange, fmtPriceCell, fmtContext,
 } from './data.js';
 import { gpuCompat, getActiveVram } from './gpu.js';
@@ -55,17 +55,27 @@ export function buildBenchCell(model, key) {
   return cell;
 }
 
-function cardHead(model, composite) {
+function cardHead(model, composite, coverage) {
   const head = el('div', { class: 'model-card-head' });
   head.appendChild(el('div', { class: 'model-name' },
     el('span', { class: 'model-rank' }, `#${model.__rank}`),
     el('h3', null, model.name),
     el('span', { class: `tier-badge ${model.tier}` }, tierLabel(model.tier)),
   ));
-  head.appendChild(el('div', { class: 'composite-score' },
+  const score = el('div', { class: 'composite-score' },
     el('span', { class: 'label' }, t('ui.table.composite')),
     el('span', { class: 'value' }, fmtScore(composite, 1)),
-  ));
+  );
+  if (coverage != null) {
+    const pct = Math.round(coverage * 100);
+    const covClass = `coverage cov-${pct >= 75 ? 'full' : pct >= 40 ? 'partial' : 'low'}`;
+    const covEl = el('span', {
+      class: covClass,
+      title: t('ui.coverageTip'),
+    }, `${t('ui.coverage')} ${pct}%`);
+    score.appendChild(covEl);
+  }
+  head.appendChild(score);
   return head;
 }
 
@@ -244,6 +254,7 @@ function cardActions(model, card) {
 export function buildModelCard(model, rank) {
   model.__rank = rank;
   const composite = compositeScore(model, State.weights);
+  const coverage = coverageOf(model, State.weights);
   const status = model.status || 'active';
   const statusClass = status === 'active' ? '' : ` is-${status}`;
   const card = el('article', {
@@ -254,7 +265,7 @@ export function buildModelCard(model, rank) {
   });
   const compat = gpuCompat(model, getActiveVram());
 
-  card.appendChild(cardHead(model, composite));
+  card.appendChild(cardHead(model, composite, coverage));
   card.appendChild(providerRow(model));
   card.appendChild(cardMeta(model, compat));
 

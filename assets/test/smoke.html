@@ -29,7 +29,7 @@
       State, BENCH_KEYS, DEFAULT_WEIGHTS, validateModels, validateWeights, isValidModel,
     } from '../js/core.js';
     import {
-      compositeScore, contradictionFor, pricingView, fmtPriceRange, fmtContext,
+      compositeScore, coverageOf, contradictionFor, pricingView, fmtPriceRange, fmtContext,
       isLocalRunnable, scoreClass, fmtScore, loadData,
     } from '../js/data.js';
     import { gpuCompat } from '../js/gpu.js';
@@ -88,12 +88,28 @@
       { id: '', name: 'X', tier: 'frontier', bench: {} },
     ]).length, 1);
 
-    // 6. data: compositeScore weighted average
+    // 6. data: compositeScore weighted average (full coverage → no penalty)
     const m = { id: 'x', name: 'X', tier: 'frontier', bench: { swePro: 80, sweV: 60 } };
     const w = Object.fromEntries(BENCH_KEYS.map(k => [k, 0]));
     w.swePro = 22; w.sweV = 10;
     const cs = compositeScore(m, w);
-    assertTrue('compositeScore is weighted avg of swePro+sweV', Math.abs(cs - ((22 * 80 + 10 * 60) / 32)) < 0.001);
+    assertTrue('compositeScore is weighted avg when coverage=100%', Math.abs(cs - ((22 * 80 + 10 * 60) / 32)) < 0.001);
+
+    // 6b. coverageOf: full coverage = 1.0
+    assertTrue('coverageOf=1 when all weighted bench keys have scores', Math.abs(coverageOf(m, w) - 1) < 0.001);
+
+    // 6c. compositeScore: sqrt(coverage) penalty for partial coverage
+    const mPartial = { id: 'p', name: 'P', tier: 'frontier', bench: { swePro: 80 } };
+    const csP = compositeScore(mPartial, w);
+    const expectedP = 80 * Math.sqrt(22 / 32); // raw=80, coverage=22/32
+    assertTrue('compositeScore × sqrt(coverage) penalises partial coverage', Math.abs(csP - expectedP) < 0.01);
+
+    // 6d. coverageOf: partial coverage
+    assertTrue('coverageOf=22/32 with only swePro covered', Math.abs(coverageOf(mPartial, w) - (22 / 32)) < 0.001);
+
+    // 6e. compositeScore: no overlap → null
+    const mNone = { id: 'n', name: 'N', tier: 'frontier', bench: { hle: 50 } };
+    assertEq('compositeScore null when no active key has score', compositeScore(mNone, w), null);
 
     // 7. data: scoreClass thresholds
     assertEq('scoreClass(85) → high', scoreClass(85), 'score-high');

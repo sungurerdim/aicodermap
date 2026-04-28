@@ -75,6 +75,36 @@
   font-weight: 600;
   color: var(--accent);
 }
+.composite-score .coverage {
+  display: inline-block;
+  margin-top: 2px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: help;
+}
+.composite-score .coverage.cov-full { color: var(--ok); border-color: var(--accent-soft); }
+.composite-score .coverage.cov-partial { color: var(--warn); border-color: var(--warn-soft); }
+.composite-score .coverage.cov-low { color: var(--danger); border-color: var(--danger-soft); }
+
+table#comparison-table .coverage-mini {
+  margin-left: 4px;
+  padding: 0 4px;
+  border-radius: 3px;
+  font-size: 0.7em;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  cursor: help;
+}
+table#comparison-table .coverage-mini.cov-full { color: var(--ok); border-color: var(--accent-soft); }
+table#comparison-table .coverage-mini.cov-partial { color: var(--warn); border-color: var(--warn-soft); }
+table#comparison-table .coverage-mini.cov-low { color: var(--danger); border-color: var(--danger-soft); }
 
 .model-meta {
   display: grid;

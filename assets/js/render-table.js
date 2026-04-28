@@ -3,7 +3,7 @@
 
 import { State, BENCH_KEYS, TIER_ORDER, STORAGE, writeStorage } from './core.js';
 import {
-  compositeScore, fmtScore, scoreClass, contradictionFor,
+  compositeScore, coverageOf, fmtScore, scoreClass, contradictionFor,
   pricingView, fmtPriceRange, fmtContext,
 } from './data.js';
 import { gpuCompat, getActiveVram, passesFilters } from './gpu.js';
@@ -37,11 +37,23 @@ function staticColumns() {
       } },
     { key: 'composite', i18n: 'ui.table.composite', sortable: true, num: true,
       get: (_m, ctx) => ctx.score,
-      render: (_m, ctx) => {
+      render: (m, ctx) => {
+        const wrap = document.createDocumentFragment();
         const span = document.createElement('span');
         span.className = scoreClass(ctx.score);
         span.textContent = fmtScore(ctx.score);
-        return span;
+        wrap.appendChild(span);
+        const cov = coverageOf(m, State.weights);
+        if (cov != null && cov < 1) {
+          const pct = Math.round(cov * 100);
+          const cls = `coverage-mini ${pct >= 75 ? 'cov-full' : pct >= 40 ? 'cov-partial' : 'cov-low'}`;
+          const covSpan = document.createElement('span');
+          covSpan.className = cls;
+          covSpan.textContent = `${pct}%`;
+          covSpan.title = t('ui.coverageTip');
+          wrap.appendChild(covSpan);
+        }
+        return wrap;
       } },
   ];
 }

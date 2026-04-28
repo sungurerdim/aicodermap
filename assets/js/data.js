@@ -30,18 +30,51 @@ export function scoreClass(v) {
   return 'score-low';
 }
 
+// Weighted composite with sqrt-coverage penalty so a model with one cherry-
+// picked high score does not outrank a broader model with more verified data.
+//
+//   raw      = weightedSum / coveredWeight   (avg of available scores)
+//   coverage = coveredWeight / activeWeight  (fraction of profile covered, 0..1)
+//   score    = raw × √coverage               (smoother than raw × coverage)
+//
+// Decay: 100% cov → ×1.00, 50% → ×0.71, 25% → ×0.50, 10% → ×0.32. Active weight
+// is the sum of weights[k] for benchmarks the *current profile* enables (>0);
+// missing scores within an active profile pull the score down without zeroing.
 export function compositeScore(model, weights) {
-  let totalW = 0;
+  let coveredWeight = 0;
+  let activeWeight = 0;
   let weightedSum = 0;
   for (const k of BENCH_KEYS) {
-    const score = model.bench?.[k];
     const w = weights[k];
-    if (score == null || !Number.isFinite(score) || !w) continue;
-    totalW += w;
-    weightedSum += w * score;
+    if (!w) continue;
+    activeWeight += w;
+    const s = model.bench?.[k];
+    if (s == null || !Number.isFinite(s)) continue;
+    coveredWeight += w;
+    weightedSum += w * s;
   }
-  if (totalW === 0) return null;
-  return weightedSum / totalW;
+  if (activeWeight === 0 || coveredWeight === 0) return null;
+  const raw = weightedSum / coveredWeight;
+  const coverage = coveredWeight / activeWeight;
+  return raw * Math.sqrt(coverage);
+}
+
+// Coverage as a 0..1 fraction of profile weight that the model has scores for.
+// UI uses this for the "Coverage XX%" badge so users can read why a composite
+// is low without reverse-engineering the formula.
+export function coverageOf(model, weights) {
+  let coveredWeight = 0;
+  let activeWeight = 0;
+  for (const k of BENCH_KEYS) {
+    const w = weights[k];
+    if (!w) continue;
+    activeWeight += w;
+    const s = model.bench?.[k];
+    if (s == null || !Number.isFinite(s)) continue;
+    coveredWeight += w;
+  }
+  if (activeWeight === 0) return null;
+  return coveredWeight / activeWeight;
 }
 
 export function fmtScore(v, digits = 1) {

@@ -126,7 +126,9 @@
       "vendor-opt-out": "Vendor opt-out",
       "not-applicable": "Not applicable",
       "out-of-scope": "Out-of-scope variant"
-    }
+    },
+    "coverage": "Coverage",
+    "coverageTip": "How much of the active profile weight is backed by available bench scores. Composite is reduced by sqrt(coverage) so cherry-picked single-test scores cannot outrank broader, verified ones."
   },
   "models": {
     "opus-4-7": {
