@@ -56,7 +56,10 @@
   color: var(--muted);
 }
 .tier-badge.frontier { color: var(--accent-2); border-color: var(--accent-2-soft); }
-.tier-badge.open-tier1, .tier-badge.ollama { color: var(--accent); border-color: var(--accent-soft); }
+.tier-badge.open-flagship,
+.tier-badge.coder-specialized,
+.tier-badge.gemma,
+.tier-badge.ollama-local { color: var(--accent); border-color: var(--accent-soft); }
 
 .composite-score {
   text-align: right;

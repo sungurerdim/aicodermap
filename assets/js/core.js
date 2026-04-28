@@ -44,7 +44,7 @@ export const PRESETS = {
 export const CONTRADICTION_WARN = 3.0;
 export const CONTRADICTION_BLOCK = 5.0;
 
-export const TIER_ORDER = { 'frontier': 0, 'open-tier1': 1, 'openrouter': 2, 'gemma': 3, 'ollama': 4 };
+export const TIER_ORDER = { 'frontier': 0, 'open-flagship': 1, 'coder-specialized': 2, 'gemma': 3, 'ollama-local': 4 };
 
 export const State = {
   models: [],

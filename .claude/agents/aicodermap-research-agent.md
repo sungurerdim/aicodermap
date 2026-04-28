@@ -121,10 +121,10 @@ The skill passes `idea_context.currentIds` (the full id list from `data/models.j
 | `tier` value | Description | Per-model survey priority |
 |--------------|-------------|---------------------------|
 | `frontier` | Closed-weight, API-first (Anthropic, OpenAI, Google, xAI, Mistral premium) | Vendor blog + 2 leaderboards + multi-provider pricing |
-| `open-tier1` | Frontier-grade open weights (Moonshot, Z.ai, MiniMax, Alibaba Qwen, StepFun, Meta, Xiaomi MiMo) | HF model card + leaderboards + Ollama + multi-provider |
-| `open-tier1` (coder) | Code-specialized open weights (Qwen-Coder, Codestral, Devstral, DeepSeek-Coder, Nemotron) | Same + bigcode-bench / EvalPlus |
+| `open-flagship` | Frontier-grade open weights (Moonshot, Z.ai, MiniMax, Alibaba Qwen, StepFun, Meta, Xiaomi MiMo, DeepSeek, Nemotron) | HF model card + leaderboards + Ollama + multi-provider |
+| `coder-specialized` | Code-specialized open weights (Qwen-Coder, Codestral, Devstral, DeepSeek-Coder) | Same + bigcode-bench / EvalPlus |
 | `gemma` | Google open-weight family (Gemma 3.x, 4.x — Dense + MoE + E-variants) | HF + Ollama + tech report |
-| `ollama` | Locally-runnable open weights packaged for Ollama runtime | Ollama page + Unsloth GGUF + community VRAM reports |
+| `ollama-local` | Distilled / quantized open weights packaged primarily for local Ollama runtime | Ollama page + Unsloth GGUF + community VRAM reports |
 
 ### Cardinality contract
 
@@ -134,29 +134,68 @@ Anytime the agent sees a newly-discovered model in Phase 0 not present in `curre
 
 ## RESEARCH_STRATEGY (`scope=full`)
 
-### Budget enforcement (HARD limits)
+### Effort doctrine — UNCAPPED + per-cell mandate (2026-04-28 rev2)
+
+There are no fetch budgets, no wallclock budgets, no per-model fetch caps. The
+contract is **completeness over every (active_model × core_bench_key) cell**.
+Vendor blog priority is a **trustScore tiebreak rule**, NOT a search
+short-circuit: the existence of a vendor self-report for `(opus-4-7, swePro)`
+does NOT excuse skipping the leaderboard sweep for `(opus-4-7, lcbV6)`.
+Hard rule: every cell gets every advertised source attempted every cycle.
+
 ```
-per_model_fetch_budget = 6        // max WebFetch per model
-per_model_wallclock_budget = 90s  // total time per model
-parallel_models = 5               // concurrent model surveys
-total_websearch ≤ 8               // skill-level WebSearch budget
-total_webfetch ≤ 70               // skill-level WebFetch budget (≈14 phase-A/B + 50-60 per-model)
+parallel_models  = 5    // parallelism guideline, NOT a cap — agent may go higher
+parallel_sources = 5    // parallelism guideline, NOT a cap
 ```
-If budget hit → STOP, return JSON with whatever gathered, list incomplete models in `gaps[]`.
 
-### Phase 1 — Leaderboard mining (single-message parallel, 5-7 fetches)
-Mine multi-model tables once; extract scores for all relevant models in one pass.
-URLs: select from `idea_context.sourcesWhitelist.leaderboards[]` (filter `phase=='leaderboard'`). Top picks by coverage breadth: Scale SEAL, LiveCodeBench, Vellum, Artificial Analysis, BenchLM, LMArena, LiveBench.
+Termination is governed exclusively by COMPLETENESS_TERMINATION (SKILL.md):
+every leaderboard visited, every vendor lineup attempted, every cell either
+filled or carrying a `gaps[]` entry with `triedSources[]` documenting the
+exhaustive fallback chain. Same-day reruns are normal — the agent does not
+abridge based on prior cycles' confirmations.
 
-### Phase 2 — Multi-provider pricing mining (single-message parallel, ≤6 fetches)
-Mine inference aggregators for the `pricing.api[]` array schema.
-URLs: select from `idea_context.sourcesWhitelist.aggregators[]` (filter `phase=='pricing'`) + Ollama (from `local[]` when local models in scope). Prioritize: OpenRouter (provider count + uptime), Together, Fireworks, DeepInfra, Groq, SiliconFlow (for Chinese-vendor pricing).
+### Phase 1 — Leaderboard mining (single-message parallel, every leaderboard)
+Mine every multi-model table the whitelist advertises; extract scores for ALL
+models in one pass. URLs: every entry in `idea_context.sourcesWhitelist.leaderboards[]`
+where `phase=='leaderboard'`. Coverage targets: Scale SEAL, LiveCodeBench,
+Vellum, Artificial Analysis, BenchLM, LMArena, LiveBench, swebench.com,
+Open LLM Leaderboard, Aider, BFCL, livebench.ai. Skipping a leaderboard
+because its bench is "less popular" is forbidden — every leaderboard whose
+`publishes[]` includes any cell still null counts.
 
-### Phase 3 — Per-model targeted fill (≤3 fetches per gap-model, parallel across 5 models)
-For models that ended Phase 1+2 with <2 bench cells filled OR with missing pricing/context/license:
-- Vendor URL bundle from `idea_context.sourcesWhitelist.vendors.<vendor>.urls.*`
-- HuggingFace card (search vendors[].urls.models or `huggingface.co/<author>/<model>`)
-- Specific leaderboard for the missing bench from `leaderboards[]`
+### Phase 2 — Multi-provider pricing mining (single-message parallel, every aggregator)
+Mine every advertised aggregator for the `pricing.api[]` array schema.
+URLs: every `aggregators[]` entry where `phase=='pricing'` + `local[]` for
+locally-runnable models. Required: OpenRouter (provider count + uptime),
+Together, Fireworks, DeepInfra, Groq, SiliconFlow. Vendor official pricing
+docs are S-tier in addition.
+
+### Phase 3 — Per-cell exhaustive fill (no per-model gate)
+
+**Trigger:** every `(active_model, benchKey)` cell that is `null` after
+Phase 1+2, where `benchKey ∈ core_bench_key_universe` AND at least one
+whitelist leaderboard's `publishes[]` includes `benchKey`. Per-cell, NOT
+per-model. Vendor blog already containing OTHER benches for that model is
+irrelevant.
+
+**Fallback chain per cell** (walked in order until value found or exhausted):
+
+```
+1. Every leaderboard whose publishes[] includes benchKey (parallel single-message)
+2. Vendor URL bundle (sourcesWhitelist.vendors.<vendor>.urls.{news, docs, model_pages})
+3. HuggingFace card (vendors[].urls.models OR huggingface.co/<author>/<id>)
+4. Aggregator mirrors (pricepertoken, llm-stats, vals.ai for SPA-blocked sources)
+5. WebSearch — minimum 2 queries per cell:
+     a. "<modelName>" benchmark "<benchKeyHumanName>" 2026
+     b. "<modelName>" "<benchKeyHumanName>" score
+6. WebSearch with vendor-specific phrasing if 5a/5b empty
+```
+
+Only after ALL 6 steps return zero hits is the cell allowed to remain null,
+and ONLY with a `gaps[]` entry carrying:
+`{key, reason, triedFormats[], triedPatterns[], triedSources[], triedQueries[]}`.
+Silent omission of a null cell is a contract violation — the orchestrator's
+self-audit (SKILL.md merge.py self-check) flags it as `coverage_audit:incomplete`.
 
 ## EXTRACTION_DISCIPLINE (named-pattern dispatch, three-pass discipline)
 
@@ -418,12 +457,37 @@ When in doubt: **scalar in storage, wrapped in provenance, contract spelled here
     }
   ],
 
-  "gaps": [{ "key": "<modelId>.<field>", "reason": "<short why couldn't fill>" }],
+  "gaps": [{
+    "key": "<modelId>.<field>",
+    "reason": "<short why couldn't fill>",
+    "triedSources": ["<url>", ...],            // every URL fetched (Phase 1+2+3 step 1-4)
+    "triedQueries": ["<query>", ...],          // every WebSearch attempted (Phase 3 step 5-6)
+    "triedFormats"?: ["<format>", ...],        // format taxonomy fallback chain walked
+    "triedPatterns"?: ["<patternName>", ...]   // regex library names attempted
+  }],
+
+  "coverageMatrix": {
+    "totalCells": <number>,                    // |active_models| × |core_bench_keys|
+    "filledCells": <number>,                   // cells with non-null value in this cycle
+    "filledThisCycle": <number>,               // cells the agent actually populated/refreshed
+    "gapsRecorded": <number>,                  // |gaps[]| where key matches "<modelId>.<benchKey>"
+    "byBench": {
+      "<benchKey>": { "filled": <int>, "total": <int> }
+    },
+    "byModel": {
+      "<modelId>": { "filled": <int>, "total": <int>, "gaps": <int> }
+    }
+  },
 
   "validationCoverage": 0.0-1.0,
   "error": null | string
 }
 ```
+
+**coverageMatrix audit invariant**: `filledCells + gapsRecorded == totalCells`.
+Any cell that is null AND missing from `gaps[]` is a contract violation —
+silent omission is forbidden. The orchestrator (`scripts/merge.py` self-check)
+verifies the invariant before commit.
 
 ## CONTRADICTION_LOGIC (auto-resolved by skill, but agent precomputes)
 ```
