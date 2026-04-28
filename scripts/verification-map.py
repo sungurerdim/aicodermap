@@ -259,7 +259,7 @@ def main():
         return read_map()
     if op == "bootstrap":
         return bootstrap_from_sources()
-    print(f"usage: verification-map.py [update|read|bootstrap]", file=sys.stderr)
+    print("usage: verification-map.py [update|read|bootstrap]", file=sys.stderr)
     return 2
 
 
