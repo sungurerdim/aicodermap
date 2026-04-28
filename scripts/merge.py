@@ -19,6 +19,7 @@ Performs schema-complete merge per SKILL.md MERGE_RULES:
 import json
 import os
 import shutil
+import sys
 from datetime import date, datetime, timezone
 from urllib.parse import urlparse
 
@@ -44,6 +45,20 @@ def rotate_backup(path):
     if os.path.exists(bak):
         os.rename(bak, bak2)
     shutil.copy2(path, bak)
+
+
+def restore_from_bak(paths):
+    """Roll back the just-written files to the .bak snapshot taken before the
+    merge. Used when post-write SSOT audit detects drift — leaves the working
+    tree in the pre-merge state so the user can investigate without polluted
+    data files. Returns the list of paths that were rolled back."""
+    rolled = []
+    for p in paths:
+        bak = p + ".bak"
+        if os.path.exists(bak):
+            shutil.copy2(bak, p)
+            rolled.append(p)
+    return rolled
 
 
 def deep_merge(dst, src):
@@ -503,28 +518,42 @@ def main():
     if matrix_warn:
         coverage_warn = (coverage_warn + matrix_warn) if coverage_warn else matrix_warn
 
-    # SSOT coherence audit — runs against the just-written data files so any
-    # drift between bench keys / i18n / sources / models / whitelist is caught
-    # before the CHANGELOG line is composed. Advisory only (UNCAPPED doctrine
-    # — never blocks commit), but the warning flows into both CHANGELOG and
-    # the summary printout below.
+    # SSOT coherence audit — HARD BLOCK gate. Runs against the just-written
+    # data files. On drift: roll the data files back to their .bak snapshots,
+    # print a loud failure with the audit's stderr, and exit non-zero so the
+    # skill orchestrator (and any caller) sees the merge did not complete.
+    # No CHANGELOG entry, no commit-eligible state — drift never reaches main.
     import subprocess
-    coherence_summary_lines = []
-    coherence_ok = True
-    try:
-        proc = subprocess.run(
-            ["python3", f"{PROJECT}/scripts/audit-data-coherence.py"],
-            capture_output=True,
-            text=True,
-            check=False,
+    proc = subprocess.run(
+        ["python3", f"{PROJECT}/scripts/audit-data-coherence.py"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    coherence_ok = proc.returncode == 0
+    if not coherence_ok:
+        rolled = restore_from_bak([models_path, sources_path])
+        print("\n" + "=" * 72, file=sys.stderr)
+        print("✗ MERGE ABORTED — SSOT coherence drift in artifact", file=sys.stderr)
+        print("=" * 72, file=sys.stderr)
+        for line in (proc.stderr or "").strip().splitlines():
+            print(f"  {line}", file=sys.stderr)
+        print("", file=sys.stderr)
+        if rolled:
+            print(
+                f"  Rolled back {len(rolled)} file(s) from .bak so the working tree "
+                f"matches the pre-merge state:", file=sys.stderr,
+            )
+            for p in rolled:
+                print(f"    - {os.path.relpath(p, PROJECT)}", file=sys.stderr)
+        print("", file=sys.stderr)
+        print(
+            "  Fix the drift in .aicodermap-agent-out.json (the agent's artifact) "
+            "or the underlying SSOT files, then re-run merge. Commit is blocked "
+            "until audit passes.", file=sys.stderr,
         )
-        coherence_ok = proc.returncode == 0
-        if not coherence_ok:
-            coverage_warn += " [WARN: SSOT coherence drift; see scripts/audit-data-coherence.py]"
-            tail = proc.stderr.strip().splitlines()
-            coherence_summary_lines = tail[:8]
-    except Exception as e:  # noqa: BLE001
-        coherence_summary_lines = [f"audit script failed to run: {e}"]
+        print("=" * 72, file=sys.stderr)
+        sys.exit(1)
 
     cl_path = f"{PROJECT}/CHANGELOG.md"
     cl_lines = [f"\n## [{TODAY}] — autonomous refresh-all{coverage_warn}\n"]
@@ -585,14 +614,7 @@ def main():
             f"gaps={matrix.get('gapsRecorded')})"
         )
 
-    if coherence_ok:
-        print("  coherence:  ✓ SSOT (bench keys + model ids aligned across surfaces)")
-    else:
-        print("  coherence:  ✗ DRIFT — see audit-data-coherence.py output:")
-        for line in coherence_summary_lines[:6]:
-            print(f"    {line}")
-        if len(coherence_summary_lines) > 6:
-            print(f"    ... and {len(coherence_summary_lines) - 6} more")
+    print("  coherence:  ✓ SSOT (bench keys + model ids aligned across surfaces)")
     if log["format_warnings"]:
         print(f"  format warnings: {len(log['format_warnings'])} (non-blocking)")
         for w in log["format_warnings"][:5]:

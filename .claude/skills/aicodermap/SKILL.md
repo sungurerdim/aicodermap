@@ -174,9 +174,15 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
     - data/sources.json keys reference only known model IDs and canonical bench keys
     - tier values ∈ {frontier, open-flagship, coder-specialized, gemma, ollama-local}
     - status values ∈ {active, deprecated, archived}
-    Drift signal → CHANGELOG warning + console fail print + non-zero exit code from
-    the audit script. Advisory only (UNCAPPED — never blocks commit), but every drift
-    appears in the same CHANGELOG header line as the coverage warning.
+    **HARD BLOCK** — drift is a single explicit exception to the UNCAPPED "never block"
+    doctrine. On audit failure, merge.py rolls data/{models,sources}.json back to their
+    .bak snapshots and exits non-zero. No CHANGELOG entry is written, the artifact is
+    NOT committed, and the skill workflow halts at this step. The user must fix the
+    drift in `.aicodermap-agent-out.json` (or the underlying SSOT files) and re-run the
+    merge before any commit can proceed. The same audit is wired into the
+    `scripts/hooks/pre-commit` hook (installed via `bash scripts/install-hooks.sh`),
+    so any commit path — manual, scripted, or skill-driven — is gated. Override is
+    `git commit --no-verify` and only acceptable for documented emergencies.
 
 10. ATOMIC WRITE — schema-complete merge per MERGE_RULES (rotated .bak backup):
     Outputs:

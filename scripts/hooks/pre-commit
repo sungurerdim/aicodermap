@@ -1,0 +1,43 @@
+#!/usr/bin/env sh
+# Pre-commit hook: HARD BLOCK on SSOT coherence drift.
+#
+# Runs scripts/audit-data-coherence.py against the working tree. If the audit
+# detects ANY drift between bench keys / model ids / i18n / data / sources /
+# whitelist surfaces, the commit is rejected loudly and the user is told what
+# to fix.
+#
+# To bypass for a true emergency: `git commit --no-verify` (do NOT use this
+# unless you have a documented reason — drift commits cause silent rendering
+# bugs downstream).
+#
+# Activation: `bash scripts/install-hooks.sh` (sets core.hooksPath).
+
+set -e
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+AUDIT="$REPO_ROOT/scripts/audit-data-coherence.py"
+
+if [ ! -f "$AUDIT" ]; then
+  # Audit script missing — let the commit through; absent audit is itself a
+  # repo-state issue but blocking all commits would be worse than logging.
+  echo "pre-commit: audit script missing at $AUDIT — skipping (this is unusual)"
+  exit 0
+fi
+
+if ! python3 "$AUDIT" >/dev/null 2>&1; then
+  echo "" >&2
+  echo "✗ COMMIT BLOCKED — SSOT coherence drift detected." >&2
+  echo "" >&2
+  echo "  Surfaces (BENCH_KEYS, i18n, data/models.json, data/sources.json," >&2
+  echo "  data/sources-whitelist.json, DEFAULT_WEIGHTS, PRESETS) disagree." >&2
+  echo "" >&2
+  echo "  Run the audit to see the exact drift:" >&2
+  echo "    python3 scripts/audit-data-coherence.py" >&2
+  echo "" >&2
+  echo "  Fix every reported diff, then re-stage and re-commit." >&2
+  echo "  Emergency override (NOT for routine use): git commit --no-verify" >&2
+  echo "" >&2
+  exit 1
+fi
+
+exit 0
