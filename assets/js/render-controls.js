@@ -140,7 +140,7 @@ function shortBuildHash(etag) {
 }
 
 export function renderDeployStamp() {
-  const node = document.getElementById('footer-deployed-at');
+  const node = document.getElementById('deployed-at');
   if (!node) return;
   const formatted = fmtDeployTime(State.dataDeployedAt);
   if (!formatted) return;

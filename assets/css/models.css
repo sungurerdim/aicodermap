@@ -4,44 +4,63 @@
 .models-list {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
+/* Card uses a 2-column grid: variable-width main on the left, fixed-min
+ * sidebar on the right for the composite score. Score is align-self:start
+ * so its small height never pushes main content down — content starts at
+ * the top of the left column regardless. The bottom-spanning actions row
+ * gives camera/doc buttons their own track so they don't collide with the
+ * sources footer. Mobile collapses to a single column (responsive.css). */
 .model-card {
   display: grid;
-  gap: var(--space-3);
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "head    score"
+    "main    score"
+    "actions actions";
+  column-gap: var(--space-3);
+  row-gap: var(--space-2);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: var(--space-3);
+  padding: var(--space-2) var(--space-3);
   box-shadow: var(--shadow);
 }
 .model-card-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-3);
-  flex-wrap: wrap;
-}
-.model-name {
+  grid-area: head;
   display: flex;
   align-items: center;
   gap: var(--space-2);
   flex-wrap: wrap;
+  min-width: 0;
 }
-.model-name h3 {
+.model-card-main {
+  grid-area: main;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.model-name-title {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   font-weight: 600;
+  line-height: 1.2;
 }
 .model-rank {
   font-family: var(--font-mono);
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 .model-provider {
   color: var(--muted);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
 }
 .tier-badge {
   display: inline-flex;
@@ -62,21 +81,35 @@
 .tier-badge.ollama-local { color: var(--accent); border-color: var(--accent-soft); }
 
 .composite-score {
-  text-align: right;
+  grid-area: score;
+  align-self: start;
+  text-align: center;
   font-variant-numeric: tabular-nums;
+  min-width: 88px;
+  padding: var(--space-2) var(--space-2);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
 }
 .composite-score .label {
   display: block;
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 .composite-score .value {
   display: block;
   font-family: var(--font-mono);
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   font-weight: 600;
   color: var(--accent);
+  line-height: 1.05;
 }
 .composite-score .coverage {
   display: inline-block;
@@ -126,25 +159,24 @@ table#comparison-table .coverage-mini.cov-low { color: var(--danger); border-col
 
 .model-meta {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: var(--space-2);
-  font-size: 0.85rem;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 6px var(--space-2);
+  font-size: 0.82rem;
 }
-.meta-cell { display: flex; flex-direction: column; gap: 2px; }
-.meta-cell .label { color: var(--muted); font-size: 0.72rem; font-weight: 600; }
-.meta-cell .value { color: var(--text); font-family: var(--font-mono); }
+.meta-cell { display: flex; flex-direction: column; gap: 1px; }
+.meta-cell .label { color: var(--muted); font-size: 0.68rem; font-weight: 600; line-height: 1.2; }
+.meta-cell .value { color: var(--text); font-family: var(--font-mono); line-height: 1.25; }
 
 .bench-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-  gap: var(--space-2);
+  grid-template-columns: repeat(auto-fit, minmax(98px, 1fr));
+  gap: 6px;
 }
 .bench-cell {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: var(--space-2);
-  padding-right: 28px;
+  gap: 1px;
+  padding: 5px 22px 5px 8px;
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -154,19 +186,20 @@ table#comparison-table .coverage-mini.cov-low { color: var(--danger); border-col
 }
 .bench-cell .name {
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 600;
   white-space: normal;
   overflow-wrap: anywhere;
   word-break: break-word;
-  line-height: 1.25;
+  line-height: 1.2;
 }
 .bench-cell .value {
   color: var(--text);
   font-family: var(--font-mono);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 500;
   white-space: nowrap;
+  line-height: 1.15;
 }
 .bench-cell.empty .value { color: var(--muted); opacity: 0.6; }
 .bench-cell .flag {
@@ -234,14 +267,14 @@ table#comparison-table .coverage-mini.cov-low { color: var(--danger); border-col
 }
 
 .ollama-block {
-  margin-top: var(--space-2);
-  padding: var(--space-2) var(--space-3);
+  margin-top: 2px;
+  padding: 6px var(--space-2);
   background: var(--surface, rgba(255, 255, 255, 0.03));
   border-left: 3px solid var(--accent-soft, var(--accent, #67e8a4));
   border-radius: 4px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 .ollama-title {
   display: flex;
@@ -319,30 +352,33 @@ table#comparison-table .coverage-mini.cov-low { color: var(--danger); border-col
 .notes {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-2);
-  font-size: 0.9rem;
+  gap: 4px;
+  font-size: 0.85rem;
+  line-height: 1.4;
 }
 .notes .strengths::before { content: "✓ "; color: var(--ok); }
 .notes .weaknesses::before { content: "△ "; color: var(--warn); }
 
 .model-actions {
+  grid-area: actions;
   display: flex;
-  gap: var(--space-2);
+  gap: 6px;
   flex-wrap: wrap;
   justify-content: flex-end;
+  margin-top: 2px;
 }
 
 .sources-footer {
-  margin-top: var(--space-2);
-  padding: var(--space-2) var(--space-3);
+  margin-top: 2px;
+  padding: 6px var(--space-2);
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   color: var(--muted);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 .sources-footer .sources-header {
   display: flex;
@@ -438,11 +474,11 @@ table#comparison-table .coverage-mini.cov-low { color: var(--danger); border-col
 
 /* Multi-provider pricing breakdown */
 .pricing-providers {
-  margin: var(--space-2) 0;
-  padding: var(--space-2) var(--space-3);
+  margin: 0;
+  padding: 6px var(--space-2);
   background: var(--surface-2);
-  border-radius: 8px;
-  font-size: 0.86rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
 }
 .pricing-providers > summary {
   cursor: pointer;

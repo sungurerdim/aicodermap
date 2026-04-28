@@ -57,13 +57,15 @@ export function buildBenchCell(model, key) {
   return cell;
 }
 
-function cardHead(model, composite, coverage, disputed) {
+function cardHead(model) {
   const head = el('div', { class: 'model-card-head' });
-  head.appendChild(el('div', { class: 'model-name' },
-    el('span', { class: 'model-rank' }, `#${model.__rank}`),
-    el('h3', null, model.name),
-    el('span', { class: `tier-badge ${model.tier}` }, tierLabel(model.tier)),
-  ));
+  head.appendChild(el('span', { class: 'model-rank' }, `#${model.__rank}`));
+  head.appendChild(el('h3', { class: 'model-name-title' }, model.name));
+  head.appendChild(el('span', { class: `tier-badge ${model.tier}` }, tierLabel(model.tier)));
+  return head;
+}
+
+function compositeBlock(composite, coverage, disputed) {
   const score = el('div', { class: 'composite-score' },
     el('span', { class: 'label' }, t('ui.table.composite')),
     el('span', { class: 'value' }, fmtScore(composite, 1)),
@@ -71,19 +73,14 @@ function cardHead(model, composite, coverage, disputed) {
   if (coverage != null) {
     const pct = Math.round(coverage * 100);
     const covClass = `coverage cov-${pct >= 75 ? 'full' : pct >= 40 ? 'partial' : 'low'}`;
-    score.appendChild(el('span', {
-      class: covClass,
-      title: t('ui.coverageTip'),
-    }, `${t('ui.coverage')} ${pct}%`));
+    score.appendChild(el('span', { class: covClass, title: t('ui.coverageTip') },
+      `${t('ui.coverage')} ${pct}%`));
   }
   if (disputed > 0) {
-    score.appendChild(el('span', {
-      class: 'disputed',
-      title: t('ui.disputedTip'),
-    }, `${disputed} ${t('ui.disputed')}`));
+    score.appendChild(el('span', { class: 'disputed', title: t('ui.disputedTip') },
+      `${disputed} ${t('ui.disputed')}`));
   }
-  head.appendChild(score);
-  return head;
+  return score;
 }
 
 function providerRow(model) {
@@ -309,27 +306,35 @@ export function buildModelCard(model, rank) {
   });
   const compat = gpuCompat(model, getActiveVram());
 
-  card.appendChild(cardHead(model, composite, coverage, disputed));
-  card.appendChild(providerRow(model));
-  card.appendChild(cardMeta(model, compat));
+  // Card layout — three grid areas: head (title row), score (right
+  // sidebar), main (everything else stacked). Score sits at align-self:
+  // start so its small height never pushes main content down; main flows
+  // freely from the top of the card alongside the score column.
+  card.appendChild(cardHead(model));
+  card.appendChild(compositeBlock(composite, coverage, disputed));
+
+  const main = el('div', { class: 'model-card-main' });
+  main.appendChild(providerRow(model));
+  main.appendChild(cardMeta(model, compat));
 
   const provBlock = pricingProvidersBlock(pricingView(model));
-  if (provBlock) card.appendChild(provBlock);
+  if (provBlock) main.appendChild(provBlock);
 
-  benchGridSection(model).forEach(n => card.appendChild(n));
+  benchGridSection(model).forEach(n => main.appendChild(n));
 
   const unsloth = unslothListBlock(model, compat);
-  if (unsloth) card.appendChild(unsloth);
+  if (unsloth) main.appendChild(unsloth);
 
   const ollama = ollamaBlock(model);
-  if (ollama) card.appendChild(ollama);
+  if (ollama) main.appendChild(ollama);
 
   const notes = notesBlock(model);
-  if (notes) card.appendChild(notes);
+  if (notes) main.appendChild(notes);
 
   const sources = sourcesFooter(model);
-  if (sources) card.appendChild(sources);
+  if (sources) main.appendChild(sources);
 
+  card.appendChild(main);
   card.appendChild(cardActions(model, card));
   return card;
 }

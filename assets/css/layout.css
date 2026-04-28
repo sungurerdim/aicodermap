@@ -1,7 +1,7 @@
 /* Layout — header, sticky-nav, app-main, section-card, footer, export, loading. */
 
 .app-header {
-  padding: var(--space-5) var(--space-4);
+  padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--border);
   background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
 }
@@ -12,10 +12,17 @@
   gap: var(--space-3);
   max-width: 100%;
   margin: 0 auto;
+  flex-wrap: wrap;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
 }
 .app-title {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.35rem;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
@@ -27,11 +34,23 @@
   font-weight: 700;
 }
 .app-tagline {
-  margin: var(--space-3) auto 0;
+  margin: 6px 0 0;
   color: var(--muted);
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   max-width: 100%;
 }
+.deploy-stamp {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.72rem;
+  color: var(--muted);
+  white-space: nowrap;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.deploy-stamp[hidden] { display: none; }
 
 .sticky-nav {
   position: sticky;
@@ -41,15 +60,16 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--border);
-  padding: var(--space-2) var(--space-4);
+  padding: 4px var(--space-3);
   display: flex;
-  gap: var(--space-3);
+  gap: var(--space-2);
   overflow-x: auto;
   scrollbar-width: thin;
+  font-size: 0.85rem;
 }
 .sticky-nav a {
   white-space: nowrap;
-  padding: 4px 10px;
+  padding: 3px 8px;
   border-radius: var(--radius-sm);
   color: var(--muted);
 }
@@ -64,10 +84,10 @@
   max-width: 100%;
   width: 100%;
   margin: 0 auto;
-  padding: var(--space-3);
+  padding: var(--space-2) var(--space-3);
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
 .section-card {
@@ -79,7 +99,7 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: var(--space-3);
+  padding: var(--space-2) var(--space-3);
   box-shadow: var(--shadow);
 }
 .section-head {
@@ -102,10 +122,10 @@
 }
 
 .app-footer {
-  padding: var(--space-4);
+  padding: var(--space-2) var(--space-4);
   border-top: 1px solid var(--border);
   color: var(--muted);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 .footer-row {
   max-width: 100%;
@@ -115,12 +135,6 @@
   align-items: center;
   gap: var(--space-3);
   flex-wrap: wrap;
-}
-.footer-deploy-stamp {
-  font-variant-numeric: tabular-nums;
-  font-size: 0.78rem;
-  opacity: 0.75;
-  white-space: nowrap;
 }
 
 .freshness-banner {
