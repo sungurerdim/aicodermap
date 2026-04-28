@@ -1,0 +1,35 @@
+/* Toast notification host — replaces blocking alert() for non-critical errors. */
+
+.toast-host {
+  position: fixed;
+  bottom: var(--space-4);
+  right: var(--space-4);
+  z-index: 200;
+  pointer-events: none;
+}
+.toast {
+  pointer-events: auto;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  border-left-width: 4px;
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  box-shadow: var(--shadow);
+  font-size: 0.9rem;
+  max-width: 360px;
+  animation: toast-in 160ms ease-out;
+}
+.toast-info { border-left-color: var(--accent-2); }
+.toast-success { border-left-color: var(--ok); }
+.toast-warn { border-left-color: var(--warn); }
+.toast-error { border-left-color: var(--danger); }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast { animation: none; }
+}

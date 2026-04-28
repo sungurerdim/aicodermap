@@ -1,0 +1,88 @@
+/* Comparison table — compact. */
+
+.table-scroll {
+  overflow: auto;
+  max-height: 82vh;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+table#comparison-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.78rem;
+}
+table#comparison-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+table#comparison-table th,
+table#comparison-table td {
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  text-align: left;
+  vertical-align: middle;
+}
+table#comparison-table th {
+  background: var(--surface-2);
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.7rem;
+  padding: 6px 8px;
+  user-select: none;
+  border-bottom: 1px solid var(--border-strong);
+}
+table#comparison-table th[data-sortable="true"] {
+  cursor: pointer;
+  transition: color 100ms, background 100ms;
+}
+table#comparison-table th[data-sortable="true"]:hover {
+  background: var(--surface);
+  color: var(--accent);
+}
+table#comparison-table th.sorted { color: var(--accent); }
+table#comparison-table th.sorted::after { content: ' ▼'; font-size: 0.7em; }
+table#comparison-table th.sorted.asc::after { content: ' ▲'; }
+table#comparison-table td.num,
+table#comparison-table th.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+table#comparison-table tbody tr:hover {
+  background: var(--accent-tint);
+}
+table#comparison-table .col-name {
+  position: sticky;
+  left: 0;
+  background: var(--surface);
+  z-index: 1;
+  min-width: 140px;
+  font-weight: 600;
+}
+table#comparison-table thead .col-name {
+  background: var(--surface-2);
+  z-index: 3;
+}
+table#comparison-table tbody tr:hover .col-name {
+  background: var(--surface-hover);
+}
+table#comparison-table .score-high { color: var(--ok); }
+table#comparison-table .score-mid { color: var(--warn); }
+table#comparison-table .score-low { color: var(--muted); }
+table#comparison-table .score-na { color: var(--muted); opacity: 0.5; }
+table#comparison-table td.bench-cell-td {
+  font-family: var(--font-mono);
+  position: relative;
+}
+table#comparison-table td.bench-cell-td .flag {
+  margin-left: 4px;
+  font-size: 0.85em;
+  cursor: help;
+}
+table#comparison-table .tier-badge {
+  display: inline-block;
+}
+table#comparison-table td.col-rank { color: var(--muted); }

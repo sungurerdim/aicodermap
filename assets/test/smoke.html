@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AICoderMap — Smoke Test</title>
+  <style>
+    body { font-family: ui-monospace, monospace; padding: 24px; background: #181c22; color: #f0f3f7; }
+    h1 { color: #6ee7b3; margin: 0 0 16px; font-size: 1.4rem; }
+    p.lede { color: #a8b3c2; max-width: 720px; }
+    table { border-collapse: collapse; margin-top: 24px; min-width: 640px; }
+    th, td { text-align: left; padding: 6px 12px; border-bottom: 1px solid #3d4651; }
+    th { color: #a8b3c2; font-weight: 600; }
+    .ok { color: #6ee7b3; }
+    .fail { color: #f47b8b; }
+    .pending { color: #a8b3c2; }
+    pre.detail { color: #a8b3c2; margin: 0; white-space: pre-wrap; word-break: break-word; }
+  </style>
+</head>
+<body>
+  <h1>AICoderMap smoke test</h1>
+  <p class="lede">Vanilla, zero-dependency assertions against the data layer + render functions. Open via a local HTTP server (e.g. <code>python -m http.server</code> from the project root, then visit <code>/assets/test/smoke.html</code>). The file URL scheme will fail because ES modules require HTTP.</p>
+  <table>
+    <thead><tr><th>#</th><th>Status</th><th>Test</th><th>Detail</th></tr></thead>
+    <tbody id="results"></tbody>
+  </table>
+  <script type="module">
+    import {
+      State, BENCH_KEYS, DEFAULT_WEIGHTS, validateModels, validateWeights, isValidModel,
+    } from '../js/core.js';
+    import {
+      compositeScore, contradictionFor, pricingView, fmtPriceRange, fmtContext,
+      isLocalRunnable, scoreClass, fmtScore, loadData,
+    } from '../js/data.js';
+    import { gpuCompat } from '../js/gpu.js';
+
+    const tbody = document.getElementById('results');
+    let n = 0;
+
+    function row(name, ok, detail) {
+      n++;
+      const tr = document.createElement('tr');
+      const num = document.createElement('td'); num.textContent = String(n);
+      const status = document.createElement('td');
+      status.className = ok ? 'ok' : 'fail';
+      status.textContent = ok ? '✓ PASS' : '✗ FAIL';
+      const title = document.createElement('td'); title.textContent = name;
+      const det = document.createElement('td');
+      const pre = document.createElement('pre'); pre.className = 'detail';
+      pre.textContent = String(detail ?? '');
+      det.appendChild(pre);
+      tr.append(num, status, title, det);
+      tbody.appendChild(tr);
+    }
+
+    function assertEq(name, actual, expected) {
+      const ok = JSON.stringify(actual) === JSON.stringify(expected);
+      row(name, ok, ok ? '' : `expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+    }
+
+    function assertTrue(name, cond, hint) {
+      row(name, !!cond, cond ? '' : (hint || ''));
+    }
+
+    // 1. core: validateWeights happy path
+    assertTrue('validateWeights accepts DEFAULT_WEIGHTS shape', validateWeights({
+      ...DEFAULT_WEIGHTS, aaIdx: 0, bfcl: 0, aime26: 0, aaOmni: 0,
+    }) !== null);
+
+    // 2. core: validateWeights rejects out-of-range
+    assertEq('validateWeights rejects negative', validateWeights(
+      Object.fromEntries(BENCH_KEYS.map(k => [k, -1])),
+    ), null);
+
+    // 3. core: validateWeights rejects missing keys
+    assertEq('validateWeights rejects partial', validateWeights({ swePro: 50 }), null);
+
+    // 4. core: isValidModel
+    assertTrue('isValidModel accepts well-formed', isValidModel({
+      id: 'x', name: 'X', tier: 'frontier', bench: { swePro: 50 },
+    }));
+    assertEq('isValidModel rejects empty', isValidModel({}), false);
+
+    // 5. core: validateModels filters out garbage
+    assertEq('validateModels filters', validateModels([
+      { id: 'a', name: 'A', tier: 'frontier', bench: {} },
+      null,
+      { id: '', name: 'X', tier: 'frontier', bench: {} },
+    ]).length, 1);
+
+    // 6. data: compositeScore weighted average
+    const m = { id: 'x', name: 'X', tier: 'frontier', bench: { swePro: 80, sweV: 60 } };
+    const w = Object.fromEntries(BENCH_KEYS.map(k => [k, 0]));
+    w.swePro = 22; w.sweV = 10;
+    const cs = compositeScore(m, w);
+    assertTrue('compositeScore is weighted avg of swePro+sweV', Math.abs(cs - ((22 * 80 + 10 * 60) / 32)) < 0.001);
+
+    // 7. data: scoreClass thresholds
+    assertEq('scoreClass(85) → high', scoreClass(85), 'score-high');
+    assertEq('scoreClass(60) → mid', scoreClass(60), 'score-mid');
+    assertEq('scoreClass(30) → low', scoreClass(30), 'score-low');
+    assertEq('scoreClass(null) → na', scoreClass(null), 'score-na');
+
+    // 8. data: fmtScore
+    assertEq('fmtScore(50.55) → "50.6"', fmtScore(50.55), '50.6');
+    assertEq('fmtScore(null) → "—"', fmtScore(null), '—');
+
+    // 9. data: fmtContext
+    assertEq('fmtContext(2_000_000) → "2M"', fmtContext(2_000_000), '2M');
+    assertEq('fmtContext(128_000) → "128K"', fmtContext(128_000), '128K');
+    assertEq('fmtContext(900) → "900"', fmtContext(900), '900');
+
+    // 10. data: pricingView legacy bridge
+    const pv = pricingView({ pricing: { api: { in: 1, out: 2, cacheHit: 0.5 } } });
+    assertEq('pricingView wraps legacy api object', pv.providers.length, 1);
+    assertTrue('pricingView range.in pair', JSON.stringify(pv.range.in) === '[1,1]');
+
+    // 11. data: contradictionFor needs ≥2 sources
+    State.sources = { 'm.k': [{ value: 50 }] };
+    assertEq('contradiction needs ≥2 sources', contradictionFor('m', 'k'), null);
+    State.sources = { 'm.k': [{ value: 50, tier: 'I', source: 'a' }, { value: 56, tier: 'I', source: 'b' }] };
+    const c = contradictionFor('m', 'k');
+    assertTrue('contradiction Δ=6 → danger', c && c.severity === 'danger');
+
+    // 12. data: isLocalRunnable
+    assertTrue('Ollama tier is local', isLocalRunnable({ tier: 'ollama' }));
+    assertTrue('vramRequirement makes local', isLocalRunnable({ tier: 'frontier', vramRequirement: 8 }));
+    assertEq('frontier without vram is not local', isLocalRunnable({ tier: 'frontier' }), false);
+
+    // 13. gpu: cloud/unknown/fits/too-large branches
+    State.i18n = { ui: { compat: { cloud: 'cloud', fits: 'fits', offload: 'offload', tooLarge: 'too-large' } } };
+    State.i18nFallback = State.i18n;
+    assertEq('gpuCompat cloud-only model', gpuCompat({ tier: 'frontier' }, 24).kind, 'cloud');
+    assertEq('gpuCompat unknown without vram', gpuCompat({ tier: 'frontier', vramRequirement: 16 }, null).kind, 'unknown');
+    assertEq('gpuCompat fits when needed < vram-1', gpuCompat({ tier: 'open-tier1', vramRequirement: 8 }, 24).kind, 'fits');
+    assertEq('gpuCompat too-large at 200GB on 8GB', gpuCompat({ tier: 'open-tier1', vramRequirement: 200 }, 8).kind, 'too-large');
+
+    // 14. integration: live data load (requires HTTP)
+    try {
+      await loadData();
+      assertTrue('loadData populated State.models', State.models.length > 0, `models=${State.models.length}`);
+    } catch (e) {
+      row('loadData failed (HTTP server required)', false, e.message);
+    }
+
+    // Summary header
+    const passes = tbody.querySelectorAll('.ok').length;
+    const fails = tbody.querySelectorAll('.fail').length;
+    const summary = document.createElement('p');
+    summary.style.marginTop = '24px';
+    summary.style.fontWeight = '700';
+    summary.textContent = `${passes} pass · ${fails} fail`;
+    summary.style.color = fails === 0 ? '#6ee7b3' : '#f47b8b';
+    document.body.appendChild(summary);
+  </script>
+</body>
+</html>

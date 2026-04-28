@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'none'">
   <meta name="description" content="Cut coding-model selection from hours of review to seconds: ranked by your priorities, source contradictions surfaced, GPU-fitting local options labeled with the exact quant that runs. Turkish + English, refreshed every 14 days.">
   <meta name="theme-color" content="#0b0d10">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b0d10'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' dominant-baseline='middle' font-size='34' font-family='ui-monospace, monospace' fill='%2367e8a4'%3E&gt;_%3C/text%3E%3C/svg%3E">
@@ -12,7 +13,13 @@
   <meta property="og:type" content="website">
   <link rel="alternate" hreflang="tr" href="./?lang=tr">
   <link rel="alternate" hreflang="en" href="./?lang=en">
-  <link rel="stylesheet" href="assets/app.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/table.css">
+  <link rel="stylesheet" href="assets/css/controls.css">
+  <link rel="stylesheet" href="assets/css/models.css">
+  <link rel="stylesheet" href="assets/css/toast.css">
+  <link rel="stylesheet" href="assets/css/responsive.css">
 </head>
 <body>
 
@@ -221,7 +228,7 @@
 
 <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
 
-<script src="assets/vendor/html2canvas.min.js" defer></script>
-<script src="assets/app.js" defer></script>
+<script src="assets/vendor/html2canvas.min.js" integrity="sha256-6H5VB5QyLldKH9oMFUmjxw2uWpPZETQXpCkBaDjquMs=" defer></script>
+<script type="module" src="assets/js/main.js"></script>
 </body>
 </html>

@@ -1,0 +1,28 @@
+/* Breakpoint overrides — keep last in cascade. */
+
+/* TABLET: 641-1024 */
+@media (min-width: 641px) {
+  body { font-size: 15px; }
+  .app-main { padding: var(--space-4); gap: var(--space-4); }
+  .app-title { font-size: 1.7rem; }
+  .models-list { grid-template-columns: 1fr; }
+  .model-card { padding: var(--space-4); }
+  .filters-grid > .filter-group { grid-column: span 2; }
+  .filters-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+}
+
+/* DESKTOP: >1024 */
+@media (min-width: 1025px) {
+  body { font-size: 15px; }
+  .app-tagline { font-size: 1rem; }
+  .app-title { font-size: 1.85rem; }
+  .section-head h2 { font-size: 1.25rem; }
+  .composite-score .value { font-size: 1.9rem; }
+  .filters-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; animation: none !important; }
+}
