@@ -8,9 +8,10 @@ import {
   pricingView, fmtPriceMoney, fmtPriceRange, fmtPriceCell, fmtContext,
 } from './data.js';
 import { gpuCompat, getActiveVram } from './gpu.js';
-import { el, cameraIconButton } from './dom.js';
+import { el, cameraIconButton, docIconButton } from './dom.js';
 import { t } from './i18n.js';
 import { showContradictionTooltip, hideTooltip, exportElement } from './overlay.js';
+import { modelSourcesSummary, exportSourcesMarkdown } from './sources.js';
 
 function tierLabel(tier) {
   return t(`ui.tier.${tier}`) || tier;
@@ -250,10 +251,46 @@ function notesBlock(model) {
 
 function cardActions(model, card) {
   const actions = el('div', { class: 'model-actions' });
+  const sourcesBtn = docIconButton(t('ui.export.sources'));
+  sourcesBtn.addEventListener('click', () => exportSourcesMarkdown(model));
+  actions.appendChild(sourcesBtn);
   const exportBtn = cameraIconButton(t('ui.export.model'));
   exportBtn.addEventListener('click', () => exportElement(card, `aicodermap-${model.id}`));
   actions.appendChild(exportBtn);
   return actions;
+}
+
+function sourcesFooter(model) {
+  const { byTier, totalUnique, totalDatapoints } = modelSourcesSummary(model);
+  if (totalUnique === 0) return null;
+
+  const block = el('div', { class: 'sources-footer' });
+  block.appendChild(el('div', { class: 'sources-header' },
+    el('span', { class: 'sources-label' }, t('ui.sources')),
+    el('span', { class: 'sources-count' },
+      `${totalUnique} ${t('ui.sourcesUnique')} · ${totalDatapoints} ${t('ui.sourcesDatapoints')}`),
+  ));
+
+  for (const tier of ['I', 'S', 'C', '?']) {
+    if (!byTier[tier].length) continue;
+    const row = el('div', { class: `sources-row tier-${tier}` });
+    row.appendChild(el('span', { class: 'sources-tier' }, `${tier}-tier (${byTier[tier].length}):`));
+    const list = el('span', { class: 'sources-list' });
+    byTier[tier].forEach((s, i) => {
+      if (i > 0) list.appendChild(document.createTextNode(', '));
+      const text = s.count > 1 ? `${s.source} ×${s.count}` : s.source;
+      if (s.url) {
+        list.appendChild(el('a', {
+          href: s.url, target: '_blank', rel: 'noopener noreferrer', title: s.url,
+        }, text));
+      } else {
+        list.appendChild(document.createTextNode(text));
+      }
+    });
+    row.appendChild(list);
+    block.appendChild(row);
+  }
+  return block;
 }
 
 export function buildModelCard(model, rank) {
@@ -288,6 +325,9 @@ export function buildModelCard(model, rank) {
 
   const notes = notesBlock(model);
   if (notes) card.appendChild(notes);
+
+  const sources = sourcesFooter(model);
+  if (sources) card.appendChild(sources);
 
   card.appendChild(cardActions(model, card));
   return card;

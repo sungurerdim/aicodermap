@@ -33,6 +33,7 @@
       isLocalRunnable, scoreClass, fmtScore, loadData,
     } from '../js/data.js';
     import { gpuCompat } from '../js/gpu.js';
+    import { modelSourcesSummary, buildSourcesMarkdown } from '../js/sources.js';
 
     const tbody = document.getElementById('results');
     let n = 0;
@@ -175,6 +176,32 @@
     assertEq('gpuCompat unknown without vram', gpuCompat({ tier: 'frontier', vramRequirement: 16 }, null).kind, 'unknown');
     assertEq('gpuCompat fits when needed < vram-1', gpuCompat({ tier: 'open-tier1', vramRequirement: 8 }, 24).kind, 'fits');
     assertEq('gpuCompat too-large at 200GB on 8GB', gpuCompat({ tier: 'open-tier1', vramRequirement: 200 }, 8).kind, 'too-large');
+
+    // 13b. sources: summary aggregates + dedupes by URL
+    State.sources['ms.swePro'] = [
+      { tier: 'I', trustScore: 1.0, source: 'leaderboard-x', url: 'https://x.example/lb', value: 80 },
+      { tier: 'I', trustScore: 1.0, source: 'leaderboard-x', url: 'https://x.example/lb', value: 80 },
+      { tier: 'S', trustScore: 0.6, source: 'vendor-y', url: 'https://y.example', value: 85 },
+    ];
+    State.sources['ms.sweV'] = [
+      { tier: 'C', trustScore: 0.4, source: 'aggregator-z', url: 'https://z.example', value: 70 },
+    ];
+    const ms = { id: 'ms', name: 'MS', tier: 'frontier', bench: { swePro: 80, sweV: 70 } };
+    const summary = modelSourcesSummary(ms);
+    assertEq('modelSourcesSummary unique count (dedupe by URL)', summary.totalUnique, 3);
+    assertEq('modelSourcesSummary datapoints count', summary.totalDatapoints, 4);
+    assertEq('modelSourcesSummary I-tier dedup', summary.byTier.I.length, 1);
+    assertEq('modelSourcesSummary I-tier x2 datapoints', summary.byTier.I[0].count, 2);
+
+    // 13c. sources: markdown export contains expected sections
+    State.i18n = { benchmarks: { swePro: { name: 'SWE-bench Pro' }, sweV: { name: 'SWE-bench Verified' } } };
+    State.i18nFallback = State.i18n;
+    const md = buildSourcesMarkdown(ms);
+    assertTrue('markdown includes model name', md.includes('MS'));
+    assertTrue('markdown includes I-tier row', md.includes('**I-tier**'));
+    assertTrue('markdown includes S-tier row', md.includes('**S-tier**'));
+    assertTrue('markdown includes URL angle-brackets', md.includes('<https://y.example>'));
+    assertTrue('markdown includes per-bench section', md.includes('### SWE-bench Pro'));
 
     // 14. integration: live data load (requires HTTP)
     try {

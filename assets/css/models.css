@@ -329,6 +329,60 @@ table#comparison-table .coverage-mini.cov-low { color: var(--danger); border-col
   justify-content: flex-end;
 }
 
+.sources-footer {
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sources-footer .sources-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+.sources-footer .sources-label {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+}
+.sources-footer .sources-count {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+.sources-footer .sources-row {
+  display: grid;
+  grid-template-columns: minmax(72px, auto) 1fr;
+  gap: var(--space-2);
+  align-items: baseline;
+  line-height: 1.45;
+}
+.sources-footer .sources-tier {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.72rem;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+.sources-footer .sources-row.tier-I .sources-tier { color: var(--ok); }
+.sources-footer .sources-row.tier-S .sources-tier { color: var(--warn); }
+.sources-footer .sources-row.tier-C .sources-tier { color: var(--accent-2); }
+.sources-footer .sources-list a {
+  color: var(--accent-2);
+  text-decoration: none;
+}
+.sources-footer .sources-list a:hover { text-decoration: underline; }
+
 /* Contradiction tooltip (JS-positioned) */
 .tooltip {
   position: fixed;

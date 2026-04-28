@@ -51,7 +51,8 @@
       "model": "Save model details as PNG",
       "table": "Save comparison table as PNG",
       "full": "Full page PNG",
-      "fullTooltip": "Save the full page as PNG"
+      "fullTooltip": "Save the full page as PNG",
+      "sources": "Download sources as Markdown"
     },
     "table": {
       "rank": "#",
@@ -130,7 +131,10 @@
     "coverage": "Coverage",
     "coverageTip": "How much of the active profile weight is backed by available bench scores. Composite is reduced by sqrt(coverage) so cherry-picked single-test scores cannot outrank broader, verified ones.",
     "disputed": "disputed",
-    "disputedTip": "Cells in the active preset that have same-tier source disagreement (≥3pp inside one tier on top of the ≥5pp BLOCK threshold). The composite carries a confidence haircut for these — capped at 5pp per cell so a single extreme outlier cannot dominate. Cross-tier disputes (e.g. I-tier vs S-tier) are not counted because autoResolveWinner already picked the higher-trust source."
+    "disputedTip": "Cells in the active preset that have same-tier source disagreement (≥3pp inside one tier on top of the ≥5pp BLOCK threshold). The composite carries a confidence haircut for these — capped at 5pp per cell so a single extreme outlier cannot dominate. Cross-tier disputes (e.g. I-tier vs S-tier) are not counted because autoResolveWinner already picked the higher-trust source.",
+    "sources": "Sources",
+    "sourcesUnique": "unique",
+    "sourcesDatapoints": "datapoints"
   },
   "models": {
     "opus-4-7": {

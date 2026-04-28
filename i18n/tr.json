@@ -51,7 +51,8 @@
       "model": "Model detaylarını PNG olarak kaydet",
       "table": "Karşılaştırma tablosunu PNG olarak kaydet",
       "full": "Tam sayfa PNG",
-      "fullTooltip": "Tüm sayfayı PNG olarak kaydet"
+      "fullTooltip": "Tüm sayfayı PNG olarak kaydet",
+      "sources": "Kaynakları Markdown olarak indir"
     },
     "table": {
       "rank": "#",
@@ -130,7 +131,10 @@
     "coverage": "Kapsam",
     "coverageTip": "Aktif profil ağırlığının ne kadarı mevcut benchmark skorlarıyla destekleniyor. Composite, √kapsam ile çarpılarak az test alıp yüksek skor çıkan modelleri ezmeyen ama avantajını da silen bir ceza uygular.",
     "disputed": "tartışmalı",
-    "disputedTip": "Aktif preset'te aynı-tier kaynaklar arasında uyumsuzluk taşıyan hücre sayısı (≥5pp BLOCK eşiğinin üstünde, tek bir tier içinde ≥3pp). Composite bu hücreler için güven kesintisi içerir — hücre başına maks 5pp, böylece tek bir outlier composite'i ezemez. Cross-tier uyumsuzluklar (örn. I-tier ↔ S-tier) sayılmaz, çünkü autoResolveWinner zaten yüksek-tier kaynağı seçti."
+    "disputedTip": "Aktif preset'te aynı-tier kaynaklar arasında uyumsuzluk taşıyan hücre sayısı (≥5pp BLOCK eşiğinin üstünde, tek bir tier içinde ≥3pp). Composite bu hücreler için güven kesintisi içerir — hücre başına maks 5pp, böylece tek bir outlier composite'i ezemez. Cross-tier uyumsuzluklar (örn. I-tier ↔ S-tier) sayılmaz, çünkü autoResolveWinner zaten yüksek-tier kaynağı seçti.",
+    "sources": "Kaynaklar",
+    "sourcesUnique": "benzersiz",
+    "sourcesDatapoints": "veri noktası"
   },
   "models": {
     "opus-4-7": {
