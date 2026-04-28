@@ -2059,10 +2059,35 @@
       "name": "Ollama Library",
       "url": "https://ollama.com/library",
       "tier": "I",
-      "extracts": "tags, pullCount, architecture, parameters, license, releasedISO",
+      "extracts": "Index page: tags, pullCount, architecture, parameters, license, releasedISO. Per-model detail page (perModelUrlTemplate): vendor-published bench scores in the model description / Tags tab metadata, plus the same metadata fields. Walk per-model for any open-weight model so detail-page bench numbers (e.g., the SWE-bench / LiveCodeBench / Aider tables on https://ollama.com/library/deepseek-v4-pro) are not missed.",
       "phase": "local",
       "format": "static_html_table",
       "extractor": "html_table",
+      "perModelUrlTemplate": "https://ollama.com/library/{slug}",
+      "slugVariations": [
+        "{id}",
+        "{family}-{N}",
+        "{family}{N}",
+        "{family}"
+      ],
+      "publishes": [
+        "swePro",
+        "sweV",
+        "sweMulti",
+        "lcbV6",
+        "tb2",
+        "tau2",
+        "mcpA",
+        "bfcl",
+        "aider",
+        "gpqa",
+        "aime26",
+        "hle",
+        "aaCoding",
+        "aaAgentic",
+        "aaIdx",
+        "aaOmni"
+      ],
       "fallbacks": [
         {
           "format": "static_html_article"

@@ -675,17 +675,20 @@ Other quants:
 **MoE:** total params for VRAM, active for tok/s.
 
 ## OLLAMA_PAGE_PARSING
-URL: `https://ollama.com/library/<id>` or `<id>:<tag>`
-| field | location |
-|-------|----------|
-| pullCmd | top code block |
-| tags[] | "Tags" tab table |
-| pullCount | header right badge |
-| architecture | "Models" section |
-| parameters | "Models" section |
-| context | "Models" section |
-| license | "Models" section |
-| releasedISO | tags last updated max |
+URL: `https://ollama.com/library/<id>` or `<id>:<tag>` (per `local[0].perModelUrlTemplate` in the whitelist; iterated in PER_MODEL_URL_EXPANSION step 2 for every open-weight model).
+| field | location | notes |
+|-------|----------|-------|
+| pullCmd | top code block | exact `ollama pull <id>:<tag>` string |
+| tags[] | "Tags" tab table | one entry per quant variant |
+| pullCount | header right badge | "X.YM pulls" |
+| architecture | "Models" section | MoE / Dense |
+| parameters | "Models" section | "<n>B" or "<n>B / <n>B active" |
+| context | "Models" section | numeric tokens |
+| license | "Models" section | string (Modified MIT, Apache-2.0, …) |
+| releasedISO | tags "last updated" max | most recent tag's date |
+| bench scores | "Models" / model description block (markdown rendered) + Tags tab metadata | Treat the description block as `static_html_article`: run the bench-name alias table (EXTRACTION_DISCIPLINE row 5) over every paragraph. Capture every `(<bench_alias>, <numeric>)` pair the markdown surfaces — vendors frequently embed SWE-bench / LiveCodeBench / Aider / GPQA tables here when their official blog is bot-blocked or image-only. Tier=I (Ollama is an independent catalog; the value originated from the vendor but is being mirrored by an aggregator) → trustScore = 1.0 × verifications/3 × recency. |
+
+**Mandatory: when iterating an Ollama detail page in PER_MODEL_URL_EXPANSION step 2b, the agent extracts BOTH metadata fields above AND every bench score the description block surfaces. Skipping the bench pass is a contract violation that the PRE_EMIT_SELF_AUDIT will catch on any cell that should have been filled here.**
 
 ## EXAMPLES
 
@@ -967,18 +970,26 @@ For each empty bench cell on a model:
     Fetch entry.url for every leaderboard whose publishes[] includes <benchKey>.
     Tier-assign per whitelist; emit if found.
 
-  Step 2 — Per-model leaderboard page (NEW — load-bearing):
-    For every leaderboard entry that has a non-null `perModelUrlTemplate`:
+  Step 2 — Per-model leaderboard / local-catalog page (NEW — load-bearing):
+    Iterate two source families with `perModelUrlTemplate`:
+      a. Every `leaderboards[]` entry with a non-null `perModelUrlTemplate`.
+      b. Every `local[]` entry (e.g., Ollama Library) with a non-null
+         `perModelUrlTemplate` AND `publishes[]` includes <benchKey>.
+         Local detail pages (e.g., https://ollama.com/library/deepseek-v4-pro)
+         carry vendor-published bench tables in the description block + Tags
+         tab — high-recall source for open-weight models. Apply step 2 to
+         them for any model whose `tier ∈ {open-flagship, coder-specialized,
+         gemma, ollama-local}` OR whose `open === true`.
+    For each iterated entry:
       For each variant in `slugVariations` (ordered):
         slug := variant.replace('{id}', model.id)
                        .replace('{family}', stripVersion(model.id))
                        .replace('{N}', majorVersion(model.id))
         url := perModelUrlTemplate.replace('{slug}', slug)
         fetch(url) — count toward triedSources[]
-        if 200 + extractable: emit + break (this leaderboard done)
+        if 200 + extractable: emit + break (this entry done)
         if 404: continue to next variation
       if all variations 404: log to triedSources[] with status, move on
-    Cap: max 4 variations per leaderboard per model (cost control).
 
   Step 3 — Vendor model card / blog post (NEW):
     For the model's vendor (resolved via model.provider → vendors.<vid>):
