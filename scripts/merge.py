@@ -100,12 +100,22 @@ def apply_model_update(model, updates):
         elif k == "bench" and isinstance(v, dict):
             if "bench" not in model:
                 model["bench"] = {}
+            if "benchUpdated" not in model or not isinstance(
+                model.get("benchUpdated"), dict
+            ):
+                model["benchUpdated"] = {}
             for bk, bv in v.items():
                 if isinstance(bv, dict) and "value" in bv:
                     bv = bv["value"]
-                if bv is not None and model["bench"].get(bk) != bv:
+                # Per-cell lastUpdated: stamp ONLY when the agent successfully
+                # extracted a value for this (model, bench) pair this cycle.
+                # Null / missing returns leave the prior date untouched.
+                if bv is None:
+                    continue
+                if model["bench"].get(bk) != bv:
                     model["bench"][bk] = bv
                     touched = True
+                model["benchUpdated"][bk] = TODAY
         elif k == "ollama" and isinstance(v, dict):
             model["ollama"] = v
             touched = True
@@ -115,8 +125,15 @@ def apply_model_update(model, updates):
             if model.get(k) != v:
                 model[k] = v
                 touched = True
-    if touched:
+    # Model-level lastUpdated derives from benchUpdated values + scalar touches.
+    bu = model.get("benchUpdated")
+    bench_max = max(bu.values()) if isinstance(bu, dict) and bu else None
+    if touched and bench_max:
+        model["lastUpdated"] = max(model.get("lastUpdated") or "", bench_max)
+    elif touched:
         model["lastUpdated"] = TODAY
+    elif bench_max:
+        model["lastUpdated"] = max(model.get("lastUpdated") or "", bench_max)
     return touched
 
 
@@ -212,6 +229,26 @@ def _build_bench_advertised_count():
     return counts
 
 
+def _load_bench_key_universe():
+    """Bench-key universe = whitelist._schema.coreBenchKeys ∪ every
+    leaderboard's publishes[] entry. Loaded fresh from whitelist on each
+    merge run so a leaderboard adding a new bench key in publishes[] flows
+    through automatically."""
+    try:
+        with open(WHITELIST, encoding="utf-8") as fp:
+            wl = json.load(fp)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return set()
+    universe = set()
+    schema = wl.get("_schema") or {}
+    for k in schema.get("coreBenchKeys", []) or []:
+        universe.add(k)
+    for lb in wl.get("leaderboards", []) or []:
+        for k in lb.get("publishes", []) or []:
+            universe.add(k)
+    return universe
+
+
 def _extract_bench_key(g):
     """Gap may carry `field` (bare or 'bench.X' form) or legacy `key` of
     'modelId.bench.X'. Normalize to bare bench key."""
@@ -222,27 +259,22 @@ def _extract_bench_key(g):
 
 
 def validate_gaps(out):
-    """GAP_VALIDITY_GATE per agent spec (2026-04-27, adaptive 2026-04-27 rev).
+    """GAP_VALIDITY_GATE — audit-only (reformed 2026-04-28).
 
-    Adaptive gate: every gaps[] entry MUST carry triedSources >=
-        clamp(advertised_high_weight_sources_for_bench, 3, 5)
-    (plus triedQueries>=2, triedFormats>=2 from the original contract).
+    Earlier behaviour stripped gaps[] entries whose triedSources count fell
+    below clamp(advertised_high_weight, 3, 5). That pressured the agent to
+    silently omit hard-to-reach pairs rather than transparently log them.
 
-    Rationale: with 31 of 34 leaderboards now carrying populated publishes[],
-    a flat "tried 2 sources" floor lets the agent declare "no data" while
-    leaving 6+ advertised high-weight leaderboards untouched. The adaptive
-    floor scales effort with available routing options:
-      - rare bench (1 advertised): require 3 attempts (general low bar)
-      - common bench (5+ advertised): require 5 attempts (cap)
-      - cap=5 to avoid runaway fetch budget on saturated benches.
+    The reform: NEVER strip a gap. Every gaps[] entry is preserved exactly as
+    the agent emitted it. The function still walks the list to compute a
+    "low-effort suspicion" record so a human reviewer can spot gaps that
+    deserved more effort, but the gap stays.
 
-    Entries failing the gate are stripped, logged to runtime.fabricatedGaps,
-    and counted under runtime.contractViolations.
+    Returns the suspicion list (audit) for the orchestrator's diff summary.
     """
     bench_advertised = _build_bench_advertised_count()
     raw = out.get("gaps", []) or []
-    valid = []
-    fabricated = []
+    suspicions = []
     for g in raw:
         ts = g.get("triedSources") or []
         tq = g.get("triedQueries") or []
@@ -251,11 +283,11 @@ def validate_gaps(out):
 
         bench_key = _extract_bench_key(g)
         n_advertised = bench_advertised.get(bench_key, 0)
-        # adaptive floor: 3 minimum, scale with advertised, cap at 5
-        min_required = min(max(n_advertised, 3), 5)
+        # advisory floor (3 minimum, scale with advertised, cap at 5)
+        suggested_floor = min(max(n_advertised, 3), 5)
 
-        if ts_n < min_required:
-            fabricated.append(
+        if ts_n < suggested_floor:
+            suspicions.append(
                 {
                     "modelId": g.get("modelId"),
                     "field": g.get("field"),
@@ -267,19 +299,13 @@ def validate_gaps(out):
                         "triedFormats": tf_n,
                     },
                     "n_advertised": n_advertised,
-                    "min_required": min_required,
+                    "suggested_floor": suggested_floor,
                 }
             )
-        else:
-            valid.append(g)
-    out["gaps"] = valid
     runtime = out.setdefault("runtime", {})
-    if fabricated:
-        runtime["contractViolations"] = runtime.get("contractViolations", 0) + len(
-            fabricated
-        )
-        runtime.setdefault("fabricatedGaps", []).extend(fabricated)
-    return fabricated
+    if suspicions:
+        runtime.setdefault("fabricatedSuspicions", []).extend(suspicions)
+    return suspicions
 
 
 def append_source(sources, key, entry):
@@ -301,7 +327,7 @@ def main():
     with open(ARTIFACT, encoding="utf-8") as fp:
         out = json.load(fp)
 
-    fabricated_gaps = validate_gaps(out)
+    fabricated_suspicions = validate_gaps(out)
 
     models_path = f"{PROJECT}/data/models.json"
     sources_path = f"{PROJECT}/data/sources.json"
@@ -324,7 +350,7 @@ def main():
         "sources_appended": 0,
         "format_warnings": [],
         "gaps": [],
-        "fabricated_gaps": fabricated_gaps,
+        "fabricated_suspicions": fabricated_suspicions,
     }
 
     for upd in out.get("models", []):
@@ -359,24 +385,7 @@ def main():
             models.append(nm)
             log["added"].append(nm["id"])
 
-    BENCH_KEYS = {
-        "sweV",
-        "swePro",
-        "tb2",
-        "lcbV6",
-        "aider",
-        "tau2",
-        "aaCoding",
-        "aaAgentic",
-        "mcpA",
-        "bfcl",
-        "aime26",
-        "aaOmni",
-        "gpqa",
-        "sweMulti",
-        "hle",
-        "aaIdx",
-    }
+    BENCH_KEYS = _load_bench_key_universe()
     for c in out.get("contradictions", []) or []:
         mid = c["modelId"]
         field = c["field"]
@@ -396,8 +405,13 @@ def main():
         if m is not None and bench_field in BENCH_KEYS:
             if "bench" not in m:
                 m["bench"] = {}
+            if "benchUpdated" not in m or not isinstance(m.get("benchUpdated"), dict):
+                m["benchUpdated"] = {}
+            prev_value = m["bench"].get(bench_field)
             m["bench"][bench_field] = winner_value
-            m["lastUpdated"] = TODAY
+            m["benchUpdated"][bench_field] = TODAY
+            if prev_value != winner_value:
+                m["lastUpdated"] = TODAY
         key = f"{mid}.{bench_field}"
         for cand in c.get("candidates", []) or []:
             append_source(
@@ -456,7 +470,11 @@ def main():
     cov_pct = round(coverage * 100, 1)
     coverage_warn = ""
     if coverage < 0.50:
-        coverage_warn = f" [WARN: partial coverage {cov_pct}%]"
+        coverage_warn = f" [WARN: very low cumulative provenance coverage {cov_pct}%]"
+    elif coverage < 0.85:
+        coverage_warn = (
+            f" [WARN: cumulative provenance coverage {cov_pct}% below 85% target]"
+        )
 
     cl_path = f"{PROJECT}/CHANGELOG.md"
     cl_lines = [f"\n## [{TODAY}] — autonomous refresh-all{coverage_warn}\n"]
@@ -514,17 +532,18 @@ def main():
             print(f"    - {w}")
         if len(log["format_warnings"]) > 5:
             print(f"    - ... and {len(log['format_warnings']) - 5} more")
-    if log.get("fabricated_gaps"):
-        n = len(log["fabricated_gaps"])
+    if log.get("fabricated_suspicions"):
+        n = len(log["fabricated_suspicions"])
         print(
-            f"  fabricated gaps stripped: {n} (adaptive GAP_VALIDITY_GATE — "
-            f"required triedSources = clamp(advertised_high_weight, 3, 5))"
+            f"  low-effort gap suspicions: {n} (advisory only — "
+            f"suggested triedSources = clamp(advertised_high_weight, 3, 5)). "
+            f"Originals retained in gaps[]."
         )
-        for fg in log["fabricated_gaps"][:8]:
+        for fg in log["fabricated_suspicions"][:8]:
             print(
                 f"    - {fg.get('modelId')}.{fg.get('bench_key', fg.get('field'))}: "
                 f"triedSources={fg['counts']['triedSources']} "
-                f"required>={fg.get('min_required', 3)} "
+                f"suggested>={fg.get('suggested_floor', 3)} "
                 f"(advertised_high_weight={fg.get('n_advertised', 0)})"
             )
         if n > 8:

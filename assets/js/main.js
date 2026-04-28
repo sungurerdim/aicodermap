@@ -140,6 +140,10 @@ async function bootstrapGpu() {
 }
 
 async function bootstrap() {
+  // Single page-load cache-bust token applied to every JSON fetch (data + i18n)
+  // so GitHub Pages CDN cannot serve stale data after a refresh push. Same
+  // token across every fetch keeps the page's view internally consistent.
+  window.__ACM_CACHE_BUST__ = String(Date.now());
   bootstrapTheme();
   bootstrapPrefs();
   await bootstrapI18n();

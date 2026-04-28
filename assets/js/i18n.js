@@ -48,11 +48,14 @@ export function applyI18n(root) {
 
 // Module-relative so it works from any HTML entry point (index.html, smoke.html).
 const I18N_BASE = new URL('../../i18n/', import.meta.url);
+const FALLBACK_BUST = String(Date.now());
 
 export async function loadI18n(lang) {
   try {
-    const url = new URL(`${lang}.json`, I18N_BASE);
-    const res = await fetch(url, { cache: 'no-cache' });
+    const bust = (typeof window !== 'undefined' && window.__ACM_CACHE_BUST__)
+      || FALLBACK_BUST;
+    const url = new URL(`${lang}.json?v=${encodeURIComponent(bust)}`, I18N_BASE);
+    const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) throw new Error('i18n fetch failed');
     return await res.json();
   } catch (_) {

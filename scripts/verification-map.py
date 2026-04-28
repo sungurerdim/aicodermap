@@ -1,16 +1,25 @@
 #!/usr/bin/env python3
-"""Verification-map manager for SOURCE_FIRST_SWEEP cross-cycle cache.
+"""Verification-map manager — historical audit log (reformed 2026-04-28).
 
 Two operations:
   - `update`: read .aicodermap-agent-out.json sourcesAdded[] across all
-    models, group by (modelId, benchKey), append fresh provenance entries
-    to the verification map, recompute `confirmed` flag per cell.
+    models, group by (modelId, benchKey), append NEW provenance entries
+    (deduped by url) to the audit log, recompute `confirmed` flag per cell.
   - `read`:  print the map (for skill orchestrator inline injection into
     idea_context).
 
+The `confirmed` flag is AUDIT-ONLY — used for contradiction analysis and
+human review. Neither the agent nor the orchestrator reads it to skip a
+fetch (every cell is re-fetched every cycle per the UNCAPPED + UNCACHED
+doctrine).
+
 Cell becomes confirmed when:
-  - verifications.length >= CONFIRMED_SKIP_THRESHOLD (3)
+  - verifications.length >= 3
   - all values agree within VERIFICATION_AGREEMENT_PP (1.5pp absolute)
+
+`lastChecked` is updated to TODAY only when at least one new verification
+was appended this cycle (i.e., a successful fetch contributed). Cycles
+that produced no new verification for a cell leave `lastChecked` alone.
 
 Map shape (canonical, mirrored in agent.md DATA_CONTRACT):
   {
@@ -36,7 +45,9 @@ PROJECT = Path(__file__).resolve().parent.parent
 ARTIFACT = PROJECT / ".aicodermap-agent-out.json"
 MAP_PATH = PROJECT / ".aicodermap-verification-map.json"
 
-CONFIRMED_SKIP_THRESHOLD = 3
+VERIFICATION_AGREEMENT_THRESHOLD = (
+    3  # number of agreeing sources before audit-only `confirmed=true`
+)
 VERIFICATION_AGREEMENT_PP = 1.5
 TODAY = date.today().isoformat()
 
@@ -95,7 +106,9 @@ def update_map():
                     "lastChecked": TODAY,
                 },
             )
-            # Append this verification (dedupe by url)
+            # Append this verification (dedupe by url). lastChecked stamps
+            # only when a NEW verification actually lands this cycle — empty
+            # cycles leave the prior date intact (per-cell freshness contract).
             url = src.get("url", "")
             existing_urls = {v.get("url") for v in cell["verifications"]}
             if url not in existing_urls:
@@ -109,7 +122,7 @@ def update_map():
                     }
                 )
                 appended += 1
-            cell["lastChecked"] = TODAY
+                cell["lastChecked"] = TODAY
 
     # Recompute confirmed flag per cell
     confirmed_count = 0
@@ -117,7 +130,7 @@ def update_map():
     for cell_key, cell in cells.items():
         verifs = cell.get("verifications", [])
         values = [v.get("value") for v in verifs if v.get("value") is not None]
-        if len(verifs) >= CONFIRMED_SKIP_THRESHOLD and values_agree(values):
+        if len(verifs) >= VERIFICATION_AGREEMENT_THRESHOLD and values_agree(values):
             cell["confirmed"] = True
             # Use median as canonical value
             nums = sorted(v for v in values if isinstance(v, (int, float)))
@@ -156,6 +169,26 @@ def read_map():
     return 0
 
 
+def _load_bench_key_universe():
+    """Bench-key universe = whitelist._schema.coreBenchKeys ∪ every
+    leaderboard's publishes[] entry. Mirrors merge.py."""
+    wl_path = PROJECT / "data" / "sources-whitelist.json"
+    if not wl_path.exists():
+        return set()
+    try:
+        wl = json.loads(wl_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return set()
+    universe = set()
+    schema = wl.get("_schema") or {}
+    for k in schema.get("coreBenchKeys", []) or []:
+        universe.add(k)
+    for lb in wl.get("leaderboards", []) or []:
+        for k in lb.get("publishes", []) or []:
+            universe.add(k)
+    return universe
+
+
 def bootstrap_from_sources():
     """Rebuild verification map from data/sources.json (the on-disk provenance
     log accumulated across all prior cycles). Use once when introducing the
@@ -166,6 +199,7 @@ def bootstrap_from_sources():
         return 1
     sources = json.loads(sources_path.read_text(encoding="utf-8"))
     cells = {}
+    bench_keys = _load_bench_key_universe()
     for key, entries in sources.items():
         # key: "<modelId>.<benchKey>" or "<modelId>.bench.<benchKey>" or other (pricing.api etc.)
         if not isinstance(entries, list):
@@ -176,25 +210,7 @@ def bootstrap_from_sources():
             continue
         mid, bk = parts
         # Skip non-bench fields — only known bench keys go in the verification map
-        BENCH_KEYS = {
-            "swePro",
-            "sweV",
-            "tb2",
-            "lcbV6",
-            "aider",
-            "tau2",
-            "aaCoding",
-            "aaAgentic",
-            "mcpA",
-            "gpqa",
-            "sweMulti",
-            "hle",
-            "aaIdx",
-            "bfcl",
-            "aime26",
-            "aaOmni",
-        }
-        if bk not in BENCH_KEYS:
+        if bk not in bench_keys:
             continue
         cell = cells.setdefault(
             f"{mid}.{bk}",
@@ -225,7 +241,7 @@ def bootstrap_from_sources():
     for cell in cells.values():
         verifs = cell["verifications"]
         values = [v["value"] for v in verifs if v["value"] is not None]
-        if len(verifs) >= CONFIRMED_SKIP_THRESHOLD and values_agree(values):
+        if len(verifs) >= VERIFICATION_AGREEMENT_THRESHOLD and values_agree(values):
             cell["confirmed"] = True
             nums = sorted(v for v in values if isinstance(v, (int, float)))
             cell["value"] = nums[len(nums) // 2] if nums else None

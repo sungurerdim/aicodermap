@@ -21,6 +21,12 @@
       "lastVerifiedDate": "ISO date URL last verified reachable.",
       "consecutiveFailures": "Integer; ≥3 → auto-demote to spa_full + _runtime.unhealthy."
     },
+    "coreBenchKeys": [
+      "swePro", "sweV", "tb2", "lcbV6", "aider", "tau2",
+      "aaCoding", "aaAgentic", "mcpA", "gpqa", "sweMulti", "hle",
+      "aaIdx", "bfcl", "aime26", "aaOmni"
+    ],
+    "benchKeysUsage": "Universe of bench keys = coreBenchKeys ∪ leaderboards[].publishes[]. New leaderboards extending publishes[] auto-extend the universe. Frontend BENCH_KEYS in assets/js/core.js mirrors coreBenchKeys; if you add a new core key here, add it to assets/js/core.js too.",
     "formatTaxonomy": {
       "static_html_table": {
         "description": "HTML page with <table> rows + scores",

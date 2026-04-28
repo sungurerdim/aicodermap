@@ -24,6 +24,16 @@ Aggregate AI coding LLM data: bench scores, multi-provider pricing, Ollama metad
    - `RENAMED`: vendor canonical id differs from data id → emit `lineupChanges.renamed[{from, to, evidenceUrl}]`
    - `REMOVED`: in data, completely absent from vendor page → emit `lineupChanges.removed[]`
 5. Return the lineup diff in the output JSON's `lineupChanges` field
+6. **Mandatory emission contract (added 2026-04-28):**
+   - `lineup` MUST be a non-empty object — at minimum, every vendor that
+     responded with HTTP 200 contributes one entry, even if the active list
+     is unchanged from the prior cycle. An empty `{}` is a contract violation.
+   - For every vendor URL that 4xx/5xx'd or timed out, emit a
+     `gaps[]` entry `lineup:<vendor>: unreachable: <reason>` AND a
+     `runtime.fetchErrors[]` entry — silent omission is forbidden.
+   - `runtime.healthChecks` MUST cover at least 3 leaderboard domains with
+     `{status, observedFormat}` entries; emit `gaps[]` entries for any
+     leaderboard whose probe failed.
 
 Phase 0 fetches do NOT count against the per-model fetch budget; they are skill-level overhead.
 
@@ -55,14 +65,15 @@ include_unsloth: <bool default:true>
 trusted_sources_only: <bool default:true>
 parallel_sources: <int default:5>          # parallelism, NOT a cap
 parallel_models: <int default:5>           # parallelism, NOT a cap
-confirmed_skip_threshold: <int default:3>  # cells with >=3 cross-source verifications skip re-verify
-verification_map_path: ".aicodermap-verification-map.json"
+verification_map_path: ".aicodermap-verification-map.json"  # tarihsel audit + contradiction analiz cache; SKIP kararı vermez
 trust_score_required: <bool default:true>
 termination: "completeness"                # explicit doctrine — see SKILL.md COMPLETENESS_TERMINATION
-# UNCAPPED RESEARCH: no fetch_budget, no wallclock_budget. Agent walks every
-# advertised source, attempts every reachable per-model URL + vendor card,
-# exhausts every documented fallback, and only stops when COMPLETENESS_TERMINATION
-# holds (all sources visited + all reachable cells attempted + all gaps documented).
+# UNCAPPED RESEARCH (2026-04-28 reform): no fetch_budget, no wallclock_budget,
+# NO confirmed-cell skip. Every cycle re-attempts every (modelId, benchKey)
+# cell from every advertised source — vendor scores can change overnight, so
+# stale "confirmed=true" caching contradicts the freshness contract. The
+# verification map is now audit-only (historical record + contradiction
+# analysis); it never short-circuits a fetch.
 ```
 
 ## TRUSTED_SOURCE_WHITELIST (`trusted_sources_only=true` enforces these)
@@ -164,7 +175,7 @@ The single biggest source of data loss in prior runs was a single mega-regex doi
 
 4. **Locale decimal disambiguation** (post-capture, not in pattern): per `regexLibrary._localeDecimalRule` — handles `87.6`, `87,6`, `1,234.56`, `1.234,56`, `1 234,56` (BIPM thin-space + EU decimal). Apply ONLY to captured numeric strings, never inside the pattern.
 
-5. **Bench alias table** (the only hardcoded discrimination still permitted in the agent — keeps human-readable bench names mapped to the 16-key schema):
+5. **Bench alias table** (the only hardcoded discrimination still permitted in the agent — keeps human-readable bench names mapped to the dynamic bench universe = `idea_context.sourcesWhitelist._schema.coreBenchKeys ∪ leaderboards[].publishes[]`):
    - SWE-bench Pro / SEAL Pro / SWE Pro → swePro
    - SWE-bench Verified / SWE-V → sweV
    - SWE-bench Multilingual / Multi-SWE → sweMulti
@@ -197,10 +208,10 @@ Some vendor announcement pages (notably Anthropic, OpenAI, DeepMind) embed bench
 5. Orchestrator writes findings into `.aicodermap-agent-out.json` for normal merge.py flow.
 
 **Empirical finding (2026-04-26):** Anthropic announcement blog charts mostly carry vendor-AUXILIARY benchmarks (OfficeQA Pro, GraphWalks, ScreenSpot-Pro, GDPVal-AA Elo, Vending-Bench, STEM win-rate). Standard cross-vendor benches (SWE-bench Verified, GPQA, HLE, Terminal-Bench, LCB v6, tau-bench, MCP-Atlas) are typically in the page TEXT (lead summary) or on independent leaderboards, not these images. Image OCR is therefore most valuable for:
-- New-release auxiliary benchmarks the user wants tracked outside the 13-key schema
+- New-release auxiliary benchmarks the user wants tracked outside the core bench universe
 - Edge cases where vendor publishes ONLY the chart and no text summary
 
-For the standard 13-key benches, prefer text extraction + leaderboards over image OCR.
+For the bench-key universe (whitelist `_schema.coreBenchKeys` ∪ `leaderboards[].publishes[]`), prefer text extraction + leaderboards over image OCR.
 
 ## FORMAT_DISPATCH (data-driven adapter selection — replaces hardcoded SPA detection)
 
@@ -429,7 +440,24 @@ ties: prefer I-tier, then most recent, then highest verifications
 
 ## VALIDATION_RULES
 1. **Triangulation**: bench score requires ≥2 independent source. Single = tier="S" + emit gaps[]
-2. **Coverage**: validationCoverage = (scores_with_≥2_source) / total_scores. Skill triggers deep-fetch if <0.95 (NOT a block)
+2. **Coverage** (cumulative — reformed 2026-04-28):
+   ```
+   total_universe = |active_models| × |bench_keys_universe|
+   bench_keys_universe = ∪ leaderboard.publishes[] over whitelist.leaderboards[]
+                        ∪ whitelist._schema.coreBenchKeys
+
+   cells_with_>=2_sources_total = COUNT(key in data/sources.json
+                                        WHERE distinct(url) >= 2
+                                        AND key matches "<modelId>.<benchKey>")
+
+   cells_attempted_this_cycle   = SET(sourcesAdded[].key for entry in this artifact
+                                      restricted to "<modelId>.<benchKey>" form)
+
+   validationCoverage = (cells_with_>=2_sources_total + |cells_attempted_this_cycle|)
+                        / total_universe
+   ```
+   This is the cumulative provenance coverage: cells that have ≥2 historical sources count, plus cells the current cycle attempted (whether or not it found new sources). The number stays high even when an individual cycle finds few brand-new sources, because the historical evidence base remains.
+   Skill treats `<COVERAGE_DEEPEN_THRESHOLD` as advisory (logs warning, never blocks); `<COVERAGE_HARD_BLOCK` (0.50) appends a CHANGELOG note but still commits.
 3. **Recency**: pricing source >30d old + disagreeing source → fresher source contributes higher trustScore
 4. **Bias**: provider self-claim always tier="S"; require independent corroboration
 5. **i18n**: provide both `tr` + `en` strengths/weaknesses (compound moat A) — for EVERY surveyed model
@@ -580,7 +608,7 @@ For each (modelId, field) still null after the primary fetch:
 Phase 1+2+3 update — WebSearch precedes WebFetch:
 
 For each model surveyed:
-  for each empty bench cell (every key in 16-key whitelist that's null/undefined):
+  for each bench cell (every key in the dynamic bench-key universe — null, stale, or already-populated all re-fetched per UNCAPPED + UNCACHED doctrine):
     query := f'"{modelName}" benchmark "{benchKeyHumanName}" 2026'
     results := WebSearch(query)
     extract every (bench, value) pair the AI summary surfaces
@@ -609,46 +637,27 @@ This replaces the prior hardcoded I/S/C domain tables. Adding a new aggregator =
 
 If both queries return zero useful (bench, score) pairs, the agent has already exhausted the fallback chain (per FORMAT_DISPATCH cascade). Only then is `gaps[]` emission permitted, and the entry MUST carry `triedFormats[]` + `triedPatterns[]` + `triedSources[]` + `triedQueries[]`.
 
-## GAP_VALIDITY_GATE (hard contract — added 2026-04-27)
+## GAP_VALIDITY_GATE (advisory audit only — reformed 2026-04-28)
 
-**Why this section exists:** The 2026-04-27 cycle 1 emitted 6 gaps with `triedSources: []` and 9 more with only 1–2 entries. Several "no data found" claims for legacy/deprecated models (`o3.sweV`, `deepseek-r1-14b.sweV`, `qwen25-coder-7b.sweV`, `gemma-4-31b.sweV`, etc.) were emitted without any fetch attempt — i.e., fabricated based on prior assumption. **This is a contract violation.**
+**Why this section exists:** Earlier cycles stripped gap entries that failed an adaptive triedSources floor. Operationally that meant "if you can't try ≥3 sources, don't even report the gap" — which pressured the agent to silently omit hard-to-reach pairs rather than transparently log them. **The user's policy reform: every fetch attempt + every reachable bit of provenance is useful information; never strip a gap.**
 
-**Hard rule — every `gaps[]` entry MUST satisfy (adaptive 2026-04-27 rev):**
+**Reformed rule (2026-04-28):**
 
-```
-gap.triedSources.length      >= clamp(advertised_high_weight_for_bench, 3, 5)
-gap.triedQueries.length      >= 2     (the 2 mandatory WebSearch queries above)
-gap.triedFormats.length      >= 2     (primary format + ≥1 documented fallback)
-```
+- `gaps[]` entries are NEVER stripped by the orchestrator.
+- The orchestrator's `validate_gaps()` walks every entry in advisory mode: it computes a "low-effort suspicion" score (gap.triedSources.length vs. clamp(advertised_high_weight_for_bench, 3, 5)) and flags entries that fall below the threshold by appending them to `runtime.fabricatedSuspicions[]` for human audit. The original entry stays in `gaps[]` regardless.
+- `runtime.contractViolations` is no longer incremented; the concept is retired (the agent isn't "violating a contract" by reporting whatever it actually tried).
 
-**Adaptive triedSources floor**: prior contract used a flat `>=2`. With 31 of
-34 leaderboards now carrying populated `publishes[]`, a flat 2 was a fiction —
-agent could declare "no data" while leaving 6+ advertised high-weight sources
-untouched. The new rule scales effort with available routing options:
+**Practical effect for the agent:** still try as many sources as feasible per gap (the cascade discipline below remains in effect — it's the right default), but the agent is no longer punished for reporting a gap with only one or two triedSources. Reporting a partial-effort gap is strictly better than omitting it.
 
-| advertised_high_weight | required triedSources |
-|---|---|
-| 0–3 (rare/proprietary bench, e.g. aaCoding/aaAgentic/bfcl) | 3 (general low bar) |
-| 4 (e.g. swePro, aider) | 4 |
-| 5+ (sweV=10, lcbV6=8, gpqa=6, tb2=6, hle=5) | 5 (cap) |
+**Audit reference (kept for human reviewers eyeballing the diff log):**
 
-Per-bench advertised counts are computed at gate-evaluation time from
-`data/sources-whitelist.json` `leaderboards[].publishes[]` × `format` weight
-(>=0.7 = high-weight). The orchestrator's `scripts/merge.py` `validate_gaps()`
-performs the lookup and strips entries failing the adaptive floor.
+| advertised_high_weight | suggested triedSources floor | low-effort flag if below |
+|---|---|---|
+| 0–3 (rare/proprietary bench, e.g. aaCoding/aaAgentic/bfcl) | 3 (general low bar) | yes |
+| 4 (e.g. swePro, aider) | 4 | yes |
+| 5+ (sweV=10, lcbV6=8, gpqa=6, tb2=6, hle=5) | 5 (cap) | yes |
 
-Practical effect: when the agent is about to emit a gap for `lcbV6` (8
-advertised high-weight sources), it MUST have tried at least 5 of them
-(BenchLM, Epoch, llm-stats, llm-stats LCB, EvalPlus, Papers with Code,
-LiveBench, BigCodeBench, etc.). Only then is "data not found" a defensible
-bookkeeping claim.
-
-A gap entry that fails any of these three counts is a **fabricated gap** and is REJECTED by the orchestrator's defensive validator (`scripts/merge.py` `validate_gaps()`). The orchestrator's behaviour on rejection:
-
-1. **Strip the fabricated gap from `out.gaps[]`** so it does not pollute the next-cycle retry queue.
-2. **Log the violation** to `~/.aicodermap-debug.log` with the (modelId, field) pair and counts.
-3. **Force-queue that pair into the deep-fetch retry list** for the SAME cycle — the orchestrator dispatches a fresh deep-fetch agent to actually attempt the pair before moving on.
-4. **Increment `runtime.contractViolations`** in the artifact so violations surface in the diff summary.
+Per-bench advertised counts are computed at gate-evaluation time from `data/sources-whitelist.json` `leaderboards[].publishes[]` × `format` weight (>=0.7 = high-weight). The audit log surfaces them so reviewers can see whether a gap deserved more effort.
 
 **Status of "data does not exist" claims:** the agent NEVER asserts non-existence. Its only honest options are:
 
@@ -660,17 +669,21 @@ A legacy/deprecated model still gets the same treatment: try the canonical histo
 
 ## SOURCE_FIRST_SWEEP (Phase 1 primary mining — added 2026-04-27 rev2)
 
-**Why this section exists:** prior phases iterated **per-model** (for each model, walk all sources). With 53 models × 5+ sources × 16 benches, this scaled poorly: per-model cascade was verification-blind and cache-unaware. Cycle 4 used only ~32 of a possible 600+ fetches because effort caps fired before saturation; cycle 5 used only 8 fetches because per-source caps capped the sweep. **2026-04-27 rev3 retires all effort caps**: the agent now walks **each source ONCE**, extracts every (modelId, benchKey, value) tuple visible on that page in one pass, then chases unfilled cells through the full Phase 2 cascade until COMPLETENESS_TERMINATION holds. No fetch budget, no wallclock budget — research runs until structurally complete.
+**Why this section exists:** prior phases iterated **per-model** (for each model, walk all sources). With 53 models × 5+ sources × 16 benches, this scaled poorly: per-model cascade was verification-blind and cache-unaware. Cycle 4 used only ~32 of a possible 600+ fetches because effort caps fired before saturation; cycle 5 used only 8 fetches because per-source caps capped the sweep. **2026-04-27 rev3 retires all effort caps**: the agent walks **each source ONCE**, extracts every (modelId, benchKey, value) tuple visible on that page in one pass, then chases unfilled cells through the full Phase 2 cascade until COMPLETENESS_TERMINATION holds. **2026-04-28 reform additionally retires the confirmed-cell skip** — vendors update scores between cycles, so persistent "confirmed → skip" caching froze stale data. Every cycle now re-extracts every (modelId, benchKey) cell from every advertised source. The verification map remains as a historical / contradiction-analysis log only; it never short-circuits a fetch.
 
 **Mandatory protocol on `scope=full`:**
 
 ```
 0. Load priors:
    verification_map := READ (project_root)/.aicodermap-verification-map.json
-                       (gitignored cache; per-cell { value, verifications[], confirmed })
+                       (gitignored audit log; per-cell history of past verifications.
+                        NEVER read for skip decisions — informational only)
    active_models    := from idea_context.currentIds
-   target_cells     := { (model.id, benchKey) | bench is empty in models.json
-                                                AND not confirmed in verification_map }
+   target_cells     := { (model.id, benchKey) | benchKey ∈ bench_keys_universe }
+                       (every active model × every bench key, every cycle —
+                        no skip based on prior confirmation; no skip based on
+                        existing non-null value either, because the underlying
+                        vendor figure may have changed)
 
 1. Build tier-prioritised source queue from sources-whitelist.json:
    tier I  (independent leaderboard, format-weight >= 0.7):
@@ -696,18 +709,18 @@ A legacy/deprecated model still gets the same treatment: try the canonical histo
    b) Extract every (modelId, benchKey, value) tuple visible on the page.
       Match modelId against active_models[] using SLUG_RESOLUTION (vendorPrefixMap +
       vendorSuffixMap + slugVariations); match benchKey against entry.publishes[]
-      (or, if publishes[] is empty/unknown, against the canonical 16-key set).
+      (or, if publishes[] is empty/unknown, against the dynamic bench universe =
+      `_schema.coreBenchKeys ∪ leaderboards[].publishes[]`).
 
    c) For each extracted tuple:
       key := f"{modelId}.{benchKey}"
-      if verification_map[key].confirmed:
-        SKIP (don't even emit — already 3+ verified)
-      else:
-        emit to sourcesAdded[] with this source's tier+url+trustScore
-        increment verification_map[key].verifications[].count
+      emit to sourcesAdded[] with this source's tier+url+trustScore
+      (NO skip on prior confirmation; verification_map is audit-only and
+       receives the new entry post-merge for contradiction analysis)
 
-   d) After processing this source: if every active_model now has all-cells confirmed
-      (no target_cells remaining), STOP early (saturation termination).
+   d) Continue walking the source queue regardless of "saturation" — every
+      source is visited every cycle so vendor score revisions surface
+      immediately. Saturation termination retired 2026-04-28.
 
 3. Per-source fallback (uncapped — exhaust the documented chain):
       try entry.fallbacks[*].url in order (e.g., websearch_snippet, mirror,
@@ -716,12 +729,10 @@ A legacy/deprecated model still gets the same treatment: try the canonical histo
       OR every documented fallback has been tried (status: 200 + extracted /
       404 / unreachable). Log every attempt to runtime.fetchLog[].
 
-4. Saturation rules (efficiency optimization, NOT effort cap):
-   - Once a model has ALL 16 bench cells confirmed (verifications >= 3 for each),
-     do NOT search its name in remaining tier-C sources. Big efficiency win for
-     well-covered frontier models (opus-4-7, gemini-3-1-pro, gpt-5-5, kimi-k2-6).
-   - Saturated does NOT mean "skip the source entirely" — the source is still
-     walked for OTHER models that need verification.
+4. Saturation rule retired (2026-04-28). Every source is walked every cycle
+   for every active model — no early stop based on "confirmed enough times".
+   Vendor scores can be revised, retracted, or re-issued between cycles, so
+   re-extracting the live value on every refresh is the freshness contract.
 
 5. COMPLETENESS_TERMINATION (sole exit condition — replaces all prior caps):
    The agent emits final JSON and stops only when ALL of these hold:
@@ -729,10 +740,16 @@ A legacy/deprecated model still gets the same treatment: try the canonical histo
         (status: extracted / unhealthy-skip / fallback-exhausted).
      b) Every vendor with perModelUrl/modelCardUrl/postUrl has been attempted
         for every model in that vendor's family (Phase 2 cascade).
-     c) Every (modelId, benchKey) cell currently null AND with >= 1 advertised
-        high-weight source has been attempted via the full cascade.
-     d) For every still-empty cell, a gaps[] entry is emitted satisfying
-        adaptive GAP_VALIDITY_GATE (triedSources >= clamp(advertised, 3, 5)).
+     c) Every (modelId, benchKey) cell — ∀ active models × ∀ bench keys in
+        bench_keys_universe — has been attempted at least once via the full
+        cascade. Existing non-null values in models.json are NOT a reason to
+        skip the attempt; the cell is re-fetched and either confirms, updates,
+        or is logged as unchanged.
+     d) For every cell that still produced no extractable value, a gaps[]
+        entry is emitted with the full triedSources[] / triedFormats[] /
+        triedPatterns[] / triedQueries[] provenance bundle. The orchestrator's
+        GAP_VALIDITY_GATE is now ADVISORY (audit-only, see below) — it never
+        strips entries; it only flags low-effort gaps for human review.
 
    No wallclock limit, no fetch-count limit. The agent terminates when the
    research is structurally complete, not when a budget runs out.

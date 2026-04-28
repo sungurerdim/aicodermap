@@ -53,6 +53,7 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
      * RENAMED (vendor changed canonical id) → auto-rename per WRONG_ID_AUTO_FIX rule
      * REMOVED (no longer on vendor page after grace period) → archive to data/archive/<id>.json
    - This step CANNOT be skipped on refresh-all; it's the source of truth for "what models exist".
+   - **Mandatory retry (added 2026-04-28):** if Step 4 returns with `lineup` empty/missing/`{}` AND this is not the first-ever run, the orchestrator dispatches ONE retry agent (sonnet) restricted to Step 0 (fetch vendor lineup pages only, no bench/pricing). On second-cycle empty, log `gaps[]` entry `lineup:incomplete` with reason and continue. Same retry policy applies when `runtime.healthChecks` covers fewer than 3 leaderboard domains.
 
 1. Read data/{models,sources,sources-whitelist}.json + lineup result from Step 0
 2. Parse arg → resolve scope + target_model_ids
@@ -67,7 +68,7 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
      verificationMap: <inline .aicodermap-verification-map.json (or {} on first run)>,
      lineup: <Step 0 result>
    }
-   - `.aicodermap-verification-map.json` is SSOT for "which (model, bench) cells are already confirmed". The agent uses it during SOURCE_FIRST_SWEEP to skip cells with verifications>=CONFIRMED_SKIP_THRESHOLD. Skill creates it (empty {}) on first cycle if missing.
+   - `.aicodermap-verification-map.json` is the historical audit log of every (model, bench) cell observation across cycles (value, sources[], lastChecked). Used for contradiction analysis only — never read for skip decisions, since every cell is re-fetched every cycle (UNCAPPED + UNCACHED doctrine, reformed 2026-04-28). Skill creates it (empty {}) on first cycle if missing.
    - `data/models.json` is SSOT for "what models we track"
    - `data/sources-whitelist.json` is SSOT for "what URLs the agent is allowed to fetch"
    - No skip registry: every (modelId, benchKey) pair is re-attempted every cycle so vendor opt-outs that close are surfaced immediately
@@ -79,38 +80,37 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
        scope, query, idea_context, target_model_ids?,
        include_unsloth: true,
        trusted_sources_only: true,           // per FETCH_WHITELIST
-       // UNCAPPED doctrine — no fetch/wallclock caps. Agent terminates ONLY on
-       // COMPLETENESS_TERMINATION (every source walked, every reachable cell
-       // attempted, every gap documented). See SKILL.md CONSTANTS.
+       // UNCAPPED + UNCACHED doctrine — no fetch/wallclock caps, no
+       // confirmed-cell skip. Agent terminates ONLY on
+       // COMPLETENESS_TERMINATION (every source walked, every cell re-fetched,
+       // every gap documented). See SKILL.md CONSTANTS.
        parallel_sources: 5,                  // parallelism (not a cap)
        parallel_models: 5,                   // parallelism (not a cap)
-       confirmed_skip_threshold: 3,          // efficiency: confirmed cells skip re-verify
-       verification_map_path: ".aicodermap-verification-map.json",
+       verification_map_path: ".aicodermap-verification-map.json",  // audit log only
        trust_score_required: true,           // every value carries a trustScore
-       termination: "completeness"           // explicit: not "wallclock", not "fetch_budget"
+       termination: "completeness",          // explicit: not "wallclock", not "fetch_budget"
+       require_lineup_populated: true,       // Step 0 lineup MUST be non-empty (orchestrator retries if not)
+       require_health_checks: true           // runtime.healthChecks MUST cover ≥3 leaderboard domains
      )
    })
 5. Parse return → validate JSON schema (strip surrounding whitespace, locate first `{` and last `}` if narration leaked)
 
-6. COVERAGE TRIGGER — **MANDATORY iteration, NEVER a halt**:
-   if validationCoverage < COVERAGE_DEEPEN_THRESHOLD (0.95):
-     loop until (coverage ≥ COVERAGE_TARGET 0.85) OR (cycles == DEEP_FETCH_MAX_CYCLES 5) OR (no progress between two consecutive cycles):
-       - identify (modelId, field) pairs missing ≥2 sources (excluding cells already `confirmed` in verification map)
-       - **SOURCE_FIRST_SWEEP coverage** (Phase 1, see agent.md): primary mining already walked every advertised source once during the main agent dispatch. Deep-fetch loop targets only the residue — cells empty after sweep AND not yet 3-verified.
-       - **Format-aware source picking**: for each missing pair, the orchestrator filters the whitelist to entries whose `format ∈ {static_html_table, static_html_article, static_markdown, github_raw_*, meta_tag_extract, pdf_report}` — i.e., formats with high signal-per-fetch — and assigns those URLs first. Entries whose format is `spa_full` or `bot_blocked` are deprioritised; their `fallbacks[].format == "websearch_snippet"` is used directly to skip the doomed primary fetch.
-       - **Per-model URL cascade** (Phase 2 fallback, see agent.md PER_MODEL_URL_EXPANSION): only invoked for cells the SOURCE_FIRST_SWEEP couldn't fill. The agent expands `entry.perModelUrlTemplate` against `entry.slugVariations` (e.g., `https://artificialanalysis.ai/models/{slug}` × `["{id}", "claude-{id}", "{id}-preview", "{id}-lite-preview"]`) — first 200 wins. Then the agent tries the model's vendor `urls.modelCardUrlTemplate` (DeepMind: `/models/model-cards/{slug}/`) and `urls.postUrlPattern` (Google: `blog.google/innovation-and-ai/models-and-research/gemini-models/{slug}/`). Bot-blocked vendor blogs (openai.com/index, x.ai/news, klu.ai) skip direct fetch and route to `site:<host>` WebSearch. Every URL attempted (including 404s) is logged in `triedSources[]` with status, satisfying GAP_VALIDITY_GATE.
-       - spawn DEEP-FETCH pass via SendMessage to existing agent (or fresh Agent if SendMessage fails): up to DEEP_FETCH_MAX_PAIRS_PER_CYCLE 25 pairs per cycle, ≤30s per pair
-       - merge deep-fetch returns into pending updates
-       - stamp the artifact with `deepFetchCycle: <n>` and `validationCoverage: <updated>`
-       - on a cycle-N agent failure (network, JSON parse, anything): retry once via fresh Agent dispatch; on second failure log to gaps[] with reason and break loop early — never halt the workflow
-   if validationCoverage still below COVERAGE_TARGET after the loop terminates:
-     write anyway, set artifact.partialCoverage=true, append "⚠ partial coverage: <%>" line to CHANGELOG
-     EVERY remaining gap pair stays in artifact.gaps[] with `triedSources: [<urls>]` so next refresh re-attempts
-   else proceed.
+6. COVERAGE LOG — **advisory only (reformed 2026-04-28)**:
+   The agent already walks every source for every (modelId, benchKey) cell in
+   one pass (UNCAPPED + UNCACHED doctrine). There is no separate deep-fetch
+   loop. The orchestrator just records:
+     - validationCoverage (cumulative — see agent.md VALIDATION_RULES rule 2)
+     - if < COVERAGE_TARGET (0.85): set artifact.partialCoverage=true, append
+       "⚠ cumulative provenance coverage: <%>" line to CHANGELOG
+     - if < COVERAGE_HARD_BLOCK (0.50): append a louder
+       "⚠ very low cumulative provenance coverage" warning, but still commit
+   No loop, no halt. Every gap from this cycle stays in artifact.gaps[] for
+   audit; the next cycle re-attempts every cell anyway (no skip cache).
 
-   ENFORCEMENT: `scripts/merge.py` MUST NOT halt the commit on low coverage. Its job is to validate schema and merge; coverage is advisory. The deepFetchCycle stamp is informational, not gating.
+   ENFORCEMENT: `scripts/merge.py` MUST NOT halt the commit on low coverage.
+   Coverage is advisory only.
 
-   **Hard rule:** missing data is NEVER a reason to skip Step 10–12 (write+commit+push). Partial coverage merges are normal; the next cycle picks up where this one left off.
+   **Hard rule:** missing data is NEVER a reason to skip Step 10–12 (write+commit+push). Partial coverage merges are normal; the next cycle re-fetches everything anyway.
 
 7. CONTRADICTION AUTO-RESOLUTION (NOT manual prompt):
    for each contradiction in contradictions[]:
@@ -147,20 +147,20 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
    - Domains with consecutiveFailures ≥ 3 across cycles get `_runtime.unhealthy: true`; auto-skipped in next 2 cycles' Phase 1 (still tried via WebSearch fallback)
    - Whitelist mutations are committed alongside data/* changes — versioned and reversible.
 
-7.6. VERIFICATION_MAP_UPDATE (cross-cycle confirmed-cell cache, added 2026-04-27):
+7.6. VERIFICATION_MAP_UPDATE (audit log, reformed 2026-04-28):
    - After merge writes data/models.json, run `python scripts/verification-map.py update`
-   - The script reads `.aicodermap-agent-out.json` sourcesAdded[] entries, groups by (modelId, benchKey), and rebuilds the verification map:
+   - The script reads `.aicodermap-agent-out.json` sourcesAdded[] entries, groups by (modelId, benchKey), and appends to the historical audit log:
      ```
-     for each (modelId, benchKey) cell across all sources this cycle:
-       map.cells[modelId.benchKey].verifications[].append({source, url, tier, fetched})
-       if all values agree within VERIFICATION_AGREEMENT_PP (=1.5pp) AND len >= CONFIRMED_SKIP_THRESHOLD (=3):
-         map.cells[modelId.benchKey].confirmed = true
+     for each (modelId, benchKey) cell observed this cycle:
+       map.cells[modelId.benchKey].verifications[].append({source, url, value, tier, fetched})
+       if all values agree within VERIFICATION_AGREEMENT_PP (=1.5pp) AND len >= 3:
+         map.cells[modelId.benchKey].confirmed = true   // audit flag only
        else if values disagree:
-         map.cells[modelId.benchKey].confirmed = false  // contradiction[] handled separately at Step 7
+         map.cells[modelId.benchKey].confirmed = false  // contradiction analysis input
+       map.cells[modelId.benchKey].lastChecked = TODAY (only if at least one new verification appended this cycle)
      ```
-   - Persists `.aicodermap-verification-map.json` (gitignored — local cache, regenerated from sources.json on demand)
-   - Confirmed cells skip Phase 1 SOURCE_FIRST_SWEEP in next cycle, freeing budget for unfilled cells.
-   - This is what makes coverage incremental: each cycle only fetches what isn't already 3-verified.
+   - Persists `.aicodermap-verification-map.json` (gitignored — historical record, regeneratable from sources.json via `bootstrap`)
+   - The `confirmed` flag is **audit-only** — used for contradiction analysis and human review. It is NEVER read by the agent or orchestrator to skip a fetch (every cell is re-fetched every cycle).
 
 8. Render diff summary (markdown table) to user-visible output: models[].updates fields, newModels[], lineup changes (NEW/DEPRECATED/RENAMED/REMOVED), contradictions auto-resolved, coverage% achieved, partialCoverage flag.
 9. AUTO-APPROVE — NO USER PROMPT. The workflow proceeds straight from Step 8 to Step 10. The only halt at this stage is schema-breaking discovery (a brand-new top-level field in a model entry not in the existing whitelist) — and even then, the unrecognized field is logged to gaps[] and merge continues with the recognized fields. RED contradictions are already auto-resolved at Step 7. REMOVED entries are auto-archived per LIFECYCLE_STATES.
@@ -188,9 +188,8 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
 ```
 CONTRADICTION_WARN              = 3.0   // pp delta → YELLOW (auto-resolve via trustScore)
 CONTRADICTION_BLOCK             = 5.0   // pp delta → RED (auto-resolve via trustScore, log loudly)
-COVERAGE_TARGET                 = 0.85  // hard floor — Step 6 cycles run until reached
-COVERAGE_DEEPEN_THRESHOLD       = 0.95  // ideal — Step 6 also triggers below this
-COVERAGE_HARD_BLOCK             = 0.50  // ADVISORY ONLY — never blocks commit. <0.50 logs a "⚠ very low coverage, investigate sources-whitelist coverage" note in CHANGELOG and proceeds; gaps[] preserved for next cycle
+COVERAGE_TARGET                 = 0.85  // ADVISORY (reformed 2026-04-28). Cumulative provenance coverage; never blocks commit. Below-target → CHANGELOG warning.
+COVERAGE_HARD_BLOCK             = 0.50  // ADVISORY (reformed 2026-04-28). <0.50 logs a "⚠ very low cumulative provenance coverage" note in CHANGELOG and proceeds; gaps[] preserved for next cycle
 STALE_DAYS                      = 14    // M5 freshness gate
 DEPRECATION_GRACE_DAYS          = 60    // vendor "deprecated" → still listed for 60d before archive
 DEPLOY_WAIT_SEC                 = 90
@@ -208,8 +207,7 @@ FAMILY_BASELINE_MIN             = 30    // refresh-all: |models[]+newModels[]| f
 // =====================================================================
 
 // Quality controls (kept — these are correctness rules, not effort caps)
-CONFIRMED_SKIP_THRESHOLD        = 3     // verifications agreeing within VERIFICATION_AGREEMENT_PP -> cell becomes "confirmed"; agent skips re-verifying it (efficiency, not a cap — agent could still re-check if needed)
-VERIFICATION_AGREEMENT_PP       = 1.5   // values within 1.5pp count as agreement; otherwise contradiction[]
+VERIFICATION_AGREEMENT_PP       = 1.5   // values within 1.5pp count as agreement; otherwise contradiction[]. Used ONLY for contradiction detection — never for skip decisions.
 PARALLEL_SOURCES                = 5     // concurrent source fetches (parallelism, NOT a cap — agent may go higher if useful)
 PARALLEL_MODELS                 = 5     // concurrent model surveys (parallelism only)
 
@@ -220,26 +218,21 @@ PARALLEL_MODELS                 = 5     // concurrent model surveys (parallelism
 //      with fallback chain exhausted, OR _runtime.unhealthy auto-skip).
 //   2. Every vendor in `vendors[]` with a perModelUrl/modelCardUrl/postUrl
 //      has been attempted for every model in that vendor's family.
-//   3. Every (modelId, benchKey) cell currently null AND with >=1 advertised
-//      high-weight source has been attempted via SOURCE_FIRST_SWEEP +
-//      PER_MODEL_URL_EXPANSION + WebSearch fallback chain.
-//   4. For every still-empty cell, a gaps[] entry is emitted satisfying
-//      adaptive GAP_VALIDITY_GATE (triedSources >= clamp(advertised, 3, 5)).
+//   3. Every (modelId, benchKey) cell — across all active models × all
+//      bench_keys_universe — has been re-attempted this cycle (no skip on
+//      prior confirmation; vendor scores can be revised between refreshes).
+//   4. Every still-empty cell carries a gaps[] entry with whatever provenance
+//      could be gathered. GAP_VALIDITY_GATE is now ADVISORY ONLY: low-effort
+//      gaps surface in `runtime.fabricatedSuspicions[]` for human review but
+//      are never stripped (reformed 2026-04-28).
 COMPLETENESS_TERMINATION        = true  // sole termination condition
 
-// Saturation termination (efficiency optimization, not effort cap):
-// If during the sweep every active model becomes fully confirmed (all 16
-// cells confirmed), the agent may stop early — there is nothing left to
-// research this cycle. This rarely fires because sparse benches keep some
-// cells unconfirmed indefinitely.
-SATURATION_TERMINATE            = true
-
-// Cross-cycle persistence (efficiency, not cap):
+// Cross-cycle persistence (audit only — reformed 2026-04-28):
+// The verification map is a HISTORICAL log: it records every (modelId, benchKey)
+// cell the cycle observed, with all sources/values that backed it. Used by
+// contradiction analysis to spot scores that drift between cycles. Never read
+// for skip decisions — every cell is re-fetched every cycle.
 VERIFICATION_MAP_PATH           = ".aicodermap-verification-map.json"  // gitignored
-
-// Deep-fetch loop (UNCAPPED — prior cycle/pair limits removed):
-DEEP_FETCH_PAIRS_PER_CYCLE      = "unlimited"  // was 25 — removed
-DEEP_FETCH_CYCLES               = "until_complete"  // was 5 — loop runs until COMPLETENESS_TERMINATION holds OR validationCoverage stops improving for 2 consecutive iterations (no-progress detect)
 
 SINGLE_ARTIFACT_PATH            = ".aicodermap-agent-out.json"  // ONE artifact, overwritten each run
 ```
@@ -248,15 +241,16 @@ SINGLE_ARTIFACT_PATH            = ".aicodermap-agent-out.json"  // ONE artifact,
 
 | Step | Success criterion | On failure (auto-recovery, never user prompt unless noted) |
 |------|-------------------|------------------------------------------------------------|
-| 0 Lineup discovery | ≥10 vendor pages successfully parsed OR all reachable vendors attempted | Retry each unreachable URL once with shorter timeout. Then log unreachable vendors to artifact.gaps[] as `lineup:<vendor>: unreachable`. CONTINUE with whatever lineup data was gathered — never block on stale lineup |
+| 0 Lineup discovery | `lineup` populated AND ≥10 vendor pages successfully parsed (or all reachable vendors attempted) | If `lineup` empty/missing AND not first run → dispatch ONE retry agent restricted to Step 0. On second-cycle empty: log `gaps[]` entry `lineup:incomplete` and CONTINUE. Unreachable vendors → log `lineup:<vendor>: unreachable`, never block on stale lineup. |
+| 0b Source health check | `runtime.healthChecks` covers ≥3 leaderboard domains with status entries | If <3 domains → dispatch retry agent restricted to PRELIM SOURCE_HEALTH_CHECK. On second-cycle <3: log `gaps[]` entry `health-check:incomplete` and CONTINUE. |
 | 4 Agent survey | JSON return parseable (first `{`, last `}`); `models[]+newModels[]` ≥ FAMILY_BASELINE_MIN OR explicit gaps[] entries explaining shortfall | Retry once with reinforced delivery contract. On second failure: extract whatever JSON fragment is recoverable + log debug to `~/.aicodermap-debug.log` + CONTINUE merge with available data. Family-count shortfall logged to gaps[], never halts. |
-| 6 Deep-fetch loop | `coverage ≥ COVERAGE_TARGET (0.85)` OR `cycles == DEEP_FETCH_MAX_CYCLES (5)` OR no-progress termination | Loop until any terminal condition. Below-target final coverage → set artifact.partialCoverage=true + emit per-pair gaps[] with triedSources[] + CONTINUE to Step 7. Coverage is never a halt — gaps[] are the bookmarks for next cycle |
+| 6 Coverage log | `validationCoverage` is a number 0..1 in artifact | Below COVERAGE_TARGET (0.85): set artifact.partialCoverage=true, append "⚠ cumulative provenance coverage" line to CHANGELOG, CONTINUE. Below COVERAGE_HARD_BLOCK (0.50): louder warning, still CONTINUE. No deep-fetch loop (retired 2026-04-28) — agent already walks every cell every cycle. |
 | 7 Contradiction auto-resolve | Every contradiction has autoResolveWinner | TrustScore ties within 0.05 with no I-tier present: prefer most-recent value, then most-verified, then alphabetical-by-source as deterministic tiebreaker — never user prompt |
 | 10 Atomic write | `data/{models,sources}.json` parse-valid + self-check passes | On parse failure: restore from `.bak` + log root cause + retry the merge once with relaxed self-check. On second failure: write the artifact's known-good fields only, mark unhealable fields in gaps[]. CONTINUE — never leave repo in restored-only state |
 | 12 git push | Exit code 0 AND remote ref advanced | On hook fail: fix root cause + new commit (NEVER --amend, NEVER --no-verify). On push conflict: SOLE USER-BLOCKING step — print "git pull --rebase first" and exit cleanly so user can resolve. This is the only halt in the entire workflow because remote state is genuinely outside skill authority |
 | 14 Live deploy verify | `curl <live_url>/data/models.json` returns 200 AND parses as JSON | Wait + retry up to 5min. On still-not-live: log warning + declare workflow done (commit was successful; Pages will eventually catch up). Never halt on Pages latency |
 
-**Cardinal rule (revised):** the workflow ALWAYS reaches Step 12 (git push) as long as Step 0+4 produced any usable JSON. Halts above Step 12 are eliminated by design. The artifact's machine-checkable flags (`deepFetchCycle`, `partialCoverage`, `error`, `gaps[]`) record what was incomplete so the next cycle picks it up.
+**Cardinal rule (revised):** the workflow ALWAYS reaches Step 12 (git push) as long as Step 0+4 produced any usable JSON. Halts above Step 12 are eliminated by design. The artifact's machine-checkable flags (`partialCoverage`, `error`, `gaps[]`, `runtime.fabricatedSuspicions[]`) record what was incomplete so the next cycle picks it up.
 
 ## VENDOR_LINEUP_SOURCES (Step 0 — official "what models exist now")
 
@@ -442,7 +436,10 @@ COMPUTED FIELDS:  pricing.range            (computed from pricing.api[] at write
 
 OBJECT FIELDS:    ollama (full pullCmd/tags/pullCount/architecture/parameters/license/releasedISO/ollamaUrl block — preserve atomically; replace only if new object has more keys)
 
-BENCH KEYS (13):  swePro, sweV, tb2, lcbV6, aider, tau2, aaCoding, aaAgentic, mcpA, gpqa, sweMulti, hle, aaIdx
+BENCH KEYS (dynamic universe = whitelist `_schema.coreBenchKeys` ∪ `leaderboards[].publishes[]`):
+                  swePro, sweV, sweMulti, tb2, lcbV6, aider, tau2, mcpA, bfcl,
+                  aaCoding, aaAgentic, aaIdx, aaOmni, gpqa, aime26, hle, …
+                  (extends automatically when a leaderboard's publishes[] adds a key)
                   → trustScore-driven contradiction resolution per bench key
 ```
 

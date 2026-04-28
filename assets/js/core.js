@@ -85,6 +85,12 @@ export function isValidModel(m) {
   if (typeof m.name !== 'string') return false;
   if (typeof m.tier !== 'string') return false;
   if (!m.bench || typeof m.bench !== 'object') return false;
+  // benchUpdated is optional per-cell timestamp map; reject only if present
+  // and the wrong shape (must be object of ISO date strings).
+  if (m.benchUpdated != null
+      && (typeof m.benchUpdated !== 'object' || Array.isArray(m.benchUpdated))) {
+    return false;
+  }
   return true;
 }
 
