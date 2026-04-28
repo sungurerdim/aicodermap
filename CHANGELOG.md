@@ -1,4 +1,30 @@
 
+## [2026-04-29] — autonomous refresh-all [WARN: cumulative provenance coverage 52.0% below 85% target] [WARN: artifact missing coverageMatrix; agent skipped self-audit]
+
+### Updated
+- 13 models: `gpt-5-5`, `sonnet-4-6`, `claude-haiku-4-5`, `glm-5-1`, `gemma-4-31b`, `gemma-4-26b-moe`, `gemma-4-e2b`, `gemma-4-e4b`, `qwen-3-6-27b`, `qwen-3-6-max`, `devstral-small-2`, `grok-4-20`, `llama-4-maverick`
+
+### Deprecated
+- `gpt-4-1` — vendor-marked deprecated
+- `o3` — vendor-marked deprecated
+- `o4-mini` — vendor-marked deprecated
+
+### Resolved (auto via trustScore)
+- grok-4-20.sweV: winner={'value': 58.6, 'trustScore': 0.67, 'sourceUrl': 'https://tokenmix.ai/blog/swe-bench-2026-claude-opus-4-7-wins', 'tier': 'I'} (severity=RED, Δ18.1)
+- gpt-5-5.sweV: winner={'value': 88.7, 'trustScore': 0.89, 'sourceUrl': 'https://artificialanalysis.ai/articles/openai-gpt5-5-is-the-new-leading-AI-model', 'tier': 'I'} (severity=YELLOW, Δ3.7)
+
+### Gaps (9 entries — see data/known-gaps.json or next refresh)
+- `grok-4-3.bench.*`: Grok 4.3 Beta launched April 17 2026; no official benchmarks published at launch; SuperGrok Heavy ($300/mo) only; no API pricing disclosed
+- `gpt-5-5.lcbV6`: No lcbV6 score found in GPT-5.5 benchmark coverage; not a benchmark OpenAI prioritises in release notes
+- `qwen-3-6-max.swePro`: Qwen3.6 Plus swePro not yet published on SWE-bench Pro public leaderboard; Alibaba reports sweV 78.8 only
+- `mimo-v2-5.sweV`: No sweV score found for MiMo-V2.5 base model; only Pro variant has swePro
+- `claude-haiku-4-5.gpqa`: No GPQA Diamond score found in Anthropic Haiku 4.5 release materials; benchmark not featured in release notes
+- `gemma-3-27b.sweV`: Gemma 3 27B sweV not found; significantly lower capability vs Gemma 4; prior benchmarks show 29.1% lcbV6
+- `qwen3-coder-next.swePro`: qwen3-coder-next swePro shows 44.3% from arxiv technical report (Feb 2026); sweV shows 70%+ with SWE-Agent; single source only
+- `deepseek-v4-flash.swePro`: V4 Flash swePro not published; only V4 Pro has swePro data (55.4%)
+- ... and 1 more
+
+
 ## [2026-04-28] — autonomous refresh-all [WARN: cumulative provenance coverage 54.0% below 85% target]
 
 ### Updated

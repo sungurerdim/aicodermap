@@ -135,20 +135,20 @@
     "vramRequirement": null,
     "strengthsKey": "gemini-3-1-pro.strengths",
     "weaknessesKey": "gemini-3-1-pro.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-29",
     "status": "active",
     "benchUpdated": {
-      "swePro": "2026-04-28",
-      "sweV": "2026-04-28",
-      "tb2": "2026-04-28",
-      "lcbV6": "2026-04-28",
-      "tau2": "2026-04-28",
-      "mcpA": "2026-04-28",
-      "gpqa": "2026-04-28",
-      "hle": "2026-04-28",
-      "aaIdx": "2026-04-28",
-      "aime26": "2026-04-28",
-      "aaOmni": "2026-04-28"
+      "swePro": "2026-04-29",
+      "sweV": "2026-04-29",
+      "tb2": "2026-04-29",
+      "lcbV6": "2026-04-29",
+      "tau2": "2026-04-29",
+      "mcpA": "2026-04-29",
+      "gpqa": "2026-04-29",
+      "hle": "2026-04-29",
+      "aaIdx": "2026-04-29",
+      "aime26": "2026-04-29",
+      "aaOmni": "2026-04-29"
     }
   },
   {
@@ -221,7 +221,7 @@
     "vramRequirement": null,
     "strengthsKey": "gpt-4-1.strengths",
     "weaknessesKey": "gpt-4-1.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-28T21:40:25Z",
     "status": "deprecated",
     "deprecatedAt": "2026-02-13",
     "successor": "gpt-5-4"
@@ -302,17 +302,17 @@
     "vramRequirement": null,
     "strengthsKey": "gpt-5-4.strengths",
     "weaknessesKey": "gpt-5-4.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-29",
     "status": "active",
     "benchUpdated": {
-      "swePro": "2026-04-28",
-      "sweV": "2026-04-28",
-      "tb2": "2026-04-28",
+      "swePro": "2026-04-29",
+      "sweV": "2026-04-29",
+      "tb2": "2026-04-29",
       "mcpA": "2026-04-28",
-      "gpqa": "2026-04-28",
-      "hle": "2026-04-28",
-      "aaIdx": "2026-04-28",
-      "aime26": "2026-04-28"
+      "gpqa": "2026-04-29",
+      "hle": "2026-04-29",
+      "aaIdx": "2026-04-29",
+      "aime26": "2026-04-29"
     }
   },
   {
@@ -596,7 +596,7 @@
     "vramRequirement": null,
     "strengthsKey": "o3.strengths",
     "weaknessesKey": "o3.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-28T21:40:25Z",
     "status": "deprecated",
     "deprecatedAt": "2026-02-13",
     "successor": "gpt-5-4"
@@ -660,7 +660,7 @@
     "vramRequirement": null,
     "strengthsKey": "o4-mini.strengths",
     "weaknessesKey": "o4-mini.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-28T21:40:25Z",
     "status": "deprecated",
     "deprecatedAt": "2026-02-13",
     "successor": "gpt-5-4"
@@ -741,20 +741,20 @@
     "vramRequirement": null,
     "strengthsKey": "opus-4-7.strengths",
     "weaknessesKey": "opus-4-7.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-29",
     "status": "active",
     "benchUpdated": {
-      "swePro": "2026-04-28",
-      "sweV": "2026-04-28",
-      "tb2": "2026-04-28",
-      "tau2": "2026-04-28",
-      "aaCoding": "2026-04-28",
-      "mcpA": "2026-04-28",
-      "gpqa": "2026-04-28",
-      "sweMulti": "2026-04-28",
-      "hle": "2026-04-28",
-      "aaIdx": "2026-04-28",
-      "aaOmni": "2026-04-28"
+      "swePro": "2026-04-29",
+      "sweV": "2026-04-29",
+      "tb2": "2026-04-29",
+      "tau2": "2026-04-29",
+      "aaCoding": "2026-04-29",
+      "mcpA": "2026-04-29",
+      "gpqa": "2026-04-29",
+      "sweMulti": "2026-04-29",
+      "hle": "2026-04-29",
+      "aaIdx": "2026-04-29",
+      "aaOmni": "2026-04-29"
     }
   },
   {
@@ -772,10 +772,10 @@
           "provider": "official",
           "in": 3,
           "out": 15,
-          "cacheHit": null,
+          "cacheHit": 0.3,
           "throughput": null,
           "url": "https://platform.claude.com/docs/en/about-claude/models",
-          "fetched": "2026-04-28"
+          "fetched": "2026-04-29"
         }
       ],
       "subscription": [
@@ -796,7 +796,10 @@
           15,
           15
         ],
-        "cacheHit": null
+        "cacheHit": [
+          0.3,
+          0.3
+        ]
       }
     },
     "bench": {
@@ -824,13 +827,13 @@
     "vramRequirement": null,
     "strengthsKey": "sonnet-4-6.strengths",
     "weaknessesKey": "sonnet-4-6.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-28T21:40:25Z",
     "status": "active",
     "benchUpdated": {
-      "sweV": "2026-04-28",
-      "tb2": "2026-04-28",
-      "gpqa": "2026-04-28",
-      "aaIdx": "2026-04-28"
+      "sweV": "2026-04-29",
+      "tb2": "2026-04-29",
+      "gpqa": "2026-04-29",
+      "aaIdx": "2026-04-29"
     }
   },
   {
@@ -1066,7 +1069,7 @@
     "vramRequirement": null,
     "strengthsKey": "deepseek-v4-flash.strengths",
     "weaknessesKey": "deepseek-v4-flash.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-29",
     "ollama": {
       "pullCmd": "ollama run deepseek-v4-flash:cloud",
       "tags": [
@@ -1086,12 +1089,12 @@
     },
     "status": "active",
     "benchUpdated": {
-      "sweV": "2026-04-28",
-      "lcbV6": "2026-04-28",
+      "sweV": "2026-04-29",
+      "lcbV6": "2026-04-29",
       "swePro": "2026-04-28",
-      "gpqa": "2026-04-28",
-      "hle": "2026-04-28",
-      "aaIdx": "2026-04-28"
+      "gpqa": "2026-04-29",
+      "hle": "2026-04-29",
+      "aaIdx": "2026-04-29"
     }
   },
   {
@@ -1183,18 +1186,18 @@
     "vramRequirement": null,
     "strengthsKey": "deepseek-v4-pro.strengths",
     "weaknessesKey": "deepseek-v4-pro.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-29",
     "status": "active",
     "benchUpdated": {
-      "sweV": "2026-04-28",
-      "tb2": "2026-04-28",
-      "lcbV6": "2026-04-28",
-      "swePro": "2026-04-28",
-      "mcpA": "2026-04-28",
-      "gpqa": "2026-04-28",
-      "sweMulti": "2026-04-28",
-      "hle": "2026-04-28",
-      "aaIdx": "2026-04-28"
+      "sweV": "2026-04-29",
+      "tb2": "2026-04-29",
+      "lcbV6": "2026-04-29",
+      "swePro": "2026-04-29",
+      "mcpA": "2026-04-29",
+      "gpqa": "2026-04-29",
+      "sweMulti": "2026-04-29",
+      "hle": "2026-04-29",
+      "aaIdx": "2026-04-29"
     }
   },
   {
@@ -1369,25 +1372,28 @@
       "api": [
         {
           "provider": "official",
-          "in": 1.05,
-          "out": 3.5,
-          "cacheHit": null,
+          "in": 1.4,
+          "out": 4.4,
+          "cacheHit": 0.26,
           "throughput": null,
-          "url": "https://openrouter.ai/z-ai/glm-5.1",
-          "fetched": "2026-04-27"
+          "url": "https://artificialanalysis.ai/models/glm-5-1",
+          "fetched": "2026-04-29"
         }
       ],
       "subscription": null,
       "range": {
         "in": [
-          1.05,
-          1.05
+          1.4,
+          1.4
         ],
         "out": [
-          3.5,
-          3.5
+          4.4,
+          4.4
         ],
-        "cacheHit": null
+        "cacheHit": [
+          0.26,
+          0.26
+        ]
       }
     },
     "bench": {
@@ -1402,8 +1408,8 @@
       "aaCoding": null,
       "aaAgentic": null,
       "sweMulti": null,
-      "hle": 52.3,
-      "aaIdx": null,
+      "hle": 31,
+      "aaIdx": 51,
       "bfcl": null,
       "aime26": 95.3,
       "aaOmni": null
@@ -1415,18 +1421,19 @@
     "vramRequirement": null,
     "strengthsKey": "glm-5-1.strengths",
     "weaknessesKey": "glm-5-1.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-28T21:40:25Z",
     "status": "active",
     "benchUpdated": {
-      "swePro": "2026-04-28",
-      "sweV": "2026-04-28",
-      "tb2": "2026-04-28",
-      "lcbV6": "2026-04-28",
-      "tau2": "2026-04-28",
-      "mcpA": "2026-04-28",
-      "gpqa": "2026-04-28",
-      "hle": "2026-04-28",
-      "aime26": "2026-04-28"
+      "swePro": "2026-04-29",
+      "sweV": "2026-04-29",
+      "tb2": "2026-04-29",
+      "lcbV6": "2026-04-29",
+      "tau2": "2026-04-29",
+      "mcpA": "2026-04-29",
+      "gpqa": "2026-04-29",
+      "hle": "2026-04-29",
+      "aime26": "2026-04-29",
+      "aaIdx": "2026-04-29"
     }
   },
   {
@@ -1486,7 +1493,7 @@
       "sweV": 80.2,
       "tb2": 66.7,
       "lcbV6": 89.6,
-      "hle": 54,
+      "hle": 34.7,
       "aider": 60,
       "tau2": 70.6,
       "aaCoding": null,
@@ -1506,20 +1513,20 @@
     "vramRequirement": null,
     "strengthsKey": "kimi-k2-6.strengths",
     "weaknessesKey": "kimi-k2-6.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-29",
     "status": "active",
     "benchUpdated": {
-      "swePro": "2026-04-28",
-      "sweV": "2026-04-28",
-      "tb2": "2026-04-28",
-      "lcbV6": "2026-04-28",
-      "hle": "2026-04-28",
-      "aider": "2026-04-28",
-      "tau2": "2026-04-28",
-      "gpqa": "2026-04-28",
-      "sweMulti": "2026-04-28",
-      "aaIdx": "2026-04-28",
-      "aime26": "2026-04-28"
+      "swePro": "2026-04-29",
+      "sweV": "2026-04-29",
+      "tb2": "2026-04-29",
+      "lcbV6": "2026-04-29",
+      "hle": "2026-04-29",
+      "aider": "2026-04-29",
+      "tau2": "2026-04-29",
+      "gpqa": "2026-04-29",
+      "sweMulti": "2026-04-29",
+      "aaIdx": "2026-04-29",
+      "aime26": "2026-04-29"
     }
   },
   {
@@ -1540,16 +1547,25 @@
           "cacheHit": null,
           "throughput": null,
           "url": "https://huggingface.co/meta-llama",
-          "fetched": "2026-04-26"
+          "fetched": "2026-04-29"
+        },
+        {
+          "provider": "groq",
+          "in": 0.11,
+          "out": 0.34,
+          "cacheHit": null,
+          "throughput": null,
+          "url": "https://groq.com/pricing",
+          "fetched": "2026-04-29"
         }
       ],
       "range": {
         "in": [
-          0.2,
+          0.11,
           0.2
         ],
         "out": [
-          0.6,
+          0.34,
           0.6
         ],
         "cacheHit": null
@@ -1580,7 +1596,7 @@
     "vramRequirement": 100,
     "strengthsKey": "llama-4-maverick.strengths",
     "weaknessesKey": "llama-4-maverick.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-28T21:40:25Z",
     "ollama": {
       "pullCmd": "ollama run llama4:128x17b",
       "tags": [
@@ -1600,11 +1616,11 @@
     },
     "status": "active",
     "benchUpdated": {
-      "swePro": "2026-04-28",
-      "sweV": "2026-04-28",
-      "lcbV6": "2026-04-28",
-      "gpqa": "2026-04-28",
-      "aaIdx": "2026-04-28"
+      "swePro": "2026-04-29",
+      "sweV": "2026-04-29",
+      "lcbV6": "2026-04-29",
+      "gpqa": "2026-04-29",
+      "aaIdx": "2026-04-29"
     }
   },
   {
@@ -2090,7 +2106,7 @@
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": 87,
+      "gpqa": 87.4,
       "sweMulti": 76.5,
       "hle": 28.1,
       "bfcl": null,
@@ -2104,14 +2120,17 @@
     "vramRequirement": null,
     "strengthsKey": "minimax-m2-7.strengths",
     "weaknessesKey": "minimax-m2-7.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-29",
     "status": "active",
     "benchUpdated": {
-      "swePro": "2026-04-28",
-      "sweV": "2026-04-28",
-      "tb2": "2026-04-28",
-      "gpqa": "2026-04-28",
-      "sweMulti": "2026-04-28"
+      "swePro": "2026-04-29",
+      "sweV": "2026-04-29",
+      "tb2": "2026-04-29",
+      "gpqa": "2026-04-29",
+      "sweMulti": "2026-04-29",
+      "aaIdx": "2026-04-29",
+      "lcbV6": "2026-04-29",
+      "hle": "2026-04-29"
     }
   },
   {
@@ -2200,7 +2219,7 @@
     "vramRequirement": 64,
     "strengthsKey": "nemotron-3-super.strengths",
     "weaknessesKey": "nemotron-3-super.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-29",
     "status": "active",
     "ollama": {
       "pullCmd": "ollama pull nemotron-3-super",
@@ -2220,11 +2239,14 @@
       "ollamaUrl": "https://ollama.com/library/nemotron-3-super"
     },
     "benchUpdated": {
-      "sweV": "2026-04-28",
-      "gpqa": "2026-04-28",
-      "sweMulti": "2026-04-28",
-      "hle": "2026-04-28",
-      "aaIdx": "2026-04-28"
+      "sweV": "2026-04-29",
+      "gpqa": "2026-04-29",
+      "sweMulti": "2026-04-29",
+      "hle": "2026-04-29",
+      "aaIdx": "2026-04-29",
+      "tb2": "2026-04-29",
+      "lcbV6": "2026-04-29",
+      "aime26": "2026-04-29"
     }
   },
   {
@@ -2249,22 +2271,22 @@
         },
         {
           "provider": "openrouter",
-          "in": 0.1,
-          "out": 0.5,
+          "in": 0.325,
+          "out": 3.25,
           "cacheHit": null,
           "throughput": null,
           "url": "https://openrouter.ai/qwen/qwen3.6-27b",
-          "fetched": "2026-04-28"
+          "fetched": "2026-04-29"
         }
       ],
       "range": {
         "in": [
-          0.1,
-          0.1
+          0.325,
+          0.325
         ],
         "out": [
-          0.5,
-          0.5
+          3.25,
+          3.25
         ],
         "cacheHit": null
       }
@@ -2305,7 +2327,7 @@
     "vramRequirement": 16,
     "strengthsKey": "qwen-3-6-27b.strengths",
     "weaknessesKey": "qwen-3-6-27b.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-28T21:40:25Z",
     "ollama": {
       "pullCmd": "ollama pull qwen3.6:27b",
       "tags": [
@@ -2331,13 +2353,14 @@
     },
     "status": "active",
     "benchUpdated": {
-      "swePro": "2026-04-28",
-      "sweV": "2026-04-28",
-      "tb2": "2026-04-28",
-      "gpqa": "2026-04-28",
+      "swePro": "2026-04-29",
+      "sweV": "2026-04-29",
+      "tb2": "2026-04-29",
+      "gpqa": "2026-04-29",
       "sweMulti": "2026-04-28",
       "hle": "2026-04-28",
-      "aime26": "2026-04-28"
+      "aime26": "2026-04-29",
+      "lcbV6": "2026-04-29"
     }
   },
   {
@@ -2359,15 +2382,24 @@
           "throughput": null,
           "url": "https://openrouter.ai/qwen/qwen3.6-max-preview",
           "fetched": "2026-04-27"
+        },
+        {
+          "provider": "openrouter",
+          "in": 0.325,
+          "out": 1.95,
+          "cacheHit": null,
+          "throughput": null,
+          "url": "https://openrouter.ai/qwen/qwen3.6-plus",
+          "fetched": "2026-04-29"
         }
       ],
       "range": {
         "in": [
           0.26,
-          0.26
+          0.325
         ],
         "out": [
-          7.57,
+          1.95,
           7.57
         ],
         "cacheHit": null
@@ -2376,8 +2408,8 @@
     "bench": {
       "aaIdx": 52,
       "swePro": 58.4,
-      "sweV": null,
-      "tb2": null,
+      "sweV": 78.8,
+      "tb2": 61.6,
       "lcbV6": 79,
       "aider": null,
       "tau2": null,
@@ -2398,8 +2430,12 @@
     "vramRequirement": null,
     "strengthsKey": "qwen-3-6-max.strengths",
     "weaknessesKey": "qwen-3-6-max.weaknesses",
-    "lastUpdated": "2026-04-27T00:00:00Z",
-    "status": "active"
+    "lastUpdated": "2026-04-28T21:40:25Z",
+    "status": "active",
+    "benchUpdated": {
+      "sweV": "2026-04-29",
+      "tb2": "2026-04-29"
+    }
   },
   {
     "id": "qwen3-235b",
@@ -2941,7 +2977,7 @@
     "vramRequirement": null,
     "strengthsKey": "qwen3-coder-480b.strengths",
     "weaknessesKey": "qwen3-coder-480b.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-29",
     "status": "active",
     "ollama": {
       "pullCmd": "ollama pull qwen3-coder:480b",
@@ -2967,7 +3003,7 @@
       "ollamaUrl": "https://ollama.com/library/qwen3-coder"
     },
     "benchUpdated": {
-      "swePro": "2026-04-28",
+      "swePro": "2026-04-29",
       "aider": "2026-04-28"
     }
   },
@@ -3245,10 +3281,10 @@
         "vram": 28
       }
     ],
-    "vramRequirement": 16,
+    "vramRequirement": 18,
     "strengthsKey": "gemma-4-26b-moe.strengths",
     "weaknessesKey": "gemma-4-26b-moe.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-28T21:40:25Z",
     "status": "active",
     "ollama": {
       "pullCmd": "ollama run gemma4:26b",
@@ -3256,16 +3292,16 @@
         {
           "name": "26b",
           "size": "18GB",
-          "vram": 16,
+          "vram": 18,
           "recommended": true
         }
       ],
-      "pullCount": "5.9M pulls (gemma4 family)",
+      "pullCount": null,
       "architecture": "MoE",
-      "parameters": "25.2B total / 3.8B active",
+      "parameters": "26B MoE",
       "license": "Apache 2.0",
       "releasedISO": "2026-04-02",
-      "ollamaUrl": "https://ollama.com/library/gemma4:26b"
+      "ollamaUrl": "https://ollama.com/library/gemma4"
     },
     "benchUpdated": {
       "lcbV6": "2026-04-28",
@@ -3358,10 +3394,10 @@
         "vram": 34
       }
     ],
-    "vramRequirement": 24,
+    "vramRequirement": 20,
     "strengthsKey": "gemma-4-31b.strengths",
     "weaknessesKey": "gemma-4-31b.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-28T21:40:25Z",
     "status": "active",
     "ollama": {
       "pullCmd": "ollama run gemma4:31b",
@@ -3369,23 +3405,29 @@
         {
           "name": "31b",
           "size": "20GB",
-          "vram": 24,
+          "vram": 20,
           "recommended": true
+        },
+        {
+          "name": "26b-moe",
+          "size": "18GB",
+          "vram": 18,
+          "recommended": false
         }
       ],
-      "pullCount": "5.9M pulls (gemma4 family)",
+      "pullCount": null,
       "architecture": "Dense",
-      "parameters": "30.7B",
+      "parameters": "31B",
       "license": "Apache 2.0",
       "releasedISO": "2026-04-02",
       "ollamaUrl": "https://ollama.com/library/gemma4"
     },
     "benchUpdated": {
       "sweV": "2026-04-28",
-      "lcbV6": "2026-04-28",
-      "tau2": "2026-04-28",
-      "gpqa": "2026-04-28",
-      "aime26": "2026-04-28"
+      "lcbV6": "2026-04-29",
+      "tau2": "2026-04-29",
+      "gpqa": "2026-04-29",
+      "aime26": "2026-04-29"
     }
   },
   {
@@ -3435,29 +3477,29 @@
     },
     "providers": 3,
     "uptime": null,
-    "ollamaSize": "7.2GB",
+    "ollamaSize": "1.5GB",
     "unslothVariants": null,
-    "vramRequirement": 5,
+    "vramRequirement": 2,
     "strengthsKey": "gemma-4-e2b.strengths",
     "weaknessesKey": "gemma-4-e2b.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-28T21:40:25Z",
     "status": "active",
     "ollama": {
       "pullCmd": "ollama run gemma4:e2b",
       "tags": [
         {
           "name": "e2b",
-          "size": "7.2GB",
-          "vram": 5,
+          "size": "1.5GB",
+          "vram": 2,
           "recommended": true
         }
       ],
-      "pullCount": "5.9M pulls (gemma4 family)",
+      "pullCount": null,
       "architecture": "Dense",
-      "parameters": "2.3B effective (5.1B with embeddings)",
+      "parameters": "2B effective",
       "license": "Apache 2.0",
       "releasedISO": "2026-04-02",
-      "ollamaUrl": "https://ollama.com/library/gemma4:e2b"
+      "ollamaUrl": "https://ollama.com/library/gemma4"
     },
     "benchUpdated": {
       "aime26": "2026-04-28"
@@ -3510,29 +3552,29 @@
     },
     "providers": 3,
     "uptime": null,
-    "ollamaSize": "9.6GB",
+    "ollamaSize": "5GB",
     "unslothVariants": null,
     "vramRequirement": 5,
     "strengthsKey": "gemma-4-e4b.strengths",
     "weaknessesKey": "gemma-4-e4b.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-28T21:40:25Z",
     "status": "active",
     "ollama": {
       "pullCmd": "ollama run gemma4:e4b",
       "tags": [
         {
           "name": "e4b",
-          "size": "9.6GB",
+          "size": "5GB",
           "vram": 5,
           "recommended": true
         }
       ],
-      "pullCount": "5.9M pulls (gemma4 family)",
+      "pullCount": null,
       "architecture": "Dense",
-      "parameters": "4.5B effective (8B with embeddings)",
+      "parameters": "4B effective",
       "license": "Apache 2.0",
       "releasedISO": "2026-04-02",
-      "ollamaUrl": "https://ollama.com/library/gemma4:e4b"
+      "ollamaUrl": "https://ollama.com/library/gemma4"
     },
     "benchUpdated": {}
   },
@@ -4118,7 +4160,7 @@
     },
     "providers": 2,
     "uptime": null,
-    "ollamaSize": "14GB",
+    "ollamaSize": "15GB",
     "unslothVariants": [
       {
         "name": "UD-Q4_K_XL",
@@ -4134,13 +4176,13 @@
     "vramRequirement": 16,
     "strengthsKey": "devstral-small-2.strengths",
     "weaknessesKey": "devstral-small-2.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-28T21:40:25Z",
     "ollama": {
       "pullCmd": "ollama pull devstral-small-2",
       "tags": [
         {
           "name": "24b",
-          "size": "14GB",
+          "size": "15GB",
           "vram": 16,
           "recommended": true
         }
@@ -4149,14 +4191,19 @@
       "architecture": "Dense",
       "parameters": "24B",
       "license": "Apache 2.0",
-      "releasedISO": "2026-04-22",
+      "releasedISO": "2025-12-09",
       "ollamaUrl": "https://ollama.com/library/devstral-small-2"
     },
     "status": "active",
     "deprecatedAt": "2026-04-01",
     "successor": "devstral-2",
     "benchUpdated": {
-      "sweV": "2026-04-28"
+      "sweV": "2026-04-29",
+      "tb2": "2026-04-29",
+      "lcbV6": "2026-04-29",
+      "tau2": "2026-04-29",
+      "gpqa": "2026-04-29",
+      "hle": "2026-04-29"
     }
   },
   {
@@ -4175,10 +4222,10 @@
           "provider": "official",
           "in": 1,
           "out": 5,
-          "cacheHit": null,
-          "throughput": null,
+          "cacheHit": 0.1,
+          "throughput": 90.9,
           "url": "https://platform.claude.com/docs/en/about-claude/models",
-          "fetched": "2026-04-28"
+          "fetched": "2026-04-29"
         }
       ],
       "subscription": [
@@ -4199,7 +4246,10 @@
           5,
           5
         ],
-        "cacheHit": null
+        "cacheHit": [
+          0.1,
+          0.1
+        ]
       }
     },
     "bench": {
@@ -4227,10 +4277,11 @@
     "vramRequirement": null,
     "strengthsKey": "claude-haiku-4-5.strengths",
     "weaknessesKey": "claude-haiku-4-5.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-28T21:40:25Z",
     "benchUpdated": {
       "swePro": "2026-04-28",
-      "sweV": "2026-04-28"
+      "sweV": "2026-04-29",
+      "aaIdx": "2026-04-29"
     }
   },
   {
@@ -4241,17 +4292,26 @@
     "tier": "frontier",
     "open": false,
     "license": "Proprietary",
-    "context": 1000000,
+    "context": 1050000,
     "pricing": {
       "api": [
         {
           "provider": "official",
           "in": 5,
           "out": 30,
+          "cacheHit": 0.5,
+          "throughput": null,
+          "url": "https://openai.com/api/pricing/",
+          "fetched": "2026-04-29"
+        },
+        {
+          "provider": "openrouter",
+          "in": 5,
+          "out": 30,
           "cacheHit": null,
           "throughput": null,
-          "url": "https://openai.com/index/introducing-gpt-5-5/",
-          "fetched": "2026-04-28"
+          "url": "https://openrouter.ai/openai/gpt-5.5",
+          "fetched": "2026-04-29"
         }
       ],
       "subscription": [
@@ -4272,7 +4332,10 @@
           30,
           30
         ],
-        "cacheHit": null
+        "cacheHit": [
+          0.5,
+          0.5
+        ]
       }
     },
     "bench": {
@@ -4283,12 +4346,12 @@
       "hle": 41.4,
       "aaIdx": 60,
       "tau2": 98,
-      "sweV": 81.5
+      "sweV": 88.7
     },
-    "providers": 1,
+    "providers": 2,
     "strengthsKey": "gpt-5-5.strengths",
     "weaknessesKey": "gpt-5-5.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-28T21:40:25Z",
     "status": "active",
     "sourcesAdded": [
       {
@@ -4313,12 +4376,13 @@
       }
     ],
     "benchUpdated": {
-      "swePro": "2026-04-28",
-      "tb2": "2026-04-28",
+      "swePro": "2026-04-29",
+      "tb2": "2026-04-29",
       "mcpA": "2026-04-28",
-      "gpqa": "2026-04-28",
-      "hle": "2026-04-28",
-      "aaIdx": "2026-04-28"
+      "gpqa": "2026-04-29",
+      "hle": "2026-04-29",
+      "aaIdx": "2026-04-29",
+      "sweV": "2026-04-29"
     }
   },
   {
@@ -4368,8 +4432,8 @@
     "bench": {
       "gpqa": 91.1,
       "hle": 32.2,
-      "lcbV6": 79.4,
-      "sweV": 66.8,
+      "lcbV6": 79,
+      "sweV": 58.6,
       "swePro": 51.8,
       "tb2": 47.1,
       "aider": null,
@@ -4384,13 +4448,18 @@
     },
     "strengthsKey": "grok-4-20.strengths",
     "weaknessesKey": "grok-4-20.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-28T21:40:25Z",
     "benchUpdated": {
       "swePro": "2026-04-28",
-      "sweV": "2026-04-28",
-      "lcbV6": "2026-04-28",
-      "gpqa": "2026-04-28",
-      "hle": "2026-04-28"
+      "sweV": "2026-04-29",
+      "lcbV6": "2026-04-29",
+      "gpqa": "2026-04-29",
+      "hle": "2026-04-29",
+      "tb2": "2026-04-29",
+      "tau2": "2026-04-29",
+      "aaCoding": "2026-04-29",
+      "aaAgentic": "2026-04-29",
+      "aaIdx": "2026-04-29"
     }
   }
 ]

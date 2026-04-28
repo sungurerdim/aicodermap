@@ -494,7 +494,9 @@ def main():
     matrix_warn = ""
     matrix = out.get("coverageMatrix")
     if not isinstance(matrix, dict):
-        matrix_warn = " [WARN: artifact missing coverageMatrix; agent skipped self-audit]"
+        matrix_warn = (
+            " [WARN: artifact missing coverageMatrix; agent skipped self-audit]"
+        )
     else:
         total = matrix.get("totalCells")
         filled = matrix.get("filledCells")
@@ -516,8 +518,9 @@ def main():
     # skill orchestrator (and any caller) sees the merge did not complete.
     # No CHANGELOG entry, no commit-eligible state — drift never reaches main.
     import subprocess
+
     proc = subprocess.run(
-        ["python3", f"{PROJECT}/scripts/audit-data-coherence.py"],
+        [sys.executable, f"{PROJECT}/scripts/audit-data-coherence.py"],
         capture_output=True,
         text=True,
         check=False,
@@ -534,7 +537,8 @@ def main():
         if rolled:
             print(
                 f"  Rolled back {len(rolled)} file(s) from .bak so the working tree "
-                f"matches the pre-merge state:", file=sys.stderr,
+                f"matches the pre-merge state:",
+                file=sys.stderr,
             )
             for p in rolled:
                 print(f"    - {os.path.relpath(p, PROJECT)}", file=sys.stderr)
@@ -542,7 +546,8 @@ def main():
         print(
             "  Fix the drift in .aicodermap-agent-out.json (the agent's artifact) "
             "or the underlying SSOT files, then re-run merge. Commit is blocked "
-            "until audit passes.", file=sys.stderr,
+            "until audit passes.",
+            file=sys.stderr,
         )
         print("=" * 72, file=sys.stderr)
         sys.exit(1)
