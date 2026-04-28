@@ -44,7 +44,7 @@ function staticColumns() {
         span.textContent = fmtScore(ctx.score);
         wrap.appendChild(span);
         const cov = coverageOf(m, State.weights);
-        if (cov != null && cov < 1) {
+        if (cov != null) {
           const pct = Math.round(cov * 100);
           const cls = `coverage-mini ${pct >= 75 ? 'cov-full' : pct >= 40 ? 'cov-partial' : 'cov-low'}`;
           const covSpan = document.createElement('span');
