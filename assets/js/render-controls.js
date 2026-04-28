@@ -129,15 +129,26 @@ export function syncLangToggleUi() {
   });
 }
 
-// Footer chip "Deployed: 2026-04-28 14:07 UTC" sourced from the models.json
-// Last-Modified header (Pages CDN refreshes it on every successful deploy).
+// Footer chip "Deployed: 2026-04-28 14:07 UTC · build a1b2c3d" — Last-Modified
+// timestamp from the Pages CDN plus a short hash derived from the ETag (GitHub
+// Pages computes ETag from file contents, so distinct deploys never share it).
 // Re-rendered on language switch so the prefix follows the active locale.
+function shortBuildHash(etag) {
+  if (!etag || typeof etag !== 'string') return null;
+  const hex = etag.replace(/^W\//, '').replace(/^"|"$/g, '').split('-')[0] || '';
+  return hex ? hex.slice(-7) : null;
+}
+
 export function renderDeployStamp() {
   const node = document.getElementById('footer-deployed-at');
   if (!node) return;
   const formatted = fmtDeployTime(State.dataDeployedAt);
   if (!formatted) return;
-  node.textContent = `${t('ui.footer.deployed') || 'Deployed'}: ${formatted}`;
-  node.title = State.dataDeployedAt;
+  const label = t('ui.footer.deployed') || 'Deployed';
+  const sha = shortBuildHash(State.dataEtag);
+  node.textContent = sha
+    ? `${label}: ${formatted} · build ${sha}`
+    : `${label}: ${formatted}`;
+  node.title = `${State.dataDeployedAt}${State.dataEtag ? ` (etag ${State.dataEtag})` : ''}`;
   node.hidden = false;
 }

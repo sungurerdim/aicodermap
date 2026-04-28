@@ -86,7 +86,7 @@
     },
     "freshness": {
       "refresh": "Refresh",
-      "stale": "A newer update was published (commit {sha}, {ageMin} min ago). Refresh the page."
+      "stale": "Newer build is live (commit {liveSha} · serving {servedShort} · {ageMin} min ago). Will reflect on refresh."
     },
     "tier": {
       "frontier": "FRONTIER",

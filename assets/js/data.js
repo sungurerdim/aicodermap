@@ -24,12 +24,17 @@ export async function fetchJson(name) {
   const url = new URL(`${name}?v=${encodeURIComponent(bust)}`, DATA_BASE);
   const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error(`${name} ${res.status}`);
-  // models.json's Last-Modified header reflects the GitHub Pages CDN's
-  // most recent file refresh — i.e. the live deploy time. Capture it so the
-  // footer can show whether the user is looking at a fresh or stale build.
+  // models.json's response headers fingerprint the served deploy:
+  // - Last-Modified: when Pages CDN last refreshed the file (deploy time).
+  // - ETag: GitHub Pages' content-derived hash; two distinct file contents
+  //   produce two distinct ETags. freshness.js polls HEAD requests and
+  //   compares ETag against State.dataEtag to detect a fresh deploy without
+  //   reloading the body or hitting GitHub's API rate limit.
   if (name === 'models.json') {
     const lm = res.headers.get('Last-Modified');
     if (lm) State.dataDeployedAt = lm;
+    const et = res.headers.get('ETag');
+    if (et) State.dataEtag = et;
   }
   return res.json();
 }

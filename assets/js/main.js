@@ -16,7 +16,7 @@ import {
 } from './render-controls.js';
 import { renderAll } from './render-table.js';
 import { wireEvents } from './events.js';
-import { checkFreshness } from './freshness.js';
+import { startFreshnessWatch } from './freshness.js';
 
 function bootstrapTheme() {
   const storedTheme = readStorage(STORAGE.theme, null);
@@ -163,10 +163,10 @@ async function bootstrap() {
   renderAll();
   wireEvents();
 
-  // Compare GitHub's latest commit timestamp with the served Pages build —
-  // surfaces a "newer update available, refresh" banner when the user's open
-  // session is on a stale build. Fire-and-forget; failures fall silent.
-  checkFreshness();
+  // Watch for a fresh deploy by polling models.json's ETag (GitHub Pages
+  // content hash) on a delay + 5min interval + tab-visibility change.
+  // Triggers the banner the moment the user's tab is visible after a push.
+  startFreshnessWatch();
 }
 
 if (document.readyState === 'loading') {

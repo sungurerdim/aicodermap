@@ -479,6 +479,30 @@ def main():
             f" [WARN: cumulative provenance coverage {cov_pct}% below 85% target]"
         )
 
+    # PRE_EMIT_SELF_AUDIT verification — advisory log, never blocks (UNCAPPED).
+    # The agent is contractually required to compute coverageMatrix and the
+    # invariant filledCells + gapsRecorded == totalCells. We re-verify here so
+    # a forgotten/skipped agent self-audit doesn't slip past silently. Output
+    # is a CHANGELOG line + console warning; commit + push proceeds either way.
+    matrix_warn = ""
+    matrix = out.get("coverageMatrix")
+    if not isinstance(matrix, dict):
+        matrix_warn = " [WARN: artifact missing coverageMatrix; agent skipped self-audit]"
+    else:
+        total = matrix.get("totalCells")
+        filled = matrix.get("filledCells")
+        gaps_recorded = matrix.get("gapsRecorded")
+        if not all(isinstance(x, int) for x in (total, filled, gaps_recorded)):
+            matrix_warn = " [WARN: coverageMatrix has non-int totalCells/filledCells/gapsRecorded]"
+        elif filled + gaps_recorded != total:
+            short = total - (filled + gaps_recorded)
+            matrix_warn = (
+                f" [WARN: coverageMatrix invariant violated — "
+                f"{short} cell(s) silently missing (filled={filled} + gaps={gaps_recorded} ≠ total={total})]"
+            )
+    if matrix_warn:
+        coverage_warn = (coverage_warn + matrix_warn) if coverage_warn else matrix_warn
+
     cl_path = f"{PROJECT}/CHANGELOG.md"
     cl_lines = [f"\n## [{TODAY}] — autonomous refresh-all{coverage_warn}\n"]
     if log["added"]:
@@ -529,6 +553,14 @@ def main():
     print(f"  contradictions auto-resolved: {len(log['contradictions'])}")
     print(f"  sources appended: {log['sources_appended']}")
     print(f"  coverage:   {cov_pct}%{' (PARTIAL WARN)' if coverage < 0.50 else ''}")
+    if matrix_warn:
+        print(f"  audit:     {matrix_warn.lstrip(' [').rstrip(']')}")
+    elif isinstance(matrix, dict):
+        print(
+            f"  audit:      coverageMatrix OK "
+            f"(filled={matrix.get('filledCells')}/{matrix.get('totalCells')}, "
+            f"gaps={matrix.get('gapsRecorded')})"
+        )
     if log["format_warnings"]:
         print(f"  format warnings: {len(log['format_warnings'])} (non-blocking)")
         for w in log["format_warnings"][:5]:

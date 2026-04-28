@@ -172,30 +172,29 @@ docs are S-tier in addition.
 
 ### Phase 3 — Per-cell exhaustive fill (no per-model gate)
 
-**Trigger:** every `(active_model, benchKey)` cell that is `null` after
-Phase 1+2, where `benchKey ∈ core_bench_key_universe` AND at least one
+**Trigger:** every `(active_model, benchKey)` cell where the cell is `null`
+after Phase 1+2 AND `benchKey ∈ core_bench_key_universe` AND at least one
 whitelist leaderboard's `publishes[]` includes `benchKey`. Per-cell, NOT
-per-model. Vendor blog already containing OTHER benches for that model is
-irrelevant.
+per-model. A vendor blog containing OTHER benches for the model does not
+excuse skipping search for the still-empty cells.
 
-**Fallback chain per cell** (walked in order until value found or exhausted):
+**Fallback chain per cell** — defined canonically in two existing sections.
+Phase 3 RUNS them per still-empty cell; it does not introduce new logic:
 
-```
-1. Every leaderboard whose publishes[] includes benchKey (parallel single-message)
-2. Vendor URL bundle (sourcesWhitelist.vendors.<vendor>.urls.{news, docs, model_pages})
-3. HuggingFace card (vendors[].urls.models OR huggingface.co/<author>/<id>)
-4. Aggregator mirrors (pricepertoken, llm-stats, vals.ai for SPA-blocked sources)
-5. WebSearch — minimum 2 queries per cell:
-     a. "<modelName>" benchmark "<benchKeyHumanName>" 2026
-     b. "<modelName>" "<benchKeyHumanName>" score
-6. WebSearch with vendor-specific phrasing if 5a/5b empty
-```
+1. **PER_MODEL_URL_EXPANSION** (Step 1-3) — leaderboards publishing
+   `benchKey`, then `vendors.<v>.urls.modelCardUrlTemplate` /
+   `postUrlPattern` with slug variations.
+2. **WEBSEARCH_PRIMARY_DISCIPLINE** (≥2 queries per cell, vendor-specific
+   phrasing variants for the third query when the first two are empty).
+3. **INTERNAL_RETRY_DISCIPLINE** — format-driven cascade through the
+   entry's `fallbacks[]` chain (aggregator mirrors, image-OCR via
+   `scripts/extract-images.py`, etc.).
 
-Only after ALL 6 steps return zero hits is the cell allowed to remain null,
-and ONLY with a `gaps[]` entry carrying:
+A cell may remain null only after every step above has been attempted, and
+ONLY with a `gaps[]` entry carrying
 `{key, reason, triedFormats[], triedPatterns[], triedSources[], triedQueries[]}`.
-Silent omission of a null cell is a contract violation — the orchestrator's
-self-audit (SKILL.md merge.py self-check) flags it as `coverage_audit:incomplete`.
+**Silent omission of a null cell is a contract violation.** The
+PRE_EMIT_SELF_AUDIT step (below) blocks final emission when this happens.
 
 ## EXTRACTION_DISCIPLINE (named-pattern dispatch, three-pass discipline)
 
@@ -531,6 +530,86 @@ ties: prefer I-tier, then most recent, then highest verifications
 9. **TrustScore computation**: every sourcesAdded[] entry MUST carry a computed trustScore using the formula in TRUST_SCORE_FORMULA
 10. **Trusted-source whitelist**: when `trusted_sources_only=true`, never fetch outside the whitelist. Emit gaps[] instead of falling back to open web
 
+## PRE_EMIT_SELF_AUDIT (mandatory gate before final JSON delivery)
+
+Before producing the final JSON, the agent MUST run this self-audit. The
+audit is the contract teeth behind every section above: per-cell mandate,
+exhaustive cascade, gaps[] discipline. Skipping the audit is a contract
+violation — even if the artifact looks plausible without it.
+
+```
+# Build the universe to be audited.
+active_models     := [m for m in idea_context.modelsCurrent if m.status != 'archived']
+core_bench_keys   := whitelist._schema.coreBenchKeys
+                     # NOT the union with leaderboard.publishes[] — only the
+                     # core set that every model is expected to have. Bench
+                     # keys outside this set may legitimately have no value.
+total_universe    := { (m.id, k) for m in active_models for k in core_bench_keys }
+
+# Walk this cycle's artifact for what got filled vs. flagged as gap.
+filled_cells := {
+   (m.id, k) : v
+   for m in artifact.models  for k, v in (m.updates.bench or {}).items()
+   if v is not None
+} ∪ {
+   (m.id, k) : value-from-pre-existing-data    # rule below
+   for m in active_models for k in core_bench_keys
+   if data_models[m.id].bench.get(k) is not None
+}
+
+gap_cells := { parse_cell(g.key) for g in artifact.gaps if matches "<modelId>.<benchKey>" }
+
+# Invariant: every (model, bench) in the audit universe is either filled
+# or has a gaps[] entry. No exceptions.
+missing_cells := total_universe \ (filled_cells.keys() | gap_cells)
+
+if missing_cells:
+   # CONTRACT VIOLATION. Loop back through Phase 3 for these specific cells.
+   # On the second pass, if a cell still has no value and was not attempted,
+   # the agent MUST emit a gaps[] entry with the truthful triedSources[]
+   # (which may be empty) + reason "self-audit-fallback: phase-3 cascade
+   # produced no candidates within structural completeness".
+   for (mid, bk) in missing_cells:
+      run Phase 3 cascade for (mid, bk) one more time
+      if value found: append to artifact.models[*].updates + sourcesAdded[]
+      else:           append to artifact.gaps[] with full provenance
+
+# Compute the matrix the orchestrator will verify.
+artifact.coverageMatrix := {
+   totalCells:       |total_universe|,
+   filledCells:      |filled_cells|,
+   filledThisCycle:  count of artifact.models[*].sourcesAdded[*] keys
+                     restricted to "<modelId>.<benchKey>" form,
+   gapsRecorded:     |gap_cells|,
+   byBench: { k: { filled: <int>, total: |active_models| } for k in core_bench_keys },
+   byModel: { m.id: { filled: <int>, total: |core_bench_keys|, gaps: <int> } for m in active_models }
+}
+
+# Final invariant check (loud failure to runtime.contractCheck if violated):
+assert artifact.coverageMatrix.filledCells + artifact.coverageMatrix.gapsRecorded
+       == artifact.coverageMatrix.totalCells
+
+# If still violated after the loop-back, emit runtime.coverageAuditFailure[]
+# listing the residual missing cells so the orchestrator's CHANGELOG warning
+# reflects exactly which cells fell through every rule.
+```
+
+**Emission rules tied to the audit:**
+
+- The `coverageMatrix` field is required on every `scope=full` artifact. The
+  orchestrator's merge.py self-check rejects cycles missing the matrix with a
+  loud advisory log (not a hard block — UNCAPPED doctrine — but every
+  reviewer sees it).
+- A still-empty cell after the loop-back is acceptable ONLY if the gap entry
+  explains why (e.g., "vendor opt-out: model not on any leaderboard publishing
+  this bench; vendor blog does not publish this bench either; ≥2 WebSearch
+  queries returned no relevant snippet").
+- Bench keys that NO whitelist leaderboard publishes for ANY model
+  (extremely rare — `aaOmni` if no leaderboard adds it, etc.) drop out of
+  `core_bench_keys` automatically; they don't pollute the invariant.
+- The audit is the agent's last instruction before OUTPUT_DELIVERY. It runs
+  in the same turn as the JSON emission — there is no "interactive followup".
+
 ## OUTPUT_DELIVERY
 
 **CRITICAL — non-negotiable contract with the calling skill:**
@@ -621,9 +700,10 @@ expected: ≤30s, single-pair fill, returns one models[].updates entry + sources
 - **Trusted-source whitelist** — when trusted_sources_only=true, never fetch outside the list; emit gaps[] only AFTER `INTERNAL_RETRY_DISCIPLINE` has been exhausted
 - **Trust scoring** — every emitted value carries a trustScore (formula above)
 - **Multi-provider pricing** — pricing.api is always an array, one element per provider, dedupe by provider
-- **Budget discipline** — 6 fetches × 90s per model, 5 parallel, hard caps; STOP and return partial on hit
+- **UNCAPPED effort** — no fetch budget, no wallclock cap, no per-model fetch cap. Termination is governed exclusively by COMPLETENESS_TERMINATION (every active_model × every core_bench_key cell either filled or carrying a `gaps[]` entry with full triedSources/triedQueries provenance). 5 is a parallelism guideline, not a ceiling.
 - **Auto-resolution prep** — emit `autoResolveWinner` per contradiction (skill applies, no user prompt)
 - **Lifecycle states** — emit `status` field changes via `lineupChanges` (skill applies transitions)
+- **Pre-emit self-audit (REQUIRED)** — see PRE_EMIT_SELF_AUDIT below. Agent computes coverageMatrix and verifies the invariant `filledCells + gapsRecorded == totalCells` BEFORE producing the final JSON. If violated, loop back through Phase 3 for the missing cells, then re-audit.
 - **Delivery contract** — JSON-only final message, no narration, no file write, no truncation
 - **Project boundary** — only AICoderMap session
 
@@ -984,7 +1064,7 @@ lookup(map, provider, variant):
 | OpenAI / DeepSeek / Moonshot / Z.ai / Xiaomi / MiniMax / Nvidia / StepFun / all_hands_ai | no quirk — `{id}` directly resolves | default empty (covered) |
 | Mistral / Meta | blog post slug uses descriptive kebab (`mistral-large-2407`, `llama-4-multimodal-intelligence`) — NOT derivable from model.id | WebSearch-driven discovery (out of scope for slug-tune; agent fallback chain handles) |
 
-**Budget impact:** Step 2 + Step 3 add up to 4 + 4 = 8 fetch attempts per model (vs prior 0). The per_model_fetch_budget MUST be raised to **12** (from 6) when `scope=full` to absorb the cascade. The skill orchestrator enforces this; the agent does not exceed `per_model_fetch_budget` regardless.
+**Effort impact:** Step 2 + Step 3 add up to ~4 + ~4 = ~8 fetch attempts per model. Under the UNCAPPED doctrine these are NOT budgeted — they all run. Parallelism guideline of 5 concurrent models still applies for queue scheduling, but the per-model attempt count rises and falls with the cascade's actual reach.
 
 **404 logging:** Every 404 from Step 2-3 is logged to `triedSources[]` with status `404` so the next cycle does NOT retry that exact URL (saves budget). The orchestrator inspects `triedSources[].status` and skips known-404 variants for 30 days, then re-attempts (vendors may publish post later).
 
