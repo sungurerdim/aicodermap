@@ -46,9 +46,13 @@ export function applyI18n(root) {
   });
 }
 
+// Module-relative so it works from any HTML entry point (index.html, smoke.html).
+const I18N_BASE = new URL('../../i18n/', import.meta.url);
+
 export async function loadI18n(lang) {
   try {
-    const res = await fetch(`./i18n/${lang}.json`, { cache: 'no-cache' });
+    const url = new URL(`${lang}.json`, I18N_BASE);
+    const res = await fetch(url, { cache: 'no-cache' });
     if (!res.ok) throw new Error('i18n fetch failed');
     return await res.json();
   } catch (_) {

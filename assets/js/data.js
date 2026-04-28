@@ -6,17 +6,24 @@ import {
   validateModels,
 } from './core.js';
 
-export async function fetchJson(path) {
-  const res = await fetch(path, { cache: 'no-cache' });
-  if (!res.ok) throw new Error(`${path} ${res.status}`);
+// Resolve data URLs against this module's location so loadData() works whether
+// the caller is index.html (project root) or assets/test/smoke.html (deeper).
+// import.meta.url here = .../assets/js/data.js, so '../../data/' lands at
+// .../data/.
+const DATA_BASE = new URL('../../data/', import.meta.url);
+
+export async function fetchJson(name) {
+  const url = new URL(name, DATA_BASE);
+  const res = await fetch(url, { cache: 'no-cache' });
+  if (!res.ok) throw new Error(`${name} ${res.status}`);
   return res.json();
 }
 
 export async function loadData() {
   const [models, sources, gpu] = await Promise.all([
-    fetchJson('./data/models.json'),
-    fetchJson('./data/sources.json'),
-    fetchJson('./data/gpu-database.json'),
+    fetchJson('models.json'),
+    fetchJson('sources.json'),
+    fetchJson('gpu-database.json'),
   ]);
   State.models = validateModels(models);
   State.sources = (sources && typeof sources === 'object') ? sources : {};

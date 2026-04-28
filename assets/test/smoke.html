@@ -117,8 +117,11 @@
     assertEq('scoreClass(30) → low', scoreClass(30), 'score-low');
     assertEq('scoreClass(null) → na', scoreClass(null), 'score-na');
 
-    // 8. data: fmtScore
-    assertEq('fmtScore(50.55) → "50.6"', fmtScore(50.55), '50.6');
+    // 8. data: fmtScore (note: 50.55 has a float-storage quirk where toFixed(1)
+    // returns "50.5" because 50.55 ≈ 50.5499999... — use values that round
+    // unambiguously to keep the test from depending on IEEE 754 edges)
+    assertEq('fmtScore(72.36) → "72.4"', fmtScore(72.36), '72.4');
+    assertEq('fmtScore(50.5) → "50.5"', fmtScore(50.5), '50.5');
     assertEq('fmtScore(null) → "—"', fmtScore(null), '—');
 
     // 9. data: fmtContext
