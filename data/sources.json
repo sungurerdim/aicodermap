@@ -1449,11 +1449,12 @@
   "gemma-4-31b.lcbV6": [
     {
       "value": 80,
-      "source": "Google DeepMind Gemma 4 blog",
+      "source": "Gemma 4 Google DeepMind announcement",
       "url": "https://blog.google/innovation-and-ai/technology/developers-tools/gemma-4/",
       "date": "2026-04-02",
       "tier": "S",
-      "trustScore": 0.467
+      "trustScore": 0.7,
+      "verifications": 2
     },
     {
       "value": 80,
@@ -2947,12 +2948,12 @@
     },
     {
       "value": 89.2,
-      "source": "Gemma 4 official blog + review",
+      "source": "Gemma 4 Google DeepMind",
       "url": "https://blog.google/innovation-and-ai/technology/developers-tools/gemma-4/",
       "date": "2026-04-29",
       "tier": "S",
       "verifications": 2,
-      "trustScore": 0.77
+      "trustScore": 0.7
     }
   ],
   "gemma-4-31b.tau2": [
@@ -2976,11 +2977,11 @@
     },
     {
       "value": 86.4,
-      "source": "Gemma 4 official blog",
+      "source": "Gemma 4 announcement",
       "url": "https://blog.google/innovation-and-ai/technology/developers-tools/gemma-4/",
       "date": "2026-04-29",
       "tier": "S",
-      "verifications": 1,
+      "verifications": 2,
       "trustScore": 0.7
     }
   ],
@@ -3315,12 +3316,12 @@
   "gpt-5-5.tb2": [
     {
       "value": 82.7,
-      "source": "OpenAI official announcement",
+      "source": "OpenAI GPT-5.5 announcement",
       "url": "https://openai.com/index/introducing-gpt-5-5/",
       "date": "2026-04-26",
       "tier": "S",
       "verifications": 2,
-      "trustScore": 0.77
+      "trustScore": 0.7
     }
   ],
   "gpt-5-5.swePro": [
@@ -3360,6 +3361,15 @@
       "tier": "S",
       "verifications": 2,
       "trustScore": 0.77
+    },
+    {
+      "value": 58.6,
+      "source": "OpenAI GPT-5.5 announcement",
+      "url": "https://openai.com/index/introducing-gpt-5-5/",
+      "date": "2026-04-29",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.7
     }
   ],
   "kimi-k2-6.context": [
@@ -3429,12 +3439,12 @@
   "gemma-4-31b.gpqa": [
     {
       "value": 84.3,
-      "source": "Google DeepMind Gemma 4",
+      "source": "Gemma 4 Google announcement",
       "url": "https://deepmind.google/models/gemma/gemma-4/",
       "date": "2026-04-26",
       "tier": "S",
-      "verifications": 1,
-      "trustScore": null
+      "verifications": 2,
+      "trustScore": 0.7
     },
     {
       "value": 84.3,
@@ -5550,6 +5560,26 @@
       "tier": "S",
       "verifications": 2,
       "trustScore": 0.85
+    },
+    {
+      "value": 3,
+      "source": "xAI official docs",
+      "url": "https://docs.x.ai/developers/models",
+      "date": "2026-04-29",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7,
+      "contradictionRole": "winner"
+    },
+    {
+      "value": 2,
+      "source": "OpenRouter",
+      "url": "https://openrouter.ai/x-ai/grok-4.20",
+      "date": "2026-04-29",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.67,
+      "contradictionRole": "loser"
     }
   ],
   "sonnet-4-6.bench.gpqa": [
@@ -6853,23 +6883,23 @@
     },
     {
       "value": 93.6,
-      "source": "Benchmark search April 2026",
+      "source": "Multiple aggregators",
       "url": "https://llm-stats.com/models/gpt-5.5",
       "date": "2026-04-29",
       "tier": "I",
       "verifications": 2,
-      "trustScore": 0.89
+      "trustScore": 0.78
     }
   ],
   "gpt-5-5.hle": [
     {
       "value": 41.4,
-      "source": "WebSearch-BenchLM",
+      "source": "BenchLM",
       "url": "https://benchlm.ai/models/gpt-5-5",
       "date": "2026-04-28",
       "tier": "I",
       "verifications": 1,
-      "trustScore": 0.85
+      "trustScore": 0.67
     },
     {
       "value": 41.4,
@@ -6899,6 +6929,15 @@
       "tier": "I",
       "verifications": 2,
       "trustScore": 0.89
+    },
+    {
+      "value": 60,
+      "source": "Artificial Analysis",
+      "url": "https://artificialanalysis.ai/models/gpt-5.5",
+      "date": "2026-04-29",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.67
     }
   ],
   "gpt-5-5.mcpA": [
@@ -6958,12 +6997,12 @@
   "grok-4-20.gpqa": [
     {
       "value": 91.1,
-      "source": "BenchLM WebSearch",
+      "source": "BenchLM Grok 4.20",
       "url": "https://benchlm.ai/models/grok-4-20-beta",
       "date": "2026-04-28",
       "tier": "I",
       "verifications": 1,
-      "trustScore": 0.82
+      "trustScore": 0.67
     }
   ],
   "grok-4-20.hle": [
@@ -6975,6 +7014,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": 0.82
+    },
+    {
+      "value": 32.2,
+      "source": "Artificial Analysis",
+      "url": "https://artificialanalysis.ai/models/grok-4-20",
+      "date": "2026-04-29",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.67
     }
   ],
   "glm-5-1.tb2": [
@@ -7247,6 +7295,15 @@
       "verifications": 1,
       "trustScore": 0.4,
       "contradictionRole": "loser"
+    },
+    {
+      "value": 88.7,
+      "source": "Vellum LLM Leaderboard",
+      "url": "https://www.vellum.ai/blog/everything-you-need-to-know-about-gpt-5-5",
+      "date": "2026-04-29",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.67
     }
   ],
   "gpt-5-5.pricing.api.out": [
@@ -7395,12 +7452,12 @@
   "grok-4-20.aaIdx": [
     {
       "value": 49,
-      "source": "Artificial Analysis Grok 4.20 page",
+      "source": "Artificial Analysis",
       "url": "https://artificialanalysis.ai/models/grok-4-20",
       "date": "2026-04-29",
       "tier": "I",
-      "verifications": 2,
-      "trustScore": 0.89
+      "verifications": 1,
+      "trustScore": 0.67
     }
   ],
   "grok-4-20.tau2": [
@@ -7445,6 +7502,59 @@
       "verifications": 1,
       "trustScore": 0.67,
       "contradictionRole": "winner"
+    },
+    {
+      "value": 58.6,
+      "source": "LLM Stats SWE-bench Verified leaderboard",
+      "url": "https://llm-stats.com/benchmarks/swe-bench-verified",
+      "date": "2026-04-29",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.67
+    }
+  ],
+  "claude-haiku-4-5.gpqa": [
+    {
+      "value": 67.2,
+      "source": "Artificial Analysis",
+      "url": "https://artificialanalysis.ai/models/claude-4-5-haiku",
+      "date": "2026-04-29",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.67
+    }
+  ],
+  "mimo-v2-5.sweV": [
+    {
+      "value": 78.9,
+      "source": "MiMo-V2.5 MarkTechPost review",
+      "url": "https://www.marktechpost.com/2026/04/22/xiaomi-releases-mimo-v2-5-pro-and-mimo-v2-5-matching-frontier-model-benchmarks-at-significantly-lower-token-cost/",
+      "date": "2026-04-29",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.27
+    }
+  ],
+  "gpt-5-5.tau2": [
+    {
+      "value": 98,
+      "source": "OpenAI GPT-5.5 announcement (Tau2-Bench Telecom)",
+      "url": "https://openai.com/index/introducing-gpt-5-5/",
+      "date": "2026-04-29",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "mimo-v2-5-pro.sweV": [
+    {
+      "value": 78.9,
+      "source": "MiMo-V2.5-Pro MarkTechPost",
+      "url": "https://www.marktechpost.com/2026/04/22/xiaomi-releases-mimo-v2-5-pro-and-mimo-v2-5-matching-frontier-model-benchmarks-at-significantly-lower-token-cost/",
+      "date": "2026-04-29",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.27
     }
   ]
 }

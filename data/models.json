@@ -1757,7 +1757,7 @@
     },
     "bench": {
       "swePro": 56.1,
-      "sweV": null,
+      "sweV": 78.9,
       "tb2": null,
       "lcbV6": null,
       "aider": null,
@@ -1780,10 +1780,11 @@
     "vramRequirement": null,
     "strengthsKey": "mimo-v2-5.strengths",
     "weaknessesKey": "mimo-v2-5.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-28T22:05:24Z",
     "status": "active",
     "benchUpdated": {
-      "swePro": "2026-04-28"
+      "swePro": "2026-04-28",
+      "sweV": "2026-04-29"
     }
   },
   {
@@ -1832,7 +1833,7 @@
     "bench": {
       "swePro": 57.2,
       "tb2": null,
-      "sweV": null,
+      "sweV": 78.9,
       "lcbV6": null,
       "aider": null,
       "tau2": 72.9,
@@ -1854,12 +1855,13 @@
     "vramRequirement": null,
     "strengthsKey": "mimo-v2-5-pro.strengths",
     "weaknessesKey": "mimo-v2-5-pro.weaknesses",
-    "lastUpdated": "2026-04-28T00:00:00Z",
+    "lastUpdated": "2026-04-28T22:05:24Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-04-28",
       "gpqa": "2026-04-28",
-      "hle": "2026-04-28"
+      "hle": "2026-04-28",
+      "sweV": "2026-04-29"
     }
   },
   {
@@ -3397,7 +3399,7 @@
     "vramRequirement": 20,
     "strengthsKey": "gemma-4-31b.strengths",
     "weaknessesKey": "gemma-4-31b.weaknesses",
-    "lastUpdated": "2026-04-28T21:40:25Z",
+    "lastUpdated": "2026-04-29",
     "status": "active",
     "ollama": {
       "pullCmd": "ollama run gemma4:31b",
@@ -3423,7 +3425,7 @@
       "ollamaUrl": "https://ollama.com/library/gemma4"
     },
     "benchUpdated": {
-      "sweV": "2026-04-28",
+      "sweV": "2026-04-29",
       "lcbV6": "2026-04-29",
       "tau2": "2026-04-29",
       "gpqa": "2026-04-29",
@@ -4262,7 +4264,7 @@
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": null,
+      "gpqa": 67.2,
       "sweMulti": null,
       "hle": null,
       "aaIdx": 31,
@@ -4277,11 +4279,12 @@
     "vramRequirement": null,
     "strengthsKey": "claude-haiku-4-5.strengths",
     "weaknessesKey": "claude-haiku-4-5.weaknesses",
-    "lastUpdated": "2026-04-28T21:40:25Z",
+    "lastUpdated": "2026-04-28T22:05:24Z",
     "benchUpdated": {
       "swePro": "2026-04-28",
       "sweV": "2026-04-29",
-      "aaIdx": "2026-04-29"
+      "aaIdx": "2026-04-29",
+      "gpqa": "2026-04-29"
     }
   },
   {
@@ -4292,7 +4295,7 @@
     "tier": "frontier",
     "open": false,
     "license": "Proprietary",
-    "context": 1050000,
+    "context": 1000000,
     "pricing": {
       "api": [
         {
@@ -4351,7 +4354,7 @@
     "providers": 2,
     "strengthsKey": "gpt-5-5.strengths",
     "weaknessesKey": "gpt-5-5.weaknesses",
-    "lastUpdated": "2026-04-28T21:40:25Z",
+    "lastUpdated": "2026-04-28T22:05:24Z",
     "status": "active",
     "sourcesAdded": [
       {
@@ -4382,7 +4385,8 @@
       "gpqa": "2026-04-29",
       "hle": "2026-04-29",
       "aaIdx": "2026-04-29",
-      "sweV": "2026-04-29"
+      "sweV": "2026-04-29",
+      "tau2": "2026-04-29"
     }
   },
   {
@@ -4405,7 +4409,7 @@
           "cacheHit": null,
           "throughput": null,
           "url": "https://docs.x.ai/developers/models",
-          "fetched": "2026-04-28"
+          "fetched": "2026-04-29"
         },
         {
           "provider": "openrouter",
@@ -4414,7 +4418,7 @@
           "cacheHit": null,
           "throughput": null,
           "url": "https://openrouter.ai/x-ai/grok-4.20",
-          "fetched": "2026-04-27"
+          "fetched": "2026-04-29"
         }
       ],
       "range": {
@@ -4448,9 +4452,9 @@
     },
     "strengthsKey": "grok-4-20.strengths",
     "weaknessesKey": "grok-4-20.weaknesses",
-    "lastUpdated": "2026-04-28T21:40:25Z",
+    "lastUpdated": "2026-04-28T22:05:24Z",
     "benchUpdated": {
-      "swePro": "2026-04-28",
+      "swePro": "2026-04-29",
       "sweV": "2026-04-29",
       "lcbV6": "2026-04-29",
       "gpqa": "2026-04-29",
@@ -4461,5 +4465,69 @@
       "aaAgentic": "2026-04-29",
       "aaIdx": "2026-04-29"
     }
+  },
+  {
+    "id": "grok-4-3",
+    "updates": {
+      "name": "Grok 4.3 Beta",
+      "provider": "xAI",
+      "released": "2026-04-17",
+      "tier": "frontier",
+      "open": false,
+      "license": "Proprietary",
+      "context": 2000000,
+      "status": "active",
+      "pricing": {
+        "api": [
+          {
+            "provider": "official",
+            "in": null,
+            "out": null,
+            "cacheHit": null,
+            "throughput": null,
+            "url": "https://docs.x.ai/developers/models",
+            "fetched": "2026-04-29"
+          }
+        ]
+      },
+      "bench": {
+        "swePro": null,
+        "sweV": null,
+        "tb2": null,
+        "lcbV6": null,
+        "aider": null,
+        "tau2": null,
+        "aaCoding": null,
+        "aaAgentic": null,
+        "mcpA": null,
+        "gpqa": null,
+        "sweMulti": null,
+        "hle": null,
+        "aaIdx": null,
+        "bfcl": null,
+        "aime26": null,
+        "aaOmni": null
+      },
+      "providers": 1,
+      "uptime": null,
+      "ollamaSize": null,
+      "unslothVariants": null,
+      "vramRequirement": null,
+      "strengthsKey": "grok-4-3.strengths",
+      "weaknessesKey": "grok-4-3.weaknesses",
+      "lastUpdated": "2026-04-29"
+    },
+    "sourcesAdded": [
+      {
+        "key": "grok-4-3.released",
+        "value": "2026-04-17",
+        "source": "TechSifted Grok 4.3 review",
+        "url": "https://dev.to/techsifted/grok-43-review-whats-new-in-xais-latest-model-april-2026-4l2l",
+        "tier": "C",
+        "fetched": "2026-04-29",
+        "verifications": 1,
+        "trustScore": 0.27
+      }
+    ]
   }
 ]

@@ -1,4 +1,26 @@
 
+## [2026-04-29] — autonomous refresh-all [WARN: cumulative provenance coverage 52.0% below 85% target] [WARN: coverageMatrix invariant violated — 428 cell(s) silently missing (filled=332 + gaps=8 ≠ total=768)]
+
+### Added
+- `grok-4-3` — new model from vendor lineup discovery
+
+### Updated
+- 5 models: `claude-haiku-4-5`, `mimo-v2-5`, `gpt-5-5`, `grok-4-20`, `mimo-v2-5-pro`
+
+### Resolved (auto via trustScore)
+- grok-4-20.pricing.api.in: winner={'value': 3, 'trustScore': 0.7, 'sourceUrl': 'https://docs.x.ai/developers/models', 'tier': 'S'} (severity=GREEN, Δ1)
+
+### Gaps (8 entries — see data/known-gaps.json or next refresh)
+- `gemma-3-27b.sweV`: Google does not officially publish SWE-bench Verified for Gemma 3 27B; swebench.com leaderboard has no entry; no independent evaluation found
+- `mimo-v2-5.sweV`: MiMo-V2.5 base model (not Pro) sweV not separately published; only V2.5-Pro has confirmed 78.9 sweV; base model data conflated; emitting single-source C-tier estimate
+- `claude-haiku-4-5.gpqa`: AA-sourced 67.2 not independently confirmed by second I-tier source; Anthropic model card does not publish Haiku GPQA separately; single-source I-tier
+- `grok-4-20.sweMulti`: No published SWE-bench Multilingual score for Grok 4.20 found on any leaderboard or xAI blog
+- `grok-4-20.mcpA`: No MCP-Atlas score for Grok 4.20 found in any indexed source
+- `qwen-3-6-max.swePro`: Qwen3.6-Max-Preview claims #1 on SWE-bench Pro but independent numeric score not confirmed; existing 58.4 is from prior cycle; Qwen blog does not publish exact number with methodology disclosure
+- `grok-4-3.bench.*`: Grok 4.3 Beta is SuperGrok-gated, no benchmarks published as of 2026-04-29
+- `gpt-5-5.lcbV6`: GPT-5.5 LCB v6 score not published by OpenAI or found on any leaderboard; OpenAI uses internal coding indices instead
+
+
 ## [2026-04-29] — autonomous refresh-all [WARN: cumulative provenance coverage 52.0% below 85% target] [WARN: artifact missing coverageMatrix; agent skipped self-audit]
 
 ### Updated
