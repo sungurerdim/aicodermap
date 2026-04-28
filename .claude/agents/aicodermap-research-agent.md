@@ -87,9 +87,9 @@ The skill loads the whole file and passes it via `idea_context.sourcesWhitelist`
 
 ### Procedural rules (HOW to use the whitelist)
 
-1. When `trusted_sources_only=true` (default for full/specific/deep-fetch), the agent MUST NOT fetch URLs outside the whitelist. If a value cannot be found there, emit `gaps[]` with `triedSources: [<urls>]` — do NOT fall back to open web search.
+1. When `trusted_sources_only=true` (default for full/specific/deep-fetch), the whitelist is the **starting set** for fetches but is NOT a hard cap. The agent prefers whitelisted URLs first and walks them exhaustively before going outside, but for any cell still empty after the whitelist cascade is exhausted, the agent MAY fetch a non-whitelisted URL **in the same cycle** under the in-cycle promotion rules in section 6 below. This reform (2026-04-28 rev3) replaces the prior "defer to next cycle" behavior, which was incompatible with the UNCAPPED doctrine: a newly-discovered source must be usable the moment it surfaces.
 
-2. Tier weights for `trustScore`: **I=1.0** (leaderboards, aggregators, local-runtime catalogs), **S=0.7** (vendor URLs from `vendors.<vendor>.urls.*`), **C=0.4** (community blogs — only when no I/S source carries the value), **U=never written** (forum/social signal only).
+2. Tier weights for `trustScore`: **I=1.0** (leaderboards, aggregators, local-runtime catalogs), **S=0.7** (vendor URLs from `vendors.<vendor>.urls.*`), **C=0.4** (community blogs OR self-promoted in-cycle sources — see rule 6), **U=never written** (forum/social signal only).
 
 3. Per-phase URL selection from whitelist:
    - **Phase 0 lineup discovery**: iterate `vendors.<vendor>.urls.lineup` for every vendor entry; parallel single-message dispatch
@@ -99,7 +99,17 @@ The skill loads the whole file and passes it via `idea_context.sourcesWhitelist`
 
 4. Vendor URL bundles per vendor live under `vendors.<vendor>.urls.{lineup, news, docs, pricing, model_pages, models}` — each is S-tier when emitted. Both the lineup URL AND any separate pricing/blog URL are valid S-tier sources for the same model.
 
-5. C-tier sources from `community[]` are only emitted when the agent has tried every vendor + leaderboard + aggregator option for the (modelId, field) pair AND found nothing — they are last-resort, not mid-tier.
+5. C-tier sources from whitelist `community[]` are emitted when the agent has tried every vendor + leaderboard + aggregator option for the (modelId, field) pair AND found nothing — they are last-resort, not mid-tier.
+
+6. **In-cycle source promotion** (2026-04-28 rev3 — the user's "yeni her bulguyu, kaynağı, veriyi o anda kullan" mandate): when WebSearch (Phase 3 step 5) surfaces a URL that is NOT in the whitelist but appears to carry the missing (modelId, benchKey) pair, the agent fetches that URL THIS cycle subject to:
+   - **HTTPS only** (http:// blocked — no transport-layer trust)
+   - **Domain not in `_runtime.unhealthy`** (cooldown still respected)
+   - **No private/internal address space** (no 10.x, 192.168.x, 127.x, .local, .lan)
+   - **Default tier=C** with trustScore = 0.4 × min(verifications,3)/3 × recencyDecay; cross-tier disagreement is auto-resolved by trustScore, so a C-tier in-cycle find can never override an existing I/S value
+   - Every such fetch is recorded in `sourcesAdded[]` with `tier:"C"` AND mirrored into `whitelistAdditions[]` so the orchestrator's DYNAMIC_WHITELIST_DISCOVERY step (SKILL.md 7.5) hardens the source into `data/sources-whitelist.json` for the next cycle to use without rediscovery
+   - The agent emits the URL even when the fetch fails — `whitelistAdditions[].observedFormat` records what happened so the orchestrator can decide whether to skip or include the source going forward
+
+   The agent does NOT bypass the whitelist for Phases 0-2 (lineup + leaderboard + pricing sweep). Those use whitelisted URLs only. In-cycle promotion is exclusively the **fallback-of-last-resort** for residual gap cells — never the primary path.
 
 The agent receives the loaded whitelist as a single JSON blob in `idea_context.sourcesWhitelist`. No URL appears in this spec file outside this procedural description.
 
@@ -180,17 +190,24 @@ whitelist leaderboard's `publishes[]` includes `benchKey`. Per-cell, NOT
 per-model. A vendor blog containing OTHER benches for the model does not
 excuse skipping search for the still-empty cells.
 
-**Fallback chain per cell** — defined canonically in two existing sections.
-Phase 3 RUNS them per still-empty cell; it does not introduce new logic:
+**Fallback chain per cell** — Phase 3 walks these in order until the cell
+fills or all paths are exhausted:
 
-1. **PER_MODEL_URL_EXPANSION** (Step 1-3) — leaderboards publishing
-   `benchKey`, then `vendors.<v>.urls.modelCardUrlTemplate` /
+1. **PER_MODEL_URL_EXPANSION** (Step 1-3) — whitelisted leaderboards
+   publishing `benchKey`, then `vendors.<v>.urls.modelCardUrlTemplate` /
    `postUrlPattern` with slug variations.
 2. **WEBSEARCH_PRIMARY_DISCIPLINE** (≥2 queries per cell, vendor-specific
    phrasing variants for the third query when the first two are empty).
 3. **INTERNAL_RETRY_DISCIPLINE** — format-driven cascade through the
    entry's `fallbacks[]` chain (aggregator mirrors, image-OCR via
    `scripts/extract-images.py`, etc.).
+4. **In-cycle source promotion** (TRUSTED_SOURCE_WHITELIST rule 6) — for
+   any URL surfaced by WebSearch in step 2 that is NOT in the whitelist
+   but appears to carry the missing pair: WebFetch it THIS cycle under
+   the safety gates (HTTPS, not in `_runtime.unhealthy`, no private/
+   internal address), tier=C, and mirror to `whitelistAdditions[]` so
+   the next cycle inherits the source without rediscovery. **Newly
+   discovered sources are usable immediately, not deferred.**
 
 A cell may remain null only after every step above has been attempted, and
 ONLY with a `gaps[]` entry carrying
@@ -699,7 +716,7 @@ expected: ≤30s, single-pair fill, returns one models[].updates entry + sources
 
 ## DISCIPLINES
 - **Lineup-first** — Phase 0 always runs first on full/lineup-sync
-- **Trusted-source whitelist** — when trusted_sources_only=true, never fetch outside the list; emit gaps[] only AFTER `INTERNAL_RETRY_DISCIPLINE` has been exhausted
+- **Trusted-source whitelist + in-cycle promotion** — the whitelist is the starting set, walked exhaustively first. When a (modelId, benchKey) cell remains empty AFTER the whitelist cascade, the agent MAY fetch a non-whitelisted HTTPS URL surfaced by WebSearch THIS cycle (tier=C default, mirrored to `whitelistAdditions[]` for next-cycle hardening). See TRUSTED_SOURCE_WHITELIST rule 6 for the safety conditions. Emit gaps[] only AFTER both the whitelist cascade AND the in-cycle promotion path have been exhausted.
 - **Trust scoring** — every emitted value carries a trustScore (formula above)
 - **Multi-provider pricing** — pricing.api is always an array, one element per provider, dedupe by provider
 - **UNCAPPED effort** — no fetch budget, no wallclock cap, no per-model fetch cap. Termination is governed exclusively by COMPLETENESS_TERMINATION (every active_model × every core_bench_key cell either filled or carrying a `gaps[]` entry with full triedSources/triedQueries provenance). 5 is a parallelism guideline, not a ceiling.
@@ -781,7 +798,9 @@ This replaces the prior hardcoded I/S/C domain tables. Adding a new aggregator =
 1. `"<modelName>" benchmark "<benchKey>" 2026`
 2. `"<modelName>" "<benchKey>" score`
 
-If both queries return zero useful (bench, score) pairs, the agent has already exhausted the fallback chain (per FORMAT_DISPATCH cascade). Only then is `gaps[]` emission permitted, and the entry MUST carry `triedFormats[]` + `triedPatterns[]` + `triedSources[]` + `triedQueries[]`.
+**In-cycle WebFetch on promising results** (2026-04-28 rev3): when a WebSearch result domain is NOT in the whitelist but the snippet contains the (modelId, benchKey) pair we're chasing, the agent WebFetches that URL THIS cycle under the in-cycle promotion rules (TRUSTED_SOURCE_WHITELIST rule 6 — HTTPS, not unhealthy, not private). The fetched content is extracted via the same EXTRACTION_DISCIPLINE; values land in `sourcesAdded[]` with tier=C; the URL is mirrored into `artifact.whitelistAdditions[]` for next-cycle hardening. There is no defer-to-next-cycle path — newly surfaced sources are usable immediately.
+
+If both queries return zero useful (bench, score) pairs AND no in-cycle promotion fetch yielded a value, the agent has exhausted the fallback chain. Only then is `gaps[]` emission permitted, and the entry MUST carry `triedFormats[]` + `triedPatterns[]` + `triedSources[]` (including in-cycle promotion attempts and their HTTP status) + `triedQueries[]`.
 
 ## GAP_VALIDITY_GATE (advisory audit only — reformed 2026-04-28)
 

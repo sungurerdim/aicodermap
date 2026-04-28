@@ -137,15 +137,17 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
    - Image OCR is opt-out per vendor: omit `imageOCRPatterns` (or set to `[]`) in the vendor's whitelist entry — no flag needed.
    - **Adding a new image-embedded vendor** = appending `imageOCRPatterns: ["<regex>"]` to that vendor's whitelist entry; no SKILL.md or agent.md change required.
 
-7.5. DYNAMIC_WHITELIST_DISCOVERY (self-healing whitelist mutation):
-   - Skill reads `artifact.whitelistAdditions[]` (agent emits when it finds high-quality new sources)
+7.5. DYNAMIC_WHITELIST_DISCOVERY (self-healing whitelist mutation, post-fact persistence):
+   - Reform 2026-04-28 rev3: the agent already FETCHED any non-whitelisted HTTPS source that surfaced during Phase 3 step 4 (in-cycle promotion — see agent.md TRUSTED_SOURCE_WHITELIST rule 6). Values from those fetches are already in `artifact.models[*].sourcesAdded[]` with tier=C and were merged into data/models.json + data/sources.json by step 10. This step's job is no longer to gate when the source is USED — it is to harden the source into the whitelist file so subsequent cycles can fetch it without rediscovery.
+   - Skill reads `artifact.whitelistAdditions[]` (agent emits ONE entry per non-whitelisted URL it fetched in-cycle, plus any URL it would have fetched but couldn't due to the safety gates)
    - For each addition:
-     * tier='C' → append to data/sources-whitelist.json `community[]` with format='static', lastVerifiedDate=today, consecutiveFailures=0
+     * tier='C' (default for in-cycle-promoted sources) → append to data/sources-whitelist.json `community[]` with format=`addition.observedFormat || 'static_html_article'`, lastVerifiedDate=today, consecutiveFailures=0
      * tier='I' → append to `aggregators[]` with phase='discovery' (not promoted without manual review)
      * tier='S' → only if matches existing vendor; ignored otherwise
    - Skill scans `artifact.runtime.healthChecks` and updates `data/sources-whitelist.json._runtime.healthChecks` per-domain
    - Domains with consecutiveFailures ≥ 3 across cycles get `_runtime.unhealthy: true`; auto-skipped in next 2 cycles' Phase 1 (still tried via WebSearch fallback)
    - Whitelist mutations are committed alongside data/* changes — versioned and reversible.
+   - **No data is "deferred" to next cycle.** The whitelist mutation is purely operational — it lets future cycles skip rediscovery and treat the source as a known starting point. The actual values discovered this cycle are committed this cycle.
 
 7.6. VERIFICATION_MAP_UPDATE (audit log, reformed 2026-04-28):
    - After merge writes data/models.json, run `python scripts/verification-map.py update`
