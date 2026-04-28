@@ -1,3 +1,31 @@
+
+## [2026-04-29] — autonomous refresh-all [WARN: very low cumulative provenance coverage 41.0%] [WARN: coverageMatrix invariant violated — 824 cell(s) silently missing (filled=347 + gaps=17 ≠ total=1188)]
+
+### Updated
+- 27 models: `opus-4-7`, `gpt-5-4`, `gpt-5-5`, `grok-4-20`, `grok-3`, `grok-3-mini`, `gemini-3-1-pro`, `sonnet-4-6`, `claude-haiku-4-5`, `deepseek-v4-pro`, `deepseek-v4-flash`, `kimi-k2-6`, `glm-5-1`, `nemotron-3-super`, `gemma-4-31b`, `gemma-4-26b-moe`, `qwen3-235b`, `qwen3-coder-480b`, `qwen3-coder-next`, `devstral-2`, `devstral-small-2`, `devstral-medium`, `llama-4-maverick`, `mimo-v2-5-pro`, `mimo-v2-pro`, `mimo-v2-flash`, `qwen3-6-plus`
+
+### Deprecated
+- `devstral-medium` — vendor-marked deprecated
+- `codestral-22b` — vendor-marked deprecated
+
+### Renamed
+- grok-4-3 -> grok-4-20
+
+### Resolved (auto via trustScore)
+- kimi-k2-6.swePro: winner={'value': 58.6, 'trustScore': 0.47, 'sourceUrl': 'https://huggingface.co/moonshotai/Kimi-K2.6', 'tier': 'S'} (severity=GREEN, Δ0)
+- deepseek-v4-pro.sweV: winner={'value': 80.6, 'trustScore': 0.67, 'sourceUrl': 'https://artificialanalysis.ai/articles/deepseek-is-back-among-the-leading-open-weights-models-with-v4-pro-and-v4-flash', 'tier': 'I'} (severity=GREEN, Δ0)
+
+### Gaps (17 entries — see data/known-gaps.json or next refresh)
+- `gemini-3-1-flash.sweV`: Gemini 3.1 Flash SWE-bench Verified not reported; model is API-only preview
+- `gemini-3-1-flash.tb2`: TB2 not reported for Gemini 3.1 Flash
+- `grok-4-20.sweV`: Grok 4.20 sweV not independently confirmed; leaked scores are unverified
+- `grok-4-20.swePro`: Grok 4.20 swePro: only leaked estimates found, not from Scale SEAL official list for this ID
+- `grok-4-20.hle`: Grok 4.20 HLE: only leaked estimates (35-45%) not independently confirmed
+- `gpt-5-5.sweV`: GPT-5.5 SWE-bench Verified not published; OpenAI only reported Pro=88.7 unverified
+- `opus-4-7.lcb`: Opus 4.7 LiveCodeBench not reported by Anthropic; model not on LCB leaderboard
+- `opus-4-7.aime26`: Opus 4.7 AIME 2026 not separately reported; only AIME 2025 scores available
+- ... and 9 more
+
 ## [2026-04-29.b] — bench taxonomy refactor
 
 ### Removed
