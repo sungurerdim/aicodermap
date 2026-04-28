@@ -4,7 +4,7 @@
 import { State, BENCH_KEYS, TIER_ORDER, STORAGE, writeStorage } from './core.js';
 import {
   compositeScore, coverageOf, fmtScore, scoreClass, contradictionFor,
-  pricingView, fmtPriceRange, fmtContext,
+  pricingView, fmtPriceRange, fmtContext, fmtLastUpdated,
 } from './data.js';
 import { gpuCompat, getActiveVram, passesFilters } from './gpu.js';
 import { el, clear } from './dom.js';
@@ -119,7 +119,7 @@ function tailColumns() {
       } },
     { key: 'lastUpdated', i18n: 'ui.table.lastUpdated', sortable: true,
       get: (m) => m.lastUpdated || '',
-      render: (m) => m.lastUpdated || '—' },
+      render: (m) => fmtLastUpdated(m.lastUpdated) || '—' },
   ];
 }
 

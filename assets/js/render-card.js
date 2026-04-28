@@ -6,6 +6,7 @@ import { State, BENCH_KEYS } from './core.js';
 import {
   compositeScore, coverageOf, disputedCount, fmtScore, contradictionFor,
   pricingView, fmtPriceMoney, fmtPriceRange, fmtPriceCell, fmtContext,
+  fmtLastUpdated,
 } from './data.js';
 import { gpuCompat, getActiveVram } from './gpu.js';
 import { el, cameraIconButton, docIconButton } from './dom.js';
@@ -125,7 +126,7 @@ function cardMeta(model, compat) {
         : (s.notes || s.tier)).join(' · ')
     : '—';
   meta.appendChild(metaCell(t('ui.table.pricingSub'), subText));
-  meta.appendChild(metaCell(t('ui.table.lastUpdated'), model.lastUpdated || '—'));
+  meta.appendChild(metaCell(t('ui.table.lastUpdated'), fmtLastUpdated(model.lastUpdated) || '—'));
 
   if (model.providers != null) {
     const uptimeNote = model.uptime != null ? ` (uptime ${fmtScore(model.uptime, 1)}%)` : '';

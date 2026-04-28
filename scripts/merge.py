@@ -19,11 +19,12 @@ Performs schema-complete merge per SKILL.md MERGE_RULES:
 import json
 import os
 import shutil
-from datetime import date
+from datetime import date, datetime, timezone
 from urllib.parse import urlparse
 
 PROJECT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 TODAY = date.today().isoformat()
+NOW = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 ARTIFACT = f"{PROJECT}/.aicodermap-agent-out.json"
 WHITELIST = f"{PROJECT}/data/sources-whitelist.json"
 
@@ -125,13 +126,15 @@ def apply_model_update(model, updates):
             if model.get(k) != v:
                 model[k] = v
                 touched = True
-    # Model-level lastUpdated derives from benchUpdated values + scalar touches.
+    # Model-level lastUpdated: full ISO 8601 datetime (UTC, e.g.
+    # "2026-04-28T17:23:45Z"). Stamping with the wallclock cycle time — not
+    # the per-bench date — disambiguates same-day reruns. Lex-sortable since
+    # ISO 8601 with Z preserves chronological order and beats date-only
+    # strings when compared via max().
     bu = model.get("benchUpdated")
     bench_max = max(bu.values()) if isinstance(bu, dict) and bu else None
-    if touched and bench_max:
-        model["lastUpdated"] = max(model.get("lastUpdated") or "", bench_max)
-    elif touched:
-        model["lastUpdated"] = TODAY
+    if touched:
+        model["lastUpdated"] = NOW
     elif bench_max:
         model["lastUpdated"] = max(model.get("lastUpdated") or "", bench_max)
     return touched
@@ -411,7 +414,7 @@ def main():
             m["bench"][bench_field] = winner_value
             m["benchUpdated"][bench_field] = TODAY
             if prev_value != winner_value:
-                m["lastUpdated"] = TODAY
+                m["lastUpdated"] = NOW
         key = f"{mid}.{bench_field}"
         for cand in c.get("candidates", []) or []:
             append_source(
@@ -443,7 +446,7 @@ def main():
             target["deprecatedAt"] = d.get("deprecationDate") or TODAY
             if d.get("successor"):
                 target["successor"] = d["successor"]
-            target["lastUpdated"] = TODAY
+            target["lastUpdated"] = NOW
             log["lineup_deprecated"].append(d["id"])
     for r in lineup.get("renamed", []) or []:
         log["lineup_renamed"].append(f"{r.get('from')} -> {r.get('to')}")

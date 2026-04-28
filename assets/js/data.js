@@ -159,6 +159,15 @@ export function fmtScore(v, digits = 1) {
   return v.toFixed(digits);
 }
 
+// ISO 8601 datetime ("2026-04-28T17:23:45Z") → "2026-04-28 17:23".
+// Date-only legacy ("2026-04-28") passes through unchanged.
+export function fmtLastUpdated(s) {
+  if (!s || typeof s !== 'string') return '';
+  const t = s.indexOf('T');
+  if (t < 0) return s;
+  return `${s.slice(0, t)} ${s.slice(t + 1, t + 6)}`;
+}
+
 export function contradictionFor(modelId, benchKey) {
   const key = `${modelId}.${benchKey}`;
   const list = State.sources[key];

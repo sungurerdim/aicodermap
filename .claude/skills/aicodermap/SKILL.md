@@ -171,7 +171,7 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
     - data/sources.json (append sourcesAdded[] + every contradiction's losing candidate, dedup by (key, url, value), include trustScore per entry)
     - i18n/{tr,en}.json (merge i18nUpdates into models[id]={strengths,weaknesses})
     - data/archive/<id>.json (when REMOVED from vendor lineup past grace period)
-    - lastUpdated := today (YYYY-MM-DD) per touched entry only
+    - lastUpdated := now (ISO 8601 UTC, "YYYY-MM-DDTHH:MM:SSZ") per touched entry only — same-day reruns disambiguate by wallclock time; legacy date-only values back-filled to T00:00:00Z
 11. Append CHANGELOG.md (Keep a Changelog):
     ## [Unreleased] / ### Updated|Added|Deprecated|Removed|Flagged
 12. AUTO-EXECUTE git (no user prompt):
@@ -461,7 +461,7 @@ After the field merge, every value in `data/models.json` must have at least one 
 
 ### F. lastUpdated discipline
 
-Touch `lastUpdated := today` ONLY on models that gained at least one new field value during merge.
+Touch `lastUpdated := now` (ISO 8601 UTC datetime, e.g. `2026-04-28T17:23:45Z`) ONLY on models that gained at least one new field value during merge. Wallclock-precision so multiple same-day reruns are distinguishable in the UI sort + provenance audit. Legacy date-only entries (`2026-04-28`) are back-filled to `2026-04-28T00:00:00Z` once; future merges always emit full timestamp. Frontend renders via `fmtLastUpdated()` (assets/js/data.js) as `YYYY-MM-DD HH:MM` for compact display while the raw ISO string remains the sort key.
 
 ### G. Backup rotation
 
