@@ -1,5 +1,8 @@
 # AICoderMap
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Live demo](https://img.shields.io/badge/live-sungurerdim.github.io%2Faicodermap-67e8a4)](https://sungurerdim.github.io/aicodermap/)
+
 > **Decide which coding model to use, in seconds.** Ranked by your priorities, source contradictions surfaced, local options labeled with the exact quant that fits your GPU. Available in English and Turkish in the live UI.
 
 ---
@@ -246,7 +249,7 @@ Currently pre-launch / solo development. Issues and discussions will open in Pha
 
 ## 📜 License
 
-MIT — code and data are public. Attribution appreciated; no takedown power (public benchmark data).
+MIT — see [LICENSE](./LICENSE). Code and data are public; attribution appreciated; no takedown power (public benchmark data).
 
 ---
 
