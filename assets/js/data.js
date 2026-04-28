@@ -172,12 +172,10 @@ export function fmtScore(v, digits = 1) {
 }
 
 // ISO 8601 datetime ("2026-04-28T17:23:45Z") → "2026-04-28 17:23".
-// Date-only legacy ("2026-04-28") passes through unchanged.
 export function fmtLastUpdated(s) {
   if (!s || typeof s !== 'string') return '';
   const t = s.indexOf('T');
-  if (t < 0) return s;
-  return `${s.slice(0, t)} ${s.slice(t + 1, t + 6)}`;
+  return t < 0 ? '' : `${s.slice(0, t)} ${s.slice(t + 1, t + 6)}`;
 }
 
 // HTTP-date string ("Tue, 28 Apr 2026 14:07:20 GMT") → "2026-04-28 14:07 UTC".
@@ -207,19 +205,13 @@ export function contradictionFor(modelId, benchKey) {
   return { delta, severity, sources: list };
 }
 
-// Schema v2 multi-provider pricing view. Backward-compatible with legacy flat
-// `pricing.api: {in,out,cacheHit}` shape — wrapped as single-element array.
+// Multi-provider pricing view. Schema is canonical: `pricing.api` is an
+// array of provider entries; `pricing.subscription` is an array of tier
+// entries; `pricing.range` is the precomputed min/max envelope. Anything
+// else is a contract violation that the SSOT audit catches.
 export function pricingView(model) {
   const p = model.pricing || {};
-  let api = p.api;
-  if (api && !Array.isArray(api) && typeof api === 'object') {
-    api = [{
-      provider: 'official', in: api.in ?? null, out: api.out ?? null,
-      cacheHit: api.cacheHit ?? null, throughput: null, url: null,
-      fetched: model.lastUpdated,
-    }];
-  }
-  api = Array.isArray(api) ? api : [];
+  const api = Array.isArray(p.api) ? p.api : [];
   const ins = api.map(e => e?.in).filter(v => v != null);
   const outs = api.map(e => e?.out).filter(v => v != null);
   const chs = api.map(e => e?.cacheHit).filter(v => v != null);
@@ -228,9 +220,7 @@ export function pricingView(model) {
     out: outs.length ? [Math.min(...outs), Math.max(...outs)] : null,
     cacheHit: chs.length ? [Math.min(...chs), Math.max(...chs)] : null,
   };
-  let subs = p.subscription;
-  if (typeof subs === 'string' && subs) subs = [{ tier: subs, price: null, billing: 'monthly', notes: subs }];
-  if (!Array.isArray(subs)) subs = [];
+  const subs = Array.isArray(p.subscription) ? p.subscription : [];
   return { providers: api, range, subscriptions: subs };
 }
 
@@ -263,7 +253,7 @@ export function fmtContext(n) {
 }
 
 export function isLocalRunnable(m) {
-  if (m.tier === 'ollama' || m.tier === 'gemma') return true;
+  if (m.tier === 'ollama-local' || m.tier === 'gemma') return true;
   if (Number.isFinite(m.vramRequirement)) return true;
   if (Array.isArray(m.unslothVariants) && m.unslothVariants.length > 0) return true;
   return false;

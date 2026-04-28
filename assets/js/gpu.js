@@ -12,7 +12,7 @@ export function gpuCompat(model, vram) {
   const hasUnsloth = Array.isArray(model.unslothVariants) && model.unslothVariants.length > 0;
   const hasVramReq = Number.isFinite(model.vramRequirement);
 
-  if (model.tier !== 'ollama' && !hasVramReq && !hasUnsloth) {
+  if (model.tier !== 'ollama-local' && !hasVramReq && !hasUnsloth) {
     return { kind: 'cloud', label: t('ui.compat.cloud') };
   }
   if (vram == null) {

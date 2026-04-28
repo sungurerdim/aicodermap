@@ -192,7 +192,7 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
     - data/sources.json (append sourcesAdded[] + every contradiction's losing candidate, dedup by (key, url, value), include trustScore per entry)
     - i18n/{tr,en}.json (merge i18nUpdates into models[id]={strengths,weaknesses})
     - data/archive/<id>.json (when REMOVED from vendor lineup past grace period)
-    - lastUpdated := now (ISO 8601 UTC, "YYYY-MM-DDTHH:MM:SSZ") per touched entry only — same-day reruns disambiguate by wallclock time; legacy date-only values back-filled to T00:00:00Z
+    - lastUpdated := now (ISO 8601 UTC, "YYYY-MM-DDTHH:MM:SSZ") per touched entry only — same-day reruns disambiguate by wallclock time
 11. Append CHANGELOG.md (Keep a Changelog):
     ## [Unreleased] / ### Updated|Added|Deprecated|Removed|Flagged
 12. AUTO-EXECUTE git (no user prompt):
@@ -358,10 +358,7 @@ Tiebreak (when trustScores within 0.05): prefer I-tier, then most recent, then h
 - **Sort by price:** sort by `pricing.range.in[0]` (cheapest input price).
 - **Subscription:** card shows lowest paid tier + a "see all tiers" expandable.
 
-**Migration policy** (one-time + every refresh until done):
-- If `pricing.api` is a flat object `{in, out, cacheHit}` (legacy schema), wrap it as `[{provider:"official", in, out, cacheHit, url:"<vendor docs>", fetched:"<lastUpdated>"}]` and compute `pricing.range`.
-- If `pricing.subscription` is a string (legacy), parse to `[{tier:<extracted>, price:<extracted>, billing:"monthly"}]`.
-- Self-check at end of every refresh validates all entries are in new schema.
+**Schema enforcement:** `pricing.api` is always an array, `pricing.subscription` is always an array, `pricing.range` is computed from `api[]` at write time. Any other shape is a contract violation that the SSOT audit (step 9b) blocks via hard rollback. There is no legacy-shape handling.
 
 ## LIFECYCLE_STATES (deprecated/active/archived handling per #2A)
 
@@ -409,13 +406,12 @@ Single source of truth for the unified shape between every layer. Mirrored verba
 
 Contradictions: `field` = **bare** bench key (`swePro`, never `bench.swePro`); `candidates[]` wrapped; `autoResolveWinner` wrapped dict — skill extracts `.value` for Storage, keeps full dict for Provenance.
 
-**Enforcement** (4 layers, defense in depth):
+**Enforcement** (3 layers):
 1. Agent self-check before emit (Storage-shape validation on every `updates.bench.<k>`)
-2. `scripts/merge.py` defensive unwrap (graceful degrade if a wrapper slips through — see MERGE_RULES section H)
+2. `scripts/audit-data-coherence.py` post-merge (HARD BLOCK + .bak rollback if any drift; pre-commit hook re-runs the audit so even manual commits can't introduce a contract violation)
 3. `scripts/verification-map.py update` post-merge (rebuilds verification cells from sourcesAdded[]; computes `confirmed` flag per VERIFICATION_AGREEMENT_PP rule)
-4. Frontend render guard (warn on non-scalar bench cells)
 
-The 2026-04-26 cycle 2 regression (live table blanked) was a contract violation at layer 1 + missing defense at layer 2. Both are now patched. Verification map (added 2026-04-27) is the cross-cycle persistence layer that powers SOURCE_FIRST_SWEEP's confirmed-cell skip.
+A wrapper-shaped value in storage is no longer "graceful-unwrapped" — it fails the audit and rolls the merge back. The verification map is the cross-cycle persistence layer used for contradiction analysis (audit-only; never reads for skip decisions).
 
 ## MERGE_RULES
 
@@ -423,7 +419,7 @@ The 2026-04-26 cycle 2 regression (live table blanked) was a contract violation 
 
 ### A. Single-artifact policy (replaces prior multi-artifact reconciliation)
 
-There is ONE artifact: `.aicodermap-agent-out.json` (gitignored). Every agent run overwrites it. No `.aicodermap-merged.json`, no `.aicodermap-targeted-out.json`, no numbered suffixes — those legacy filenames are deleted; never re-created.
+There is ONE artifact: `.aicodermap-agent-out.json` (gitignored). Every agent run overwrites it. No multi-artifact reconciliation, no numbered suffixes.
 
 Reconciliation against the FILE SYSTEM (`data/models.json`) replaces the prior multi-artifact dance:
 - Existing values in `data/models.json` are preserved unless the current run has a higher-trustScore replacement
@@ -482,7 +478,7 @@ After the field merge, every value in `data/models.json` must have at least one 
 
 ### F. lastUpdated discipline
 
-Touch `lastUpdated := now` (ISO 8601 UTC datetime, e.g. `2026-04-28T17:23:45Z`) ONLY on models that gained at least one new field value during merge. Wallclock-precision so multiple same-day reruns are distinguishable in the UI sort + provenance audit. Legacy date-only entries (`2026-04-28`) are back-filled to `2026-04-28T00:00:00Z` once; future merges always emit full timestamp. Frontend renders via `fmtLastUpdated()` (assets/js/data.js) as `YYYY-MM-DD HH:MM` for compact display while the raw ISO string remains the sort key.
+Touch `lastUpdated := now` (ISO 8601 UTC datetime, e.g. `2026-04-28T17:23:45Z`) ONLY on models that gained at least one new field value during merge. Wallclock-precision so multiple same-day reruns are distinguishable in the UI sort + provenance audit. Frontend renders via `fmtLastUpdated()` (assets/js/data.js) as `YYYY-MM-DD HH:MM` for compact display while the raw ISO string remains the sort key.
 
 ### G. Backup rotation
 
@@ -500,8 +496,8 @@ for each model in data/models.json:
   for each field in (whitelist above):
     if field is null AND any artifact has a non-null value:
       → MERGE BUG. Halt, log model+field+artifact path, prompt user.
-  validate pricing.api is an array (not flat object) — auto-migrate if not
-  validate pricing.subscription is an array (not string) — auto-migrate if not
+  validate pricing.api is an array — fail merge if not
+  validate pricing.subscription is an array — fail merge if not
   validate pricing.range is computed and matches min/max of pricing.api[]
   validate every (model, bench) value has a sources.json entry with trustScore
   validate status is one of {active, deprecated, archived}

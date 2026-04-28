@@ -152,10 +152,13 @@
     assertEq('fmtContext(128_000) → "128K"', fmtContext(128_000), '128K');
     assertEq('fmtContext(900) → "900"', fmtContext(900), '900');
 
-    // 10. data: pricingView legacy bridge
-    const pv = pricingView({ pricing: { api: { in: 1, out: 2, cacheHit: 0.5 } } });
-    assertEq('pricingView wraps legacy api object', pv.providers.length, 1);
-    assertTrue('pricingView range.in pair', JSON.stringify(pv.range.in) === '[1,1]');
+    // 10. data: pricingView canonical schema (array of provider entries)
+    const pv = pricingView({ pricing: { api: [
+      { provider: 'official', in: 1, out: 2, cacheHit: 0.5 },
+      { provider: 'openrouter', in: 0.8, out: 2.4, cacheHit: null },
+    ] } });
+    assertEq('pricingView reads provider array', pv.providers.length, 2);
+    assertTrue('pricingView range.in min/max', JSON.stringify(pv.range.in) === '[0.8,1]');
 
     // 11. data: contradictionFor needs ≥2 sources
     State.sources = { 'm.k': [{ value: 50 }] };
@@ -165,7 +168,7 @@
     assertTrue('contradiction Δ=6 → danger', c && c.severity === 'danger');
 
     // 12. data: isLocalRunnable
-    assertTrue('Ollama tier is local', isLocalRunnable({ tier: 'ollama' }));
+    assertTrue('Ollama-local tier is local', isLocalRunnable({ tier: 'ollama-local' }));
     assertTrue('vramRequirement makes local', isLocalRunnable({ tier: 'frontier', vramRequirement: 8 }));
     assertEq('frontier without vram is not local', isLocalRunnable({ tier: 'frontier' }), false);
 
@@ -174,8 +177,8 @@
     State.i18nFallback = State.i18n;
     assertEq('gpuCompat cloud-only model', gpuCompat({ tier: 'frontier' }, 24).kind, 'cloud');
     assertEq('gpuCompat unknown without vram', gpuCompat({ tier: 'frontier', vramRequirement: 16 }, null).kind, 'unknown');
-    assertEq('gpuCompat fits when needed < vram-1', gpuCompat({ tier: 'open-tier1', vramRequirement: 8 }, 24).kind, 'fits');
-    assertEq('gpuCompat too-large at 200GB on 8GB', gpuCompat({ tier: 'open-tier1', vramRequirement: 200 }, 8).kind, 'too-large');
+    assertEq('gpuCompat fits when needed < vram-1', gpuCompat({ tier: 'open-flagship', vramRequirement: 8 }, 24).kind, 'fits');
+    assertEq('gpuCompat too-large at 200GB on 8GB', gpuCompat({ tier: 'open-flagship', vramRequirement: 200 }, 8).kind, 'too-large');
 
     // 13b. sources: summary aggregates + dedupes by URL
     State.sources['ms.swePro'] = [

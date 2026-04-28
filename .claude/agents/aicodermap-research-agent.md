@@ -367,10 +367,9 @@ Three layers, three shapes — never mix them. Violating this contract is the re
 
 **Enforcement points:**
 1. Agent self-check before emit (verify every `updates.bench.<k>` is `number|null`, never an object).
-2. `scripts/merge.py` defensive unwrap (gracefully reduces a `{value, trustScore}` slip-through to its scalar).
-3. Frontend render guard (logs `console.warn` and treats non-scalar bench cells as null).
+2. `scripts/audit-data-coherence.py` post-merge (HARD BLOCK + .bak rollback if any value is non-scalar; pre-commit hook re-runs the audit so even manual commits can't introduce a wrapper-shaped storage cell).
 
-When in doubt: **scalar in storage, wrapped in provenance, contract spelled here.**
+When in doubt: **scalar in storage, wrapped in provenance, contract spelled here.** A wrapper-shaped value in storage is a contract violation, not a thing to gracefully repair.
 
 ## OUTPUT_SCHEMA (NEW — multi-provider pricing array)
 ```jsonc

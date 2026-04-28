@@ -53,15 +53,12 @@ TODAY = date.today().isoformat()
 
 
 def parse_cell_key(source_added_key: str):
-    """sourcesAdded entry keys come as `<modelId>.bench.<benchKey>` or
-    `<modelId>.<benchKey>` (legacy). Returns (modelId, benchKey) or None."""
+    """sourcesAdded entry keys are `<modelId>.<benchKey>` (DATA_CONTRACT
+    Provenance shape). Returns (modelId, benchKey) or None."""
     parts = source_added_key.split(".")
-    if len(parts) >= 3 and parts[-2] == "bench":
-        return parts[0] if len(parts) == 3 else ".".join(parts[:-2]), parts[-1]
-    if len(parts) >= 2:
-        # Treat second-to-last segments as modelId, last as benchKey
-        return ".".join(parts[:-1]), parts[-1]
-    return None
+    if len(parts) < 2:
+        return None
+    return ".".join(parts[:-1]), parts[-1]
 
 
 def values_agree(values, threshold_pp=VERIFICATION_AGREEMENT_PP):

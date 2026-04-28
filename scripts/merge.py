@@ -268,12 +268,9 @@ def _load_bench_key_universe():
 
 
 def _extract_bench_key(g):
-    """Gap may carry `field` (bare or 'bench.X' form) or legacy `key` of
-    'modelId.bench.X'. Normalize to bare bench key."""
-    field = g.get("field") or ""
-    if not field and g.get("key"):
-        field = g["key"].split(".")[-1]
-    return field.replace("bench.", "") if field.startswith("bench.") else field
+    """Per the agent contract a gap entry carries `field` as the bare bench
+    key (e.g. "swePro"). Returns the bare key as-is."""
+    return g.get("field") or ""
 
 
 def validate_gaps(out):
@@ -406,19 +403,14 @@ def main():
     BENCH_KEYS = _load_bench_key_universe()
     for c in out.get("contradictions", []) or []:
         mid = c["modelId"]
-        field = c["field"]
+        # Agent contract: `field` is the bare bench key, `autoResolveWinner` is
+        # the wrapped {value, trustScore, sourceUrl, tier} dict — Storage extracts
+        # `.value` for models.json, full dict goes into sources.json provenance.
+        bench_field = c["field"]
         winner = c.get("autoResolveWinner")
         if winner is None:
             continue
-        # DATA_CONTRACT defensive unwrap: winner may arrive as wrapped dict {value, trustScore, sourceUrl, tier}.
-        # Storage shape is scalar; extract .value before writing to models.json.
-        winner_value = (
-            winner["value"]
-            if isinstance(winner, dict) and "value" in winner
-            else winner
-        )
-        # Bare-key normalize: agent contract says field is bare ("swePro"), but tolerate "bench.swePro" too.
-        bench_field = field.split(".", 1)[1] if field.startswith("bench.") else field
+        winner_value = winner["value"]
         m = find(models, mid)
         if m is not None and bench_field in BENCH_KEYS:
             if "bench" not in m:
