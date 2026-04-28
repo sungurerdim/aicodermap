@@ -6,7 +6,7 @@ import { State, STORAGE, writeStorage } from './core.js';
 import { applyI18n, loadI18n } from './i18n.js';
 import {
   applyPreset, resetWeights, syncPresetSelect, switchTheme, syncLangToggleUi,
-  renderWeightsEditor,
+  renderWeightsEditor, renderDeployStamp,
 } from './render-controls.js';
 import { renderAll, renderTable } from './render-table.js';
 import { resolveGpuVram, updateGpuStatus, populateGpuSelect } from './gpu.js';
@@ -24,6 +24,7 @@ export async function switchLanguage(lang) {
   renderAll();
   populateGpuSelect();
   syncPresetSelect();
+  renderDeployStamp();
 }
 
 function wireLangToggle() {

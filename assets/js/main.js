@@ -12,6 +12,7 @@ import {
 import { el, clear } from './dom.js';
 import {
   applyTheme, syncLangToggleUi, renderWeightsEditor, syncPresetSelect,
+  renderDeployStamp,
 } from './render-controls.js';
 import { renderAll } from './render-table.js';
 import { wireEvents } from './events.js';
@@ -100,6 +101,7 @@ async function bootstrapData() {
   }
 }
 
+
 function restoreFilterUi() {
   const dep = document.getElementById('filter-deployment');
   if (dep) dep.value = State.filters.deployment;
@@ -151,6 +153,7 @@ async function bootstrap() {
   const ok = await bootstrapData();
   if (!ok) return;
 
+  renderDeployStamp();
   restoreFilterUi();
   await bootstrapGpu();
 

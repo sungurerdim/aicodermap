@@ -59,6 +59,7 @@ export const State = {
   vram: null,
   selectedGpu: 'auto',
   detectedGpu: null,
+  dataDeployedAt: null,
 };
 
 export function readStorage(key, fallback) {

@@ -116,6 +116,12 @@
   gap: var(--space-3);
   flex-wrap: wrap;
 }
+.footer-deploy-stamp {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+  opacity: 0.75;
+  white-space: nowrap;
+}
 
 /* Export mode — hide UI chrome for clean PNG */
 body.exporting [data-no-export] { display: none !important; }

@@ -24,6 +24,13 @@ export async function fetchJson(name) {
   const url = new URL(`${name}?v=${encodeURIComponent(bust)}`, DATA_BASE);
   const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error(`${name} ${res.status}`);
+  // models.json's Last-Modified header reflects the GitHub Pages CDN's
+  // most recent file refresh — i.e. the live deploy time. Capture it so the
+  // footer can show whether the user is looking at a fresh or stale build.
+  if (name === 'models.json') {
+    const lm = res.headers.get('Last-Modified');
+    if (lm) State.dataDeployedAt = lm;
+  }
   return res.json();
 }
 
@@ -166,6 +173,17 @@ export function fmtLastUpdated(s) {
   const t = s.indexOf('T');
   if (t < 0) return s;
   return `${s.slice(0, t)} ${s.slice(t + 1, t + 6)}`;
+}
+
+// HTTP-date string ("Tue, 28 Apr 2026 14:07:20 GMT") → "2026-04-28 14:07 UTC".
+// Returns '' on parse failure so callers can fall back to a static label.
+export function fmtDeployTime(httpDate) {
+  if (!httpDate) return '';
+  const d = new Date(httpDate);
+  if (Number.isNaN(d.getTime())) return '';
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} `
+    + `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
 }
 
 export function contradictionFor(modelId, benchKey) {

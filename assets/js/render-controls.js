@@ -7,6 +7,7 @@ import {
 } from './core.js';
 import { el, clear } from './dom.js';
 import { t } from './i18n.js';
+import { fmtDeployTime } from './data.js';
 
 export function renderWeightsEditor(onChange) {
   const grid = document.getElementById('weights-grid');
@@ -126,4 +127,17 @@ export function syncLangToggleUi() {
     btn.classList.toggle('active', active);
     btn.setAttribute('aria-pressed', String(active));
   });
+}
+
+// Footer chip "Deployed: 2026-04-28 14:07 UTC" sourced from the models.json
+// Last-Modified header (Pages CDN refreshes it on every successful deploy).
+// Re-rendered on language switch so the prefix follows the active locale.
+export function renderDeployStamp() {
+  const node = document.getElementById('footer-deployed-at');
+  if (!node) return;
+  const formatted = fmtDeployTime(State.dataDeployedAt);
+  if (!formatted) return;
+  node.textContent = `${t('ui.footer.deployed') || 'Deployed'}: ${formatted}`;
+  node.title = State.dataDeployedAt;
+  node.hidden = false;
 }
