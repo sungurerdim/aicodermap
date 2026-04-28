@@ -16,6 +16,7 @@ import {
 } from './render-controls.js';
 import { renderAll } from './render-table.js';
 import { wireEvents } from './events.js';
+import { checkFreshness } from './freshness.js';
 
 function bootstrapTheme() {
   const storedTheme = readStorage(STORAGE.theme, null);
@@ -161,6 +162,11 @@ async function bootstrap() {
   syncPresetSelect();
   renderAll();
   wireEvents();
+
+  // Compare GitHub's latest commit timestamp with the served Pages build —
+  // surfaces a "newer update available, refresh" banner when the user's open
+  // session is on a stale build. Fire-and-forget; failures fall silent.
+  checkFreshness();
 }
 
 if (document.readyState === 'loading') {

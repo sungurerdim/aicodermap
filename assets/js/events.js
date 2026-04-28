@@ -178,6 +178,35 @@ function wireWindowEvents() {
   window.addEventListener('resize', hideTooltip);
 }
 
+// Auto-clamp [data-tip] tooltips inside the viewport. CSS centers them on the
+// host by default; when a host sits near the right or left edge the centered
+// tooltip would overflow. We measure on hover/focus, estimate the tooltip's
+// rendered width from the text length (the CSS max-width is 260px), and pick
+// `start`, `end`, or default-center alignment so the tooltip never extends
+// past the visible area.
+function clampTooltip(host) {
+  const text = host.getAttribute('data-tip') || '';
+  if (!text) return;
+  const r = host.getBoundingClientRect();
+  const margin = 8;
+  const estW = Math.min(260, text.length * 7 + 24);
+  const cx = r.left + r.width / 2;
+  if (cx - estW / 2 < margin) host.setAttribute('data-tip-align', 'start');
+  else if (cx + estW / 2 > window.innerWidth - margin) host.setAttribute('data-tip-align', 'end');
+  else host.removeAttribute('data-tip-align');
+}
+
+function wireTooltipClamp() {
+  document.addEventListener('mouseover', (e) => {
+    const t = e.target.closest && e.target.closest('[data-tip]');
+    if (t) clampTooltip(t);
+  }, { passive: true });
+  document.addEventListener('focusin', (e) => {
+    const t = e.target.closest && e.target.closest('[data-tip]');
+    if (t) clampTooltip(t);
+  });
+}
+
 export function wireEvents() {
   wireLangToggle();
   wireThemeToggle();
@@ -189,6 +218,7 @@ export function wireEvents() {
   wireGpuControls();
   wireExports();
   wireWindowEvents();
+  wireTooltipClamp();
   // Re-export for sort wiring inside renderTable; keeps reference live.
   void renderTable;
 }

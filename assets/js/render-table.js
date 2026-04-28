@@ -63,6 +63,7 @@ function benchColumns() {
     key: `bench.${k}`,
     benchKey: k,
     i18n: `benchmarks.${k}.short`,
+    i18nTitle: `benchmarks.${k}.name`,
     sortable: true,
     num: true,
     cls: 'bench-cell-td',
@@ -167,6 +168,13 @@ function renderTableHeader(thead, cols) {
     }
     if (State.sort.col === col.key) th.classList.add('sorted', State.sort.dir);
     th.textContent = t(col.i18n);
+    if (col.i18nTitle) {
+      const fullName = t(col.i18nTitle);
+      if (fullName && fullName !== col.i18nTitle) {
+        th.setAttribute('data-tip', fullName);
+        th.setAttribute('data-tip-position', 'bottom');
+      }
+    }
     thead.appendChild(th);
   }
 }

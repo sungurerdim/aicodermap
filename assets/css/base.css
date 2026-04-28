@@ -325,7 +325,11 @@ input[type="checkbox"] {
 }
 .btn .icon { width: 16px; height: 16px; }
 
-/* Instant CSS tooltip (replaces native title delay) */
+/* Instant CSS tooltip (replaces native title delay).
+ * Default: anchored above the host, horizontally centered.
+ * data-tip-align="end"   anchors the tooltip's right edge to the host's right
+ * data-tip-align="start" anchors the tooltip's left edge to the host's left
+ * (set by clampTooltip in events.js when the host sits near a viewport edge). */
 [data-tip] { position: relative; }
 [data-tip]::after {
   content: attr(data-tip);
@@ -333,7 +337,7 @@ input[type="checkbox"] {
   bottom: calc(100% + 6px);
   left: 50%;
   transform: translateX(-50%);
-  max-width: 260px;
+  max-width: min(260px, calc(100vw - 16px));
   width: max-content;
   padding: 6px 10px;
   background: var(--surface-2);
@@ -345,6 +349,7 @@ input[type="checkbox"] {
   line-height: 1.3;
   text-align: center;
   white-space: normal;
+  overflow-wrap: anywhere;
   pointer-events: none;
   z-index: 100;
   box-shadow: var(--shadow);
@@ -361,4 +366,14 @@ input[type="checkbox"] {
 [data-tip][data-tip-position="bottom"]::after {
   bottom: auto;
   top: calc(100% + 6px);
+}
+[data-tip][data-tip-align="end"]::after {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+[data-tip][data-tip-align="start"]::after {
+  left: 0;
+  right: auto;
+  transform: none;
 }

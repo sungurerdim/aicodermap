@@ -123,6 +123,41 @@
   white-space: nowrap;
 }
 
+.freshness-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0 var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  background: var(--accent-tint);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.85rem;
+}
+.freshness-banner[hidden] { display: none; }
+.freshness-message { flex: 1; }
+.freshness-banner .freshness-refresh {
+  background: var(--accent);
+  color: var(--bg);
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 4px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.freshness-banner .freshness-refresh:hover { filter: brightness(1.1); }
+.freshness-banner .freshness-dismiss {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0 6px;
+}
+.freshness-banner .freshness-dismiss:hover { color: var(--text); }
+
 /* Export mode — hide UI chrome for clean PNG */
 body.exporting [data-no-export] { display: none !important; }
 body.exporting .app-main { padding: var(--space-2); }
