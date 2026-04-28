@@ -69,8 +69,8 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
      lineup: <Step 0 result>
    }
    - `.aicodermap-verification-map.json` is the historical audit log of every (model, bench) cell observation across cycles (value, sources[], lastChecked). Used for contradiction analysis only — never read for skip decisions, since every cell is re-fetched every cycle (UNCAPPED + UNCACHED doctrine, reformed 2026-04-28). Skill creates it (empty {}) on first cycle if missing.
-   - `data/models.json` is SSOT for "what models we track"
-   - `data/sources-whitelist.json` is SSOT for "what URLs the agent is allowed to fetch"
+   - `data/models.json` is SSOT for "what models we track" — `currentIds` MUST be derived from this file at the moment the skill runs. Hardcoding the id list in a prompt or agent message is a contract violation (any drift between models.json and what the agent receives surfaces as silent omission of new/renamed models).
+   - `data/sources-whitelist.json` is SSOT for "what URLs the agent is allowed to fetch" AND for the bench-key universe (`_schema.coreBenchKeys`). Frontend `BENCH_KEYS` (assets/js/core.js), i18n `benchmarks.*`, and the data-file `bench` cells all mirror this canonical set. `scripts/audit-data-coherence.py` enforces the mirroring by failing loudly on any drift.
    - No skip registry: every (modelId, benchKey) pair is re-attempted every cycle so vendor opt-outs that close are surfaced immediately
    - The agent file (.claude/agents/aicodermap-research-agent.md) only carries PROCEDURE (how) — every list of URLs, vendors, or model IDs lives in data files
 4. Agent({
@@ -164,6 +164,19 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
 
 8. Render diff summary (markdown table) to user-visible output: models[].updates fields, newModels[], lineup changes (NEW/DEPRECATED/RENAMED/REMOVED), contradictions auto-resolved, coverage% achieved, partialCoverage flag.
 9. AUTO-APPROVE — NO USER PROMPT. The workflow proceeds straight from Step 8 to Step 10. The only halt at this stage is schema-breaking discovery (a brand-new top-level field in a model entry not in the existing whitelist) — and even then, the unrecognized field is logged to gaps[] and merge continues with the recognized fields. RED contradictions are already auto-resolved at Step 7. REMOVED entries are auto-archived per LIFECYCLE_STATES.
+
+9b. SSOT_COHERENCE_AUDIT (scripts/audit-data-coherence.py — runs inside merge.py post-write):
+    Verifies every surface that mirrors a SSOT set is still aligned:
+    - assets/js/core.js BENCH_KEYS == data/sources-whitelist.json _schema.coreBenchKeys
+    - i18n/{tr,en}.json benchmarks.* keys == BENCH_KEYS (label sets identical)
+    - DEFAULT_WEIGHTS / PRESETS keys ⊆ BENCH_KEYS
+    - data/models.json bench cells use only canonical keys
+    - data/sources.json keys reference only known model IDs and canonical bench keys
+    - tier values ∈ {frontier, open-flagship, coder-specialized, gemma, ollama-local}
+    - status values ∈ {active, deprecated, archived}
+    Drift signal → CHANGELOG warning + console fail print + non-zero exit code from
+    the audit script. Advisory only (UNCAPPED — never blocks commit), but every drift
+    appears in the same CHANGELOG header line as the coverage warning.
 
 10. ATOMIC WRITE — schema-complete merge per MERGE_RULES (rotated .bak backup):
     Outputs:

@@ -116,6 +116,8 @@ The agent NEVER hardcodes model IDs. The actual roster is derived at runtime fro
 
 The skill passes `idea_context.currentIds` (the full id list from `data/models.json`) into every agent run. The agent groups them by `(provider, tier)` for parallel batch dispatch.
 
+**SSOT discipline (currentIds):** the orchestrator MUST derive `currentIds` by reading `data/models.json` at invocation time. Inlining a hand-typed id list in the prompt is a contract violation — it produces silent drift the moment a new model is added or renamed. If the agent ever sees `currentIds` whose length disagrees with the count of `data/models.json` entries it can also Read, it should treat the latter as authoritative + log `runtime.contractCheck.currentIdsDrift = true` in the artifact.
+
 ### Tier taxonomy (these labels are invariant; concrete IDs change run-to-run)
 
 | `tier` value | Description | Per-model survey priority |

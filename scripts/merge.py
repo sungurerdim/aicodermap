@@ -503,6 +503,29 @@ def main():
     if matrix_warn:
         coverage_warn = (coverage_warn + matrix_warn) if coverage_warn else matrix_warn
 
+    # SSOT coherence audit — runs against the just-written data files so any
+    # drift between bench keys / i18n / sources / models / whitelist is caught
+    # before the CHANGELOG line is composed. Advisory only (UNCAPPED doctrine
+    # — never blocks commit), but the warning flows into both CHANGELOG and
+    # the summary printout below.
+    import subprocess
+    coherence_summary_lines = []
+    coherence_ok = True
+    try:
+        proc = subprocess.run(
+            ["python3", f"{PROJECT}/scripts/audit-data-coherence.py"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        coherence_ok = proc.returncode == 0
+        if not coherence_ok:
+            coverage_warn += " [WARN: SSOT coherence drift; see scripts/audit-data-coherence.py]"
+            tail = proc.stderr.strip().splitlines()
+            coherence_summary_lines = tail[:8]
+    except Exception as e:  # noqa: BLE001
+        coherence_summary_lines = [f"audit script failed to run: {e}"]
+
     cl_path = f"{PROJECT}/CHANGELOG.md"
     cl_lines = [f"\n## [{TODAY}] — autonomous refresh-all{coverage_warn}\n"]
     if log["added"]:
@@ -561,6 +584,15 @@ def main():
             f"(filled={matrix.get('filledCells')}/{matrix.get('totalCells')}, "
             f"gaps={matrix.get('gapsRecorded')})"
         )
+
+    if coherence_ok:
+        print("  coherence:  ✓ SSOT (bench keys + model ids aligned across surfaces)")
+    else:
+        print("  coherence:  ✗ DRIFT — see audit-data-coherence.py output:")
+        for line in coherence_summary_lines[:6]:
+            print(f"    {line}")
+        if len(coherence_summary_lines) > 6:
+            print(f"    ... and {len(coherence_summary_lines) - 6} more")
     if log["format_warnings"]:
         print(f"  format warnings: {len(log['format_warnings'])} (non-blocking)")
         for w in log["format_warnings"][:5]:

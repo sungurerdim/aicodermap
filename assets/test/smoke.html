@@ -207,6 +207,27 @@
     try {
       await loadData();
       assertTrue('loadData populated State.models', State.models.length > 0, `models=${State.models.length}`);
+
+      // 14b. SSOT coherence — every bench cell key in live data must be in
+      // BENCH_KEYS, every BENCH_KEY must have an i18n label, every model id
+      // referenced in sources.json must exist in models.json.
+      const benchSet = new Set(BENCH_KEYS);
+      const dataKeys = new Set();
+      for (const m of State.models) {
+        for (const k of Object.keys(m.bench || {})) dataKeys.add(k);
+      }
+      const rogue = [...dataKeys].filter(k => !benchSet.has(k));
+      assertTrue('every data bench key is in BENCH_KEYS', rogue.length === 0,
+        rogue.length ? `rogue: ${rogue.join(',')}` : '');
+
+      const ids = new Set(State.models.map(m => m.id));
+      let unknownSrcModels = 0;
+      for (const k of Object.keys(State.sources)) {
+        const mid = k.split('.')[0];
+        if (!ids.has(mid)) unknownSrcModels++;
+      }
+      assertTrue('every sources.json key references a known model id',
+        unknownSrcModels === 0, `unknown=${unknownSrcModels}`);
     } catch (e) {
       row('loadData failed (HTTP server required)', false, e.message);
     }
