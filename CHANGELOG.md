@@ -1,4 +1,36 @@
 
+## [2026-04-28] — autonomous refresh-all [WARN: cumulative provenance coverage 54.0% below 85% target]
+
+### Updated
+- 29 models: `gpt-5-5`, `opus-4-7`, `sonnet-4-6`, `claude-haiku-4-5`, `grok-4-20`, `kimi-k2-6`, `glm-5-1`, `deepseek-v4-pro`, `deepseek-v4-flash`, `mimo-v2-5-pro`, `mimo-v2-5`, `mimo-v2-flash`, `minimax-m2-7`, `qwen3-coder-30b`, `qwen3-coder-next`, `qwen-3-6-27b`, `qwen3-6-35b-moe`, `qwen3-6-plus`, `qwen3-235b`, `gemma-3-27b`, `gemma-4-26b-moe`, `gemma-4-31b`, `gemma-4-e2b`, `gemma-4-e4b`, `devstral-small-2`, `codestral`, `nemotron-3-super`, `step-3-5-flash`, `devstral-2`
+
+### Deprecated
+- `gpt-4-1` — vendor-marked deprecated
+- `o3` — vendor-marked deprecated
+- `o4-mini` — vendor-marked deprecated
+- `codestral-22b` — vendor-marked deprecated
+- `devstral-2` — vendor-marked deprecated
+
+### Renamed
+- devstral-medium -> devstral-small-2
+
+### Resolved (auto via trustScore)
+- grok-4-20.swePro: winner={'value': 51.8, 'trustScore': 0.82, 'sourceUrl': 'https://benchlm.ai/models/grok-4-20-beta', 'tier': 'I'} (severity=RED, Δ5.9)
+- deepseek-v4-pro.swePro: winner={'value': 55.4, 'trustScore': 0.85, 'sourceUrl': 'https://benchlm.ai/benchmarks/swePro', 'tier': 'I'} (severity=YELLOW, Δ3.3)
+- glm-5-1.hle: winner={'value': 52.3, 'trustScore': 0.55, 'sourceUrl': 'https://lushbinary.com/blog/glm-5-1-benchmarks-breakdown-swe-bench-pro-nl2repo-cybergym/', 'tier': 'C'} (severity=RED, Δ21.3)
+
+### Gaps (17 entries — see data/known-gaps.json or next refresh)
+- `grok-4-20.tb2`: No public Terminal-Bench 2 score published for Grok 4.20; xAI docs bot-blocked, WebSearch returned no score
+- `grok-4-20.aime26`: xAI did not publish AIME 2026 score; WebSearch returned only AIME 2025 data
+- `grok-3.swePro`: Grok 3 not on Scale SEAL public leaderboard; xAI docs bot-blocked
+- `qwen3-6-max.sweV`: Qwen3.6 Max is proprietary API; no public SWE-bench Verified score found in whitelist sources
+- `qwen3-6-plus.sweV`: Qwen3.6 Plus is proprietary API; no public SWE-bench Verified score found
+- `codestral.bench.*`: Codestral 2508 has no published benchmark scores on Scale SEAL, BenchLM, or whitelist leaderboards; model is code-complete specialized, scores not submitted
+- `mimo-v2-flash.bench.*`: MiMo-V2-Flash (older open-source MoE) has no published scores on current leaderboards
+- `deepseek-r1-14b.bench.*`: Local distilled model; not benchmarked on frontier leaderboards like Scale SEAL or BenchLM for coding tasks
+- ... and 9 more
+
+
 ## [2026-04-28] — autonomous refresh-all [WARN: partial coverage 48.0%]
 
 ### Resolved (auto via trustScore)

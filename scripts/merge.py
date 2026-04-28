@@ -22,7 +22,7 @@ import shutil
 from datetime import date
 from urllib.parse import urlparse
 
-PROJECT = "D:/GitHub/aicodermap"
+PROJECT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 TODAY = date.today().isoformat()
 ARTIFACT = f"{PROJECT}/.aicodermap-agent-out.json"
 WHITELIST = f"{PROJECT}/data/sources-whitelist.json"
