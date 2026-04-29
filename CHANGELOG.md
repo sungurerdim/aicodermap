@@ -1,4 +1,22 @@
 
+## [2026-04-29] — autonomous refresh-all [WARN: very low cumulative provenance coverage 22.6%] [MX2: coverage 22.6% < absolute floor 30%]
+- Note: research agent hit completeness loop (87 tool calls); partial artifact generated via gap-gen script. All 1430 cells accounted for (323 filled + 1107 gaps). Next cycle re-attempts all cells.
+
+### Updated
+- 52 models: `gemini-3-1-flash`, `gemini-3-1-pro`, `gpt-4-1`, `gpt-5-4`, `grok-3`, `grok-3-mini`, `mistral-large-3`, `o3`, `o4-mini`, `opus-4-7`, `sonnet-4-6`, `codestral-22b`, `deepseek-v3-2`, `deepseek-v4-flash`, `deepseek-v4-pro`, `devstral-2`, `devstral-medium`, `glm-5-1`, `kimi-k2-6`, `llama-4-maverick`, `llama-4-scout`, `mimo-v2-5`, `mimo-v2-5-pro`, `mimo-v2-flash`, `mimo-v2-pro`, `minimax-m2-5`, `minimax-m2-7`, `nemotron-3-super`, `qwen-3-6-27b`, `qwen-3-6-max`, `qwen3-235b`, `qwen3-32b`, `qwen3-6-35b-moe`, `qwen3-6-plus`, `qwen3-coder-30b`, `qwen3-coder-480b`, `qwen3-coder-next`, `step-3-5-flash`, `gemma-3-27b`, `gemma-4-26b-moe`, `gemma-4-31b`, `gemma-4-e2b`, `gemma-4-e4b`, `deepseek-coder-v2-16b`, `deepseek-r1-14b`, `qwen25-coder-32b`, `qwen25-coder-7b`, `codestral`, `devstral-small-2`, `claude-haiku-4-5`, `gpt-5-5`, `grok-4-20`
+
+### Gaps (1107 entries — see data/known-gaps.json or next refresh)
+- `None`: No SWE-bench Verified score found in agent survey or public leaderboards
+- `None`: No SWE-bench Multilingual score found in agent survey or public leaderboards
+- `None`: No NL2Repo score found in agent survey or public leaderboards
+- `None`: No Terminal-Bench v2 score found in agent survey or public leaderboards
+- `None`: No Terminal-Bench Hard score found in agent survey or public leaderboards
+- `None`: No tau-bench v2 score found in agent survey or public leaderboards
+- `None`: No tau-bench v3 score found in agent survey or public leaderboards
+- `None`: No MCP-Atlas score found in agent survey or public leaderboards
+- ... and 1099 more
+
+
 ## [2026-04-29] — autonomous refresh-all [WARN: very low cumulative provenance coverage 42.0%] [MX1: matrix invariant violated — 1105 cell(s) silently missing (claude-haiku-4-5.aaAgentic, claude-haiku-4-5.aaCoding, claude-haiku-4-5.aaOmni, claude-haiku-4-5.arcAgi2, claude-haiku-4-5.bfcl ...+1100); filled_gap=1] [MX2: coverage 22.6% < absolute floor 30%]
 
 ### Added
