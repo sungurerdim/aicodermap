@@ -1,3 +1,22 @@
+
+## [2026-04-29] — autonomous refresh-all [WARN: very low cumulative provenance coverage 42.0%] [MX1: matrix invariant violated — 1105 cell(s) silently missing (claude-haiku-4-5.aaAgentic, claude-haiku-4-5.aaCoding, claude-haiku-4-5.aaOmni, claude-haiku-4-5.arcAgi2, claude-haiku-4-5.bfcl ...+1100); filled_gap=1] [MX2: coverage 22.6% < absolute floor 30%]
+
+### Added
+- `grok-4-1-fast` — new model from vendor lineup discovery
+
+### Updated
+- 10 models: `sonnet-4-6`, `gemini-3-1-flash`, `llama-4-maverick`, `kimi-k2-6`, `deepseek-v4-pro`, `mimo-v2-5-pro`, `step-3-5-flash`, `qwen3-235b`, `qwen3-coder-480b`, `qwen3-coder-30b`
+
+### Resolved (auto via trustScore)
+- sonnet-4-6.gpqa: winner={'value': 74.1, 'trustScore': 0.53, 'sourceUrl': 'https://www.nxcode.io/resources/news/claude-sonnet-4-6-complete-guide-benchmarks-pricing-2026', 'tier': 'C'} (severity=RED, Δ15.8)
+- gemini-3-1-flash.hle: winner={'value': 33.7, 'trustScore': 0.7, 'sourceUrl': 'https://blog.google/products-and-platforms/products/gemini/gemini-3-flash/', 'tier': 'S'} (severity=RED, Δ17.5)
+- llama-4-maverick.lcb: winner={'value': 43.4, 'trustScore': 1.0, 'sourceUrl': 'https://benchlm.ai/models/llama-4-maverick', 'tier': 'I'} (severity=RED, Δ41.6)
+
+### Gaps (3 entries — see data/known-gaps.json or next refresh)
+- `grok-4-1-fast.swePro`: New model with no published bench data yet; early access only
+- `grok-4-3.swePro`: Grok 4.3 Beta early access only, no published benchmark data
+- `deepseek-v4-pro.mrcr`: Single C-tier source only; MRCR not on standard leaderboards
+
 # Changelog
 
 All notable changes to AICoderMap will be documented here.

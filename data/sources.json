@@ -422,6 +422,34 @@
       "date": "2026-02-17",
       "tier": "S",
       "trustScore": 0.198
+    },
+    {
+      "value": 74.1,
+      "source": "NxCode Claude Sonnet 4.6 Guide",
+      "url": "https://www.nxcode.io/resources/news/claude-sonnet-4-6-complete-guide-benchmarks-pricing-2026",
+      "date": "2026-04-29",
+      "tier": "C",
+      "verifications": 4,
+      "trustScore": 0.53
+    },
+    {
+      "value": 74.1,
+      "source": "MorphLLM Claude Benchmarks",
+      "url": "https://www.morphllm.com/claude-benchmarks",
+      "date": "2026-04-29",
+      "tier": "C",
+      "verifications": 4,
+      "trustScore": 0.53
+    },
+    {
+      "value": 89.9,
+      "source": "LinkedIn Deep Dive",
+      "url": "https://www.linkedin.com/pulse/claude-sonnet-46-deep-dive-opus-level-intelligence-pricing-steven-cen-z6sxc",
+      "date": "2026-04-29",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.13,
+      "contradictionRole": "loser"
     }
   ],
   "sonnet-4-6.aaIdx": [
@@ -1307,6 +1335,15 @@
       "tier": "S",
       "verifications": 2,
       "trustScore": 0.47
+    },
+    {
+      "value": 74.8,
+      "source": "LLM Stats Qwen3-235B",
+      "url": "https://llm-stats.com/benchmarks/livecodebench-v6",
+      "date": "2026-04-29",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.67
     }
   ],
   "o3.sweV": [
@@ -1843,11 +1880,12 @@
   "llama-4-maverick.lcb": [
     {
       "value": 43.4,
-      "source": "Meta Llama 4 official",
+      "source": "Meta Llama 4 Official",
       "url": "https://www.llama.com/models/llama-4/",
       "date": "2025-04-05",
       "tier": "S",
-      "trustScore": 0.07
+      "trustScore": 0.7,
+      "verifications": 3
     },
     {
       "value": 85,
@@ -1857,6 +1895,25 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": 0.33
+    },
+    {
+      "value": 43.4,
+      "source": "BenchLM Llama 4 Maverick",
+      "url": "https://benchlm.ai/models/llama-4-maverick",
+      "date": "2026-04-29",
+      "tier": "I",
+      "verifications": 3,
+      "trustScore": 1.0
+    },
+    {
+      "value": 85.0,
+      "source": "Prior cycle self-report (Meta)",
+      "url": "https://ai.meta.com/blog/llama-4-multimodal-intelligence/",
+      "date": "2026-04-27",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.23,
+      "contradictionRole": "loser"
     }
   ],
   "llama-4-maverick.gpqa": [
@@ -2618,6 +2675,25 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": 0.4
+    },
+    {
+      "value": 33.7,
+      "source": "Google Gemini 3 Flash Blog",
+      "url": "https://blog.google/products-and-platforms/products/gemini/gemini-3-flash/",
+      "date": "2026-04-29",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.7
+    },
+    {
+      "value": 16.2,
+      "source": "Prior cycle stale",
+      "url": "https://artificialanalysis.ai/evaluations/humanitys-last-exam",
+      "date": "2026-04-27",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.33,
+      "contradictionRole": "loser"
     }
   ],
   "gemini-3-1-pro.tb2": [
@@ -3221,6 +3297,15 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": 0.13
+    },
+    {
+      "value": 69.6,
+      "source": "Together AI Qwen3-Coder",
+      "url": "https://www.together.ai/blog/qwen-3-coder",
+      "date": "2026-04-29",
+      "tier": "C",
+      "verifications": 3,
+      "trustScore": 0.4
     }
   ],
   "gemma-4-31b.aime26": [
@@ -7447,6 +7532,15 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": 0.72
+    },
+    {
+      "value": 69.6,
+      "source": "Qwen3-Coder Blog",
+      "url": "https://qwenlm.github.io/blog/qwen3-coder/",
+      "date": "2026-04-29",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.47
     }
   ],
   "qwen3-coder-next.swePro": [
@@ -8378,6 +8472,97 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": 0.4
+    }
+  ],
+  "kimi-k2-6.pricing.api.out": [
+    {
+      "value": 2.5,
+      "source": "Moonshot Platform Docs",
+      "url": "https://platform.moonshot.cn/docs",
+      "date": "2026-04-29",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.7
+    }
+  ],
+  "deepseek-v4-pro.mrcr": [
+    {
+      "value": 83.5,
+      "source": "Lushbinary DeepSeek V4 Benchmarks",
+      "url": "https://lushbinary.com/blog/deepseek-v4-pro-vs-flash-benchmarks-pricing-comparison/",
+      "date": "2026-04-29",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.13
+    }
+  ],
+  "mimo-v2-5-pro.tb2": [
+    {
+      "value": 68.4,
+      "source": "BenchLM TerminalBench2",
+      "url": "https://benchlm.ai/benchmarks/terminalBench2",
+      "date": "2026-04-29",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.33
+    }
+  ],
+  "mimo-v2-5-pro.tbHard": [
+    {
+      "value": 43.2,
+      "source": "AA MiMo-V2.5-Pro",
+      "url": "https://artificialanalysis.ai/models/mimo-v2-5-pro",
+      "date": "2026-04-29",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.33
+    }
+  ],
+  "step-3-5-flash.gpqa": [
+    {
+      "value": 82.6,
+      "source": "StepFun Blog Step 3.5 Flash",
+      "url": "https://static.stepfun.com/blog/step-3.5-flash/",
+      "date": "2026-04-29",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.23
+    }
+  ],
+  "step-3-5-flash.hle": [
+    {
+      "value": 22.6,
+      "source": "StepFun Blog Step 3.5 Flash",
+      "url": "https://static.stepfun.com/blog/step-3.5-flash/",
+      "date": "2026-04-29",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.23
+    }
+  ],
+  "grok-4-1-fast.pricing": [
+    {
+      "value": {
+        "in": 0.2,
+        "out": 0.5
+      },
+      "source": "OpenRouter Grok 4.1 Fast",
+      "url": "https://openrouter.ai/x-ai/grok-4.1-fast",
+      "date": "2026-04-29",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.67
+    }
+  ],
+  "grok-4-1-fast.context": [
+    {
+      "value": 2000000,
+      "source": "xAI Models Docs",
+      "url": "https://docs.x.ai/developers/models",
+      "date": "2026-04-29",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.7
     }
   ]
 }
