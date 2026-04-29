@@ -2,11 +2,11 @@
 // its own builder function so individual concerns stay <50 lines and brace
 // nesting stays ≤3.
 
-import { State, BENCH_KEYS } from './core.js';
+import { State, BENCH_KEYS, BENCH_CATEGORIES } from './core.js';
 import {
   compositeScore, coverageOf, disputedCount, fmtScore, contradictionFor,
   pricingView, fmtPriceMoney, fmtPriceRange, fmtPriceCell, fmtContext,
-  fmtLastUpdated,
+  fmtLastUpdated, formatBenchValue, isCellStale,
 } from './data.js';
 import { gpuCompat, getActiveVram } from './gpu.js';
 import { el, cameraIconButton, docIconButton } from './dom.js';
@@ -34,16 +34,42 @@ function metaCell(label, value) {
 export function buildBenchCell(model, key) {
   const score = model.bench?.[key];
   const weight = Number(State.weights?.[key]) || 0;
-  // Excluded = current preset gives this bench zero weight; the cell still
-  // shows the value (so the user knows the data exists) but visually dims
-  // out so it's obvious the preset is ignoring it for ranking purposes.
+  const sources = State.sources[`${model.id}.${key}`] || [];
+  const topSource = sources.slice().sort((a, b) =>
+    (b.trustScore || 0) - (a.trustScore || 0))[0];
+
   const classes = ['bench-cell'];
-  if (score == null) classes.push('empty');
+  if (score == null) {
+    // Semantic empty-state routing
+    const naKeys = model.notApplicableBenchKeys || [];
+    if (naKeys.includes(key)) {
+      classes.push('opt-out');
+      const rule = (model.bench?.[`_na_rule_${key}`] || '');
+      if (rule === 'vendor-opt-out') classes.push('opt-out-vendor-opt-out');
+      else if (rule === 'out-of-scope') classes.push('opt-out-out-of-scope');
+      else classes.push('opt-out-not-applicable');
+    } else {
+      // Check if this cell is in the current cycle's gap list
+      const inGap = (State.gaps || []).some(g =>
+        (g.key === `${model.id}.${key}`) ||
+        (g.modelId === model.id && g.field === key));
+      classes.push(inGap ? 'gap-pending' : 'empty');
+    }
+  } else {
+    // Provenance tier badge
+    if (topSource) {
+      const tier = topSource.tier || '';
+      if (tier === 'C') classes.push('tier-c');
+    } else if (score != null) {
+      classes.push('tier-unknown');
+    }
+    // Freshness
+    if (isCellStale(model.id, key)) classes.push('stale');
+  }
   if (weight === 0) classes.push('excluded');
   const cell = el('div', { class: classes.join(' ') });
 
   const nameWrap = el('span', { class: 'name' }, t(`benchmarks.${key}.name`));
-  // Weight overlay on the bench label — dynamic per active preset.
   if (weight > 0) {
     nameWrap.appendChild(el('span', {
       class: 'bench-weight',
@@ -53,25 +79,29 @@ export function buildBenchCell(model, key) {
     nameWrap.title = t('ui.weights.excluded') || 'Excluded by active preset';
   }
   cell.appendChild(nameWrap);
-  cell.appendChild(el('span', { class: 'value' }, score != null ? fmtScore(score) : '—'));
+
+  const desc = t(`benchmarks.${key}.desc`);
+  if (desc) cell.dataset.tip = desc;
+
+  cell.appendChild(el('span', { class: 'value' }, score != null ? formatBenchValue(key, score) : '—'));
 
   const c = contradictionFor(model.id, key);
-  if (!c) return cell;
-
-  cell.classList.add(c.severity === 'danger' ? 'flag-danger' : 'flag-warn');
-  const flag = el('span', {
-    class: 'flag',
-    tabindex: '0',
-    role: 'button',
-    'aria-label': t('ui.contradiction.title'),
-  }, c.severity === 'danger' ? '🚨' : '⚠');
-  flag.dataset.modelId = model.id;
-  flag.dataset.benchKey = key;
-  flag.addEventListener('mouseenter', (e) => showContradictionTooltip(e.currentTarget, c));
-  flag.addEventListener('focus', (e) => showContradictionTooltip(e.currentTarget, c));
-  flag.addEventListener('mouseleave', hideTooltip);
-  flag.addEventListener('blur', hideTooltip);
-  cell.appendChild(flag);
+  if (c) {
+    cell.classList.add(c.severity === 'danger' ? 'flag-danger' : 'flag-warn');
+    const flag = el('span', {
+      class: 'flag',
+      tabindex: '0',
+      role: 'button',
+      'aria-label': t('ui.contradiction.title'),
+    }, c.severity === 'danger' ? '🚨' : '⚠');
+    flag.dataset.modelId = model.id;
+    flag.dataset.benchKey = key;
+    flag.addEventListener('mouseenter', (e) => showContradictionTooltip(e.currentTarget, c));
+    flag.addEventListener('focus', (e) => showContradictionTooltip(e.currentTarget, c));
+    flag.addEventListener('mouseleave', hideTooltip);
+    flag.addEventListener('blur', hideTooltip);
+    cell.appendChild(flag);
+  }
   return cell;
 }
 
@@ -189,7 +219,21 @@ function buildPricingProviderRow(e) {
 function benchGridSection(model) {
   const head = el('div', { class: 'meta-cell' }, el('span', { class: 'label' }, t('ui.table.bench')));
   const grid = el('div', { class: 'bench-grid' });
-  for (const k of BENCH_KEYS) grid.appendChild(buildBenchCell(model, k));
+  const categorised = new Set();
+  for (const cat of BENCH_CATEGORIES) {
+    const catLabel = t(`benchCategories.${cat.id}.label`) || cat.id;
+    grid.appendChild(el('div', { class: 'bench-cat-header' }, catLabel));
+    for (const k of cat.keys) {
+      if (BENCH_KEYS.includes(k)) {
+        grid.appendChild(buildBenchCell(model, k));
+        categorised.add(k);
+      }
+    }
+  }
+  // Uncategorised keys fallback (should not occur if BENCH_CATEGORIES is complete)
+  for (const k of BENCH_KEYS) {
+    if (!categorised.has(k)) grid.appendChild(buildBenchCell(model, k));
+  }
   return [head, grid];
 }
 

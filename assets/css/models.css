@@ -264,6 +264,61 @@ table#comparison-table .coverage-mini.cov-low { color: var(--danger); border-col
 .bench-cell.opt-out-not-applicable .value { color: var(--muted, #8a8d92); }
 .bench-cell.opt-out-out-of-scope .value { color: var(--muted, #6a6e74); }
 
+/* Provenance tier badges on bench cells */
+.bench-cell.tier-c .value {
+  color: var(--muted, #8a8d92);
+  font-style: italic;
+}
+.bench-cell.tier-c::after {
+  content: 'C';
+  font-size: 0.6rem;
+  vertical-align: super;
+  color: var(--muted, #8a8d92);
+  margin-left: 2px;
+}
+.bench-cell.tier-unknown .value {
+  color: var(--warn, #f0b04a);
+}
+.bench-cell.tier-unknown::before {
+  content: '?';
+  font-size: 0.7rem;
+  color: var(--warn, #f0b04a);
+  margin-right: 2px;
+}
+.bench-cell.gap-pending {
+  opacity: 0.45;
+}
+.bench-cell.gap-pending .value {
+  color: var(--muted, #8a8d92);
+  font-size: 0.85em;
+}
+
+/* Freshness indicator — cells >14 days old */
+.bench-cell.stale::after {
+  content: '↻';
+  font-size: 0.65rem;
+  vertical-align: super;
+  color: var(--muted, #8a8d92);
+  margin-left: 2px;
+  cursor: help;
+}
+.bench-cell.tier-c.stale::after {
+  content: 'C↻';
+}
+
+/* Category header rows in bench grid */
+.bench-cat-header {
+  grid-column: 1 / -1;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted, #8a8d92);
+  padding: 6px 4px 2px;
+  border-bottom: 1px solid var(--border, rgba(255,255,255,0.08));
+  margin-top: 4px;
+}
+
 .compat-badge {
   display: inline-flex;
   align-items: center;

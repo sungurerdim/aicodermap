@@ -57,6 +57,40 @@ export function scoreClass(v) {
   return 'score-low';
 }
 
+// Per-bench unit metadata — keys that deviate from the default "percent" scale.
+const BENCH_UNITS = { cfElo: 'elo', webDevElo: 'elo' };
+const BENCH_DIRECTION = { aaOmni: 'lower_better' };
+
+export function formatBenchValue(key, value) {
+  if (value == null || !Number.isFinite(value)) return '—';
+  const unit = BENCH_UNITS[key] || 'percent';
+  const dir = BENCH_DIRECTION[key] || 'higher_better';
+  if (unit === 'elo') return `${Math.round(value)} ELO`;
+  const pct = `${value.toFixed(1)}%`;
+  return dir === 'lower_better' ? `${pct} ↓` : pct;
+}
+
+// Returns the most recent `fetched` ISO date across all sources for a cell,
+// or null if no sources exist.
+export function getCellFreshness(modelId, benchKey) {
+  const entries = (State.sources[`${modelId}.${benchKey}`]) || [];
+  if (!entries.length) return null;
+  let latest = null;
+  for (const e of entries) {
+    const f = e.fetched || e.lastChecked || null;
+    if (f && (!latest || f > latest)) latest = f;
+  }
+  return latest;
+}
+
+// Returns true if the cell's freshness is older than STALE_DAYS (14).
+export function isCellStale(modelId, benchKey) {
+  const freshness = getCellFreshness(modelId, benchKey);
+  if (!freshness) return false;
+  const age = (Date.now() - new Date(freshness).getTime()) / 86400000;
+  return age > 14;
+}
+
 // Worst within-tier disagreement for a contested cell. We separate same-tier
 // disputes (real residual uncertainty: two equally-trusted observers landing
 // on different numbers) from cross-tier disputes (already settled by the
