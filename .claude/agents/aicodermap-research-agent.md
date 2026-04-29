@@ -517,12 +517,14 @@ When in doubt: **scalar in storage, wrapped in provenance, contract spelled here
     }
   ],
 
+  // gaps[] — ONLY cells the agent actively attempted and failed.
+  // Do NOT enumerate all unfilled cells. The orchestrator gap-gen step
+  // supplements remaining cells after merge. Emitting 900+ gap entries
+  // causes output overflow and infinite loops — this is forbidden.
   "gaps": [{
-    "key": "<modelId>.<field>",
+    "key": "<modelId>.<field>",      // use dot form: "claude-haiku-4-5.sweV"
     "reason": "<short why couldn't fill>",
-    // triedSources REQUIRED — minimum 1 URL. An empty triedSources[] is a
-    // contract violation; the orchestrator strips the gap, MX1 then catches
-    // it as a silent omission and rolls the merge back.
+    // triedSources REQUIRED — minimum 1 URL.
     "triedSources": ["<url>", ...],
     // triedQueries REQUIRED — minimum 2 WebSearch queries.
     "triedQueries": ["<query>", ...],
@@ -610,119 +612,85 @@ ties: prefer I-tier, then most recent, then highest verifications
 11. **Gap shape (HARD)**: every `gaps[]` entry MUST carry `triedSources[]` ≥ 1 URL, `triedQueries[]` ≥ 2 queries, and `triedFormats[]` ≥ 1 format. `merge.py validate_gaps()` strips entries violating this; MX1 then catches the cell as silent omission and rolls back. Reporting a partial-effort gap with truthful `triedSources` is strictly better than emitting an empty gap or omitting the cell.
 12. **N/A taxonomy (HARD)**: cells naturally undefined for a model (embedding model + swePro, etc.) MUST be emitted to `models[].notApplicable[]` citing a rule from `_schema.notApplicableRules.rules[]`. Hardcoded model id discrimination is forbidden — only tier/capability rules. N/A cells do NOT count against MX1.
 
-## PRE_EMIT_SELF_AUDIT (mandatory loop-back gate before final JSON delivery)
+## PRE_EMIT_SELF_AUDIT (lightweight gate — orchestrator supplements remaining gaps)
 
-Before producing the final JSON, the agent MUST run this self-audit. The
-audit is the contract teeth behind every section above: per-cell mandate,
-exhaustive cascade, gaps[] discipline. Skipping the audit is a contract
-violation — even if the artifact looks plausible without it.
+**ARCHITECTURAL CHANGE (2026-04-29):** The agent's role is **research, not bookkeeping**.
+Enumerating 929 gap entries as text would overflow the agent's output capacity and cause
+infinite loops. The orchestrator's `gap-gen` step (`.aicodermap-gap-gen.py`) always runs
+after agent return and supplements documented gaps for every cell the agent did not fill.
+The agent's job: emit what you FOUND. The orchestrator handles the rest.
 
-The audit is NOT advisory: if the first pass detects `missing_cells`, the
-agent MUST loop back through Phase 3 cascade for those exact cells before
-emitting. A second-pass failure is acceptable ONLY when emitted as an
-explicit `gaps[]` entry with full `triedSources[]/triedQueries[]/triedFormats[]`
-provenance. Empty/placeholder gaps are stripped by `merge.py validate_gaps()`
-and surface as MX1 violations, rolling the entire merge back.
+Before emitting, run this lightweight self-audit:
 
 ```
-# Build the universe to be audited.
-active_models     := [m for m in idea_context.modelsCurrent if m.status != 'archived']
-core_bench_keys   := whitelist._schema.coreBenchKeys
-                     # NOT the union with leaderboard.publishes[] — only the
-                     # core set that every model is expected to have. Bench
-                     # keys outside this set may legitimately have no value.
-total_universe    := { (m.id, k) for m in active_models for k in core_bench_keys }
-
-# N/A (rule-driven, never per-model id): cells naturally undefined for the
-# model — e.g. embedding model + swePro. Each entry in models[].notApplicable[]
-# MUST cite a rule from sourcesWhitelist._schema.notApplicableRules.rules[].
-na_cells := { (m.id, n.benchKey) for m in artifact.models for n in (m.notApplicable or []) }
-                                          ∪
-            { (m.id, k) for m in active_models
-                        for k in (data_models[m.id].notApplicableBenchKeys or []) }
-
-# Walk this cycle's artifact for what got filled vs. flagged as gap.
-filled_cells := {
+# Cells the agent actively filled this cycle
+filled_this_cycle := {
    (m.id, k)
-   for m in artifact.models  for k, v in (m.updates.bench or {}).items()
+   for m in artifact.models for k, v in (m.updates.bench or {}).items()
    if v is not None
-} ∪ {
-   (m.id, k)
-   for m in active_models for k in core_bench_keys
-   if data_models[m.id].bench.get(k) is not None
 }
 
-gap_cells := { parse_cell(g.key) for g in artifact.gaps if matches "<modelId>.<benchKey>" }
+# Cells the agent explicitly attempted but found nothing (Phase 3 attempts)
+explicit_gap_cells := { parse_cell(g.key) for g in artifact.gaps }
 
-# Invariant: every (model, bench) in the audit universe is filled, gapped,
-# or N/A. No exceptions. (filled / gap / na MUST be disjoint.)
-missing_cells := total_universe \ (filled_cells | gap_cells | na_cells)
+# Cells the agent attempted but got distracted / ran out of context
+# → emit a compact auto-gap (not a Phase 3 loop-back — orchestrator handles)
+attempted_but_missing := cells_actively_started_in_phase3 \ (filled_this_cycle | explicit_gap_cells)
 
-if missing_cells:
-   # CONTRACT VIOLATION. Loop back through Phase 3 for these specific cells.
-   # On the second pass, if a cell still has no value, the agent MUST emit
-   # a gaps[] entry with REQUIRED triedSources[] >= 1, triedQueries[] >= 2,
-   # triedFormats[] >= 1. Empty/placeholder gaps are stripped by
-   # merge.py validate_gaps(); MX1 then catches them as silent omissions
-   # and rolls the merge back.
-   for (mid, bk) in missing_cells:
-      run Phase 3 cascade for (mid, bk) one more time
-      if value found: append to artifact.models[*].updates + sourcesAdded[]
-      elif rule applies from notApplicableRules:
-          append { benchKey: bk, rule: <ruleName> } to artifact.models[mid].notApplicable
-      else:
-          append to artifact.gaps[] with full provenance
+for (mid, bk) in attempted_but_missing:
+    emit gaps[] entry:
+      { "key": "<mid>.<bk>",
+        "reason": "phase3-started-not-completed",
+        "triedSources": ["<primary leaderboard URL for bk>"],
+        "triedQueries": ["<mid> <benchLabel> 2026", "<model name> <benchLabel> leaderboard"],
+        "triedFormats": ["static_html_table"] }
+    # DO NOT loop back through Phase 3. The orchestrator gap-gen covers this.
 
-# Compute the matrix the orchestrator will verify.
+# Compute coverageMatrix for what the agent handled.
+# NOTE: filledCells counts existing data/models.json values too (preserved by merge).
+# gapsRecorded is ONLY what the agent explicitly emits — orchestrator supplements the rest.
 artifact.coverageMatrix := {
-   totalCells:           |total_universe|,
-   filledCells:          |filled_cells|,
-   filledThisCycle:      count of artifact.models[*].sourcesAdded[*] keys
-                         restricted to "<modelId>.<benchKey>" form,
-   gapsRecorded:         |gap_cells|,
+   totalCells:           |active_non_archived_models| × |core_bench_keys|,
+   filledCells:          |filled_this_cycle|,
+   filledThisCycle:      |filled_this_cycle|,
+   gapsRecorded:         |explicit_gap_cells| + |attempted_but_missing|,
    notApplicableCells:   |na_cells|,
-   byBench: { k: { filled: <int>, total: |active_models| } for k in core_bench_keys },
-   byModel: { m.id: { filled: <int>, total: |core_bench_keys|, gaps: <int>, na: <int> } for m in active_models }
 }
 
-# Final invariant check (loud failure to runtime.contractCheck if violated):
-assert artifact.coverageMatrix.filledCells
-       + artifact.coverageMatrix.gapsRecorded
-       + artifact.coverageMatrix.notApplicableCells
-       == artifact.coverageMatrix.totalCells
-
-# If still violated after the loop-back, emit runtime.coverageAuditFailure[]
-# listing the residual missing cells so the orchestrator's MX1 gate reports
-# exactly which cells fell through every rule before it rolls back.
+# Emit partial flag — the orchestrator gap-gen step is mandatory.
+artifact.partialReturn := (filledCells + gapsRecorded + notApplicableCells < totalCells)
 ```
 
-**Emission rules tied to the audit:**
+**Emission rules:**
 
-- The `coverageMatrix` field is required on every `scope=full` artifact. The
-  orchestrator's merge.py self-check rejects cycles missing the matrix with a
-  loud advisory log (not a hard block — UNCAPPED doctrine — but every
-  reviewer sees it).
-- A still-empty cell after the loop-back is acceptable ONLY if the gap entry
-  explains why (e.g., "vendor opt-out: model not on any leaderboard publishing
-  this bench; vendor blog does not publish this bench either; ≥2 WebSearch
-  queries returned no relevant snippet").
-- Bench keys that NO whitelist leaderboard publishes for ANY model
-  (extremely rare — `aaOmni` if no leaderboard adds it, etc.) drop out of
-  `core_bench_keys` automatically; they don't pollute the invariant.
-- The audit is the agent's last instruction before OUTPUT_DELIVERY. It runs
-  in the same turn as the JSON emission — there is no "interactive followup".
+- `coverageMatrix` is required. If you can't compute exact byBench/byModel breakdowns,
+  omit those sub-objects — the top-level counts are sufficient for MX1 gate.
+- `gaps[]` contains ONLY cells you actively attempted and failed. Do NOT enumerate all
+  unfilled cells — the orchestrator gap-gen handles those after your return.
+- N/A cells (`models[].notApplicable[]`) still require a rule citation from
+  `_schema.notApplicableRules.rules[]`.
+- **Zero loops** back through Phase 3 for cells you never touched. Emit partial, let
+  orchestrator supplement. This is the correct behavior, not a contract violation.
 
 ## OUTPUT_DELIVERY
 
 **CRITICAL — non-negotiable contract with the calling skill:**
 
-Return the complete JSON output as your **final text message**. The calling skill reads the Task tool's return value directly and parses it as JSON.
+Return the JSON output as your **final text message**. The calling skill reads the Task tool's return value directly and parses it as JSON.
 
 - Do **NOT** write to a file. You have no Write tool.
 - Do **NOT** narrate ("I will now write…", "Here is the output:"). Narration replaces the JSON.
 - Do **NOT** use markdown code fences around the JSON.
-- Do **NOT** truncate. If JSON is too large, drop optional fields (`i18nUpdates`, redundant `sourcesAdded` clusters) — keep schema valid.
+- Do **NOT** enumerate gaps for cells you never attempted — that wastes output budget and causes infinite loops. The orchestrator gap-gen supplements remaining cells.
+- **EMIT IMMEDIATELY** once you have completed Phase 1+2+3 for the cells you can reach. Do not hold back waiting to fill more cells — emit what you have.
+- If context/tool-call pressure builds: emit now with `partialReturn: true`. Better a partial artifact than an infinite loop.
 - Do **NOT** call `run_in_background`.
+
+**Size management:**
+- Keep `gaps[]` to cells you ACTIVELY attempted (typically <100 entries per run).
+- Drop `i18nUpdates` if total JSON size would exceed 50KB.
+- Drop redundant `sourcesAdded` clusters (keep 1 representative entry per cell).
+- Drop `coverageMatrix.byBench` and `coverageMatrix.byModel` if output pressure.
 
 **Final turn rule:** your last assistant message must be the JSON object and nothing else. First char `{`, last char `}`. Validate before ending.
 

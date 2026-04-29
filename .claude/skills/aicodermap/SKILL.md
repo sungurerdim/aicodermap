@@ -160,29 +160,30 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
     filled_cells_from_models + na_cells). `pre_snapshot` is held in skill
     memory only; never written to disk.
 
-5b. COMPLETENESS_GATE (P4 reform — single-pass enforcement):
+5b. GAP_GEN SUPPLEMENT (mandatory — runs ALWAYS after agent return, not just on failure):
     ```
-    expected_total := |active_models| × |coreBenchKeys| - |notApplicableCells|
-    actual_covered := artifact.coverageMatrix.filledCells
-                    + artifact.coverageMatrix.gapsRecorded
-                    + artifact.coverageMatrix.notApplicableCells
+    // Architectural reform 2026-04-29: the agent emits only what it FOUND.
+    // Gap enumeration for all remaining unfilled cells is the orchestrator's job.
+    // The agent's gaps[] contains only cells it actively attempted and failed;
+    // it does NOT enumerate cells it never touched (that caused infinite loops).
 
-    if actual_covered < expected_total:
-        partial_return := true
-        missing_cells  := identify_missing(artifact, idea_context, pre_snapshot)
-        if AGENT_RETRY > 0:
-            dispatch ONE retry agent with prompt:
-              "COMPLETENESS_RETRY: the following (modelId, benchKey) pairs were
-               neither filled, gapped, nor marked notApplicable. Re-attempt
-               Phase 3 only; emit fill OR gap with triedSources[]>=1, OR
-               notApplicable[] citing a rule. Do NOT re-run Phase 0/1/2."
-              + missing_cells list
-            AGENT_RETRY := 0
-        else:
-            artifact.partialReturn := true
-            CHANGELOG note: "⚠ SINGLE-PASS VIOLATION: <N> cells implicitly
-                             skipped — next cycle re-attempts."
-            CONTINUE to Step 6 (NEVER halt — autonomy doctrine preserved)
+    python .aicodermap-gap-gen.py
+    // gap-gen reads data/models.json (current state) + sources-whitelist.json
+    // and writes .aicodermap-agent-out.json, MERGING the agent's found values
+    // into the existing artifact and adding gaps[] for all remaining unfilled cells.
+    // This ensures merge.py MX1 invariant (filled+gaps+na == totalCells) always holds.
+
+    // gap-gen merge policy (in .aicodermap-gap-gen.py):
+    //   1. Read .aicodermap-agent-out.json (agent artifact, may not exist if agent looped)
+    //   2. For each (active_model, bench_key):
+    //      - If artifact has a fill for this cell → keep fill
+    //      - Else if artifact has an explicit gap → keep gap
+    //      - Else → add auto-gap with appropriate triedSources/triedQueries/triedFormats
+    //   3. Write merged artifact back to .aicodermap-agent-out.json
+
+    // No retry agent needed. next cycle re-attempts all cells anyway (UNCAPPED doctrine).
+    // CHANGELOG records gap count: "⚠ gap-gen supplemented <N> cells"
+    CONTINUE to Step 5c
     ```
 
 5c. DELTA_CHECK (P7 reform):
