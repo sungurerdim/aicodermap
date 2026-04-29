@@ -95,6 +95,59 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
    })
 5. Parse return → validate JSON schema (strip surrounding whitespace, locate first `{` and last `}` if narration leaked)
 
+5a. MATRIX_SNAPSHOT (P7 reform):
+    Before consuming the artifact, snapshot the pre-merge state of
+    `data/models.json` so step 5b can detect partial returns + zero-delta
+    silence:
+    ```
+    pre_snapshot := {
+       totals: { models: |active|, coreKeys: |coreBenchKeys| },
+       perModel: { id: { filled: <int>, na: <int>, gapKeys: [] } for id in active }
+    }
+    ```
+    Skill computes via scripts/lib/matrix.py helpers (active_models +
+    filled_cells_from_models + na_cells). `pre_snapshot` is held in skill
+    memory only; never written to disk.
+
+5b. COMPLETENESS_GATE (P4 reform — single-pass enforcement):
+    ```
+    expected_total := |active_models| × |coreBenchKeys| - |notApplicableCells|
+    actual_covered := artifact.coverageMatrix.filledCells
+                    + artifact.coverageMatrix.gapsRecorded
+                    + artifact.coverageMatrix.notApplicableCells
+
+    if actual_covered < expected_total:
+        partial_return := true
+        missing_cells  := identify_missing(artifact, idea_context, pre_snapshot)
+        if AGENT_RETRY > 0:
+            dispatch ONE retry agent with prompt:
+              "COMPLETENESS_RETRY: the following (modelId, benchKey) pairs were
+               neither filled, gapped, nor marked notApplicable. Re-attempt
+               Phase 3 only; emit fill OR gap with triedSources[]>=1, OR
+               notApplicable[] citing a rule. Do NOT re-run Phase 0/1/2."
+              + missing_cells list
+            AGENT_RETRY := 0
+        else:
+            artifact.partialReturn := true
+            CHANGELOG note: "⚠ SINGLE-PASS VIOLATION: <N> cells implicitly
+                             skipped — next cycle re-attempts."
+            CONTINUE to Step 6 (NEVER halt — autonomy doctrine preserved)
+    ```
+
+5c. DELTA_CHECK (P7 reform):
+    Compare artifact against `pre_snapshot`:
+    ```
+    for id in pre_snapshot.perModel.keys:
+        delta := artifact.models[id].sourcesAdded[]
+                 ∪ artifact.models[id].updates
+                 ∪ gaps[].(modelId==id)
+                 ∪ notApplicable[].(modelId==id)
+        if delta is empty:
+            runtime.modelAudit[id] := "zero-delta-no-gap"
+    ```
+    Zero-delta-no-gap models are NOT halts — they surface in the CHANGELOG
+    "⚠ silent omission suspects" section so the next cycle prioritizes them.
+
 6. COVERAGE LOG — **advisory only (reformed 2026-04-28)**:
    The agent already walks every source for every (modelId, benchKey) cell in
    one pass (UNCAPPED + UNCACHED doctrine). There is no separate deep-fetch
@@ -206,16 +259,28 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
 ```
 
 ## CONSTANTS
+
+> **SSOT (P9 reform):** numeric thresholds below are **fetched from
+> `data/sources-whitelist.json._schema.contracts` at run time** via
+> `scripts/lib/whitelist.py contracts()`. The values listed here mirror the
+> defaults baked into `lib/whitelist.SAFE_DEFAULTS` so the skill can run
+> even before the contracts block is populated, but the canonical source is
+> the whitelist file. SKILL.md, agent.md, and merge.py never duplicate the
+> values — they reference the contracts block.
+
 ```
-CONTRADICTION_WARN              = 3.0   // pp delta → YELLOW (auto-resolve via trustScore)
-CONTRADICTION_BLOCK             = 5.0   // pp delta → RED (auto-resolve via trustScore, log loudly)
-COVERAGE_TARGET                 = 0.85  // ADVISORY (reformed 2026-04-28). Cumulative provenance coverage; never blocks commit. Below-target → CHANGELOG warning.
-COVERAGE_HARD_BLOCK             = 0.50  // ADVISORY (reformed 2026-04-28). <0.50 logs a "⚠ very low cumulative provenance coverage" note in CHANGELOG and proceeds; gaps[] preserved for next cycle
-STALE_DAYS                      = 14    // M5 freshness gate
-DEPRECATION_GRACE_DAYS          = 60    // vendor "deprecated" → still listed for 60d before archive
-DEPLOY_WAIT_SEC                 = 90
-AGENT_RETRY                     = 1
-FAMILY_BASELINE_MIN             = 30    // refresh-all: |models[]+newModels[]| floor
+CONTRADICTION_WARN_PP              = 3.0   // pp delta → YELLOW (auto-resolve via trustScore)
+CONTRADICTION_BLOCK_PP             = 5.0   // pp delta → RED (auto-resolve via trustScore, log loudly)
+COVERAGE_TARGET                    = 0.85  // ADVISORY. Cumulative provenance coverage; never blocks commit. Below-target → CHANGELOG warning.
+COVERAGE_HARD_BLOCK                = 0.50  // ADVISORY. <0.50 logs a "⚠ very low cumulative provenance coverage" note in CHANGELOG and proceeds; gaps[] preserved for next cycle
+ABSOLUTE_COVERAGE_FLOOR            = 0.30  // HARD BLOCK after W3 activation (env AICODERMAP_MX2_BLOCK=1). One-time bypass: merge.py --bypass-floor-check. Below-floor → MX2 violation + .bak rollback.
+MIN_SOURCES_PER_FILLED_CELL        = 2     // <2 distinct URLs → benchQuarantine[key]=true (WARN). MX5.
+COMPLETENESS_RETRY_LIMIT           = 1     // SINGLE retry per refresh; second partial → CHANGELOG warn (no halt)
+STALE_DAYS                         = 14    // M5 freshness gate
+DEPRECATION_GRACE_DAYS             = 60    // vendor "deprecated" → still listed for 60d before archive
+DEPLOY_WAIT_SEC                    = 90
+AGENT_RETRY                        = 1
+FAMILY_BASELINE_MIN                = 30    // refresh-all: |models[]+newModels[]| floor
 // =====================================================================
 // UNCAPPED RESEARCH DOCTRINE (added 2026-04-27 rev3)
 // User policy: "do not put budget/limit/cap on the agent's research effort.

@@ -29,6 +29,29 @@ NOW = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 ARTIFACT = f"{PROJECT}/.aicodermap-agent-out.json"
 WHITELIST = f"{PROJECT}/data/sources-whitelist.json"
 
+# Allow `from lib.whitelist import ...` when invoked from any cwd.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from lib.matrix import active_models as _matrix_active  # noqa: E402
+from lib.matrix import expected_total as _matrix_expected_total  # noqa: E402
+from lib.matrix import filled_cells_from_models as _matrix_filled  # noqa: E402
+from lib.matrix import gap_cells_from_artifact as _matrix_gaps  # noqa: E402
+from lib.matrix import na_cells as _matrix_na  # noqa: E402
+from lib.matrix import total_universe as _matrix_universe  # noqa: E402
+from lib.matrix import verify_matrix_invariant as _matrix_verify  # noqa: E402
+from lib.whitelist import contracts as _wl_contracts  # noqa: E402
+from lib.whitelist import core_bench_keys as _wl_core_bench_keys  # noqa: E402
+from lib.whitelist import load_whitelist as _wl_load  # noqa: E402
+
+
+# CLI flags — let migrations bypass post-write floors during W1 phase.
+BYPASS_FLOOR_CHECK = "--bypass-floor-check" in sys.argv
+# MX1 invariant: BLOCK by default once W2 activates. During W1 migration,
+# set AICODERMAP_MX1_WARN_ONLY=1 (or pass --warn-only-invariant) to log + continue.
+WARN_ONLY_INVARIANT = (
+    "--warn-only-invariant" in sys.argv
+    or os.environ.get("AICODERMAP_MX1_WARN_ONLY") == "1"
+)
+
 # Formats whose primary fetch is "skip" — fetching their canonical URL directly
 # should be rare. A sourcesAdded entry that points at one of these formats and
 # claims a high tier deserves a non-blocking warning so an operator can verify
@@ -274,21 +297,24 @@ def _extract_bench_key(g):
 
 
 def validate_gaps(out):
-    """GAP_VALIDITY_GATE — audit-only (reformed 2026-04-28).
+    """GAP_VALIDITY_GATE — strip + audit (P5 reform).
 
-    Earlier behaviour stripped gaps[] entries whose triedSources count fell
-    below clamp(advertised_high_weight, 3, 5). That pressured the agent to
-    silently omit hard-to-reach pairs rather than transparently log them.
+    Hard rule (MX3): every `gaps[]` entry MUST carry triedSources[] >= 1.
+    Empty triedSources is a contract violation; the entry is stripped and
+    recorded in `runtime.strippedGaps[]`. The corresponding cell then
+    surfaces as a silent omission via MX1 (matrix invariant), rolling the
+    merge back unless --warn-only-invariant is in effect.
 
-    The reform: NEVER strip a gap. Every gaps[] entry is preserved exactly as
-    the agent emitted it. The function still walks the list to compute a
-    "low-effort suspicion" record so a human reviewer can spot gaps that
-    deserved more effort, but the gap stays.
+    Soft rule (audit suspicion): triedQueries[] < 2 OR triedFormats[] < 1
+    flags `runtime.fabricatedSuspicions[]` for human review but the entry
+    stays in gaps[].
 
     Returns the suspicion list (audit) for the orchestrator's diff summary.
     """
     bench_advertised = _build_bench_advertised_count()
     raw = out.get("gaps", []) or []
+    kept = []
+    stripped = []
     suspicions = []
     for g in raw:
         ts = g.get("triedSources") or []
@@ -297,11 +323,26 @@ def validate_gaps(out):
         ts_n, tq_n, tf_n = len(ts), len(tq), len(tf)
 
         bench_key = _extract_bench_key(g)
-        n_advertised = bench_advertised.get(bench_key, 0)
-        # advisory floor (3 minimum, scale with advertised, cap at 5)
-        suggested_floor = min(max(n_advertised, 3), 5)
 
-        if ts_n < suggested_floor:
+        # MX3 — empty triedSources strips the gap.
+        if ts_n < 1:
+            stripped.append(
+                {
+                    "modelId": g.get("modelId"),
+                    "field": g.get("field"),
+                    "bench_key": bench_key,
+                    "reason": g.get("reason"),
+                    "stripReason": "triedSources empty",
+                }
+            )
+            continue
+
+        kept.append(g)
+
+        # Soft suspicion: low query/format effort.
+        n_advertised = bench_advertised.get(bench_key, 0)
+        suggested_floor = min(max(n_advertised, 3), 5)
+        if tq_n < 2 or tf_n < 1 or ts_n < suggested_floor:
             suspicions.append(
                 {
                     "modelId": g.get("modelId"),
@@ -317,7 +358,11 @@ def validate_gaps(out):
                     "suggested_floor": suggested_floor,
                 }
             )
+
+    out["gaps"] = kept
     runtime = out.setdefault("runtime", {})
+    if stripped:
+        runtime.setdefault("strippedGaps", []).extend(stripped)
     if suspicions:
         runtime.setdefault("fabricatedSuspicions", []).extend(suspicions)
     return suspicions
@@ -336,6 +381,28 @@ def append_source(sources, key, entry):
             return False
     arr.append(entry)
     return True
+
+
+def _verify_matrix_invariant(models, artifact):
+    """MX1 — every (active_modelId, coreBenchKey) cell ends up in exactly one
+    of FILLED | GAP | NOT_APPLICABLE. Silent omission is a contract violation.
+
+    Returns (ok: bool, diagnostic: dict).
+    On failure the orchestrator rolls models.json + sources.json back to .bak
+    and exits non-zero before CHANGELOG is touched.
+    """
+    wl = _wl_load()
+    core = _wl_core_bench_keys(wl)
+    active = _matrix_active(models)
+    universe = _matrix_universe(active, core)
+    filled = _matrix_filled(active, core)
+    gaps = _matrix_gaps(artifact, core)
+    na = _matrix_na(active, core)
+    diag = _matrix_verify(filled, gaps, na, universe)
+    diag["expectedTotal"] = _matrix_expected_total(active, core)
+    diag["coreBenchKeys"] = list(core)
+    diag["activeModelCount"] = len(active)
+    return diag["ok"], diag
 
 
 def main():
@@ -486,31 +553,94 @@ def main():
             f" [WARN: cumulative provenance coverage {cov_pct}% below 85% target]"
         )
 
-    # PRE_EMIT_SELF_AUDIT verification — advisory log, never blocks (UNCAPPED).
-    # The agent is contractually required to compute coverageMatrix and the
-    # invariant filledCells + gapsRecorded == totalCells. We re-verify here so
-    # a forgotten/skipped agent self-audit doesn't slip past silently. Output
-    # is a CHANGELOG line + console warning; commit + push proceeds either way.
+    # MX1 — Cell-level matrix invariant (HARD BLOCK after W2 activation;
+    # WARN-only via --warn-only-invariant during W1 migration phase).
+    # Every (active_modelId, coreBenchKey) cell must end up in exactly one
+    # of FILLED | GAP | NOT_APPLICABLE. Silent omission = contract violation.
+    contracts_block = _wl_contracts(_wl_load())
     matrix_warn = ""
+    invariant_ok, mx_diag = _verify_matrix_invariant(models, out)
+    if not invariant_ok:
+        missing = mx_diag.get("missing") or []
+        overlap = mx_diag.get("overlap") or {}
+        msg_parts = []
+        if missing:
+            sample = ", ".join(f"{m}.{b}" for m, b in missing[:5])
+            extra = f" ...+{len(missing) - 5}" if len(missing) > 5 else ""
+            msg_parts.append(
+                f"{len(missing)} cell(s) silently missing ({sample}{extra})"
+            )
+        for okey, items in overlap.items():
+            if items:
+                msg_parts.append(f"{okey}={len(items)}")
+        matrix_warn = " [MX1: matrix invariant violated — " + "; ".join(msg_parts) + "]"
+
+    # Surface the agent's self-reported coverageMatrix (informational; the
+    # canonical truth is the recomputed mx_diag above).
     matrix = out.get("coverageMatrix")
     if not isinstance(matrix, dict):
         matrix_warn = (
-            " [WARN: artifact missing coverageMatrix; agent skipped self-audit]"
+            (matrix_warn + " [WARN: artifact missing coverageMatrix]")
+            if matrix_warn
+            else " [WARN: artifact missing coverageMatrix; agent skipped self-audit]"
         )
-    else:
-        total = matrix.get("totalCells")
-        filled = matrix.get("filledCells")
-        gaps_recorded = matrix.get("gapsRecorded")
-        if not all(isinstance(x, int) for x in (total, filled, gaps_recorded)):
-            matrix_warn = " [WARN: coverageMatrix has non-int totalCells/filledCells/gapsRecorded]"
-        elif filled + gaps_recorded != total:
-            short = total - (filled + gaps_recorded)
-            matrix_warn = (
-                f" [WARN: coverageMatrix invariant violated — "
-                f"{short} cell(s) silently missing (filled={filled} + gaps={gaps_recorded} ≠ total={total})]"
-            )
+
     if matrix_warn:
         coverage_warn = (coverage_warn + matrix_warn) if coverage_warn else matrix_warn
+
+    # MX1 HARD BLOCK gate.
+    if not invariant_ok and not WARN_ONLY_INVARIANT:
+        rolled = restore_from_bak([models_path, sources_path])
+        print("\n" + "=" * 72, file=sys.stderr)
+        print("✗ MERGE ABORTED — MX1 matrix invariant violated", file=sys.stderr)
+        print("=" * 72, file=sys.stderr)
+        print(
+            "  filled+gaps+notApplicable does NOT cover the (active × core_bench) "
+            "universe. Silent omission is a contract violation.",
+            file=sys.stderr,
+        )
+        print(
+            f"  totalCells={mx_diag.get('totalCells')} "
+            f"filled={mx_diag.get('filled')} "
+            f"gaps={mx_diag.get('gaps')} "
+            f"notApplicable={mx_diag.get('notApplicable')} "
+            f"missing={len(mx_diag.get('missing') or [])}",
+            file=sys.stderr,
+        )
+        if mx_diag.get("missing"):
+            print("  missing cells (first 10):", file=sys.stderr)
+            for m, b in (mx_diag.get("missing") or [])[:10]:
+                print(f"    - {m}.{b}", file=sys.stderr)
+        if rolled:
+            print(f"  rolled back {len(rolled)} file(s) from .bak", file=sys.stderr)
+        print(
+            "  re-run with --warn-only-invariant to log + continue (W1 migration only).",
+            file=sys.stderr,
+        )
+        print("=" * 72, file=sys.stderr)
+        sys.exit(1)
+
+    # MX2 — Absolute coverage floor (WARN during W1; flip via env to BLOCK in W3).
+    floor = float(contracts_block.get("ABSOLUTE_COVERAGE_FLOOR") or 0.30)
+    if mx_diag.get("totalCells"):
+        ratio = mx_diag.get("filled", 0) / max(mx_diag["totalCells"], 1)
+        if ratio < floor:
+            floor_msg = (
+                f" [MX2: coverage {round(ratio * 100, 1)}% < absolute floor "
+                f"{int(floor * 100)}%]"
+            )
+            coverage_warn = (coverage_warn or "") + floor_msg
+            mx2_block = (
+                os.environ.get("AICODERMAP_MX2_BLOCK") == "1" and not BYPASS_FLOOR_CHECK
+            )
+            if mx2_block:
+                rolled = restore_from_bak([models_path, sources_path])
+                print(
+                    f"\n✗ MERGE ABORTED — MX2 floor violated ({round(ratio * 100, 1)}% < "
+                    f"{int(floor * 100)}%); rolled back {len(rolled)} file(s).",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
 
     # SSOT coherence audit — HARD BLOCK gate. Runs against the just-written
     # data files. On drift: roll the data files back to their .bak snapshots,

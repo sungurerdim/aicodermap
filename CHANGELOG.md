@@ -1,491 +1,3 @@
-
-## [2026-04-29] — autonomous refresh-all [WARN: very low cumulative provenance coverage 38.0%]
-
-### Updated
-- 2 models: `devstral-small-2`, `gpt-5-5`
-
-### Deprecated
-- `devstral-small-2` — vendor-marked deprecated
-
-### Gaps (48 entries — see data/known-gaps.json or next refresh)
-- `opus-4-7.webDevElo`: LMArena WebDev Arena SPA-gated; no static index. claude-opus-4-7 added to leaderboard 2026-04-17 but numeric score not in indexed text.
-- `sonnet-4-6.webDevElo`: LMArena WebDev Arena SPA-gated.
-- `claude-haiku-4-5.webDevElo`: LMArena WebDev Arena SPA-gated.
-- `gpt-5-5.webDevElo`: gpt-5.5-high added to Arena 2026-04-27 — too new for settled WebDev Elo. SPA-gated.
-- `gpt-5-4.webDevElo`: LMArena WebDev Arena SPA-gated.
-- `gemini-3-1-pro.webDevElo`: LMArena WebDev Arena SPA-gated.
-- `gemini-3-1-flash.webDevElo`: LMArena WebDev Arena SPA-gated.
-- `grok-4-20.webDevElo`: LMArena WebDev Arena SPA-gated.
-- ... and 40 more
-
-
-## [2026-04-29.c] — preset weight bug fix + bench taxonomy expansion
-
-### Fixed
-- `applyPreset` weight leak: prior `{...DEFAULT_WEIGHTS, ...preset}` spread leaked DEFAULT keys for every key the preset omitted, pushing runtime sums to 123–160 instead of 100. Switched to zero-base merge `Object.fromEntries(BENCH_KEYS.map(k => [k, preset[k] || 0]))`. Every preset now sums to exactly 100 at runtime.
-
-### Added (3 new bench keys, 22 → 25)
-- `nl2Repo` — Natural-language → full repository generation (multi-file, dependency resolution); 7/9 vendor adoption per recent flagship reports, complementary to SWE-bench.
-- `tau3` — τ³-bench, longer-horizon multi-turn tool-calling successor to τ²-bench; 9/9 vendor adoption.
-- `toolDec` — Tool-Decathlon, 10-task multi-tool agent benchmark; 9/9 vendor adoption, complements MCP-Atlas.
-
-### Reweighted (all 5 presets — every preset still sums to 100)
-- `balanced`: 16 → 19 keys (added nl2Repo:5, tau3:1, toolDec:1; trimmed swePro 20→18, tb2 13→12, lcb 13→12, sweV 10→9, mcpA 5→4, tau2 4→3)
-- `swe-focused`: 8 → 9 keys (added nl2Repo:9; trimmed swePro 25→23, sweV 18→16, sweMulti 15→13, lcb 12→11, tb2 10→9, tbHard 10→9)
-- `agentic-focused`: 9 → 11 keys (added tau3:8, toolDec:7; trimmed tb2 18→15, mcpA 15→13, tbHard 12→10, browseComp 12→10, aaAgentic 12→10, tau2 10→8, swePro 8→7, lcb 8→7)
-- `reasoning-focused`: unchanged (no reasoning-domain additions)
-- `benchmark-only`: 10 → 13 keys (added nl2Repo:5, tau3:3, toolDec:3; trimmed swePro 18→17, sweV 15→13, tb2 13→11, lcb 13→11, tbHard 10→9, cfElo 8→7, sweMulti 8→7, gpqa 7→6)
-
-### Skipped (analyzed user-supplied bench table, rejected for project scope)
-- `HLE w/Tools` — variant of `hle`; tool-augmented branch adds noise without distinct signal.
-- `HMMT Nov 2025`, `HMMT Feb 2026`, `IMOAnswerBench` — math/Olympiad domain already covered by `aime26`; coding-tracker overweighting math is an anti-pattern.
-- `Terminal-Bench 2.0 (best self-reported)` — same bench as `tb2`, vendor-favored harness is provenance noise.
-- `CyberGym` — niche security domain, 5/9 vendor adoption.
-- `BrowseComp w/Context Manage` — variant of `browseComp`; vendor-reported context-management addon, single source of truth maintained.
-- `Vending Bench 2` — $-denominated agentic business simulation, scale incompatible with 0–100 normalization.
-
-## [2026-04-29] — autonomous refresh-all [WARN: very low cumulative provenance coverage 41.0%] [WARN: coverageMatrix invariant violated — 824 cell(s) silently missing (filled=347 + gaps=17 ≠ total=1188)]
-
-### Updated
-- 27 models: `opus-4-7`, `gpt-5-4`, `gpt-5-5`, `grok-4-20`, `grok-3`, `grok-3-mini`, `gemini-3-1-pro`, `sonnet-4-6`, `claude-haiku-4-5`, `deepseek-v4-pro`, `deepseek-v4-flash`, `kimi-k2-6`, `glm-5-1`, `nemotron-3-super`, `gemma-4-31b`, `gemma-4-26b-moe`, `qwen3-235b`, `qwen3-coder-480b`, `qwen3-coder-next`, `devstral-2`, `devstral-small-2`, `devstral-medium`, `llama-4-maverick`, `mimo-v2-5-pro`, `mimo-v2-pro`, `mimo-v2-flash`, `qwen3-6-plus`
-
-### Deprecated
-- `devstral-medium` — vendor-marked deprecated
-- `codestral-22b` — vendor-marked deprecated
-
-### Renamed
-- grok-4-3 -> grok-4-20
-
-### Resolved (auto via trustScore)
-- kimi-k2-6.swePro: winner={'value': 58.6, 'trustScore': 0.47, 'sourceUrl': 'https://huggingface.co/moonshotai/Kimi-K2.6', 'tier': 'S'} (severity=GREEN, Δ0)
-- deepseek-v4-pro.sweV: winner={'value': 80.6, 'trustScore': 0.67, 'sourceUrl': 'https://artificialanalysis.ai/articles/deepseek-is-back-among-the-leading-open-weights-models-with-v4-pro-and-v4-flash', 'tier': 'I'} (severity=GREEN, Δ0)
-
-### Gaps (17 entries — see data/known-gaps.json or next refresh)
-- `gemini-3-1-flash.sweV`: Gemini 3.1 Flash SWE-bench Verified not reported; model is API-only preview
-- `gemini-3-1-flash.tb2`: TB2 not reported for Gemini 3.1 Flash
-- `grok-4-20.sweV`: Grok 4.20 sweV not independently confirmed; leaked scores are unverified
-- `grok-4-20.swePro`: Grok 4.20 swePro: only leaked estimates found, not from Scale SEAL official list for this ID
-- `grok-4-20.hle`: Grok 4.20 HLE: only leaked estimates (35-45%) not independently confirmed
-- `gpt-5-5.sweV`: GPT-5.5 SWE-bench Verified not published; OpenAI only reported Pro=88.7 unverified
-- `opus-4-7.lcb`: Opus 4.7 LiveCodeBench not reported by Anthropic; model not on LCB leaderboard
-- `opus-4-7.aime26`: Opus 4.7 AIME 2026 not separately reported; only AIME 2025 scores available
-- ... and 9 more
-
-## [2026-04-29.b] — bench taxonomy refactor
-
-### Removed
-- `aider` (Aider Polyglot): leaderboard frozen 2025-08-25; no Opus 4.7, Gemini 3.1 Pro, GPT-5.5 entries; vendors stopped self-reporting. 13 historical scores dropped from data, 12 sources entries dropped.
-
-### Renamed
-- `lcbV6` → `lcb`: pinned v6 dataset frozen Apr 2025 (12-month contamination window); switched to rolling LiveCodeBench leaderboard (May 2023 → present). 49 sources entries renamed.
-
-### Added (7 new bench keys)
-- `tbHard` — Terminal-Bench Hard (44-task subset, AA Index v4 component)
-- `cfElo` — Codeforces ELO (raw 1000-3500 scale; normalized in composite)
-- `mmluPro` — MMLU-Pro (57-discipline reasoning)
-- `simpleQa` — SimpleQA-Verified (factuality / hallucination resistance)
-- `mrcr` — MRCR 1M (long-context multi-needle retrieval)
-- `arcAgi2` — ARC-AGI-2 (the only frontier bench below human baseline)
-- `browseComp` — BrowseComp (web research agent benchmark)
-
-### Reweighted
-- DEFAULT_WEIGHTS rebalanced (16 → 16 active keys; aider:10pp redistributed across new keys)
-- All 5 PRESETS rewritten — `swe-focused` adds `tbHard`+`cfElo`; `agentic-focused` adds `tbHard`+`browseComp`; `reasoning-focused` adds `arcAgi2`+`mmluPro`+`simpleQa`+`mrcr`; `benchmark-only` adds `tbHard`+`cfElo`+`mmluPro`
-- Each preset still sums to 100
-
-### Fixed
-- `grok-4-3` entry — merge.py left envelope (`updates`/`sourcesAdded`) un-flattened from previous refresh; fields hoisted to top-level
-- `audit-data-coherence.py` — cfElo cell-value range relaxed to 0-3500 (raw ELO)
-
-### Migrated
-- `data/models.json` — 54 models updated (rename + drop + 7 nullable adds per model)
-- `data/sources.json` — 12 aider provenance entries dropped, 49 lcbV6 keys renamed to lcb
-- `i18n/{tr,en}.json` — bench label sets aligned to new taxonomy
-- `auto/eval.py` BENCH_KEYS list aligned
-
-
-## [2026-04-29] — autonomous refresh-all [WARN: cumulative provenance coverage 52.0% below 85% target] [WARN: coverageMatrix invariant violated — 428 cell(s) silently missing (filled=332 + gaps=8 ≠ total=768)]
-
-### Added
-- `grok-4-3` — new model from vendor lineup discovery
-
-### Updated
-- 5 models: `claude-haiku-4-5`, `mimo-v2-5`, `gpt-5-5`, `grok-4-20`, `mimo-v2-5-pro`
-
-### Resolved (auto via trustScore)
-- grok-4-20.pricing.api.in: winner={'value': 3, 'trustScore': 0.7, 'sourceUrl': 'https://docs.x.ai/developers/models', 'tier': 'S'} (severity=GREEN, Δ1)
-
-### Gaps (8 entries — see data/known-gaps.json or next refresh)
-- `gemma-3-27b.sweV`: Google does not officially publish SWE-bench Verified for Gemma 3 27B; swebench.com leaderboard has no entry; no independent evaluation found
-- `mimo-v2-5.sweV`: MiMo-V2.5 base model (not Pro) sweV not separately published; only V2.5-Pro has confirmed 78.9 sweV; base model data conflated; emitting single-source C-tier estimate
-- `claude-haiku-4-5.gpqa`: AA-sourced 67.2 not independently confirmed by second I-tier source; Anthropic model card does not publish Haiku GPQA separately; single-source I-tier
-- `grok-4-20.sweMulti`: No published SWE-bench Multilingual score for Grok 4.20 found on any leaderboard or xAI blog
-- `grok-4-20.mcpA`: No MCP-Atlas score for Grok 4.20 found in any indexed source
-- `qwen-3-6-max.swePro`: Qwen3.6-Max-Preview claims #1 on SWE-bench Pro but independent numeric score not confirmed; existing 58.4 is from prior cycle; Qwen blog does not publish exact number with methodology disclosure
-- `grok-4-3.bench.*`: Grok 4.3 Beta is SuperGrok-gated, no benchmarks published as of 2026-04-29
-- `gpt-5-5.lcbV6`: GPT-5.5 LCB v6 score not published by OpenAI or found on any leaderboard; OpenAI uses internal coding indices instead
-
-
-## [2026-04-29] — autonomous refresh-all [WARN: cumulative provenance coverage 52.0% below 85% target] [WARN: artifact missing coverageMatrix; agent skipped self-audit]
-
-### Updated
-- 13 models: `gpt-5-5`, `sonnet-4-6`, `claude-haiku-4-5`, `glm-5-1`, `gemma-4-31b`, `gemma-4-26b-moe`, `gemma-4-e2b`, `gemma-4-e4b`, `qwen-3-6-27b`, `qwen-3-6-max`, `devstral-small-2`, `grok-4-20`, `llama-4-maverick`
-
-### Deprecated
-- `gpt-4-1` — vendor-marked deprecated
-- `o3` — vendor-marked deprecated
-- `o4-mini` — vendor-marked deprecated
-
-### Resolved (auto via trustScore)
-- grok-4-20.sweV: winner={'value': 58.6, 'trustScore': 0.67, 'sourceUrl': 'https://tokenmix.ai/blog/swe-bench-2026-claude-opus-4-7-wins', 'tier': 'I'} (severity=RED, Δ18.1)
-- gpt-5-5.sweV: winner={'value': 88.7, 'trustScore': 0.89, 'sourceUrl': 'https://artificialanalysis.ai/articles/openai-gpt5-5-is-the-new-leading-AI-model', 'tier': 'I'} (severity=YELLOW, Δ3.7)
-
-### Gaps (9 entries — see data/known-gaps.json or next refresh)
-- `grok-4-3.bench.*`: Grok 4.3 Beta launched April 17 2026; no official benchmarks published at launch; SuperGrok Heavy ($300/mo) only; no API pricing disclosed
-- `gpt-5-5.lcbV6`: No lcbV6 score found in GPT-5.5 benchmark coverage; not a benchmark OpenAI prioritises in release notes
-- `qwen-3-6-max.swePro`: Qwen3.6 Plus swePro not yet published on SWE-bench Pro public leaderboard; Alibaba reports sweV 78.8 only
-- `mimo-v2-5.sweV`: No sweV score found for MiMo-V2.5 base model; only Pro variant has swePro
-- `claude-haiku-4-5.gpqa`: No GPQA Diamond score found in Anthropic Haiku 4.5 release materials; benchmark not featured in release notes
-- `gemma-3-27b.sweV`: Gemma 3 27B sweV not found; significantly lower capability vs Gemma 4; prior benchmarks show 29.1% lcbV6
-- `qwen3-coder-next.swePro`: qwen3-coder-next swePro shows 44.3% from arxiv technical report (Feb 2026); sweV shows 70%+ with SWE-Agent; single source only
-- `deepseek-v4-flash.swePro`: V4 Flash swePro not published; only V4 Pro has swePro data (55.4%)
-- ... and 1 more
-
-
-## [2026-04-28] — autonomous refresh-all [WARN: cumulative provenance coverage 54.0% below 85% target]
-
-### Updated
-- 29 models: `gpt-5-5`, `opus-4-7`, `sonnet-4-6`, `claude-haiku-4-5`, `grok-4-20`, `kimi-k2-6`, `glm-5-1`, `deepseek-v4-pro`, `deepseek-v4-flash`, `mimo-v2-5-pro`, `mimo-v2-5`, `mimo-v2-flash`, `minimax-m2-7`, `qwen3-coder-30b`, `qwen3-coder-next`, `qwen-3-6-27b`, `qwen3-6-35b-moe`, `qwen3-6-plus`, `qwen3-235b`, `gemma-3-27b`, `gemma-4-26b-moe`, `gemma-4-31b`, `gemma-4-e2b`, `gemma-4-e4b`, `devstral-small-2`, `codestral`, `nemotron-3-super`, `step-3-5-flash`, `devstral-2`
-
-### Deprecated
-- `gpt-4-1` — vendor-marked deprecated
-- `o3` — vendor-marked deprecated
-- `o4-mini` — vendor-marked deprecated
-- `codestral-22b` — vendor-marked deprecated
-- `devstral-2` — vendor-marked deprecated
-
-### Renamed
-- devstral-medium -> devstral-small-2
-
-### Resolved (auto via trustScore)
-- grok-4-20.swePro: winner={'value': 51.8, 'trustScore': 0.82, 'sourceUrl': 'https://benchlm.ai/models/grok-4-20-beta', 'tier': 'I'} (severity=RED, Δ5.9)
-- deepseek-v4-pro.swePro: winner={'value': 55.4, 'trustScore': 0.85, 'sourceUrl': 'https://benchlm.ai/benchmarks/swePro', 'tier': 'I'} (severity=YELLOW, Δ3.3)
-- glm-5-1.hle: winner={'value': 52.3, 'trustScore': 0.55, 'sourceUrl': 'https://lushbinary.com/blog/glm-5-1-benchmarks-breakdown-swe-bench-pro-nl2repo-cybergym/', 'tier': 'C'} (severity=RED, Δ21.3)
-
-### Gaps (17 entries — see data/known-gaps.json or next refresh)
-- `grok-4-20.tb2`: No public Terminal-Bench 2 score published for Grok 4.20; xAI docs bot-blocked, WebSearch returned no score
-- `grok-4-20.aime26`: xAI did not publish AIME 2026 score; WebSearch returned only AIME 2025 data
-- `grok-3.swePro`: Grok 3 not on Scale SEAL public leaderboard; xAI docs bot-blocked
-- `qwen3-6-max.sweV`: Qwen3.6 Max is proprietary API; no public SWE-bench Verified score found in whitelist sources
-- `qwen3-6-plus.sweV`: Qwen3.6 Plus is proprietary API; no public SWE-bench Verified score found
-- `codestral.bench.*`: Codestral 2508 has no published benchmark scores on Scale SEAL, BenchLM, or whitelist leaderboards; model is code-complete specialized, scores not submitted
-- `mimo-v2-flash.bench.*`: MiMo-V2-Flash (older open-source MoE) has no published scores on current leaderboards
-- `deepseek-r1-14b.bench.*`: Local distilled model; not benchmarked on frontier leaderboards like Scale SEAL or BenchLM for coding tasks
-- ... and 9 more
-
-
-## [2026-04-28] — autonomous refresh-all [WARN: partial coverage 48.0%]
-
-### Resolved (auto via trustScore)
-- sonnet-4-6.sweV: winner={'value': 79.6, 'trustScore': 0.87, 'sourceUrl': 'https://www.marc0.dev/en/leaderboard', 'tier': 'I'} (severity=GREEN, Δ2.4)
-- opus-4-7.swePro: winner={'value': 64.3, 'trustScore': 0.93, 'sourceUrl': 'https://labs.scale.com/leaderboard/swe_bench_pro_public', 'tier': 'I'} (severity=YELLOW, Δ3.1)
-- deepseek-v4-pro.sweV: winner={'value': 80.6, 'trustScore': 0.8, 'sourceUrl': 'https://artificialanalysis.ai/articles/deepseek-is-back-among-the-leading-open-weights-models-with-v4-pro-and-v4-flash', 'tier': 'I'} (severity=GREEN, Δ0)
-
-
-## [2026-04-27] — autonomous refresh-all [WARN: partial coverage 48.0%]
-
-### Updated
-- 5 models: `gpt-5-5`, `glm-5-1`, `minimax-m2-5`, `qwen3-32b`, `qwen3-6-plus`
-
-### Resolved (auto via trustScore)
-- sonnet-4-6.sweV: winner={'value': 79.6, 'trustScore': 0.87, 'sourceUrl': 'https://www.marc0.dev/en/leaderboard', 'tier': 'I'} (severity=GREEN, Δ2.4)
-- opus-4-7.swePro: winner={'value': 64.3, 'trustScore': 0.93, 'sourceUrl': 'https://labs.scale.com/leaderboard/swe_bench_pro_public', 'tier': 'I'} (severity=YELLOW, Δ3.1)
-- deepseek-v4-pro.sweV: winner={'value': 80.6, 'trustScore': 0.8, 'sourceUrl': 'https://artificialanalysis.ai/articles/deepseek-is-back-among-the-leading-open-weights-models-with-v4-pro-and-v4-flash', 'tier': 'I'} (severity=GREEN, Δ0)
-
-
-## [2026-04-27] — autonomous refresh-all [WARN: partial coverage 42.0%]
-
-### Updated
-- 14 models: `gpt-5-5`, `claude-haiku-4-5`, `grok-4-20`, `gpt-4-1`, `codestral-22b`, `codestral`, `deepseek-r1-14b`, `qwen25-coder-7b`, `qwen3-coder-480b`, `qwen3-6-35b-moe`, `minimax-m2-5`, `mimo-v2-flash`, `mimo-v2-pro`, `mimo-v2-5-pro`
-
-### Gaps (10 entries — see data/known-gaps.json or next refresh)
-- `None`: No public sweV score for Codestral-22B; tried 5 sources; deprecated coder focused on FIM not SWE-bench agent tasks
-- `None`: LCB v6 for 14B specifically not extracted from technical report images; 7B and 32B extracted
-- `None`: SWE-bench Verified not reported for Lite 16B; main paper reports full 236B model only
-- `None`: MiMo-V2.5 (base) sweV not confirmed separately from Pro/Flash variants
-- `None`: sweV for MiMo-V2.5-Pro not explicitly stated; V2-Pro has 78% but V2.5-Pro upgrade unclear
-- `None`: GPQA for step-3-5-flash not in search snippets; arXiv table shows samples but exact % not extracted
-- `None`: HLE for Mistral Large 3 not found in any source
-- `None`: HLE for GPT-4.1 not available; model released Apr 2025, HLE benchmark newer
-- ... and 2 more
-
-
-## [2026-04-27] — autonomous refresh-all
-
-### Updated
-- 14 models: `qwen25-coder-14b`, `qwen25-coder-7b`, `deepseek-coder-v2-16b`, `devstral-2`, `devstral-medium`, `mimo-v2-5`, `qwen-3-6-max`, `qwen3-32b`, `gpt-4-1`, `o3`, `qwen3-6-plus`, `gemma-4-e2b`, `gemma-4-e4b`, `devstral-small-2`
-
-### Resolved (auto via trustScore)
-- devstral-medium.sweV: winner={'value': 68, 'trustScore': 0.9, 'sourceUrl': 'https://designforonline.com/ai-models/mistral-devstral-medium/', 'tier': 'I'} (severity=GREEN, Δ0)
-
-### Gaps (11 entries — see data/known-gaps.json or next refresh)
-- `None`: Only 2024-era LCB v1-v4 score 23.4 found; LCB v6 not published for 14B
-- `None`: LCB v6 not published for 7B
-- `None`: Codestral 22B 2024-era; no v6 evaluation found
-- `None`: Codestral is code-focused; GPQA not reported
-- `None`: MiMo-V2.5 base sweV not independently published; Pro variant 77.2 unconfirmed for base
-- `None`: MiMo-V2.5 base not on LCB v6
-- `None`: AIME 2026 score for Qwen3.6-Max-Preview not in aggregator sources
-- `None`: No official GPQA Diamond for Gemma 4 E2B; only 31B/26B have GPQA
-- ... and 3 more
-
-
-## [2026-04-27] — autonomous refresh-all
-
-### Updated
-- 26 models: `gpt-5-5`, `claude-haiku-4-5`, `grok-4-20`, `sonnet-4-6`, `gemini-3-1-pro`, `gemini-3-1-flash`, `kimi-k2-6`, `glm-5-1`, `devstral-2`, `devstral-medium`, `mimo-v2-5-pro`, `minimax-m2-5`, `minimax-m2-7`, `nemotron-3-super`, `qwen-3-6-27b`, `qwen3-6-plus`, `qwen3-coder-30b`, `qwen3-coder-480b`, `qwen3-coder-next`, `qwen3-235b`, `step-3-5-flash`, `gemma-4-26b-moe`, `gemma-3-27b`, `deepseek-r1-14b`, `codestral`, `deepseek-coder-v2-16b`
-
-### Resolved (auto via trustScore)
-- kimi-k2-6.lcbV6: winner={'value': 89.6, 'trustScore': 0.65, 'sourceUrl': 'https://www.latent.space/p/ainews-moonshot-kimi-k26-the-worlds', 'tier': 'C'} (severity=RED, Δ35.9)
-- gpt-5-5.swePro: winner={'value': 58.6, 'trustScore': 0.65, 'sourceUrl': 'https://mindwiredai.com/2026/04/24/gpt-5-5-is-here-benchmarks-pricing-and-who-should-actually-upgrade-april-2026/', 'tier': 'C'} (severity=GREEN, Δ0.9)
-- gemma-4-26b-moe.gpqa: winner={'value': 82.3, 'trustScore': 0.62, 'sourceUrl': 'https://tokenmix.ai/blog/gemma-4-review-open-source-benchmarks-2026', 'tier': 'C'} (severity=YELLOW, Δ3.1)
-
-### Gaps (13 entries — see data/known-gaps.json or next refresh)
-- `None`: Gemini 3.1 Flash model card not found separately from Flash-Lite; sweep data not in available search snippets
-- `None`: No TB2 score found for Gemini 3.1 Flash specifically
-- `None`: Grok 3 sweV not in available 2026 search results
-- `None`: Grok 3 Mini sweV not found
-- `None`: MiMo-V2-Flash sweV numeric score not surfaced, only qualitative #1 claim
-- `None`: MiMo-V2-Pro sweV score not in available search snippets
-- `None`: SWE-bench V score for 16B Lite variant not in official paper; full 236B model score only
-- `None`: GPQA not reported for DeepSeek-Coder-V2 in official paper (code-focused)
-- ... and 5 more
-
-
-## [2026-04-27] — autonomous refresh-all [WARN: partial coverage 38.0%]
-
-### Added
-- `grok-4-20` — new model from vendor lineup discovery
-
-### Updated
-- 39 models: `opus-4-7`, `sonnet-4-6`, `claude-haiku-4-5`, `gpt-5-5`, `gpt-4-1`, `gpt-5-4`, `o3`, `o4-mini`, `gemini-3-1-pro`, `gemini-3-1-flash`, `grok-3`, `grok-3-mini`, `deepseek-v4-pro`, `deepseek-v4-flash`, `deepseek-v3-2`, `glm-5-1`, `kimi-k2-6`, `llama-4-maverick`, `llama-4-scout`, `minimax-m2-5`, `minimax-m2-7`, `nemotron-3-super`, `devstral-2`, `devstral-small-2`, `codestral-22b`, `codestral`, `devstral-medium`, `qwen3-235b`, `qwen3-6-35b-moe`, `qwen-3-6-27b`, `qwen-3-6-max`, `qwen3-coder-480b`, `qwen3-coder-30b`, `qwen3-coder-next`, `mimo-v2-flash`, `mimo-v2-pro`, `mimo-v2-5`, `mimo-v2-5-pro`, `step-3-5-flash`
-
-### Deprecated
-- `codestral-22b` — vendor-marked deprecated
-- `devstral-small-2` — vendor-marked deprecated
-- `o4-mini` — vendor-marked deprecated
-- `gpt-4-1` — vendor-marked deprecated
-
-### Resolved (auto via trustScore)
-- gpt-5-5.swePro: winner={'value': 58.6, 'trustScore': 0.6, 'sourceUrl': 'https://mindwiredai.com/2026/04/24/gpt-5-5-is-here-benchmarks-pricing-and-who-should-actually-upgrade-april-2026/', 'tier': 'C'} (severity=GREEN, Δ0)
-
-### Gaps (15 entries — see data/known-gaps.json or next refresh)
-- `None`: No SWE-bench Verified data found for Gemini 3.1 Flash-Lite specifically
-- `None`: No independent SWE-bench Verified score found; only SWE-bench Pro reported
-- `None`: o3 deprecated from ChatGPT Feb 2026; no new bench data
-- `None`: o4-mini deprecated from ChatGPT Feb 2026; no new bench data
-- `None`: SWE-bench Verified not yet published for Grok 4.20; only community leak estimates
-- `None`: Qwen3-Coder-Next benchmark data not yet publicly available
-- `None`: MiMo-V2.5 (standard) bench data sparse; V2.5-Pro has data but base model unclear
-- `None`: Legacy model; no 2026 bench refresh found
-- ... and 7 more
-
-
-## [2026-04-26] — autonomous refresh-all
-
-### Updated
-- 46 models: `opus-4-7`, `sonnet-4-6`, `claude-haiku-4-5`, `gpt-5-5`, `gpt-5-4`, `gemini-3-1-pro`, `deepseek-v4-pro`, `deepseek-v4-flash`, `deepseek-v3-2`, `kimi-k2-6`, `glm-5-1`, `minimax-m2-7`, `minimax-m2-5`, `mimo-v2-5-pro`, `mimo-v2-5`, `mimo-v2-pro`, `mimo-v2-flash`, `qwen3-235b`, `qwen3-coder-480b`, `qwen3-coder-30b`, `qwen3-coder-next`, `qwen-3-6-27b`, `qwen3-6-35b-moe`, `qwen3-6-plus`, `qwen-3-6-max`, `qwen3-32b`, `gemma-4-31b`, `gemma-4-26b-moe`, `gemma-4-e2b`, `gemma-4-e4b`, `gemma-3-27b`, `llama-4-maverick`, `llama-4-scout`, `nemotron-3-super`, `step-3-5-flash`, `mistral-large-3`, `devstral-medium`, `grok-3`, `grok-3-mini`, `o3`, `o4-mini`, `gpt-4-1`, `gemini-3-1-flash`, `codestral-22b`, `qwen25-coder-7b`, `qwen25-coder-32b`
-
-### Resolved (auto via trustScore)
-- kimi-k2-6.pricing.api.in: winner={'value': 0.57, 'trustScore': 0.85, 'sourceUrl': 'https://platform.kimi.com/docs', 'tier': 'S'} (severity=WARN, Δ0.38)
-- llama-4-maverick.pricing.api.in: winner={'value': 0.2, 'trustScore': 0.82, 'sourceUrl': 'https://www.vellum.ai/llm-leaderboard', 'tier': 'I'} (severity=WARN, Δ0.1)
-- llama-4-scout.pricing.api.in: winner={'value': 0.11, 'trustScore': 0.82, 'sourceUrl': 'https://www.vellum.ai/open-llm-leaderboard', 'tier': 'I'} (severity=WARN, Δ0.08)
-- gemini-3-1-pro.bench.sweV: winner={'value': 80.6, 'trustScore': 0.85, 'sourceUrl': 'https://www.swebench.com/', 'tier': 'I'} (severity=WARN, Δ1.8)
-- qwen3-coder-480b.bench.sweV: winner={'value': 69.6, 'trustScore': 0.65, 'sourceUrl': 'https://llm-stats.com/benchmarks/swe-bench-verified', 'tier': 'I'} (severity=WARN, Δ3.1)
-
-### Gaps (21 entries — see data/known-gaps.json or next refresh)
-- `None`: No SWE-bench Verified submission for Qwen3-32B dense standalone (Qwen3-Max 235B = 69.6%)
-- `None`: Qwen3.6-Max-Preview API-hosted proprietary; too recent for independent eval (released 2026-04-20)
-- `None`: SWE-bench Pro submission not found
-- `None`: MiMo-V2.5 standard SWE-bench Verified score not published; V2.5-Pro available
-- `None`: Not on Scale SEAL or BenchLM; vendor opt-out for Flash variant
-- `None`: xAI vendor opt-out pattern; no submission to SWE-bench
-- `None`: xAI vendor opt-out pattern
-- `None`: Legacy 2024 model; not on current leaderboards
-- ... and 13 more
-
-
-## [2026-04-26] — autonomous refresh-all
-
-### Updated
-- 1 models: `gpt-5-4`
-
-### Resolved (auto via trustScore)
-- opus-4-7.swePro: winner=64.3 (severity=YELLOW, Δ3.1)
-
-### Gaps (9 entries — see data/known-gaps.json or next refresh)
-- `aaCoding.most`: AA Coding Index sub-page SPA-only across all whitelist sources after 3 cycles + 6 alternate URLs; will retry next cycle via WebSearch primary protocol now in agent.md
-- `aaAgentic.all`: AA Agentic Index sub-page SPA-only; only GDPval-AA Elo found (which is a different metric, not a 0-100 index)
-- `bfcl.most`: BFCL leaderboard SPA; awesomeagents aggregator only carries Qwen3-235B (74.9%); no GitHub raw mirror found
-- `aime26.opus-4-7`: Anthropic did not publish AIME 2026 score for Opus 4.7
-- `aime26.sonnet-4-6`: Anthropic Sonnet 4.6 announcement no AIME 2026
-- `aime26.gpt-5-5`: GPT-5.5 launch did not publish AIME 2026
-- `grok-3.swePro`: xAI vendor opt-out from SWE-bench (data confirmed via WebSearch — no Grok 3 SWE-bench score)
-- `o3.swePro`: OpenAI does not publish o3 swePro
-- ... and 1 more
-
-
-## [2026-04-26] — autonomous refresh-all
-
-### Added
-- `gpt-5-5` — new model from vendor lineup discovery
-
-### Updated
-- 17 models: `gpt-5-4`, `devstral-medium`, `devstral-2`, `devstral-small-2`, `kimi-k2-6`, `minimax-m2-7`, `mimo-v2-5-pro`, `deepseek-v4-pro`, `deepseek-v4-flash`, `qwen3-6-35b-moe`, `qwen3-coder-480b`, `gemma-4-31b`, `gemma-4-26b-moe`, `opus-4-7`, `gemini-3-1-pro`, `glm-5-1`, `qwen3-235b`
-
-### Deprecated
-- `devstral-small-2` — vendor-marked deprecated
-
-### Renamed
-- devstral-medium -> devstral-2-123b
-
-### Resolved (auto via trustScore)
-- kimi-k2-6.bench.swePro: winner=58.6 (severity=RED, Δ30.93)
-- kimi-k2-6.bench.sweV: winner=80.2 (severity=RED, Δ14.4)
-- devstral-medium.bench.sweV: winner=72.2 (severity=RED, Δ10.6)
-- minimax-m2-7.bench.sweV: winner=78 (severity=RED, Δ21.8)
-- opus-4-7.bench.sweV: winner=87.6 (severity=RED, Δ5.6)
-
-### Gaps (19 entries — see data/known-gaps.json or next refresh)
-- `aaCoding.*`: AA coding leaderboard JS-SPA
-- `aaAgentic.*`: AA agentic JS-SPA
-- `bfcl.*`: BFCL Berkeley page not parseable
-- `aaOmni.*`: AA omni leaderboard not fetched
-- `mimo-v2-5.bench`: MiMo V2.5 standard bench not publicly published
-- `qwen3-coder-next.sweV`: prior 58.7 unverified — needs triangulation
-- `step-3-5-flash.swePro`: no swePro found
-- `o3.swePro`: OpenAI does not publish o3 swePro
-- ... and 11 more
-
-
-## [2026-04-26] — autonomous refresh-all
-
-### Updated
-- 1 models: `grok-3`
-
-### Gaps (3 entries — see data/known-gaps.json or next refresh)
-- `grok-3.sweV`: S-tier value 63.8 found but custom-scaffold; needs I-tier corroboration; recheckAfter 2026-10-01
-- `llama-4-maverick.sweV`: Confirmed permanent vendor-opt-out — Meta does not submit
-- `mimo-v2-5.swePro`: Confirmed — only V2.5-Pro variant has SWE-Pro 57.2; base V2.5 has no public bench
-
-
-## [2026-04-26] — autonomous refresh-all
-
-### Updated
-- 5 models: `gpt-5-4`, `gemini-3-1-pro`, `kimi-k2-6`, `minimax-m2-7`, `qwen3-coder-480b`
-
-### Resolved (auto via trustScore)
-- kimi-k2-6.lcbV6: winner=53.7 (severity=RED, Δ35.9)
-- kimi-k2-6.sweV: winner=65.8 (severity=RED, Δ14.4)
-- kimi-k2-6.tb2: winner=27.8 (severity=RED, Δ38.9)
-- minimax-m2-7.swePro: winner=36.81 (severity=RED, Δ19.39)
-- gemini-3-1-pro.hle: winner=51.4 (severity=RED, Δ7.0)
-- gpt-5-4.swePro: winner=59.1 (severity=GREEN, Δ1.4)
-
-### Gaps (8 entries — see data/known-gaps.json or next refresh)
-- `claude-haiku-4-5.gpqa`: Anthropic page lacks GPQA in text (likely PNG); needs system card or image OCR
-- `claude-haiku-4-5.tb2`: Same — bench in image
-- `claude-haiku-4-5.tau2`: Same
-- `claude-haiku-4-5.lcbV6`: Same
-- `claude-haiku-4-5.hle`: Same
-- `openai_403_block`: openai.com/index/* returned 403 — agent could not fetch o3/o4-mini/gpt-4-1/gpt-5-4 official pages this cycle
-- `lcbV6_general`: LiveCodeBench leaderboard JS-rendered; many models without lcbV6 — needs GitHub releases JSON or alternate source
-- `permanent_swePro_gaps`: Models not submitted to Scale SEAL public leaderboard — should move to known-gaps.json as vendor-opt-out
-
-
-## [2026-04-26] — autonomous refresh-all
-
-### Updated
-- 18 models: `claude-haiku-4-5`, `gpt-4-1`, `gpt-5-4`, `gemini-3-1-flash`, `gemini-3-1-pro`, `o3`, `o4-mini`, `mistral-large-3`, `minimax-m2-5`, `mimo-v2-pro`, `mimo-v2-5-pro`, `mimo-v2-5`, `mimo-v2-flash`, `step-3-5-flash`, `nemotron-3-super`, `deepseek-v3-2`, `qwen3-coder-480b`, `glm-5-1`
-
-### Resolved (auto via trustScore)
-- gemini-3-1-pro.gpqa: winner=94.3 (severity=GREEN, Δ2.4)
-- gpt-5-4.swePro: winner=57.7 (severity=GREEN, Δ1.4)
-
-### Gaps (8 entries — see data/known-gaps.json or next refresh)
-- `claude-haiku-4-5.swePro`: Not on SEAL board
-- `claude-haiku-4-5.lcbV6`: No LCB v6 score for Haiku 4.5
-- `gpt-4-1.swePro`: Non-reasoning model; no SWE-bench Pro published
-- `o3.swePro`: o3 predates SWE-bench Pro
-- `o4-mini.swePro`: No SWE-bench Pro for o4-mini
-- `mistral-large-3.swePro`: No SEAL submission for Mistral Large 3
-- `qwen3-coder-30b.bench`: Only 480B variant has published bench
-- `minimax-m2-5.pricing`: M2.5 pricing not in standard per-1M format
-
-
-## [2026-04-26] — autonomous refresh-all
-
-### Updated
-- 7 models: `claude-haiku-4-5`, `gemini-3-1-flash`, `nemotron-3-super`, `minimax-m2-7`, `mimo-v2-pro`, `step-3-5-flash`, `qwen3-coder-480b`
-
-### Gaps (11 entries — see data/known-gaps.json or next refresh)
-- `claude-haiku-4-5.gpqa`: No standalone GPQA Diamond score; benchmark image not machine-readable
-- `claude-haiku-4-5.tau2`: Not in visible rows on tau2-bench AA leaderboard
-- `claude-haiku-4-5.aaCoding`: AA only exposes composite Intelligence Index per model page
-- `claude-haiku-4-5.aaAgentic`: AA only exposes composite Intelligence Index
-- `gemini-3-1-flash.aaCoding`: Coding sub-index not separately published
-- `gemini-3-1-flash.aaAgentic`: Agentic sub-index not separately published
-- `nemotron-3-super.aaCoding`: AA bundles into composite index only
-- `nemotron-3-super.aaAgentic`: AA bundles into composite index only
-- ... and 3 more
-
-
-## [2026-04-26] — autonomous refresh-all [WARN: partial coverage 41.0%]
-
-### Updated
-- 22 models: `opus-4-7`, `gpt-5-4`, `grok-3`, `deepseek-v4-pro`, `deepseek-v4-flash`, `devstral-medium`, `devstral-2`, `kimi-k2-6`, `qwen3-235b`, `qwen3-32b`, `qwen3-6-35b-moe`, `gemma-4-26b-moe`, `gemma-4-31b`, `gemma-4-e2b`, `gemma-4-e4b`, `deepseek-r1-14b`, `qwen25-coder-32b`, `qwen25-coder-14b`, `qwen25-coder-7b`, `codestral-22b`, `llama-4-maverick`, `llama-4-scout`
-
-### Resolved (auto via trustScore)
-- opus-4-7.sweV: winner=87.6 (severity=GREEN, Δ1.2)
-- opus-4-7.gpqa: winner=95.4 (severity=GREEN, Δ1.2)
-- sonnet-4-6.sweV: winner=82 (severity=YELLOW, Δ4.9)
-
-### Gaps (11 entries — see data/known-gaps.json or next refresh)
-- `claude-haiku-4-5.swePro`: No SEAL submission
-- `claude-haiku-4-5.sweV`: Not on bench leaderboards
-- `minimax-m2-7.all`: MiniMax platform unreachable
-- `minimax-m2-5.all`: MiniMax platform unreachable
-- `mimo-v2-pro.all`: Xiaomi MiMo fetch failed
-- `mimo-v2-5-pro.all`: Xiaomi MiMo fetch failed
-- `step-3-5-flash.all`: StepFun login wall
-- `nemotron-3-super.all`: Nvidia NIM timeout
-- ... and 3 more
-
-
-## [2026-04-26] — autonomous refresh-all [WARN: partial coverage 41.0%]
-
-### Added
-- `claude-haiku-4-5` — new model from vendor lineup discovery
-
-### Updated
-- 26 models: `opus-4-7`, `sonnet-4-6`, `gemini-3-1-pro`, `gpt-5-4`, `grok-3`, `deepseek-v4-pro`, `deepseek-v4-flash`, `deepseek-v3-2`, `devstral-medium`, `devstral-2`, `kimi-k2-6`, `glm-5-1`, `qwen3-235b`, `qwen3-32b`, `qwen3-6-35b-moe`, `gemma-4-26b-moe`, `gemma-4-31b`, `gemma-4-e2b`, `gemma-4-e4b`, `deepseek-r1-14b`, `qwen25-coder-32b`, `qwen25-coder-14b`, `qwen25-coder-7b`, `codestral-22b`, `llama-4-maverick`, `llama-4-scout`
-
-### Resolved (auto via trustScore)
-- opus-4-7.sweV: winner=87.6 (severity=GREEN, Δ1.2)
-- opus-4-7.gpqa: winner=95.4 (severity=GREEN, Δ1.2)
-- sonnet-4-6.sweV: winner=82 (severity=YELLOW, Δ4.9)
-
-### Gaps (11 entries — see data/known-gaps.json or next refresh)
-- `claude-haiku-4-5.swePro`: No SEAL submission
-- `claude-haiku-4-5.sweV`: Not on bench leaderboards
-- `minimax-m2-7.all`: MiniMax platform unreachable
-- `minimax-m2-5.all`: MiniMax platform unreachable
-- `mimo-v2-pro.all`: Xiaomi MiMo fetch failed
-- `mimo-v2-5-pro.all`: Xiaomi MiMo fetch failed
-- `step-3-5-flash.all`: StepFun login wall
-- `nemotron-3-super.all`: Nvidia NIM timeout
-- ... and 3 more
-
 # Changelog
 
 All notable changes to AICoderMap will be documented here.
@@ -493,6 +5,89 @@ All notable changes to AICoderMap will be documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+
+## [2026-04-29.d] — refresh pipeline reform (gate stack)
+
+### Added
+- `scripts/lib/whitelist.py` + `scripts/lib/matrix.py` — DRY shared modules (P9). Every audit/merge script now reads contracts and matrix invariants through one path.
+- `scripts/audit-bench-source-mapping.py` — AC6/AC7/AC8: every `coreBenchKey` must have a publishing leaderboard; advertised keys must be canonical; single-publisher keys flagged.
+- `scripts/migrate-w1-foundation.py` — one-shot migration adding `notApplicableBenchKeys` + `benchQuarantine` to every model entry; bootstraps `_schema.contracts` + `_schema.benchAliases` + `_schema.notApplicableRules` + `_schema.deprecatedBenchKeys` blocks in the whitelist.
+- `merge.py _verify_matrix_invariant()` — MX1 cell-level invariant: every `(active_modelId, coreBenchKey)` cell ends in exactly one of FILLED / GAP / NOT_APPLICABLE. HARD BLOCK + `.bak` rollback on violation; `--warn-only-invariant` (or `AICODERMAP_MX1_WARN_ONLY=1`) for migration phase.
+- `merge.py validate_gaps()` MX3 — strips gap entries with empty `triedSources[]`; surfaces them via MX1 as silent omissions.
+- `merge.py` MX2 absolute coverage floor (default 0.30) — env-gated BLOCK via `AICODERMAP_MX2_BLOCK=1`; `--bypass-floor-check` for migration.
+- `audit-data-coherence.py` AC9 (notApplicableBenchKeys ⊆ coreBenchKeys), MX4 (filled cell ↔ sources.json entry), MX5 (≥2 distinct source URLs per filled cell, quarantine candidates).
+- SKILL.md Step 5a/5b/5c — MATRIX_SNAPSHOT, COMPLETENESS_GATE (single retry), DELTA_CHECK (zero-delta-no-gap detection).
+- agent.md SUCCESS_CRITERIA / ADEQUACY_REACTION / INADEQUACY_SIGNALS blocks; `notApplicable[]` + `coverageMatrix.notApplicableCells` + `runMetadata` in OUTPUT_SCHEMA.
+- agent.md RESEARCH_PIPELINE_OPTIMIZATION (P10) — concurrent Phase 0+1, parallel batching, priority cascade, low-coverage queue, fail-fast.
+- pre-commit hook now runs `audit-bench-source-mapping.py`; cross-platform python resolver (`python3` → `python` fallback for Windows).
+
+### Changed
+- `verification-map.py` — `confirmed` flag retired (P9 YAGNI: no reader, recomputable on demand from `verifications[]`).
+- agent.md bench alias table moved out of EXTRACTION_DISCIPLINE row 5 → `_schema.benchAliases` whitelist block. Vendor names removed from `SCOPE_CATEGORIES` (data-driven via `sourcesWhitelist.vendors`).
+- agent.md gap shape HARD: `triedSources[]≥1`, `triedQueries[]≥2`, `triedFormats[]≥1`. Empty/placeholder gaps stripped.
+- SKILL.md CONSTANTS — numeric thresholds now reference `_schema.contracts` SSOT block; `lib/whitelist.py contracts()` overlays SAFE_DEFAULTS.
+- `data/sources-whitelist.json._schema` — `contracts`, `benchAliases`, `notApplicableRules`, `deprecatedBenchKeys` blocks; `publishes[]` shape upgrade documented (string list legacy + `{key, priority}` future).
+- `data/models.json` — every entry gains `notApplicableBenchKeys: []` + `benchQuarantine: {}`.
+- `docs/WORKFLOW.md` — section 9 reform gate matrix (AC1-AC9 + MX1-MX5 + CP1), bench add/deprecate checklist, post-reform pipeline diagram.
+
+### Activation phases
+- W1 (current): every new gate WARN-only via env flags or CLI flags. Pre-commit runs both audits; bench-source mapping non-blocking.
+- W2: `unset AICODERMAP_MX1_WARN_ONLY` + `unset AICODERMAP_BENCH_SOURCE_WARN_ONLY` → AC6/AC7/MX1 promote to HARD BLOCK.
+- W3: `AICODERMAP_MX2_BLOCK=1` + `AICODERMAP_MX4_BLOCK=1` set as defaults; `--bypass-floor-check` retired.
+
+## [2026-04-29.c] — preset weight bug fix + bench taxonomy expansion
+
+### Fixed
+- `applyPreset` weight leak: prior `{...DEFAULT_WEIGHTS, ...preset}` spread leaked DEFAULT keys for every key the preset omitted, pushing runtime sums to 123–160 instead of 100. Switched to zero-base merge `Object.fromEntries(BENCH_KEYS.map(k => [k, preset[k] || 0]))`. Every preset now sums to exactly 100 at runtime.
+
+### Added (3 new bench keys, 22 → 25)
+- `nl2Repo` — NL → full-repo generation; 7/9 vendor adoption.
+- `tau3` — τ³-bench, longer-horizon multi-turn tool-calling; 9/9 vendor adoption.
+- `toolDec` — Tool-Decathlon, 10-task multi-tool agent; 9/9 vendor adoption.
+
+### Reweighted
+- All 5 presets rewritten to sum to 100 with new keys folded in (`balanced`, `swe-focused`, `agentic-focused`, `reasoning-focused`, `benchmark-only`).
+
+### Skipped (rejected for project scope)
+- `HLE w/Tools`, `HMMT Nov 2025`, `HMMT Feb 2026`, `IMOAnswerBench`, `Terminal-Bench 2.0 (best self-reported)`, `CyberGym`, `BrowseComp w/Context Manage`, `Vending Bench 2` — variant noise / domain mismatch / scale incompatibility.
+
+## [2026-04-29.b] — bench taxonomy refactor
+
+### Removed
+- `aider` (Aider Polyglot) — leaderboard frozen 2025-08-25; 13 historical scores + 12 sources entries dropped.
+
+### Renamed
+- `lcbV6` → `lcb` (rolling LiveCodeBench supersedes pinned v6); 49 sources entries renamed.
+
+### Added (7 new bench keys)
+- `tbHard`, `cfElo`, `mmluPro`, `simpleQa`, `mrcr`, `arcAgi2`, `browseComp`.
+
+### Reweighted
+- DEFAULT_WEIGHTS rebalanced; all 5 presets rewritten; each still sums to 100.
+
+### Fixed
+- `grok-4-3` envelope un-flatten regression; `audit-data-coherence.py` cfElo range relaxed to 0-3500 (raw ELO).
+
+### Migrated
+- `data/models.json` (54 entries), `data/sources.json` (drops + renames), `i18n/{tr,en}.json`, `auto/eval.py` BENCH_KEYS list aligned.
+
+## [Refresh log] — autonomous `refresh-all` cycles (compacted)
+
+> Detailed per-cycle entries collapsed 2026-04-29 to keep this file readable.
+> Each refresh now lands as a single-line summary; root-cause findings worth
+> permanent record graduate to a manually-curated `[YYYY-MM-DD.x]` section.
+> Full per-cycle history is recoverable from `git log -- CHANGELOG.md`.
+
+| Date | Updated | Lineup Δ | Resolved | Gaps | Coverage | Note |
+|------|---------|----------|----------|------|----------|------|
+| 2026-04-29 | 2 | 1 deprecated | 0 | 48 | 38.0% | webDevElo SPA-gated across frontier set |
+| 2026-04-29 | 27 | 2 deprecated, 1 renamed | 2 | 17 | 41.0% | matrix invariant violated (824 cells silent) → motivated reform [.d] |
+| 2026-04-29 | 23 | — | 1 | 8 | 52.0% | invariant violated (428 cells silent) |
+| 2026-04-29 | — | — | — | — | 52.0% | artifact missing coverageMatrix; agent self-audit skipped |
+| 2026-04-28 | 29 | 4 deprecated | — | — | 54.0% | first refresh after dynamic whitelist mutation |
+| 2026-04-28 | — | — | — | — | 48.0% | (lineup-sync) |
+| 2026-04-27 (×5) | various | various | various | various | 38–48% | SOURCE_FIRST_SWEEP path live; per-model URL expansion; vendor-conditional slug map |
+| 2026-04-26 (×9) | various | various | various | various | ~41% | UNCAPPED reform live; 9 cycles ran in one day during research-pipeline tuning |
 
 ## [Unreleased]
 

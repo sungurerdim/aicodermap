@@ -130,11 +130,16 @@ The skill passes `idea_context.currentIds` (the full id list from `data/models.j
 
 ### Tier taxonomy (these labels are invariant; concrete IDs change run-to-run)
 
+The agent NEVER hardcodes vendor names or model lists. The concrete vendors
+that fall under each tier are derived at runtime from `idea_context.sourcesWhitelist.vendors`
+(per-vendor entries carry their own `tier` field). The table below names the
+tier labels and their per-model survey priorities only.
+
 | `tier` value | Description | Per-model survey priority |
 |--------------|-------------|---------------------------|
-| `frontier` | Closed-weight, API-first (Anthropic, OpenAI, Google, xAI, Mistral premium) | Vendor blog + 2 leaderboards + multi-provider pricing |
-| `open-flagship` | Frontier-grade open weights (Moonshot, Z.ai, MiniMax, Alibaba Qwen, StepFun, Meta, Xiaomi MiMo, DeepSeek, Nemotron) | HF model card + leaderboards + Ollama + multi-provider |
-| `coder-specialized` | Code-specialized open weights (Qwen-Coder, Codestral, Devstral, DeepSeek-Coder) | Same + bigcode-bench / EvalPlus |
+| `frontier` | Closed-weight, API-first | Vendor blog + 2 leaderboards + multi-provider pricing |
+| `open-flagship` | Frontier-grade open weights | HF model card + leaderboards + Ollama + multi-provider |
+| `coder-specialized` | Code-specialized open weights | Same + bigcode-bench / EvalPlus |
 | `gemma` | Google open-weight family (Gemma 3.x, 4.x — Dense + MoE + E-variants) | HF + Ollama + tech report |
 | `ollama-local` | Distilled / quantized open weights packaged primarily for local Ollama runtime | Ollama page + Unsloth GGUF + community VRAM reports |
 
@@ -232,21 +237,13 @@ The single biggest source of data loss in prior runs was a single mega-regex doi
 
 4. **Locale decimal disambiguation** (post-capture, not in pattern): per `regexLibrary._localeDecimalRule` — handles `87.6`, `87,6`, `1,234.56`, `1.234,56`, `1 234,56` (BIPM thin-space + EU decimal). Apply ONLY to captured numeric strings, never inside the pattern.
 
-5. **Bench alias table** (the only hardcoded discrimination still permitted in the agent — keeps human-readable bench names mapped to the dynamic bench universe = `idea_context.sourcesWhitelist._schema.coreBenchKeys ∪ leaderboards[].publishes[]`):
-   - SWE-bench Pro / SEAL Pro / SWE Pro → swePro
-   - SWE-bench Verified / SWE-V → sweV
-   - SWE-bench Multilingual / Multi-SWE → sweMulti
-   - LiveCodeBench v6 / LCB v6 / LCBv6 → lcbV6
-   - Terminal-Bench 2 / TB2 / Terminal-Bench Hard → tb2
-   - tau-bench v2 / tau2 / tau-2 → tau2
-   - Aider Polyglot / Aider → aider
-   - MCP-Atlas / MCP Atlas → mcpA
-   - GPQA Diamond / GPQA → gpqa
-   - Humanity's Last Exam / HLE → hle
-   - Artificial Analysis Coding Index / AA Coding → aaCoding
-   - Artificial Analysis Agentic Index / AA Agentic → aaAgentic
-   - Artificial Analysis Intelligence Index / AA Index / aaIdx → aaIdx
-   - BFCL → bfcl, AIME 2026 → aime26, AA Omni → aaOmni
+5. **Bench alias table** (data-driven — lives in `idea_context.sourcesWhitelist._schema.benchAliases`):
+   - The agent reads `_schema.benchAliases[<canonicalKey>]` for the human-readable
+     names to match against scraped page text.
+   - Adding a new alias = appending to that block in
+     `data/sources-whitelist.json`. No agent.md edit required.
+   - The canonical bench universe is `_schema.coreBenchKeys ∪ leaderboards[].publishes[]`
+     (with `_schema.deprecatedBenchKeys` excluded).
 
 6. EVERY (bench_name, score) pair the patterns surface becomes a candidate value. Do NOT pre-filter to "the bench I was looking for" — if the page mentions GPQA 87.7, MMLU 89, AIME 85.4, HumanEval 92.0, capture them all even if your target was just sweV.
 
@@ -442,6 +439,15 @@ When in doubt: **scalar in storage, wrapped in provenance, contract spelled here
         "tr": { "strengths", "weaknesses" },
         "en": { "strengths", "weaknesses" }
       },
+      // notApplicable: bench keys naturally undefined for this model (e.g.
+      // embedding model + swePro). Each entry MUST cite a rule from
+      // sourcesWhitelist._schema.notApplicableRules.rules[].rule. Hardcoded
+      // model id discrimination is NOT permitted; cells are derived from
+      // tier/capability rules. Cells in this array do NOT count against the
+      // matrix invariant.
+      "notApplicable"?: [
+        { "benchKey": "<key>", "rule": "<rule name from notApplicableRules>" }
+      ],
       "sourcesAdded": [
         {
           "key": "<modelId>.<field>",
@@ -477,10 +483,15 @@ When in doubt: **scalar in storage, wrapped in provenance, contract spelled here
   "gaps": [{
     "key": "<modelId>.<field>",
     "reason": "<short why couldn't fill>",
-    "triedSources": ["<url>", ...],            // every URL fetched (Phase 1+2+3 step 1-4)
-    "triedQueries": ["<query>", ...],          // every WebSearch attempted (Phase 3 step 5-6)
-    "triedFormats"?: ["<format>", ...],        // format taxonomy fallback chain walked
-    "triedPatterns"?: ["<patternName>", ...]   // regex library names attempted
+    // triedSources REQUIRED — minimum 1 URL. An empty triedSources[] is a
+    // contract violation; the orchestrator strips the gap, MX1 then catches
+    // it as a silent omission and rolls the merge back.
+    "triedSources": ["<url>", ...],
+    // triedQueries REQUIRED — minimum 2 WebSearch queries.
+    "triedQueries": ["<query>", ...],
+    // triedFormats REQUIRED — at least 1 fallback format from formatTaxonomy.
+    "triedFormats": ["<format>", ...],
+    "triedPatterns"?: ["<patternName>", ...]
   }],
 
   "coverageMatrix": {
@@ -488,23 +499,35 @@ When in doubt: **scalar in storage, wrapped in provenance, contract spelled here
     "filledCells": <number>,                   // cells with non-null value in this cycle
     "filledThisCycle": <number>,               // cells the agent actually populated/refreshed
     "gapsRecorded": <number>,                  // |gaps[]| where key matches "<modelId>.<benchKey>"
+    "notApplicableCells": <number>,            // cells covered by notApplicableRules
     "byBench": {
       "<benchKey>": { "filled": <int>, "total": <int> }
     },
     "byModel": {
-      "<modelId>": { "filled": <int>, "total": <int>, "gaps": <int> }
+      "<modelId>": { "filled": <int>, "total": <int>, "gaps": <int>, "na": <int> }
     }
   },
 
   "validationCoverage": 0.0-1.0,
+  "runMetadata"?: {
+    "whitelistHash": "<sha256>",
+    "benchKeysHash": "<sha256>",
+    "agentVersion": "<semver>",
+    "startedAt": ISO_datetime,
+    "finishedAt": ISO_datetime,
+    "elapsedMs": <int>,
+    "phaseElapsed"?: { "phase0Ms": <int>, "phase1Ms": <int>, "phase2Ms": <int>, "phase3Ms": <int> }
+  },
   "error": null | string
 }
 ```
 
-**coverageMatrix audit invariant**: `filledCells + gapsRecorded == totalCells`.
-Any cell that is null AND missing from `gaps[]` is a contract violation —
-silent omission is forbidden. The orchestrator (`scripts/merge.py` self-check)
-verifies the invariant before commit.
+**coverageMatrix audit invariant (HARD)**:
+`filledCells + gapsRecorded + notApplicableCells == totalCells`.
+Any cell that is null AND missing from both `gaps[]` and `notApplicable[]` is
+a contract violation — silent omission is forbidden. The orchestrator
+(`scripts/merge.py` MX1 gate) blocks the merge + rolls files back to .bak
+on violation.
 
 ## CONTRADICTION_LOGIC (auto-resolved by skill, but agent precomputes)
 ```
@@ -547,13 +570,22 @@ ties: prefer I-tier, then most recent, then highest verifications
 8. **Multi-provider pricing**: pricing.api is an ARRAY. NEVER emit a flat `{in, out, cacheHit}` object. One element per provider, dedupe by provider name within a single emission
 9. **TrustScore computation**: every sourcesAdded[] entry MUST carry a computed trustScore using the formula in TRUST_SCORE_FORMULA
 10. **Trusted-source whitelist**: when `trusted_sources_only=true`, never fetch outside the whitelist. Emit gaps[] instead of falling back to open web
+11. **Gap shape (HARD)**: every `gaps[]` entry MUST carry `triedSources[]` ≥ 1 URL, `triedQueries[]` ≥ 2 queries, and `triedFormats[]` ≥ 1 format. `merge.py validate_gaps()` strips entries violating this; MX1 then catches the cell as silent omission and rolls back. Reporting a partial-effort gap with truthful `triedSources` is strictly better than emitting an empty gap or omitting the cell.
+12. **N/A taxonomy (HARD)**: cells naturally undefined for a model (embedding model + swePro, etc.) MUST be emitted to `models[].notApplicable[]` citing a rule from `_schema.notApplicableRules.rules[]`. Hardcoded model id discrimination is forbidden — only tier/capability rules. N/A cells do NOT count against MX1.
 
-## PRE_EMIT_SELF_AUDIT (mandatory gate before final JSON delivery)
+## PRE_EMIT_SELF_AUDIT (mandatory loop-back gate before final JSON delivery)
 
 Before producing the final JSON, the agent MUST run this self-audit. The
 audit is the contract teeth behind every section above: per-cell mandate,
 exhaustive cascade, gaps[] discipline. Skipping the audit is a contract
 violation — even if the artifact looks plausible without it.
+
+The audit is NOT advisory: if the first pass detects `missing_cells`, the
+agent MUST loop back through Phase 3 cascade for those exact cells before
+emitting. A second-pass failure is acceptable ONLY when emitted as an
+explicit `gaps[]` entry with full `triedSources[]/triedQueries[]/triedFormats[]`
+provenance. Empty/placeholder gaps are stripped by `merge.py validate_gaps()`
+and surface as MX1 violations, rolling the entire merge back.
 
 ```
 # Build the universe to be audited.
@@ -564,52 +596,67 @@ core_bench_keys   := whitelist._schema.coreBenchKeys
                      # keys outside this set may legitimately have no value.
 total_universe    := { (m.id, k) for m in active_models for k in core_bench_keys }
 
+# N/A (rule-driven, never per-model id): cells naturally undefined for the
+# model — e.g. embedding model + swePro. Each entry in models[].notApplicable[]
+# MUST cite a rule from sourcesWhitelist._schema.notApplicableRules.rules[].
+na_cells := { (m.id, n.benchKey) for m in artifact.models for n in (m.notApplicable or []) }
+                                          ∪
+            { (m.id, k) for m in active_models
+                        for k in (data_models[m.id].notApplicableBenchKeys or []) }
+
 # Walk this cycle's artifact for what got filled vs. flagged as gap.
 filled_cells := {
-   (m.id, k) : v
+   (m.id, k)
    for m in artifact.models  for k, v in (m.updates.bench or {}).items()
    if v is not None
 } ∪ {
-   (m.id, k) : value-from-pre-existing-data    # rule below
+   (m.id, k)
    for m in active_models for k in core_bench_keys
    if data_models[m.id].bench.get(k) is not None
 }
 
 gap_cells := { parse_cell(g.key) for g in artifact.gaps if matches "<modelId>.<benchKey>" }
 
-# Invariant: every (model, bench) in the audit universe is either filled
-# or has a gaps[] entry. No exceptions.
-missing_cells := total_universe \ (filled_cells.keys() | gap_cells)
+# Invariant: every (model, bench) in the audit universe is filled, gapped,
+# or N/A. No exceptions. (filled / gap / na MUST be disjoint.)
+missing_cells := total_universe \ (filled_cells | gap_cells | na_cells)
 
 if missing_cells:
    # CONTRACT VIOLATION. Loop back through Phase 3 for these specific cells.
-   # On the second pass, if a cell still has no value and was not attempted,
-   # the agent MUST emit a gaps[] entry with the truthful triedSources[]
-   # (which may be empty) + reason "self-audit-fallback: phase-3 cascade
-   # produced no candidates within structural completeness".
+   # On the second pass, if a cell still has no value, the agent MUST emit
+   # a gaps[] entry with REQUIRED triedSources[] >= 1, triedQueries[] >= 2,
+   # triedFormats[] >= 1. Empty/placeholder gaps are stripped by
+   # merge.py validate_gaps(); MX1 then catches them as silent omissions
+   # and rolls the merge back.
    for (mid, bk) in missing_cells:
       run Phase 3 cascade for (mid, bk) one more time
       if value found: append to artifact.models[*].updates + sourcesAdded[]
-      else:           append to artifact.gaps[] with full provenance
+      elif rule applies from notApplicableRules:
+          append { benchKey: bk, rule: <ruleName> } to artifact.models[mid].notApplicable
+      else:
+          append to artifact.gaps[] with full provenance
 
 # Compute the matrix the orchestrator will verify.
 artifact.coverageMatrix := {
-   totalCells:       |total_universe|,
-   filledCells:      |filled_cells|,
-   filledThisCycle:  count of artifact.models[*].sourcesAdded[*] keys
-                     restricted to "<modelId>.<benchKey>" form,
-   gapsRecorded:     |gap_cells|,
+   totalCells:           |total_universe|,
+   filledCells:          |filled_cells|,
+   filledThisCycle:      count of artifact.models[*].sourcesAdded[*] keys
+                         restricted to "<modelId>.<benchKey>" form,
+   gapsRecorded:         |gap_cells|,
+   notApplicableCells:   |na_cells|,
    byBench: { k: { filled: <int>, total: |active_models| } for k in core_bench_keys },
-   byModel: { m.id: { filled: <int>, total: |core_bench_keys|, gaps: <int> } for m in active_models }
+   byModel: { m.id: { filled: <int>, total: |core_bench_keys|, gaps: <int>, na: <int> } for m in active_models }
 }
 
 # Final invariant check (loud failure to runtime.contractCheck if violated):
-assert artifact.coverageMatrix.filledCells + artifact.coverageMatrix.gapsRecorded
+assert artifact.coverageMatrix.filledCells
+       + artifact.coverageMatrix.gapsRecorded
+       + artifact.coverageMatrix.notApplicableCells
        == artifact.coverageMatrix.totalCells
 
 # If still violated after the loop-back, emit runtime.coverageAuditFailure[]
-# listing the residual missing cells so the orchestrator's CHANGELOG warning
-# reflects exactly which cells fell through every rule.
+# listing the residual missing cells so the orchestrator's MX1 gate reports
+# exactly which cells fell through every rule before it rolls back.
 ```
 
 **Emission rules tied to the audit:**
@@ -1204,3 +1251,108 @@ Before emitting the final JSON:
 5. If any verification fails, RE-EMIT the message with corrections. Never deliver a violating message.
 
 The skill parses Task tool's return value via regex `^\s*(\{[\s\S]*\})\s*$`. Narration before/after the JSON makes parsing fragile — never narrate.
+
+## RESEARCH_PIPELINE_OPTIMIZATION (P10 reform — efektif + hızlı + eksiksiz)
+
+UNCAPPED + UNCACHED doctrine remains in force ("her cell her cycle"). The
+optimizations below reduce wallclock without sacrificing completeness.
+
+1. **Concurrent Phase 0 + Phase 1 dispatch** — Phase 0 (vendor lineup) and
+   Phase 1 (whitelist leaderboard sweep) run in PARALLEL via a single-message
+   multi-tool-call. Critical path becomes `max(P0, P1) + P2` instead of
+   `P0 + P1 + P2`. Both feed Phase 2 once available.
+2. **Parallel fetch batching** — vendor + leaderboard URLs fetched in batches
+   of `_schema.contracts.PARALLEL_FETCH_BATCH` (default 5) per single-message
+   tool-call burst. The agent issues all batch members concurrently, never
+   sequentially.
+3. **Multi-model batch extract** — when a leaderboard table lists N models,
+   ONE fetch + ONE parse → cells emitted for every matched model in that
+   single pass. This is the documented `static_html_table` semantic; agent
+   never re-fetches the same aggregate page per-model.
+4. **Source priority cascade** — Phase 3 walks publishers in deterministic
+   order: `priority="primary"` → `secondary` → `tertiary` → WebSearch
+   fallback. Whitelist `publishes[]` may be either a flat string list (legacy)
+   or `[{key, priority}]` (P10.4); the agent reads both shapes via
+   `idea_context.sourcesWhitelist` without normalization.
+5. **Low-coverage priority queue** — when the skill ships `idea_context.priorityCells[]`
+   (computed from MATRIX_SNAPSHOT), the agent resolves those cells FIRST in
+   Phase 2/3 cascade. Mid-cycle interruption thus closes the most starved
+   cells before less critical ones.
+6. **Phase 1.5 broad WebSearch sweep** — concurrent with Phase 1 fetches, the
+   agent issues `WebSearch("<bench> leaderboard 2026")` queries for each
+   coreBenchKey. Snippets discover unknown leaderboards (auto-suggested via
+   `whitelistAdditions[]`) and surface scores without waiting on Phase 3.
+7. **Phase 0 fail-fast** — vendor URL 4xx/5xx → 1 retry with
+   `_schema.contracts.FETCH_RETRY_COUNT` (default 1) backoff
+   `_schema.contracts.FETCH_TIMEOUT_SEC` (default 10s) → vendor entry skipped
+   for this cycle (recorded in `gaps[]` under `lineup:<vendor>: unreachable`).
+   Never block on a stuck fetch.
+8. **Deterministic output ordering** — `models[]` sorted by `id` ascending;
+   each `models[i].updates.bench` keys ordered per `coreBenchKeys`; `gaps[]`
+   sorted by `(modelId, benchKey)` lex; `sourcesAdded[]` mirror. Result:
+   idempotent re-application, minimal git diff churn, faster review.
+9. **Run metadata** — populate `runMetadata` with phase wallclock counters
+   (`phase0Ms`, `phase1Ms`, `phase2Ms`, `phase3Ms`, `totalMs`). Skill compares
+   to prior cycle and surfaces `⚠ phase-N regression` in CHANGELOG when a
+   phase doubles.
+10. **Health-check freshness TTL** — `_runtime.healthChecks[url].observedAt`
+    is honored; entries fresher than `_schema.contracts.HEALTH_CHECK_TTL_DAYS`
+    (default 7) skip the re-probe step (extraction still runs).
+
+These directives never weaken completeness — they only shorten the wallclock.
+The matrix invariant + gap chain rules above remain absolute.
+
+## SUCCESS_CRITERIA
+
+A cycle is **structurally complete** iff ALL hold:
+
+1. `coverageMatrix.filledCells + gapsRecorded + notApplicableCells == totalCells`
+   (zero silent omissions; matrix invariant satisfied).
+2. Every `gaps[]` entry has `triedSources[]` ≥ 1 URL, `triedQueries[]` ≥ 2 queries,
+   `triedFormats[]` ≥ 1 format.
+3. Every leaderboard whose `publishes[]` intersects `coreBenchKeys` was visited
+   (status 200 + extract attempted, OR documented unreachable + fallback exhausted,
+   OR `_runtime.unhealthy` auto-skip).
+4. Every vendor in `sourcesWhitelist.vendors[]` was attempted for Phase 0 lineup
+   discovery (4xx/5xx/timeout documented in the gap chain or `runtime.healthChecks`).
+5. Every `models[].notApplicable[]` entry cites a `rule` from
+   `sourcesWhitelist._schema.notApplicableRules.rules[]` (no hardcoded model id).
+
+The orchestrator (`scripts/merge.py`) HARD-BLOCKs on (1) via the MX1 gate, and
+HARD-BLOCKs on (2) by stripping malformed gap entries — which then surfaces as
+an MX1 violation, completing the loop.
+
+## ADEQUACY_REACTION
+
+When `PRE_EMIT_SELF_AUDIT` detects `missing_cells`:
+
+- Loop-back through Phase 3 cascade for each missing cell — no narration, no
+  "I will retry" preamble, just execute.
+- Phase 3 success → `models[].updates.bench[<key>] = value` + `sourcesAdded[]`.
+- Phase 3 failure WITH a matching N/A rule → append `{ benchKey, rule }` to
+  `models[].notApplicable[]`. Cell drops out of the matrix accounting.
+- Phase 3 failure WITHOUT N/A rule → append a `gaps[]` entry carrying the
+  REQUIRED `triedSources[]`, `triedQueries[]`, `triedFormats[]` provenance.
+- An empty `triedSources[]` is a contract violation; `merge.py` strips the gap
+  and MX1 then rejects the cycle.
+- Placeholder/empty gap entries are NEVER acceptable.
+- Termination is forbidden while any `missing_cell` exists.
+- Fabricating an N/A rule (citing a rule that does not exist in
+  `_schema.notApplicableRules`) fails the audit-data-coherence AC9 check;
+  rolls the merge back.
+
+## INADEQUACY_SIGNALS (orchestrator-side)
+
+The orchestrator triggers `COMPLETENESS_RETRY` (single retry) or surfaces a
+loud CHANGELOG warning on any of:
+
+- `coverageMatrix` missing or `totalCells == 0`.
+- `filledCells + gapsRecorded + notApplicableCells != totalCells`.
+- Model in `idea_context.currentIds` absent from BOTH `models[]` AND `gaps[]`
+  AND `notApplicable[]`.
+- `runtime.modelAudit[id] == "zero-delta-no-gap"` (skill matrix-snapshot
+  delta detector — model received no updates and emitted no gaps; suspect
+  silent omission).
+- `gaps[]` entry with `triedSources[]` empty (stripped → silent omission).
+- `notApplicable[].rule` not found in `_schema.notApplicableRules.rules[]`
+  (fabricated N/A — caught by audit-data-coherence AC9).

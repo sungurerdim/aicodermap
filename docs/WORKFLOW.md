@@ -182,3 +182,87 @@
 | TR/EN switch not working | Check i18n/{tr,en}.json files, clear localStorage |
 | Validation <95% warning | Add missing sources manually or force-override + accept risk |
 | Git conflict | `git pull --rebase` then push again |
+
+---
+
+## 9. Reform Gate Reference (2026-04-29)
+
+The skill+agent pipeline enforces a layered gate stack so silent omissions
+become impossible. Every refresh cycle terminates with the matrix invariant
+satisfied OR with explicit rollback.
+
+### Gate matrix
+
+| Gate | Where | Check | Pass | Fail |
+|------|-------|-------|------|------|
+| AC1-AC5 | `audit-data-coherence.py` | BENCH_KEYS / weights / presets / i18n / model ↔ sources cross-check | full match | BLOCK |
+| **AC6** | `audit-bench-source-mapping.py` | every coreBenchKey has ≥1 publishing leaderboard | exists | BLOCK (W2+) |
+| **AC7** | `audit-bench-source-mapping.py` | publishes[] ⊆ coreBenchKeys ∪ deprecatedBenchKeys | subset | BLOCK (W2+) |
+| **AC8** | `audit-bench-source-mapping.py` | per-bench publisher count ≥ 2 | true | WARN |
+| **AC9** | `audit-data-coherence.py` | notApplicableBenchKeys ⊆ coreBenchKeys | subset | BLOCK |
+| SSOT | `merge.py` post-write | AC1-AC9 unified | pass | BLOCK + .bak rollback |
+| **MX1** | `merge.py` pre-CHANGELOG | filled+gap+na == total | equality | BLOCK + .bak rollback (W2+); WARN via `--warn-only-invariant` or `AICODERMAP_MX1_WARN_ONLY=1` |
+| **MX2** | `merge.py` post-write | filled/total ≥ ABSOLUTE_COVERAGE_FLOOR (0.30) | true | BLOCK via `AICODERMAP_MX2_BLOCK=1` (W3+); one-time bypass `--bypass-floor-check` |
+| **MX3** | `merge.py validate_gaps()` | every gap has triedSources ≥ 1 | true | STRIP gap → MX1 catches as silent omission |
+| **MX4** | `audit-data-coherence.py` | every filled cell has ≥ 1 sources.json entry | true | BLOCK via `AICODERMAP_MX4_BLOCK=1` (W3+); WARN by default |
+| **MX5** | `audit-data-coherence.py` | per filled cell ≥ 2 distinct source URLs | true | WARN + benchQuarantine[key]=true |
+| **CP1** | `SKILL.md` Step 5b | `coverageMatrix` artifact completeness | filled+gap+na == total | agent retry (1×), then CHANGELOG warn (no halt) |
+
+### Activation phases
+
+- **W1 (current)** — All MX/AC gates land in WARN-only mode behind env flags.
+  Pre-commit hook runs both audits but bench-source mapping is non-blocking.
+  Scripts learn the new contract; data backfills via the skill cycle.
+- **W2** — `AICODERMAP_MX1_WARN_ONLY` removed; AC6/AC7 promoted to HARD BLOCK
+  in pre-commit; agent retries unfilled cells once before partial CHANGELOG warn.
+- **W3** — `AICODERMAP_MX2_BLOCK=1` + `AICODERMAP_MX4_BLOCK=1` set as default.
+  `--bypass-floor-check` flag retired. P10 research-pipeline optimizations
+  (concurrent Phase 0+1, parallel batching, low-coverage queue, phaseElapsed
+  observability) wired in.
+
+### Adding a new bench key (checklist)
+
+1. `data/sources-whitelist.json._schema.coreBenchKeys` — append the key.
+2. `data/sources-whitelist.json._schema.benchAliases` — append the canonical
+   key with its human-readable aliases.
+3. `data/sources-whitelist.json.leaderboards[*].publishes` — at least ONE
+   leaderboard entry must list the key (else AC6 blocks).
+4. `assets/js/core.js BENCH_KEYS` — append to mirror canonical universe.
+5. `assets/js/core.js DEFAULT_WEIGHTS` and any `PRESETS[*]` — add weight slots.
+6. `i18n/{tr,en}.json` `benchmarks.*` — add `short` + `name` for both locales.
+7. Run `python scripts/audit-data-coherence.py && python scripts/audit-bench-source-mapping.py`
+   — both must exit 0.
+8. The next `/aicodermap refresh-all` cycle starts populating the new cell.
+
+### Removing / deprecating a bench key
+
+1. Move the key into `_schema.deprecatedBenchKeys` (NOT delete).
+2. Drop it from `_schema.coreBenchKeys`.
+3. Mirror removal across `assets/js/core.js` (BENCH_KEYS / DEFAULT_WEIGHTS /
+   PRESETS) and `i18n/{tr,en}.json benchmarks`.
+4. Existing `data/models.json` cells stay (frozen value); the cell drops out
+   of the matrix universe so it no longer counts against MX1.
+
+### Research pipeline diagram (post-reform)
+
+```
+Skill init → MATRIX_SNAPSHOT (pre-merge counts)
+           ↓
+Phase 0 (lineup) ┐
+                 │ concurrent dispatch (P10.1)
+Phase 1 (LB)    ┘ → batches of PARALLEL_FETCH_BATCH (P10.2)
+           ↓
+Phase 2 (per-model fill)
+           ↓
+Phase 3 (cell-by-cell residual fill, priority cascade primary→secondary→tertiary→WebSearch)
+           ↓
+PRE_EMIT_SELF_AUDIT (loop-back if missing_cells > 0)
+           ↓
+Skill: COMPLETENESS_GATE (Step 5b) → retry agent ONCE if partial
+           ↓
+DELTA_CHECK → flag zero-delta-no-gap models
+           ↓
+merge.py: validate_gaps (MX3 strip) → MX1 invariant → SSOT audit → MX2 floor → write
+           ↓
+CHANGELOG append → git push → Pages deploy verify
+```

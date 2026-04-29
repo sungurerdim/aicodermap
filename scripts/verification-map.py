@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
-"""Verification-map manager — historical audit log (reformed 2026-04-28).
+"""Verification-map manager — historical audit log (reformed 2026-04-29).
 
 Two operations:
   - `update`: read .aicodermap-agent-out.json sourcesAdded[] across all
     models, group by (modelId, benchKey), append NEW provenance entries
-    (deduped by url) to the audit log, recompute `confirmed` flag per cell.
+    (deduped by url) to the audit log.
   - `read`:  print the map (for skill orchestrator inline injection into
     idea_context).
 
-The `confirmed` flag is AUDIT-ONLY — used for contradiction analysis and
-human review. Neither the agent nor the orchestrator reads it to skip a
-fetch (every cell is re-fetched every cycle per the UNCAPPED + UNCACHED
-doctrine).
+The map is HISTORICAL audit-only — never read for skip decisions, never
+gates a fetch. Every cell is re-fetched every cycle per the
+UNCAPPED + UNCACHED doctrine. The previous `confirmed` flag was retired
+(P9 YAGNI: nothing read it; agreement is recomputed on demand by
+contradiction analysis from the verifications[] history).
 
-Cell becomes confirmed when:
-  - verifications.length >= 3
-  - all values agree within VERIFICATION_AGREEMENT_PP (1.5pp absolute)
+`contested` cells (multi-source disagreement) still surface in stats so
+human reviewers can spot drift across cycles.
 
 `lastChecked` is updated to TODAY only when at least one new verification
 was appended this cycle (i.e., a successful fetch contributed). Cycles
@@ -24,12 +24,11 @@ that produced no new verification for a cell leave `lastChecked` alone.
 Map shape (canonical, mirrored in agent.md DATA_CONTRACT):
   {
     "lastUpdate": "YYYY-MM-DD",
-    "stats": {"totalCells": N, "confirmed": N, "contested": N},
+    "stats": {"totalCells": N, "contested": N},
     "cells": {
       "<modelId>.<benchKey>": {
         "value": <number | null>,            // last consensus value (null on contradiction)
         "verifications": [{source, url, tier, fetched}, ...],
-        "confirmed": <bool>,
         "lastChecked": "YYYY-MM-DD"
       }
     }
@@ -99,10 +98,12 @@ def update_map():
                 {
                     "value": None,
                     "verifications": [],
-                    "confirmed": False,
                     "lastChecked": TODAY,
                 },
             )
+            # `confirmed` field retired — strip on read so legacy maps don't
+            # leak the field forward.
+            cell.pop("confirmed", None)
             # Append this verification (dedupe by url). lastChecked stamps
             # only when a NEW verification actually lands this cycle — empty
             # cycles leave the prior date intact (per-cell freshness contract).
@@ -121,30 +122,24 @@ def update_map():
                 appended += 1
                 cell["lastChecked"] = TODAY
 
-    # Recompute confirmed flag per cell
-    confirmed_count = 0
+    # Recompute consensus value (median when ≥ THRESHOLD agree); flag
+    # contested cells for stats. No `confirmed` flag — readers compute on
+    # demand from verifications[].
     contested_count = 0
     for cell_key, cell in cells.items():
         verifs = cell.get("verifications", [])
         values = [v.get("value") for v in verifs if v.get("value") is not None]
         if len(verifs) >= VERIFICATION_AGREEMENT_THRESHOLD and values_agree(values):
-            cell["confirmed"] = True
-            # Use median as canonical value
             nums = sorted(v for v in values if isinstance(v, (int, float)))
             cell["value"] = nums[len(nums) // 2] if nums else None
-            confirmed_count += 1
         elif len(verifs) >= 2 and not values_agree(values):
-            cell["confirmed"] = False
             cell["value"] = None
             contested_count += 1
-        else:
-            cell["confirmed"] = False
 
     m_out = {
         "lastUpdate": TODAY,
         "stats": {
             "totalCells": len(cells),
-            "confirmed": confirmed_count,
             "contested": contested_count,
         },
         "cells": cells,
@@ -152,8 +147,7 @@ def update_map():
     MAP_PATH.write_text(json.dumps(m_out, indent=2) + "\n", encoding="utf-8")
     print(
         f"verification-map: appended {appended} verifications | "
-        f"{confirmed_count}/{len(cells)} cells confirmed, "
-        f"{contested_count} contested"
+        f"{len(cells)} total cells, {contested_count} contested"
     )
     return 0
 
@@ -214,7 +208,6 @@ def bootstrap_from_sources():
             {
                 "value": None,
                 "verifications": [],
-                "confirmed": False,
                 "lastChecked": TODAY,
             },
         )
@@ -233,25 +226,20 @@ def bootstrap_from_sources():
                     "fetched": e.get("date") or e.get("fetched") or TODAY,
                 }
             )
-    # Recompute confirmed
-    confirmed = contested = 0
+    contested = 0
     for cell in cells.values():
         verifs = cell["verifications"]
         values = [v["value"] for v in verifs if v["value"] is not None]
         if len(verifs) >= VERIFICATION_AGREEMENT_THRESHOLD and values_agree(values):
-            cell["confirmed"] = True
             nums = sorted(v for v in values if isinstance(v, (int, float)))
             cell["value"] = nums[len(nums) // 2] if nums else None
-            confirmed += 1
         elif len(verifs) >= 2 and not values_agree(values):
-            cell["confirmed"] = False
             cell["value"] = None
             contested += 1
     m_out = {
         "lastUpdate": TODAY,
         "stats": {
             "totalCells": len(cells),
-            "confirmed": confirmed,
             "contested": contested,
         },
         "cells": cells,
@@ -259,7 +247,7 @@ def bootstrap_from_sources():
     MAP_PATH.write_text(json.dumps(m_out, indent=2) + "\n", encoding="utf-8")
     print(
         f"verification-map: bootstrapped from data/sources.json — "
-        f"{len(cells)} cells, {confirmed} confirmed, {contested} contested"
+        f"{len(cells)} cells, {contested} contested"
     )
     return 0
 

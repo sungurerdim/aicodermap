@@ -294,6 +294,67 @@ def main():
     if bad_status:
         failures.append(f"models with non-canonical status: {bad_status}")
 
+    # === AC9 — notApplicableBenchKeys ⊆ coreBenchKeys ===
+    bad_na: list[str] = []
+    for m in models:
+        for k in m.get("notApplicableBenchKeys", []) or []:
+            if k not in canonical_bench:
+                bad_na.append(f"{m['id']}.notApplicableBenchKeys[{k}]")
+    if bad_na:
+        failures.append(
+            f"AC9 — notApplicableBenchKeys references {len(bad_na)} non-canonical "
+            f"bench key(s): {bad_na[:5]}{' ...' if len(bad_na) > 5 else ''}"
+        )
+
+    # === MX4 — every filled bench cell has ≥1 sources.json entry ===
+    # WARN during W1; promotes to FAIL in W3 (set AICODERMAP_MX4_BLOCK=1).
+    mx4_block = os.environ.get("AICODERMAP_MX4_BLOCK") == "1"
+    no_source_filled: list[str] = []
+    for m in models:
+        for k, v in (m.get("bench") or {}).items():
+            if v is None:
+                continue
+            key = f"{m['id']}.{k}"
+            entries = sources.get(key)
+            if not isinstance(entries, list) or len(entries) == 0:
+                no_source_filled.append(key)
+    if no_source_filled:
+        msg = (
+            f"MX4 — {len(no_source_filled)} filled bench cell(s) have ZERO "
+            f"sources.json entries: {no_source_filled[:5]}"
+            f"{' ...' if len(no_source_filled) > 5 else ''}"
+        )
+        if mx4_block:
+            failures.append(msg)
+        else:
+            warnings.append(msg)
+
+    # === MX5 — quarantine flag for cells with <2 distinct source URLs (WARN) ===
+    quarantine_warn = os.environ.get("AICODERMAP_WARN_ONLY_QUARANTINE") == "1"
+    weak_provenance: list[str] = []
+    for m in models:
+        for k, v in (m.get("bench") or {}).items():
+            if v is None:
+                continue
+            key = f"{m['id']}.{k}"
+            entries = sources.get(key) or []
+            if not isinstance(entries, list):
+                continue
+            distinct_urls = {e.get("url") for e in entries if e.get("url")}
+            if len(distinct_urls) < 2:
+                weak_provenance.append(key)
+    if weak_provenance:
+        msg = (
+            f"MX5 — {len(weak_provenance)} filled bench cell(s) have <2 distinct "
+            f"source URLs (quarantine candidates): {weak_provenance[:5]}"
+            f"{' ...' if len(weak_provenance) > 5 else ''}"
+        )
+        if quarantine_warn:
+            warnings.append(msg)
+        else:
+            warnings.append(msg)
+    # MX5 is WARN-only.
+
     # === Report ===
     print(f"Audit summary  ({len(models)} models, {len(canonical_bench)} bench keys)")
     print(f"  bench keys:        {sorted(canonical_bench)}")

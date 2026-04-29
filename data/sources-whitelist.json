@@ -19,7 +19,8 @@
       "imageOCRPatterns": "Vendor-only regex strings; URL match triggers scripts/extract-images.py.",
       "format_lastVerified": "ISO date format last confirmed.",
       "lastVerifiedDate": "ISO date URL last verified reachable.",
-      "consecutiveFailures": "Integer; ≥3 → auto-demote to spa_full + _runtime.unhealthy."
+      "consecutiveFailures": "Integer; ≥3 → auto-demote to spa_full + _runtime.unhealthy.",
+      "publishes": "Array of bench keys this leaderboard publishes. Two shapes accepted (P10.4 reform): legacy string list ['swePro','sweV',...] OR object list [{key:'swePro',priority:'primary'},...]. Priority drives Phase 3 cascade order (primary → secondary → tertiary → WebSearch fallback). scripts/lib/whitelist.py normalizes both shapes."
     },
     "coreBenchKeys": [
       "swePro",
@@ -504,7 +505,185 @@
         "4. vendor postUrlPattern × postSlugVariations (NEW)",
         "5. WebSearch with site:<domain> \"<modelName>\" \"<benchKey>\" 2026 (existing)"
       ]
-    }
+    },
+    "contracts": {
+      "_purpose": "SSOT for every threshold, retry count, and pass/fail criterion the skill + agent + scripts share. SKILL.md/agent.md reference this block rather than mirroring values; merge.py + audit-* scripts fetch via scripts/lib/whitelist.py contracts().",
+      "ABSOLUTE_COVERAGE_FLOOR": 0.3,
+      "MIN_SOURCES_PER_FILLED_CELL": 2,
+      "COMPLETENESS_RETRY_LIMIT": 1,
+      "VERIFICATION_AGREEMENT_THRESHOLD": 3,
+      "VERIFICATION_AGREEMENT_PP": 1.5,
+      "CONTRADICTION_WARN_PP": 3.0,
+      "CONTRADICTION_BLOCK_PP": 5.0,
+      "COVERAGE_TARGET": 0.85,
+      "COVERAGE_HARD_BLOCK": 0.5,
+      "STALE_DAYS": 14,
+      "DEPRECATION_GRACE_DAYS": 60,
+      "FAMILY_BASELINE_MIN": 30,
+      "FETCH_TIMEOUT_SEC": 10,
+      "FETCH_RETRY_COUNT": 1,
+      "PARALLEL_FETCH_BATCH": 5,
+      "HEALTH_CHECK_TTL_DAYS": 7
+    },
+    "notApplicableRules": {
+      "_purpose": "Tier/capability based rules that mark a (model, benchKey) cell as naturally not-applicable so it does not count against the matrix invariant. Agent emits cells under these rules into models[].notApplicable[]; orchestrator reconciles.",
+      "_schema": {
+        "rule": "<rule name>",
+        "appliesTo": "<criteria — matched against model entry>",
+        "excludeBenchKeys": "<list of bench keys naturally undefined>"
+      },
+      "rules": [
+        {
+          "rule": "embedding-only-tier",
+          "appliesTo": {
+            "tier": [
+              "embedding"
+            ]
+          },
+          "excludeBenchKeys": [
+            "swePro",
+            "sweV",
+            "sweMulti",
+            "nl2Repo",
+            "tb2",
+            "tbHard",
+            "lcb",
+            "tau2",
+            "tau3",
+            "mcpA",
+            "bfcl",
+            "toolDec",
+            "browseComp",
+            "aaCoding",
+            "aaAgentic",
+            "cfElo",
+            "webDevElo"
+          ]
+        }
+      ]
+    },
+    "benchAliases": {
+      "_purpose": "Canonical bench-key ↔ human-name mapping. Agent extraction maps scraped names back to canonical keys via this table — replaces the hardcoded EXTRACTION_DISCIPLINE row 5 table.",
+      "swePro": [
+        "SWE-bench Pro",
+        "SEAL Pro",
+        "SWE Pro",
+        "SWEbench Pro"
+      ],
+      "sweV": [
+        "SWE-bench Verified",
+        "SWE-V",
+        "SWE Verified",
+        "SWEbench Verified"
+      ],
+      "sweMulti": [
+        "SWE-bench Multilingual",
+        "Multi-SWE",
+        "SWEbench Multilingual"
+      ],
+      "nl2Repo": [
+        "NL2Repo",
+        "NL-to-Repo"
+      ],
+      "lcb": [
+        "LiveCodeBench",
+        "LCB",
+        "LCB v6",
+        "LCBv6"
+      ],
+      "tb2": [
+        "Terminal-Bench 2",
+        "TB2",
+        "Terminal Bench v2"
+      ],
+      "tbHard": [
+        "Terminal-Bench Hard",
+        "TB Hard"
+      ],
+      "tau2": [
+        "tau-bench v2",
+        "tau2",
+        "tau-2"
+      ],
+      "tau3": [
+        "tau-bench v3",
+        "tau3",
+        "tau-3"
+      ],
+      "mcpA": [
+        "MCP-Atlas",
+        "MCP Atlas"
+      ],
+      "bfcl": [
+        "BFCL",
+        "Berkeley Function Calling"
+      ],
+      "toolDec": [
+        "ToolDec",
+        "Tool-Dec"
+      ],
+      "browseComp": [
+        "BrowseComp",
+        "Browse Comp"
+      ],
+      "aaCoding": [
+        "Artificial Analysis Coding Index",
+        "AA Coding"
+      ],
+      "aaAgentic": [
+        "Artificial Analysis Agentic Index",
+        "AA Agentic"
+      ],
+      "aaIdx": [
+        "Artificial Analysis Intelligence Index",
+        "AA Intelligence Index",
+        "AA Index",
+        "aaIdx"
+      ],
+      "aaOmni": [
+        "AA Omni",
+        "Artificial Analysis Omni"
+      ],
+      "cfElo": [
+        "Codeforces Elo",
+        "CF Elo",
+        "Codeforces Rating"
+      ],
+      "webDevElo": [
+        "LMArena WebDev Elo",
+        "WebDev Arena Elo",
+        "WebDev Elo"
+      ],
+      "mmluPro": [
+        "MMLU-Pro",
+        "MMLU Pro"
+      ],
+      "simpleQa": [
+        "SimpleQA",
+        "Simple QA"
+      ],
+      "mrcr": [
+        "MRCR"
+      ],
+      "arcAgi2": [
+        "ARC-AGI-2",
+        "ARC AGI 2"
+      ],
+      "gpqa": [
+        "GPQA",
+        "GPQA Diamond"
+      ],
+      "aime26": [
+        "AIME 2026",
+        "AIME26",
+        "AIME"
+      ],
+      "hle": [
+        "HLE",
+        "Humanity's Last Exam"
+      ]
+    },
+    "deprecatedBenchKeys": []
   },
   "vendors": {
     "anthropic": {

@@ -16,6 +16,17 @@ set -e
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 AUDIT="$REPO_ROOT/scripts/audit-data-coherence.py"
+BENCH_AUDIT="$REPO_ROOT/scripts/audit-bench-source-mapping.py"
+
+# Resolve python interpreter: prefer python3, fall back to python (Windows).
+if command -v python3 >/dev/null 2>&1; then
+  PY=python3
+elif command -v python >/dev/null 2>&1; then
+  PY=python
+else
+  echo "pre-commit: no python interpreter found — skipping audits" >&2
+  exit 0
+fi
 
 if [ ! -f "$AUDIT" ]; then
   # Audit script missing — let the commit through; absent audit is itself a
@@ -24,7 +35,7 @@ if [ ! -f "$AUDIT" ]; then
   exit 0
 fi
 
-if ! python3 "$AUDIT" >/dev/null 2>&1; then
+if ! "$PY" "$AUDIT" >/dev/null 2>&1; then
   echo "" >&2
   echo "✗ COMMIT BLOCKED — SSOT coherence drift detected." >&2
   echo "" >&2
@@ -32,12 +43,35 @@ if ! python3 "$AUDIT" >/dev/null 2>&1; then
   echo "  data/sources-whitelist.json, DEFAULT_WEIGHTS, PRESETS) disagree." >&2
   echo "" >&2
   echo "  Run the audit to see the exact drift:" >&2
-  echo "    python3 scripts/audit-data-coherence.py" >&2
+  echo "    python scripts/audit-data-coherence.py" >&2
   echo "" >&2
   echo "  Fix every reported diff, then re-stage and re-commit." >&2
   echo "  Emergency override (NOT for routine use): git commit --no-verify" >&2
   echo "" >&2
   exit 1
+fi
+
+# AC6/AC7 — bench-source mapping audit. WARN-only during W1 phase
+# (AICODERMAP_BENCH_SOURCE_WARN_ONLY=1); HARD BLOCK after W2 activation.
+if [ -f "$BENCH_AUDIT" ]; then
+  if ! "$PY" "$BENCH_AUDIT" >/dev/null 2>&1; then
+    echo "" >&2
+    echo "✗ COMMIT BLOCKED — bench-source mapping drift (AC6/AC7)." >&2
+    echo "" >&2
+    echo "  A coreBenchKey has no whitelisted publisher, OR a leaderboard" >&2
+    echo "  advertises a bench key that isn't canonical. See:" >&2
+    echo "    python scripts/audit-bench-source-mapping.py" >&2
+    echo "" >&2
+    echo "  Either add the publisher mapping to data/sources-whitelist.json" >&2
+    echo "  leaderboards[].publishes[], or move the key into" >&2
+    echo "  _schema.deprecatedBenchKeys (and update core.js BENCH_KEYS)." >&2
+    echo "" >&2
+    echo "  W1 migration override:" >&2
+    echo "    AICODERMAP_BENCH_SOURCE_WARN_ONLY=1 git commit ..." >&2
+    echo "  Emergency override: git commit --no-verify" >&2
+    echo "" >&2
+    exit 1
+  fi
 fi
 
 exit 0
