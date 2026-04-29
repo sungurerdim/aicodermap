@@ -15,10 +15,18 @@ export const BENCH_KEYS = [
   'aaIdx',
   'swePro', 'sweV', 'sweMulti', 'nl2Repo',
   'lcb', 'tb2', 'tbHard',
-  'tau2', 'tau3', 'mcpA', 'bfcl', 'toolDec', 'aaCoding', 'aaAgentic', 'browseComp',
+  'tau2', 'tau3', 'mcpA', 'bfcl', 'aaCoding', 'aaAgentic', 'browseComp',
   'cfElo', 'webDevElo',
   'gpqa', 'aime26', 'hle', 'aaOmni',
   'mmluPro', 'simpleQa', 'mrcr', 'arcAgi2',
+];
+
+// Mirrors data/sources-whitelist.json _schema.benchCategories (audit-data-coherence.py verifies sync).
+export const BENCH_CATEGORIES = [
+  { id: 'coding',    keys: ['swePro', 'sweV', 'sweMulti', 'nl2Repo', 'lcb', 'tb2', 'tbHard', 'cfElo', 'webDevElo', 'aaCoding'] },
+  { id: 'agentic',   keys: ['tau2', 'tau3', 'mcpA', 'bfcl', 'browseComp', 'aaAgentic'] },
+  { id: 'reasoning', keys: ['gpqa', 'aime26', 'hle', 'arcAgi2', 'mmluPro', 'simpleQa', 'mrcr'] },
+  { id: 'general',   keys: ['aaIdx', 'aaOmni'] },
 ];
 
 // cfElo stores raw Codeforces ELO (~1000-3500). compositeScore() needs every
@@ -44,7 +52,7 @@ export const DEFAULT_WEIGHTS = {
   swePro: 16, tb2: 11, lcb: 11, sweV: 9, tbHard: 7, cfElo: 7,
   nl2Repo: 5, aaCoding: 5, mcpA: 4, aaAgentic: 4, webDevElo: 4,
   tau2: 3, browseComp: 3, arcAgi2: 3,
-  gpqa: 2, sweMulti: 2, hle: 1, mmluPro: 1, tau3: 1, toolDec: 1,
+  gpqa: 2, sweMulti: 2, hle: 1, mmluPro: 1, tau3: 1,
 };
 
 export const PRESETS = {
@@ -55,7 +63,7 @@ export const PRESETS = {
   },
   'agentic-focused': {
     tb2: 15, mcpA: 13, tbHard: 10, browseComp: 10, aaAgentic: 10,
-    tau2: 8, tau3: 8, toolDec: 7, swePro: 7, lcb: 7, bfcl: 5,
+    tau2: 8, tau3: 8, swePro: 7, lcb: 7, bfcl: 5,
   },
   // Reasoning / knowledge breadth — covers the bench keys (aaIdx, aime26,
   // aaOmni, mmluPro, simpleQa, mrcr, arcAgi2) the coding-centric presets
@@ -69,7 +77,7 @@ export const PRESETS = {
   },
   'benchmark-only': {
     swePro: 16, sweV: 12, tb2: 10, lcb: 10, tbHard: 8, sweMulti: 7, cfElo: 7,
-    gpqa: 6, hle: 5, webDevElo: 5, nl2Repo: 5, mmluPro: 3, tau3: 3, toolDec: 3,
+    gpqa: 6, hle: 5, webDevElo: 5, nl2Repo: 5, mmluPro: 3, tau3: 3,
   },
 };
 

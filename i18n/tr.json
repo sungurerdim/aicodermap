@@ -472,12 +472,13 @@
       "name": "τ³-bench",
       "short": "τ³",
       "desc": "τ²-bench halefi: uzun-ufuklu çok-turlu araç çağrısı + plan yürütme."
-    },
-    "toolDec": {
-      "name": "Tool-Decathlon",
-      "short": "TOOLDEC",
-      "desc": "10 farklı görevde araç kullanımı (takvim, e-posta, kod, finans, vb.)."
     }
+  },
+  "benchCategories": {
+    "coding":    { "label": "Kodlama" },
+    "agentic":   { "label": "Ajansal" },
+    "reasoning": { "label": "Akıl Yürütme" },
+    "general":   { "label": "Genel" }
   },
   "verdicts": {
     "preset": {

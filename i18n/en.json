@@ -472,12 +472,13 @@
       "name": "τ³-bench",
       "short": "τ³",
       "desc": "Successor to τ²-bench: longer-horizon multi-turn tool-calling + plan execution."
-    },
-    "toolDec": {
-      "name": "Tool-Decathlon",
-      "short": "TOOLDEC",
-      "desc": "10-task tool-use benchmark across diverse domains (calendar, email, code, finance, etc.)."
     }
+  },
+  "benchCategories": {
+    "coding":    { "label": "Coding" },
+    "agentic":   { "label": "Agentic" },
+    "reasoning": { "label": "Reasoning" },
+    "general":   { "label": "General" }
   },
   "verdicts": {
     "preset": {
