@@ -32,6 +32,8 @@
 | **T18** | 1 CP2 evergreen guide: "Top 5 for 8GB VRAM devs" (QW1) | M5 | 2 hr | T23 | Launch |
 | **T19** | 1 CP3 quarterly: "SWE-V vs Pro: why a 35-point gap?" (QW2) | M5 | 3 hr | T23 | Launch |
 | **T20** | Launch playbook: channel list + ready-to-post text TR+EN | M5 | 1.5 hr | T23, T16 | Launch |
+| **T24** | Mobile card-stack: ≤640px card list instead of table | M4 | 2 hr | T5, T6 | Polish |
+| **T25** | Custom preset save/load (localStorage + import/export) | M4 | 1.5 hr | T7 | Polish |
 
 ---
 
@@ -61,6 +63,7 @@
 ### M4 — Polish (Week 4, 3-4 hr)
 **Deliverable:** Production-ready
 **Tasks:** T14, T21, T22, T23
+**Deferred (optional):** T24 (mobile card-stack), T25 (custom preset save/load)
 **Go criteria:** SEO meta on all pages, CHANGELOG format, E2E 13 AC pass, Lighthouse SEO+a11y ≥90
 **Demo:** Lighthouse audit report
 **Rollback:** Specific polish revert
