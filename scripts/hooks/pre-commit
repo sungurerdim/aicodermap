@@ -51,8 +51,7 @@ if ! "$PY" "$AUDIT" >/dev/null 2>&1; then
   exit 1
 fi
 
-# AC6/AC7 — bench-source mapping audit. WARN-only during W1 phase
-# (AICODERMAP_BENCH_SOURCE_WARN_ONLY=1); HARD BLOCK after W2 activation.
+# AC6/AC7 — bench-source mapping audit. HARD BLOCK.
 if [ -f "$BENCH_AUDIT" ]; then
   if ! "$PY" "$BENCH_AUDIT" >/dev/null 2>&1; then
     echo "" >&2
@@ -65,9 +64,6 @@ if [ -f "$BENCH_AUDIT" ]; then
     echo "  Either add the publisher mapping to data/sources-whitelist.json" >&2
     echo "  leaderboards[].publishes[], or move the key into" >&2
     echo "  _schema.deprecatedBenchKeys (and update core.js BENCH_KEYS)." >&2
-    echo "" >&2
-    echo "  W1 migration override:" >&2
-    echo "    AICODERMAP_BENCH_SOURCE_WARN_ONLY=1 git commit ..." >&2
     echo "  Emergency override: git commit --no-verify" >&2
     echo "" >&2
     exit 1

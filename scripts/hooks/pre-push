@@ -1,0 +1,52 @@
+#!/usr/bin/env sh
+# Pre-push hook: HARD BLOCK on SSOT coherence drift.
+#
+# Same gates as pre-commit — re-runs both audits at push time so a
+# --no-verify bypass during commit is caught before hitting remote.
+#
+# Activation: `bash scripts/install-hooks.sh` (sets core.hooksPath).
+
+set -e
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+AUDIT="$REPO_ROOT/scripts/audit-data-coherence.py"
+BENCH_AUDIT="$REPO_ROOT/scripts/audit-bench-source-mapping.py"
+
+if command -v python3 >/dev/null 2>&1; then
+  PY=python3
+elif command -v python >/dev/null 2>&1; then
+  PY=python
+else
+  echo "pre-push: no python interpreter found — skipping audits" >&2
+  exit 0
+fi
+
+if [ ! -f "$AUDIT" ]; then
+  echo "pre-push: audit script missing at $AUDIT — skipping (this is unusual)"
+  exit 0
+fi
+
+if ! "$PY" "$AUDIT" >/dev/null 2>&1; then
+  echo "" >&2
+  echo "✗ PUSH BLOCKED — SSOT coherence drift detected." >&2
+  echo "" >&2
+  echo "  Run: python scripts/audit-data-coherence.py" >&2
+  echo "  Fix every reported diff, then re-commit and re-push." >&2
+  echo "  Emergency override (NOT for routine use): git push --no-verify" >&2
+  echo "" >&2
+  exit 1
+fi
+
+if [ -f "$BENCH_AUDIT" ]; then
+  if ! "$PY" "$BENCH_AUDIT" >/dev/null 2>&1; then
+    echo "" >&2
+    echo "✗ PUSH BLOCKED — bench-source mapping drift (AC6/AC7)." >&2
+    echo "" >&2
+    echo "  Run: python scripts/audit-bench-source-mapping.py" >&2
+    echo "  Emergency override: git push --no-verify" >&2
+    echo "" >&2
+    exit 1
+  fi
+fi
+
+exit 0

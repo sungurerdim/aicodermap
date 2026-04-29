@@ -17,11 +17,14 @@ Performs schema-complete merge per SKILL.md MERGE_RULES:
 """
 
 import json
+import logging
 import os
 import shutil
 import sys
 from datetime import date, datetime, timezone
 from urllib.parse import urlparse
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 PROJECT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 TODAY = date.today().isoformat()
@@ -43,14 +46,7 @@ from lib.whitelist import core_bench_keys as _wl_core_bench_keys  # noqa: E402
 from lib.whitelist import load_whitelist as _wl_load  # noqa: E402
 
 
-# CLI flags — let migrations bypass post-write floors during W1 phase.
 BYPASS_FLOOR_CHECK = "--bypass-floor-check" in sys.argv
-# MX1 invariant: BLOCK by default once W2 activates. During W1 migration,
-# set AICODERMAP_MX1_WARN_ONLY=1 (or pass --warn-only-invariant) to log + continue.
-WARN_ONLY_INVARIANT = (
-    "--warn-only-invariant" in sys.argv
-    or os.environ.get("AICODERMAP_MX1_WARN_ONLY") == "1"
-)
 
 # Formats whose primary fetch is "skip" — fetching their canonical URL directly
 # should be rare. A sourcesAdded entry that points at one of these formats and
@@ -191,7 +187,8 @@ def build_whitelist_index():
     try:
         with open(WHITELIST, encoding="utf-8") as fp:
             wl = json.load(fp)
-    except (FileNotFoundError, json.JSONDecodeError):
+    except (FileNotFoundError, json.JSONDecodeError) as exc:
+        logging.warning("build_whitelist_index: loaded empty (%s)", exc)
         return {}
     idx = {}
     for cat in ("leaderboards", "aggregators", "community", "local", "registries"):
@@ -258,7 +255,8 @@ def _build_bench_advertised_count():
     try:
         with open(WHITELIST, encoding="utf-8") as fp:
             wl = json.load(fp)
-    except (FileNotFoundError, json.JSONDecodeError):
+    except (FileNotFoundError, json.JSONDecodeError) as exc:
+        logging.warning("_build_bench_advertised_count: loaded empty (%s)", exc)
         return {}
     counts = {}
     for lb in wl.get("leaderboards", []) or []:
@@ -406,6 +404,27 @@ def _verify_matrix_invariant(models, artifact):
 
 
 def main():
+    import subprocess as _sp
+
+    # Schema validation — HARD BLOCK before any file writes.
+    _val = _sp.run(
+        [sys.executable, f"{PROJECT}/scripts/validate-agent-out.py", ARTIFACT],
+        capture_output=True,
+        text=True,
+        check=False,
+        env={**os.environ, "PYTHONIOENCODING": "utf-8"},
+    )
+    if _val.returncode != 0:
+        print("\n" + "=" * 72, file=sys.stderr)
+        print(
+            "✗ MERGE ABORTED — agent artifact fails schema validation", file=sys.stderr
+        )
+        print("=" * 72, file=sys.stderr)
+        for line in (_val.stderr or _val.stdout or "").strip().splitlines():
+            print(f"  {line}", file=sys.stderr)
+        print("=" * 72, file=sys.stderr)
+        sys.exit(1)
+
     with open(ARTIFACT, encoding="utf-8") as fp:
         out = json.load(fp)
 
@@ -589,7 +608,7 @@ def main():
         coverage_warn = (coverage_warn + matrix_warn) if coverage_warn else matrix_warn
 
     # MX1 HARD BLOCK gate.
-    if not invariant_ok and not WARN_ONLY_INVARIANT:
+    if not invariant_ok:
         rolled = restore_from_bak([models_path, sources_path])
         print("\n" + "=" * 72, file=sys.stderr)
         print("✗ MERGE ABORTED — MX1 matrix invariant violated", file=sys.stderr)
@@ -630,17 +649,6 @@ def main():
                 f"{int(floor * 100)}%]"
             )
             coverage_warn = (coverage_warn or "") + floor_msg
-            mx2_block = (
-                os.environ.get("AICODERMAP_MX2_BLOCK") == "1" and not BYPASS_FLOOR_CHECK
-            )
-            if mx2_block:
-                rolled = restore_from_bak([models_path, sources_path])
-                print(
-                    f"\n✗ MERGE ABORTED — MX2 floor violated ({round(ratio * 100, 1)}% < "
-                    f"{int(floor * 100)}%); rolled back {len(rolled)} file(s).",
-                    file=sys.stderr,
-                )
-                sys.exit(1)
 
     # SSOT coherence audit — HARD BLOCK gate. Runs against the just-written
     # data files. On drift: roll the data files back to their .bak snapshots,
@@ -680,6 +688,26 @@ def main():
             "until audit passes.",
             file=sys.stderr,
         )
+        print("=" * 72, file=sys.stderr)
+        sys.exit(1)
+
+    # Bench-source mapping audit — HARD BLOCK on AC6/AC7 drift.
+    bench_proc = subprocess.run(
+        [sys.executable, f"{PROJECT}/scripts/audit-bench-source-mapping.py"],
+        capture_output=True,
+        text=True,
+        check=False,
+        env={**os.environ, "PYTHONIOENCODING": "utf-8"},
+    )
+    if bench_proc.returncode != 0:
+        rolled = restore_from_bak([models_path, sources_path])
+        print("\n" + "=" * 72, file=sys.stderr)
+        print("✗ MERGE ABORTED — bench-source mapping drift (AC6/AC7)", file=sys.stderr)
+        print("=" * 72, file=sys.stderr)
+        for line in (bench_proc.stderr or "").strip().splitlines():
+            print(f"  {line}", file=sys.stderr)
+        if rolled:
+            print(f"\n  Rolled back {len(rolled)} file(s) from .bak.", file=sys.stderr)
         print("=" * 72, file=sys.stderr)
         sys.exit(1)
 

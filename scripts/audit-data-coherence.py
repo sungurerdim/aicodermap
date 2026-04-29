@@ -33,6 +33,10 @@ import json
 import os
 import re
 import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lib.matrix import active_models as _active_models  # noqa: E402
 
 for _stream in (sys.stdout, sys.stderr):
     _reconf = getattr(_stream, "reconfigure", None)
@@ -111,7 +115,7 @@ def main():
     # === Canonical sets ===
     canonical_bench = set((whitelist.get("_schema") or {}).get("coreBenchKeys") or [])
     canonical_ids = {m["id"] for m in models}
-    deprecated_ids = {m["id"] for m in models if m.get("status") == "deprecated"}
+    active_ids = {m["id"] for m in _active_models(models)}
 
     # === 1. core.js BENCH_KEYS ===
     core_bench = set(parse_bench_keys_from_core(core_src))
@@ -306,9 +310,7 @@ def main():
             f"bench key(s): {bad_na[:5]}{' ...' if len(bad_na) > 5 else ''}"
         )
 
-    # === MX4 — every filled bench cell has ≥1 sources.json entry ===
-    # WARN during W1; promotes to FAIL in W3 (set AICODERMAP_MX4_BLOCK=1).
-    mx4_block = os.environ.get("AICODERMAP_MX4_BLOCK") == "1"
+    # === MX4 — every filled bench cell has ≥1 sources.json entry (BLOCK) ===
     no_source_filled: list[str] = []
     for m in models:
         for k, v in (m.get("bench") or {}).items():
@@ -324,13 +326,9 @@ def main():
             f"sources.json entries: {no_source_filled[:5]}"
             f"{' ...' if len(no_source_filled) > 5 else ''}"
         )
-        if mx4_block:
-            failures.append(msg)
-        else:
-            warnings.append(msg)
+        failures.append(msg)
 
     # === MX5 — quarantine flag for cells with <2 distinct source URLs (WARN) ===
-    quarantine_warn = os.environ.get("AICODERMAP_WARN_ONLY_QUARANTINE") == "1"
     weak_provenance: list[str] = []
     for m in models:
         for k, v in (m.get("bench") or {}).items():
@@ -349,17 +347,14 @@ def main():
             f"source URLs (quarantine candidates): {weak_provenance[:5]}"
             f"{' ...' if len(weak_provenance) > 5 else ''}"
         )
-        if quarantine_warn:
-            warnings.append(msg)
-        else:
-            warnings.append(msg)
+        warnings.append(msg)
     # MX5 is WARN-only.
 
     # === Report ===
     print(f"Audit summary  ({len(models)} models, {len(canonical_bench)} bench keys)")
     print(f"  bench keys:        {sorted(canonical_bench)}")
-    print(f"  model ids active:  {len(canonical_ids - deprecated_ids)}")
-    print(f"  model ids deprec:  {len(deprecated_ids)}")
+    print(f"  model ids total:   {len(canonical_ids)}")
+    print(f"  model ids active:  {len(active_ids)}")
     if not failures and not warnings:
         print("  ✓ FULL COHERENCE — every surface aligned")
         return 0

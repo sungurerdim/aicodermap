@@ -1,38 +1,32 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Bench-key ↔ leaderboard mapping audit (P2 reform).
+"""Bench-key ↔ leaderboard mapping audit.
 
-Three checks:
-  AC6 (BLOCK): every coreBenchKey ∈ ⋃ leaderboards[].publishes[]
-               i.e., every bench we track is published by at least one
-               whitelisted leaderboard. A bench with no publisher has
-               no sourcing path — coverage will be 0 forever.
+Four checks:
+  AC6 (BLOCK): every coreBenchKey ∈ ⋃ live leaderboards[].publishes[]
+               A publisher counts as "live" if EITHER:
+               (a) lastVerifiedDate is non-null AND ≤60 days old, OR
+               (b) data/sources.json contains ≥1 S/I-tier entry whose url
+                   matches the leaderboard URL (historical extraction proof).
+               Self-declared-only publishers without recent verification are
+               rejected — this blocks fictional bench keys from passing AC6.
   AC7 (BLOCK): ⋃ leaderboards[].publishes[] ⊆ coreBenchKeys ∪ deprecatedBenchKeys
-               i.e., a leaderboard cannot advertise a bench key that the
-               canonical universe does not recognize. Catches reverse drift.
-  AC8 (WARN):  per-bench publisher count >= 2.
-               Single-publisher benches are flagged for human awareness so
-               the fallback chain (aggregator mirrors / WebSearch) can be
-               beefed up before the publisher goes down.
-
-Used as a CI-style gate by:
-  - scripts/merge.py post-write step (advisory log; HARD BLOCK after W2 activation)
-  - scripts/hooks/pre-commit (HARD BLOCK after W2 activation)
-  - manual `python scripts/audit-bench-source-mapping.py`
+  AC8 (WARN):  per-bench live-publisher count >= 2 (single point of failure).
+  AC9_live (WARN): leaderboards with no verification in >60 days flagged for review.
 
 Exit code:
   0  every check passed
   1  AC6 or AC7 drift
-  (AC8 is WARN-only — never returns non-zero)
 """
 
 from __future__ import annotations
 
-import os
+import json
 import sys
+from datetime import date, timedelta
 from pathlib import Path
 
-# Allow `from lib.whitelist import ...` when invoked from any cwd.
+PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from lib.whitelist import (  # noqa: E402
@@ -51,9 +45,50 @@ for _stream in (sys.stdout, sys.stderr):
         except (OSError, ValueError):
             pass
 
+LIVENESS_DAYS = 60
+
+
+def _load_sources() -> dict:
+    path = PROJECT / "data" / "sources.json"
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+def _url_has_extraction_proof(url: str, sources: dict) -> bool:
+    """Return True if sources.json has ≥1 S/I-tier entry whose url matches."""
+    url = url.rstrip("/")
+    for entries in sources.values():
+        if not isinstance(entries, list):
+            continue
+        for e in entries:
+            if not isinstance(e, dict):
+                continue
+            tier = e.get("tier", "")
+            src_url = (e.get("url") or "").rstrip("/")
+            if tier in ("I", "S") and (src_url == url or src_url.startswith(url)):
+                return True
+    return False
+
+
+def _is_live(lb: dict, sources: dict) -> bool:
+    """Publisher counts as live: recent verification OR historical extraction proof."""
+    lvd = lb.get("lastVerifiedDate")
+    if lvd:
+        try:
+            d = date.fromisoformat(str(lvd))
+            if date.today() - d <= timedelta(days=LIVENESS_DAYS):
+                return True
+        except ValueError:
+            pass
+    url = lb.get("url", "")
+    return bool(url and _url_has_extraction_proof(url, sources))
+
 
 def main() -> int:
     wl = load_whitelist()
+    sources = _load_sources()
     core = set(core_bench_keys(wl))
     deprecated = set(deprecated_bench_keys(wl))
     universe = bench_universe(wl)
@@ -62,16 +97,41 @@ def main() -> int:
     failures: list[str] = []
     warnings: list[str] = []
 
-    # AC6 — every coreBenchKey has at least one publishing leaderboard
-    missing_publisher = sorted(k for k in core if k not in by_bench)
+    # Build live-publisher index: only publishers that pass liveness check
+    live_by_bench: dict[str, list] = {}
+    stale_lbs: list[str] = []
+    for lb in wl.get("leaderboards", []):
+        alive = _is_live(lb, sources)
+        if not alive:
+            stale_lbs.append(lb.get("url") or lb.get("name") or "?")
+        for item in lb.get("publishes", []) or []:
+            key = (
+                item
+                if isinstance(item, str)
+                else (item.get("key") if isinstance(item, dict) else None)
+            )
+            if not key:
+                continue
+            if alive:
+                live_by_bench.setdefault(key, []).append(lb)
+
+    if stale_lbs:
+        warnings.append(
+            f"AC9_live — {len(stale_lbs)} leaderboard(s) have no recent verification "
+            f"(>{LIVENESS_DAYS}d) and no extraction proof in sources.json: "
+            f"{stale_lbs[:5]}{' ...' if len(stale_lbs) > 5 else ''}"
+        )
+
+    # AC6 — every coreBenchKey has at least one LIVE publishing leaderboard
+    missing_publisher = sorted(k for k in core if k not in live_by_bench)
     if missing_publisher:
         failures.append(
-            f"AC6 — {len(missing_publisher)} coreBenchKey(s) have no whitelisted "
-            f"publisher (no leaderboards[].publishes[] mention them): "
+            f"AC6 — {len(missing_publisher)} coreBenchKey(s) have no live "
+            f"publisher (lastVerifiedDate stale or missing, no extraction proof): "
             f"{missing_publisher}"
         )
 
-    # AC7 — leaderboard-advertised keys ⊆ core ∪ deprecated
+    # AC7 — all advertised keys (any publisher, live or not) ⊆ core ∪ deprecated
     advertised = set(by_bench.keys())
     rogue = sorted(advertised - (core | deprecated))
     if rogue:
@@ -80,19 +140,22 @@ def main() -> int:
             f"but are NOT in coreBenchKeys nor deprecatedBenchKeys: {rogue}"
         )
 
-    # AC8 — single-publisher benches (WARN)
-    single = sorted(k for k, lbs in by_bench.items() if len(lbs) == 1 and k in core)
+    # AC8 — single live-publisher benches (WARN)
+    single = sorted(
+        k for k, lbs in live_by_bench.items() if len(lbs) == 1 and k in core
+    )
     if single:
         warnings.append(
-            f"AC8 — {len(single)} core bench key(s) have only ONE publishing "
+            f"AC8 — {len(single)} core bench key(s) have only ONE live publishing "
             f"leaderboard (single point of failure): {single}"
         )
 
     # Report
+    live_count = len(live_by_bench)
     print(f"Bench-source mapping audit  (universe={len(universe)} keys)")
     print(f"  core:        {len(core)}")
     print(f"  deprecated:  {len(deprecated)}")
-    print(f"  advertised:  {len(advertised)}")
+    print(f"  advertised:  {len(advertised)}  live: {live_count}")
     if not failures and not warnings:
         print("  ✓ FULL MAPPING — every coreBenchKey has ≥2 publishers")
         return 0
@@ -105,15 +168,6 @@ def main() -> int:
         for w in warnings:
             print(f"    - {w}")
 
-    # WARN-only mode for migration phase
-    warn_only = os.environ.get("AICODERMAP_BENCH_SOURCE_WARN_ONLY") == "1"
-    if warn_only and failures:
-        print(
-            "\n  (warn-only: AICODERMAP_BENCH_SOURCE_WARN_ONLY=1 set — "
-            "exit 0 despite failures; W2 activation will remove this flag)",
-            file=sys.stderr,
-        )
-        return 0
     return 1 if failures else 0
 
 
