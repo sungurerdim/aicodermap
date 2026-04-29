@@ -40,6 +40,7 @@
       "aaIdx",
       "aaOmni",
       "cfElo",
+      "webDevElo",
       "mmluPro",
       "simpleQa",
       "mrcr",
@@ -48,7 +49,7 @@
       "aime26",
       "hle"
     ],
-    "_benchKeyNotes": "cfElo stores RAW Codeforces ELO (range 0-3500); every other bench key stores 0-100 percentage. compositeScore() in assets/js/data.js normalizes cfElo via core.js normalizeBenchScore() before weighting. audit-data-coherence.py allows cfElo cells in [0, 3500].",
+    "_benchKeyNotes": "cfElo stores RAW Codeforces ELO (range 0-3500); webDevElo stores RAW LMArena WebDev Arena Elo (range 950-1300 typical, allowed up to 1500); every other bench key stores 0-100 percentage. compositeScore() in assets/js/data.js normalizes cfElo and webDevElo via core.js normalizeBenchScore() (linear map to 0-100) before weighting. audit-data-coherence.py allows cfElo cells in [0, 3500] and webDevElo cells in [0, 1500].",
     "benchKeysUsage": "Universe of bench keys = coreBenchKeys ∪ leaderboards[].publishes[]. New leaderboards extending publishes[] auto-extend the universe. Frontend BENCH_KEYS in assets/js/core.js mirrors coreBenchKeys; if you add a new core key here, add it to assets/js/core.js too. NOTE 2026-04-29: dropped `aider` (Aider Polyglot leaderboard frozen 2025-08; no Opus 4.7 / Gemini 3.1 Pro / GPT-5.5 entries). Renamed `lcbV6` → `lcb` (rolling LiveCodeBench leaderboard supersedes pinned v6). Added: `tbHard`, `cfElo`, `mmluPro`, `simpleQa`, `mrcr`, `arcAgi2`, `browseComp` — all with strong 2026 vendor adoption.",
     "formatTaxonomy": {
       "static_html_table": {
@@ -789,7 +790,8 @@
       "format_lastVerified": "2026-04-26",
       "publishes": [
         "sweV",
-        "swePro"
+        "swePro",
+        "nl2Repo"
       ]
     },
     {
@@ -863,7 +865,8 @@
       "publishes": [
         "sweV",
         "sweMulti"
-      ]
+      ],
+      "phase": "leaderboard"
     },
     {
       "name": "LiveCodeBench",
@@ -888,7 +891,7 @@
       ],
       "format_lastVerified": "2026-04-26",
       "publishes": [
-        "lcbV6"
+        "lcb"
       ]
     },
     {
@@ -909,8 +912,9 @@
       ],
       "format_lastVerified": "2026-04-26",
       "publishes": [
-        "lcbV6"
-      ]
+        "lcb"
+      ],
+      "phase": "leaderboard"
     },
     {
       "name": "Terminal-Bench",
@@ -932,7 +936,8 @@
       ],
       "format_lastVerified": "2026-04-26",
       "publishes": [
-        "tb2"
+        "tb2",
+        "tbHard"
       ]
     },
     {
@@ -953,8 +958,10 @@
       ],
       "format_lastVerified": "2026-04-26",
       "publishes": [
-        "tb2"
-      ]
+        "tb2",
+        "tbHard"
+      ],
+      "phase": "leaderboard"
     },
     {
       "name": "tau-bench (canonical)",
@@ -977,30 +984,8 @@
       ],
       "format_lastVerified": "2026-04-26",
       "publishes": [
-        "tau2"
-      ]
-    },
-    {
-      "name": "Aider Polyglot",
-      "url": "https://aider.chat/docs/leaderboards/",
-      "tier": "I",
-      "authority": "aider",
-      "warn": "stale since Nov 2025",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
-      "consecutiveFailures": 0,
-      "extractor": "html_table",
-      "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-04-26",
-      "publishes": [
-        "aider"
+        "tau2",
+        "tau3"
       ]
     },
     {
@@ -1023,7 +1008,8 @@
       "format_lastVerified": "2026-04-26",
       "publishes": [
         "mcpA"
-      ]
+      ],
+      "phase": "leaderboard"
     },
     {
       "name": "Artificial Analysis",
@@ -1081,7 +1067,16 @@
         "hle",
         "mcpA",
         "aime26",
-        "lcbV6"
+        "lcb",
+        "tbHard",
+        "cfElo",
+        "mmluPro",
+        "simpleQa",
+        "mrcr",
+        "arcAgi2",
+        "browseComp",
+        "tau3",
+        "toolDec"
       ]
     },
     {
@@ -1111,7 +1106,11 @@
         "gpqa",
         "aime26",
         "hle",
-        "aaIdx"
+        "aaIdx",
+        "mmluPro",
+        "simpleQa",
+        "arcAgi2",
+        "browseComp"
       ]
     },
     {
@@ -1143,29 +1142,38 @@
         "sweV",
         "gpqa",
         "hle",
-        "lcbV6",
-        "aime26"
-      ]
+        "lcb",
+        "aime26",
+        "cfElo",
+        "mmluPro",
+        "simpleQa",
+        "arcAgi2",
+        "browseComp"
+      ],
+      "phase": "leaderboard"
     },
     {
-      "name": "LMArena",
-      "url": "https://lmarena.ai/",
+      "name": "LMArena WebDev Arena",
+      "url": "https://lmarena.ai/leaderboard/webdev",
       "tier": "I",
-      "authority": "blind human preference (formerly LMSYS)",
+      "authority": "blind human preference (TrueSkill/Elo, formerly LMSYS)",
       "format": "static_html_table",
       "lastVerifiedDate": null,
       "consecutiveFailures": 0,
       "extractor": "html_table",
       "fallbacks": [
         {
-          "format": "static_html_article"
+          "format": "spa_full"
         },
         {
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
-      "publishes": []
+      "format_lastVerified": "2026-04-29",
+      "publishes": [
+        "webDevElo"
+      ],
+      "phase": "leaderboard"
     },
     {
       "name": "LiveBench",
@@ -1190,8 +1198,9 @@
       "format_lastVerified": "2026-04-26",
       "publishes": [
         "gpqa",
-        "lcbV6"
-      ]
+        "lcb"
+      ],
+      "phase": "leaderboard"
     },
     {
       "name": "Berkeley BFCL",
@@ -1216,7 +1225,8 @@
       "format_lastVerified": "2026-04-26",
       "publishes": [
         "bfcl"
-      ]
+      ],
+      "phase": "leaderboard"
     },
     {
       "name": "BigCodeBench",
@@ -1237,8 +1247,9 @@
       ],
       "format_lastVerified": "2026-04-26",
       "publishes": [
-        "lcbV6"
-      ]
+        "lcb"
+      ],
+      "phase": "leaderboard"
     },
     {
       "name": "BigCodeBench HF Space",
@@ -1258,8 +1269,9 @@
       ],
       "format_lastVerified": "2026-04-26",
       "publishes": [
-        "lcbV6"
-      ]
+        "lcb"
+      ],
+      "phase": "leaderboard"
     },
     {
       "name": "EvalPlus",
@@ -1280,8 +1292,9 @@
       ],
       "format_lastVerified": "2026-04-26",
       "publishes": [
-        "lcbV6"
-      ]
+        "lcb"
+      ],
+      "phase": "leaderboard"
     },
     {
       "name": "HF Open LLM Leaderboard",
@@ -1304,8 +1317,10 @@
       "publishes": [
         "gpqa",
         "hle",
-        "aime26"
-      ]
+        "aime26",
+        "mmluPro"
+      ],
+      "phase": "leaderboard"
     },
     {
       "name": "Klu.ai",
@@ -1328,8 +1343,10 @@
       "publishes": [
         "gpqa",
         "sweV",
-        "hle"
-      ]
+        "hle",
+        "mmluPro"
+      ],
+      "phase": "leaderboard"
     },
     {
       "name": "Papers with Code",
@@ -1351,9 +1368,10 @@
       "format_lastVerified": "2026-04-26",
       "publishes": [
         "sweV",
-        "lcbV6",
+        "lcb",
         "gpqa"
-      ]
+      ],
+      "phase": "leaderboard"
     },
     {
       "name": "arXiv",
@@ -1373,7 +1391,8 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "publishes": []
+      "publishes": [],
+      "phase": "discovery"
     },
     {
       "name": "BenchLM",
@@ -1409,8 +1428,7 @@
         "swePro",
         "sweV",
         "tb2",
-        "lcbV6",
-        "aider",
+        "lcb",
         "tau2",
         "aaCoding",
         "aaAgentic",
@@ -1421,8 +1439,19 @@
         "aaIdx",
         "bfcl",
         "aime26",
-        "aaOmni"
-      ]
+        "aaOmni",
+        "tbHard",
+        "cfElo",
+        "mmluPro",
+        "simpleQa",
+        "mrcr",
+        "arcAgi2",
+        "browseComp",
+        "tau3",
+        "toolDec",
+        "nl2Repo"
+      ],
+      "phase": "leaderboard"
     },
     {
       "name": "AgentBench",
@@ -1442,7 +1471,8 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "publishes": []
+      "publishes": [],
+      "phase": "discovery"
     },
     {
       "name": "MathArena",
@@ -1467,7 +1497,8 @@
       "format_lastVerified": "2026-04-26",
       "publishes": [
         "aime26"
-      ]
+      ],
+      "phase": "leaderboard"
     },
     {
       "name": "Vals.ai",
@@ -1490,7 +1521,8 @@
       "publishes": [
         "sweV",
         "tb2"
-      ]
+      ],
+      "phase": "leaderboard"
     },
     {
       "name": "LMMarketCap",
@@ -1510,7 +1542,8 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "publishes": []
+      "publishes": [],
+      "phase": "discovery"
     },
     {
       "name": "llm-stats LiveCodeBench",
@@ -1536,7 +1569,7 @@
         "claude-{id}"
       ],
       "publishes": [
-        "lcbV6"
+        "lcb"
       ]
     },
     {
@@ -1574,10 +1607,13 @@
       "format": "spa_full",
       "publishes": [
         "sweV",
-        "lcbV6",
+        "lcb",
         "gpqa",
         "hle",
-        "aaIdx"
+        "aaIdx",
+        "cfElo",
+        "mmluPro",
+        "arcAgi2"
       ],
       "lastVerifiedDate": "2026-04-27",
       "consecutiveFailures": 0,
@@ -1606,7 +1642,8 @@
       "vendorPrefixMap": {
         "anthropic": "claude-",
         "default": ""
-      }
+      },
+      "phase": "leaderboard"
     },
     {
       "name": "LMCouncil Benchmarks",
@@ -1616,13 +1653,13 @@
       "publishes": [
         "sweV",
         "tb2",
-        "aider",
         "gpqa",
         "hle"
       ],
       "lastVerifiedDate": "2026-04-27",
       "consecutiveFailures": 0,
-      "rationale": "18-benchmark independent aggregator (AI Explained / SimpleBench creator). Sources: Epoch AI + Scale AI independent runs (NOT vendor self-reports). Covers SWE-bench Verified, Terminal-Bench 2.0, METR Time Horizons. 70+ models, updated monthly."
+      "rationale": "18-benchmark independent aggregator (AI Explained / SimpleBench creator). Sources: Epoch AI + Scale AI independent runs (NOT vendor self-reports). Covers SWE-bench Verified, Terminal-Bench 2.0, METR Time Horizons. 70+ models, updated monthly.",
+      "phase": "leaderboard"
     },
     {
       "name": "marc0.dev SWE-bench Leaderboard",
@@ -1632,12 +1669,12 @@
       "publishes": [
         "sweV",
         "swePro",
-        "tb2",
-        "aider"
+        "tb2"
       ],
       "lastVerifiedDate": "2026-04-27",
       "consecutiveFailures": 0,
-      "rationale": "Independent community tracker — single-page cross-view for SWE-bench Verified + SWE-bench Pro + Terminal-Bench 2.0 + Aider Polyglot, 100 entries. Monthly cadence; April 2026 includes Claude Opus 4.7."
+      "rationale": "Independent community tracker — single-page cross-view for SWE-bench Verified + SWE-bench Pro + Terminal-Bench 2.0 + Aider Polyglot, 100 entries. Monthly cadence; April 2026 includes Claude Opus 4.7.",
+      "phase": "leaderboard"
     }
   ],
   "aggregators": [
@@ -1757,7 +1794,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "phase": "pricing"
     },
     {
       "name": "Cerebras",
@@ -1776,7 +1814,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "phase": "pricing"
     },
     {
       "name": "Cerebras inference",
@@ -1794,7 +1833,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "phase": "pricing"
     },
     {
       "name": "SambaNova Cloud",
@@ -1813,7 +1853,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "phase": "pricing"
     },
     {
       "name": "Replicate",
@@ -1832,7 +1873,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "phase": "pricing"
     },
     {
       "name": "Lepton AI",
@@ -1851,7 +1893,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "phase": "pricing"
     },
     {
       "name": "Novita AI",
@@ -1870,7 +1913,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "phase": "pricing"
     },
     {
       "name": "SiliconFlow",
@@ -1889,7 +1933,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "phase": "pricing"
     },
     {
       "name": "Anyscale",
@@ -1908,7 +1953,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "phase": "pricing"
     },
     {
       "name": "Cloudflare Workers AI",
@@ -1927,7 +1973,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "phase": "pricing"
     },
     {
       "name": "AWS Bedrock",
@@ -1946,7 +1993,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "phase": "pricing"
     },
     {
       "name": "Azure AI Foundry",
@@ -1965,7 +2013,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "phase": "pricing"
     },
     {
       "name": "HuggingFace Inference Endpoints",
@@ -1984,7 +2033,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "phase": "pricing"
     },
     {
       "name": "OpenCode Zen",
@@ -2003,7 +2053,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "phase": "pricing"
     },
     {
       "name": "OpenCode Go",
@@ -2021,7 +2072,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "phase": "pricing"
     },
     {
       "name": "Lambda Cloud",
@@ -2040,7 +2092,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "phase": "pricing"
     },
     {
       "name": "Tensorix",
@@ -2059,7 +2112,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "phase": "pricing"
     },
     {
       "name": "benchlm.ai",

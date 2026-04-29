@@ -16,7 +16,7 @@ export const BENCH_KEYS = [
   'swePro', 'sweV', 'sweMulti', 'nl2Repo',
   'lcb', 'tb2', 'tbHard',
   'tau2', 'tau3', 'mcpA', 'bfcl', 'toolDec', 'aaCoding', 'aaAgentic', 'browseComp',
-  'cfElo',
+  'cfElo', 'webDevElo',
   'gpqa', 'aime26', 'hle', 'aaOmni',
   'mmluPro', 'simpleQa', 'mrcr', 'arcAgi2',
 ];
@@ -31,12 +31,18 @@ export function normalizeBenchScore(key, value) {
     const pct = (value - 1000) / 25;
     return Math.max(0, Math.min(100, pct));
   }
+  if (key === 'webDevElo') {
+    // LMArena WebDev Arena Elo, observed range ~950-1300.
+    // Map (950, 1300) -> (0, 100): pct = (value - 950) / 3.5
+    const pct = (value - 950) / 3.5;
+    return Math.max(0, Math.min(100, pct));
+  }
   return value;
 }
 
 export const DEFAULT_WEIGHTS = {
-  swePro: 18, tb2: 12, lcb: 12, sweV: 9, tbHard: 7, cfElo: 7,
-  nl2Repo: 5, aaCoding: 5, mcpA: 4, aaAgentic: 4,
+  swePro: 16, tb2: 11, lcb: 11, sweV: 9, tbHard: 7, cfElo: 7,
+  nl2Repo: 5, aaCoding: 5, mcpA: 4, aaAgentic: 4, webDevElo: 4,
   tau2: 3, browseComp: 3, arcAgi2: 3,
   gpqa: 2, sweMulti: 2, hle: 1, mmluPro: 1, tau3: 1, toolDec: 1,
 };
@@ -62,8 +68,8 @@ export const PRESETS = {
     swePro: 3, lcb: 2,
   },
   'benchmark-only': {
-    swePro: 17, sweV: 13, tb2: 11, lcb: 11, tbHard: 9, sweMulti: 7, cfElo: 7,
-    gpqa: 6, hle: 5, nl2Repo: 5, mmluPro: 3, tau3: 3, toolDec: 3,
+    swePro: 16, sweV: 12, tb2: 10, lcb: 10, tbHard: 8, sweMulti: 7, cfElo: 7,
+    gpqa: 6, hle: 5, webDevElo: 5, nl2Repo: 5, mmluPro: 3, tau3: 3, toolDec: 3,
   },
 };
 

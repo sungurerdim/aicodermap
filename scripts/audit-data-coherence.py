@@ -176,9 +176,14 @@ def main():
 
     # === 6. data/models.json bench cells ===
     # Most bench cells are percentages (0-100). cfElo stores raw Codeforces
-    # ELO, range 0-3500 (see whitelist _benchKeyNotes).
+    # ELO (range 0-3500); webDevElo stores raw LMArena WebDev Arena Elo
+    # (allowed up to 1500). See whitelist _benchKeyNotes.
     def _bench_max(key):
-        return 3500 if key == "cfElo" else 100
+        if key == "cfElo":
+            return 3500
+        if key == "webDevElo":
+            return 1500
+        return 100
 
     data_bench_cells = set()
     bad_cells = []
