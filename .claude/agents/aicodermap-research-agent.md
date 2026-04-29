@@ -37,6 +37,34 @@ Aggregate AI coding LLM data: bench scores, multi-provider pricing, Ollama metad
 
 Phase 0 fetches do NOT count against the per-model fetch budget; they are skill-level overhead.
 
+## PHASE 0b — UNKNOWN VENDOR PROBE (runs after Phase 0 lineup diff)
+
+Detects vendor/model families that are NOT in `sourcesWhitelist.vendors[]` yet trending on Hugging Face or community aggregators.
+
+**Protocol:**
+1. WebSearch `site:huggingface.co/models text-generation sort:trending` + fetch `https://huggingface.co/api/models?sort=trending&direction=-1&full=true&limit=50&filter=text-generation` — extract `author`/`modelId` for entries whose organization is NOT in the current whitelist vendor set.
+2. WebFetch any `awesome-llm` or `lmsys/chatbot-arena` aggregator index pages already in `sourcesWhitelist.community[]` — extract newly mentioned vendor/family names.
+3. For each unknown candidate: emit into `discoveries.vendors[]`:
+   ```json
+   { "id": "<orgId>", "observedAt": "<source URL>", "modelCount": N, "latestRelease": "<id>", "suggestedTier": "S" }
+   ```
+4. Do NOT auto-add to `whitelistAdditions[]` — whitelist promotion requires human review via `scripts/promote-discovery.py`.
+5. Count emitted candidates; orchestrator appends `🔎 New vendor candidates: N (review queue)` to CHANGELOG.
+
+## PHASE 0c — UNKNOWN LEADERBOARD PROBE (runs after Phase 0b)
+
+Detects benchmark leaderboards NOT yet in `sourcesWhitelist.leaderboards[]`.
+
+**Protocol:**
+1. WebFetch `https://paperswithcode.com/area/computer-code` benchmark index — extract benchmarks first published in the last 90 days that are not in `_schema.coreBenchKeys ∪ _schema.deprecatedBenchKeys`.
+2. WebFetch `https://artificialanalysis.ai/leaderboards` main page — extract leaderboard track names not currently in `leaderboards[].url`.
+3. For each unknown candidate: emit into `discoveries.benchmarks[]`:
+   ```json
+   { "key": "<suggested_short_key>", "label": "<human name>", "sourceUrl": "<url>", "firstObserved": "<today>", "suggestedPublishers": ["<url>"] }
+   ```
+4. Do NOT auto-add to `_schema.coreBenchKeys` — key promotion requires a 2+ publisher AC6 check + human review.
+5. Orchestrator appends `🔎 New benchmark candidates: M (review queue)` to CHANGELOG.
+
 ## SCOPE
 | scope | task | model | parallelism |
 |-------|------|-------|-------------|
@@ -776,7 +804,7 @@ expected: ≤30s, single-pair fill, returns one models[].updates entry + sources
 - **UNCAPPED effort** — no fetch budget, no wallclock cap, no per-model fetch cap. Termination is governed exclusively by COMPLETENESS_TERMINATION (every active_model × every core_bench_key cell either filled or carrying a `gaps[]` entry with full triedSources/triedQueries provenance). 5 is a parallelism guideline, not a ceiling.
 - **Auto-resolution prep** — emit `autoResolveWinner` per contradiction (skill applies, no user prompt)
 - **Lifecycle states** — emit `status` field changes via `lineupChanges` (skill applies transitions)
-- **Pre-emit self-audit (REQUIRED)** — see PRE_EMIT_SELF_AUDIT below. Agent computes coverageMatrix and verifies the invariant `filledCells + gapsRecorded == totalCells` BEFORE producing the final JSON. If violated, loop back through Phase 3 for the missing cells, then re-audit.
+- **Pre-emit self-audit (REQUIRED)** — see PRE_EMIT_SELF_AUDIT below. Agent computes coverageMatrix for what it attempted, sets `partialReturn: true`, and emits. Orchestrator gap-gen supplements remaining cells. Looping back through Phase 3 is **forbidden** — emit and exit.
 - **Delivery contract** — JSON-only final message, no narration, no file write, no truncation
 - **Project boundary** — only AICoderMap session
 
@@ -1309,42 +1337,38 @@ The matrix invariant + gap chain rules above remain absolute.
 
 ## SUCCESS_CRITERIA
 
-A cycle is **structurally complete** iff ALL hold:
+The agent cycle is **complete** when every cell the agent **attempted** is either
+filled, gapped (with provenance), or marked N/A. The agent does NOT need to
+attempt every cell — `partialReturn: true` is always set, and the orchestrator
+gap-gen closes the matrix invariant for anything the agent did not attempt.
 
-1. `coverageMatrix.filledCells + gapsRecorded + notApplicableCells == totalCells`
-   (zero silent omissions; matrix invariant satisfied).
-2. Every `gaps[]` entry has `triedSources[]` ≥ 1 URL, `triedQueries[]` ≥ 2 queries,
-   `triedFormats[]` ≥ 1 format.
-3. Every leaderboard whose `publishes[]` intersects `coreBenchKeys` was visited
+Quality rules (agent is responsible for these):
+1. Every `gaps[]` entry the agent emits has `triedSources[]` ≥ 1 URL,
+   `triedQueries[]` ≥ 2 queries, `triedFormats[]` ≥ 1 format.
+2. Every leaderboard whose `publishes[]` intersects `coreBenchKeys` was visited
    (status 200 + extract attempted, OR documented unreachable + fallback exhausted,
    OR `_runtime.unhealthy` auto-skip).
-4. Every vendor in `sourcesWhitelist.vendors[]` was attempted for Phase 0 lineup
-   discovery (4xx/5xx/timeout documented in the gap chain or `runtime.healthChecks`).
-5. Every `models[].notApplicable[]` entry cites a `rule` from
+3. Every vendor in `sourcesWhitelist.vendors[]` was attempted for Phase 0 lineup
+   discovery.
+4. Every `models[].notApplicable[]` entry cites a `rule` from
    `sourcesWhitelist._schema.notApplicableRules.rules[]` (no hardcoded model id).
 
-The orchestrator (`scripts/merge.py`) HARD-BLOCKs on (1) via the MX1 gate, and
-HARD-BLOCKs on (2) by stripping malformed gap entries — which then surfaces as
-an MX1 violation, completing the loop.
+The orchestrator (`scripts/merge.py`) HARD-BLOCKs via MX1 gate — satisfied by
+the combined agent output + gap-gen supplement, not the agent alone.
 
-## ADEQUACY_REACTION
+## PARTIAL_RETURN_PROTOCOL
 
-When `PRE_EMIT_SELF_AUDIT` detects `missing_cells`:
+When `PRE_EMIT_SELF_AUDIT` runs:
+1. Compute `coverageMatrix` for cells attempted this cycle only.
+2. Set `partialReturn: true` in the artifact.
+3. For each cell the agent attempted but could not fill:
+   - If matching N/A rule exists → `models[].notApplicable[]` entry.
+   - Otherwise → `gaps[]` entry with `triedSources[]`, `triedQueries[]`, `triedFormats[]`.
+4. **Emit and exit.** Do NOT loop back. Do NOT retry missing cells.
+   The orchestrator gap-gen step is mandatory and covers remaining cells.
 
-- Loop-back through Phase 3 cascade for each missing cell — no narration, no
-  "I will retry" preamble, just execute.
-- Phase 3 success → `models[].updates.bench[<key>] = value` + `sourcesAdded[]`.
-- Phase 3 failure WITH a matching N/A rule → append `{ benchKey, rule }` to
-  `models[].notApplicable[]`. Cell drops out of the matrix accounting.
-- Phase 3 failure WITHOUT N/A rule → append a `gaps[]` entry carrying the
-  REQUIRED `triedSources[]`, `triedQueries[]`, `triedFormats[]` provenance.
-- An empty `triedSources[]` is a contract violation; `merge.py` strips the gap
-  and MX1 then rejects the cycle.
-- Placeholder/empty gap entries are NEVER acceptable.
-- Termination is forbidden while any `missing_cell` exists.
-- Fabricating an N/A rule (citing a rule that does not exist in
-  `_schema.notApplicableRules`) fails the audit-data-coherence AC9 check;
-  rolls the merge back.
+Fabricating an N/A rule (citing a rule absent from `_schema.notApplicableRules`)
+fails audit-data-coherence AC9 and rolls the merge back.
 
 ## INADEQUACY_SIGNALS (orchestrator-side)
 

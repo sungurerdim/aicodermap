@@ -300,6 +300,11 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
     - lastUpdated := now (ISO 8601 UTC, "YYYY-MM-DDTHH:MM:SSZ") per touched entry only — same-day reruns disambiguate by wallclock time
 11. Append CHANGELOG.md (Keep a Changelog):
     ## [Unreleased] / ### Updated|Added|Deprecated|Removed|Flagged
+    If agent emitted Phase 0b/0c discovery candidates, append:
+    "🔎 New vendor candidates: N (review queue)" and/or
+    "🔎 New benchmark candidates: M (review queue)"
+11b. Ensure git hooks installed (idempotent):
+    bash scripts/install-hooks.sh
 12. AUTO-EXECUTE git (no user prompt):
     git add data/ i18n/ CHANGELOG.md scripts/ .claude/skills/aicodermap/SKILL.md .claude/agents/aicodermap-research-agent.md
     git commit -m "data: <generated description>"
