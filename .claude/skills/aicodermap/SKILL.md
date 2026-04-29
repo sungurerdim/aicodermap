@@ -66,7 +66,31 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
      familyGrouping: <models grouped by (provider, tier) for parallel batches>,
      sourcesWhitelist: <inline data/sources-whitelist.json>,
      verificationMap: <inline .aicodermap-verification-map.json (or {} on first run)>,
-     lineup: <Step 0 result>
+     lineup: <Step 0 result>,
+
+     // Matrix-aware context (P7+C plan reform — added 2026-04-29):
+     // Computed via scripts/lib/matrix.py {matrix_snapshot, priority_cells}.
+     // Skill MUST inject these so the agent sees the contract reality:
+     // expected_total cells, current per-bench/per-model fill state, and
+     // a top-N starvation queue to resolve FIRST.
+     matrixState: <matrix_snapshot(active_models, coreBenchKeys)>,
+     // Shape: {
+     //   activeModels: <int>, coreKeys: <int>,
+     //   totalCells: <int>, filledCells: <int>,
+     //   notApplicableCells: <int>, expectedTotal: <int>,
+     //   fillRatio: <float 0..1>,
+     //   byBench: { <key>: {filled, na, total} },
+     //   byModel: { <id>:  {filled, na, total} }
+     // }
+     priorityCells: <priority_cells(active_models, coreBenchKeys, limit=200)>,
+     // Top-N empty (modelId, benchKey) pairs ranked by starvation
+     // (rare benches first, then rare models, lex tiebreak). Agent's Phase 2/3
+     // cascade MUST process these before any other empty cell — closes the
+     // worst gaps even when wallclock pressure interrupts the cycle.
+     contracts: <data/sources-whitelist.json._schema.contracts>
+     // Numeric thresholds (ABSOLUTE_COVERAGE_FLOOR, MIN_SOURCES_PER_FILLED_CELL,
+     // VERIFICATION_AGREEMENT_PP, etc.) — single source of truth; agent reads
+     // these values rather than hardcoding any number in agent.md.
    }
    - `.aicodermap-verification-map.json` is the historical audit log of every (model, bench) cell observation across cycles (value, sources[], lastChecked). Used for contradiction analysis only — never read for skip decisions, since every cell is re-fetched every cycle (UNCAPPED + UNCACHED doctrine, reformed 2026-04-28). Skill creates it (empty {}) on first cycle if missing.
    - `data/models.json` is SSOT for "what models we track" — `currentIds` MUST be derived from this file at the moment the skill runs. Hardcoding the id list in a prompt or agent message is a contract violation (any drift between models.json and what the agent receives surfaces as silent omission of new/renamed models).
@@ -90,9 +114,36 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
        trust_score_required: true,           // every value carries a trustScore
        termination: "completeness",          // explicit: not "wallclock", not "fetch_budget"
        require_lineup_populated: true,       // Step 0 lineup MUST be non-empty (orchestrator retries if not)
-       require_health_checks: true           // runtime.healthChecks MUST cover ≥3 leaderboard domains
+       require_health_checks: true,          // runtime.healthChecks MUST cover ≥3 leaderboard domains
+
+       // Matrix-aware enforcement (C plan reform — 2026-04-29):
+       expected_total: idea_context.matrixState.expectedTotal,
+       priority_queue_size: |idea_context.priorityCells|,
+       require_priority_first: true,         // Phase 2/3 MUST start with priorityCells before any other empty cell
+       require_full_matrix: true             // every (active_modelId, coreBenchKey) cell MUST end as fill | gap | notApplicable; partial returns will be re-dispatched via COMPLETENESS_GATE
      )
    })
+
+   **Prompt header MUST surface (verbatim, not paraphrased):**
+   ```
+   MATRIX REALITY (this cycle):
+     active models: <matrixState.activeModels>
+     core bench keys: <matrixState.coreKeys>
+     expected_total cells: <matrixState.expectedTotal>
+     currently filled: <matrixState.filledCells> (<fillRatio*100>%)
+     notApplicable: <matrixState.notApplicableCells>
+     missing-or-stale: <expectedTotal - filledCells - notApplicableCells>
+
+   PRIORITY QUEUE (top <N>; resolve these FIRST in Phase 2/3 cascade):
+     <modelId>.<benchKey>  (bench fill <ratio>, model fill <ratio>)
+     ...
+
+   EMISSION RULES (HARD, see agent.md SUCCESS_CRITERIA):
+     - every cell ends as: bench[k]=value | gaps[].entry | notApplicable[].entry
+     - gaps[] entries: triedSources[]>=1, triedQueries[]>=2, triedFormats[]>=1
+     - notApplicable[] entries: cite a rule from _schema.notApplicableRules
+     - silent omission triggers MX1 rollback in merge.py
+   ```
 5. Parse return → validate JSON schema (strip surrounding whitespace, locate first `{` and last `}` if narration leaked)
 
 5a. MATRIX_SNAPSHOT (P7 reform):

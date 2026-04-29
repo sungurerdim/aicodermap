@@ -58,6 +58,23 @@ idea_context: {
   total_models: <n>,
   last_refresh: <iso>,
   currentIds: <string[]>,
+  sourcesWhitelist: <inline whitelist file>,
+  verificationMap: <inline audit map>,
+  lineup: <Phase 0 result>,
+
+  // C plan reform (added 2026-04-29) — matrix-aware context.
+  matrixState: {
+    activeModels: <int>, coreKeys: <int>,
+    totalCells: <int>, filledCells: <int>,
+    notApplicableCells: <int>, expectedTotal: <int>,
+    fillRatio: <float 0..1>,
+    byBench: { <key>: { filled, na, total } },
+    byModel: { <id>:  { filled, na, total } }
+  },
+  priorityCells: [{ modelId, benchKey, benchFillRatio, modelFillRatio }, ...],
+  contracts: { ABSOLUTE_COVERAGE_FLOOR, MIN_SOURCES_PER_FILLED_CELL,
+               VERIFICATION_AGREEMENT_PP, FETCH_TIMEOUT_SEC,
+               FETCH_RETRY_COUNT, PARALLEL_FETCH_BATCH, ... }
 }
 target_model_ids: <string[] | required for 'specific' or 'deep-fetch'>
 target_field: <string | required for 'deep-fetch'>
@@ -68,6 +85,9 @@ parallel_models: <int default:5>           # parallelism, NOT a cap
 verification_map_path: ".aicodermap-verification-map.json"  # tarihsel audit + contradiction analiz cache; SKIP kararı vermez
 trust_score_required: <bool default:true>
 termination: "completeness"                # explicit doctrine — see SKILL.md COMPLETENESS_TERMINATION
+expected_total: <int>                      # |active|×|coreKeys| - |notApplicable|; matrix invariant target
+require_priority_first: <bool default:true>  # process priorityCells in Phase 2/3 BEFORE any other empty cell
+require_full_matrix: <bool default:true>     # every cell must end as fill | gap | notApplicable
 # UNCAPPED RESEARCH (2026-04-28 reform): no fetch_budget, no wallclock_budget,
 # NO confirmed-cell skip. Every cycle re-attempts every (modelId, benchKey)
 # cell from every advertised source — vendor scores can change overnight, so
@@ -75,6 +95,23 @@ termination: "completeness"                # explicit doctrine — see SKILL.md 
 # verification map is now audit-only (historical record + contradiction
 # analysis); it never short-circuits a fetch.
 ```
+
+**Matrix awareness (HARD — C plan reform 2026-04-29):**
+The skill ships `matrixState` + `priorityCells` so the agent sees the
+contract reality before the first fetch. The agent MUST:
+
+1. Scan `matrixState.byBench` to identify the bench keys with the lowest
+   fill ratio — these get extra time in Phase 1 leaderboard sweep (more
+   patterns, more aggregator mirrors, longer WebSearch cascade).
+2. Walk `priorityCells[]` IN ORDER through the Phase 2/3 cascade. The
+   first 50–100 cells of `priorityCells` are the highest-starvation cells;
+   resolve them BEFORE any non-priority empty cell.
+3. Compare the agent's eventual `coverageMatrix.filledCells +
+   gapsRecorded + notApplicableCells` against `expected_total`. If less,
+   the cycle is partial — go back through Phase 3 cascade for the
+   residual cells before emitting final JSON. The orchestrator's
+   COMPLETENESS_GATE will dispatch a single retry if the artifact still
+   lands short, but a well-formed cycle should not need that retry.
 
 ## TRUSTED_SOURCE_WHITELIST (`trusted_sources_only=true` enforces these)
 

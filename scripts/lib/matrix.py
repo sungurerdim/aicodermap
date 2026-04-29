@@ -83,6 +83,88 @@ def expected_total(active: Iterable[dict[str, Any]], core_keys: Iterable[str]) -
     return len(active) * len(keys) - len(na_cells(active, keys))
 
 
+def priority_cells(
+    active: list[dict[str, Any]],
+    core_keys: list[str],
+    limit: int = 200,
+) -> list[dict[str, Any]]:
+    """Top-N most starved (modelId, benchKey) cells the agent should hit FIRST.
+
+    Ranking heuristic (descending priority):
+      1. cells where the bench has fewer total filled hits → starve-the-bench bias
+      2. cells in models with fewer total filled hits → starve-the-model bias
+      3. lex order on (modelId, benchKey) for deterministic tie-break
+
+    Returns: [{modelId, benchKey, benchFillRatio, modelFillRatio}], capped at limit.
+    """
+    keys = list(core_keys)
+    na = na_cells(active, keys)
+    bench_filled = {k: 0 for k in keys}
+    model_filled = {m["id"]: 0 for m in active}
+    for m in active:
+        for k in keys:
+            v = (m.get("bench") or {}).get(k)
+            if v is not None:
+                bench_filled[k] += 1
+                model_filled[m["id"]] += 1
+    candidates: list[tuple[float, float, str, str]] = []
+    n_models = max(len(active), 1)
+    for m in active:
+        for k in keys:
+            if (m["id"], k) in na:
+                continue
+            v = (m.get("bench") or {}).get(k)
+            if v is not None:
+                continue
+            bench_ratio = bench_filled[k] / n_models
+            model_ratio = model_filled[m["id"]] / max(len(keys), 1)
+            candidates.append((bench_ratio, model_ratio, m["id"], k))
+    candidates.sort(key=lambda t: (t[0], t[1], t[2], t[3]))
+    out = []
+    for bench_ratio, model_ratio, mid, k in candidates[:limit]:
+        out.append(
+            {
+                "modelId": mid,
+                "benchKey": k,
+                "benchFillRatio": round(bench_ratio, 3),
+                "modelFillRatio": round(model_ratio, 3),
+            }
+        )
+    return out
+
+
+def matrix_snapshot(
+    active: list[dict[str, Any]], core_keys: list[str]
+) -> dict[str, Any]:
+    """Pre-agent snapshot: counts + per-bench / per-model fill, plus expected total."""
+    keys = list(core_keys)
+    na = na_cells(active, keys)
+    filled = filled_cells_from_models(active, keys)
+    by_bench: dict[str, dict[str, int]] = {}
+    by_model: dict[str, dict[str, int]] = {}
+    for m in active:
+        mid = m["id"]
+        bench = m.get("bench") or {}
+        m_filled = sum(1 for k in keys if bench.get(k) is not None)
+        m_na = sum(1 for k in keys if (mid, k) in na)
+        by_model[mid] = {"filled": m_filled, "na": m_na, "total": len(keys)}
+    for k in keys:
+        k_filled = sum(1 for m in active if (m.get("bench") or {}).get(k) is not None)
+        k_na = sum(1 for m in active if (m["id"], k) in na)
+        by_bench[k] = {"filled": k_filled, "na": k_na, "total": len(active)}
+    return {
+        "activeModels": len(active),
+        "coreKeys": len(keys),
+        "totalCells": len(active) * len(keys),
+        "filledCells": len(filled),
+        "notApplicableCells": len(na),
+        "expectedTotal": len(active) * len(keys) - len(na),
+        "fillRatio": round(len(filled) / max(len(active) * len(keys), 1), 3),
+        "byBench": by_bench,
+        "byModel": by_model,
+    }
+
+
 def verify_matrix_invariant(
     filled: set[tuple[str, str]],
     gaps: set[tuple[str, str]],
