@@ -1,4 +1,24 @@
 
+## [2026-04-29] — autonomous refresh-all [WARN: very low cumulative provenance coverage 38.0%]
+
+### Updated
+- 2 models: `devstral-small-2`, `gpt-5-5`
+
+### Deprecated
+- `devstral-small-2` — vendor-marked deprecated
+
+### Gaps (48 entries — see data/known-gaps.json or next refresh)
+- `opus-4-7.webDevElo`: LMArena WebDev Arena SPA-gated; no static index. claude-opus-4-7 added to leaderboard 2026-04-17 but numeric score not in indexed text.
+- `sonnet-4-6.webDevElo`: LMArena WebDev Arena SPA-gated.
+- `claude-haiku-4-5.webDevElo`: LMArena WebDev Arena SPA-gated.
+- `gpt-5-5.webDevElo`: gpt-5.5-high added to Arena 2026-04-27 — too new for settled WebDev Elo. SPA-gated.
+- `gpt-5-4.webDevElo`: LMArena WebDev Arena SPA-gated.
+- `gemini-3-1-pro.webDevElo`: LMArena WebDev Arena SPA-gated.
+- `gemini-3-1-flash.webDevElo`: LMArena WebDev Arena SPA-gated.
+- `grok-4-20.webDevElo`: LMArena WebDev Arena SPA-gated.
+- ... and 40 more
+
+
 ## [2026-04-29.c] — preset weight bug fix + bench taxonomy expansion
 
 ### Fixed

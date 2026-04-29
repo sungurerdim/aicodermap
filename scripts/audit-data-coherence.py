@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 SSOT coherence audit. Walks every surface that touches bench keys + model
 IDs, computes the cross-surface diff, and reports it. Designed to be loud
@@ -32,6 +33,14 @@ import json
 import os
 import re
 import sys
+
+for _stream in (sys.stdout, sys.stderr):
+    _reconf = getattr(_stream, "reconfigure", None)
+    if callable(_reconf):
+        try:
+            _reconf(encoding="utf-8", errors="replace")
+        except (OSError, ValueError):
+            pass
 
 PROJECT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 

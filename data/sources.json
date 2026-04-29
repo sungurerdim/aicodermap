@@ -7293,11 +7293,11 @@
   "grok-4-20.gpqa": [
     {
       "value": 91.1,
-      "source": "BenchLM Grok 4.20",
+      "source": "BenchLM / xAI docs",
       "url": "https://benchlm.ai/models/grok-4-20-beta",
       "date": "2026-04-28",
       "tier": "I",
-      "verifications": 1,
+      "verifications": 2,
       "trustScore": 0.67
     }
   ],
@@ -7313,11 +7313,11 @@
     },
     {
       "value": 32.2,
-      "source": "Artificial Analysis",
+      "source": "BenchLM / artificialanalysis.ai",
       "url": "https://artificialanalysis.ai/models/grok-4-20",
       "date": "2026-04-29",
       "tier": "I",
-      "verifications": 1,
+      "verifications": 2,
       "trustScore": 0.67
     }
   ],
@@ -7625,6 +7625,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": 0.67
+    },
+    {
+      "value": 88.7,
+      "source": "OpenAI GPT-5.5 announcement",
+      "url": "https://openai.com/index/introducing-gpt-5-5/",
+      "date": "2026-04-29",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.7
     }
   ],
   "gpt-5-5.pricing.api.out": [
@@ -8347,6 +8356,28 @@
       "tier": "C",
       "verifications": 2,
       "trustScore": 0.27
+    }
+  ],
+  "devstral-small-2.status": [
+    {
+      "value": "deprecated",
+      "source": "Mistral AI Docs",
+      "url": "https://docs.mistral.ai/models/devstral-small-2-25-12",
+      "date": "2026-04-29",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.7
+    }
+  ],
+  "grok-4-3.released": [
+    {
+      "value": "2026-04-17",
+      "source": "xAI / Dev Community",
+      "url": "https://dev.to/techsifted/grok-43-review-whats-new-in-xais-latest-model-april-2026-4l2l",
+      "date": "2026-04-29",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.4
     }
   ]
 }

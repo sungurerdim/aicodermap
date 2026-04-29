@@ -147,7 +147,7 @@
     "vramRequirement": null,
     "strengthsKey": "gemini-3-1-pro.strengths",
     "weaknessesKey": "gemini-3-1-pro.weaknesses",
-    "lastUpdated": "2026-04-28T23:15:51Z",
+    "lastUpdated": "2026-04-29",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-04-29",
@@ -330,7 +330,7 @@
     "vramRequirement": null,
     "strengthsKey": "gpt-5-4.strengths",
     "weaknessesKey": "gpt-5-4.weaknesses",
-    "lastUpdated": "2026-04-28T23:15:51Z",
+    "lastUpdated": "2026-04-29",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-04-29",
@@ -811,7 +811,7 @@
     "vramRequirement": null,
     "strengthsKey": "opus-4-7.strengths",
     "weaknessesKey": "opus-4-7.weaknesses",
-    "lastUpdated": "2026-04-28T23:15:51Z",
+    "lastUpdated": "2026-04-29",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-04-29",
@@ -906,7 +906,7 @@
     "vramRequirement": null,
     "strengthsKey": "sonnet-4-6.strengths",
     "weaknessesKey": "sonnet-4-6.weaknesses",
-    "lastUpdated": "2026-04-28T23:15:51Z",
+    "lastUpdated": "2026-04-29",
     "status": "active",
     "benchUpdated": {
       "sweV": "2026-04-29",
@@ -1167,7 +1167,7 @@
     "vramRequirement": null,
     "strengthsKey": "deepseek-v4-flash.strengths",
     "weaknessesKey": "deepseek-v4-flash.weaknesses",
-    "lastUpdated": "2026-04-28T23:15:51Z",
+    "lastUpdated": "2026-04-29",
     "ollama": {
       "pullCmd": "ollama run deepseek-v4-flash:cloud",
       "tags": [
@@ -1188,7 +1188,7 @@
     "status": "active",
     "benchUpdated": {
       "sweV": "2026-04-29",
-      "swePro": "2026-04-28",
+      "swePro": "2026-04-29",
       "gpqa": "2026-04-29",
       "hle": "2026-04-29",
       "aaIdx": "2026-04-29",
@@ -1290,7 +1290,7 @@
     "vramRequirement": null,
     "strengthsKey": "deepseek-v4-pro.strengths",
     "weaknessesKey": "deepseek-v4-pro.weaknesses",
-    "lastUpdated": "2026-04-28T23:15:51Z",
+    "lastUpdated": "2026-04-29",
     "status": "active",
     "benchUpdated": {
       "sweV": "2026-04-29",
@@ -1551,7 +1551,7 @@
     "vramRequirement": null,
     "strengthsKey": "glm-5-1.strengths",
     "weaknessesKey": "glm-5-1.weaknesses",
-    "lastUpdated": "2026-04-28T23:15:51Z",
+    "lastUpdated": "2026-04-29",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-04-29",
@@ -1650,7 +1650,7 @@
     "vramRequirement": null,
     "strengthsKey": "kimi-k2-6.strengths",
     "weaknessesKey": "kimi-k2-6.weaknesses",
-    "lastUpdated": "2026-04-28T23:15:51Z",
+    "lastUpdated": "2026-04-29",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-04-29",
@@ -4527,7 +4527,7 @@
     "vramRequirement": 16,
     "strengthsKey": "devstral-small-2.strengths",
     "weaknessesKey": "devstral-small-2.weaknesses",
-    "lastUpdated": "2026-04-28T23:15:51Z",
+    "lastUpdated": "2026-04-29T00:29:30Z",
     "ollama": {
       "pullCmd": "ollama pull devstral-small-2",
       "tags": [
@@ -4545,8 +4545,8 @@
       "releasedISO": "2025-12-09",
       "ollamaUrl": "https://ollama.com/library/devstral-small-2"
     },
-    "status": "active",
-    "deprecatedAt": "2026-04-01",
+    "status": "deprecated",
+    "deprecatedAt": "2026-02-27",
     "successor": "devstral-2",
     "benchUpdated": {
       "sweV": "2026-04-29",
@@ -4716,7 +4716,7 @@
     "providers": 2,
     "strengthsKey": "gpt-5-5.strengths",
     "weaknessesKey": "gpt-5-5.weaknesses",
-    "lastUpdated": "2026-04-28T23:15:51Z",
+    "lastUpdated": "2026-04-29T00:29:30Z",
     "status": "active",
     "sourcesAdded": [
       {
@@ -4832,7 +4832,7 @@
     },
     "strengthsKey": "grok-4-20.strengths",
     "weaknessesKey": "grok-4-20.weaknesses",
-    "lastUpdated": "2026-04-28T23:15:51Z",
+    "lastUpdated": "2026-04-29",
     "benchUpdated": {
       "swePro": "2026-04-29",
       "sweV": "2026-04-29",

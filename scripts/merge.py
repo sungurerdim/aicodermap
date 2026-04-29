@@ -524,6 +524,7 @@ def main():
         capture_output=True,
         text=True,
         check=False,
+        env={**os.environ, "PYTHONIOENCODING": "utf-8"},
     )
     coherence_ok = proc.returncode == 0
     if not coherence_ok:
