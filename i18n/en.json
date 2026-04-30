@@ -9,7 +9,8 @@
       "filters": "Filters",
       "table": "Comparison Table",
       "models": "Model Cards",
-      "export": "Export"
+      "export": "Export",
+      "privacy": "Privacy"
     },
     "weights": {
       "total": "Total",
@@ -143,7 +144,40 @@
     "disputedTip": "Cells in the active preset that have same-tier source disagreement (≥3pp inside one tier on top of the ≥5pp BLOCK threshold). The composite carries a confidence haircut for these — capped at 5pp per cell so a single extreme outlier cannot dominate. Cross-tier disputes (e.g. I-tier vs S-tier) are not counted because autoResolveWinner already picked the higher-trust source.",
     "sources": "Sources",
     "sourcesUnique": "unique",
-    "sourcesDatapoints": "datapoints"
+    "sourcesDatapoints": "datapoints",
+    "lowConfidence": "low confidence",
+    "lowConfidenceTip": "Composite computed from fewer than 40% of active profile weight. Score reliability is limited."
+  },
+  "pricing": {
+    "blended": "BLENDED $/1M",
+    "blendedTip": "Blended price per 1M tokens assuming 3:1 input:output ratio. Formula: (in×3 + out) / 4.",
+    "baseline": "Compare prices to",
+    "baselineNone": "None (off)",
+    "baselineTip": "Show each model's blended price as a multiple of the selected baseline"
+  },
+  "privacy": {
+    "heading": "Privacy & Compliance",
+    "subheading": "Training opt-out policies, data residency, and certification status. Verify with your compliance team.",
+    "col": {
+      "model": "Model",
+      "trainingOptOut": "Training opt-out",
+      "dataResidency": "Data residency",
+      "soc2": "SOC 2",
+      "gdpr": "GDPR",
+      "apiLogging": "API logging"
+    },
+    "val": {
+      "available": "Available",
+      "none": "None",
+      "unknown": "—",
+      "yes": "Yes",
+      "no": "No",
+      "defaultOn": "On by default",
+      "defaultOff": "Off by default",
+      "optOut": "Opt-out available",
+      "notLogged": "Not logged"
+    },
+    "note": "Source: vendor documentation & terms of service. Last verified: 2026-04-30."
   },
   "models": {
     "opus-4-7": {

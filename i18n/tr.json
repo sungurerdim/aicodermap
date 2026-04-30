@@ -9,7 +9,8 @@
       "filters": "Filtreler",
       "table": "Karşılaştırma Tablosu",
       "models": "Model Kartları",
-      "export": "Dışa Aktar"
+      "export": "Dışa Aktar",
+      "privacy": "Gizlilik"
     },
     "weights": {
       "total": "Toplam",
@@ -143,7 +144,40 @@
     "disputedTip": "Aktif preset'te aynı-tier kaynaklar arasında uyumsuzluk taşıyan hücre sayısı (≥5pp BLOCK eşiğinin üstünde, tek bir tier içinde ≥3pp). Composite bu hücreler için güven kesintisi içerir — hücre başına maks 5pp, böylece tek bir outlier composite'i ezemez. Cross-tier uyumsuzluklar (örn. I-tier ↔ S-tier) sayılmaz, çünkü autoResolveWinner zaten yüksek-tier kaynağı seçti.",
     "sources": "Kaynaklar",
     "sourcesUnique": "benzersiz",
-    "sourcesDatapoints": "veri noktası"
+    "sourcesDatapoints": "veri noktası",
+    "lowConfidence": "düşük güven",
+    "lowConfidenceTip": "Composite, aktif profil ağırlığının %40'ından azından hesaplandı. Skor güvenilirliği sınırlı."
+  },
+  "pricing": {
+    "blended": "KARMA $/1M",
+    "blendedTip": "1M token başına karma fiyat (3:1 giriş:çıkış oranı varsayımı). Formül: (giriş×3 + çıkış) / 4.",
+    "baseline": "Fiyatı şununla karşılaştır",
+    "baselineNone": "Yok (kapalı)",
+    "baselineTip": "Her modelin karma fiyatını seçilen referans modele oran olarak göster"
+  },
+  "privacy": {
+    "heading": "Gizlilik ve Uyumluluk",
+    "subheading": "Eğitim verisi opt-out politikaları, veri barındırma ve sertifikasyon durumu. Uyumluluk ekibinizle doğrulayın.",
+    "col": {
+      "model": "Model",
+      "trainingOptOut": "Eğitim opt-out",
+      "dataResidency": "Veri konumu",
+      "soc2": "SOC 2",
+      "gdpr": "GDPR",
+      "apiLogging": "API loglama"
+    },
+    "val": {
+      "available": "Mevcut",
+      "none": "Yok",
+      "unknown": "—",
+      "yes": "Evet",
+      "no": "Hayır",
+      "defaultOn": "Varsayılan açık",
+      "defaultOff": "Varsayılan kapalı",
+      "optOut": "Opt-out mevcut",
+      "notLogged": "Loglanmıyor"
+    },
+    "note": "Kaynak: tedarikçi belgesi ve hizmet şartları. Son doğrulama: 2026-04-30."
   },
   "models": {
     "opus-4-7": {

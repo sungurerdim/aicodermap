@@ -111,3 +111,55 @@ table#comparison-table .tier-badge {
   display: inline-block;
 }
 table#comparison-table td.col-rank { color: var(--muted); }
+
+/* Privacy table */
+table.privacy-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.82rem;
+}
+table.privacy-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--surface);
+}
+table.privacy-table th {
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+table.privacy-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+table.privacy-table tr:last-child td { border-bottom: none; }
+table.privacy-table td.priv-model {
+  font-weight: 500;
+  white-space: nowrap;
+}
+.priv-badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.priv-yes     { background: color-mix(in srgb, var(--good) 18%, transparent);     color: var(--good); }
+.priv-no      { background: color-mix(in srgb, var(--danger) 18%, transparent);   color: var(--danger); }
+.priv-partial { background: color-mix(in srgb, var(--warn-2) 18%, transparent);   color: var(--warn-2); }
+.priv-unknown { color: var(--muted); }
+.privacy-note {
+  margin-top: 0.75rem;
+  font-size: 0.72rem;
+  color: var(--muted);
+}

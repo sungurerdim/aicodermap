@@ -140,7 +140,21 @@
 }
 .composite-score .coverage.cov-full { color: var(--ok); border-color: var(--accent-soft); }
 .composite-score .coverage.cov-partial { color: var(--warn); border-color: var(--warn-soft); }
-.composite-score .coverage.cov-low { color: var(--danger); border-color: var(--danger-soft); }
+.composite-score .coverage.cov-low { color: var(--warn-2, #e07320); border-color: var(--warn-2-soft, #e0732040); }
+/* B1: low-confidence composite — italic value + inline note */
+.composite-score .value.value-low-confidence { font-style: italic; opacity: 0.82; }
+.composite-score .low-confidence-note {
+  display: inline-block;
+  margin-top: 2px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border: 1px solid var(--warn-2-soft, #e0732040);
+  background: var(--surface-2);
+  color: var(--warn-2, #e07320);
+}
 .composite-score .disputed {
   display: inline-block;
   margin-top: 2px;
@@ -168,7 +182,7 @@ table#comparison-table .coverage-mini {
 }
 table#comparison-table .coverage-mini.cov-full { color: var(--ok); border-color: var(--accent-soft); }
 table#comparison-table .coverage-mini.cov-partial { color: var(--warn); border-color: var(--warn-soft); }
-table#comparison-table .coverage-mini.cov-low { color: var(--danger); border-color: var(--danger-soft); }
+table#comparison-table .coverage-mini.cov-low { color: var(--warn-2, #e07320); border-color: var(--warn-2-soft, #e0732040); }
 
 .model-meta {
   display: grid;
@@ -304,6 +318,19 @@ table#comparison-table .coverage-mini.cov-low { color: var(--danger); border-col
 }
 .bench-cell.tier-c.stale::after {
   content: 'C↻';
+}
+
+/* B4: Very stale cells (>60 days) — stronger visual signal */
+.bench-cell.cell-very-stale::after {
+  content: '60d+';
+  font-size: 0.6rem;
+  vertical-align: super;
+  color: var(--warn-2, #e07320);
+  margin-left: 2px;
+  cursor: help;
+}
+.bench-cell.cell-very-stale {
+  border-color: var(--warn-2-soft, #e0732040);
 }
 
 /* Category header rows in bench grid */

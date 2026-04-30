@@ -6,7 +6,7 @@ import { State, BENCH_KEYS, BENCH_CATEGORIES } from './core.js';
 import {
   compositeScore, coverageOf, disputedCount, fmtScore, contradictionFor,
   pricingView, fmtPriceMoney, fmtPriceRange, fmtPriceCell, fmtContext,
-  fmtLastUpdated, formatBenchValue, isCellStale,
+  fmtLastUpdated, formatBenchValue, isCellStale, getCellFreshness,
 } from './data.js';
 import { gpuCompat, getActiveVram } from './gpu.js';
 import { el, cameraIconButton, docIconButton } from './dom.js';
@@ -63,8 +63,14 @@ export function buildBenchCell(model, key) {
     } else if (score != null) {
       classes.push('tier-unknown');
     }
-    // Freshness
-    if (isCellStale(model.id, key)) classes.push('stale');
+    // Freshness — stale >14d, very-stale >60d
+    if (isCellStale(model.id, key)) {
+      const freshness = getCellFreshness(model.id, key);
+      const ageDays = freshness
+        ? (Date.now() - new Date(freshness).getTime()) / 86400000
+        : 0;
+      classes.push(ageDays > 60 ? 'cell-very-stale' : 'stale');
+    }
   }
   if (weight === 0) classes.push('excluded');
   const cell = el('div', { class: classes.join(' ') });
@@ -137,15 +143,24 @@ function cardHead(model) {
 }
 
 function compositeBlock(composite, coverage, disputed) {
+  const pct = coverage != null ? Math.round(coverage * 100) : null;
+  const isLowCov = pct != null && pct < 40;
+  const valueText = fmtScore(composite, 1);
+  const valueEl = el('span', {
+    class: isLowCov ? 'value value-low-confidence' : 'value',
+    title: isLowCov ? t('ui.lowConfidenceTip') : '',
+  }, isLowCov ? `${valueText}*` : valueText);
   const score = el('div', { class: 'composite-score' },
     el('span', { class: 'label' }, t('ui.table.composite')),
-    el('span', { class: 'value' }, fmtScore(composite, 1)),
+    valueEl,
   );
-  if (coverage != null) {
-    const pct = Math.round(coverage * 100);
+  if (pct != null) {
     const covClass = `coverage cov-${pct >= 75 ? 'full' : pct >= 40 ? 'partial' : 'low'}`;
     score.appendChild(el('span', { class: covClass, title: t('ui.coverageTip') },
       `${t('ui.coverage')} ${pct}%`));
+  }
+  if (isLowCov) {
+    score.appendChild(el('span', { class: 'low-confidence-note' }, t('ui.lowConfidence')));
   }
   if (disputed > 0) {
     score.appendChild(el('span', { class: 'disputed', title: t('ui.disputedTip') },
@@ -160,6 +175,9 @@ function cardMeta(model, compat) {
 
   meta.appendChild(metaCell(t('ui.table.context'), fmtContext(model.context)));
   meta.appendChild(metaCell(t('ui.table.pricingApi'), fmtPriceCell(model)));
+  if (pview.blended != null) {
+    meta.appendChild(metaCell(t('pricing.blended'), `$${pview.blended.toFixed(2)}`));
+  }
   if (pview.range?.cacheHit) {
     meta.appendChild(metaCell(t('ui.table.cacheHit') || 'Cache hit', fmtPriceRange(pview.range.cacheHit)));
   }

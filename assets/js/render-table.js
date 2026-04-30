@@ -1,7 +1,7 @@
 // Comparison table + model list render. Columns are split into helper builders;
 // renderAll wires both surfaces together.
 
-import { State, BENCH_KEYS, TIER_ORDER, STORAGE, writeStorage } from './core.js';
+import { State, BENCH_KEYS, TIER_ORDER, STORAGE, writeStorage, readStorage } from './core.js';
 import {
   compositeScore, coverageOf, fmtScore, scoreClass, contradictionFor,
   pricingView, fmtPriceRange, fmtContext, fmtLastUpdated,
@@ -106,6 +106,32 @@ function tailColumns() {
     { key: 'priceOut', i18n: 'ui.table.priceOut', sortable: true, num: true,
       get: (m) => pricingView(m).range?.out?.[0] ?? null,
       render: (m) => fmtPriceRange(pricingView(m).range?.out) },
+    { key: 'blended', i18n: 'pricing.blended', sortable: true, num: true,
+      get: (m) => pricingView(m).blended ?? null,
+      render: (m) => {
+        const b = pricingView(m).blended;
+        if (b == null) return '—';
+        const baselineId = readStorage('aicm.pricingBaseline', 'none');
+        if (baselineId && baselineId !== 'none') {
+          const base = State.models.find(bm => bm.id === baselineId);
+          const baseBlended = base ? pricingView(base).blended : null;
+          if (baseBlended && baseBlended > 0) {
+            const ratio = b / baseBlended;
+            const ratioText = ratio.toFixed(2) + '×';
+            const frag = document.createDocumentFragment();
+            const priceSpan = document.createElement('span');
+            priceSpan.textContent = `$${b.toFixed(2)}`;
+            frag.appendChild(priceSpan);
+            const ratioSpan = document.createElement('span');
+            ratioSpan.className = `price-ratio ${ratio < 1 ? 'cheaper' : ratio > 1 ? 'pricier' : 'same'}`;
+            ratioSpan.textContent = ` ${ratioText}`;
+            ratioSpan.title = `vs ${base.name}`;
+            frag.appendChild(ratioSpan);
+            return frag;
+          }
+        }
+        return `$${b.toFixed(2)}`;
+      } },
     { key: 'vram', i18n: 'ui.table.vram', sortable: true, num: true,
       get: (m) => m.vramRequirement,
       render: (m) => m.vramRequirement != null ? `${m.vramRequirement} GB` : '—' },

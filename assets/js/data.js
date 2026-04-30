@@ -256,7 +256,14 @@ export function pricingView(model) {
     cacheHit: chs.length ? [Math.min(...chs), Math.max(...chs)] : null,
   };
   const subs = Array.isArray(p.subscription) ? p.subscription : [];
-  return { providers: api, range, subscriptions: subs };
+  // Blended: cheapest input + cheapest output combined via 3:1 input:output ratio.
+  // Represents a typical mixed workload (3 input tokens per 1 output token).
+  const minIn = range.in?.[0];
+  const minOut = range.out?.[0];
+  const blended = (minIn != null && minOut != null)
+    ? (minIn * 3 + minOut) / 4
+    : null;
+  return { providers: api, range, subscriptions: subs, blended };
 }
 
 export function fmtPriceMoney(v) {
@@ -285,6 +292,46 @@ export function fmtContext(n) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
   if (n >= 1000) return `${Math.round(n / 1000)}K`;
   return String(n);
+}
+
+// Tier-2 imputation: for a null cell, return the mean of same-tier+provider peers
+// that have a real value. Requires ≥3 peers; otherwise returns null (no guess).
+// Imputed values are never written to storage — only used in compositeScoreImputed().
+export function impute(model, key, allModels) {
+  if (model.bench?.[key] != null) return model.bench[key];
+  const peers = (allModels || []).filter(
+    m => m.id !== model.id
+      && m.tier === model.tier
+      && m.bench?.[key] != null,
+  );
+  if (peers.length < 3) return null;
+  const vals = peers.map(p => normalizeBenchScore(key, p.bench[key])).filter(v => v != null);
+  if (vals.length < 3) return null;
+  return vals.reduce((a, b) => a + b, 0) / vals.length;
+}
+
+// Composite score computed with Tier-2 imputed values for empty cells.
+// Returns { score, imputedKeys } where imputedKeys lists which bench keys
+// were imputed (so UI can show the toggle badge).
+export function compositeScoreImputed(model, weights, allModels) {
+  let coveredWeight = 0;
+  let activeWeight = 0;
+  let weightedSum = 0;
+  const imputedKeys = [];
+  for (const k of BENCH_KEYS) {
+    const w = weights[k];
+    if (!w) continue;
+    activeWeight += w;
+    const raw = model.bench?.[k] ?? impute(model, k, allModels);
+    const s = normalizeBenchScore(k, raw);
+    if (s == null || !Number.isFinite(s)) continue;
+    coveredWeight += w;
+    weightedSum += w * s;
+    if (model.bench?.[k] == null) imputedKeys.push(k);
+  }
+  if (activeWeight === 0 || coveredWeight === 0) return { score: null, imputedKeys };
+  const coverage = coveredWeight / activeWeight;
+  return { score: (weightedSum / coveredWeight) * Math.sqrt(coverage), imputedKeys };
 }
 
 export function isLocalRunnable(m) {

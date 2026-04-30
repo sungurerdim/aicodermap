@@ -9,6 +9,7 @@ export const STORAGE = {
   filters: 'acm.v1.filters',
   sort: 'acm.v1.sort',
   theme: 'acm.v1.theme',
+  pricingBaseline: 'aicm.pricingBaseline',
 };
 
 export const BENCH_KEYS = [

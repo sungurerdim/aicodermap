@@ -15,6 +15,7 @@ import {
   renderDeployStamp, populateProviderFilter,
 } from './render-controls.js';
 import { renderAll } from './render-table.js';
+import { renderPrivacyTable } from './render-privacy.js';
 import { wireEvents } from './events.js';
 import { startFreshnessWatch } from './freshness.js';
 
@@ -167,6 +168,7 @@ async function bootstrap() {
   renderWeightsEditor(renderAll);
   syncPresetSelect();
   renderAll();
+  renderPrivacyTable();
   wireEvents();
 
   // Watch for a fresh deploy by polling models.json's ETag (GitHub Pages

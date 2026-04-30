@@ -7,8 +7,10 @@ import { applyI18n, loadI18n } from './i18n.js';
 import {
   applyPreset, resetWeights, syncPresetSelect, switchTheme, syncLangToggleUi,
   renderWeightsEditor, renderDeployStamp, populateProviderFilter,
+  renderPricingBaselineDropdown,
 } from './render-controls.js';
 import { renderAll, renderTable } from './render-table.js';
+import { renderPrivacyTable } from './render-privacy.js';
 import { resolveGpuVram, updateGpuStatus, populateGpuSelect } from './gpu.js';
 import { exportElement, hideTooltip } from './overlay.js';
 
@@ -22,6 +24,7 @@ export async function switchLanguage(lang) {
   syncLangToggleUi();
   renderWeightsEditor(renderAll);
   renderAll();
+  renderPrivacyTable();
   populateGpuSelect();
   populateProviderFilter();
   syncPresetSelect();
@@ -227,6 +230,7 @@ export function wireEvents() {
   wireSearchInput();
   wireFilterControls();
   wireGpuControls();
+  renderPricingBaselineDropdown(renderAll);
   wireExports();
   wireWindowEvents();
   wireTooltipClamp();

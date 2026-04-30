@@ -82,6 +82,7 @@
   <a href="#weights" data-i18n-key="ui.section.weights">Weights Editor</a>
   <a href="#table" data-i18n-key="ui.section.table">Comparison Table</a>
   <a href="#models" data-i18n-key="ui.section.models">Model Cards</a>
+  <a href="#privacy" data-i18n-key="ui.section.privacy">Privacy</a>
   <a href="#export" data-i18n-key="ui.section.export">Export</a>
 </nav>
 
@@ -134,6 +135,14 @@
         <span data-i18n-key="ui.filter.openOnly">Open only</span>
       </label>
       <small id="gpu-status" class="muted-note inline gpu-status-line" aria-live="polite"></small>
+      <div id="pricing-baseline-wrap" class="select-row" hidden>
+        <label for="pricing-baseline"
+               data-i18n-key="pricing.baseline"
+               data-tip-key="pricing.baselineTip">Compare prices to</label>
+        <select id="pricing-baseline">
+          <option value="none" data-i18n-key="pricing.baselineNone">None (off)</option>
+        </select>
+      </div>
       <button id="filters-reset" class="btn btn-ghost btn-compact" type="button" data-i18n-key="ui.filter.reset">Reset filters</button>
     </div>
   </section>
@@ -202,6 +211,20 @@
     <div id="models-list" class="models-list" aria-live="polite">
       <p class="loading" data-i18n-key="ui.loading">Loading...</p>
     </div>
+  </section>
+
+  <section id="privacy" class="section-card" aria-labelledby="privacy-heading">
+    <header class="section-head">
+      <h2 id="privacy-heading" data-i18n-key="privacy.heading">Privacy &amp; Compliance</h2>
+    </header>
+    <p class="muted-note" data-i18n-key="privacy.subheading"></p>
+    <div class="table-scroll">
+      <table id="privacy-table" class="privacy-table">
+        <thead><tr></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="muted-note privacy-note" data-i18n-key="privacy.note"></p>
   </section>
 
   <section id="export" class="card section-card" aria-labelledby="export-heading">
