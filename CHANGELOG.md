@@ -1,4 +1,27 @@
 
+## [2026-04-30] — autonomous refresh-all [WARN: very low cumulative provenance coverage 0%] [WARN: artifact missing coverageMatrix; agent skipped self-audit] [MX2: coverage 29.4% < absolute floor 30%] [partial: code=completeness; attempted=1175 filled=170 (0.14)]
+
+### Updated
+- 47 models: `claude-haiku-4-5`, `codestral`, `deepseek-coder-v2-16b`, `deepseek-r1-14b`, `deepseek-v3-2`, `deepseek-v4-flash`, `deepseek-v4-pro`, `devstral-2`, `gemini-3-1-flash`, `gemini-3-1-pro`, `gemma-3-27b`, `gemma-4-26b-moe`, `gemma-4-31b`, `gemma-4-e2b`, `gemma-4-e4b`, `glm-5-1`, `gpt-5-4`, `gpt-5-5`, `grok-4-1-fast`, `grok-4-20`, `grok-4-3`, `kimi-k2-6`, `llama-4-maverick`, `llama-4-scout`, `mimo-v2-5`, `mimo-v2-5-pro`, `mimo-v2-flash`, `mimo-v2-pro`, `minimax-m2-5`, `minimax-m2-7`, `mistral-large-3`, `nemotron-3-super`, `opus-4-7`, `qwen-3-6-27b`, `qwen-3-6-max`, `qwen25-coder-14b`, `qwen25-coder-32b`, `qwen25-coder-7b`, `qwen3-235b`, `qwen3-32b`, `qwen3-6-35b-moe`, `qwen3-6-plus`, `qwen3-coder-30b`, `qwen3-coder-480b`, `qwen3-coder-next`, `sonnet-4-6`, `step-3-5-flash`
+
+### Resolved (auto via trustScore)
+- gpt-5-4.sweV: winner={'value': 54.6, 'trustScore': 0.7, 'sourceUrl': 'https://openai.com/index/gpt-4-1/', 'tier': 'S'} (severity=RED, Δ13.5)
+- gpt-5-5.sweV: winner={'value': 82.6, 'trustScore': 0.85, 'sourceUrl': 'https://www.vellum.ai/llm-leaderboard', 'tier': 'I'} (severity=RED, Δ6.1)
+- grok-4-20.hle: winner={'value': 24.0, 'trustScore': 0.72, 'sourceUrl': 'https://artificialanalysis.ai/models/grok-4-20', 'tier': 'I'} (severity=RED, Δ20.4)
+- qwen3-32b.sweV: winner={'value': 3.4, 'trustScore': 0.67, 'sourceUrl': 'https://labs.scale.com/leaderboard/swe_bench_pro_public', 'tier': 'I'} (severity=GREEN, Δ0)
+
+### Gaps (971 entries — see data/known-gaps.json or next refresh)
+- `gpt-5-4.lcb`: None
+- `gpt-5-4.bfcl`: None
+- `gpt-5-4.aaCoding`: None
+- `gpt-5-4.aaAgentic`: None
+- `gpt-5-4.webDevElo`: None
+- `gpt-5-4.sweMulti`: None
+- `gpt-5-4.nl2Repo`: None
+- `gpt-5-4.tbHard`: None
+- ... and 963 more
+
+
 ## [2026-04-30] — autonomous refresh-all [WARN: very low cumulative provenance coverage 27.1%] [MX2: coverage 27.1% < absolute floor 30%] [partial: gap-gen supplement: agent found 51 new fills; 0 cells auto-gapped by orchestrator; 1007 explicit agent gaps preserved]
 
 ### Updated
