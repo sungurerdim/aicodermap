@@ -1,4 +1,31 @@
 
+## [2026-04-30] — autonomous refresh-all [WARN: very low cumulative provenance coverage 27.1%] [MX2: coverage 27.1% < absolute floor 30%] [partial: gap-gen supplement: agent found 51 new fills; 0 cells auto-gapped by orchestrator; 1007 explicit agent gaps preserved]
+
+### Updated
+- 21 models: `gpt-5-4`, `gpt-5-5`, `sonnet-4-6`, `gemini-3-1-flash`, `gemma-3-27b`, `gemma-4-26b-moe`, `deepseek-v3-2`, `devstral-2`, `qwen3-32b`, `qwen3-6-35b-moe`, `qwen-3-6-27b`, `qwen-3-6-max`, `qwen25-coder-14b`, `qwen3-235b`, `glm-5-1`, `kimi-k2-6`, `step-3-5-flash`, `nemotron-3-super`, `minimax-m2-5`, `minimax-m2-7`, `mimo-v2-flash`
+
+### Resolved (auto via trustScore)
+- gpt-5-5.hle: winner={'value': 41.4, 'trustScore': 0.7, 'sourceUrl': 'https://openai.com/index/introducing-gpt-5-5/', 'tier': 'S'} (severity=RED, Δ10.8)
+- sonnet-4-6.tau2: winner={'value': 87.5, 'trustScore': 0.67, 'sourceUrl': 'https://benchlm.ai/models/sonnet-4-6', 'tier': 'I'} (severity=RED, Δ7.3)
+- deepseek-v3-2.sweV: winner={'value': 67.8, 'trustScore': 0.7, 'sourceUrl': 'https://github.com/deepseek-ai/DeepSeek-V3.2-Exp', 'tier': 'S'} (severity=GREEN, Δ2.2)
+- deepseek-v3-2.lcb: winner={'value': 74.1, 'trustScore': 0.7, 'sourceUrl': 'https://github.com/deepseek-ai/DeepSeek-V3.2-Exp', 'tier': 'S'} (severity=RED, Δ9.2)
+- deepseek-v3-2.gpqa: winner={'value': 79.9, 'trustScore': 0.7, 'sourceUrl': 'https://github.com/deepseek-ai/DeepSeek-V3.2-Exp', 'tier': 'S'} (severity=GREEN, Δ2.5)
+- deepseek-v3-2.hle: winner={'value': 19.8, 'trustScore': 0.7, 'sourceUrl': 'https://github.com/deepseek-ai/DeepSeek-V3.2-Exp', 'tier': 'S'} (severity=RED, Δ21.0)
+- kimi-k2-6.tb2: winner={'value': 66.7, 'trustScore': 0.7, 'sourceUrl': 'https://platform.moonshot.cn/docs', 'tier': 'S'} (severity=RED, Δ13.5)
+- minimax-m2-5.swePro: winner={'value': 55.4, 'trustScore': 0.7, 'sourceUrl': 'https://platform.minimaxi.com/document', 'tier': 'S'} (severity=RED, Δ18.59)
+
+### Gaps (1003 entries — see data/known-gaps.json or next refresh)
+- `gpt-5-4.webDevElo`: LMArena WebDev Arena is SPA (spa_full) — no static Elo extraction possible via search snippets
+- `gpt-5-5.webDevElo`: LMArena WebDev Arena is SPA (spa_full) — no static Elo extraction possible via search snippets
+- `opus-4-7.webDevElo`: LMArena WebDev Arena is SPA (spa_full) — no static Elo extraction possible via search snippets
+- `sonnet-4-6.webDevElo`: LMArena WebDev Arena is SPA (spa_full) — no static Elo extraction possible via search snippets
+- `claude-haiku-4-5.webDevElo`: LMArena WebDev Arena is SPA (spa_full) — no static Elo extraction possible via search snippets
+- `grok-4-20.webDevElo`: LMArena WebDev Arena is SPA (spa_full) — no static Elo extraction possible via search snippets
+- `grok-4-3.webDevElo`: LMArena WebDev Arena is SPA (spa_full) — no static Elo extraction possible via search snippets
+- `grok-4-1-fast.webDevElo`: LMArena WebDev Arena is SPA (spa_full) — no static Elo extraction possible via search snippets
+- ... and 995 more
+
+
 ## [2026-04-30] — autonomous refresh-all [WARN: very low cumulative provenance coverage 24.1%] [MX2: coverage 24.1% < absolute floor 30%]
 
 ### Updated

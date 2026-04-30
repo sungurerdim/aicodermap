@@ -143,7 +143,24 @@ for m in active:
         }
 
 # Build gaps list (preserve existing explicit gaps + add auto-gaps for missing)
-existing_gaps = list(existing_artifact.get("gaps", []))
+# Filter out agent gaps for cells already filled (existing_filled | agent_filled)
+# to prevent overlap_filled_gap in merge.py MX1 invariant check.
+already_filled = existing_filled | agent_filled
+
+
+def _gap_cell(g: dict) -> tuple[str, str] | None:
+    key = g.get("key")
+    if isinstance(key, str) and "." in key:
+        mid, _, bk = key.partition(".")
+        return (mid, bk)
+    mid = g.get("modelId")
+    bk = g.get("field")
+    return (mid, bk) if mid and bk else None
+
+
+existing_gaps = [
+    g for g in existing_artifact.get("gaps", []) if _gap_cell(g) not in already_filled
+]
 auto_gap_count = 0
 for mid, bk in sorted(missing):
     lb1 = bench_to_lb.get(bk, "")

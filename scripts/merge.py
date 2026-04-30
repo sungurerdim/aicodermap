@@ -795,7 +795,7 @@ def main():
             f"gaps={matrix.get('gapsRecorded')})"
         )
 
-    print("  coherence:  ✓ SSOT (bench keys + model ids aligned across surfaces)")
+    print("  coherence:  OK SSOT (bench keys + model ids aligned across surfaces)")
     if log["format_warnings"]:
         print(f"  format warnings: {len(log['format_warnings'])} (non-blocking)")
         for w in log["format_warnings"][:5]:

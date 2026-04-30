@@ -929,6 +929,25 @@
       "tier": "S",
       "verifications": 2,
       "trustScore": 0.47
+    },
+    {
+      "value": 66.7,
+      "source": "Moonshot Kimi K2.6 official release (Terminal-Bench 2.0)",
+      "url": "https://platform.moonshot.cn/docs",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    },
+    {
+      "value": 80.2,
+      "source": "Prior cycle (suspected data error — same value as sweV)",
+      "url": "",
+      "date": "2026-04-28",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.27,
+      "contradictionRole": "loser"
     }
   ],
   "kimi-k2-6.lcb": [
@@ -2760,6 +2779,15 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": 0.7
+    },
+    {
+      "value": 51.3,
+      "source": "MiniMax MiniMax-M2.5 official release (vendor)",
+      "url": "https://platform.minimaxi.com/document",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "mimo-v2-pro.tb2": [
@@ -2871,6 +2899,25 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": 0.7
+    },
+    {
+      "value": 67.8,
+      "source": "DeepSeek V3.2-Exp Official GitHub",
+      "url": "https://github.com/deepseek-ai/DeepSeek-V3.2-Exp",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    },
+    {
+      "value": 70.0,
+      "source": "DeepSeek V3 prior vendor docs",
+      "url": "https://api-docs.deepseek.com",
+      "date": "2026-04-28",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.47,
+      "contradictionRole": "loser"
     }
   ],
   "deepseek-v3-2.gpqa": [
@@ -2882,6 +2929,25 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": 0.7
+    },
+    {
+      "value": 79.9,
+      "source": "DeepSeek V3.2-Exp Official GitHub",
+      "url": "https://github.com/deepseek-ai/DeepSeek-V3.2-Exp",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    },
+    {
+      "value": 82.4,
+      "source": "Prior cycle vendor doc",
+      "url": "https://api-docs.deepseek.com",
+      "date": "2026-04-28",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.47,
+      "contradictionRole": "loser"
     }
   ],
   "deepseek-v3-2.hle": [
@@ -2893,6 +2959,25 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": 0.7
+    },
+    {
+      "value": 19.8,
+      "source": "DeepSeek V3.2-Exp Official GitHub",
+      "url": "https://github.com/deepseek-ai/DeepSeek-V3.2-Exp",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    },
+    {
+      "value": 40.8,
+      "source": "Prior cycle C-tier (likely cross-model error)",
+      "url": "https://deepinfra.com",
+      "date": "2026-04-28",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.27,
+      "contradictionRole": "loser"
     }
   ],
   "glm-5-1.gpqa": [
@@ -3836,6 +3921,25 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": 0.9
+    },
+    {
+      "value": 55.4,
+      "source": "MiniMax MiniMax-M2.5 official vendor release",
+      "url": "https://platform.minimaxi.com/document",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    },
+    {
+      "value": 36.81,
+      "source": "Prior cycle Scale SEAL (likely minimax-2.1 data)",
+      "url": "https://labs.scale.com/leaderboard",
+      "date": "2026-04-28",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.27,
+      "contradictionRole": "loser"
     }
   ],
   "mimo-v2-5-pro.gpqa": [
@@ -7281,6 +7385,26 @@
       "tier": "C",
       "verifications": 2,
       "trustScore": 0.27
+    },
+    {
+      "value": 41.4,
+      "source": "OpenAI GPT-5.5 launch blog",
+      "url": "https://openai.com/index/introducing-gpt-5-5/",
+      "date": "2026-04-29",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.7,
+      "contradictionRole": "winner"
+    },
+    {
+      "value": 52.2,
+      "source": "automatio.ai GPT-5.5 model page",
+      "url": "https://automatio.ai/models/gpt-5-5",
+      "date": "2026-04-30",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.27,
+      "contradictionRole": "loser"
     }
   ],
   "gpt-5-5.aaIdx": [
@@ -8547,6 +8671,15 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": 0.23
+    },
+    {
+      "value": 83.5,
+      "source": "StepFun Step-3.5-Flash model card (HF/arxiv)",
+      "url": "https://www.stepfun.com",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.47
     }
   ],
   "step-3-5-flash.hle": [
@@ -8558,6 +8691,15 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": 0.23
+    },
+    {
+      "value": 23.1,
+      "source": "StepFun Step-3.5-Flash model card (HF/arxiv)",
+      "url": "https://www.stepfun.com",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.47
     }
   ],
   "grok-4-1-fast.pricing": [
@@ -8703,6 +8845,25 @@
       "fetched": "2026-04-29",
       "trustScore": 0.55,
       "note": "backfilled — provenance reconstructed from canonical publisher"
+    },
+    {
+      "value": 74.1,
+      "source": "DeepSeek V3.2-Exp Official GitHub",
+      "url": "https://github.com/deepseek-ai/DeepSeek-V3.2-Exp",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    },
+    {
+      "value": 83.3,
+      "source": "morphllm community comparison (C-tier, likely error)",
+      "url": "https://morphllm.com",
+      "date": "2026-04-28",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.27,
+      "contradictionRole": "loser"
     }
   ],
   "deepseek-v4-flash.hle": [
@@ -9591,6 +9752,478 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": 0.333
+    }
+  ],
+  "gpt-5-4.tau2": [
+    {
+      "value": 92.8,
+      "source": "OpenAI GPT-5.5 launch blog (GPT-5.4 baseline)",
+      "url": "https://openai.com/index/introducing-gpt-5-5/",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "gpt-5-4.arcAgi2": [
+    {
+      "value": 73.3,
+      "source": "OpenAI GPT-5.5 launch blog (GPT-5.4 baseline)",
+      "url": "https://openai.com/index/introducing-gpt-5-5/",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "gpt-5-4.mmluPro": [
+    {
+      "value": 78.0,
+      "source": "TokenMix MMLU leaderboard",
+      "url": "https://tokenmix.ai/blog/mmlu-benchmark-leaderboard",
+      "date": "2026-04-30",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.27
+    }
+  ],
+  "gpt-5-4.cfElo": [
+    {
+      "value": 1484,
+      "source": "LMArena Apr-2026 report",
+      "url": "https://aidevdayindia.org/blogs/lmsys-chatbot-arena-current-rankings/gpt-5-1-high-elo-lmarena-performance.html",
+      "date": "2026-04-30",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.27
+    }
+  ],
+  "gpt-5-4.aaOmni": [
+    {
+      "value": 43,
+      "source": "Artificial Analysis GPT-5.5 article (derived: GPT-5.5=57% +14pp over GPT-5.4)",
+      "url": "https://artificialanalysis.ai/articles/openai-gpt5-5-is-the-new-leading-AI-model",
+      "date": "2026-04-30",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.67
+    }
+  ],
+  "gpt-5-5.cfElo": [
+    {
+      "value": 1488,
+      "source": "LMArena Leaderboard Changelog Apr-27-2026",
+      "url": "https://arena.ai/blog/leaderboard-changelog/",
+      "date": "2026-04-30",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.67
+    }
+  ],
+  "gpt-5-5.aaOmni": [
+    {
+      "value": 57,
+      "source": "Artificial Analysis GPT-5.5 article",
+      "url": "https://artificialanalysis.ai/articles/openai-gpt5-5-is-the-new-leading-AI-model",
+      "date": "2026-04-30",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.67
+    }
+  ],
+  "sonnet-4-6.tau2": [
+    {
+      "value": 87.5,
+      "source": "BenchLM Sonnet-4.6",
+      "url": "https://benchlm.ai/models/sonnet-4-6",
+      "date": "2026-04-30",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.67
+    },
+    {
+      "value": 94.8,
+      "source": "Anthropic system card aggregate (derived)",
+      "url": "https://www.anthropic.com/news/claude-sonnet-4-6",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.47,
+      "contradictionRole": "loser"
+    }
+  ],
+  "sonnet-4-6.mcpA": [
+    {
+      "value": 61.3,
+      "source": "Anthropic Claude Sonnet-4.6 system card",
+      "url": "https://www.anthropic.com/news/claude-sonnet-4-6",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "sonnet-4-6.sweMulti": [
+    {
+      "value": 75.9,
+      "source": "Anthropic Claude Sonnet-4.6 system card",
+      "url": "https://www.anthropic.com/news/claude-sonnet-4-6",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "sonnet-4-6.browseComp": [
+    {
+      "value": 74.0,
+      "source": "Anthropic Claude Sonnet-4.6 system card (single-agent)",
+      "url": "https://www.anthropic.com/news/claude-sonnet-4-6",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "gemini-3-1-flash.mmluPro": [
+    {
+      "value": 89.0,
+      "source": "Artificial Analysis Gemini-3.1-Flash model page",
+      "url": "https://artificialanalysis.ai/models/gemini-3-1-flash",
+      "date": "2026-04-30",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.67
+    }
+  ],
+  "gemma-3-27b.mmluPro": [
+    {
+      "value": 67.5,
+      "source": "Hugging Face Gemma 3 blog",
+      "url": "https://huggingface.co/blog/gemma3",
+      "date": "2026-04-30",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.87
+    }
+  ],
+  "gemma-4-26b-moe.mmluPro": [
+    {
+      "value": 82.6,
+      "source": "Google DeepMind Gemma 4 tech report",
+      "url": "https://deepmind.google/models/gemma/gemma-4/",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.47
+    }
+  ],
+  "deepseek-v3-2.mmluPro": [
+    {
+      "value": 85.0,
+      "source": "DeepSeek V3.2-Exp Official GitHub README",
+      "url": "https://github.com/deepseek-ai/DeepSeek-V3.2-Exp",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "deepseek-v3-2.browseComp": [
+    {
+      "value": 40.1,
+      "source": "DeepSeek V3.2-Exp Official GitHub README",
+      "url": "https://github.com/deepseek-ai/DeepSeek-V3.2-Exp",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "deepseek-v3-2.simpleQa": [
+    {
+      "value": 97.1,
+      "source": "DeepSeek V3.2-Exp Official GitHub README",
+      "url": "https://github.com/deepseek-ai/DeepSeek-V3.2-Exp",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "deepseek-v3-2.cfElo": [
+    {
+      "value": 2121,
+      "source": "DeepSeek V3.2-Exp Official GitHub README",
+      "url": "https://github.com/deepseek-ai/DeepSeek-V3.2-Exp",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "deepseek-v3-2.tb2": [
+    {
+      "value": 37.7,
+      "source": "DeepSeek V3.2-Exp Official GitHub README",
+      "url": "https://github.com/deepseek-ai/DeepSeek-V3.2-Exp",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "deepseek-v3-2.sweMulti": [
+    {
+      "value": 57.9,
+      "source": "DeepSeek V3.2-Exp Official GitHub README",
+      "url": "https://github.com/deepseek-ai/DeepSeek-V3.2-Exp",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "devstral-2.mmluPro": [
+    {
+      "value": 76.2,
+      "source": "Mistral AI Devstral 2 release blog",
+      "url": "https://mistral.ai/news/devstral-2-vibe-cli",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.47
+    }
+  ],
+  "qwen3-32b.mmluPro": [
+    {
+      "value": 65.5,
+      "source": "Qwen3 technical report (arxiv)",
+      "url": "https://arxiv.org/html/2505.09388v1",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.47
+    }
+  ],
+  "qwen3-6-35b-moe.mmluPro": [
+    {
+      "value": 85.2,
+      "source": "Qwen3.6 blog tech report",
+      "url": "https://qwenlm.github.io/blog/qwen3.6/",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.47
+    }
+  ],
+  "qwen3-6-35b-moe.tau3": [
+    {
+      "value": 67.2,
+      "source": "Qwen3.6-35B-A3B HF model card",
+      "url": "https://huggingface.co/Qwen/Qwen3.6-35B-A3B",
+      "date": "2026-04-30",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.27
+    }
+  ],
+  "qwen3-6-35b-moe.nl2Repo": [
+    {
+      "value": 29.4,
+      "source": "BenchLM Qwen3.6-35B-A3B model page",
+      "url": "https://benchlm.ai/models/qwen3.6-35b-a3b",
+      "date": "2026-04-30",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.67
+    }
+  ],
+  "qwen-3-6-27b.mmluPro": [
+    {
+      "value": 86.2,
+      "source": "Qwen3.6 blog tech report",
+      "url": "https://qwenlm.github.io/blog/qwen3.6/",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.47
+    }
+  ],
+  "qwen-3-6-27b.nl2Repo": [
+    {
+      "value": 36.2,
+      "source": "BenchLM Qwen3.6-27B model page",
+      "url": "https://benchlm.ai/models/qwen3.6-27b",
+      "date": "2026-04-30",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.67
+    }
+  ],
+  "qwen-3-6-max.simpleQa": [
+    {
+      "value": 52.0,
+      "source": "Qwen3.6-Max-Preview blog release",
+      "url": "https://qwenlm.github.io/blog/qwen3.6/",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.47
+    }
+  ],
+  "qwen-3-6-max.nl2Repo": [
+    {
+      "value": 42.9,
+      "source": "BenchLM Qwen3.6-Max model page",
+      "url": "https://benchlm.ai/models/qwen3.6-max",
+      "date": "2026-04-30",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.67
+    }
+  ],
+  "qwen25-coder-14b.lcb": [
+    {
+      "value": 37.6,
+      "source": "Qwen2.5-Coder family blog",
+      "url": "https://qwenlm.github.io/blog/qwen2.5-coder-family/",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.47
+    }
+  ],
+  "qwen3-235b.sweV": [
+    {
+      "value": 34.4,
+      "source": "Kimi K2.6 technical comparison paper (HF)",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2.6",
+      "date": "2026-04-30",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.27
+    }
+  ],
+  "glm-5-1.nl2Repo": [
+    {
+      "value": 42.7,
+      "source": "ZAI GLM-5.1 official release announcement",
+      "url": "https://docs.z.ai/api-reference",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.47
+    }
+  ],
+  "kimi-k2-6.browseComp": [
+    {
+      "value": 83.2,
+      "source": "Moonshot Kimi K2.6 official announcement",
+      "url": "https://platform.moonshot.cn/docs",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "kimi-k2-6.mcpA": [
+    {
+      "value": 66.6,
+      "source": "BuildFastWithAI Kimi K2.6 review",
+      "url": "https://www.buildfastwithai.com/blogs/kimi-k2-6-review",
+      "date": "2026-04-30",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.27
+    }
+  ],
+  "kimi-k2-6.mmluPro": [
+    {
+      "value": 84.6,
+      "source": "BenchLM Kimi K2.6 model page",
+      "url": "https://benchlm.ai/models/kimi-k2-6",
+      "date": "2026-04-30",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.27
+    }
+  ],
+  "kimi-k2-6.simpleQa": [
+    {
+      "value": 43,
+      "source": "BenchLM Kimi K2.6 model page",
+      "url": "https://benchlm.ai/models/kimi-k2-6",
+      "date": "2026-04-30",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.27
+    }
+  ],
+  "step-3-5-flash.mmluPro": [
+    {
+      "value": 84.4,
+      "source": "StepFun Step-3.5-Flash model card (HF/arxiv)",
+      "url": "https://www.stepfun.com",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.47
+    }
+  ],
+  "nemotron-3-super.mmluPro": [
+    {
+      "value": 83.7,
+      "source": "NVIDIA Nemotron-3 Super tech report/comparison",
+      "url": "https://build.nvidia.com",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.47
+    }
+  ],
+  "nemotron-3-super.tbHard": [
+    {
+      "value": 29,
+      "source": "Artificial Analysis Nemotron-3-Super article",
+      "url": "https://artificialanalysis.ai/models/nemotron-3-super",
+      "date": "2026-04-30",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.67
+    }
+  ],
+  "minimax-m2-5.browseComp": [
+    {
+      "value": 76.3,
+      "source": "MiniMax MiniMax-M2.5 official release (vendor)",
+      "url": "https://platform.minimaxi.com/document",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
+    }
+  ],
+  "minimax-m2-7.tau2": [
+    {
+      "value": 84.8,
+      "source": "BenchLM MiniMax-M2.7 comparison",
+      "url": "https://benchlm.ai/models/minimax-m2-7",
+      "date": "2026-04-30",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.27
+    }
+  ],
+  "mimo-v2-flash.browseComp": [
+    {
+      "value": 45.4,
+      "source": "Xiaomi MiMo-V2 tech report (arxiv 2601.02780)",
+      "url": "https://arxiv.org/abs/2601.02780",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.47
     }
   ]
 }
