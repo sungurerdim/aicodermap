@@ -1,0 +1,230 @@
+{
+  "generatedAt": "2026-04-30",
+  "keys": [
+    {
+      "benchKey": "swe",
+      "status": "live",
+      "lastEntryDate": "2026-04",
+      "has2025_2026Entries": true,
+      "leaderboardURL": "https://www.swebench.com/verified.html",
+      "replacedBy": null,
+      "notes": "Actively updated; 43+ models as of Apr 2026. Gold standard for agentic coding. Also tracked at epoch.ai, llm-stats.com, swe-rebench.com. SWE-bench-Live variant also active."
+    },
+    {
+      "benchKey": "aaCoding",
+      "status": "live",
+      "lastEntryDate": "2026-04",
+      "has2025_2026Entries": true,
+      "leaderboardURL": "https://aider.chat/docs/leaderboards/",
+      "replacedBy": null,
+      "notes": "Actively updated; 22+ models Apr 2026. Old edit-format leaderboard replaced by polyglot leaderboard. GPT-5 (high) at 88%, Claude Opus 4.5 at 89.4%."
+    },
+    {
+      "benchKey": "humaneval",
+      "status": "stale",
+      "lastEntryDate": "2026-04",
+      "has2025_2026Entries": true,
+      "leaderboardURL": "https://evalplus.github.io/leaderboard.html",
+      "replacedBy": "bigCodeBench",
+      "notes": "Still tracked (75+ models, avg 89.7%) but saturated — frontier models 95-97%+. Scores compress; limited signal at top. EvalPlus (HumanEval+) more rigorous. BigCodeBench is the recommended successor."
+    },
+    {
+      "benchKey": "mbpp",
+      "status": "stale",
+      "lastEntryDate": "2026-03",
+      "has2025_2026Entries": true,
+      "leaderboardURL": "https://evalplus.github.io/leaderboard.html",
+      "replacedBy": null,
+      "notes": "Papers with Code shut down Jul 2025. MBPP+ (EvalPlus) actively tracked. Base MBPP saturating for frontier models. CodeSOTA and llm-stats.com maintain active trackers."
+    },
+    {
+      "benchKey": "liveCodeBench",
+      "status": "live",
+      "lastEntryDate": "2026-04",
+      "has2025_2026Entries": true,
+      "leaderboardURL": "https://livecodebench.github.io/leaderboard.html",
+      "replacedBy": null,
+      "notes": "Highly active; continuously adds fresh contest problems (LeetCode/AtCoder/Codeforces). Release v6 covers to Apr 2025; 71+ models tracked. Best contamination-free coding signal available."
+    },
+    {
+      "benchKey": "bigCodeBench",
+      "status": "live",
+      "lastEntryDate": "2026-04",
+      "has2025_2026Entries": true,
+      "leaderboardURL": "https://bigcode-bench.github.io/",
+      "replacedBy": null,
+      "notes": "ICLR 2025 paper; Hugging Face leaderboard updated ~Apr 2026. 1140 tasks, 139 libraries. BigCodeBench-Hard subset added Jul 2024. Email-submission model slows additions but tracker is live."
+    },
+    {
+      "benchKey": "nl2Repo",
+      "status": "live",
+      "lastEntryDate": "2026-04",
+      "has2025_2026Entries": true,
+      "leaderboardURL": "https://benchlm.ai/benchmarks/nl2Repo",
+      "replacedBy": null,
+      "notes": "New benchmark; paper submitted Dec 2025. 6 models evaluated as of Apr 24 2026. Excluded from weighted scoring on BenchLM but displayed for reference. Repo-level generation benchmark."
+    },
+    {
+      "benchKey": "tau",
+      "status": "live",
+      "lastEntryDate": "2026-04",
+      "has2025_2026Entries": true,
+      "leaderboardURL": "https://taubench.com/",
+      "replacedBy": null,
+      "notes": "Active; evolved to tau2-bench (telecom domain, Dec-POMDP). 30 models on tau2 leaderboard. Voice full-duplex added. Original tau-bench still referenced; taubench.com is canonical."
+    },
+    {
+      "benchKey": "mlLiveBench",
+      "status": "live",
+      "lastEntryDate": "2026-04",
+      "has2025_2026Entries": true,
+      "leaderboardURL": "https://livebench.ai/",
+      "replacedBy": null,
+      "notes": "Actively updated monthly with fresh questions from arXiv, news, IMDb. 18 tasks across 6 categories. Latest release 2025-04-25. ICLR 2025 Spotlight. Strong contamination-free general benchmark."
+    },
+    {
+      "benchKey": "mmlu",
+      "status": "stale",
+      "lastEntryDate": "2026-04",
+      "has2025_2026Entries": true,
+      "leaderboardURL": "https://llm-stats.com/benchmarks/mmlu",
+      "replacedBy": "mmlu-pro",
+      "notes": "Saturated for frontier models (88-93%+). Tracked but no longer differentiates top models. MMLU-Pro is the active successor. Still useful for smaller/mid-tier model evaluation."
+    },
+    {
+      "benchKey": "gpqaDiamond",
+      "status": "live",
+      "lastEntryDate": "2026-04",
+      "has2025_2026Entries": true,
+      "leaderboardURL": "https://artificialanalysis.ai/evaluations/gpqa-diamond",
+      "replacedBy": null,
+      "notes": "263 models tracked; top models 91-94%. Approaching saturation at frontier but still best expert-science discriminator. PhD baseline is 69.7%. Tracked by Artificial Analysis and Epoch AI."
+    },
+    {
+      "benchKey": "mathBench",
+      "status": "stale",
+      "lastEntryDate": "2026-04",
+      "has2025_2026Entries": true,
+      "leaderboardURL": "https://benchlm.ai/math",
+      "replacedBy": "aime",
+      "notes": "MATH-500 nearly saturated (97-99% frontier). Retained on some leaderboards for reference but not primary signal. AIME 2025/2026 and BRUMO now preferred. FrontierMath (Epoch AI) is emerging harder alternative."
+    },
+    {
+      "benchKey": "aime",
+      "status": "live",
+      "lastEntryDate": "2026-04",
+      "has2025_2026Entries": true,
+      "leaderboardURL": "https://llm-stats.com/benchmarks/aime-2026",
+      "replacedBy": null,
+      "notes": "AIME 2025 saturated (98%+ top-5). AIME 2026 now the active version (12 models, Kimi K2.6 leads at 96.4%). MathArena tracks live competition results. Yearly refresh avoids contamination."
+    },
+    {
+      "benchKey": "agiEval",
+      "status": "stale",
+      "lastEntryDate": "2025-12",
+      "has2025_2026Entries": true,
+      "leaderboardURL": "https://llm-stats.com/benchmarks/agieval",
+      "replacedBy": null,
+      "notes": "10 models tracked; still cited in 2025-2026 but no active official leaderboard updates. GitHub repo (microsoft/AGIEval) not receiving new submissions. Referenced as baseline rather than primary eval."
+    },
+    {
+      "benchKey": "bbhBench",
+      "status": "stale",
+      "lastEntryDate": "2026-04",
+      "has2025_2026Entries": true,
+      "leaderboardURL": "https://llm-stats.com/benchmarks/big-bench-hard",
+      "replacedBy": "bbeh",
+      "notes": "116 models tracked but saturating (frontier ~94%). BIG-Bench Extra Hard (BBEH) released Feb 2025 as successor — frontier models avg only 9.8% on BBEH. BBH still reported but no longer primary signal."
+    },
+    {
+      "benchKey": "hellaswag",
+      "status": "dead",
+      "lastEntryDate": "2024-11",
+      "has2025_2026Entries": false,
+      "leaderboardURL": "https://llm-stats.com/benchmarks/hellaswag",
+      "replacedBy": null,
+      "notes": "Official test leaderboard submissions closed Nov 2024. Saturated at 95%+ for frontier models. Validity issues: 36% errors in validation set, 40% ungrammatical prompts. Stale for all practical purposes."
+    },
+    {
+      "benchKey": "truthfulQa",
+      "status": "stale",
+      "lastEntryDate": "2025-12",
+      "has2025_2026Entries": true,
+      "leaderboardURL": "https://llm-stats.com/benchmarks/truthfulqa",
+      "replacedBy": null,
+      "notes": "17 models tracked, all self-reported. Stanford HELM leaderboard deprecated. Not widely used for frontier comparisons. Phi-3.5-MoE leads at 77.5%. Still cited for truthfulness/hallucination analysis."
+    },
+    {
+      "benchKey": "winogrande",
+      "status": "dead",
+      "lastEntryDate": "2024-06",
+      "has2025_2026Entries": false,
+      "leaderboardURL": "https://leaderboard.allenai.org/winogrande/submissions/public",
+      "replacedBy": null,
+      "notes": "Dropped from HuggingFace Open LLM Leaderboard V2 due to saturation and contamination concerns. 21 models tracked, all self-reported, no 2025-2026 verified entries. Community moved to V2 benchmarks."
+    },
+    {
+      "benchKey": "arc",
+      "status": "stale",
+      "lastEntryDate": "2026-04",
+      "has2025_2026Entries": true,
+      "leaderboardURL": "https://llm-stats.com/benchmarks/arc-c",
+      "replacedBy": "arc-agi",
+      "notes": "ARC Challenge (science QA) has GPT-5 at 96.3% — approaching saturation. ARC-AGI-2/3 (abstract reasoning) is the live successor with active 2026 competition. The science-QA 'arc' key is nearly saturated."
+    },
+    {
+      "benchKey": "drop",
+      "status": "stale",
+      "lastEntryDate": "2025-07",
+      "has2025_2026Entries": false,
+      "leaderboardURL": "https://llm-stats.com/benchmarks/drop",
+      "replacedBy": null,
+      "notes": "Papers with Code (primary tracker) shut down Jul 2025. 29 models on llm-stats.com but minimal 2026 activity. Removed from HuggingFace Open LLM Leaderboard V2. Effectively stale."
+    },
+    {
+      "benchKey": "gsm8k",
+      "status": "stale",
+      "lastEntryDate": "2026-04",
+      "has2025_2026Entries": true,
+      "leaderboardURL": "https://llm-stats.com/benchmarks/gsm8k",
+      "replacedBy": "aime",
+      "notes": "Completely saturated for frontier models (GPT-5.3 at 99%). 47-53 models tracked. Still useful for smaller/fine-tuned models. Contamination concerns documented (13% score inflation). AIME 2025/2026 replaced it as math signal."
+    },
+    {
+      "benchKey": "humanevallp",
+      "status": "stale",
+      "lastEntryDate": "2025-06",
+      "has2025_2026Entries": false,
+      "leaderboardURL": "https://llm-stats.com/benchmarks/multipl-e-humaneval",
+      "replacedBy": null,
+      "notes": "The key 'humanevallp' likely refers to HumanEval language pack / MultiPL-E or mHumanEval. MultiPL-E tracks only 3 models on llm-stats. Superseded by BigCodeBench and LiveCodeBench for multilingual coding eval."
+    },
+    {
+      "benchKey": "mtBench",
+      "status": "stale",
+      "lastEntryDate": "2024-09",
+      "has2025_2026Entries": false,
+      "leaderboardURL": "https://llm-stats.com/benchmarks/mt-bench",
+      "replacedBy": "arenaElo",
+      "notes": "Static 80-question benchmark. At 95% CI, agreement with human preference drops to 22.6%. Replaced by Arena-Hard (500 curated questions, 98.6% human preference correlation, 3x better model separation)."
+    },
+    {
+      "benchKey": "arenaElo",
+      "status": "live",
+      "lastEntryDate": "2026-04",
+      "has2025_2026Entries": true,
+      "leaderboardURL": "https://huggingface.co/spaces/lmarena-ai/arena-leaderboard",
+      "replacedBy": null,
+      "notes": "Highly active; rebranded from LMSYS Chatbot Arena to 'Arena' (Arena Intelligence Inc.) Jan 2026. 323 models, 5.4M+ votes. Separate coding leaderboard. Claude Opus 4.6 leads at 1504 Elo."
+    },
+    {
+      "benchKey": "codexglue",
+      "status": "dead",
+      "lastEntryDate": "2023-01",
+      "has2025_2026Entries": false,
+      "leaderboardURL": "https://microsoft.github.io/CodeXGLUE/",
+      "replacedBy": "bigCodeBench",
+      "notes": "Last GitHub activity Jan 2023. Submission via email (codexglue@microsoft.com) with no 2025-2026 entries found. Community shifted to SWE-bench, LiveCodeBench, BigCodeBench. Effectively dead."
+    }
+  ]
+}
