@@ -58,6 +58,21 @@ def main() -> int:
         return 2
 
     errors = validate(artifact, schema)
+
+    # F3: reject flat bench keys (e.g. updates["bench.swePro"] instead of updates.bench.swePro)
+    flat_key_errors: list[str] = []
+    for model_entry in artifact.get("models") or []:
+        updates = model_entry.get("updates") or {}
+        flat_bench = [k for k in updates if k.startswith("bench.")]
+        if flat_bench:
+            mid = model_entry.get("id") or "?"
+            flat_key_errors.append(
+                f"model {mid}: flat bench keys in updates (must use nested bench object): "
+                + ", ".join(flat_bench[:5])
+            )
+    if flat_key_errors:
+        errors = (errors or []) + [f"FLAT_BENCH_KEY: {e}" for e in flat_key_errors]
+
     if errors:
         print(f"✗ Agent output INVALID — {len(errors)} error(s):", file=sys.stderr)
         for e in errors[:20]:

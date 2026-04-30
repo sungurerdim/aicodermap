@@ -268,9 +268,17 @@ fills or all paths are exhausted:
    `postUrlPattern` with slug variations.
 2. **WEBSEARCH_PRIMARY_DISCIPLINE** (≥2 queries per cell, vendor-specific
    phrasing variants for the third query when the first two are empty).
-3. **INTERNAL_RETRY_DISCIPLINE** — format-driven cascade through the
-   entry's `fallbacks[]` chain (aggregator mirrors, image-OCR via
-   `scripts/extract-images.py`, etc.).
+3. **INTERNAL_RETRY_DISCIPLINE** — format-driven cascade per `FORMAT_DISPATCH`
+   protocol (see below). **F7 dispatch rule:** read `entry.format` before
+   any fetch:
+   - `spa_full` or `image_embedded` → **skip WebFetch entirely**; go
+     directly to aggregator-mirror cascade or `websearch_snippet`.
+   - `bot_blocked` → skip primary, use `websearch_snippet`.
+   - `static_html_table` or `static_html_article` → WebFetch first.
+   - `github_raw_json` / `github_raw_markdown` → raw.githubusercontent.com
+     GET first.
+   Never issue a WebFetch to a `spa_full`-classified URL; the rendered DOM
+   returns no extractable text and burns fetch budget.
 4. **In-cycle source promotion** (TRUSTED_SOURCE_WHITELIST rule 6) — for
    any URL surfaced by WebSearch in step 2 that is NOT in the whitelist
    but appears to carry the missing pair: WebFetch it THIS cycle under
@@ -279,11 +287,26 @@ fills or all paths are exhausted:
    the next cycle inherits the source without rediscovery. **Newly
    discovered sources are usable immediately, not deferred.**
 
-A cell may remain null only after every step above has been attempted, and
-ONLY with a `gaps[]` entry carrying
-`{key, reason, triedFormats[], triedPatterns[], triedSources[], triedQueries[]}`.
+A cell may remain null only after every step above has been attempted. Before
+emitting any remaining null cell, apply the **notApplicableRules cascade (F4)**:
+
+```
+for each (modelId, benchKey) cell still null after steps 1-4:
+  for rule in sourcesWhitelist._schema.notApplicableRules.rules[]:
+    if rule.benchKeys contains benchKey AND rule.modelFilter matches modelId:
+      emit models[].notApplicable[] entry:
+        { benchKey, ruleId: rule.id, reason: rule.reason }
+      skip to next cell
+  # No rule matched — this is a genuine data gap
+  emit gaps[] entry:
+    { key: benchKey, reason, triedFormats[], triedPatterns[],
+      triedSources[], triedQueries[] }
+```
+
 **Silent omission of a null cell is a contract violation.** The
 PRE_EMIT_SELF_AUDIT step (below) blocks final emission when this happens.
+Every null cell MUST produce either a `notApplicable[]` entry (rule matched)
+or a `gaps[]` entry (no rule matched, genuine gap).
 
 ## EXTRACTION_DISCIPLINE (named-pattern dispatch, three-pass discipline)
 
@@ -1358,7 +1381,24 @@ the combined agent output + gap-gen supplement, not the agent alone.
 
 ## PARTIAL_RETURN_PROTOCOL
 
-When `PRE_EMIT_SELF_AUDIT` runs:
+**Threshold gate (F6):** Before emitting `partialReturn: true`, compute:
+
+```
+ratio = cellsAttemptedThisCycle / batchExpectedCells
+```
+
+- If `ratio < 0.30` AND wallclock < 8 minutes → **do NOT emit yet**.
+  Continue Phase 3 until ratio ≥ 0.30 OR wallclock ≥ 8 min OR
+  at least 50 new cells were attempted.
+- If `ratio < 0.30` AND (wallclock ≥ 8 min OR cellsAttempted ≥ 50):
+  Emit with structured `partialReason`:
+  ```json
+  { "code": "wallclock|completeness|fetch_quota|spa_dead",
+    "cellsAttempted": <n>, "cellsFilled": <n>,
+    "topBlockingSources": ["<url>", ...] }
+  ```
+
+When `PRE_EMIT_SELF_AUDIT` runs and the threshold is met:
 1. Compute `coverageMatrix` for cells attempted this cycle only.
 2. Set `partialReturn: true` in the artifact.
 3. For each cell the agent attempted but could not fill:

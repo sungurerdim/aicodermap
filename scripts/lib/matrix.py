@@ -87,6 +87,8 @@ def priority_cells(
     active: list[dict[str, Any]],
     core_keys: list[str],
     limit: int = 200,
+    verification_map: dict[str, Any] | None = None,
+    skip_confirmed_within_days: int = 14,
 ) -> list[dict[str, Any]]:
     """Top-N most starved (modelId, benchKey) cells the agent should hit FIRST.
 
@@ -95,8 +97,16 @@ def priority_cells(
       2. cells in models with fewer total filled hits → starve-the-model bias
       3. lex order on (modelId, benchKey) for deterministic tie-break
 
-    Returns: [{modelId, benchKey, benchFillRatio, modelFillRatio}], capped at limit.
+    F2 skip-cache: cells confirmed by ≥2 sources in the last
+    `skip_confirmed_within_days` days are excluded from the priority queue.
+    Pass `verification_map` (the `.aicodermap-verification-map.json` cells dict)
+    to activate this behaviour; omit to retain UNCAPPED behaviour.
+
+    Returns: [{modelId, benchKey, benchFillRatio, modelFillRatio, skipped?}], capped at limit.
     """
+    import datetime as _dt
+
+    today = _dt.date.today()
     keys = list(core_keys)
     na = na_cells(active, keys)
     bench_filled = {k: 0 for k in keys}
@@ -107,6 +117,11 @@ def priority_cells(
             if v is not None:
                 bench_filled[k] += 1
                 model_filled[m["id"]] += 1
+
+    vm_cells: dict[str, Any] = {}
+    if verification_map and isinstance(verification_map, dict):
+        vm_cells = verification_map.get("cells") or {}
+
     candidates: list[tuple[float, float, str, str]] = []
     n_models = max(len(active), 1)
     for m in active:
@@ -116,6 +131,19 @@ def priority_cells(
             v = (m.get("bench") or {}).get(k)
             if v is not None:
                 continue
+            # F2: skip cells recently confirmed by ≥2 independent sources
+            if vm_cells:
+                cell_key = f"{m['id']}.{k}"
+                vm_entry = vm_cells.get(cell_key) or {}
+                if vm_entry.get("confirmed"):
+                    last_checked = vm_entry.get("lastChecked") or ""
+                    try:
+                        checked_date = _dt.date.fromisoformat(last_checked[:10])
+                        age_days = (today - checked_date).days
+                        if age_days < skip_confirmed_within_days:
+                            continue  # skip — recently confirmed, not yet stale
+                    except (ValueError, TypeError):
+                        pass  # malformed date → include cell (safe fallback)
             bench_ratio = bench_filled[k] / n_models
             model_ratio = model_filled[m["id"]] / max(len(keys), 1)
             candidates.append((bench_ratio, model_ratio, m["id"], k))
@@ -131,6 +159,49 @@ def priority_cells(
             }
         )
     return out
+
+
+# Provider families used by family_batches() for fan-out dispatch.
+_FAMILY_PROVIDER_MAP: dict[str, int] = {
+    # Bucket 0 — OpenAI
+    "openai": 0,
+    # Bucket 1 — Anthropic
+    "anthropic": 1,
+    # Bucket 2 — xAI
+    "xai": 2,
+    # Bucket 3 — Google / Mistral / DeepSeek / Qwen / Alibaba
+    "google": 3,
+    "mistral": 3,
+    "deepseek": 3,
+    "qwen": 3,
+    "alibaba": 3,
+    # Bucket 4 — all others (Meta, NVIDIA, MiniMax, MiMo, StepFun, Kimi, etc.)
+}
+
+
+def family_batches(
+    active: list[dict[str, Any]],
+    n: int = 5,
+) -> list[list[dict[str, Any]]]:
+    """Partition active models into n provider-family buckets for parallel fan-out.
+
+    F1 reform: rather than one agent surveying all ~50+ models, the skill
+    dispatches n parallel sub-agents each responsible for one batch. This
+    shrinks idea_context per agent (fewer models → smaller matrixState /
+    priorityCells) and allows each agent's fetch budget to focus on its slice.
+
+    Bucket assignment: provider field lowercased → _FAMILY_PROVIDER_MAP →
+    default bucket (n-1) for unknowns. Buckets balanced round-robin when a
+    provider maps to a bucket that is already the largest.
+
+    Returns: list of n lists of model dicts (empty lists possible when n > active).
+    """
+    buckets: list[list[dict[str, Any]]] = [[] for _ in range(n)]
+    for m in active:
+        prov = (m.get("provider") or "").lower().replace(" ", "")
+        bucket_idx = _FAMILY_PROVIDER_MAP.get(prov, n - 1)
+        buckets[bucket_idx].append(m)
+    return buckets
 
 
 def matrix_snapshot(

@@ -64,7 +64,17 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
      last_refresh: <max(lastUpdated) from data/models.json>,
      currentIds: [<every id in data/models.json, including status='deprecated'>],
      familyGrouping: <models grouped by (provider, tier) for parallel batches>,
-     sourcesWhitelist: <inline data/sources-whitelist.json>,
+     // F5 REFORM (2026-04-30): Send FILTERED whitelist, not the full 100KB blob.
+     // Per-batch filtering: only vendor entries relevant to this batch's providers.
+     // _schema, leaderboards[], aggregators[], local[], registries[] sent in full
+     // (shared across all batches — bench keys, format taxonomy, contracts live here).
+     // Typical reduction: 30-50KB → 10-15KB per batch agent context.
+     sourcesWhitelist: filtered_for_batch_vendors(
+       data/sources-whitelist.json,
+       batch_provider_set,  // set of provider names for this batch
+       // Keep: vendors matching batch_provider_set, _schema, leaderboards, aggregators, local, registries
+       // Drop: vendor entries for other families (they have their own batch)
+     ),
      verificationMap: <inline .aicodermap-verification-map.json (or {} on first run)>,
      lineup: <Step 0 result>,
 
@@ -97,32 +107,58 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
    - `data/sources-whitelist.json` is SSOT for "what URLs the agent is allowed to fetch" AND for the bench-key universe (`_schema.coreBenchKeys`). Frontend `BENCH_KEYS` (assets/js/core.js), i18n `benchmarks.*`, and the data-file `bench` cells all mirror this canonical set. `scripts/audit-data-coherence.py` enforces the mirroring by failing loudly on any drift.
    - No skip registry: every (modelId, benchKey) pair is re-attempted every cycle so vendor opt-outs that close are surfaced immediately
    - The agent file (.claude/agents/aicodermap-research-agent.md) only carries PROCEDURE (how) — every list of URLs, vendors, or model IDs lives in data files
-4. Agent({
-     subagent_type: "aicodermap-research-agent",
-     model: "sonnet",
-     prompt: structured(
-       scope, query, idea_context, target_model_ids?,
-       include_unsloth: true,
-       trusted_sources_only: true,           // per FETCH_WHITELIST
-       // UNCAPPED + UNCACHED doctrine — no fetch/wallclock caps, no
-       // confirmed-cell skip. Agent terminates ONLY on
-       // COMPLETENESS_TERMINATION (every source walked, every cell re-fetched,
-       // every gap documented). See SKILL.md CONSTANTS.
-       parallel_sources: 5,                  // parallelism (not a cap)
-       parallel_models: 5,                   // parallelism (not a cap)
-       verification_map_path: ".aicodermap-verification-map.json",  // audit log only
-       trust_score_required: true,           // every value carries a trustScore
-       termination: "completeness",          // explicit: not "wallclock", not "fetch_budget"
-       require_lineup_populated: true,       // Step 0 lineup MUST be non-empty (orchestrator retries if not)
-       require_health_checks: true,          // runtime.healthChecks MUST cover ≥3 leaderboard domains
+// F1 REFORM (2026-04-30): Multi-Agent Fan-Out — 5 parallel sub-agents, one per provider family.
+   // Each batch receives only its slice of models → smaller idea_context → better per-cell coverage.
+   //
+   // batches = scripts/lib/matrix.py family_batches(active_models, n=5)
+   //   Bucket 0: OpenAI family
+   //   Bucket 1: Anthropic family
+   //   Bucket 2: xAI family
+   //   Bucket 3: Google + Mistral + DeepSeek + Qwen/Alibaba
+   //   Bucket 4: all others (Meta, NVIDIA, MiniMax, MiMo, StepFun, Kimi, etc.)
+   //
+   // Dispatch each bucket as a SEPARATE Agent({...}) call (parallel single message).
+   // Each sub-agent receives:
+   //   - target_model_ids: ids for its bucket only
+   //   - filtered idea_context (F5: only relevant vendor entries, see Step 3)
+   //   - full leaderboards[] and coreBenchKeys (shared across all buckets)
+   //   - priorityCells filtered to its bucket's models
+   //
+   // merge_artifacts(results): orchestrator collects all 5 agent outputs, merges
+   // via the same gap-gen + merge.py pipeline. Each sub-agent artifact is written to
+   // .aicodermap-agent-out-<bucket>.json; gap-gen then assembles a unified artifact.
+   //
+   // Partial-return gate (F6): orchestrator validates EACH sub-agent's artifact:
+   //   if artifact.partialReason.cellsAttempted / batch_expected_cells < 0.30
+   //     AND wallclock < 8min: SendMessage to same agent to continue.
+   //
+   // Token cost: ~5× vs single agent. Justified: manual fill cost is far larger.
 
-       // Matrix-aware enforcement (C plan reform — 2026-04-29):
-       expected_total: idea_context.matrixState.expectedTotal,
-       priority_queue_size: |idea_context.priorityCells|,
-       require_priority_first: true,         // Phase 2/3 MUST start with priorityCells before any other empty cell
-       require_full_matrix: true             // every (active_modelId, coreBenchKey) cell MUST end as fill | gap | notApplicable; partial returns will be re-dispatched via COMPLETENESS_GATE
-     )
-   })
+   results = parallel([
+     Agent({
+       subagent_type: "aicodermap-research-agent", model: "sonnet",
+       prompt: structured(
+         scope, query,
+         idea_context: filtered_for_bucket(idea_context, batch_i),  // F5
+         target_model_ids: batch_i.map(m => m.id),
+         include_unsloth: true,
+         trusted_sources_only: true,
+         parallel_sources: 5,
+         parallel_models: 5,
+         verification_map_path: ".aicodermap-verification-map.json",
+         trust_score_required: true,
+         termination: "completeness",
+         require_lineup_populated: true,
+         require_health_checks: (batch_i == 0),  // only first batch runs health check
+         expected_total: batch_expected_cells,
+         priority_queue_size: |batch_priority_cells|,
+         require_priority_first: true,
+         require_full_matrix: true
+       )
+     })
+     for batch_i in family_batches(active_models, 5)
+   ])
+   artifact = merge_artifacts(results)
 
    **Prompt header MUST surface (verbatim, not paraphrased):**
    ```
@@ -145,6 +181,28 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
      - silent omission triggers MX1 rollback in merge.py
    ```
 5. Parse return → validate JSON schema (strip surrounding whitespace, locate first `{` and last `}` if narration leaked)
+
+5-F6. PARTIAL_RETURN_GATE (F6 reform — 2026-04-30):
+    For each sub-agent artifact:
+    ```
+    partial_reason = artifact.partialReason  // may be string or structured object
+    cells_attempted = partial_reason?.cellsAttempted if isinstance(dict) else null
+    batch_expected = len(batch_i) * len(coreBenchKeys)  // na cells not yet subtracted (conservative)
+
+    completeness_ratio = cells_attempted / batch_expected if cells_attempted else null
+
+    if completeness_ratio != null and completeness_ratio < 0.30:
+        if wallclock < 480s and completeness_ratio > 0:
+            // Agent stopped too early — SendMessage to SAME agent to continue
+            SendMessage(agent_id, "Continue from where you stopped. You attempted " +
+              cells_attempted + "/" + batch_expected + " cells (" + round(completeness_ratio*100) +
+              "%). Process the remaining cells before emitting final JSON.")
+            // Wait for second return; if still < 0.30 → log CHANGELOG warn, CONTINUE (no halt)
+        else:
+            // Wallclock exceeded or zero cells attempted → log warn, CONTINUE
+            log("⚠ sub-agent batch " + bucket + " completeness " + completeness_ratio + " < 0.30 threshold")
+    ```
+    This ensures agents cannot cheaply exit after surveying only 8/882 cells.
 
 5a. MATRIX_SNAPSHOT (P7 reform):
     Before consuming the artifact, snapshot the pre-merge state of

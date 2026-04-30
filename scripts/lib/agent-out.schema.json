@@ -9,7 +9,23 @@
     "cycleDate": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
     "generatedAt": { "type": "string" },
     "partialReturn": { "type": "boolean" },
-    "partialReason": { "type": "string" },
+    "partialReason": {
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "enum": ["completeness", "wallclock", "fetch_quota", "spa_dead"]
+            },
+            "cellsAttempted": { "type": "integer", "minimum": 0 },
+            "cellsFilled": { "type": "integer", "minimum": 0 },
+            "topBlockingSources": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      ]
+    },
     "models": {
       "type": "array",
       "items": {
@@ -19,7 +35,22 @@
         "properties": {
           "id":              { "type": "string", "minLength": 1 },
           "modelId":         { "type": "string" },
-          "updates":         { "type": "object" },
+          "updates": {
+            "type": "object",
+            "not": {
+              "anyOf": [
+                { "required": ["bench.swePro"] },
+                { "required": ["bench.sweV"] },
+                { "required": ["bench.lcb"] },
+                { "required": ["bench.tb2"] },
+                { "required": ["bench.tau2"] },
+                { "required": ["bench.gpqa"] }
+              ]
+            },
+            "properties": {
+              "bench": { "type": ["object", "null"] }
+            }
+          },
           "sourcesAdded":    { "type": "array" },
           "notApplicable":   { "type": "array" }
         }

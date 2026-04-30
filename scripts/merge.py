@@ -711,8 +711,33 @@ def main():
         print("=" * 72, file=sys.stderr)
         sys.exit(1)
 
+    # F8: Emit structured partialReason telemetry to CHANGELOG for root-cause analysis.
+    partial_reason = out.get("partialReason")
+    partial_info = ""
+    if partial_reason:
+        if isinstance(partial_reason, dict):
+            code = partial_reason.get("code", "unknown")
+            attempted: int | None = partial_reason.get("cellsAttempted")
+            filled: int | None = partial_reason.get("cellsFilled")
+            blockers: list = partial_reason.get("topBlockingSources") or []
+            parts = [f"code={code}"]
+            if attempted is not None:
+                fill_ratio = (
+                    round(filled / attempted, 2)
+                    if (attempted and filled is not None)
+                    else "?"
+                )
+                parts.append(f"attempted={attempted} filled={filled} ({fill_ratio})")
+            if blockers:
+                parts.append(f"blockers=[{', '.join(blockers[:3])}]")
+            partial_info = f" [partial: {'; '.join(parts)}]"
+        else:
+            partial_info = f" [partial: {partial_reason}]"
+
     cl_path = f"{PROJECT}/CHANGELOG.md"
-    cl_lines = [f"\n## [{TODAY}] — autonomous refresh-all{coverage_warn}\n"]
+    cl_lines = [
+        f"\n## [{TODAY}] — autonomous refresh-all{coverage_warn}{partial_info}\n"
+    ]
     if log["added"]:
         cl_lines.append("\n### Added\n")
         for mid in log["added"]:
