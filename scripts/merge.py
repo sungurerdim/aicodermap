@@ -26,6 +26,12 @@ from urllib.parse import urlparse
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
+# Force UTF-8 stdout so non-ASCII chars (✗, —, ×, →, Δ) don't crash on Windows cp1254.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 PROJECT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 TODAY = date.today().isoformat()
 NOW = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")

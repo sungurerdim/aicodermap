@@ -17,6 +17,11 @@ import sys
 import datetime as dt
 from pathlib import Path
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 ROOT = Path(__file__).parent
 sys.path.insert(0, str(ROOT / "scripts"))
 from lib.matrix import active_models as _active_models  # noqa: E402
@@ -228,5 +233,8 @@ print(f"AGENT_NEW_FILLS: {len(agent_filled)}")
 print(f"AGENT_EXPLICIT_GAPS: {len(existing_artifact.get('gaps', []))}")
 print(f"AUTO_GAPS_ADDED: {auto_gap_count}")
 print(f"TOTAL_GAPS: {gap_count}")
+total_filled = len(existing_filled | agent_filled)
 print(f"COVERAGE: {artifact['validationCoverage'] * 100:.1f}%")
-print(f"COVERED: {len(agent_filled) + gap_count + na_count} / {total_cells}")
+print(
+    f"COVERED: {total_filled + gap_count + na_count} / {total_cells}  (filled={total_filled}, gaps={gap_count}, na={na_count})"
+)

@@ -3,8 +3,16 @@
 Run once, then gap-gen + merge.py proceed normally.
 """
 
-import json, datetime, sys
+import json
+import datetime
+import sys
 from pathlib import Path
+
+# Force UTF-8 stdout so non-ASCII chars don't crash on Windows cp1254.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / ".aicodermap-agent-out.json"
@@ -849,7 +857,7 @@ GAPS = [
 ]
 
 # ── Build artifact ────────────────────────────────────────────────────────────
-NOW = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+NOW = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 models_arr = []
 for model_id, bench_updates in UPDATES.items():
