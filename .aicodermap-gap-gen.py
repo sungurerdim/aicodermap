@@ -77,10 +77,16 @@ for entry in existing_artifact.get("models", []):
     if not mid or mid not in active_ids:
         continue
     for k, v in (entry.get("updates", {}) or {}).items():
-        # bench keys in updates may be "bench.sweV" or just "sweV"
-        bk = k.removeprefix("bench.")
-        if bk in core_keys and v is not None:
-            agent_filled.add((mid, bk))
+        if k == "bench" and isinstance(v, dict):
+            # nested format: {"bench": {"sweV": 65.4, ...}}
+            for bk, bv in v.items():
+                if bk in core_keys and bv is not None:
+                    agent_filled.add((mid, bk))
+        else:
+            # flat format: {"bench.sweV": 65.4} or {"sweV": 65.4}
+            bk = k.removeprefix("bench.")
+            if bk in core_keys and v is not None:
+                agent_filled.add((mid, bk))
     for na_entry in entry.get("notApplicable", []) or []:
         bk = na_entry.get("benchKey") if isinstance(na_entry, dict) else None
         if bk and bk in core_keys:

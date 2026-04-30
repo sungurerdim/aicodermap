@@ -7944,6 +7944,26 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": 0.67
+    },
+    {
+      "value": 58.6,
+      "source": "vals.ai SWE-bench independent evaluation",
+      "url": "https://www.vals.ai/benchmarks/swebench",
+      "date": "2026-04-29",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.333,
+      "contradictionRole": "winner"
+    },
+    {
+      "value": 73.5,
+      "source": "xAI self-report (Grok 4 SWE-bench, extrapolated midpoint)",
+      "url": "https://x.ai/news/grok-4",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.233,
+      "contradictionRole": "loser"
     }
   ],
   "claude-haiku-4-5.gpqa": [
@@ -9483,6 +9503,94 @@
       "fetched": "2026-04-29",
       "trustScore": 0.55,
       "note": "backfilled — provenance reconstructed from canonical publisher"
+    }
+  ],
+  "grok-4-1-fast.lcb": [
+    {
+      "value": 82.2,
+      "source": "xAI Grok 4.1 Fast benchmarks (Artificial Analysis index)",
+      "url": "https://x.ai/news/grok-4",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.233
+    }
+  ],
+  "grok-4-1-fast.gpqa": [
+    {
+      "value": 85.3,
+      "source": "xAI Grok 4.1 Fast benchmarks (GPQA Diamond)",
+      "url": "https://x.ai/news/grok-4",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.233
+    }
+  ],
+  "grok-4-1-fast.hle": [
+    {
+      "value": 17.6,
+      "source": "xAI Grok 4.1 Fast benchmarks (HLE)",
+      "url": "https://x.ai/news/grok-4",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.233
+    }
+  ],
+  "grok-4-1-fast.mmluPro": [
+    {
+      "value": 85.4,
+      "source": "xAI Grok 4.1 Fast benchmarks (MMLU-Pro)",
+      "url": "https://x.ai/news/grok-4",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.233
+    }
+  ],
+  "grok-4-1-fast.tbHard": [
+    {
+      "value": 24.2,
+      "source": "xAI Grok 4.1 Fast benchmarks (Terminal-Bench Hard)",
+      "url": "https://x.ai/news/grok-4",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.233
+    }
+  ],
+  "grok-4-1-fast.tau2": [
+    {
+      "value": 93.3,
+      "source": "xAI Grok 4.1 Fast benchmarks (tau2-bench)",
+      "url": "https://x.ai/news/grok-4",
+      "date": "2026-04-30",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.233
+    }
+  ],
+  "sonnet-4-6.swePro": [
+    {
+      "value": 40.2,
+      "source": "Vellum LLM Leaderboard",
+      "url": "https://www.vellum.ai/llm-leaderboard",
+      "date": "2026-04-30",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.133
+    }
+  ],
+  "claude-haiku-4-5.lcb": [
+    {
+      "value": 72,
+      "source": "LMArena Code Leaderboard",
+      "url": "https://lmarena.ai/leaderboard/code",
+      "date": "2026-04-30",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.333
     }
   ]
 }

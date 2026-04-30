@@ -960,7 +960,7 @@
     },
     "bench": {
       "sweV": 79.6,
-      "swePro": null,
+      "swePro": 40.2,
       "tb2": 59.1,
       "tau2": null,
       "aaCoding": null,
@@ -989,14 +989,15 @@
     "vramRequirement": null,
     "strengthsKey": "sonnet-4-6.strengths",
     "weaknessesKey": "sonnet-4-6.weaknesses",
-    "lastUpdated": "2026-04-29T16:52:32Z",
+    "lastUpdated": "2026-04-30T07:30:15Z",
     "status": "active",
     "benchUpdated": {
       "sweV": "2026-04-29",
       "tb2": "2026-04-29",
       "gpqa": "2026-04-29",
       "aaIdx": "2026-04-29",
-      "arcAgi2": "2026-04-29"
+      "arcAgi2": "2026-04-29",
+      "swePro": "2026-04-30"
     },
     "notApplicableBenchKeys": [],
     "benchQuarantine": {},
@@ -5018,7 +5019,7 @@
       "bfcl": null,
       "aime26": 96.3,
       "aaOmni": null,
-      "lcb": null,
+      "lcb": 72,
       "tbHard": null,
       "cfElo": null,
       "browseComp": null,
@@ -5034,12 +5035,13 @@
     "vramRequirement": null,
     "strengthsKey": "claude-haiku-4-5.strengths",
     "weaknessesKey": "claude-haiku-4-5.weaknesses",
-    "lastUpdated": "2026-04-29T16:52:32Z",
+    "lastUpdated": "2026-04-30T07:30:15Z",
     "benchUpdated": {
       "swePro": "2026-04-29",
       "sweV": "2026-04-29",
       "aaIdx": "2026-04-29",
-      "gpqa": "2026-04-29"
+      "gpqa": "2026-04-29",
+      "lcb": "2026-04-30"
     },
     "notApplicableBenchKeys": [],
     "benchQuarantine": {},
@@ -5256,7 +5258,7 @@
     "lastUpdated": "2026-04-29T16:52:32Z",
     "benchUpdated": {
       "swePro": "2026-04-29",
-      "sweV": "2026-04-29",
+      "sweV": "2026-04-30",
       "gpqa": "2026-04-29",
       "hle": "2026-04-29",
       "tb2": "2026-04-29",
@@ -5389,22 +5391,22 @@
       "swePro": null,
       "sweV": null,
       "tb2": null,
-      "tau2": null,
+      "tau2": 93.3,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": null,
+      "gpqa": 85.3,
       "sweMulti": null,
-      "hle": null,
+      "hle": 17.6,
       "aaIdx": null,
       "bfcl": null,
       "aime26": null,
       "aaOmni": null,
-      "lcb": null,
-      "tbHard": null,
+      "lcb": 82.2,
+      "tbHard": 24.2,
       "cfElo": null,
       "browseComp": null,
-      "mmluPro": null,
+      "mmluPro": 85.4,
       "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
@@ -5419,8 +5421,16 @@
     "vramRequirement": null,
     "strengthsKey": "grok-4-1-fast.strengths",
     "weaknessesKey": "grok-4-1-fast.weaknesses",
-    "lastUpdated": "2026-04-29T13:04:18Z",
+    "lastUpdated": "2026-04-30T07:30:15Z",
     "notApplicableBenchKeys": [],
-    "benchQuarantine": {}
+    "benchQuarantine": {},
+    "benchUpdated": {
+      "lcb": "2026-04-30",
+      "gpqa": "2026-04-30",
+      "hle": "2026-04-30",
+      "mmluPro": "2026-04-30",
+      "tbHard": "2026-04-30",
+      "tau2": "2026-04-30"
+    }
   }
 ]

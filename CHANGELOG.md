@@ -1,4 +1,24 @@
 
+## [2026-04-30] — autonomous refresh-all [WARN: very low cumulative provenance coverage 24.1%] [MX2: coverage 24.1% < absolute floor 30%]
+
+### Updated
+- 3 models: `grok-4-1-fast`, `sonnet-4-6`, `claude-haiku-4-5`
+
+### Resolved (auto via trustScore)
+- grok-4-20.sweV: winner={'value': 58.6, 'trustScore': 0.333, 'sourceUrl': 'https://www.vals.ai/benchmarks/swebench', 'tier': 'I'} (severity=RED, Δ14.9)
+
+### Gaps (1044 entries — see data/known-gaps.json or next refresh)
+- `None`: Grok 4.3 Beta — no public benchmark data published as of 2026-04-30
+- `None`: Grok 4.3 Beta — no public benchmark data published as of 2026-04-30
+- `None`: Grok 4.3 Beta — no public benchmark data published as of 2026-04-30
+- `None`: No SWE-bench Verified score found for Gemini 3.1 Flash in public leaderboards
+- `None`: No explicit SWE-bench Pro score found for Mistral Large 3
+- `None`: AIME 2026 score not in official OpenAI GPT-5.5 announcement; only AIME 2025 referenced
+- `None`: Only AIME 2025 (89.3%) found for Grok 4.1 Fast; AIME 2026 score not published
+- `claude-haiku-4-5.aaAgentic`: not reached in agent survey cycle; AA Agentic data unavailable
+- ... and 1036 more
+
+
 ## [2026-04-29] — autonomous refresh-all [WARN: very low cumulative provenance coverage 22.6%] [MX2: coverage 22.6% < absolute floor 30%]
 - Note: research agent hit completeness loop (87 tool calls); partial artifact generated via gap-gen script. All 1430 cells accounted for (323 filled + 1107 gaps). Next cycle re-attempts all cells.
 
