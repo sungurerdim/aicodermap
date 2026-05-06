@@ -14,6 +14,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added — 2026-05-06 (FAZ E — source enrichment)
+
+- `data/sources-whitelist.json` — Berkeley BFCL marked live with
+  `lastVerifiedDate=2026-05-06` (was null, kept it out of the live
+  publisher index so AC8 flagged bfcl as a single-publisher SPOF).
+  bfcl now has 2 live publishers (Berkeley + BenchLM); AC8 grace count
+  dropped from 2 → 1 (only `webDevElo` still SPOF).
+- New I-tier publisher: **OpenRouter Rankings**
+  (`https://openrouter.ai/rankings`) — multi-provider adoption + price
+  signal aggregator; publishes `aaIdx` proxy. `lastVerifiedDate` +
+  `format_lastVerified` set to today so AC6 sees it as live.
+- New `_schema.notApplicableRules` entry **`spa-blocked-bench-without-alt`**:
+  when the canonical publisher is `spa_full` AND no alt publisher
+  exists, the bench is structurally unfillable; agent records affected
+  cells under `notApplicable[]` citing this rule. `excludeBenchKeys[]`
+  starts empty — populated dynamically as the cycle's health-check
+  surfaces persistently-broken extraction paths.
+- AC9_live stale-leaderboard count dropped 17 → 16 (Berkeley fresh).
+
 ### Added — 2026-05-06 (FAZ D — observability + cycle telemetry)
 
 - `scripts/lib/telemetry.py` (new) — pure-stdlib helper that composes the

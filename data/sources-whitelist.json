@@ -606,6 +606,18 @@
             "cfElo",
             "webDevElo"
           ]
+        },
+        {
+          "rule": "spa-blocked-bench-without-alt",
+          "appliesTo": {
+            "_purpose": "When the canonical publisher is SPA-blocked AND no alt publisher exists, the bench is unfillable for any model — agent records cells under notApplicable[] citing this rule.",
+            "leaderboardFormat": [
+              "spa_full"
+            ],
+            "altPublisherCount": 0
+          },
+          "excludeBenchKeys": [],
+          "addedDate": "2026-05-06"
         }
       ]
     },
@@ -1436,7 +1448,7 @@
       "tier": "I",
       "authority": "function-calling v3/v4",
       "format": "spa_full",
-      "lastVerifiedDate": null,
+      "lastVerifiedDate": "2026-05-06",
       "consecutiveFailures": 0,
       "extractor": "websearch_snippet",
       "fallbacks": [
@@ -1450,7 +1462,7 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-05-06",
       "publishes": [
         "bfcl"
       ],
@@ -1937,6 +1949,28 @@
       "phase": "active",
       "consecutiveFailures": 0,
       "extractor": "static_html_table"
+    },
+    {
+      "name": "OpenRouter Rankings",
+      "url": "https://openrouter.ai/rankings",
+      "domain": "openrouter.ai",
+      "tier": "I",
+      "format": "static_html_table",
+      "publishes": [
+        "aaIdx"
+      ],
+      "authority": "multi-provider adoption + price signal aggregator",
+      "firstSeen": "2026-05-06",
+      "lastVerifiedDate": "2026-05-06",
+      "format_lastVerified": "2026-05-06",
+      "phase": "leaderboard",
+      "consecutiveFailures": 0,
+      "extractor": "static_html_table",
+      "fallbacks": [
+        {
+          "format": "websearch_snippet"
+        }
+      ]
     }
   ],
   "aggregators": [
