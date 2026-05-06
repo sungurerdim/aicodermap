@@ -3,19 +3,106 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-6H5VB5QyLldKH9oMFUmjxw2uWpPZETQXpCkBaDjquMs=' 'sha256-CPwUVaW9j9iTueG0qKPfyt4lp1s9UpcD0U0RhNk3n1M='; img-src 'self' data:; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="interest-cohort=(), browsing-topics=(), geolocation=(), camera=(), microphone=(), payment=()">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta name="description" content="Cut coding-model selection from hours of review to seconds: ranked by your priorities, source contradictions surfaced, GPU-fitting local options labeled with the exact quant that runs. Turkish + English, refreshed every 14 days.">
   <meta name="theme-color" content="#0b0d10">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b0d10'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' dominant-baseline='middle' font-size='34' font-family='ui-monospace, monospace' fill='%2367e8a4'%3E&gt;_%3C/text%3E%3C/svg%3E">
+  <link rel="canonical" href="https://sungurerdim.github.io/aicodermap/">
   <title data-i18n-key="ui.appTitle">AICoderMap</title>
+  <meta property="og:site_name" content="AICoderMap">
   <meta property="og:title" content="AICoderMap — Pick the right coding model in seconds">
   <meta property="og:description" content="Ranked by your priorities, source contradictions surfaced, exact GPU-fitting quants labeled. Turkish + English, never more than 14 days stale.">
   <meta property="og:type" content="website">
-  <link rel="alternate" hreflang="tr" href="./?lang=tr">
-  <link rel="alternate" hreflang="en" href="./?lang=en">
+  <meta property="og:url" content="https://sungurerdim.github.io/aicodermap/">
+  <meta property="og:image" content="https://sungurerdim.github.io/aicodermap/assets/og-image.svg">
+  <meta property="og:image:type" content="image/svg+xml">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="AICoderMap — Decide which coding model to use, in seconds">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="tr_TR">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AICoderMap — Pick the right coding model in seconds">
+  <meta name="twitter:description" content="Ranked by your priorities, source contradictions surfaced, exact GPU-fitting quants labeled. Turkish + English, never more than 14 days stale.">
+  <meta name="twitter:image" content="https://sungurerdim.github.io/aicodermap/assets/og-image.svg">
+  <meta name="twitter:image:alt" content="AICoderMap — Decide which coding model to use, in seconds">
+  <link rel="alternate" hreflang="tr" href="https://sungurerdim.github.io/aicodermap/?lang=tr">
+  <link rel="alternate" hreflang="en" href="https://sungurerdim.github.io/aicodermap/?lang=en">
+  <link rel="alternate" hreflang="x-default" href="https://sungurerdim.github.io/aicodermap/">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://sungurerdim.github.io/aicodermap/#website",
+        "url": "https://sungurerdim.github.io/aicodermap/",
+        "name": "AICoderMap",
+        "description": "Decide which coding model to use, in seconds. Ranked by your priorities, source contradictions surfaced, local options labeled with the exact quant that fits your GPU.",
+        "inLanguage": ["en", "tr"],
+        "license": "https://opensource.org/licenses/MIT",
+        "publisher": { "@id": "https://github.com/sungurerdim#person" }
+      },
+      {
+        "@type": "Person",
+        "@id": "https://github.com/sungurerdim#person",
+        "name": "Sungur Erdim",
+        "url": "https://github.com/sungurerdim",
+        "email": "sungurerdim@gmail.com"
+      },
+      {
+        "@type": "Dataset",
+        "@id": "https://sungurerdim.github.io/aicodermap/#dataset",
+        "name": "AICoderMap — AI Coding LLM Benchmark Tracker",
+        "description": "Cross-source-validated benchmark scores, multi-provider pricing, and GPU compatibility metadata for 50+ AI coding LLMs (frontier, open, local). Refreshed every 14 days at most. Source contradictions flagged at >3pp (warn) and >5pp (red).",
+        "url": "https://sungurerdim.github.io/aicodermap/",
+        "license": "https://opensource.org/licenses/MIT",
+        "creator": { "@id": "https://github.com/sungurerdim#person" },
+        "isAccessibleForFree": true,
+        "keywords": [
+          "LLM benchmarks", "coding LLM", "SWE-bench Pro", "SWE-bench Verified",
+          "Terminal-Bench", "LiveCodeBench", "tau-bench", "MCP-Atlas",
+          "BFCL", "GPQA", "AIME", "HLE", "ARC-AGI",
+          "Unsloth dynamic quants", "GPU VRAM compatibility",
+          "AI coding model comparison", "yapay zeka kodlama modeli karşılaştırma"
+        ],
+        "distribution": [
+          {
+            "@type": "DataDownload",
+            "encodingFormat": "application/json",
+            "contentUrl": "https://sungurerdim.github.io/aicodermap/data/models.json"
+          },
+          {
+            "@type": "DataDownload",
+            "encodingFormat": "application/json",
+            "contentUrl": "https://sungurerdim.github.io/aicodermap/data/sources.json"
+          },
+          {
+            "@type": "DataDownload",
+            "encodingFormat": "application/json",
+            "contentUrl": "https://sungurerdim.github.io/aicodermap/data/gpu-database.json"
+          }
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://sungurerdim.github.io/aicodermap/#app",
+        "name": "AICoderMap",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any (browser)",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "url": "https://sungurerdim.github.io/aicodermap/",
+        "author": { "@id": "https://github.com/sungurerdim#person" },
+        "license": "https://opensource.org/licenses/MIT"
+      }
+    ]
+  }
+  </script>
   <link rel="stylesheet" href="assets/css/base.css">
   <link rel="stylesheet" href="assets/css/layout.css">
   <link rel="stylesheet" href="assets/css/table.css">
@@ -25,6 +112,8 @@
   <link rel="stylesheet" href="assets/css/responsive.css">
 </head>
 <body>
+
+<a class="skip-link" href="#filters" data-i18n-key="ui.a11y.skipToContent">Skip to content</a>
 
 <header class="app-header" data-export-section="header">
   <div class="header-row">
@@ -240,6 +329,18 @@
           <circle cx="12" cy="13" r="4"/>
         </svg>
         <span data-i18n-key="ui.export.full">Full page PNG</span>
+      </button>
+      <button id="share-link" class="btn btn-ghost" type="button"
+              data-i18n-tip="ui.share.tooltip"
+              data-tip="Copy a link with your current weights and filters">
+        <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <circle cx="18" cy="5" r="3"/>
+          <circle cx="6" cy="12" r="3"/>
+          <circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+        <span data-i18n-key="ui.share.button">Copy share link</span>
       </button>
       <p class="muted-note" data-i18n-key="ui.footer.privacy">
         This site does not use cookies; anonymous traffic is measured via GitHub Insights only.

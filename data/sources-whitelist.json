@@ -47,7 +47,8 @@
       "arcAgi2",
       "gpqa",
       "aime26",
-      "hle"
+      "hle",
+      "programBench"
     ],
     "benchCategories": [
       {
@@ -62,7 +63,8 @@
           "tbHard",
           "cfElo",
           "webDevElo",
-          "aaCoding"
+          "aaCoding",
+          "programBench"
         ]
       },
       {
@@ -722,6 +724,13 @@
       "hle": [
         "HLE",
         "Humanity's Last Exam"
+      ],
+      "programBench": [
+        "programbench",
+        "program-bench",
+        "ProgramBench",
+        "program_bench",
+        "programBench"
       ]
     },
     "deprecatedBenchKeys": []
@@ -1893,6 +1902,41 @@
       "consecutiveFailures": 0,
       "rationale": "Independent community tracker — single-page cross-view for SWE-bench Verified + SWE-bench Pro + Terminal-Bench 2.0 + Aider Polyglot, 100 entries. Monthly cadence; April 2026 includes Claude Opus 4.7.",
       "phase": "leaderboard"
+    },
+    {
+      "name": "ProgramBench (official)",
+      "url": "https://programbench.com/",
+      "domain": "programbench.com",
+      "tier": "I",
+      "format": "static_html_table",
+      "publishes": [
+        "programBench"
+      ],
+      "authority": "cleanroom program reconstruction; 200 tasks, 248K behavioral tests",
+      "paperUrl": "https://arxiv.org/abs/2605.03546",
+      "firstSeen": "2026-05-06",
+      "lastVerifiedDate": "2026-05-06",
+      "format_lastVerified": "2026-05-06",
+      "phase": "active",
+      "consecutiveFailures": 0,
+      "extractor": "static_html_table"
+    },
+    {
+      "name": "BenchLM — ProgramBench tracker",
+      "url": "https://benchlm.ai/benchmarks/programBench",
+      "domain": "benchlm.ai",
+      "tier": "I",
+      "format": "static_html_table",
+      "publishes": [
+        "programBench"
+      ],
+      "authority": "aggregator tracking ProgramBench publication state across 9+ models",
+      "firstSeen": "2026-05-06",
+      "lastVerifiedDate": "2026-05-06",
+      "format_lastVerified": "2026-05-06",
+      "phase": "active",
+      "consecutiveFailures": 0,
+      "extractor": "static_html_table"
     }
   ],
   "aggregators": [

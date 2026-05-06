@@ -102,6 +102,31 @@ export function populateGpuSelect() {
   if (!sel) return;
   while (sel.options.length > 1) sel.remove(1);
 
+  // ⭐ Featured presets — the eight everyday hardware tiers the dropdown
+  // surfaces first so the user can pick "RTX 4090 24GB" without scrolling
+  // through 100+ entries. Each id resolves to a canonical vendor.entry row.
+  const featured = Array.isArray(State.gpu.featuredPresets) ? State.gpu.featuredPresets : [];
+  if (featured.length) {
+    const popLabel = t('ui.filter.gpuPopular') || 'Popular hardware';
+    const ogPop = document.createElement('optgroup');
+    ogPop.label = '⭐ ' + popLabel;
+    const ordered = [...featured].sort((a, b) => (a.orderHint || 99) - (b.orderHint || 99));
+    for (const p of ordered) {
+      const path = String(p.id || '');
+      const dot = path.indexOf('.');
+      if (dot < 0) continue;
+      const g = path.slice(0, dot);
+      const id = path.slice(dot + 1);
+      const info = State.gpu[g] && State.gpu[g][id];
+      if (!info) continue;
+      const opt = document.createElement('option');
+      opt.value = path;
+      opt.textContent = `${info.displayName || id} — ${info.vram} GB`;
+      ogPop.appendChild(opt);
+    }
+    if (ogPop.children.length) sel.appendChild(ogPop);
+  }
+
   const groups = [
     ['nvidia', 'NVIDIA'],
     ['apple', 'Apple Silicon'],

@@ -40,7 +40,8 @@
       "search": "Ara",
       "searchPlaceholder": "model adı, sağlayıcı...",
       "provider": "Üretici",
-      "providerAll": "Tüm üreticiler"
+      "providerAll": "Tüm üreticiler",
+      "gpuPopular": "Popüler donanım"
     },
     "lang": {
       "toggle": "EN"
@@ -146,7 +147,16 @@
     "sourcesUnique": "benzersiz",
     "sourcesDatapoints": "veri noktası",
     "lowConfidence": "düşük güven",
-    "lowConfidenceTip": "Composite, aktif profil ağırlığının %40'ından azından hesaplandı. Skor güvenilirliği sınırlı."
+    "lowConfidenceTip": "Composite, aktif profil ağırlığının %40'ından azından hesaplandı. Skor güvenilirliği sınırlı.",
+    "a11y": {
+      "skipToContent": "İçeriğe atla"
+    },
+    "share": {
+      "tooltip": "Mevcut ağırlıklarını ve filtrelerini içeren paylaşılabilir link oluştur",
+      "button": "Paylaşım linkini kopyala",
+      "copied": "Link kopyalandı",
+      "failed": "Link kopyalanamadı"
+    }
   },
   "pricing": {
     "blended": "KARMA $/1M",
@@ -379,7 +389,17 @@
     "gpt-5-5": {
       "strengths": "Terminal-Bench 2.0'da %82.7 lider; GPQA %93.6; 1M token bağlam; natif çok modallu (omni); MCP-Atlas %75.3; SWE-bench Pro %58.6.",
       "weaknesses": "SWE-bench Pro'da Opus 4.7'nin 5.7 puan gerisinde; HLE %41.4 (Opus 4.7 = %46.9); $5/$30 yüksek API fiyatı; kapalı ağırlıklar."
-    }
+    },
+    "glm-4-5-air.strengths": "12B aktif parametreli MoE; self-host icin maliyet-yetenek dengesi iyi; MIT lisansli.",
+    "glm-4-5-air.weaknesses": "Bench kapsami bekliyor; yayin aninda agentic kolonlar buyuk olcude test edilmemis.",
+    "glm-4-7.strengths": "GLM serisinde acik-agirlikli kodlama lideri; MIT altinda frontier-sinifi SWE davranisi hedefler.",
+    "glm-4-7.weaknesses": "Kullanilabilir quantlarda 40GB+ VRAM ister; tuketici GPU icin gercekci degil.",
+    "mistral-medium-3-5.strengths": "Avrupa dilleri destegi guclu, fiyati ongorulebilir orta-seviye Mistral modeli.",
+    "mistral-medium-3-5.weaknesses": "Modified-MIT lisansi ticari yeniden dagitimi kisitlar; yalnizca cloud.",
+    "qwen3-5-9b.strengths": "6-8GB tuketici GPU icin uygun kompakt 9B Qwen; Apache 2.0 kisitsiz.",
+    "qwen3-5-9b.weaknesses": "Coklu-dosya refaktorde 27B/35B kardeslerinden daha dusuk kapasite; agentic bosluklar bekleniyor.",
+    "minimax-m2-1.strengths": "Token basina 1$ altinda 1M-token baglam penceresi; uzun-dokuman ve coklu-dosya gorevleri icin faydali.",
+    "minimax-m2-1.weaknesses": "Tam hassasiyette yerel calistirma pratik degil; cloud-oncelikli dagitim."
   },
   "benchmarks": {
     "swePro": {
@@ -506,13 +526,26 @@
       "name": "τ³-bench",
       "short": "τ³",
       "desc": "τ²-bench halefi: uzun-ufuklu çok-turlu araç çağrısı + plan yürütme."
+    },
+    "programBench": {
+      "short": "ProgramBench",
+      "name": "ProgramBench",
+      "desc": "Cleanroom program reconstruction — 200 görev, 248K davranış testi. Modele dökümantasyon + test koşumu verilir, sandbox'ta tüm kod tabanını sıfırdan kurması beklenir. arXiv:2605.03546 (Meta + Stanford + Harvard, 2026-05). Bugün hiçbir kamu model %100 çözmüyor; frontier takip metriği."
     }
   },
   "benchCategories": {
-    "coding":    { "label": "Kodlama" },
-    "agentic":   { "label": "Ajansal" },
-    "reasoning": { "label": "Akıl Yürütme" },
-    "general":   { "label": "Genel" }
+    "coding": {
+      "label": "Kodlama"
+    },
+    "agentic": {
+      "label": "Ajansal"
+    },
+    "reasoning": {
+      "label": "Akıl Yürütme"
+    },
+    "general": {
+      "label": "Genel"
+    }
   },
   "verdicts": {
     "preset": {

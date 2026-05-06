@@ -13,6 +13,8 @@ import { renderAll, renderTable } from './render-table.js';
 import { renderPrivacyTable } from './render-privacy.js';
 import { resolveGpuVram, updateGpuStatus, populateGpuSelect } from './gpu.js';
 import { exportElement, hideTooltip } from './overlay.js';
+import { pushUrlState, buildShareUrl } from './url-state.js';
+import { showToast } from './dom.js';
 
 export async function switchLanguage(lang) {
   const next = await loadI18n(lang);
@@ -20,6 +22,7 @@ export async function switchLanguage(lang) {
   State.i18n = next;
   State.lang = lang;
   writeStorage(STORAGE.language, lang);
+  document.documentElement.setAttribute('lang', lang);
   applyI18n(document);
   syncLangToggleUi();
   renderWeightsEditor(renderAll);
@@ -29,6 +32,7 @@ export async function switchLanguage(lang) {
   populateProviderFilter();
   syncPresetSelect();
   renderDeployStamp();
+  pushUrlState();
 }
 
 function wireLangToggle() {
@@ -187,6 +191,53 @@ function wireExports() {
   }
 }
 
+// Single delegated listener pushes the live state into the URL whenever any
+// form control changes. Saves wiring N individual handlers and stays robust
+// when new controls land. Debounce inside pushUrlState handles drag-storm
+// from sliders.
+function wireUrlSync() {
+  const onMutation = () => pushUrlState();
+  document.addEventListener('input', onMutation, { passive: true });
+  document.addEventListener('change', onMutation, { passive: true });
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest && e.target.closest('button[data-lang], button[data-theme], #weights-reset, #filters-reset, .lang-toggle button, .theme-toggle button');
+    if (t) pushUrlState();
+  }, { passive: true });
+}
+
+function wireShareLink() {
+  const btn = document.getElementById('share-link');
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    const url = buildShareUrl();
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'AICoderMap', url }).catch(() => {});
+      } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        // Fallback: temporary textarea + execCommand. Last resort for old browsers.
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'absolute';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } finally { document.body.removeChild(ta); }
+      }
+      const msg = (State.i18n?.ui?.share?.copied)
+        || (State.i18n?.ui?.share?.copy)
+        || 'Link copied';
+      showToast(msg);
+    } catch (e) {
+      console.error('share failed', e);
+      const msg = (State.i18n?.ui?.share?.failed) || 'Could not share link';
+      showToast(msg);
+    }
+  });
+}
+
 function wireWindowEvents() {
   window.addEventListener('scroll', hideTooltip, { passive: true });
   window.addEventListener('resize', hideTooltip);
@@ -232,6 +283,8 @@ export function wireEvents() {
   wireGpuControls();
   renderPricingBaselineDropdown(renderAll);
   wireExports();
+  wireShareLink();
+  wireUrlSync();
   wireWindowEvents();
   wireTooltipClamp();
   // Re-export for sort wiring inside renderTable; keeps reference live.

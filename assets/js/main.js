@@ -18,6 +18,7 @@ import { renderAll } from './render-table.js';
 import { renderPrivacyTable } from './render-privacy.js';
 import { wireEvents } from './events.js';
 import { startFreshnessWatch } from './freshness.js';
+import { readUrlState, applyUrlState, pushUrlState } from './url-state.js';
 
 function bootstrapTheme() {
   const storedTheme = readStorage(STORAGE.theme, null);
@@ -155,6 +156,18 @@ async function bootstrap() {
   window.__ACM_CACHE_BUST__ = String(Date.now());
   bootstrapTheme();
   bootstrapPrefs();
+
+  // URL params override localStorage at first load — this is what makes a
+  // shared link reproducible across machines / browsers / sessions.
+  const urlState = readUrlState();
+  if (urlState.theme) {
+    applyTheme(urlState.theme);
+  }
+  applyUrlState(urlState);
+  // Preset application is deferred until renderWeightsEditor is bound below,
+  // so urlState.preset just gets recorded and consumed at sync time.
+  window.__ACM_URL_PRESET__ = urlState.preset || null;
+
   await bootstrapI18n();
 
   const ok = await bootstrapData();
@@ -170,6 +183,9 @@ async function bootstrap() {
   renderAll();
   renderPrivacyTable();
   wireEvents();
+  // Push the resolved state back into the URL so that the address bar always
+  // reflects what the page is showing — including localStorage-driven defaults.
+  pushUrlState({ immediate: true });
 
   // Watch for a fresh deploy by polling models.json's ETag (GitHub Pages
   // content hash) on a delay + 5min interval + tab-visibility change.

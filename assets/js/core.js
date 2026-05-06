@@ -17,14 +17,14 @@ export const BENCH_KEYS = [
   'swePro', 'sweV', 'sweMulti', 'nl2Repo',
   'lcb', 'tb2', 'tbHard',
   'tau2', 'tau3', 'mcpA', 'bfcl', 'aaCoding', 'aaAgentic', 'browseComp',
-  'cfElo', 'webDevElo',
+  'cfElo', 'webDevElo', 'programBench',
   'gpqa', 'aime26', 'hle', 'aaOmni',
   'mmluPro', 'simpleQa', 'mrcr', 'arcAgi2',
 ];
 
 // Mirrors data/sources-whitelist.json _schema.benchCategories (audit-data-coherence.py verifies sync).
 export const BENCH_CATEGORIES = [
-  { id: 'coding',    keys: ['swePro', 'sweV', 'sweMulti', 'nl2Repo', 'lcb', 'tb2', 'tbHard', 'cfElo', 'webDevElo', 'aaCoding'] },
+  { id: 'coding',    keys: ['swePro', 'sweV', 'sweMulti', 'nl2Repo', 'lcb', 'tb2', 'tbHard', 'cfElo', 'webDevElo', 'aaCoding', 'programBench'] },
   { id: 'agentic',   keys: ['tau2', 'tau3', 'mcpA', 'bfcl', 'browseComp', 'aaAgentic'] },
   { id: 'reasoning', keys: ['gpqa', 'aime26', 'hle', 'arcAgi2', 'mmluPro', 'simpleQa', 'mrcr'] },
   { id: 'general',   keys: ['aaIdx', 'aaOmni'] },
@@ -52,7 +52,7 @@ export function normalizeBenchScore(key, value) {
 export const DEFAULT_WEIGHTS = {
   swePro: 16, tb2: 11, lcb: 11, sweV: 9, tbHard: 7, cfElo: 7,
   nl2Repo: 5, aaCoding: 5, mcpA: 4, aaAgentic: 4, webDevElo: 4,
-  tau2: 3, browseComp: 3, arcAgi2: 3,
+  tau2: 3, browseComp: 3, arcAgi2: 3, programBench: 1,
   gpqa: 2, sweMulti: 2, hle: 1, mmluPro: 1, tau3: 1,
 };
 

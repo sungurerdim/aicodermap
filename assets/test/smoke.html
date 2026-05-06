@@ -34,6 +34,7 @@
     } from '../js/data.js';
     import { gpuCompat } from '../js/gpu.js';
     import { modelSourcesSummary, buildSourcesMarkdown } from '../js/sources.js';
+    import { readUrlState, buildShareUrl, applyUrlState } from '../js/url-state.js';
 
     const tbody = document.getElementById('results');
     let n = 0;
@@ -268,8 +269,105 @@
       }
       assertTrue('every sources.json key references a known model id',
         unknownSrcModels === 0, `unknown=${unknownSrcModels}`);
+
+      // 14c. SSOT — every notApplicableBenchKeys entry is a known BENCH_KEYS.
+      let badNa = [];
+      for (const m of State.models) {
+        const na = Array.isArray(m.notApplicableBenchKeys) ? m.notApplicableBenchKeys : [];
+        for (const k of na) if (!benchSet.has(k)) badNa.push(`${m.id}.${k}`);
+      }
+      assertTrue('notApplicableBenchKeys ⊆ BENCH_KEYS', badNa.length === 0,
+        badNa.length ? badNa.slice(0, 5).join(',') : '');
+
+      // 14e. SSOT — featuredPresets ⊆ existing GPU entries.
+      try {
+        const gpu = await fetch('../../data/gpu-database.json').then(r => r.json());
+        const featured = Array.isArray(gpu.featuredPresets) ? gpu.featuredPresets : [];
+        const dangling = featured.filter(p => {
+          if (!p || typeof p.id !== 'string') return true;
+          const dot = p.id.indexOf('.');
+          if (dot < 0) return true;
+          const g = p.id.slice(0, dot);
+          const m = p.id.slice(dot + 1);
+          return !(gpu[g] && gpu[g][m]);
+        });
+        assertTrue('every featuredPreset.id resolves to a vendor.entry',
+          dangling.length === 0,
+          dangling.length ? dangling.map(p => p.id || '<empty>').join(',') : '');
+      } catch (e) {
+        row('featuredPresets check failed (HTTP server required)', false, e.message);
+      }
+
+      // 14d. SSOT — pricing.api is array of provider entries (post-2026-04 schema).
+      let badPricing = [];
+      for (const m of State.models) {
+        const api = m.pricing && m.pricing.api;
+        if (api == null) continue;
+        if (!Array.isArray(api)) badPricing.push(m.id);
+      }
+      assertTrue('every pricing.api is an array (multi-provider schema)',
+        badPricing.length === 0, badPricing.length ? badPricing.slice(0, 5).join(',') : '');
     } catch (e) {
       row('loadData failed (HTTP server required)', false, e.message);
+    }
+
+    // 16. url-state — buildShareUrl reflects live State, including custom weights.
+    State.weights = { ...DEFAULT_WEIGHTS };
+    State.lang = 'en';
+    State.filters = { search: '', deployment: 'all', tier: 'all', provider: 'all', openOnly: false };
+    State.sort = { col: 'composite', dir: 'desc' };
+    State.vram = null;
+    State.selectedGpu = 'auto';
+    let url1;
+    try { url1 = buildShareUrl(); } catch (_) { url1 = ''; }
+    assertTrue('buildShareUrl emits a valid URL with preset=balanced', /preset=balanced/.test(url1), url1);
+    assertTrue('buildShareUrl omits filters at default values', !/&deployment=/.test(url1) && !/&tier=/.test(url1), url1);
+
+    // 16b. Custom weights serialize as compact key:value pairs.
+    State.weights = Object.fromEntries(BENCH_KEYS.map(k => [k, 0]));
+    State.weights.swePro = 50;
+    State.weights.sweV = 50;
+    const url2 = buildShareUrl();
+    assertTrue('custom weights produce w=swePro:50,sweV:50', /w=swePro%3A50%2CsweV%3A50/.test(url2) || /w=swePro:50,sweV:50/.test(decodeURIComponent(url2)), url2);
+
+    // 16c. Filter encoding — open-only + tier + vram round-trips.
+    State.weights = { ...DEFAULT_WEIGHTS };
+    State.filters.openOnly = true;
+    State.filters.tier = 'open-flagship';
+    State.vram = 16;
+    const url3 = buildShareUrl();
+    assertTrue('open-only encodes as open=1', /open=1/.test(url3), url3);
+    assertTrue('tier encodes as tier=open-flagship', /tier=open-flagship/.test(url3), url3);
+    assertTrue('vram encodes as vram=16', /vram=16/.test(url3), url3);
+
+    // Cleanup so subsequent tests start from a known state.
+    State.filters = { search: '', deployment: 'all', tier: 'all', provider: 'all', openOnly: false };
+    State.vram = null;
+
+    // 17. i18n TR/EN parity — every key in TR exists in EN and vice versa.
+    try {
+      const [tr, en] = await Promise.all([
+        fetch('../../i18n/tr.json').then(r => r.json()),
+        fetch('../../i18n/en.json').then(r => r.json()),
+      ]);
+      function flat(d, p = '') {
+        const out = [];
+        for (const k of Object.keys(d)) {
+          const kk = p ? `${p}.${k}` : k;
+          if (d[k] && typeof d[k] === 'object' && !Array.isArray(d[k])) out.push(...flat(d[k], kk));
+          else out.push(kk);
+        }
+        return out;
+      }
+      const trKeys = new Set(flat(tr));
+      const enKeys = new Set(flat(en));
+      const trOnly = [...trKeys].filter(k => !enKeys.has(k));
+      const enOnly = [...enKeys].filter(k => !trKeys.has(k));
+      assertTrue(`i18n parity: TR=${trKeys.size} EN=${enKeys.size}`, trOnly.length === 0 && enOnly.length === 0,
+        trOnly.length ? `TR-only: ${trOnly.slice(0, 5).join(',')}` :
+        enOnly.length ? `EN-only: ${enOnly.slice(0, 5).join(',')}` : '');
+    } catch (e) {
+      row('i18n parity check failed (HTTP server required)', false, e.message);
     }
 
     // Summary header
