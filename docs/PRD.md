@@ -44,7 +44,7 @@ artificialanalysis.ai and llm-stats.com readers. Active on r/LocalLLaMA (694K me
 ## 3. User Stories (10)
 
 ### P1 Sungur
-- **P1-1**: I want to regenerate the 35-model tracker in <15 min via a single skill command, so my daily choice reflects this week's data.
+- **P1-1**: I want to regenerate the 55+-model tracker in <15 min via a single skill command, so my daily choice reflects this week's data.
 - **P1-2**: I want to tune weights to my use case (agentic-heavy, SWE-heavy) so the top recommendations match real usage.
 - **P1-3**: I want to see cross-source score contradictions so I can base decisions on Pro instead of inflated Verified.
 

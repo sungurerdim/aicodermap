@@ -10,7 +10,7 @@
 ┌──────────────────────────────────────────────────────────────────┐
 │  HAPPY PATH                                                      │
 ├──────────────────────────────────────────────────────────────────┤
-│ 1. User → Claude Code → /ledger-tracker-update (skill invoke)    │
+│ 1. User → Claude Code → /aicodermap (skill invoke)    │
 │ 2. Skill reads idea context (last launch, known models, defs)    │
 │ 3. Skill asks: "Full refresh? Specific model? New release?"      │
 │ 4. Scope selection:                                              │
@@ -104,7 +104,7 @@
 
 | Feature | Pass Criteria |
 |---------|---------------|
-| **F1** Skill+agent | `/ledger-tracker-update` is invokable, agent delegation starts <5s |
+| **F1** Skill+agent | `/aicodermap` is invokable, agent delegation starts <5s |
 | **F3** i18n switch | Instant change, no reload, localStorage persist |
 | **F7** Cross-source validation | Release gate enforced (warning if <95%) |
 | **F9** Weights editor | Total=100% constraint, live recalc <100ms, 4 presets work, reset-to-default works |
@@ -146,7 +146,7 @@
 **Scenario:** New Kimi K2.7 release; existing tracker is out of date.
 
 ```
-1. /ledger-tracker-update
+1. /aicodermap
 2. Skill: "Last update was 9 days ago. What scope?"
 3. User: "New release: Kimi K2.7"
 4. Skill → agent (scope: full, target_model_ids: ["kimi-k2-7"], include_unsloth: true)

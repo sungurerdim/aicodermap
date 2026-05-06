@@ -48,5 +48,13 @@ data/discoveries.json
 # ds-tune state
 .audit/
 auto/run.log
-scripts/__pycache__/
-scripts/**/__pycache__/
+
+# Python bytecode (any depth)
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+
+# Lighthouse audit reports (generated, not committed)
+docs/lighthouse/*.html
+docs/lighthouse/*.json

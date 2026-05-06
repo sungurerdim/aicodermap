@@ -24,7 +24,7 @@
 aicodermap/
 ├── index.html              # Main page (structure + interactive UI)
 ├── assets/
-│   ├── js/                 # ES modules (browser-loaded, no build)
+│   ├── js/                 # ES modules (browser-loaded, no build) — 15 files
 │   │   ├── main.js         # bootstrap entry (split-phase init)
 │   │   ├── core.js         # State + constants + STORAGE + schema validation
 │   │   ├── i18n.js         # t() + applyI18n + loadI18n
@@ -32,9 +32,13 @@ aicodermap/
 │   │   ├── gpu.js          # gpuCompat + WebGPU detect + filter predicate
 │   │   ├── dom.js          # el + clear + cameraIconButton + showToast
 │   │   ├── overlay.js      # tooltip + html2canvas export
+│   │   ├── freshness.js    # ETag-based stale-data banner + auto-refresh
+│   │   ├── sources.js      # provenance lookup + contradiction tier hand-off
+│   │   ├── url-state.js    # URL ⇄ state codec (deep-link share + restore)
 │   │   ├── render-controls.js  # weights editor + theme/lang sync
 │   │   ├── render-card.js  # buildModelCard (split into 9 sub-builders)
 │   │   ├── render-table.js # comparison table + model list + renderAll
+│   │   ├── render-privacy.js   # privacy & compliance section table
 │   │   └── events.js       # wireEvents (split by concern) + switchLanguage
 │   ├── css/                # 3-breakpoint responsive, dark/light themes
 │   │   ├── base.css        # vars, themes, reset, form controls, toggles
@@ -151,28 +155,32 @@ Entry: index.html → assets/vendor/html2canvas.min.js (defer, SRI)
                   + assets/js/main.js (type="module")
 
 Modules:
-  assets/js/        → 11 ES modules (browser-loaded, no build, every file <300L)
+  assets/js/        → 15 ES modules (browser-loaded, no build, every file <500L)
     main.js         → bootstrap orchestrator (split-phase init)
-    core.js         → State + STORAGE + BENCH_KEYS + DEFAULTS + PRESETS + schema validation
+    core.js         → State + STORAGE + BENCH_KEYS (25) + DEFAULTS + PRESETS (5) + schema validation
     i18n.js         → t() + applyI18n + loadI18n
     data.js         → fetch + score + contradiction + pricing + format
     gpu.js          → gpuCompat + WebGPU detect + filter predicate
     dom.js          → el + clear + cameraIconButton + showToast
     overlay.js      → contradiction tooltip + html2canvas export
+    freshness.js    → ETag-based stale-data banner + auto-refresh prompt
+    sources.js      → provenance lookup + tier hand-off for contradiction UI
+    url-state.js    → URL query-string ⇄ live State codec (deep-link share)
     render-controls.js  → weights editor + theme/lang sync
     render-card.js  → buildModelCard split into 9 sub-builders (orchestrator 34L)
     render-table.js → comparison table + model list + renderAll
+    render-privacy.js   → privacy & compliance section table
     events.js       → wireEvents (split into wireXxx by concern) + switchLanguage
   assets/css/       → 7 stylesheets (cascade-ordered in index.html)
     base / layout / table / controls / models / toast / responsive
   assets/test/      → smoke.html — vanilla in-browser unit harness (14 tests, no deps)
   assets/vendor/    → html2canvas.min.js (1.4.1, SHA256 e87e5507…8cb)
   data/             → JSON SSOT (3 canonical + whitelist + external/)
-    models.json     → 53 models, schema v2 multi-provider pricing
+    models.json     → 60 models, schema v2 multi-provider pricing, 26 bench keys
     sources.json    → per-(modelId,benchKey) provenance with trustScore
-    gpu-database.json     → NVIDIA / Apple / AMD / Intel + webgpuVendorMap
-    sources-whitelist.json → research-agent allowed-fetch list
-  i18n/             → content translations (tr.json + en.json, 249 keys each, 0 drift)
+    gpu-database.json     → NVIDIA / Apple / AMD / Intel + webgpuVendorMap + 8 featuredPresets
+    sources-whitelist.json → research-agent allowed-fetch list (26 coreBenchKeys, 35 leaderboards)
+  i18n/             → content translations (tr.json + en.json, 323 keys each, 0 drift)
   scripts/          → skill helpers (stdlib-only Python + 2 Node scripts)
   auto/             → ds-tune harness (eval.py + bench.sh/bat + fixtures.json)
   docs/             → 7 spec docs (PRD, TECHSPEC, IMPLGUIDE, TASKS, WORKFLOW, PITCH, TEST_PLAN)

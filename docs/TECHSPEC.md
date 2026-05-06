@@ -77,6 +77,12 @@ Browser load:
 
 ### `data/models.json` — MODELS array entry
 
+The canonical 26-key bench universe is defined in
+`data/sources-whitelist.json._schema.coreBenchKeys` and mirrored by
+`assets/js/core.js BENCH_KEYS`. Pricing is a per-provider array
+(multi-provider rule) — each entry pins to a single provider and is
+attributed in `data/sources.json` separately.
+
 ```json
 {
   "id": "opus-4-7",
@@ -88,16 +94,35 @@ Browser load:
   "license": "Proprietary",
   "context": 1000000,
   "pricing": {
-    "api": { "in": 5.00, "out": 25.00, "cacheHit": 0.50 },
+    "api": [
+      {
+        "provider": "official",
+        "in": 5.00,
+        "out": 25.00,
+        "cacheHit": 0.50,
+        "throughput": null,
+        "url": "https://platform.claude.com/docs/en/about-claude/pricing",
+        "fetched": "2026-04-30"
+      }
+    ],
     "subscription": "Max $200/month"
   },
   "bench": {
-    "swePro": 64.3, "sweV": 87.6, "tb2": 69.4,
-    "lcbV6": null, "aider": null, "tau2": 59,
-    "hle": 46.9, "mcpA": 77.3, "gpqa": 94.2,
-    "aime26": null, "mmmu": 77.3, "sweMulti": 79.3,
-    "bfcl": null, "aaIdx": 57, "aaAgentic": null, "aaCoding": 53
+    "aaIdx": 57,
+    "swePro": 64.3, "sweV": 87.6, "sweMulti": 79.3, "nl2Repo": null,
+    "lcb": null, "tb2": 69.4, "tbHard": null,
+    "tau2": 59, "tau3": null, "mcpA": 77.3, "bfcl": null,
+    "aaCoding": 53, "aaAgentic": null, "browseComp": null,
+    "cfElo": null, "webDevElo": null,
+    "gpqa": 94.2, "aime26": null, "hle": 46.9, "aaOmni": null,
+    "mmluPro": null, "simpleQa": null, "mrcr": null, "arcAgi2": null
   },
+  "benchUpdated": {
+    "swePro": "2026-04-30",
+    "sweV": "2026-04-30"
+  },
+  "notApplicableBenchKeys": [],
+  "benchQuarantine": {},
   "providers": 4,
   "uptime": 99.8,
   "ollamaSize": null,
@@ -105,20 +130,42 @@ Browser load:
   "vramRequirement": null,
   "strengthsKey": "opus-4-7.strengths",
   "weaknessesKey": "opus-4-7.weaknesses",
-  "lastUpdated": "2026-04-24"
+  "lastUpdated": "2026-04-30"
 }
 ```
 
+**Schema notes (post-2026-04-29.d reform):**
+
+- `notApplicableBenchKeys[]` — list of `coreBenchKeys` where this model is
+  structurally not measurable (e.g. an embedded edge model on agentic
+  tool-use benchmarks). MX1 invariant counts these as `notApplicable`,
+  not `gap` — closes silent-omission loophole.
+- `benchQuarantine{}` — `{ benchKey: true }` map for cells where the only
+  available source disagreed with itself across two recent fetches; UI
+  warns but does not red-flag (MX5 single-publisher rule).
+- `benchUpdated{}` — optional per-cell ISO date; freshness banner reads it.
+
 **Local model entry difference:**
+
 ```json
 {
   "id": "qwen-3-6-27b",
   ...
   "ollamaSize": "18 GB (Q4_K_M, community)",
+  "ollama": {
+    "pullCmd": "ollama pull qwen-3-6-27b",
+    "tags": ["27b", "27b-q4_k_m", "27b-q8_0"],
+    "pullCount": 412000,
+    "architecture": "qwen3",
+    "parameters": "27B",
+    "license": "Apache 2.0",
+    "releasedISO": "2026-03-22",
+    "ollamaUrl": "https://ollama.com/library/qwen3"
+  },
   "unslothVariants": [
     { "name": "UD-IQ2_XXS", "size": "9.39 GB", "vram": 10 },
     { "name": "UD-IQ3_XXS", "size": "11.2 GB", "vram": 12 },
-    { "name": "Q4_K_M", "size": "18 GB", "vram": 20 }
+    { "name": "Q4_K_M",     "size": "18 GB",   "vram": 20 }
   ],
   "vramRequirement": 18,
   ...
@@ -256,9 +303,41 @@ GET /data/models.json         → MODELS array
 GET /data/sources.json        → provenance map
 GET /data/gpu-database.json   → GPU lookup
 GET /i18n/tr.json | en.json   → translations
+GET /sitemap.xml              → SEO crawl hints (TR + EN + x-default)
+GET /robots.txt               → crawler policy
 ```
 
-No auth, no query params, CORS-friendly static asset.
+No auth, no query params, CORS-friendly static asset. The dataset's
+`distribution[]` is also discoverable from the JSON-LD `Dataset` block in
+`/index.html` for AI agents and crawlers.
+
+### 4.5 URL state (deep-linkable view)
+
+The page's full visible state lives in the address bar — sharing a URL
+shares the exact ranking the recipient will see. State precedence at first
+load: **URL params > localStorage > defaults**. Subsequent mutations
+(slider drag, filter change, language toggle, theme switch) push the state
+back into the URL via `history.replaceState` (debounced 250 ms).
+
+| Key          | Domain |
+|--------------|--------|
+| `lang`       | `tr` \| `en` |
+| `theme`      | `dark` \| `light` |
+| `preset`     | `balanced` \| `swe-focused` \| `agentic-focused` \| `reasoning-focused` \| `benchmark-only` \| `custom` |
+| `w`          | `<benchKey>:<weight>,...` — only honoured when `preset=custom`; missing keys default to 0; total must be in `validateWeights` shape (sums to 100) |
+| `tier`       | `frontier` \| `open-flagship` \| `coder-specialized` \| `gemma` \| `ollama-local` \| `all` |
+| `deployment` | `all` \| `cloud` \| `local` |
+| `provider`   | URL-encoded vendor name \| `all` |
+| `vram`       | integer GB 1..256 |
+| `gpu`        | webgpu vendor key (per `data/gpu-database.json._webgpuVendorMap`) \| `auto` |
+| `open`       | `1` \| `0` |
+| `search`     | URL-encoded substring |
+| `sort`       | `<columnKey>-<asc\|desc>` |
+
+Stability contract: param names, value sets, and shape are versioned with
+`acm.v1.*` localStorage keys — bumping to v2 implies a coordinated rename.
+Consumers (CLI, agents, embedded preview tools) can rely on the codec
+documented above. `assets/js/url-state.js` is the reference implementation.
 
 ### 4.4 Browser → External Services
 
@@ -288,7 +367,9 @@ No auth, no query params, CORS-friendly static asset.
 
 ### localStorage
 - Schema validation on read (wrong shape → reset-to-default)
-- Versioned keys: `cmt.v1.weights`, `cmt.v1.language`, `cmt.v1.vram`
+- Versioned keys (canonical, see `assets/js/core.js:STORAGE`):
+  `acm.v1.weights`, `acm.v1.language`, `acm.v1.vram`, `acm.v1.gpu`,
+  `acm.v1.filters`, `acm.v1.sort`, `acm.v1.theme`, `aicm.pricingBaseline`.
 - Migration plan to v2 already in place
 
 ### GDPR / Privacy

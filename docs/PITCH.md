@@ -44,7 +44,7 @@ Four converging factors:
 
 - **Market momentum** — frontier release every two weeks; manual research can't keep up.
 - **Technical readiness** — the skill + research-agent architecture is mature and clone-ready for other tracker domains.
-- **v0 done** — 35 models × 14 benchmarks already compiled manually as an HTML report; only the automation layer remains.
+- **v0 done** — 55+ models × 25 benchmarks compiled and continuously refreshed; the skill+agent automation layer ships every 14 days at most.
 - **Skill ecosystem timing** — Claude Code skill ecosystem is new; this is one of the first comprehensive domain-research skills.
 
 ---

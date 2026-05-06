@@ -32,8 +32,10 @@
 | **T18** | 1 CP2 evergreen guide: "Top 5 for 8GB VRAM devs" (QW1) | M5 | 2 hr | T23 | Launch |
 | **T19** | 1 CP3 quarterly: "SWE-V vs Pro: why a 35-point gap?" (QW2) | M5 | 3 hr | T23 | Launch |
 | **T20** | Launch playbook: channel list + ready-to-post text TR+EN | M5 | 1.5 hr | T23, T16 | Launch |
-| **T24** | Mobile card-stack: ≤640px card list instead of table | M4 | 2 hr | T5, T6 | Polish |
-| **T25** | Custom preset save/load (localStorage + import/export) | M4 | 1.5 hr | T7 | Polish |
+| **T24** | ✅ Mobile card-stack: ≤640px card list instead of table (`responsive.css @media`) | M4 | 2 hr | T5, T6 | Polish — done |
+| **T25** | ⏳ Custom preset save/load (localStorage + import/export) — deferred to Phase 2 | M4→Phase 2 | 1.5 hr | T7 | Deferred |
+| **T26** | ✅ SEO polish: sitemap.xml + robots.txt + canonical + JSON-LD + OG/Twitter + a11y skip-link | M4 | 1.5 hr | T5, T8 | Polish — done 2026-05-06 |
+| **T27** | ✅ Doc drift sweep (CLAUDE.md modules / TECHSPEC schema / IMPLGUIDE weights / TEST_PLAN AC) | M4 | 1 hr | — | Polish — done 2026-05-06 |
 
 ---
 

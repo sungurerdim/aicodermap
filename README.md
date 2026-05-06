@@ -112,11 +112,92 @@ Everything else (skill, agent, scripts, data, vendor JS, docs, i18n, auto/ folde
 
 - [x] **M1 Foundation** (Week 1) — Repo + 4 JSON schemas + research agent
 - [x] **M2 Core** (Week 2) — Live tracker static render, TR/EN toggle
-- [x] **M3 Integration** (Week 3) — 13 must-have features (weights editor + GPU VRAM + contradiction flags + PNG)
-- [ ] **M4 Polish** (Week 4) — SEO + responsive + Lighthouse ≥90 + E2E
+- [x] **M3 Integration** (Week 3) — 13 must-have features (weights editor + GPU VRAM + contradiction flags + PNG). Bench cross-source coverage continues to climb each refresh — current M4 floor is 30 %, target ≥ 95 %.
+- [x] **M4 Polish** (Week 4) — SEO (sitemap, robots, JSON-LD, hreflang, OG/Twitter), a11y skip-link + focus rings, mobile card-stack, doc drift sweep, smoke harness.
 - [ ] **M5 Launch** (Week 5) — Simultaneous TR + Global soft launch + 2-week validation
 
 ---
+
+## 🔗 Shareable deep-links
+
+Every page state is reflected in the URL — copy the address bar (or click
+**Copy share link** in the Export section) and you've shared the exact
+ranking the other person will see. The state schema is human-readable and
+stable; CLI consumers can construct URLs by hand.
+
+| Param        | Values                                                                            |
+|--------------|-----------------------------------------------------------------------------------|
+| `lang`       | `tr` \| `en`                                                                      |
+| `theme`      | `dark` \| `light`                                                                  |
+| `preset`     | `balanced` \| `swe-focused` \| `agentic-focused` \| `reasoning-focused` \| `benchmark-only` \| `custom` |
+| `w`          | comma-separated `benchKey:weight` pairs; honoured only when `preset=custom`       |
+| `tier`       | `frontier` \| `open-flagship` \| `coder-specialized` \| `gemma` \| `ollama-local` \| `all` |
+| `deployment` | `all` \| `cloud` \| `local`                                                       |
+| `provider`   | vendor name (URL-encoded) \| `all`                                                |
+| `vram`       | integer GB (1..256)                                                               |
+| `gpu`        | webgpu vendor key (e.g. `nvidia.rtx-4090`) \| `auto`                              |
+| `open`       | `1` \| `0` (open-license-only filter)                                             |
+| `search`     | substring (URL-encoded)                                                           |
+| `sort`       | `<columnKey>-<asc\|desc>` (e.g. `swePro-desc`, `composite-asc`)                   |
+
+**Example deep-link** — Turkish UI, SWE-focused preset, only models that
+fit a 16 GB RTX 4080, sorted by SWE-bench Pro descending:
+
+```
+https://sungurerdim.github.io/aicodermap/?lang=tr&preset=swe-focused&deployment=local&vram=16&sort=swePro-desc
+```
+
+## 🧪 Programmatic Access (CLI / agent friendly)
+
+The site is a static GitHub Pages deploy backed by stable JSON files. Any
+shell tool that can curl + jq can consume it; no auth, no rate limit, no
+WAF. The schemas are documented in [`docs/TECHSPEC.md`](docs/TECHSPEC.md) §3.
+
+```bash
+BASE=https://sungurerdim.github.io/aicodermap
+
+# All models, just id + provider + tier + composite-relevant scores:
+curl -s "$BASE/data/models.json" | jq '
+  [.[] | {id, name, provider, tier, open,
+          swePro: .bench.swePro, sweV: .bench.sweV,
+          lcb:    .bench.lcb,    tb2:  .bench.tb2,
+          priceIn: .pricing.api[0].in, priceOut: .pricing.api[0].out}]
+'
+
+# Top-10 frontier models by SWE-bench Pro:
+curl -s "$BASE/data/models.json" | jq '
+  [.[] | select(.tier=="frontier" and .bench.swePro != null)
+       | {id, swePro: .bench.swePro, priceIn: .pricing.api[0].in}]
+  | sort_by(-.swePro) | .[:10]
+'
+
+# Models that fit a 16 GB GPU (vramRequirement <= 16, including null = cloud):
+curl -s "$BASE/data/models.json" | jq '
+  [.[] | select(.vramRequirement != null and .vramRequirement <= 16)
+       | {id, vram: .vramRequirement, license, swePro: .bench.swePro}]
+'
+
+# Cross-source contradictions for a model (≥3pp delta):
+curl -s "$BASE/data/sources.json" | jq '
+  to_entries | map(select(
+    (.key | startswith("opus-4-7."))
+    and ([.value[].value] | (max - min)) >= 3
+  ))
+'
+
+# Pull provenance for a single (model, bench) cell:
+curl -s "$BASE/data/sources.json" | jq '."opus-4-7.swePro"'
+```
+
+A consumer that wants the same view a sharable URL produces can fetch the
+URL directly and read the `<script type="application/ld+json">` block — it
+contains the `Dataset` schema with `distribution[]` pointing at the three
+canonical JSON files.
+
+```bash
+# Discover the dataset distribution from JSON-LD:
+curl -s "$BASE/" | grep -oP 'application/ld\+json[^<]*<[^>]*>([\s\S]+?)</script>' | head -200
+```
 
 ## 📚 Data Sources
 
@@ -145,7 +226,8 @@ Every value the tracker shows comes from one of the sources below. Each value ca
 | Klu.ai | [klu.ai/llm-leaderboard](https://klu.ai/llm-leaderboard) | broader benchmark aggregator |
 | Papers with Code | [paperswithcode.com/area/code-generation](https://paperswithcode.com/area/code-generation) | peer-reviewed leaderboards |
 | arXiv | [arxiv.org](https://arxiv.org/) | original benchmark papers |
-| BenchLM | [benchlm.ai](https://benchlm.ai/) | verified vs provisional transparency |
+| BenchLM | [benchlm.ai](https://benchlm.ai/) | verified vs provisional transparency; ProgramBench tracker |
+| ProgramBench | [programbench.com](https://programbench.com/) · [arXiv 2605.03546](https://arxiv.org/abs/2605.03546) | cleanroom program reconstruction (Meta + Stanford + Harvard, 2026-05-05) |
 | AgentBench | agentbench.ai | multi-domain agentic |
 | MathArena | [matharena.ai](https://matharena.ai/) | AIME math reasoning (auxiliary) |
 | Vals.ai | [vals.ai/benchmarks](https://www.vals.ai/benchmarks/) | enterprise-gated benchmark sets |

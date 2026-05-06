@@ -322,35 +322,48 @@ async function loadData() {
 
 ## 8. Configuration Reference
 
-### `WEIGHTS` (default editorial weights — `app.js`)
+### `WEIGHTS` (default editorial weights — `assets/js/core.js`)
+
+Weights are integers 0-100 summing to exactly 100. The 19-key default set
+covers the coding-centric and agentic columns; reasoning-only keys
+(`aime26`, `aaOmni`, `simpleQa`) are zeroed in the default and surface via
+the `reasoning-focused` preset. The full 25-key universe lives in
+`BENCH_KEYS` — every preset zero-bases against it (no leak from default).
 
 ```javascript
 const DEFAULT_WEIGHTS = {
-  swePro: 0.22,
-  tb2: 0.15,
-  lcbV6: 0.15,
-  sweV: 0.10,
-  aider: 0.10,
-  aaCoding: 0.07,
-  aaAgentic: 0.05,
-  tau2: 0.05,
-  mcpA: 0.05,
-  gpqa: 0.02,
-  sweMulti: 0.02,
-  hle: 0.02
+  swePro: 16, tb2: 11, lcb: 11, sweV: 9, tbHard: 7, cfElo: 7,
+  nl2Repo: 5, aaCoding: 5, mcpA: 4, aaAgentic: 4, webDevElo: 4,
+  tau2: 3, browseComp: 3, arcAgi2: 3, programBench: 1,
+  gpqa: 2, sweMulti: 2, hle: 1, mmluPro: 1, tau3: 1
 };
-// Total: 1.00 (100%)
+// Total: 100 (20 keys; 26-key universe — remaining 6 keys default to 0)
 ```
 
-### Preset profiles
+### Preset profiles (5 — see `assets/js/core.js:PRESETS`)
 
 ```javascript
 const PRESETS = {
-  "swe-focused":     { swePro: 0.30, sweV: 0.20, sweMulti: 0.15, tb2: 0.10, lcbV6: 0.10, aider: 0.10, aaCoding: 0.05 },
-  "agentic-focused": { tb2: 0.25, mcpA: 0.20, tau2: 0.15, aaAgentic: 0.15, swePro: 0.10, lcbV6: 0.10, gpqa: 0.05 },
-  "balanced":        DEFAULT_WEIGHTS,
-  "benchmark-only":  { swePro: 0.20, sweV: 0.15, tb2: 0.15, lcbV6: 0.15, aider: 0.10, gpqa: 0.10, sweMulti: 0.10, hle: 0.05 }
+  'balanced':         { ...DEFAULT_WEIGHTS },
+  'swe-focused':      {
+    swePro: 23, sweV: 16, sweMulti: 13, lcb: 11, tb2: 9, tbHard: 9,
+    nl2Repo: 9, cfElo: 5, aaCoding: 5
+  },
+  'agentic-focused':  {
+    tb2: 15, mcpA: 13, tbHard: 10, browseComp: 10, aaAgentic: 10,
+    tau2: 8, tau3: 8, swePro: 7, lcb: 7, bfcl: 5
+  },
+  'reasoning-focused': {
+    gpqa: 18, aime26: 15, hle: 15, arcAgi2: 12, mmluPro: 10,
+    aaIdx: 7, aaOmni: 8, simpleQa: 5, mrcr: 5,
+    swePro: 3, lcb: 2
+  },
+  'benchmark-only':   {
+    swePro: 16, sweV: 12, tb2: 10, lcb: 10, tbHard: 8, sweMulti: 7, cfElo: 7,
+    gpqa: 6, hle: 5, webDevElo: 5, nl2Repo: 5, mmluPro: 3, tau3: 3
+  }
 };
+// Each preset sums to exactly 100.
 ```
 
 ### Contradiction thresholds
@@ -388,7 +401,7 @@ const STALE_THRESHOLD_DAYS = 14;       // M5 metric: ≤14 days max update inter
 | AC3 Contradiction flag | Force a 5pp delta in sources.json, verify red flag UI |
 | AC4 Diff preview | Run skill update, verify diff UI shows changed fields |
 | AC5 GitHub Pages deploy | Push commit, verify live in <2 min + JSON fetch <2s |
-| AC-F1 Skill+agent | Invoke `/ledger-tracker-update`, verify <5s agent start |
+| AC-F1 Skill+agent | Invoke `/aicodermap`, verify <5s agent start |
 | AC-F3 i18n switch | Toggle TR↔EN, verify no reload, localStorage persist |
 | AC-F9 Weights editor | Slide swePro to 50%, verify others auto-rebalance to 50% total |
 | AC-F10 PNG export | Export section + full page, verify no clipping iOS Safari + Chrome Android |
