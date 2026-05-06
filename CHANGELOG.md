@@ -14,6 +14,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added — 2026-05-06 (FAZ C — research pipeline telemetry)
+
+- `agent.md OUTPUT_SCHEMA.runMetadata` — promoted from optional to MANDATORY,
+  with three new fields the orchestrator records per cycle to detect
+  research-pipeline degradation early:
+  - `toolCallCount` — total agent tool invocations (≥80 = priority-cascade
+    starvation alarm; CHANGELOG WARN on next cycle prelude).
+  - `fetchAttemptCount` — subset of toolCallCount that hit the network
+    (sizes IN-CYCLE PROMOTION budget; spots cycles that thrashed local
+    Reads instead of fetching evidence).
+  - `batchCount` — number of sub-agents the orchestrator dispatched. The
+    P10.1 multi-agent fan-out target is 5; batchCount=1 surfaces a WARN
+    that fan-out collapsed and per-cell coverage will be lower.
+- `merge.py` — new soft-gate `runMetadata` audit. Missing fields surface
+  `[WARN: runMetadata missing fields …]` in the CHANGELOG entry; tool/batch
+  alarms surface inline (`[WARN: toolCallCount=85 near agent ceiling — priority cascade likely starved]`).
+  Merge is NOT rolled back (legacy artifacts predate this contract). Once
+  one full refresh-all lands with the new fields, a future commit can
+  promote this to MX6 hard-block.
+
 ### Added — 2026-05-06 (FAZ B — silent-failure hardening + post-push verify)
 
 - `scripts/verify-deploy.py` (new) — post-push GitHub Pages deploy

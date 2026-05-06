@@ -599,14 +599,36 @@ When in doubt: **scalar in storage, wrapped in provenance, contract spelled here
   },
 
   "validationCoverage": 0.0-1.0,
-  "runMetadata"?: {
+  "runMetadata": {
     "whitelistHash": "<sha256>",
     "benchKeysHash": "<sha256>",
     "agentVersion": "<semver>",
     "startedAt": ISO_datetime,
     "finishedAt": ISO_datetime,
     "elapsedMs": <int>,
-    "phaseElapsed"?: { "phase0Ms": <int>, "phase1Ms": <int>, "phase2Ms": <int>, "phase3Ms": <int> }
+    "phaseElapsed"?: { "phase0Ms": <int>, "phase1Ms": <int>, "phase2Ms": <int>, "phase3Ms": <int> },
+
+    // FAZ C reform (2026-05-06) — three new MANDATORY fields the agent
+    // populates so the orchestrator can detect research-pipeline degradation
+    // before the cycle commits.
+    //
+    //   toolCallCount: total agent tool invocations (WebFetch + WebSearch +
+    //     Read + Bash etc.). When this approaches the agent's hard ceiling
+    //     (~85), priority-cascade is starving and the next cycle should
+    //     pre-bias the priorityCells injection more aggressively.
+    //
+    //   fetchAttemptCount: subset of toolCallCount that hit the network
+    //     (WebFetch + WebSearch only). Used to size IN-CYCLE PROMOTION
+    //     budget and to spot cycles where the agent thrashed local Reads
+    //     instead of fetching evidence.
+    //
+    //   batchCount: number of sub-agents the orchestrator dispatched for
+    //     this artifact. P10.1 multi-agent fan-out target = 5 (one per
+    //     provider family). batchCount=1 means fan-out collapsed to a
+    //     single agent and per-cell coverage will be lower.
+    "toolCallCount": <int>,
+    "fetchAttemptCount": <int>,
+    "batchCount": <int>
   },
   "error": null | string
 }
@@ -1347,7 +1369,7 @@ optimizations below reduce wallclock without sacrificing completeness.
    each `models[i].updates.bench` keys ordered per `coreBenchKeys`; `gaps[]`
    sorted by `(modelId, benchKey)` lex; `sourcesAdded[]` mirror. Result:
    idempotent re-application, minimal git diff churn, faster review.
-9. **Run metadata** — populate `runMetadata` with phase wallclock counters
+9. **Run metadata (MANDATORY)** — populate `runMetadata` with phase wallclock counters PLUS the three FAZ C fields: `toolCallCount`, `fetchAttemptCount`, `batchCount`. The orchestrator's CHANGELOG appender records these per-cycle; missing fields trigger a `MISSING_RUN_METADATA` warning in the next cycle's prelude
    (`phase0Ms`, `phase1Ms`, `phase2Ms`, `phase3Ms`, `totalMs`). Skill compares
    to prior cycle and surfaces `⚠ phase-N regression` in CHANGELOG when a
    phase doubles.

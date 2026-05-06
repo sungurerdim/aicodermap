@@ -747,6 +747,33 @@ def main():
         print("=" * 72, file=sys.stderr)
         sys.exit(1)
 
+    # FAZ C audit — research-pipeline telemetry from runMetadata.
+    # MANDATORY fields (toolCallCount, fetchAttemptCount, batchCount). Missing
+    # fields are surfaced as a CHANGELOG warning so the next cycle's prelude
+    # picks them up; the merge is NOT rolled back (legacy artifacts may
+    # predate FAZ C).
+    rm_warn = ""
+    rm = out.get("runMetadata") or {}
+    rm_required = ("toolCallCount", "fetchAttemptCount", "batchCount")
+    rm_missing = [k for k in rm_required if k not in rm]
+    if rm_missing:
+        rm_warn = f" [WARN: runMetadata missing fields {rm_missing}]"
+    else:
+        tc = rm.get("toolCallCount", 0)
+        bc = rm.get("batchCount", 0)
+        # Heuristic alarms — surface to CHANGELOG without blocking merge.
+        if isinstance(tc, int) and tc >= 80:
+            rm_warn = (
+                rm_warn
+                + f" [WARN: toolCallCount={tc} near agent ceiling — priority cascade likely starved]"
+            )
+        if isinstance(bc, int) and bc < 5:
+            rm_warn = (
+                rm_warn + f" [WARN: batchCount={bc}<5 — multi-agent fan-out collapsed]"
+            )
+    if rm_warn:
+        coverage_warn = (coverage_warn or "") + rm_warn
+
     # F8: Emit structured partialReason telemetry to CHANGELOG for root-cause analysis.
     partial_reason = out.get("partialReason")
     partial_info = ""
