@@ -122,6 +122,17 @@ require_full_matrix: <bool default:true>     # every cell must end as fill | gap
 # stale "confirmed=true" caching contradicts the freshness contract. The
 # verification map is now audit-only (historical record + contradiction
 # analysis); it never short-circuits a fetch.
+
+# BUDGET REFORM (2026-05-06): the orchestrator pre-shards the cycle into
+# multi-batch dispatch where every batch is sized to fit comfortably under
+# the agent's tool-call ceiling (50-call buffer / 150-cell budget). Each
+# sub-agent receives `target_model_ids` covering only ITS slice of the
+# matrix — typically 5 models × 26 keys = 130 cells. Sub-agents do NOT
+# attempt the full 60-model universe; the orchestrator does that
+# parallelism via plan.waves. UNCAPPED still applies: within the
+# sub-agent's slice, every cell is attempted, no internal cap.
+agent_budget_buffer: <int default:50>      # tool-call ceiling target; if approaching, finish current cell + emit final JSON, do not start another cascade
+batch_id: <string>                          # the orchestrator's batch label; surfaced in runMetadata + per-batch artifact path
 ```
 
 **Matrix awareness (HARD — C plan reform 2026-04-29):**
@@ -265,7 +276,21 @@ fills or all paths are exhausted:
 
 1. **PER_MODEL_URL_EXPANSION** (Step 1-3) — whitelisted leaderboards
    publishing `benchKey`, then `vendors.<v>.urls.modelCardUrlTemplate` /
-   `postUrlPattern` with slug variations.
+   `postUrlPattern` with slug variations, **then** the HuggingFace
+   chain when the vendor has HF mirror URLs:
+   1. `vendors.<v>.urls.hfApi`     → `GET /api/models/<org>/<slug>` →
+      JSON with `{lastModified, downloads, likes, tags, library_name,
+      gated, modelIndex}`. The `modelIndex` field, when present,
+      surfaces `[{name: "swePro", ...}, ...]` per HF model-card spec.
+   2. `vendors.<v>.urls.hfReadme`  → `GET /<org>/<slug>/raw/main/README.md` →
+      markdown bench-table extraction via
+      `_schema.huggingfaceExtraction.benchTablePatterns`.
+   3. `vendors.<v>.urls.hfModelCard` → HTML fallback if README absent.
+   The HF chain is checked AFTER the vendor's own blog/docs/leaderboard
+   primary sources but BEFORE generic WebSearch — `huggingface.co/api/...`
+   returns structured JSON, lower fetch cost than scraping a marketing
+   page. Mark the source `tier=S` in `sourcesAdded[]` (HF model card is
+   the vendor's canonical card, vendor-curated metadata).
 2. **WEBSEARCH_PRIMARY_DISCIPLINE** (≥2 queries per cell, vendor-specific
    phrasing variants for the third query when the first two are empty).
 3. **INTERNAL_RETRY_DISCIPLINE** — format-driven cascade per `FORMAT_DISPATCH`

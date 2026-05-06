@@ -107,15 +107,38 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
    - `data/sources-whitelist.json` is SSOT for "what URLs the agent is allowed to fetch" AND for the bench-key universe (`_schema.coreBenchKeys`). Frontend `BENCH_KEYS` (assets/js/core.js), i18n `benchmarks.*`, and the data-file `bench` cells all mirror this canonical set. `scripts/audit-data-coherence.py` enforces the mirroring by failing loudly on any drift.
    - No skip registry: every (modelId, benchKey) pair is re-attempted every cycle so vendor opt-outs that close are surfaced immediately
    - The agent file (.claude/agents/aicodermap-research-agent.md) only carries PROCEDURE (how) — every list of URLs, vendors, or model IDs lives in data files
-// F1 REFORM (2026-04-30): Multi-Agent Fan-Out — 5 parallel sub-agents, one per provider family.
-   // Each batch receives only its slice of models → smaller idea_context → better per-cell coverage.
+// F1 REFORM (2026-04-30) → BUDGET REFORM (2026-05-06):
+   // Adaptive multi-batch dispatch with per-agent budget guarantee.
    //
-   // batches = scripts/lib/matrix.py family_batches(active_models, n=5)
-   //   Bucket 0: OpenAI family
-   //   Bucket 1: Anthropic family
-   //   Bucket 2: xAI family
-   //   Bucket 3: Google + Mistral + DeepSeek + Qwen/Alibaba
-   //   Bucket 4: all others (Meta, NVIDIA, MiniMax, MiMo, StepFun, Kimi, etc.)
+   // Root cause this reform addresses: a 60-model × 26-bench refresh against
+   // ONE sonnet agent collides with Claude Code's ~85 tool-call ceiling at
+   // ~11 % filled. The remaining ~89 % returned as orchestrator auto-stub
+   // gaps — the cycle "completed" but every refresh re-stubbed the same
+   // cells instead of advancing fill ratio.
+   //
+   // Plan source: scripts/lib/dispatch.py compute_dispatch_plan()
+   //   AGENT_BUDGET_BUFFER     = 50      // tool calls; ~35 buffer to ceiling
+   //   CELLS_PER_TOOL_CALL     = 3       // empirical (1 fetch → ~3 cells)
+   //   MAX_BATCH_CELLS         = 150     // 50 × 3
+   //   MAX_BATCH_MODELS        = floor(150 / |coreBenchKeys|) capped at 8
+   //   MAX_PARALLEL            = 5       // per wave
+   //
+   // For 60 models × 26 keys: 5 models/batch × 26 keys = 130 cells/batch
+   // (well under 150 budget) → 18 batches → 4 waves of {5,5,5,3} parallel
+   // sub-agents. NO agent ever exceeds its tool-call ceiling.
+   //
+   // Sequential waves are independent: each wave's sub-agents run in parallel,
+   // wave N+1 dispatches only after every batch in wave N has returned. The
+   // orchestrator collects (artifact[N][i]) and merges via gen_unified_artifact.
+   //
+   // batches = scripts/lib/dispatch.py compute_dispatch_plan(active_models, coreBenchKeys)
+   //   Bucket pattern (post-reform): grouped by provider family then
+   //   subdivided so no batch exceeds MAX_BATCH_MODELS:
+   //     batch00-anthropic  (3 models)
+   //     batch01-deepseek   (5 models)
+   //     batch02-google_dm  (5 models)  // family overflow → batch03 takes the rest
+   //     batch03-google_dm  (2 models)
+   //     ...18 batches total, varying sizes 1-5 models each
    //
    // Dispatch each bucket as a SEPARATE Agent({...}) call (parallel single message).
    // Each sub-agent receives:
@@ -132,33 +155,48 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
    //   if artifact.partialReason.cellsAttempted / batch_expected_cells < 0.30
    //     AND wallclock < 8min: SendMessage to same agent to continue.
    //
-   // Token cost: ~5× vs single agent. Justified: manual fill cost is far larger.
+   // Token cost: ~18× vs single agent (60 models / 5 per batch ≈ 18). Each
+   // sub-agent emits its own .aicodermap-agent-out-<batchId>.json; orchestrator
+   // collects all artifacts at end of last wave and feeds them through
+   // gen_unified_artifact.py for merge.
 
-   results = parallel([
-     Agent({
-       subagent_type: "aicodermap-research-agent", model: "sonnet",
-       prompt: structured(
-         scope, query,
-         idea_context: filtered_for_bucket(idea_context, batch_i),  // F5
-         target_model_ids: batch_i.map(m => m.id),
-         include_unsloth: true,
-         trusted_sources_only: true,
-         parallel_sources: 5,
-         parallel_models: 5,
-         verification_map_path: ".aicodermap-verification-map.json",
-         trust_score_required: true,
-         termination: "completeness",
-         require_lineup_populated: true,
-         require_health_checks: (batch_i == 0),  // only first batch runs health check
-         expected_total: batch_expected_cells,
-         priority_queue_size: |batch_priority_cells|,
-         require_priority_first: true,
-         require_full_matrix: true
-       )
-     })
-     for batch_i in family_batches(active_models, 5)
-   ])
-   artifact = merge_artifacts(results)
+   plan = compute_dispatch_plan(active_models, coreBenchKeys)  // dispatch.py
+   per_batch_artifacts = []
+   for wave_index, wave in enumerate(plan["waves"]):
+     // Sequential between waves; parallel within a wave.
+     wave_results = parallel([
+       Agent({
+         subagent_type: "aicodermap-research-agent", model: "sonnet",
+         prompt: structured(
+           scope, query,
+           idea_context: filtered_for_bucket(idea_context, batch_spec),  // F5
+           target_model_ids: batch_spec.modelIds,
+           batch_id: batch_spec.batchId,
+           expected_total: batch_spec.expectedCells,
+           agent_budget_buffer: plan.agentBudgetBuffer,  // hard reminder
+           include_unsloth: true,
+           trusted_sources_only: true,
+           parallel_sources: 5,
+           parallel_models: 5,
+           verification_map_path: ".aicodermap-verification-map.json",
+           trust_score_required: true,
+           termination: "completeness",
+           require_lineup_populated: (wave_index == 0 and batch_spec.batchId == "batch00-..."),
+           require_health_checks: (wave_index == 0 and batch_spec.batchId == "batch00-..."),
+           priority_queue_size: |batch_priority_cells|,
+           require_priority_first: true,
+           require_full_matrix: true,
+           require_run_metadata: true,  // FAZ C: toolCallCount, fetchAttemptCount, batchCount=1
+         ),
+         output_path: f".aicodermap-agent-out-{batch_spec.batchId}.json"
+       })
+       for batch_spec in [b for b in plan.batches if b.waveIndex == wave_index]
+     ])
+     per_batch_artifacts.extend(wave_results)
+   artifact = merge_batch_artifacts(per_batch_artifacts)
+     // gen_unified_artifact.py reads every .aicodermap-agent-out-batch*.json,
+     // merges via union (no value conflicts because each batch covers disjoint
+     // model_ids), and writes the unified .aicodermap-agent-out.json.
 
    **Prompt header MUST surface (verbatim, not paraphrased):**
    ```

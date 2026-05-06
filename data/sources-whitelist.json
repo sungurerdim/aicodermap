@@ -745,7 +745,28 @@
         "programBench"
       ]
     },
-    "deprecatedBenchKeys": []
+    "deprecatedBenchKeys": [],
+    "huggingfaceExtraction": {
+      "_purpose": "HF model card README scraping protocol — Phase 2 PER_MODEL_URL_EXPANSION priority chain",
+      "fetchOrder": [
+        "1. hfApi: GET /api/models/{org}/{slug} → JSON: {modelId, lastModified, downloads, likes, tags, library_name}",
+        "2. hfReadme: GET /<org>/<slug>/raw/main/README.md → markdown → bench table extraction",
+        "3. hfModelCard: HTML fallback if README absent or empty"
+      ],
+      "benchTablePatterns": [
+        "\\|\\s*(?P<bench>SWE[-\\s_]?bench[\\s\\w]*)\\s*\\|",
+        "\\|\\s*(?P<bench>LiveCodeBench[\\s\\w]*)\\s*\\|",
+        "\\|\\s*(?P<bench>GPQA[\\s\\w]*)\\s*\\|",
+        "\\|\\s*(?P<bench>AIME[\\s\\d]*)\\s*\\|",
+        "\\|\\s*(?P<bench>MMLU[\\s\\w]*)\\s*\\|",
+        "\\|\\s*(?P<bench>HLE)\\s*\\|",
+        "\\|\\s*(?P<bench>BFCL[\\s\\w]*)\\s*\\|",
+        "\\|\\s*(?P<bench>τ[-\\s_]?bench|tau[-\\s_]?bench)\\s*\\|"
+      ],
+      "tier": "S",
+      "trustScoreFloor": 0.55,
+      "addedDate": "2026-05-06"
+    }
   },
   "vendors": {
     "anthropic": {
@@ -835,7 +856,10 @@
         "lineup": "https://docs.mistral.ai/getting-started/models/models_overview/",
         "news": "https://mistral.ai/news",
         "blog": "https://mistral.ai/news",
-        "postUrlPattern": "https://mistral.ai/news/{slug}"
+        "postUrlPattern": "https://mistral.ai/news/{slug}",
+        "hfModelCard": "https://huggingface.co/mistralai/{slug}",
+        "hfReadme": "https://huggingface.co/mistralai/{slug}/raw/main/README.md",
+        "hfApi": "https://huggingface.co/api/models/mistralai/{slug}"
       },
       "extracts": "Mistral + Devstral + Codestral lineup",
       "postSlugStrategy": "websearch_required",
@@ -855,7 +879,10 @@
         "news": "https://www.deepseek.com/news",
         "docs": "https://api-docs.deepseek.com",
         "blog": "https://api-docs.deepseek.com/news",
-        "postUrlPattern": "https://api-docs.deepseek.com/news/news{date}"
+        "postUrlPattern": "https://api-docs.deepseek.com/news/news{date}",
+        "hfModelCard": "https://huggingface.co/deepseek-ai/{slug}",
+        "hfReadme": "https://huggingface.co/deepseek-ai/{slug}/raw/main/README.md",
+        "hfApi": "https://huggingface.co/api/models/deepseek-ai/{slug}"
       },
       "extracts": "Active API model IDs, pricing",
       "postSlugStrategy": "date_coded",
@@ -894,7 +921,10 @@
         "models": "https://huggingface.co/Qwen",
         "alt": "https://qwen-lm.github.io",
         "blog": "https://qwenlm.github.io/blog",
-        "postUrlPattern": "https://qwenlm.github.io/blog/{slug}/"
+        "postUrlPattern": "https://qwenlm.github.io/blog/{slug}/",
+        "hfModelCard": "https://huggingface.co/Qwen/{slug}",
+        "hfReadme": "https://huggingface.co/Qwen/{slug}/raw/main/README.md",
+        "hfApi": "https://huggingface.co/api/models/Qwen/{slug}"
       },
       "extracts": "Qwen series releases",
       "postSlugStrategy": "try_variations",
@@ -933,7 +963,10 @@
       "urls": {
         "lineup": "https://xiaomimimo.github.io",
         "news": "https://mimo.xiaomi.com",
-        "models": "https://huggingface.co/XiaomiMiMo"
+        "models": "https://huggingface.co/XiaomiMiMo",
+        "hfModelCard": "https://huggingface.co/XiaomiMiMo/{slug}",
+        "hfReadme": "https://huggingface.co/XiaomiMiMo/{slug}/raw/main/README.md",
+        "hfApi": "https://huggingface.co/api/models/XiaomiMiMo/{slug}"
       },
       "extracts": "MiMo series"
     },
@@ -943,7 +976,10 @@
       "urls": {
         "lineup": "https://platform.minimaxi.com/document",
         "news": "https://www.minimaxi.com/news",
-        "models": "https://huggingface.co/MiniMaxAI"
+        "models": "https://huggingface.co/MiniMaxAI",
+        "hfModelCard": "https://huggingface.co/MiniMaxAI/{slug}",
+        "hfReadme": "https://huggingface.co/MiniMaxAI/{slug}/raw/main/README.md",
+        "hfApi": "https://huggingface.co/api/models/MiniMaxAI/{slug}"
       },
       "extracts": "M-series"
     },
@@ -953,7 +989,10 @@
       "urls": {
         "lineup": "https://build.nvidia.com",
         "news": "https://blogs.nvidia.com",
-        "models": "https://huggingface.co/nvidia"
+        "models": "https://huggingface.co/nvidia",
+        "hfModelCard": "https://huggingface.co/nvidia/{slug}",
+        "hfReadme": "https://huggingface.co/nvidia/{slug}/raw/main/README.md",
+        "hfApi": "https://huggingface.co/api/models/nvidia/{slug}"
       },
       "extracts": "Nemotron variants, NIM catalog"
     },
@@ -964,7 +1003,10 @@
         "lineup": "https://huggingface.co/meta-llama",
         "news": "https://ai.meta.com/blog",
         "blog": "https://ai.meta.com/blog",
-        "postUrlPattern": "https://ai.meta.com/blog/{slug}/"
+        "postUrlPattern": "https://ai.meta.com/blog/{slug}/",
+        "hfModelCard": "https://huggingface.co/meta-llama/{slug}",
+        "hfReadme": "https://huggingface.co/meta-llama/{slug}/raw/main/README.md",
+        "hfApi": "https://huggingface.co/api/models/meta-llama/{slug}"
       },
       "extracts": "Released Llama models",
       "postSlugStrategy": "descriptive_kebab",
@@ -981,7 +1023,10 @@
       "tier": "S",
       "urls": {
         "lineup": "https://huggingface.co/google",
-        "docs": "https://ai.google.dev/gemma"
+        "docs": "https://ai.google.dev/gemma",
+        "hfModelCard": "https://huggingface.co/google/{slug}",
+        "hfReadme": "https://huggingface.co/google/{slug}/raw/main/README.md",
+        "hfApi": "https://huggingface.co/api/models/google/{slug}"
       },
       "extracts": "Gemma releases"
     },
@@ -990,7 +1035,10 @@
       "tier": "S",
       "urls": {
         "lineup": "https://www.stepfun.com",
-        "models": "https://huggingface.co/stepfun-ai"
+        "models": "https://huggingface.co/stepfun-ai",
+        "hfModelCard": "https://huggingface.co/stepfun-ai/{slug}",
+        "hfReadme": "https://huggingface.co/stepfun-ai/{slug}/raw/main/README.md",
+        "hfApi": "https://huggingface.co/api/models/stepfun-ai/{slug}"
       },
       "extracts": "Step series"
     },
@@ -1496,7 +1544,7 @@
       "url": "https://huggingface.co/spaces/bigcode/bigcode-models-leaderboard",
       "tier": "I",
       "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "lastVerifiedDate": "2026-05-06",
       "consecutiveFailures": 0,
       "extractor": "html_table",
       "fallbacks": [
@@ -1507,7 +1555,7 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-05-06",
       "publishes": [
         "lcb"
       ],
@@ -1542,7 +1590,7 @@
       "tier": "I",
       "authority": "open-weight canonical aggregation",
       "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "lastVerifiedDate": "2026-05-06",
       "consecutiveFailures": 0,
       "extractor": "html_table",
       "fallbacks": [
@@ -1553,7 +1601,7 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-05-06",
       "publishes": [
         "gpqa",
         "hle",
@@ -1967,6 +2015,31 @@
       "consecutiveFailures": 0,
       "extractor": "static_html_table",
       "fallbacks": [
+        {
+          "format": "websearch_snippet"
+        }
+      ]
+    },
+    {
+      "name": "LMSYS Chatbot Arena (HF mirror)",
+      "url": "https://huggingface.co/spaces/lmsys/chatbot-arena-leaderboard",
+      "domain": "huggingface.co",
+      "tier": "I",
+      "format": "spa_full",
+      "publishes": [
+        "webDevElo"
+      ],
+      "authority": "human-preference Elo (now LMArena); HF mirror serves the JSON datapack",
+      "firstSeen": "2026-05-06",
+      "lastVerifiedDate": "2026-05-06",
+      "format_lastVerified": "2026-05-06",
+      "phase": "leaderboard",
+      "consecutiveFailures": 0,
+      "extractor": "spa_full",
+      "fallbacks": [
+        {
+          "format": "github_raw_json"
+        },
         {
           "format": "websearch_snippet"
         }
