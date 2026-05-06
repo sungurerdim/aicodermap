@@ -14,6 +14,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added — 2026-05-06 (FAZ B — silent-failure hardening + post-push verify)
+
+- `scripts/verify-deploy.py` (new) — post-push GitHub Pages deploy
+  verification. Three nested checks (commits-API SHA / Pages ETag rotation
+  / `_meta.json` parity) wrapped in one binary; 60s CDN warm-up + 3×30s
+  retry budget; exit code semantics 0/1/2 documented for skill Step 14.
+- `merge.py` MX2 absolute coverage floor — promoted from WARN-only to
+  HARD BLOCK by default; opt-out via `AICODERMAP_MX2_WARN_ONLY=1` env or
+  `--bypass-floor-check` CLI flag for transition periods. The breach
+  triggers the same `.bak` rollback + non-zero exit chain MX1 already
+  uses, so cycles that regress below the 30 % cumulative-provenance
+  floor are blocked at merge time, never reach `git push`.
+- `merge.py` MX1 — retired the `--warn-only-invariant` migration path
+  from docstrings + error message; the matrix invariant has no warn-only
+  override. Operators must fix the artifact (gaps[] / notApplicable[] /
+  bench cells) instead of bypassing.
+- `audit-bench-source-mapping.py` AC8 — promoted from pure WARN to
+  CONDITIONAL BLOCK behind `AICODERMAP_AC8_BLOCK=1` env-flag (opt-in
+  until FAZ E lands missing publishers). Within the 14-day grace window
+  (`firstSeen` ≤ 14 days), single-publisher status stays a warn so a
+  freshly-added coreBenchKey isn't rejected immediately.
+- `scripts/hooks/pre-push` — every successful run stamps
+  `.audit/last-pre-push.iso` + `.audit/last-pre-push.sha`. Acts as audit
+  trail anchor: a downstream check can detect a stale stamp (proxy for
+  `git push --no-verify` bypass) without polluting the commit history.
+- `.claude/skills/aicodermap/SKILL.md` Step 14 — now invokes
+  `verify-deploy.py` (was a single `curl`). Exit-code policy explicit:
+  0 = ✓ verified, 1 = log failure to CHANGELOG, 2 = tooling unavailable.
+  Cycle is not "complete" until verify-deploy returns 0 or 2.
+- `.gitignore` — `.audit/` directory ignored except `.audit/.gitkeep`
+  preserves the directory in fresh clones so hooks have a write target.
+
 ### Added — 2026-05-06 (M4 polish gate)
 
 - `sitemap.xml` + `robots.txt` at repo root — TR / EN / x-default hreflang

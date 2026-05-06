@@ -11,17 +11,22 @@ Four checks:
                Self-declared-only publishers without recent verification are
                rejected — this blocks fictional bench keys from passing AC6.
   AC7 (BLOCK): ⋃ leaderboards[].publishes[] ⊆ coreBenchKeys ∪ deprecatedBenchKeys
-  AC8 (WARN):  per-bench live-publisher count >= 2 (single point of failure).
+  AC8 (CONDITIONAL BLOCK): per-bench live-publisher count >= 2 (single point of
+               failure). Newly-added publishers (firstSeen ≤ AC8_GRACE_DAYS old)
+               receive a 14-day grace window — single-publisher status is WARN
+               for them, BLOCK once the grace expires. Override: env-flag
+               AICODERMAP_AC8_WARN_ONLY=1 keeps the legacy warn-only behaviour.
   AC9_live (WARN): leaderboards with no verification in >60 days flagged for review.
 
 Exit code:
-  0  every check passed
-  1  AC6 or AC7 drift
+  0  every check passed (or AC8 grace-period warnings only)
+  1  AC6, AC7, or AC8-after-grace drift
 """
 
 from __future__ import annotations
 
 import json
+import os
 import sys
 from datetime import date, timedelta
 from pathlib import Path
@@ -46,6 +51,13 @@ for _stream in (sys.stdout, sys.stderr):
             pass
 
 LIVENESS_DAYS = 60
+AC8_GRACE_DAYS = 14
+# AC8 single-publisher block: opt-in until FAZ E lands the missing publishers.
+# Default = warn-only so legacy single-publisher state (bfcl, webDevElo) does
+# NOT immediately reject commits; flip via env-flag once each core key has ≥2
+# live publishers.
+AC8_BLOCK_ENABLED = os.environ.get("AICODERMAP_AC8_BLOCK") == "1"
+AC8_WARN_ONLY = not AC8_BLOCK_ENABLED
 
 
 def _load_sources() -> dict:
@@ -140,14 +152,50 @@ def main() -> int:
             f"but are NOT in coreBenchKeys nor deprecatedBenchKeys: {rogue}"
         )
 
-    # AC8 — single live-publisher benches (WARN)
-    single = sorted(
+    # AC8 — single live-publisher benches.
+    # Default: HARD BLOCK once the lone publisher's firstSeen ≤ AC8_GRACE_DAYS
+    # ago has matured (i.e., the bench has been advertised long enough that we
+    # should have found a second publisher). Brand-new benches get a grace
+    # window so a freshly-added coreBenchKey isn't rejected immediately.
+    # Override: AICODERMAP_AC8_WARN_ONLY=1 reverts to legacy warn-only.
+    today = date.today()
+    grace = timedelta(days=AC8_GRACE_DAYS)
+    single_block: list[str] = []
+    single_grace: list[str] = []
+    for key in sorted(
         k for k, lbs in live_by_bench.items() if len(lbs) == 1 and k in core
-    )
-    if single:
+    ):
+        lone = live_by_bench[key][0]
+        first_seen_raw = lone.get("firstSeen") or lone.get("addedDate") or ""
+        is_new = False
+        try:
+            if (
+                first_seen_raw
+                and (today - date.fromisoformat(str(first_seen_raw))) <= grace
+            ):
+                is_new = True
+        except ValueError:
+            pass
+        if is_new or AC8_WARN_ONLY:
+            single_grace.append(key)
+        else:
+            single_block.append(key)
+    if single_block:
+        msg = (
+            f"AC8 — {len(single_block)} core bench key(s) have only ONE live "
+            f"publishing leaderboard past the {AC8_GRACE_DAYS}-day grace window: "
+            f"{single_block}"
+        )
+        if AC8_WARN_ONLY:
+            warnings.append(msg + " (warn-only via AICODERMAP_AC8_WARN_ONLY)")
+        else:
+            failures.append(msg)
+    if single_grace:
         warnings.append(
-            f"AC8 — {len(single)} core bench key(s) have only ONE live publishing "
-            f"leaderboard (single point of failure): {single}"
+            f"AC8_grace — {len(single_grace)} core bench key(s) have only ONE "
+            f"live publishing leaderboard but are within "
+            f"{AC8_GRACE_DAYS}-day grace window or warn-only override: "
+            f"{single_grace}"
         )
 
     # Report

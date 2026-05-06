@@ -370,7 +370,14 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
     On hook failure: fix root cause + new commit (NEVER --amend, NEVER --no-verify)
     On push conflict (only halt path in entire workflow): prompt user "git pull --rebase first" — this is the sole user-blocking step because remote-state reconciliation is genuinely outside skill authority.
 13. Sleep DEPLOY_WAIT_SEC (90s)
-14. Verify: curl <live_url>/data/models.json → 200 + valid schema → "✓ Live". On non-200: log warning, declare workflow done — Pages will eventually finish, no halt.
+14. Run `python scripts/verify-deploy.py` (added 2026-05-06). Three nested checks in one binary:
+      (a) GitHub commits API confirms `origin/main` HEAD == local HEAD
+      (b) Pages-served `data/models.json` ETag rotated vs `data/_meta.json.prevPushEtag`
+      (c) Served `data/_meta.json` `modelCount` + `benchKeyCount` match local
+    Exit 0 → "✓ DEPLOY VERIFIED", workflow complete.
+    Exit 1 → log "DEPLOY VERIFICATION FAILED" + last error to CHANGELOG (cycle still considered closed; next cycle will re-push), surface URL + GitHub status link.
+    Exit 2 → tooling/network unavailable → log "DEPLOY VERIFICATION UNAVAILABLE", do not flag failure.
+    The script handles its own retry budget (60s warm-up + 3 × 30s retries, ~2.5 min total). Skill MUST NOT skip this step on `refresh-all`; on partial-scope refresh the script also runs (cheap, idempotent).
 ```
 
 ## CONSTANTS

@@ -307,7 +307,7 @@ def validate_gaps(out):
     Empty triedSources is a contract violation; the entry is stripped and
     recorded in `runtime.strippedGaps[]`. The corresponding cell then
     surfaces as a silent omission via MX1 (matrix invariant), rolling the
-    merge back unless --warn-only-invariant is in effect.
+    merge back. MX1 has no warn-only override.
 
     Soft rule (audit suspicion): triedQueries[] < 2 OR triedFormats[] < 1
     flags `runtime.fabricatedSuspicions[]` for human review but the entry
@@ -578,8 +578,7 @@ def main():
             f" [WARN: cumulative provenance coverage {cov_pct}% below 85% target]"
         )
 
-    # MX1 — Cell-level matrix invariant (HARD BLOCK after W2 activation;
-    # WARN-only via --warn-only-invariant during W1 migration phase).
+    # MX1 — Cell-level matrix invariant (HARD BLOCK, no override).
     # Every (active_modelId, coreBenchKey) cell must end up in exactly one
     # of FILLED | GAP | NOT_APPLICABLE. Silent omission = contract violation.
     contracts_block = _wl_contracts(_wl_load())
@@ -639,13 +638,17 @@ def main():
         if rolled:
             print(f"  rolled back {len(rolled)} file(s) from .bak", file=sys.stderr)
         print(
-            "  re-run with --warn-only-invariant to log + continue (W1 migration only).",
+            "  fix the artifact: every missing cell must land in models[].bench, "
+            "gaps[] (with triedSources/triedQueries/triedFormats), or "
+            "models[].notApplicableBenchKeys.",
             file=sys.stderr,
         )
         print("=" * 72, file=sys.stderr)
         sys.exit(1)
 
-    # MX2 — Absolute coverage floor (WARN during W1; flip via env to BLOCK in W3).
+    # MX2 — Absolute coverage floor (HARD BLOCK by default; regression guard).
+    # Override: AICODERMAP_MX2_WARN_ONLY=1 (transition periods only) or the
+    # documented one-shot --bypass-floor-check CLI flag.
     floor = float(contracts_block.get("ABSOLUTE_COVERAGE_FLOOR") or 0.30)
     if mx_diag.get("totalCells"):
         ratio = mx_diag.get("filled", 0) / max(mx_diag["totalCells"], 1)
@@ -655,6 +658,33 @@ def main():
                 f"{int(floor * 100)}%]"
             )
             coverage_warn = (coverage_warn or "") + floor_msg
+            mx2_warn_only = os.environ.get("AICODERMAP_MX2_WARN_ONLY") == "1"
+            if not mx2_warn_only and not BYPASS_FLOOR_CHECK:
+                rolled = restore_from_bak([models_path, sources_path])
+                print("\n" + "=" * 72, file=sys.stderr)
+                print(
+                    "✗ MERGE ABORTED — MX2 absolute coverage floor breached",
+                    file=sys.stderr,
+                )
+                print("=" * 72, file=sys.stderr)
+                print(
+                    f"  fill ratio {round(ratio * 100, 1)}% < floor "
+                    f"{int(floor * 100)}% (filled={mx_diag.get('filled')}, "
+                    f"total={mx_diag.get('totalCells')})",
+                    file=sys.stderr,
+                )
+                if rolled:
+                    print(
+                        f"  rolled back {len(rolled)} file(s) from .bak",
+                        file=sys.stderr,
+                    )
+                print(
+                    "  override paths: AICODERMAP_MX2_WARN_ONLY=1 env "
+                    "(logs warning, continues) or --bypass-floor-check CLI flag.",
+                    file=sys.stderr,
+                )
+                print("=" * 72, file=sys.stderr)
+                sys.exit(1)
 
     # SSOT coherence audit — HARD BLOCK gate. Runs against the just-written
     # data files. On drift: roll the data files back to their .bak snapshots,

@@ -49,4 +49,14 @@ if [ -f "$BENCH_AUDIT" ]; then
   fi
 fi
 
+# Stamp every successful pre-push run. Two purposes:
+#   1) audit-trail: `.audit/last-pre-push.iso` records the timestamp of the
+#      last hook-protected push so a downstream check can detect a stale
+#      anchor (proxy for someone bypassing with --no-verify).
+#   2) ds-commit / verify-deploy can read this to confirm the audit chain
+#      ran on the local HEAD before the push reached origin.
+mkdir -p "$REPO_ROOT/.audit" 2>/dev/null || true
+date -u +"%Y-%m-%dT%H:%M:%SZ" > "$REPO_ROOT/.audit/last-pre-push.iso" 2>/dev/null || true
+git -C "$REPO_ROOT" rev-parse HEAD > "$REPO_ROOT/.audit/last-pre-push.sha" 2>/dev/null || true
+
 exit 0
