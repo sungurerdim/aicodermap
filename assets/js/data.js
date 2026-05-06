@@ -40,14 +40,17 @@ export async function fetchJson(name) {
 }
 
 export async function loadData() {
-  const [models, sources, gpu] = await Promise.all([
+  const [models, sources, gpu, meta] = await Promise.all([
     fetchJson('models.json'),
     fetchJson('sources.json'),
     fetchJson('gpu-database.json'),
+    // _meta.json is best-effort — older deploys lack it, so a 404 is silent.
+    fetchJson('_meta.json').catch(() => null),
   ]);
   State.models = validateModels(models);
   State.sources = (sources && typeof sources === 'object') ? sources : {};
   if (gpu && typeof gpu === 'object') State.gpu = { ...State.gpu, ...gpu };
+  if (meta && typeof meta === 'object') State.meta = meta;
 }
 
 export function scoreClass(v) {

@@ -14,6 +14,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added — 2026-05-06 (FAZ D — observability + cycle telemetry)
+
+- `scripts/lib/telemetry.py` (new) — pure-stdlib helper that composes the
+  cycle snapshot, writes `data/_meta.json`, and appends a row to
+  `data/refresh-history.json` (ring-buffer, last 30 cycles).
+- `data/_meta.json` (new canonical artifact) — single-row snapshot per
+  refresh: `schemaVersion`, `updatedAt`, `buildSha`, `cycleId`,
+  `modelCount`, `benchKeyCount`, `totalCells`, `filledCells`, `gapCells`,
+  `naCells`, `fillRatio`, `contradictionsResolved`,
+  `lastCycle{ToolCallCount,FetchAttemptCount,BatchCount,ElapsedMs}`,
+  `prevPushEtag`. Consumers: `freshness.js`, `verify-deploy.py`, the
+  footer chip in the UI.
+- `data/refresh-history.json` (new ring-buffer) — last 30 cycles' worth
+  of telemetry. Human-review fodder; not consumed by the UI today.
+- `merge.py` — telemetry write happens after MX1/MX2/SSOT/AC6/AC7 gates
+  pass (writes only on a clean merge). CHANGELOG entry header now carries
+  a one-line metadata row right under the title:
+  `[fillRatio:0.27 cells:421/1560 contradictions:4 fetch:5.2min tools:62 batches:5 build:abc1234]`.
+- `assets/js/data.js` — `loadData()` fetches `_meta.json` best-effort
+  (404 silent for legacy deploys). Populates `State.meta`.
+- `assets/js/core.js` — `State.meta` slot.
+- `assets/js/render-controls.js` — footer chip extended:
+  `Deployed: 2026-05-06 · build abc1234 · 27% · 421/1560`. Tooltip
+  carries cycle-id + tool-call + batch-count diagnostics.
+
 ### Added — 2026-05-06 (FAZ C — research pipeline telemetry)
 
 - `agent.md OUTPUT_SCHEMA.runMetadata` — promoted from optional to MANDATORY,

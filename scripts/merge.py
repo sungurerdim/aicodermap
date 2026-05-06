@@ -22,6 +22,7 @@ import os
 import shutil
 import sys
 from datetime import date, datetime, timezone
+from pathlib import Path
 from urllib.parse import urlparse
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -50,6 +51,13 @@ from lib.matrix import verify_matrix_invariant as _matrix_verify  # noqa: E402
 from lib.whitelist import contracts as _wl_contracts  # noqa: E402
 from lib.whitelist import core_bench_keys as _wl_core_bench_keys  # noqa: E402
 from lib.whitelist import load_whitelist as _wl_load  # noqa: E402
+from lib.telemetry import build_meta as _telemetry_build_meta  # noqa: E402
+from lib.telemetry import (  # noqa: E402
+    metadata_changelog_row as _telemetry_changelog_row,
+)
+from lib.telemetry import (  # noqa: E402
+    write_meta_and_history as _telemetry_write,
+)
 
 
 BYPASS_FLOOR_CHECK = "--bypass-floor-check" in sys.argv
@@ -797,9 +805,36 @@ def main():
         else:
             partial_info = f" [partial: {partial_reason}]"
 
+    # FAZ D — write data/_meta.json + append data/refresh-history.json
+    # ring-buffer. The browser's freshness.js + verify-deploy.py both consume
+    # data/_meta.json; the ring buffer is human-review fodder.
+    contradictions_resolved = len(log.get("contradictions") or [])
+    prev_etag = None
+    try:
+        existing_meta = json.loads(
+            (Path(f"{PROJECT}/data/_meta.json")).read_text(encoding="utf-8")
+        )
+        prev_etag = existing_meta.get("etag") or existing_meta.get("prevPushEtag")
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        prev_etag = None
+    meta_row = _telemetry_build_meta(
+        models=models,
+        bench_keys=_wl_core_bench_keys(_wl_load()),
+        matrix_diag=mx_diag,
+        artifact=out,
+        contradictions_resolved=contradictions_resolved,
+        prev_push_etag=prev_etag,
+    )
+    try:
+        _telemetry_write(meta_row)
+    except OSError as exc:  # never abort the merge on telemetry I/O
+        print(f"WARN: telemetry write failed: {exc}", file=sys.stderr)
+    metadata_row = _telemetry_changelog_row(meta_row)
+
     cl_path = f"{PROJECT}/CHANGELOG.md"
     cl_lines = [
-        f"\n## [{TODAY}] — autonomous refresh-all{coverage_warn}{partial_info}\n"
+        f"\n## [{TODAY}] — autonomous refresh-all{coverage_warn}{partial_info}\n",
+        f"\n{metadata_row}\n",
     ]
     if log["added"]:
         cl_lines.append("\n### Added\n")

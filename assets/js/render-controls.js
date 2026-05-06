@@ -217,10 +217,30 @@ export function renderDeployStamp() {
   const formatted = fmtDeployTime(State.dataDeployedAt);
   if (!formatted) return;
   const label = t('ui.footer.deployed') || 'Deployed';
-  const sha = shortBuildHash(State.dataEtag);
-  node.textContent = sha
-    ? `${label}: ${formatted} · build ${sha}`
-    : `${label}: ${formatted}`;
-  node.title = `${State.dataDeployedAt}${State.dataEtag ? ` (etag ${State.dataEtag})` : ''}`;
+  const meta = State.meta && typeof State.meta === 'object' ? State.meta : null;
+  // Prefer the build SHA + cycle telemetry the merge step writes into
+  // data/_meta.json. Fall back to the ETag-derived short hash (legacy).
+  const sha = (meta && typeof meta.buildSha === 'string' && meta.buildSha !== 'unknown')
+    ? meta.buildSha
+    : shortBuildHash(State.dataEtag);
+  const fillRatioPct = (meta && Number.isFinite(meta.fillRatio))
+    ? Math.round(meta.fillRatio * 100)
+    : null;
+  const cellLine = (meta && Number.isFinite(meta.filledCells) && Number.isFinite(meta.totalCells))
+    ? ` · ${meta.filledCells}/${meta.totalCells}`
+    : '';
+  const ratioLine = (fillRatioPct != null) ? ` · ${fillRatioPct}%` : '';
+  const buildLine = sha ? ` · build ${sha}` : '';
+  node.textContent = `${label}: ${formatted}${buildLine}${ratioLine}${cellLine}`;
+  const titleParts = [State.dataDeployedAt];
+  if (State.dataEtag) titleParts.push(`etag ${State.dataEtag}`);
+  if (meta && meta.cycleId) titleParts.push(`cycle ${meta.cycleId}`);
+  if (meta && meta.lastCycleToolCallCount != null) {
+    titleParts.push(`tools=${meta.lastCycleToolCallCount}`);
+  }
+  if (meta && meta.lastCycleBatchCount != null) {
+    titleParts.push(`batches=${meta.lastCycleBatchCount}`);
+  }
+  node.title = titleParts.filter(Boolean).join(' · ');
   node.hidden = false;
 }

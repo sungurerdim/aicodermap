@@ -102,6 +102,7 @@ export const State = {
   detectedGpu: null,
   dataDeployedAt: null,
   dataEtag: null,
+  meta: null,
 };
 
 export function readStorage(key, fallback) {
