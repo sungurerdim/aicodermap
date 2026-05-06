@@ -112,13 +112,34 @@ for g in existing_artifact.get("gaps", []):
 
 # Also count existing filled cells from data/models.json (merge.py preserves them)
 existing_filled: set[tuple[str, str]] = set()
+existing_na: set[tuple[str, str]] = set()
+existing_na_entries: dict[str, list[dict]] = {}
 for m in active:
     bench = m.get("bench") or {}
     for k, v in bench.items():
         if k in core_keys and v is not None:
             existing_filled.add((m["id"], k))
+    # data/models.json carries notApplicable both as object list and as bare key list.
+    # gap-gen MUST preserve these — otherwise gap-gen enumerates them as gaps and
+    # merge.py MX1 fails with overlap_gap_na (filled+gaps+na > totalCells).
+    saved: list[dict] = []
+    for na in m.get("notApplicable", []) or []:
+        if isinstance(na, dict):
+            bk = na.get("benchKey") or na.get("key")
+            if bk in core_keys:
+                existing_na.add((m["id"], bk))
+                saved.append(na)
+        elif isinstance(na, str) and na in core_keys:
+            existing_na.add((m["id"], na))
+            saved.append({"benchKey": na, "rule": "preserved-from-data"})
+    for k in m.get("notApplicableBenchKeys", []) or []:
+        if k in core_keys and (m["id"], k) not in existing_na:
+            existing_na.add((m["id"], k))
+            saved.append({"benchKey": k, "rule": "preserved-from-data"})
+    if saved:
+        existing_na_entries[m["id"]] = saved
 
-all_covered = agent_filled | agent_gaps | agent_na | existing_filled
+all_covered = agent_filled | agent_gaps | agent_na | existing_filled | existing_na
 
 # Build the universe
 total_universe = {(m["id"], k) for m in active for k in core_keys}
@@ -147,10 +168,27 @@ for m in active:
             "notApplicable": [],
         }
 
+# Re-attach existing notApplicable entries from data/models.json so merge.py sees
+# the same N/A universe the gap-gen excluded above. Dedupe by benchKey.
+for mid, saved in existing_na_entries.items():
+    entry = artifact_models_by_id.setdefault(
+        mid, {"id": mid, "updates": {}, "sourcesAdded": [], "notApplicable": []}
+    )
+    seen = {
+        (n.get("benchKey") or n.get("key"))
+        for n in entry.get("notApplicable", [])
+        if isinstance(n, dict)
+    }
+    for na in saved:
+        bk = na.get("benchKey") or na.get("key")
+        if bk and bk not in seen:
+            entry.setdefault("notApplicable", []).append(na)
+            seen.add(bk)
+
 # Build gaps list (preserve existing explicit gaps + add auto-gaps for missing)
-# Filter out agent gaps for cells already filled (existing_filled | agent_filled)
-# to prevent overlap_filled_gap in merge.py MX1 invariant check.
-already_filled = existing_filled | agent_filled
+# Filter out agent gaps for cells already filled OR already N/A — both overlaps
+# break merge.py MX1 invariant (filled+gaps+na exceeds universe).
+already_covered = existing_filled | agent_filled | existing_na | agent_na
 
 
 def _gap_cell(g: dict) -> tuple[str, str] | None:
@@ -164,7 +202,7 @@ def _gap_cell(g: dict) -> tuple[str, str] | None:
 
 
 existing_gaps = [
-    g for g in existing_artifact.get("gaps", []) if _gap_cell(g) not in already_filled
+    g for g in existing_artifact.get("gaps", []) if _gap_cell(g) not in already_covered
 ]
 auto_gap_count = 0
 for mid, bk in sorted(missing):
@@ -189,7 +227,7 @@ for mid, bk in sorted(missing):
 
 filled_count = len(existing_filled | agent_filled)
 gap_count = len(existing_gaps)
-na_count = len(agent_na)
+na_count = len(agent_na | existing_na)
 total_cells = len(total_universe)
 
 artifact = {
