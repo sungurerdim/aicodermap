@@ -24,10 +24,10 @@ Orchestrate AI coding LLM tracker updates: discover **official vendor lineup** �
 | arg | scope | model | typical_duration |
 |-----|-------|-------|------------------|
 | (none) | interactive prompt | — | — |
-| `refresh-all` | full (lineup + bench + pricing + local) | sonnet | 4-7min |
-| `lineup-sync` | vendor lineup discovery only (Step 0) | sonnet | 1-2min |
-| `model <id>` | specific | sonnet | 1-2min |
-| `new-release` | new-release detection | sonnet | 2-3min |
+| `refresh-all` | full (lineup + bench + pricing + local) | sonnet | 30-90min (4 waves × 17 batches; per-batch wallclock 5-30min depending on SPA-fetch fallbacks) |
+| `lineup-sync` | vendor lineup discovery only (Step 0) | sonnet | 3-6min (single batch, vendors in parallel) |
+| `model <id>` | specific | sonnet | 3-8min (single-batch, single-model deep sweep) |
+| `new-release` | new-release detection | sonnet | 4-10min |
 | `validate` | (no fetch) | — | <10s |
 | `stale-check` | (no fetch) | — | <5s |
 | `changelog` | (no fetch) | — | <5s |
@@ -143,6 +143,7 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
    // Dispatch each bucket as a SEPARATE Agent({...}) call (parallel single message).
    // Each sub-agent receives:
    //   - target_model_ids: ids for its bucket only
+   //   - artifact_path: <abs>/.aicodermap-agent-out-<batchId>.json (agent Writes here)
    //   - filtered idea_context (F5: only relevant vendor entries, see Step 3)
    //   - full leaderboards[] and coreBenchKeys (shared across all buckets)
    //   - priorityCells filtered to its bucket's models
@@ -218,7 +219,11 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
      - notApplicable[] entries: cite a rule from _schema.notApplicableRules
      - silent omission triggers MX1 rollback in merge.py
    ```
-5. Parse return → validate JSON schema (strip surrounding whitespace, locate first `{` and last `}` if narration leaked)
+5. Parse return:
+   - **PRIMARY (post-2026-05-07):** read `.aicodermap-agent-out-<batchId>.json` (agent wrote it via `Write` tool)
+   - **FALLBACK A:** if file missing/unparseable, run `python scripts/extract-agent-output.py <subagent-jsonl-path> <out-path>` against the agent's transcript at `~/.claude/projects/<projid>/<sessionid>/subagents/agent-<agentId>.jsonl`
+   - **FALLBACK B:** if persisted tool-result file exists at `<projid>/<sessionid>/tool-results/toolu_*.json`, run `extract-agent-output.py <persisted-json> <out-path>`
+   - validate JSON schema after extraction; on parse failure log to `~/.aicodermap-debug.log` and CONTINUE with whatever fragment is recoverable
 
 5-F6. PARTIAL_RETURN_GATE (F6 reform — 2026-04-30):
     For each sub-agent artifact:
@@ -489,7 +494,7 @@ SINGLE_ARTIFACT_PATH            = ".aicodermap-agent-out.json"  // ONE artifact,
 |------|-------------------|------------------------------------------------------------|
 | 0 Lineup discovery | `lineup` populated AND ≥10 vendor pages successfully parsed (or all reachable vendors attempted) | If `lineup` empty/missing AND not first run → dispatch ONE retry agent restricted to Step 0. On second-cycle empty: log `gaps[]` entry `lineup:incomplete` and CONTINUE. Unreachable vendors → log `lineup:<vendor>: unreachable`, never block on stale lineup. |
 | 0b Source health check | `runtime.healthChecks` covers ≥3 leaderboard domains with status entries | If <3 domains → dispatch retry agent restricted to PRELIM SOURCE_HEALTH_CHECK. On second-cycle <3: log `gaps[]` entry `health-check:incomplete` and CONTINUE. |
-| 4 Agent survey | JSON return parseable (first `{`, last `}`); `models[]+newModels[]` ≥ FAMILY_BASELINE_MIN OR explicit gaps[] entries explaining shortfall | Retry once with reinforced delivery contract. On second failure: extract whatever JSON fragment is recoverable + log debug to `~/.aicodermap-debug.log` + CONTINUE merge with available data. Family-count shortfall logged to gaps[], never halts. |
+| 4 Agent survey | `.aicodermap-agent-out-<batchId>.json` exists and parses; `models[]+newModels[]` ≥ FAMILY_BASELINE_MIN OR explicit gaps[] | (1) agent-written file primary; (2) FALLBACK A: `extract-agent-output.py` against subagent jsonl; (3) FALLBACK B: persisted tool-result extraction; (4) on all-3 failure: log to `~/.aicodermap-debug.log` + CONTINUE merge with available data. Family-count shortfall logged to gaps[], never halts. |
 | 6 Coverage log | `validationCoverage` is a number 0..1 in artifact | Below COVERAGE_TARGET (0.85): set artifact.partialCoverage=true, append "⚠ cumulative provenance coverage" line to CHANGELOG, CONTINUE. Below COVERAGE_HARD_BLOCK (0.50): louder warning, still CONTINUE. No deep-fetch loop (retired 2026-04-28) — agent already walks every cell every cycle. |
 | 7 Contradiction auto-resolve | Every contradiction has autoResolveWinner | TrustScore ties within 0.05 with no I-tier present: prefer most-recent value, then most-verified, then alphabetical-by-source as deterministic tiebreaker — never user prompt |
 | 10 Atomic write | `data/{models,sources}.json` parse-valid + self-check passes | On parse failure: restore from `.bak` + log root cause + retry the merge once with relaxed self-check. On second failure: write the artifact's known-good fields only, mark unhealable fields in gaps[]. CONTINUE — never leave repo in restored-only state |

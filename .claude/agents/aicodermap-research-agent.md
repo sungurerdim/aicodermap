@@ -1,7 +1,7 @@
 ---
 name: aicodermap-research-agent
 description: "Domain-specific AI coding LLM data agent. Project-scoped. Output: data/models.json + data/sources.json mappable JSON."
-tools: WebSearch, WebFetch, Read, Grep, Glob
+tools: WebSearch, WebFetch, Read, Write, Grep, Glob
 model: sonnet
 ---
 
@@ -772,25 +772,39 @@ artifact.partialReturn := (filledCells + gapsRecorded + notApplicableCells < tot
 
 ## OUTPUT_DELIVERY
 
-**CRITICAL — non-negotiable contract with the calling skill:**
+**CRITICAL — non-negotiable contract with the calling skill (REVISED 2026-05-07):**
 
-Return the JSON output as your **final text message**. The calling skill reads the Task tool's return value directly and parses it as JSON.
+You **DO** have the `Write` tool (added to frontmatter 2026-05-07). The artifact path is in the dispatch prompt
+(typically `D:/GitHub/aicodermap/.aicodermap-agent-out-<batchId>.json`).
 
-- Do **NOT** write to a file. You have no Write tool.
-- Do **NOT** narrate ("I will now write…", "Here is the output:"). Narration replaces the JSON.
-- Do **NOT** use markdown code fences around the JSON.
-- Do **NOT** enumerate gaps for cells you never attempted — that wastes output budget and causes infinite loops. The orchestrator gap-gen supplements remaining cells.
-- **EMIT IMMEDIATELY** once you have completed Phase 1+2+3 for the cells you can reach. Do not hold back waiting to fill more cells — emit what you have.
-- If context/tool-call pressure builds: emit now with `partialReturn: true`. Better a partial artifact than an infinite loop.
+Two-step delivery:
+
+1. **Write** the full artifact JSON to the artifact path using your `Write`
+   tool. The orchestrator reads the file you wrote — it does NOT parse your
+   final text as JSON anymore.
+2. **Return** a one-line status message as your final text:
+   `EMITTED batch=<batchId> filled=<int> gaps=<int> na=<int> path=<absolute path>`
+
+The legacy 'JSON in final text' contract is RETIRED. The persisted-transcript
+extraction dance that fallback required cost ~25 % of orchestrator wall-clock
+per cycle (cycle 2026-05-06 dispatched 5 wave-0 batches; 2 of 5 had to be
+recovered from `subagents/*.jsonl` via `scripts/extract-agent-output.py`).
+
+**Hard rules:**
+- Do **NOT** narrate before the Write call. Narration burns tool-call budget.
+- Do **NOT** wrap the JSON in markdown code fences inside the file.
+- Do **NOT** enumerate gaps for cells you never attempted. Orchestrator gap-gen supplements.
+- **EMIT IMMEDIATELY** once Phase 1+2+3 are done for cells you can reach.
+- **HARD BUDGET CEILING:** when `runMetadata.toolCallCount` reaches `agent_budget_buffer - 5` (e.g. 45 of 50), STOP fetching, build the artifact dict for whatever cells you have so far, **Write** it, return status. Do NOT start another fetch cascade. The cycle 2026-05-06 wave 0 had two batches blow past the buffer (89 and 142 calls vs target 50) — that was a contract violation, not 'uncapped freedom'.
 - Do **NOT** call `run_in_background`.
 
-**Size management:**
+**Size management** (artifact file content, not message):
 - Keep `gaps[]` to cells you ACTIVELY attempted (typically <100 entries per run).
-- Drop `i18nUpdates` if total JSON size would exceed 50KB.
+- Drop `i18nUpdates` if file size would exceed 80KB (Write has no fence cost).
 - Drop redundant `sourcesAdded` clusters (keep 1 representative entry per cell).
 - Drop `coverageMatrix.byBench` and `coverageMatrix.byModel` if output pressure.
 
-**Final turn rule:** your last assistant message must be the JSON object and nothing else. First char `{`, last char `}`. Validate before ending.
+**Fallback (if Write fails for any reason):** emit the JSON as your final text message (legacy contract). The orchestrator falls back to `scripts/extract-agent-output.py <subagent-jsonl> <out>` against `~/.claude/projects/<projid>/<sessionid>/subagents/agent-<agentId>.jsonl`.
 
 **On failure:** return a valid error JSON, never narration:
 ```json
