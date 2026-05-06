@@ -1,3 +1,25 @@
+
+## [2026-05-06] — autonomous refresh-all [WARN: very low cumulative provenance coverage 28.4%] [MX2: coverage 27.3% < absolute floor 30%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 182 new fills; 0 cells auto-gapped by orchestrator; 1031 explicit agent gaps preserved]
+
+[fillRatio:0.27 cells:426/1560 contradictions:1 fetch:0.0min tools:None batches:None build:6688fa2]
+
+### Updated
+- 29 models: `opus-4-7`, `sonnet-4-6`, `gpt-5-5`, `gpt-5-4`, `o3`, `o4-mini`, `gemini-3-1-pro`, `gemini-3-1-flash`, `grok-4-20`, `grok-4-3`, `grok-4-1-fast`, `grok-3-mini`, `deepseek-v4-pro`, `deepseek-v4-flash`, `deepseek-v3-2`, `minimax-m2-5`, `minimax-m2-7`, `minimax-m2-1`, `qwen3-coder-480b`, `qwen3-coder-next`, `qwen3-5-9b`, `mistral-medium-3-5`, `mistral-large-3`, `gemma-4-26b-moe`, `mimo-v2-pro`, `mimo-v2-flash`, `glm-4-5-air`, `glm-4-7`, `glm-5-1`
+
+### Resolved (auto via trustScore)
+- gemini-3-1-flash.lcb: winner={'value': 91.7, 'trustScore': 0.87, 'sourceUrl': 'https://livecodebench.github.io/leaderboard.html', 'tier': 'I'} (severity=GREEN, Δ0.9)
+
+### Gaps (1020 entries — see data/known-gaps.json or next refresh)
+- `glm-4-5-air.sweV`: GLM-4.5 Air sweV not found on any leaderboard; model too recent/lightweight for SWE-bench listing
+- `glm-4-5-air.swePro`: GLM-4.5 Air not listed on Scale SEAL SWE-bench Pro leaderboard
+- `devstral-2.swePro`: Devstral 2 too newly released (2026-05-01); not yet indexed on Scale SEAL Pro leaderboard
+- `mistral-medium-3-5.gpqa`: Mistral Medium 3.5 GPQA not published at launch per official blog
+- `mistral-medium-3-5.lcb`: LiveCodeBench score for Mistral Medium 3.5 not published at launch
+- `qwen3-5-9b.sweV`: Qwen3-5-9B sweV score not found on SWE-bench leaderboard; likely too recent
+- `claude-haiku-4-5.aaAgentic`: not reached in agent survey cycle; AA Agentic data unavailable
+- `claude-haiku-4-5.aaCoding`: not reached in agent survey cycle; AA Coding data unavailable
+- ... and 1012 more
+
 # Changelog
 
 All notable changes to AICoderMap will be documented here.

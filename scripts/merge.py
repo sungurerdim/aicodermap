@@ -476,6 +476,23 @@ def main():
             continue
         if apply_model_update(m, upd.get("updates", {})):
             log["updated"].append(mid)
+        # Promote inline notApplicable[] entries (agent emits per-model array)
+        # into models[].notApplicableBenchKeys so the matrix invariant counts
+        # them correctly. Idempotent: dedupe before merge.
+        inline_na = upd.get("notApplicable") or []
+        if inline_na:
+            existing_na = m.setdefault("notApplicableBenchKeys", [])
+            existing_set = set(existing_na)
+            for entry in inline_na:
+                bk = entry.get("benchKey") if isinstance(entry, dict) else None
+                if bk and bk not in existing_set:
+                    existing_na.append(bk)
+                    existing_set.add(bk)
+            # Also clear bench cell if present (cell can't be both filled and na).
+            bench = m.setdefault("bench", {})
+            for bk in existing_set:
+                if bk in bench and bench.get(bk) is not None:
+                    bench[bk] = None
         for s in upd.get("sourcesAdded", []) or []:
             warn = format_consistency_warn(s, wl_idx)
             if warn:
