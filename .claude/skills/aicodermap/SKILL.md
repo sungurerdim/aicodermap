@@ -104,19 +104,20 @@ PRELIM-B. LEADERBOARD_PREFETCH (FAZ 2.1, 2026-05-07 — orchestrator-side single
      //   byModel: { <id>:  {filled, na, total} }
      // }
      priorityCells: <priority_cells(active_models, coreBenchKeys, limit=200, verification_map=vm, skip_confirmed_within_days=contracts.FRESHNESS_TTL_DAYS)>,
-     // FAZ 2.3 (2026-05-07): AUTHORITATIVE work list — agent walks only these.
-     // Top-N empty (modelId, benchKey) pairs ranked by starvation
-     // (rare benches first, then rare models, lex tiebreak). The list excludes
-     // T2 freshness-tier cells (confirmed + ≥3 verifs + age ≤ FRESHNESS_TTL_DAYS,
-     // see FAZ 2.2) — those go through idea_context.skipCells instead.
+     // FAZ 4.A (2026-05-08): ORDERING (advisory), NOT scope.
+     // Top-N empty (modelId, benchKey) pairs ranked by starvation. Agent
+     // resolves priorityCells FIRST inside its slice, then sweeps the rest
+     // of `target_model_ids × coreBenchKeys`.
      //
-     // Pre-FAZ-2.3 contract: "process these BEFORE any other empty cell" —
-     // agent could sweep the rest of the matrix afterward. That sweep
-     // routinely burned the entire budget on low-priority cells (cycle
-     // 2026-05-06 batch03 0-fill pattern). The reform makes priorityCells
-     // the only valid scope: agent processes top-down until budget/wallclock
-     // ceiling, then emits artifact. Cells not reached re-surface in next
-     // cycle's priority queue.
+     // Pre-FAZ-4.A (FAZ 2.3 reform): priorityCells was AUTHORITATIVE — agent
+     // walked ONLY this list, ignoring the rest of its slice. Cycle 2026-05-08
+     // measured the cost: 18 batches used 591/900 tool-calls (~33%) and
+     // produced 51 fills (~4% slice coverage) because top-200 priority queue
+     // ÷ 18 batches ≈ 11 cells/batch — agents stopped early.
+     //
+     // FAZ 4.A restores full-slice target. Wallclock cap (FAZ 1.3) +
+     // tool-call ceiling (FAZ 1) independently prevent runaway sweep (the
+     // problem the 2.3 reform tried to fix).
      contracts: <data/sources-whitelist.json._schema.contracts>,
      // Numeric thresholds (ABSOLUTE_COVERAGE_FLOOR, MIN_SOURCES_PER_FILLED_CELL,
      // VERIFICATION_AGREEMENT_PP, etc.) — single source of truth; agent reads

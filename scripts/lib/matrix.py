@@ -90,26 +90,29 @@ def priority_cells(
     verification_map: dict[str, Any] | None = None,
     skip_confirmed_within_days: int = 7,
 ) -> list[dict[str, Any]]:
-    """Top-N most starved (modelId, benchKey) cells the agent should hit FIRST.
+    """Top-N most starved (modelId, benchKey) cells — ORDERING (advisory).
 
-    FAZ 2.3 (2026-05-07): this list is now the AUTHORITATIVE work list — the
-    agent walks ONLY these cells in Phase 2/3 and SHALL NOT process cells
-    outside the list. Cells not reached this cycle remain in the priority
-    queue for the next cycle. See agent.md "Matrix awareness" section.
+    FAZ 4.A (2026-05-08): this list is the ORDERING within an agent's slice,
+    NOT the scope. Agent target = `target_model_ids × coreBenchKeys` (full
+    slice); priorityCells just says "do these FIRST, then sweep the rest."
+    See agent.md "Matrix awareness" section.
+
+    The FAZ 2.3 AUTHORITATIVE rule was retired after the 2026-05-08 cycle
+    showed it clamped agents to ~33% of their tool-call budget (top-200
+    queue ÷ 18 batches ≈ 11 cells/batch). Wallclock + tool-call caps
+    independently prevent runaway sweep.
 
     Ranking heuristic (descending priority):
       1. cells where the bench has fewer total filled hits → starve-the-bench bias
       2. cells in models with fewer total filled hits → starve-the-model bias
       3. lex order on (modelId, benchKey) for deterministic tie-break
 
-    F2 skip-cache (aligned with FAZ 2.2 freshness contract 2026-05-07):
+    F2 skip-cache (aligned with FAZ 2.2 freshness contract):
     cells confirmed AND verified within `skip_confirmed_within_days` are
     excluded from the priority queue (default 7d, matching
     `_schema.contracts.FRESHNESS_TTL_DAYS`). The agent gets these cells
-    via `idea_context.skipCells` (FAZ 2.2) instead — same source data, two
-    presentations: skipCells says "use cached value"; priorityCells says
-    "actively work on this." Pass `verification_map` to activate the skip;
-    omit to retain UNCAPPED behaviour for legacy callers.
+    via `idea_context.skipCells` (FAZ 2.2) instead. Pass `verification_map`
+    to activate the skip; omit to retain UNCAPPED behaviour for legacy callers.
 
     Returns: [{modelId, benchKey, benchFillRatio, modelFillRatio}], capped at limit.
     """

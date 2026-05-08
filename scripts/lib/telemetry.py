@@ -200,7 +200,16 @@ def aggregate_per_batch_telemetry(per_batch_artifacts: list[dict]) -> dict:
             for m in models
             if isinstance(m, dict)
         )
-        gaps = len(art.get("gaps") or [])
+        all_gaps = art.get("gaps") or []
+        gaps = len(all_gaps)
+        # FAZ 4.B (2026-05-08): split by source — 'agent' = real research,
+        # 'orchestrator' = auto-stub placeholder. Legacy entries default 'agent'.
+        agent_gaps = sum(
+            1
+            for g in all_gaps
+            if isinstance(g, dict) and g.get("source") != "orchestrator"
+        )
+        orch_gaps = gaps - agent_gaps
         na = sum(
             len(m.get("notApplicable") or []) for m in models if isinstance(m, dict)
         )
@@ -230,6 +239,8 @@ def aggregate_per_batch_telemetry(per_batch_artifacts: list[dict]) -> dict:
                 "toolCallCount": tool_call_count,
                 "fills": fills,
                 "gaps": gaps,
+                "agentGaps": agent_gaps,
+                "orchestratorGaps": orch_gaps,
                 "naCount": na,
                 "partialReason": partial_reason,
             }
@@ -254,6 +265,8 @@ def aggregate_per_batch_telemetry(per_batch_artifacts: list[dict]) -> dict:
         "totals": {
             "fills": fills_total,
             "gaps": gaps_total,
+            "agentGaps": sum(pb.get("agentGaps", 0) for pb in per_batch),
+            "orchestratorGaps": sum(pb.get("orchestratorGaps", 0) for pb in per_batch),
             "na": na_total,
             "wallclockSecMax": round(wc_max, 2),
             "wallclockSecP95": round(wc_p95, 2),

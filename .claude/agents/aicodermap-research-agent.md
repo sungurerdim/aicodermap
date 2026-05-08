@@ -118,36 +118,50 @@ batch_id: <string>                          # orchestrator batch label; surfaced
 wallclock_deadline_unix: <int>             # epoch seconds. Self-check at every Phase boundary; if Date.now()/1000 >= deadline-30 → STOP fetching, Write artifact, return EMITTED. Orchestrator SIGKILLs at deadline. Cells written survive; mid-flight lost. 30s soft buffer is for the Write call.
 ```
 
-**Matrix awareness (HARD — FAZ 2.3 reform 2026-05-07):**
+**Matrix awareness (HARD — FAZ 4.A reform 2026-05-08):**
 The skill ships `matrixState` + `priorityCells` (after T2-skip removal — see
 FAZ 2.2) so the agent sees the contract reality before the first fetch.
+
+**Target = `target_model_ids × coreBenchKeys` (FULL SLICE).**
+Each batch is responsible for every (modelId, benchKey) cell in its slice.
+A typical batch slice is 3-5 models × 26 keys = 78-130 cells; the agent
+must attempt EVERY cell, not just the priorityCells subset.
+
+**`priorityCells[]` is the ORDERING (advisory), NOT the scope.**
+Resolve priorityCells in order FIRST inside the slice, then sweep the
+rest of `target_model_ids × coreBenchKeys`. When the agent exhausts the
+slice OR hits the budget/wallclock ceiling, it emits and returns. Cells
+not reached this cycle remain in the next cycle's priority queue.
+
 The agent MUST:
 
 1. Scan `matrixState.byBench` to identify the bench keys with the lowest
    fill ratio — these get extra time in Phase 1 leaderboard sweep (more
    patterns, more aggregator mirrors, longer WebSearch cascade).
-2. **`priorityCells[]` is the AUTHORITATIVE work list (FAZ 2.3 reform
-   2026-05-07).** The agent walks it top-down through the Phase 2/3
-   cascade and SHALL NOT process cells outside this list. When the agent
-   exhausts `priorityCells` OR hits the budget/wallclock ceiling, it
-   emits artifact and returns. Cells not reached this cycle remain in
-   the priority queue for the next cycle — they are NOT auto-stubbed
-   inside the agent.
+2. **Order**: process priorityCells (the cells in your slice that are
+   also in priorityCells) FIRST in Phase 2/3 cascade. Then continue
+   through the rest of `target_model_ids × coreBenchKeys`.
+3. **Snapshot-first multi-cell extraction**: when reading a leaderboard
+   snapshot, extract every (modelId, benchKey) tuple visible in the
+   table that intersects your slice — not just the priority cells. One
+   Read should yield N×M cells across N models × M benches.
+4. Compare the agent's eventual `coverageMatrix.filledCells +
+   gapsRecorded + notApplicableCells` against `len(target_model_ids) ×
+   len(coreBenchKeys) - |notApplicable|`. If less, the cycle is partial
+   in the FAZ-1.3 wallclock sense — go back through Phase 3 cascade for
+   residual cells before emitting. Unreached cells re-surface in the
+   next cycle's priority queue.
 
-   Pre-FAZ-2.3 behavior was "process priorityCells first, then sweep
-   the rest of the matrix." That sweep regularly burned the entire
-   tool-call budget on low-priority cells while top priorities were
-   still unfilled — exactly the cycle 2026-05-06 batch03 0-fill pattern.
-   The reform makes the priority queue the only valid scope.
-
-3. Compare the agent's eventual `coverageMatrix.filledCells +
-   gapsRecorded + notApplicableCells` against `len(priorityCells) +
-   |skipCells|` (the cycle's actual reachable target). If less, the
-   cycle is partial in the FAZ-1.3 wallclock sense — go back through
-   Phase 3 cascade for residual priority cells before emitting final
-   JSON. The orchestrator's COMPLETENESS_GATE will dispatch a single
-   retry if the artifact still lands short. The unreached
-   priorityCells re-surface in next cycle's priority queue.
+**Why FAZ 4.A retires the FAZ 2.3 AUTHORITATIVE rule:** in the
+2026-05-08 cycle measured against the AUTHORITATIVE rule, agents used
+only ~33% of their tool-call budget (591/900) and produced 51 fills out
+of ~1300 reachable slice cells (fill rate ~4%). The bottleneck was the
+"priorityCells is the only valid scope" clamp — agents stopped early
+because the priority queue was small (top-200 across 18 batches ≈ 11
+cells per batch) instead of working the full slice. Restoring full-slice
+target fixes this without reverting the cycle 2026-05-06 batch03 0-fill
+defense (the wallclock cap and tool-call ceiling protect against
+runaway sweeps independently).
 
 ## TRUSTED_SOURCE_WHITELIST (`trusted_sources_only=true` enforces these)
 
@@ -605,8 +619,8 @@ Three shapes, never mixed:
 
   // gaps[] — ONLY cells the agent actively attempted and failed.
   // Do NOT enumerate all unfilled cells. The orchestrator gap-gen step
-  // supplements remaining cells after merge. Emitting 900+ gap entries
-  // causes output overflow and infinite loops — this is forbidden.
+  // supplements remaining cells after merge with source='orchestrator'.
+  // Emitting 900+ gap entries causes output overflow — this is forbidden.
   "gaps": [{
     "key": "<modelId>.<field>",      // use dot form: "claude-haiku-4-5.sweV"
     "reason": "<short why couldn't fill>",
@@ -616,7 +630,12 @@ Three shapes, never mixed:
     "triedQueries": ["<query>", ...],
     // triedFormats REQUIRED — at least 1 fallback format from formatTaxonomy.
     "triedFormats": ["<format>", ...],
-    "triedPatterns"?: ["<patternName>", ...]
+    "triedPatterns"?: ["<patternName>", ...],
+    // FAZ 4.B (2026-05-08): explicit source — agent emits 'agent' to mark
+    // "real research effort, tried-and-failed". Orchestrator gap-gen sets
+    // 'orchestrator' for auto-stubs. CHANGELOG + telemetry split by source
+    // so agentGaps (signal) ≠ orchestratorGaps (noise).
+    "source": "agent"
   }],
 
   "coverageMatrix": {

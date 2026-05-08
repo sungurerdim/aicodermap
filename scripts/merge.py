@@ -875,13 +875,30 @@ def main():
         for c in log["contradictions"]:
             cl_lines.append(f"- {c}\n")
     if out.get("gaps"):
+        # FAZ 4.B (2026-05-08): split gaps by source ('agent' vs 'orchestrator').
+        # Agent gaps = "tried and failed"; orchestrator gaps = "didn't reach".
+        agent_gaps = [g for g in out["gaps"] if g.get("source") == "agent"]
+        orch_gaps = [g for g in out["gaps"] if g.get("source") == "orchestrator"]
+        # Legacy entries without source field default to 'agent'.
+        unknown_gaps = [
+            g for g in out["gaps"] if g.get("source") not in ("agent", "orchestrator")
+        ]
+        agent_gaps.extend(unknown_gaps)
         cl_lines.append(
-            f"\n### Gaps ({len(out['gaps'])} entries — see data/known-gaps.json or next refresh)\n"
+            f"\n### Gaps ({len(out['gaps'])} entries — agent:{len(agent_gaps)} "
+            f"orchestrator:{len(orch_gaps)} — see data/known-gaps.json or next refresh)\n"
         )
-        for g in out["gaps"][:8]:
-            cl_lines.append(f"- `{g.get('key')}`: {g.get('reason')}\n")
-        if len(out["gaps"]) > 8:
-            cl_lines.append(f"- ... and {len(out['gaps']) - 8} more\n")
+        # Show agent gaps first (real research effort), then orchestrator stubs.
+        for g in agent_gaps[:6]:
+            cl_lines.append(f"- `{g.get('key')}` *(agent)*: {g.get('reason')}\n")
+        if orch_gaps:
+            for g in orch_gaps[:2]:
+                cl_lines.append(
+                    f"- `{g.get('key')}` *(orchestrator)*: {g.get('reason')}\n"
+                )
+        total_shown = min(6, len(agent_gaps)) + min(2, len(orch_gaps))
+        if len(out["gaps"]) > total_shown:
+            cl_lines.append(f"- ... and {len(out['gaps']) - total_shown} more\n")
 
     cl_blob = "".join(cl_lines)
     if os.path.exists(cl_path):
