@@ -122,59 +122,27 @@ PRELIM-B. LEADERBOARD_PREFETCH (FAZ 2.1, 2026-05-07 — orchestrator-side single
      // VERIFICATION_AGREEMENT_PP, etc.) — single source of truth; agent reads
      // these values rather than hardcoding any number in agent.md.
 
-     // FAZ 1.4 (2026-05-07): hard WebFetch ban list — orchestrator-derived.
-     // Agent FORMAT_DISPATCH gate refuses to WebFetch any URL on this list.
-     // Sources of bans:
-     //   1. Every URL in leaderboards[]/aggregators[]/community[]/local[]/
-     //      registries[] whose `format` has _schema.formatTaxonomy[<f>].skipWebFetch=true
-     //      (spa_full + image_embedded + bot_blocked).
-     //   2. Every URL whose _runtime.unhealthy=true (≥3 consecutive failures).
-     //   3. Every vendor URL in vendors.<v>.urls.* whose format key matches (1).
-     //
-     // Computed via scripts/lib/whitelist.py banned_fetch_patterns(whitelist):
-     //   returns a list of regex strings (anchored on hostname + optional path
-     //   prefix). Agent's matches_any() uses these against entry.url before
-     //   issuing WebFetch. Repeated WebFetch on a banned pattern is a contract
-     //   violation that the post-cycle telemetry flags (runtime.bannedFetchHits[]).
+     // FAZ 1.4: hard WebFetch ban list. Agent FORMAT_DISPATCH refuses these URLs.
+     // Sources: skipWebFetch=true formats (spa_full/image_embedded/bot_blocked),
+     // _runtime.unhealthy=true entries, and vendor URLs whose format matches.
+     // Computed via scripts/lib/whitelist.banned_fetch_patterns(whitelist).
      bannedFetchPatterns: banned_fetch_patterns(sourcesWhitelist),
 
-     // FAZ 2.1 (2026-05-07): pre-fetched leaderboard snapshots from PRELIM-B.
-     // Agent FORMAT_DISPATCH primary path: when target URL is in this map,
-     // use Read on `path` instead of WebFetch on `url`. Same extractor cascade
-     // (3-pass html_table / regex_extract / etc.) — only the source changes
-     // from "live network fetch" to "local snapshot Read".
+     // FAZ 2.1: pre-fetched leaderboard snapshots from PRELIM-B.
+     // Agent uses Read(path) instead of WebFetch(url) when URL is in map.
      // Cuts ~666 duplicated WebFetches/cycle (18 agents × 37 leaderboards) to
-     // 73 single-pass HTTP gets in ~15s. Tool-call savings: ~1.5 calls per
-     // leaderboard per agent (WebFetch + retry vs single Read).
-     // Fallback: any URL absent from this map → agent falls back to WebFetch.
-     // Loaded from data/.leaderboard-snapshots/_index.json.
+     // 73 single-pass HTTP gets in ~15s. Loaded from
+     // data/.leaderboard-snapshots/_index.json.
      leaderboardSnapshots: load_snapshot_index(),
-       // Shape: { <url>: { path: "data/.leaderboard-snapshots/<file>",
-       //                   contentType, contentLength, fetchedAt, etag } }
+       // Shape: { <url>: { path, contentType, contentLength, fetchedAt, etag } }
 
-     // FAZ 2.2 (2026-05-07): freshness-tiered skip cells — verification-map driven.
-     // Computed via scripts/lib/freshness.py compute_skip_cells():
-     //   T1 (re-fetch): confirmed=false OR verifs<3 OR age>FRESHNESS_TTL_DAYS
-     //                  OR unresolved-contradiction OR cell missing from map.
-     //   T2 (skip):     confirmed=true AND verifs≥3 AND age≤FRESHNESS_TTL_DAYS
-     //                  AND no contradiction.
-     // Default FRESHNESS_TTL_DAYS = 7 (configurable via _schema.contracts).
-     //
-     // Agent FORMAT_DISPATCH gate: when (target_modelId, target_benchKey) is
-     // in skipCells, the agent treats the cached value as already-filled and
-     // does NOT issue any fetch for that cell — value is preserved during
-     // gen_unified_artifact merge from the verification map directly.
-     //
-     // Why this is NOT a known-gaps registry redux: T1 dominates uncertainty;
-     // any cell with <3 verifications, missing freshness, or any
-     // contradiction is RE-FETCHED. Vendor scores changing overnight surface
-     // within ≤7d for confirmed cells (freshness expiry); within ONE cycle
-     // for low-verification cells (always T1).
-     //
-     // The "every (modelId, benchKey) every cycle" memory feedback is
-     // scope-clarified, not retired: T1 cells (the majority initially) still
-     // re-fetch every cycle. Only well-corroborated, recently-seen cells
-     // earn the skip pass.
+     // FAZ 2.2: freshness-tier skip cells (T2 only — T1 always re-fetches).
+     // T2 = confirmed=true AND verifs≥3 AND age≤FRESHNESS_TTL_DAYS AND no contradiction.
+     // Agent FORMAT_DISPATCH treats T2 cells as already-filled and emits cached
+     // value + provenance without any fetch. Computed via
+     // scripts/lib/freshness.compute_skip_cells(). NOT a known-gaps registry redux:
+     // any cell with <3 verifs, missing freshness, or any contradiction is T1
+     // (re-fetched every cycle). Drift surfaces within ≤7d for confirmed cells.
      skipCells: compute_skip_cells(
        verification_map,
        today,
@@ -191,59 +159,18 @@ PRELIM-B. LEADERBOARD_PREFETCH (FAZ 2.1, 2026-05-07 — orchestrator-side single
    - `data/sources-whitelist.json` is SSOT for "what URLs the agent is allowed to fetch" AND for the bench-key universe (`_schema.coreBenchKeys`). Frontend `BENCH_KEYS` (assets/js/core.js), i18n `benchmarks.*`, and the data-file `bench` cells all mirror this canonical set. `scripts/audit-data-coherence.py` enforces the mirroring by failing loudly on any drift.
    - No skip registry: every (modelId, benchKey) pair is re-attempted every cycle so vendor opt-outs that close are surfaced immediately
    - The agent file (.claude/agents/aicodermap-research-agent.md) only carries PROCEDURE (how) — every list of URLs, vendors, or model IDs lives in data files
-// F1 REFORM (2026-04-30) → BUDGET REFORM (2026-05-06):
-   // Adaptive multi-batch dispatch with per-agent budget guarantee.
-   //
-   // Root cause this reform addresses: a 60-model × 26-bench refresh against
-   // ONE sonnet agent collides with Claude Code's ~85 tool-call ceiling at
-   // ~11 % filled. The remaining ~89 % returned as orchestrator auto-stub
-   // gaps — the cycle "completed" but every refresh re-stubbed the same
-   // cells instead of advancing fill ratio.
-   //
-   // Plan source: scripts/lib/dispatch.py compute_dispatch_plan()
-   //   AGENT_BUDGET_BUFFER     = 50      // tool calls; ~35 buffer to ceiling
-   //   CELLS_PER_TOOL_CALL     = 3       // empirical (1 fetch → ~3 cells)
-   //   MAX_BATCH_CELLS         = 150     // 50 × 3
-   //   MAX_BATCH_MODELS        = floor(150 / |coreBenchKeys|) capped at 8
-   //   MAX_PARALLEL            = 5       // per wave
-   //
-   // For 60 models × 26 keys: 5 models/batch × 26 keys = 130 cells/batch
-   // (well under 150 budget) → 18 batches → 4 waves of {5,5,5,3} parallel
-   // sub-agents. NO agent ever exceeds its tool-call ceiling.
-   //
-   // Sequential waves are independent: each wave's sub-agents run in parallel,
-   // wave N+1 dispatches only after every batch in wave N has returned. The
-   // orchestrator collects (artifact[N][i]) and merges via gen_unified_artifact.
-   //
-   // batches = scripts/lib/dispatch.py compute_dispatch_plan(active_models, coreBenchKeys)
-   //   Bucket pattern (post-reform): grouped by provider family then
-   //   subdivided so no batch exceeds MAX_BATCH_MODELS:
-   //     batch00-anthropic  (3 models)
-   //     batch01-deepseek   (5 models)
-   //     batch02-google_dm  (5 models)  // family overflow → batch03 takes the rest
-   //     batch03-google_dm  (2 models)
-   //     ...18 batches total, varying sizes 1-5 models each
-   //
-   // Dispatch each bucket as a SEPARATE Agent({...}) call (parallel single message).
-   // Each sub-agent receives:
-   //   - target_model_ids: ids for its bucket only
-   //   - artifact_path: <abs>/.aicodermap-agent-out-<batchId>.json (agent Writes here)
-   //   - filtered idea_context (F5: only relevant vendor entries, see Step 3)
-   //   - full leaderboards[] and coreBenchKeys (shared across all buckets)
-   //   - priorityCells filtered to its bucket's models
-   //
-   // merge_artifacts(results): orchestrator collects all 5 agent outputs, merges
-   // via the same gap-gen + merge.py pipeline. Each sub-agent artifact is written to
-   // .aicodermap-agent-out-<bucket>.json; gap-gen then assembles a unified artifact.
-   //
-   // Partial-return gate (F6): orchestrator validates EACH sub-agent's artifact:
-   //   if artifact.partialReason.cellsAttempted / batch_expected_cells < 0.30
-   //     AND wallclock < 8min: SendMessage to same agent to continue.
-   //
-   // Token cost: ~18× vs single agent (60 models / 5 per batch ≈ 18). Each
-   // sub-agent emits its own .aicodermap-agent-out-<batchId>.json; orchestrator
-   // collects all artifacts at end of last wave and feeds them through
-   // gen_unified_artifact.py for merge.
+// Adaptive multi-batch dispatch — every batch fits under the agent's
+   // tool-call ceiling (AGENT_BUDGET_BUFFER=50 → MAX_BATCH_CELLS=150).
+   // Plan source: scripts/lib/dispatch.compute_dispatch_plan(active, coreKeys).
+   // Buckets group by provider family; oversize families split into sub-batches
+   // of ≤MAX_BATCH_MODELS. Each sub-agent receives:
+   //   - target_model_ids (its bucket only, ≤8 models × |coreKeys| cells)
+   //   - artifact_path (agent Writes here): .aicodermap-agent-out-<batchId>.json
+   //   - filtered idea_context (F5: only relevant vendor entries)
+   //   - full leaderboards[] + coreBenchKeys + priorityCells filtered to bucket
+   // Waves run sequentially; batches within a wave run in parallel. Token cost:
+   // ~totalBatches× vs single agent. gen_unified_artifact.py merges via union
+   // (disjoint slices, no value conflicts).
 
    // FAZ 1.1 (2026-05-07): wave dispatch state machine — ALL waves MUST run.
    // The 2026-05-06 cycle bug was committing partial wave-0 results without
@@ -588,80 +515,24 @@ PRELIM-B. LEADERBOARD_PREFETCH (FAZ 2.1, 2026-05-07 — orchestrator-side single
 
 ## CONSTANTS
 
-> **SSOT (P9 reform):** numeric thresholds below are **fetched from
-> `data/sources-whitelist.json._schema.contracts` at run time** via
-> `scripts/lib/whitelist.py contracts()`. The values listed here mirror the
-> defaults baked into `lib/whitelist.SAFE_DEFAULTS` so the skill can run
-> even before the contracts block is populated, but the canonical source is
-> the whitelist file. SKILL.md, agent.md, and merge.py never duplicate the
-> values — they reference the contracts block.
+Single source of truth: `scripts/lib/constants.py`. Runtime values fetch from
+`data/sources-whitelist.json._schema.contracts` via `lib/whitelist.contracts()`,
+falling back to `constants.py` defaults. SKILL.md, agent.md, and merge.py
+reference the module — never duplicate values.
 
-```
-CONTRADICTION_WARN_PP              = 3.0   // pp delta → YELLOW (auto-resolve via trustScore)
-CONTRADICTION_BLOCK_PP             = 5.0   // pp delta → RED (auto-resolve via trustScore, log loudly)
-COVERAGE_TARGET                    = 0.85  // ADVISORY. Cumulative provenance coverage; never blocks commit. Below-target → CHANGELOG warning.
-COVERAGE_HARD_BLOCK                = 0.50  // ADVISORY. <0.50 logs a "⚠ very low cumulative provenance coverage" note in CHANGELOG and proceeds; gaps[] preserved for next cycle
-ABSOLUTE_COVERAGE_FLOOR            = 0.30  // HARD BLOCK after W3 activation (env AICODERMAP_MX2_BLOCK=1). One-time bypass: merge.py --bypass-floor-check. Below-floor → MX2 violation + .bak rollback.
-MIN_SOURCES_PER_FILLED_CELL        = 2     // <2 distinct URLs → benchQuarantine[key]=true (WARN). MX5.
-COMPLETENESS_RETRY_LIMIT           = 1     // SINGLE retry per refresh; second partial → CHANGELOG warn (no halt)
-STALE_DAYS                         = 14    // M5 freshness gate
-DEPRECATION_GRACE_DAYS             = 60    // vendor "deprecated" → still listed for 60d before archive
-DEPLOY_WAIT_SEC                    = 90
-AGENT_RETRY                        = 1
-FAMILY_BASELINE_MIN                = 30    // refresh-all: |models[]+newModels[]| floor
-BATCH_WALLCLOCK_SEC                = 600   // FAZ 1.3: hard per-batch wallclock cap (10 min). Orchestrator passes wallclock_deadline_unix=now()+BATCH_WALLCLOCK_SEC to each agent; agent self-stops at deadline-30s. Aşımda orchestrator ne yazıldıysa onu okur, partialReason:timeout işaretler, sonraki wave'e geçer.
-BATCH_WALLCLOCK_SOFT_STOP_SEC      = 30    // FAZ 1.3: agent'a "deadline-30s'de Write+return" kuralı. Soft buffer agent'ın final JSON'u yazıp döndürmesi için.
-// =====================================================================
-// UNCAPPED RESEARCH DOCTRINE (added 2026-04-27 rev3)
-// User policy: "do not put budget/limit/cap on the agent's research effort.
-// Use every available capacity to find every available data point. No
-// timeout. Stop only when research is structurally complete."
-//
-// SCOPE CLARIFICATION (FAZ 1.3, 2026-05-07): UNCAPPED applies to RESEARCH
-// QUALITY (which sources to attempt, how many fallbacks to chain, whether
-// to fabricate gaps) — NOT to per-dispatch resource budgets. Two hard caps
-// remain authoritative because they protect Claude Code's own runtime:
-//   • AGENT_BUDGET_BUFFER (50 tool-calls/agent)  — ceiling enforcement
-//   • BATCH_WALLCLOCK_SEC (600s/batch)           — wallclock enforcement
-// When either cap fires, agent emits whatever it has + partialReason; the
-// next cycle re-attempts unfilled cells (gaps[] preserved across cycles).
-// "UNCAPPED on data quality, capped on per-dispatch resource budgets."
-//
-// All previous fetch budgets are REMOVED. The agent walks every
-// advertised source, attempts every reachable per-model URL + vendor card,
-// runs every fallback chain, and only terminates on COMPLETENESS_TERMINATION.
-// =====================================================================
+UNCAPPED applies to RESEARCH QUALITY (which sources to attempt, fallback
+chains, gap fabrication policy). Per-dispatch resource budgets remain HARD:
+`AGENT_BUDGET_BUFFER` and `BATCH_WALLCLOCK_SEC` enforce themselves; when
+either fires, agent emits + `partialReason`. Next cycle re-attempts unfilled
+cells (gaps[] preserved across cycles).
 
-// Quality controls (kept — these are correctness rules, not effort caps)
-VERIFICATION_AGREEMENT_PP       = 1.5   // values within 1.5pp count as agreement; otherwise contradiction[]. Used ONLY for contradiction detection — never for skip decisions.
-PARALLEL_SOURCES                = 5     // concurrent source fetches (parallelism, NOT a cap — agent may go higher if useful)
-PARALLEL_MODELS                 = 5     // concurrent model surveys (parallelism only)
-
-// Termination — ONLY way the agent stops research:
-// All four conditions MUST hold before agent emits final JSON:
-//   1. Every leaderboard in sources-whitelist.json `leaderboards[]` has been
-//      visited (status: 200 + extract attempted, OR documented unreachable
-//      with fallback chain exhausted, OR _runtime.unhealthy auto-skip).
-//   2. Every vendor in `vendors[]` with a perModelUrl/modelCardUrl/postUrl
-//      has been attempted for every model in that vendor's family.
-//   3. Every (modelId, benchKey) cell — across all active models × all
-//      bench_keys_universe — has been re-attempted this cycle (no skip on
-//      prior confirmation; vendor scores can be revised between refreshes).
-//   4. Every still-empty cell carries a gaps[] entry with whatever provenance
-//      could be gathered. GAP_VALIDITY_GATE is now ADVISORY ONLY: low-effort
-//      gaps surface in `runtime.fabricatedSuspicions[]` for human review but
-//      are never stripped (reformed 2026-04-28).
-COMPLETENESS_TERMINATION        = true  // sole termination condition
-
-// Cross-cycle persistence (audit only — reformed 2026-04-28):
-// The verification map is a HISTORICAL log: it records every (modelId, benchKey)
-// cell the cycle observed, with all sources/values that backed it. Used by
-// contradiction analysis to spot scores that drift between cycles. Never read
-// for skip decisions — every cell is re-fetched every cycle.
-VERIFICATION_MAP_PATH           = ".aicodermap-verification-map.json"  // gitignored
-
-SINGLE_ARTIFACT_PATH            = ".aicodermap-agent-out.json"  // ONE artifact, overwritten each run
-```
+Termination — all four MUST hold before agent emits final JSON:
+1. Every `leaderboards[]` entry visited (200+extract OR unreachable+fallback
+   exhausted OR `_runtime.unhealthy` auto-skip).
+2. Every vendor with perModelUrl/modelCardUrl/postUrl attempted per model.
+3. Every priorityCells[] entry attempted (FAZ 2.3 authoritative work list).
+4. Every still-empty cell carries a gaps[] entry; advisory GAP_VALIDITY_GATE
+   surfaces low-effort suspicions but never strips entries.
 
 ## SILENT_FAIL_PREVENTION (loud failures + auto-recovery, halts only at git push conflict)
 
@@ -959,13 +830,12 @@ Per-step error handling lives in **SILENT_FAIL_PREVENTION** above (single source
 | `stale-check` | List `data/models.json` entries with `today - lastUpdated > STALE_DAYS` |
 | `changelog` | tail -50 CHANGELOG.md → last 5 release entries |
 
-## INVARIANTS (cross-cutting rules; specifics live in their canonical sections above)
+## INVARIANTS
 
-- **Procedure vs data**: spec files (this file + agent.md) carry HOW; data files carry WHAT (model roster, source URLs, known gaps, GPU DB, **format taxonomy + regex library**). Spec never hardcodes IDs/URLs/regex patterns/format keywords.
-- **Format taxonomy reference**: 12 canonical format keys + adapter selection rules + 16 named extractor patterns live in `data/sources-whitelist.json._schema.{formatTaxonomy, extractors, regexLibrary}`. Adding a new source format = appending a key there + (rare) a new extractor pattern via `scripts/regex-corpus.json` + `scripts/regex-lint.js`. No code change required in agent.md / SKILL.md.
-- **Autonomous-by-default**: orchestrator + agent iterate, retry, fall back to alternate source, emit gap[] — never deal-break on missing data. The ONE user-blocking exception is git push conflict.
-- **Loud failures, never silent**: every step has an explicit success criterion (see SILENT_FAIL_PREVENTION); failures emit log + gap[] entry + CONTINUE — never halt the workflow short of Step 12.
-- **Partial-coverage merges are normal**: low coverage marks `partialCoverage=true` + populates gaps[] for next cycle, but never blocks write/commit/push.
+- **Procedure vs data:** spec files carry HOW; data files carry WHAT. URLs, IDs, format keys, regex patterns live in `data/sources-whitelist.json._schema.{formatTaxonomy, extractors, regexLibrary}`. Spec never hardcodes them.
+- **Autonomous-by-default:** orchestrator+agent iterate, retry, fall back, emit gap[]; SOLE user-blocking exception is git push conflict.
+- **Loud failures + auto-recovery:** every step has explicit success criterion (see SILENT_FAIL_PREVENTION). Failures emit log + gap[] + CONTINUE.
+- **Partial-coverage merges normal:** never block write/commit/push on low coverage.
 - **No GitHub Actions / CI / workflows** (manual orchestration is the contract).
-- **M5 ≤14-day freshness gate** (Aider 5-month-stale antipattern defense).
-- **Project-scoped**: skill + agent only in `D:\GitHub\aicodermap\` session.
+- **M5 ≤14-day freshness gate.**
+- **Project-scoped:** skill + agent only in `D:\GitHub\aicodermap\` session.

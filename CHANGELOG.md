@@ -65,6 +65,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed — 2026-05-07 (FAZ 3 — spec slim-down, pragmatic level)
+
+Reduced spec sprawl in `agent.md` and `SKILL.md`. The aggressive original
+targets (agent ~600, SKILL ~400) were de-scoped to "remove redundancy
+without behavioural risk"; aggressive trimming deferred until next refresh
+exercises the FAZ 1+2 reforms.
+
+- `agent.md`: 1571 → 1418 lines (-153, -10%):
+  - Removed 6 "Why this section exists" reform-narrative blocks that were
+    historical justification, not active guidance (PHASE 0,
+    WEBSEARCH_PRIMARY_DISCIPLINE, GAP_VALIDITY_GATE, SOURCE_FIRST_SWEEP,
+    PER_MODEL_URL_EXPANSION, DATA_CONTRACT).
+  - Folded PHASE 0b/0c into PHASE 0 sub-probes section.
+  - Trimmed RESEARCH_PIPELINE_OPTIMIZATION P10 reform paragraph.
+  - Trimmed FORMAT_DISPATCH inline FAZ comments to one-liners.
+  - Trimmed PRE_EMIT_SELF_AUDIT pseudocode + emission rules.
+  - Removed EXAMPLES section (was 3 boilerplate dispatch templates).
+  - Trimmed UNCAPPED + BUDGET reform comments in INPUT_CONTRACT.
+- `SKILL.md`: 972 → 841 lines (-131, -13%):
+  - Replaced CONSTANTS block (~85 lines) with reference to new
+    `scripts/lib/constants.py` + 4-bullet termination summary.
+  - Trimmed F1 REFORM and FAZ 1.4/2.1/2.2 reform-narrative comments
+    inside WORKFLOW Step 3 idea_context block.
+  - Trimmed INVARIANTS section.
+- New `scripts/lib/constants.py` (67 lines) — single source of truth for
+  numeric thresholds, freshness contract, file paths. Runtime values still
+  fetch from `_schema.contracts` via `whitelist.contracts()`; constants.py
+  is the SAFE_DEFAULTS fallback.
+
+Lint: ruff clean. Imports verified.
+
 ### Added — 2026-05-07 (FAZ 2.4 — wave telemetry + 0-fill auto-retry)
 
 - `scripts/lib/telemetry.aggregate_per_batch_telemetry()` — walks per-batch

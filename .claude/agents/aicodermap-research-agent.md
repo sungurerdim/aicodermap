@@ -12,58 +12,42 @@ Aggregate AI coding LLM data: bench scores, multi-provider pricing, Ollama metad
 
 ## PHASE 0 — LINEUP DISCOVERY (always first on `scope=full|lineup-sync`)
 
-**Why this phase exists:** prior runs surveyed bench/pricing for whatever id list was in current data, missing the source-of-truth signal — *which models exist according to the vendor right now*. This caused stale ids (e.g., `devstral-medium` actually held Devstral Small 2's data), missed new releases until they were already widely known, and never archived deprecated entries.
-
-**Phase 0 protocol:**
-1. Fetch the VENDOR_LINEUP_SOURCES table (see SKILL.md) — one fetch per vendor, parallel single-message dispatch
-2. From each page, extract the **active model list**, **deprecation table** (if shown), **renamed/successor announcements**
-3. Cross-reference with current `data/models.json` (passed in via `idea_context.currentIds`)
-4. Build the lineup diff:
-   - `NEW`: in vendor lineup, not in data → mark for full survey in Phase 2
-   - `DEPRECATED`: in data, vendor lineup marks deprecated → emit `lineupChanges.deprecated[]`
-   - `RENAMED`: vendor canonical id differs from data id → emit `lineupChanges.renamed[{from, to, evidenceUrl}]`
-   - `REMOVED`: in data, completely absent from vendor page → emit `lineupChanges.removed[]`
-5. Return the lineup diff in the output JSON's `lineupChanges` field
-6. **Mandatory emission contract (added 2026-04-28):**
-   - `lineup` MUST be a non-empty object — at minimum, every vendor that
-     responded with HTTP 200 contributes one entry, even if the active list
-     is unchanged from the prior cycle. An empty `{}` is a contract violation.
-   - For every vendor URL that 4xx/5xx'd or timed out, emit a
-     `gaps[]` entry `lineup:<vendor>: unreachable: <reason>` AND a
-     `runtime.fetchErrors[]` entry — silent omission is forbidden.
-   - `runtime.healthChecks` MUST cover at least 3 leaderboard domains with
-     `{status, observedFormat}` entries; emit `gaps[]` entries for any
-     leaderboard whose probe failed.
-
-Phase 0 fetches do NOT count against the per-model fetch budget; they are skill-level overhead.
-
-## PHASE 0b — UNKNOWN VENDOR PROBE (runs after Phase 0 lineup diff)
-
-Detects vendor/model families that are NOT in `sourcesWhitelist.vendors[]` yet trending on Hugging Face or community aggregators.
+Source of truth for "which models exist according to the vendor right now."
+Walks `sourcesWhitelist.vendors.*.urls.lineup` URLs in parallel.
 
 **Protocol:**
-1. WebSearch `site:huggingface.co/models text-generation sort:trending` + fetch `https://huggingface.co/api/models?sort=trending&direction=-1&full=true&limit=50&filter=text-generation` — extract `author`/`modelId` for entries whose organization is NOT in the current whitelist vendor set.
-2. WebFetch any `awesome-llm` or `lmsys/chatbot-arena` aggregator index pages already in `sourcesWhitelist.community[]` — extract newly mentioned vendor/family names.
-3. For each unknown candidate: emit into `discoveries.vendors[]`:
-   ```json
-   { "id": "<orgId>", "observedAt": "<source URL>", "modelCount": N, "latestRelease": "<id>", "suggestedTier": "S" }
-   ```
-4. Do NOT auto-add to `whitelistAdditions[]` — whitelist promotion requires human review via `scripts/promote-discovery.py`.
-5. Count emitted candidates; orchestrator appends `🔎 New vendor candidates: N (review queue)` to CHANGELOG.
+1. Fetch every vendor lineup URL (parallel single-message dispatch).
+2. Extract: active model list, deprecation table, renamed/successor announcements.
+3. Cross-reference with `idea_context.currentIds` (current `data/models.json`).
+4. Emit lineup diff in `lineupChanges`:
+   - `NEW`: in vendor lineup, not in data → mark for Phase 2 survey.
+   - `DEPRECATED`: in data, vendor marks deprecated → `lineupChanges.deprecated[]`.
+   - `RENAMED`: vendor canonical id differs → `lineupChanges.renamed[{from, to, evidenceUrl}]`.
+   - `REMOVED`: in data, absent from vendor page → `lineupChanges.removed[]`.
+5. **Mandatory emission contract:** `lineup` MUST be non-empty (every HTTP 200
+   vendor contributes at least one entry). 4xx/5xx/timeout vendors emit a
+   `gaps[]` entry `lineup:<vendor>: unreachable: <reason>` AND a
+   `runtime.fetchErrors[]` entry. Silent omission = contract violation.
+6. `runtime.healthChecks` MUST cover ≥3 leaderboard domains with
+   `{status, observedFormat}`; failures emit `gaps[]` entries.
 
-## PHASE 0c — UNKNOWN LEADERBOARD PROBE (runs after Phase 0b)
+Phase 0 fetches do NOT count against per-model fetch budget — skill-level overhead.
 
-Detects benchmark leaderboards NOT yet in `sourcesWhitelist.leaderboards[]`.
+### Phase 0 sub-probes (optional discovery — emit candidates only, never auto-add)
 
-**Protocol:**
-1. WebFetch `https://paperswithcode.com/area/computer-code` benchmark index — extract benchmarks first published in the last 90 days that are not in `_schema.coreBenchKeys ∪ _schema.deprecatedBenchKeys`.
-2. WebFetch `https://artificialanalysis.ai/leaderboards` main page — extract leaderboard track names not currently in `leaderboards[].url`.
-3. For each unknown candidate: emit into `discoveries.benchmarks[]`:
-   ```json
-   { "key": "<suggested_short_key>", "label": "<human name>", "sourceUrl": "<url>", "firstObserved": "<today>", "suggestedPublishers": ["<url>"] }
-   ```
-4. Do NOT auto-add to `_schema.coreBenchKeys` — key promotion requires a 2+ publisher AC6 check + human review.
-5. Orchestrator appends `🔎 New benchmark candidates: M (review queue)` to CHANGELOG.
+**Unknown-vendor probe:** scan trending HF + aggregator indexes for orgs absent
+from `sourcesWhitelist.vendors`. Emit `discoveries.vendors[] = { id,
+observedAt, modelCount, latestRelease, suggestedTier }`. Promotion requires
+`scripts/promote-discovery.py` (human review).
+
+**Unknown-leaderboard probe:** scan paperswithcode.com/area/computer-code +
+artificialanalysis.ai/leaderboards for benches absent from
+`_schema.coreBenchKeys ∪ deprecatedBenchKeys`. Emit
+`discoveries.benchmarks[] = { key, label, sourceUrl, firstObserved,
+suggestedPublishers }`. Promotion requires AC6 (≥2 publishers) + human review.
+
+Orchestrator appends count badges to CHANGELOG: `🔎 New vendor candidates: N`,
+`🔎 New benchmark candidates: M`.
 
 ## SCOPE
 | scope | task | model | parallelism |
@@ -116,42 +100,22 @@ termination: "completeness"                # explicit doctrine — see SKILL.md 
 expected_total: <int>                      # |active|×|coreKeys| - |notApplicable|; matrix invariant target
 require_priority_first: <bool default:true>  # process priorityCells in Phase 2/3 BEFORE any other empty cell
 require_full_matrix: <bool default:true>     # every cell must end as fill | gap | notApplicable
-# UNCAPPED RESEARCH (2026-04-28 reform, scope-clarified FAZ 1.3 2026-05-07):
-# UNCAPPED applies to RESEARCH QUALITY — which sources to attempt, how many
-# fallbacks to chain, whether to fabricate gaps. It does NOT remove per-dispatch
-# resource ceilings:
-#   • agent_budget_buffer (50 tool-calls) — hard, enforced by self-monitoring
-#   • wallclock_deadline_unix              — hard, enforced by orchestrator SIGKILL
-# When either ceiling fires, the agent emits whatever it has + partialReason;
-# orchestrator gap-gen closes the matrix invariant. Next cycle re-attempts
-# unfilled cells (gaps[] preserved across cycles).
+# UNCAPPED applies to RESEARCH QUALITY (sources, fallbacks, gap fabrication).
+# Per-dispatch resource ceilings remain hard:
+#   • agent_budget_buffer (50 tool-calls) — enforced by self-monitoring
+#   • wallclock_deadline_unix             — enforced by orchestrator SIGKILL
+# When either fires, agent emits + partialReason; gap-gen closes the matrix.
 #
-# Cell skip — freshness-tier ONLY (FAZ 2.2 reform 2026-05-07):
-#   T1 cells (default — confirmed=false OR verifs<3 OR age>7d OR contradicted
-#     OR not in map): re-fetched every cycle. This is the majority of cells
-#     and preserves the "vendor scores can change overnight" guarantee.
-#   T2 cells (confirmed=true AND verifs≥3 AND age≤7d AND no-contradiction):
-#     skipped this cycle, value copied from verification map. Drift surfaces
-#     within ≤7d via freshness expiry (cell drops back to T1).
-# Pre-FAZ-2.2 behavior was "every cell every cycle, no skip ever" — that
-# made wallclock unbounded and produced 97% auto-gap stubs. The reform
-# preserves the freshness contract via the 7d TTL; it does NOT reintroduce
-# a known-gaps skip registry.
-# The skill computes skipCells in idea_context; the agent obeys.
-# Verification map remains audit-only for everything else (contradiction
-# analysis, drift detection); never short-circuits a T1 fetch.
-
-# BUDGET REFORM (2026-05-06): the orchestrator pre-shards the cycle into
-# multi-batch dispatch where every batch is sized to fit comfortably under
-# the agent's tool-call ceiling (50-call buffer / 150-cell budget). Each
-# sub-agent receives `target_model_ids` covering only ITS slice of the
-# matrix — typically 5 models × 26 keys = 130 cells. Sub-agents do NOT
-# attempt the full 60-model universe; the orchestrator does that
-# parallelism via plan.waves. UNCAPPED still applies: within the
-# sub-agent's slice, every cell is attempted, no internal cap.
-agent_budget_buffer: <int default:50>      # tool-call ceiling target; if approaching, finish current cell + emit final JSON, do not start another cascade
-batch_id: <string>                          # the orchestrator's batch label; surfaced in runMetadata + per-batch artifact path
-wallclock_deadline_unix: <int>             # FAZ 1.3 (2026-05-07): orchestrator-enforced hard wallclock cap (epoch seconds). Agent MUST self-check at every Phase boundary: if Date.now()/1000 >= wallclock_deadline_unix - 30 → STOP fetching, build the artifact dict for whatever cells you have, Write the artifact, return the EMITTED status line. Do NOT start another fetch cascade. The orchestrator subprocess will SIGKILL the agent at wallclock_deadline_unix; cells written before the kill survive, anything in mid-flight is lost. Treat the 30s soft buffer as non-negotiable.
+# Cell skip — freshness-tier ONLY (T2 cells, see SKILL.md FAZ 2.2):
+#   T1 (re-fetch): confirmed=false OR verifs<3 OR age>7d OR contradicted OR absent.
+#   T2 (skip):     confirmed=true AND verifs≥3 AND age≤7d AND no contradiction.
+# T2 cells arrive in idea_context.skipCells and bypass FORMAT_DISPATCH entirely.
+#
+# Sub-agents see ONLY their slice (target_model_ids ≤ 8 models × |coreKeys| cells).
+# The orchestrator parallelizes across slices via plan.waves.
+agent_budget_buffer: <int default:50>      # tool-call ceiling; near (buffer-5), finish current cell + emit
+batch_id: <string>                          # orchestrator batch label; surfaced in runMetadata
+wallclock_deadline_unix: <int>             # epoch seconds. Self-check at every Phase boundary; if Date.now()/1000 >= deadline-30 → STOP fetching, Write artifact, return EMITTED. Orchestrator SIGKILLs at deadline. Cells written survive; mid-flight lost. 30s soft buffer is for the Write call.
 ```
 
 **Matrix awareness (HARD — FAZ 2.3 reform 2026-05-07):**
@@ -444,18 +408,9 @@ extractor := entry.extractor || formatTaxonomy[format].extractor
 patterns := entry.extractorHints?.patternOverride
               || formatTaxonomy[format].extractorPatterns
 
-// FAZ 2.2 (2026-05-07): FRESHNESS-TIER CELL SKIP — non-negotiable.
-// Before any fetch logic, check whether the (modelId, benchKey) target is
-// in idea_context.skipCells. If yes: the verification-map already has a
-// confirmed value (≥3 verifs, ≤7d old, no contradiction). The agent
-// treats the cached value as already-filled, emits a synthetic
-// sourcesAdded[] entry pointing at the cached provenance, and SKIPS this
-// cell entirely. Fetch budget saved goes to T1 cells (the unconfirmed /
-// stale / contradicted ones).
-// HARD RULE: never re-issue any fetch for a T2 skip cell. The skill's
-// gen_unified_artifact merge writes the cached value back to data/models.json
-// using the map's existing provenance. Agent re-fetching a T2 cell is a
-// contract violation logged to runtime.fabricatedSuspicions[].
+// FRESHNESS-TIER CELL SKIP — bypass all fetch logic for T2 cells.
+// idea_context.skipCells carries cached values for cells confirmed ≥3 verifs,
+// ≤7d old, no contradiction. Agent emits cached value + provenance; NO fetch.
 if (idea_context.skipCells[modelId]?.[benchKey]):
     cached := idea_context.skipCells[modelId][benchKey]
     emit models[id].updates.bench[benchKey] = cached.value
@@ -463,37 +418,23 @@ if (idea_context.skipCells[modelId]?.[benchKey]):
         bench: benchKey, value: cached.value, sources: cached.sources,
         lastChecked: cached.lastChecked, extractedVia: "freshness-tier-skip"
     })
-    continue  // next cell — no fetch, no fallback chain
+    continue
 
-// FAZ 1.4 (2026-05-07): HARD WebFetch GATE — non-negotiable.
-// Three signals can ban a WebFetch BEFORE it issues:
-//   (a) formatTaxonomy[format].skipWebFetch === true
-//       (spa_full, image_embedded, bot_blocked — known unfetchable)
+// HARD WebFetch GATE — three ban signals (any match → skip primary, jump to fallback):
+//   (a) formatTaxonomy[format].skipWebFetch === true   (spa_full, image_embedded, bot_blocked)
 //   (b) formatTaxonomy[format].primaryTool === "skip"  (legacy alias)
-//   (c) entry.url matches any pattern in idea_context.bannedFetchPatterns[]
-//       (orchestrator-derived: every URL whose format has skipWebFetch=true,
-//        plus every URL whose _runtime.unhealthy=true)
-// On any (a)+(b)+(c) match: SKIP WebFetch entirely, jump straight to
-// fallback chain. NO retry, NO "let me try once anyway" — those WebFetch
-// attempts cost 1 tool-call each AND 5-30s wallclock for 0 yield.
-// Repeated WebFetch on a banned pattern is a contract violation.
+//   (c) entry.url matches idea_context.bannedFetchPatterns[]  (orchestrator-derived)
+// Repeated WebFetch on a banned pattern = contract violation.
 if (formatTaxonomy[format].skipWebFetch === true
     || formatTaxonomy[format].primaryTool === "skip"
     || matches_any(entry.url, idea_context.bannedFetchPatterns)):
     skip_primary = true
 else if (idea_context.leaderboardSnapshots[entry.url]):
-    // FAZ 2.1 (2026-05-07): SNAPSHOT-FIRST path.
-    // Orchestrator's PRELIM-B prefetch already HTTP-GET'd this URL once and
-    // wrote the body to disk. Reading the snapshot costs 1 Read tool-call
-    // (~50ms) vs WebFetch's 1 call + retry + 5-30s wallclock. Same extractor
-    // cascade applies — only the body source changes.
+    // SNAPSHOT-FIRST path — orchestrator pre-fetched; Read costs ~50ms vs
+    // WebFetch's 5-30s. Same extractor cascade.
     snapshot := idea_context.leaderboardSnapshots[entry.url]
     body := Read(snapshot.path)
     sourcesAdded[].extractedVia += "@snapshot-" + snapshot.fetchedAt
-    // Skip the WebFetch branch entirely — agent never issues a network fetch
-    // for any URL the orchestrator already prefetched. If extraction yields
-    // nothing, agent goes straight to the format's fallback chain (websearch
-    // snippets, aggregator mirrors) without re-fetching the original URL.
 else:
     body := WebFetch(entry.url) (or scripts/extract-images.py for image_embedded — orchestrator-side)
     cleaned := cleanup(body) if extractors[extractor].cleanupBeforeExtract
@@ -541,26 +482,14 @@ No pair is ever pre-skipped. Every (modelId, benchKey) pair currently null in da
 
 ## DATA_CONTRACT (unified shape — agent ⇄ skill ⇄ data ⇄ frontend)
 
-Three layers, three shapes — never mix them. Violating this contract is the regression that cycle 2026-04-26-cycle-2 hit (bench wrapped objects leaked into `data/models.json`, blanking the live table).
+Three shapes, never mixed:
+- **Storage** (`data/models.json`): flat scalars. `bench.<key>` = number, `context` = number, `pricing.api[].{in,out,cacheHit,throughput}` = number. NEVER wrappers.
+- **Provenance** (`data/sources.json`): wrapped `{value, source, url, tier, date, verifications, trustScore, contradictionRole?}`. The only on-disk home of `trustScore`.
+- **Transit** (agent → skill JSON): `models[].updates.<field>` is Storage shape; `models[].sourcesAdded[]` is Provenance shape. Never cross-mix.
 
-| Layer        | File / channel        | Shape                                                                                                                                                                          |
-|--------------|-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Storage**  | `data/models.json`    | **Flat scalars.** `bench.<key>` = number, `context` = number, `pricing.api[].in/out/cacheHit/throughput` = number. NEVER `{value, trustScore}` wrappers, NEVER nested objects. |
-| **Provenance** | `data/sources.json` | **Wrapped entries:** `{value, source, url, tier, date, verifications, trustScore, contradictionRole?}`. This is the *only* place `trustScore` lives on disk.                 |
-| **Transit**  | agent → skill JSON    | `models[].updates.<field>` = Storage shape (scalars). `models[].sourcesAdded[]` = Provenance shape (wrapped). NEVER emit wrappers inside `updates`.                            |
-| **Verification** | `.aicodermap-verification-map.json` (gitignored) | **Cross-cycle cache:** `cells.<modelId>.<benchKey> = {value, verifications[], confirmed, lastChecked}`. Skill reads at cycle start (skip confirmed cells), updates post-merge from sourcesAdded[]. NOT a render input — purely orchestrator state. |
-| **Render**   | frontend `assets/js/render-card.js` + `render-table.js` (entry `assets/js/main.js`) | Reads Storage scalars. Looks up Provenance from sources.json by `<modelId>.<field>` for tooltips / source links. |
+**Contradictions:** `field` is bare bench key (`swePro`, never `bench.swePro`); non-bench uses dotted form (`pricing.api.in`). `candidates[]` is wrapped; `autoResolveWinner` is wrapped — skill extracts `.value` for Storage.
 
-**Contradictions** sit between Transit and Provenance:
-- `field`: **bare** bench key (e.g., `swePro`, NOT `bench.swePro`); non-bench paths use dotted form (`pricing.api.in`).
-- `candidates[]`: wrapped (Provenance shape).
-- `autoResolveWinner`: wrapped dict `{value, trustScore, sourceUrl, tier}`. The skill extracts `.value` for Storage, keeps the full dict in Provenance.
-
-**Enforcement points:**
-1. Agent self-check before emit (verify every `updates.bench.<k>` is `number|null`, never an object).
-2. `scripts/audit-data-coherence.py` post-merge (HARD BLOCK + .bak rollback if any value is non-scalar; pre-commit hook re-runs the audit so even manual commits can't introduce a wrapper-shaped storage cell).
-
-When in doubt: **scalar in storage, wrapped in provenance, contract spelled here.** A wrapper-shaped value in storage is a contract violation, not a thing to gracefully repair.
+**Enforcement:** agent self-check before emit (every `updates.bench.<k>` is `number|null`); `scripts/audit-data-coherence.py` post-merge (HARD BLOCK + .bak rollback on wrapper-shaped storage cell).
 
 ## OUTPUT_SCHEMA (NEW — multi-provider pricing array)
 ```jsonc
@@ -714,24 +643,10 @@ When in doubt: **scalar in storage, wrapped in provenance, contract spelled here
     "elapsedMs": <int>,
     "phaseElapsed"?: { "phase0Ms": <int>, "phase1Ms": <int>, "phase2Ms": <int>, "phase3Ms": <int> },
 
-    // FAZ C reform (2026-05-06) — three new MANDATORY fields the agent
-    // populates so the orchestrator can detect research-pipeline degradation
-    // before the cycle commits.
-    //
-    //   toolCallCount: total agent tool invocations (WebFetch + WebSearch +
-    //     Read + Bash etc.). When this approaches the agent's hard ceiling
-    //     (~85), priority-cascade is starving and the next cycle should
-    //     pre-bias the priorityCells injection more aggressively.
-    //
-    //   fetchAttemptCount: subset of toolCallCount that hit the network
-    //     (WebFetch + WebSearch only). Used to size IN-CYCLE PROMOTION
-    //     budget and to spot cycles where the agent thrashed local Reads
-    //     instead of fetching evidence.
-    //
-    //   batchCount: number of sub-agents the orchestrator dispatched for
-    //     this artifact. P10.1 multi-agent fan-out target = 5 (one per
-    //     provider family). batchCount=1 means fan-out collapsed to a
-    //     single agent and per-cell coverage will be lower.
+    // Mandatory telemetry — orchestrator detects pipeline degradation:
+    //   toolCallCount      total tool invocations (WebFetch + WebSearch + Read + ...)
+    //   fetchAttemptCount  network subset (WebFetch + WebSearch only)
+    //   batchCount         sub-agents dispatched for this artifact
     "toolCallCount": <int>,
     "fetchAttemptCount": <int>,
     "batchCount": <int>
@@ -791,65 +706,36 @@ ties: prefer I-tier, then most recent, then highest verifications
 11. **Gap shape (HARD)**: every `gaps[]` entry MUST carry `triedSources[]` ≥ 1 URL, `triedQueries[]` ≥ 2 queries, and `triedFormats[]` ≥ 1 format. `merge.py validate_gaps()` strips entries violating this; MX1 then catches the cell as silent omission and rolls back. Reporting a partial-effort gap with truthful `triedSources` is strictly better than emitting an empty gap or omitting the cell.
 12. **N/A taxonomy (HARD)**: cells naturally undefined for a model (embedding model + swePro, etc.) MUST be emitted to `models[].notApplicable[]` citing a rule from `_schema.notApplicableRules.rules[]`. Hardcoded model id discrimination is forbidden — only tier/capability rules. N/A cells do NOT count against MX1.
 
-## PRE_EMIT_SELF_AUDIT (lightweight gate — orchestrator supplements remaining gaps)
+## PRE_EMIT_SELF_AUDIT
 
-**ARCHITECTURAL CHANGE (2026-04-29):** The agent's role is **research, not bookkeeping**.
-Enumerating 929 gap entries as text would overflow the agent's output capacity and cause
-infinite loops. The orchestrator's `gap-gen` step (`.aicodermap-gap-gen.py`) always runs
-after agent return and supplements documented gaps for every cell the agent did not fill.
-The agent's job: emit what you FOUND. The orchestrator handles the rest.
+The agent emits what it FOUND. The orchestrator's `gap-gen` step supplements
+gaps for every cell the agent did not fill. Enumerating 900+ gap entries
+overflows output and triggers loops — forbidden.
 
-Before emitting, run this lightweight self-audit:
-
+Before emitting:
 ```
-# Cells the agent actively filled this cycle
-filled_this_cycle := {
-   (m.id, k)
-   for m in artifact.models for k, v in (m.updates.bench or {}).items()
-   if v is not None
+filled_this_cycle    = {(m.id, k) for m in models for k,v in (m.updates.bench or {}) if v is not None}
+explicit_gap_cells   = {parse_cell(g.key) for g in gaps}
+attempted_but_missed = cells_started_in_phase3 \ (filled_this_cycle | explicit_gap_cells)
+
+for (mid, bk) in attempted_but_missed:
+    emit gaps[] entry with triedSources/triedQueries/triedFormats. NO loop-back.
+
+artifact.coverageMatrix = {
+    totalCells:         |active_models| × |core_bench_keys|,
+    filledCells:        |filled_this_cycle|,
+    filledThisCycle:    |filled_this_cycle|,
+    gapsRecorded:       |explicit_gap_cells| + |attempted_but_missed|,
+    notApplicableCells: |na_cells|,
 }
-
-# Cells the agent explicitly attempted but found nothing (Phase 3 attempts)
-explicit_gap_cells := { parse_cell(g.key) for g in artifact.gaps }
-
-# Cells the agent attempted but got distracted / ran out of context
-# → emit a compact auto-gap (not a Phase 3 loop-back — orchestrator handles)
-attempted_but_missing := cells_actively_started_in_phase3 \ (filled_this_cycle | explicit_gap_cells)
-
-for (mid, bk) in attempted_but_missing:
-    emit gaps[] entry:
-      { "key": "<mid>.<bk>",
-        "reason": "phase3-started-not-completed",
-        "triedSources": ["<primary leaderboard URL for bk>"],
-        "triedQueries": ["<mid> <benchLabel> 2026", "<model name> <benchLabel> leaderboard"],
-        "triedFormats": ["static_html_table"] }
-    # DO NOT loop back through Phase 3. The orchestrator gap-gen covers this.
-
-# Compute coverageMatrix for what the agent handled.
-# NOTE: filledCells counts existing data/models.json values too (preserved by merge).
-# gapsRecorded is ONLY what the agent explicitly emits — orchestrator supplements the rest.
-artifact.coverageMatrix := {
-   totalCells:           |active_non_archived_models| × |core_bench_keys|,
-   filledCells:          |filled_this_cycle|,
-   filledThisCycle:      |filled_this_cycle|,
-   gapsRecorded:         |explicit_gap_cells| + |attempted_but_missing|,
-   notApplicableCells:   |na_cells|,
-}
-
-# Emit partial flag — the orchestrator gap-gen step is mandatory.
-artifact.partialReturn := (filledCells + gapsRecorded + notApplicableCells < totalCells)
+artifact.partialReturn = (filledCells + gapsRecorded + notApplicableCells < totalCells)
 ```
 
-**Emission rules:**
-
-- `coverageMatrix` is required. If you can't compute exact byBench/byModel breakdowns,
-  omit those sub-objects — the top-level counts are sufficient for MX1 gate.
-- `gaps[]` contains ONLY cells you actively attempted and failed. Do NOT enumerate all
-  unfilled cells — the orchestrator gap-gen handles those after your return.
-- N/A cells (`models[].notApplicable[]`) still require a rule citation from
-  `_schema.notApplicableRules.rules[]`.
-- **Zero loops** back through Phase 3 for cells you never touched. Emit partial, let
-  orchestrator supplement. This is the correct behavior, not a contract violation.
+Rules:
+- `coverageMatrix` is required; byBench/byModel sub-objects optional.
+- `gaps[]` carries ONLY actively-attempted cells. NEVER enumerate unfilled cells.
+- N/A cells cite a rule from `_schema.notApplicableRules.rules[]`.
+- Zero loop-back through Phase 3. Emit partial, exit.
 
 ## OUTPUT_DELIVERY
 
@@ -932,47 +818,21 @@ URL: `https://ollama.com/library/<id>` or `<id>:<tag>` (per `local[0].perModelUr
 | context | "Models" section | numeric tokens |
 | license | "Models" section | string (Modified MIT, Apache-2.0, …) |
 | releasedISO | tags "last updated" max | most recent tag's date |
-| bench scores | "Models" / model description block (markdown rendered) + Tags tab metadata | Treat the description block as `static_html_article`: run the bench-name alias table (EXTRACTION_DISCIPLINE row 5) over every paragraph. Capture every `(<bench_alias>, <numeric>)` pair the markdown surfaces — vendors frequently embed SWE-bench / LiveCodeBench / Aider / GPQA tables here when their official blog is bot-blocked or image-only. Tier=I (Ollama is an independent catalog; the value originated from the vendor but is being mirrored by an aggregator) → trustScore = 1.0 × verifications/3 × recency. |
+| bench scores | "Models" / description block + Tags metadata | Treat as `static_html_article`; run bench-name alias table (EXTRACTION_DISCIPLINE row 5). Capture every `(<bench_alias>, <numeric>)` pair. Vendors often embed SWE-bench / LCB / Aider / GPQA tables here when their official blog is bot-blocked. tier=I; trustScore = 1.0 × verifications/3 × recency. |
 
-**Mandatory: when iterating an Ollama detail page in PER_MODEL_URL_EXPANSION step 2b, the agent extracts BOTH metadata fields above AND every bench score the description block surfaces. Skipping the bench pass is a contract violation that the PRE_EMIT_SELF_AUDIT will catch on any cell that should have been filled here.**
-
-## EXAMPLES
-
-### example_lineup_sync
-```
-scope: lineup-sync
-idea_context: { currentIds: [...50 ids...] }
-```
-expected: `lineupChanges` populated, `models[]` empty, no bench fetch.
-
-### example_full_refresh
-```
-scope: full
-trusted_sources_only: true
-per_model_fetch_budget: 6
-parallel_models: 5
-```
-expected: lineup + bench + multi-provider pricing + ollama for ≥35 models, all sources whitelisted, every value carries trustScore.
-
-### example_deep_fetch
-```
-scope: deep-fetch
-target_model_ids: ["opus-4-7"]
-target_field: "bench.swePro"
-```
-expected: ≤30s, single-pair fill, returns one models[].updates entry + sourcesAdded with trustScore.
+In PER_MODEL_URL_EXPANSION step 2b, extract BOTH metadata AND every bench score the description block surfaces. Skipping the bench pass is a contract violation.
 
 ## DISCIPLINES
-- **Lineup-first** — Phase 0 always runs first on full/lineup-sync
-- **Trusted-source whitelist + in-cycle promotion** — the whitelist is the starting set, walked exhaustively first. When a (modelId, benchKey) cell remains empty AFTER the whitelist cascade, the agent MAY fetch a non-whitelisted HTTPS URL surfaced by WebSearch THIS cycle (tier=C default, mirrored to `whitelistAdditions[]` for next-cycle hardening). See TRUSTED_SOURCE_WHITELIST rule 6 for the safety conditions. Emit gaps[] only AFTER both the whitelist cascade AND the in-cycle promotion path have been exhausted.
-- **Trust scoring** — every emitted value carries a trustScore (formula above)
-- **Multi-provider pricing** — pricing.api is always an array, one element per provider, dedupe by provider
-- **UNCAPPED effort** — no fetch budget, no wallclock cap, no per-model fetch cap. Termination is governed exclusively by COMPLETENESS_TERMINATION (every active_model × every core_bench_key cell either filled or carrying a `gaps[]` entry with full triedSources/triedQueries provenance). 5 is a parallelism guideline, not a ceiling.
-- **Auto-resolution prep** — emit `autoResolveWinner` per contradiction (skill applies, no user prompt)
-- **Lifecycle states** — emit `status` field changes via `lineupChanges` (skill applies transitions)
-- **Pre-emit self-audit (REQUIRED)** — see PRE_EMIT_SELF_AUDIT below. Agent computes coverageMatrix for what it attempted, sets `partialReturn: true`, and emits. Orchestrator gap-gen supplements remaining cells. Looping back through Phase 3 is **forbidden** — emit and exit.
-- **Delivery contract** — JSON-only final message, no narration, no file write, no truncation
-- **Project boundary** — only AICoderMap session
+- **Lineup-first** — Phase 0 always runs first on full/lineup-sync.
+- **Trusted-source whitelist + in-cycle promotion** — walk the whitelist exhaustively first; cells still empty after the cascade may fetch non-whitelisted HTTPS URLs surfaced by WebSearch THIS cycle (tier=C; mirrored to `whitelistAdditions[]`). See TRUSTED_SOURCE_WHITELIST rule 6.
+- **Trust scoring** — every emitted value carries a trustScore.
+- **Multi-provider pricing** — `pricing.api[]` is always an array; dedupe by `provider`.
+- **Capped resources, uncapped quality** — agent_budget_buffer (50 tool-calls) + wallclock_deadline_unix are HARD; UNCAPPED applies only to research quality (sources, fallbacks, gap-fabrication policy).
+- **Auto-resolution prep** — emit `autoResolveWinner` per contradiction.
+- **Lifecycle states** — emit `status` changes via `lineupChanges`.
+- **Pre-emit self-audit (REQUIRED)** — see PRE_EMIT_SELF_AUDIT. Compute coverageMatrix for what was attempted, set `partialReturn: true`, emit. NEVER loop back through Phase 3.
+- **Delivery contract** — Write artifact + return one-line EMITTED status.
+- **Project boundary** — only AICoderMap session.
 
 ## INTERNAL_RETRY_DISCIPLINE (format-driven cascade — replaces hardcoded escalation)
 
@@ -1007,11 +867,14 @@ For each (modelId, field) still null after the primary fetch:
 
 **No hardcoded "if SPA → try GitHub" / "if blog → try news" branches** — those mappings now live in each entry's `fallbacks[]` (populated by `scripts/whitelist-format-migration.js`) and in `formatTaxonomy[<format>].defaultFallbacks`. Adding a new fallback path = editing the whitelist, never the agent.
 
-## WEBSEARCH_PRIMARY_DISCIPLINE (2026 update — root-cause fix for SPA/403 walls)
+## WEBSEARCH_PRIMARY_DISCIPLINE
 
-**Why this section exists:** In 2026, every major AI leaderboard (artificialanalysis.ai, swebench.com, livecodebench.github.io, gorilla.cs.berkeley.edu, livebench.ai, matharena.ai) is a JavaScript SPA returning empty static HTML. Direct vendor blogs (openai.com/index, blog.google, x.ai) reject Claude Code's WebFetch with 403/404 (bot detection). Anthropic vendor blogs embed bench tables as PNG images (text-only extraction misses 80%+ of scores). Text-only WebFetch hit a structural ceiling at ~25% per-page coverage.
-
-**The fix:** WebSearch (which uses Google's index + AI-summarized snippets) extracts numeric scores from cached pages, aggregator blogs, and snippet-rendered SPA content. WebSearch succeeded across all 6 frontier-model queries where WebFetch returned 403/SPA_NO_DATA.
+WebSearch (Google index + AI-summarized snippets) is the primary path for
+SPA leaderboards (artificialanalysis.ai, swebench.com, livecodebench.io,
+gorilla.cs.berkeley.edu, livebench.ai, matharena.ai), bot-blocked vendor
+blogs (openai.com, blog.google, x.ai), and image-embedded charts
+(anthropic.com/news, deepmind.google). WebFetch on these returns
+403 / SPA_NO_DATA; WebSearch extracts numeric scores from cached pages.
 
 **Mandatory protocol per (modelId, field) pair:**
 
@@ -1050,17 +913,14 @@ This replaces the prior hardcoded I/S/C domain tables. Adding a new aggregator =
 
 If both queries return zero useful (bench, score) pairs AND no in-cycle promotion fetch yielded a value, the agent has exhausted the fallback chain. Only then is `gaps[]` emission permitted, and the entry MUST carry `triedFormats[]` + `triedPatterns[]` + `triedSources[]` (including in-cycle promotion attempts and their HTTP status) + `triedQueries[]`.
 
-## GAP_VALIDITY_GATE (advisory audit only — reformed 2026-04-28)
+## GAP_VALIDITY_GATE (advisory audit only)
 
-**Why this section exists:** Earlier cycles stripped gap entries that failed an adaptive triedSources floor. Operationally that meant "if you can't try ≥3 sources, don't even report the gap" — which pressured the agent to silently omit hard-to-reach pairs rather than transparently log them. **The user's policy reform: every fetch attempt + every reachable bit of provenance is useful information; never strip a gap.**
-
-**Reformed rule (2026-04-28):**
-
-- `gaps[]` entries are NEVER stripped by the orchestrator.
-- The orchestrator's `validate_gaps()` walks every entry in advisory mode: it computes a "low-effort suspicion" score (gap.triedSources.length vs. clamp(advertised_high_weight_for_bench, 3, 5)) and flags entries that fall below the threshold by appending them to `runtime.fabricatedSuspicions[]` for human audit. The original entry stays in `gaps[]` regardless.
-- `runtime.contractViolations` is no longer incremented; the concept is retired (the agent isn't "violating a contract" by reporting whatever it actually tried).
-
-**Practical effect for the agent:** still try as many sources as feasible per gap (the cascade discipline below remains in effect — it's the right default), but the agent is no longer punished for reporting a gap with only one or two triedSources. Reporting a partial-effort gap is strictly better than omitting it.
+`gaps[]` entries are NEVER stripped by the orchestrator. The skill's
+`validate_gaps()` walks every entry advisorily: low-effort gaps
+(triedSources.length below the bench's advertised-publisher count) get
+appended to `runtime.fabricatedSuspicions[]` for human audit. Original
+entries stay in `gaps[]` regardless. Reporting a partial-effort gap with
+1-2 triedSources is strictly better than omitting it.
 
 **Audit reference (kept for human reviewers eyeballing the diff log):**
 
@@ -1080,9 +940,11 @@ Per-bench advertised counts are computed at gate-evaluation time from `data/sour
 
 A legacy/deprecated model still gets the same treatment: try the canonical historical leaderboards (Papers with Code, Epoch AI, llm-stats archive, marc0.dev historical entries, BigCodeBench archive) before declaring a gap. "Model is old" is never a sufficient reason to skip the attempt.
 
-## SOURCE_FIRST_SWEEP (Phase 1 primary mining — added 2026-04-27 rev2)
+## SOURCE_FIRST_SWEEP (Phase 1 primary mining)
 
-**Why this section exists:** prior phases iterated **per-model** (for each model, walk all sources). With 53 models × 5+ sources × 16 benches, this scaled poorly: per-model cascade was verification-blind and cache-unaware. Cycle 4 used only ~32 of a possible 600+ fetches because effort caps fired before saturation; cycle 5 used only 8 fetches because per-source caps capped the sweep. **2026-04-27 rev3 retires all effort caps**: the agent walks **each source ONCE**, extracts every (modelId, benchKey, value) tuple visible on that page in one pass, then chases unfilled cells through the full Phase 2 cascade until COMPLETENESS_TERMINATION holds. **2026-04-28 reform additionally retires the confirmed-cell skip** — vendors update scores between cycles, so persistent "confirmed → skip" caching froze stale data. Every cycle now re-extracts every (modelId, benchKey) cell from every advertised source. The verification map remains as a historical / contradiction-analysis log only; it never short-circuits a fetch.
+Walk each source ONCE, extract every visible (modelId, benchKey, value)
+tuple in one pass. Per-model cascade only chases what Phase 1 didn't catch.
+T2 cells (FAZ 2.2 freshness skip) are excluded by `idea_context.skipCells`.
 
 **Mandatory protocol on `scope=full`:**
 
@@ -1193,19 +1055,14 @@ A legacy/deprecated model still gets the same treatment: try the canonical histo
 
 `confirmed = (verifications.length >= 3) AND (all verifications agree on value within 1.5pp)`. If multiple sources disagree, the cell is NOT confirmed even with 3+ verifications — it goes to contradictions[] for trustScore-based resolution.
 
-**Why this beats per-model cascade:**
+## PER_MODEL_URL_EXPANSION (Phase 2 fallback — cells still empty after SOURCE_FIRST_SWEEP)
 
-| Metric | Per-model (prior) | SOURCE_FIRST_SWEEP |
-|---|---|---|
-| Total fetches per cycle (estimate) | 53 × 12 = 636 capped at wallclock | unlimited — agent fetches until COMPLETENESS_TERMINATION |
-| Verification-aware skip | no (each model from scratch) | yes (3+ verified = skip rest of cycle, persists across cycles) |
-| Same source re-visited | up to 53× | exactly 1× per cycle (agent may re-try documented fallbacks) |
-| Termination | wallclock cap | COMPLETENESS_TERMINATION (research structurally exhausted) |
-| Coverage trajectory | linear-ish, plateaus around 30-35% (capped) | step-function: each cycle approaches reachable ceiling |
-
-## PER_MODEL_URL_EXPANSION (Phase 2 fallback — for cells still empty after SOURCE_FIRST_SWEEP)
-
-**Why this section exists:** the 2026-04-27 audit found that several whitelisted leaderboards (artificialanalysis.ai, benchlm.ai, epoch.ai, llm-stats.com) and most vendor blogs (blog.google, anthropic.com/news, deepmind.google/models/model-cards/) host **per-model pages** with rich bench tables that the prior cascade never visited. The agent only fetched aggregate leaderboard URLs, missing model-specific content like `https://artificialanalysis.ai/models/gemini-3-1-flash-lite-preview` or `https://deepmind.google/models/model-cards/gemini-3-1-pro/`. Those per-model pages frequently contain 14+ benchmarks for a single model — exactly what fills sparse cells.
+Whitelisted leaderboards (artificialanalysis.ai, benchlm.ai, epoch.ai,
+llm-stats.com) and vendor blogs (blog.google, anthropic.com/news,
+deepmind.google/models/model-cards/) host per-model pages with rich bench
+tables that the aggregate-URL sweep doesn't visit. Each per-model page
+typically carries 14+ benches for a single model — exactly the sparse-cell
+fill source.
 
 **Mandatory cascade per (modelId, benchKey) pair (replaces prior 3-step fallback):**
 
@@ -1451,36 +1308,27 @@ Before emitting the final JSON:
 
 The skill parses Task tool's return value via regex `^\s*(\{[\s\S]*\})\s*$`. Narration before/after the JSON makes parsing fragile — never narrate.
 
-## RESEARCH_PIPELINE_OPTIMIZATION (P10 reform — efektif + hızlı + eksiksiz)
+## RESEARCH_PIPELINE_OPTIMIZATION
 
-UNCAPPED + UNCACHED doctrine remains in force ("her cell her cycle"). The
-optimizations below reduce wallclock without sacrificing completeness.
+Wallclock optimizations layered on top of the freshness-tier skip:
 
-1. **Concurrent Phase 0 + Phase 1 dispatch** — Phase 0 (vendor lineup) and
-   Phase 1 (whitelist leaderboard sweep) run in PARALLEL via a single-message
-   multi-tool-call. Critical path becomes `max(P0, P1) + P2` instead of
-   `P0 + P1 + P2`. Both feed Phase 2 once available.
-2. **Parallel fetch batching** — vendor + leaderboard URLs fetched in batches
-   of `_schema.contracts.PARALLEL_FETCH_BATCH` (default 5) per single-message
-   tool-call burst. The agent issues all batch members concurrently, never
-   sequentially.
-3. **Multi-model batch extract** — when a leaderboard table lists N models,
-   ONE fetch + ONE parse → cells emitted for every matched model in that
-   single pass. This is the documented `static_html_table` semantic; agent
-   never re-fetches the same aggregate page per-model.
-4. **Source priority cascade** — Phase 3 walks publishers in deterministic
-   order: `priority="primary"` → `secondary` → `tertiary` → WebSearch
-   fallback. Whitelist `publishes[]` may be either a flat string list (legacy)
-   or `[{key, priority}]` (P10.4); the agent reads both shapes via
-   `idea_context.sourcesWhitelist` without normalization.
-5. **Low-coverage priority queue** — when the skill ships `idea_context.priorityCells[]`
-   (computed from MATRIX_SNAPSHOT), the agent resolves those cells FIRST in
-   Phase 2/3 cascade. Mid-cycle interruption thus closes the most starved
-   cells before less critical ones.
-6. **Phase 1.5 broad WebSearch sweep** — concurrent with Phase 1 fetches, the
-   agent issues `WebSearch("<bench> leaderboard 2026")` queries for each
-   coreBenchKey. Snippets discover unknown leaderboards (auto-suggested via
-   `whitelistAdditions[]`) and surface scores without waiting on Phase 3.
+1. **Parallel Phase 0 + Phase 1** — vendor lineup and whitelist leaderboard
+   sweep run via single-message multi-tool-call. Critical path becomes
+   `max(P0, P1) + P2`.
+2. **Batch fetch** — `_schema.contracts.PARALLEL_FETCH_BATCH` (default 5)
+   URLs per single-message burst. Concurrent, never sequential.
+3. **Multi-model batch extract** — one leaderboard fetch yields cells for
+   every matched model in one pass. Never re-fetch the same aggregate per
+   model.
+4. **Priority cascade** — Phase 3 walks publishers `primary → secondary →
+   tertiary → WebSearch`. `publishes[]` accepts both flat strings (legacy)
+   and `[{key, priority}]` (P10.4) shapes.
+5. **priorityCells[] is authoritative** (FAZ 2.3) — agent walks ONLY this
+   list; cells outside the list are NOT processed.
+6. **Phase 1.5 broad WebSearch** — concurrent with Phase 1, issue
+   `WebSearch("<bench> leaderboard 2026")` per coreBenchKey. Snippets
+   surface unknown leaderboards (→ `whitelistAdditions[]`) and stray
+   scores without waiting on Phase 3.
 7. **Phase 0 fail-fast** — vendor URL 4xx/5xx → 1 retry with
    `_schema.contracts.FETCH_RETRY_COUNT` (default 1) backoff
    `_schema.contracts.FETCH_TIMEOUT_SEC` (default 10s) → vendor entry skipped
