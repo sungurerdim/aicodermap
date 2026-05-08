@@ -1,4 +1,30 @@
 
+## [2026-05-08] — autonomous refresh-all [WARN: very low cumulative provenance coverage 27.3%] [MX2: coverage 27.3% < absolute floor 30%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 51 new fills; 969 cells auto-gapped by orchestrator; 81 explicit agent gaps preserved]
+
+[fillRatio:0.27 cells:426/1560 contradictions:8 fetch:0.0min tools:None batches:None build:c512eaa]
+
+### Resolved (auto via trustScore)
+- gpt-5-5.hle: winner={'value': 41.4, 'trustScore': 0.7, 'sourceUrl': 'https://openai.com/index/introducing-gpt-5-5/', 'tier': 'S'} (severity=RED, Δ10.8)
+- sonnet-4-6.tau2: winner={'value': 87.5, 'trustScore': 0.67, 'sourceUrl': 'https://benchlm.ai/models/sonnet-4-6', 'tier': 'I'} (severity=RED, Δ7.3)
+- deepseek-v3-2.sweV: winner={'value': 67.8, 'trustScore': 0.7, 'sourceUrl': 'https://github.com/deepseek-ai/DeepSeek-V3.2-Exp', 'tier': 'S'} (severity=GREEN, Δ2.2)
+- deepseek-v3-2.lcb: winner={'value': 74.1, 'trustScore': 0.7, 'sourceUrl': 'https://github.com/deepseek-ai/DeepSeek-V3.2-Exp', 'tier': 'S'} (severity=RED, Δ9.2)
+- deepseek-v3-2.gpqa: winner={'value': 79.9, 'trustScore': 0.7, 'sourceUrl': 'https://github.com/deepseek-ai/DeepSeek-V3.2-Exp', 'tier': 'S'} (severity=GREEN, Δ2.5)
+- deepseek-v3-2.hle: winner={'value': 19.8, 'trustScore': 0.7, 'sourceUrl': 'https://github.com/deepseek-ai/DeepSeek-V3.2-Exp', 'tier': 'S'} (severity=RED, Δ21.0)
+- kimi-k2-6.tb2: winner={'value': 66.7, 'trustScore': 0.7, 'sourceUrl': 'https://platform.moonshot.cn/docs', 'tier': 'S'} (severity=RED, Δ13.5)
+- minimax-m2-5.swePro: winner={'value': 55.4, 'trustScore': 0.7, 'sourceUrl': 'https://platform.minimaxi.com/document', 'tier': 'S'} (severity=RED, Δ18.59)
+
+### Gaps (1021 entries — see data/known-gaps.json or next refresh)
+- `gpt-5-5.nl2Repo`: Scale SEAL NL2Repo leaderboard SPA — model not found in search snippets
+- `opus-4-7.nl2Repo`: Scale SEAL NL2Repo leaderboard SPA — model not found in search snippets
+- `sonnet-4-6.nl2Repo`: Scale SEAL NL2Repo leaderboard SPA — model not found in search snippets
+- `claude-haiku-4-5.nl2Repo`: Scale SEAL NL2Repo leaderboard SPA — model not found in search snippets
+- `grok-4-20.nl2Repo`: Scale SEAL NL2Repo leaderboard SPA — model not found in search snippets
+- `grok-4-3.nl2Repo`: Scale SEAL NL2Repo leaderboard SPA — model not found in search snippets
+- `grok-4-1-fast.nl2Repo`: Scale SEAL NL2Repo leaderboard SPA — model not found in search snippets
+- `deepseek-v4-pro.nl2Repo`: Scale SEAL NL2Repo leaderboard SPA — model not found in search snippets
+- ... and 1013 more
+
+
 ## [2026-05-07] — autonomous refresh-all [WARN: very low cumulative provenance coverage 27.3%] [MX2: coverage 27.3% < absolute floor 30%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 51 new fills; 969 cells auto-gapped by orchestrator; 81 explicit agent gaps preserved]
 
 [fillRatio:0.27 cells:426/1560 contradictions:8 fetch:0.0min tools:None batches:None build:951a10b]
