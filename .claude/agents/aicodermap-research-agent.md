@@ -116,12 +116,30 @@ termination: "completeness"                # explicit doctrine — see SKILL.md 
 expected_total: <int>                      # |active|×|coreKeys| - |notApplicable|; matrix invariant target
 require_priority_first: <bool default:true>  # process priorityCells in Phase 2/3 BEFORE any other empty cell
 require_full_matrix: <bool default:true>     # every cell must end as fill | gap | notApplicable
-# UNCAPPED RESEARCH (2026-04-28 reform): no fetch_budget, no wallclock_budget,
-# NO confirmed-cell skip. Every cycle re-attempts every (modelId, benchKey)
-# cell from every advertised source — vendor scores can change overnight, so
-# stale "confirmed=true" caching contradicts the freshness contract. The
-# verification map is now audit-only (historical record + contradiction
-# analysis); it never short-circuits a fetch.
+# UNCAPPED RESEARCH (2026-04-28 reform, scope-clarified FAZ 1.3 2026-05-07):
+# UNCAPPED applies to RESEARCH QUALITY — which sources to attempt, how many
+# fallbacks to chain, whether to fabricate gaps. It does NOT remove per-dispatch
+# resource ceilings:
+#   • agent_budget_buffer (50 tool-calls) — hard, enforced by self-monitoring
+#   • wallclock_deadline_unix              — hard, enforced by orchestrator SIGKILL
+# When either ceiling fires, the agent emits whatever it has + partialReason;
+# orchestrator gap-gen closes the matrix invariant. Next cycle re-attempts
+# unfilled cells (gaps[] preserved across cycles).
+#
+# Cell skip — freshness-tier ONLY (FAZ 2.2 reform 2026-05-07):
+#   T1 cells (default — confirmed=false OR verifs<3 OR age>7d OR contradicted
+#     OR not in map): re-fetched every cycle. This is the majority of cells
+#     and preserves the "vendor scores can change overnight" guarantee.
+#   T2 cells (confirmed=true AND verifs≥3 AND age≤7d AND no-contradiction):
+#     skipped this cycle, value copied from verification map. Drift surfaces
+#     within ≤7d via freshness expiry (cell drops back to T1).
+# Pre-FAZ-2.2 behavior was "every cell every cycle, no skip ever" — that
+# made wallclock unbounded and produced 97% auto-gap stubs. The reform
+# preserves the freshness contract via the 7d TTL; it does NOT reintroduce
+# a known-gaps skip registry.
+# The skill computes skipCells in idea_context; the agent obeys.
+# Verification map remains audit-only for everything else (contradiction
+# analysis, drift detection); never short-circuits a T1 fetch.
 
 # BUDGET REFORM (2026-05-06): the orchestrator pre-shards the cycle into
 # multi-batch dispatch where every batch is sized to fit comfortably under
@@ -133,24 +151,39 @@ require_full_matrix: <bool default:true>     # every cell must end as fill | gap
 # sub-agent's slice, every cell is attempted, no internal cap.
 agent_budget_buffer: <int default:50>      # tool-call ceiling target; if approaching, finish current cell + emit final JSON, do not start another cascade
 batch_id: <string>                          # the orchestrator's batch label; surfaced in runMetadata + per-batch artifact path
+wallclock_deadline_unix: <int>             # FAZ 1.3 (2026-05-07): orchestrator-enforced hard wallclock cap (epoch seconds). Agent MUST self-check at every Phase boundary: if Date.now()/1000 >= wallclock_deadline_unix - 30 → STOP fetching, build the artifact dict for whatever cells you have, Write the artifact, return the EMITTED status line. Do NOT start another fetch cascade. The orchestrator subprocess will SIGKILL the agent at wallclock_deadline_unix; cells written before the kill survive, anything in mid-flight is lost. Treat the 30s soft buffer as non-negotiable.
 ```
 
-**Matrix awareness (HARD — C plan reform 2026-04-29):**
-The skill ships `matrixState` + `priorityCells` so the agent sees the
-contract reality before the first fetch. The agent MUST:
+**Matrix awareness (HARD — FAZ 2.3 reform 2026-05-07):**
+The skill ships `matrixState` + `priorityCells` (after T2-skip removal — see
+FAZ 2.2) so the agent sees the contract reality before the first fetch.
+The agent MUST:
 
 1. Scan `matrixState.byBench` to identify the bench keys with the lowest
    fill ratio — these get extra time in Phase 1 leaderboard sweep (more
    patterns, more aggregator mirrors, longer WebSearch cascade).
-2. Walk `priorityCells[]` IN ORDER through the Phase 2/3 cascade. The
-   first 50–100 cells of `priorityCells` are the highest-starvation cells;
-   resolve them BEFORE any non-priority empty cell.
+2. **`priorityCells[]` is the AUTHORITATIVE work list (FAZ 2.3 reform
+   2026-05-07).** The agent walks it top-down through the Phase 2/3
+   cascade and SHALL NOT process cells outside this list. When the agent
+   exhausts `priorityCells` OR hits the budget/wallclock ceiling, it
+   emits artifact and returns. Cells not reached this cycle remain in
+   the priority queue for the next cycle — they are NOT auto-stubbed
+   inside the agent.
+
+   Pre-FAZ-2.3 behavior was "process priorityCells first, then sweep
+   the rest of the matrix." That sweep regularly burned the entire
+   tool-call budget on low-priority cells while top priorities were
+   still unfilled — exactly the cycle 2026-05-06 batch03 0-fill pattern.
+   The reform makes the priority queue the only valid scope.
+
 3. Compare the agent's eventual `coverageMatrix.filledCells +
-   gapsRecorded + notApplicableCells` against `expected_total`. If less,
-   the cycle is partial — go back through Phase 3 cascade for the
-   residual cells before emitting final JSON. The orchestrator's
-   COMPLETENESS_GATE will dispatch a single retry if the artifact still
-   lands short, but a well-formed cycle should not need that retry.
+   gapsRecorded + notApplicableCells` against `len(priorityCells) +
+   |skipCells|` (the cycle's actual reachable target). If less, the
+   cycle is partial in the FAZ-1.3 wallclock sense — go back through
+   Phase 3 cascade for residual priority cells before emitting final
+   JSON. The orchestrator's COMPLETENESS_GATE will dispatch a single
+   retry if the artifact still lands short. The unreached
+   priorityCells re-surface in next cycle's priority queue.
 
 ## TRUSTED_SOURCE_WHITELIST (`trusted_sources_only=true` enforces these)
 
@@ -411,8 +444,56 @@ extractor := entry.extractor || formatTaxonomy[format].extractor
 patterns := entry.extractorHints?.patternOverride
               || formatTaxonomy[format].extractorPatterns
 
-if formatTaxonomy[format].primaryTool == "skip":
+// FAZ 2.2 (2026-05-07): FRESHNESS-TIER CELL SKIP — non-negotiable.
+// Before any fetch logic, check whether the (modelId, benchKey) target is
+// in idea_context.skipCells. If yes: the verification-map already has a
+// confirmed value (≥3 verifs, ≤7d old, no contradiction). The agent
+// treats the cached value as already-filled, emits a synthetic
+// sourcesAdded[] entry pointing at the cached provenance, and SKIPS this
+// cell entirely. Fetch budget saved goes to T1 cells (the unconfirmed /
+// stale / contradicted ones).
+// HARD RULE: never re-issue any fetch for a T2 skip cell. The skill's
+// gen_unified_artifact merge writes the cached value back to data/models.json
+// using the map's existing provenance. Agent re-fetching a T2 cell is a
+// contract violation logged to runtime.fabricatedSuspicions[].
+if (idea_context.skipCells[modelId]?.[benchKey]):
+    cached := idea_context.skipCells[modelId][benchKey]
+    emit models[id].updates.bench[benchKey] = cached.value
+    sourcesAdded[].push({
+        bench: benchKey, value: cached.value, sources: cached.sources,
+        lastChecked: cached.lastChecked, extractedVia: "freshness-tier-skip"
+    })
+    continue  // next cell — no fetch, no fallback chain
+
+// FAZ 1.4 (2026-05-07): HARD WebFetch GATE — non-negotiable.
+// Three signals can ban a WebFetch BEFORE it issues:
+//   (a) formatTaxonomy[format].skipWebFetch === true
+//       (spa_full, image_embedded, bot_blocked — known unfetchable)
+//   (b) formatTaxonomy[format].primaryTool === "skip"  (legacy alias)
+//   (c) entry.url matches any pattern in idea_context.bannedFetchPatterns[]
+//       (orchestrator-derived: every URL whose format has skipWebFetch=true,
+//        plus every URL whose _runtime.unhealthy=true)
+// On any (a)+(b)+(c) match: SKIP WebFetch entirely, jump straight to
+// fallback chain. NO retry, NO "let me try once anyway" — those WebFetch
+// attempts cost 1 tool-call each AND 5-30s wallclock for 0 yield.
+// Repeated WebFetch on a banned pattern is a contract violation.
+if (formatTaxonomy[format].skipWebFetch === true
+    || formatTaxonomy[format].primaryTool === "skip"
+    || matches_any(entry.url, idea_context.bannedFetchPatterns)):
     skip_primary = true
+else if (idea_context.leaderboardSnapshots[entry.url]):
+    // FAZ 2.1 (2026-05-07): SNAPSHOT-FIRST path.
+    // Orchestrator's PRELIM-B prefetch already HTTP-GET'd this URL once and
+    // wrote the body to disk. Reading the snapshot costs 1 Read tool-call
+    // (~50ms) vs WebFetch's 1 call + retry + 5-30s wallclock. Same extractor
+    // cascade applies — only the body source changes.
+    snapshot := idea_context.leaderboardSnapshots[entry.url]
+    body := Read(snapshot.path)
+    sourcesAdded[].extractedVia += "@snapshot-" + snapshot.fetchedAt
+    // Skip the WebFetch branch entirely — agent never issues a network fetch
+    // for any URL the orchestrator already prefetched. If extraction yields
+    // nothing, agent goes straight to the format's fallback chain (websearch
+    // snippets, aggregator mirrors) without re-fetching the original URL.
 else:
     body := WebFetch(entry.url) (or scripts/extract-images.py for image_embedded — orchestrator-side)
     cleaned := cleanup(body) if extractors[extractor].cleanupBeforeExtract
@@ -796,6 +877,7 @@ recovered from `subagents/*.jsonl` via `scripts/extract-agent-output.py`).
 - Do **NOT** enumerate gaps for cells you never attempted. Orchestrator gap-gen supplements.
 - **EMIT IMMEDIATELY** once Phase 1+2+3 are done for cells you can reach.
 - **HARD BUDGET CEILING:** when `runMetadata.toolCallCount` reaches `agent_budget_buffer - 5` (e.g. 45 of 50), STOP fetching, build the artifact dict for whatever cells you have so far, **Write** it, return status. Do NOT start another fetch cascade. The cycle 2026-05-06 wave 0 had two batches blow past the buffer (89 and 142 calls vs target 50) — that was a contract violation, not 'uncapped freedom'.
+- **HARD WALLCLOCK CEILING (FAZ 1.3, 2026-05-07):** at every Phase boundary (after Phase 1, after Phase 2, after each cell in Phase 3), check `Date.now()/1000 >= wallclock_deadline_unix - 30`. If true: **STOP fetching immediately**, build the artifact dict from whatever cells you have, **Write** it, return the EMITTED status line. Do not start another cascade or fetch — the orchestrator will SIGKILL the agent at `wallclock_deadline_unix` (10 min from dispatch by default). Cells written before the kill survive; mid-flight Reads/Fetches do not. The 30s soft buffer is for the Write call itself + return — don't burn it on extra fetches. Wallclock ceiling and tool-call ceiling are EQUAL authority: trip whichever fires first.
 - Do **NOT** call `run_in_background`.
 
 **Size management** (artifact file content, not message):

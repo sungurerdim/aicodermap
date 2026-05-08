@@ -19,9 +19,14 @@ Reform contract:
                             With 26 keys: floor(150/26) = 5 models per batch.
   MAX_PARALLEL            — concurrent agent dispatch ceiling. Claude Code's
                             single-message Agent invocation supports up to
-                            10 parallel sub-agents; we use 5 to stay
-                            conservative + leave room for orchestrator
-                            wallclock budget.
+                            10 parallel sub-agents. Bumped 5→10 (FAZ 1.2,
+                            2026-05-07) to halve wave count: 18 batches
+                            now fit in 2 waves (10+8) instead of 4 waves
+                            (5+5+5+3). Each wave's wallclock is bounded by
+                            its slowest batch, so fewer waves = less total
+                            wallclock. The orchestrator wallclock budget
+                            is now enforced per-batch via deadline_unix
+                            (FAZ 1.3), independent of parallel count.
   SEQUENTIAL_AFTER        — after MAX_PARALLEL batches return, the next
                             wave dispatches sequentially (still parallel
                             within the wave). Each wave is independent.
@@ -39,7 +44,7 @@ from typing import Any
 AGENT_BUDGET_BUFFER = 50
 CELLS_PER_TOOL_CALL = 3
 MAX_BATCH_CELLS = AGENT_BUDGET_BUFFER * CELLS_PER_TOOL_CALL  # 150
-MAX_PARALLEL = 5
+MAX_PARALLEL = 10  # bumped 5→10 (FAZ 1.2, 2026-05-07): halve wave count
 ABSOLUTE_MAX_BATCH_MODELS = 8
 
 
@@ -187,7 +192,7 @@ def compute_dispatch_plan(
 def summarize_plan(plan: dict[str, Any]) -> str:
     """Compact one-block summary the orchestrator can paste into the cycle log."""
     out = []
-    out.append(f"=== DISPATCH PLAN ===")
+    out.append("=== DISPATCH PLAN ===")
     out.append(
         f"models={plan['totalModels']} keys={plan['coreKeys']} "
         f"modelsPerBatch={plan['modelsPerBatch']} "

@@ -44,6 +44,17 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
    - Persistent-unhealthy domains (≥3 cycles consecutive) get `_runtime.unhealthy: true` — agent skips them in this cycle's Phase 1 until next health-check passes
    - This step prevents wasted fetch budget on guaranteed-SPA/403 URLs AND keeps the whitelist's format classification accurate without human intervention
 
+PRELIM-B. LEADERBOARD_PREFETCH (FAZ 2.1, 2026-05-07 — orchestrator-side single-pass):
+   ```
+   python scripts/prefetch-leaderboards.py --max 12
+   ```
+   - **What:** stdlib `urllib` HTTP-GET pass over every healthy whitelist leaderboard/aggregator/community/registries URL whose format is NOT in the FAZ 1.4 banned-list. Writes snapshots to `data/.leaderboard-snapshots/<host>__<sha8>.{html,json}` and a manifest to `data/.leaderboard-snapshots/_index.json`.
+   - **Why:** the prior cycle had 18 sub-agents each running their own Phase 1 sweep, fetching ~37 leaderboards × 18 batches = ~666 duplicated WebFetches per refresh-all. This pass collapses that into ONE prefetch (~15s wallclock for 73 URLs). Each batch agent then `Read`s the snapshot from disk instead of WebFetching — saves 1 tool-call + 5–30s per leaderboard per agent.
+   - **TTL:** snapshots stay fresh for 24h. Re-runs within TTL no-op (`fresh: N to-fetch: 0`). Use `--force` to ignore TTL (rare; only when whitelist URLs change).
+   - **Failure tolerance:** prefetch is non-fatal. SSL/DNS/404 misses are logged in `_index.json._meta.totalFailed`; agent's Phase 1 transparently falls back to WebFetch for any URL absent from `leaderboardSnapshots` map.
+   - **Output to skill:** the orchestrator reads `_index.json` and injects `idea_context.leaderboardSnapshots = { <url>: { path: "<rel>", contentType, contentLength, fetchedAt } }` into every batch dispatch (Step 3).
+   - This step CANNOT be skipped on `refresh-all` and `lineup-sync`. It is opt-out via `AICODERMAP_NO_PREFETCH=1` env var only for emergency manual reruns.
+
 0. LINEUP DISCOVERY (always run first on refresh-all):
    - Agent fetches each vendor's official "active models" page from VENDOR_LINEUP_SOURCES table
    - Returns canonical lineup: { vendorId: { active: [...], deprecated: [...], renamed: [{from,to}] } }
@@ -92,15 +103,88 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
      //   byBench: { <key>: {filled, na, total} },
      //   byModel: { <id>:  {filled, na, total} }
      // }
-     priorityCells: <priority_cells(active_models, coreBenchKeys, limit=200)>,
+     priorityCells: <priority_cells(active_models, coreBenchKeys, limit=200, verification_map=vm, skip_confirmed_within_days=contracts.FRESHNESS_TTL_DAYS)>,
+     // FAZ 2.3 (2026-05-07): AUTHORITATIVE work list — agent walks only these.
      // Top-N empty (modelId, benchKey) pairs ranked by starvation
-     // (rare benches first, then rare models, lex tiebreak). Agent's Phase 2/3
-     // cascade MUST process these before any other empty cell — closes the
-     // worst gaps even when wallclock pressure interrupts the cycle.
-     contracts: <data/sources-whitelist.json._schema.contracts>
+     // (rare benches first, then rare models, lex tiebreak). The list excludes
+     // T2 freshness-tier cells (confirmed + ≥3 verifs + age ≤ FRESHNESS_TTL_DAYS,
+     // see FAZ 2.2) — those go through idea_context.skipCells instead.
+     //
+     // Pre-FAZ-2.3 contract: "process these BEFORE any other empty cell" —
+     // agent could sweep the rest of the matrix afterward. That sweep
+     // routinely burned the entire budget on low-priority cells (cycle
+     // 2026-05-06 batch03 0-fill pattern). The reform makes priorityCells
+     // the only valid scope: agent processes top-down until budget/wallclock
+     // ceiling, then emits artifact. Cells not reached re-surface in next
+     // cycle's priority queue.
+     contracts: <data/sources-whitelist.json._schema.contracts>,
      // Numeric thresholds (ABSOLUTE_COVERAGE_FLOOR, MIN_SOURCES_PER_FILLED_CELL,
      // VERIFICATION_AGREEMENT_PP, etc.) — single source of truth; agent reads
      // these values rather than hardcoding any number in agent.md.
+
+     // FAZ 1.4 (2026-05-07): hard WebFetch ban list — orchestrator-derived.
+     // Agent FORMAT_DISPATCH gate refuses to WebFetch any URL on this list.
+     // Sources of bans:
+     //   1. Every URL in leaderboards[]/aggregators[]/community[]/local[]/
+     //      registries[] whose `format` has _schema.formatTaxonomy[<f>].skipWebFetch=true
+     //      (spa_full + image_embedded + bot_blocked).
+     //   2. Every URL whose _runtime.unhealthy=true (≥3 consecutive failures).
+     //   3. Every vendor URL in vendors.<v>.urls.* whose format key matches (1).
+     //
+     // Computed via scripts/lib/whitelist.py banned_fetch_patterns(whitelist):
+     //   returns a list of regex strings (anchored on hostname + optional path
+     //   prefix). Agent's matches_any() uses these against entry.url before
+     //   issuing WebFetch. Repeated WebFetch on a banned pattern is a contract
+     //   violation that the post-cycle telemetry flags (runtime.bannedFetchHits[]).
+     bannedFetchPatterns: banned_fetch_patterns(sourcesWhitelist),
+
+     // FAZ 2.1 (2026-05-07): pre-fetched leaderboard snapshots from PRELIM-B.
+     // Agent FORMAT_DISPATCH primary path: when target URL is in this map,
+     // use Read on `path` instead of WebFetch on `url`. Same extractor cascade
+     // (3-pass html_table / regex_extract / etc.) — only the source changes
+     // from "live network fetch" to "local snapshot Read".
+     // Cuts ~666 duplicated WebFetches/cycle (18 agents × 37 leaderboards) to
+     // 73 single-pass HTTP gets in ~15s. Tool-call savings: ~1.5 calls per
+     // leaderboard per agent (WebFetch + retry vs single Read).
+     // Fallback: any URL absent from this map → agent falls back to WebFetch.
+     // Loaded from data/.leaderboard-snapshots/_index.json.
+     leaderboardSnapshots: load_snapshot_index(),
+       // Shape: { <url>: { path: "data/.leaderboard-snapshots/<file>",
+       //                   contentType, contentLength, fetchedAt, etag } }
+
+     // FAZ 2.2 (2026-05-07): freshness-tiered skip cells — verification-map driven.
+     // Computed via scripts/lib/freshness.py compute_skip_cells():
+     //   T1 (re-fetch): confirmed=false OR verifs<3 OR age>FRESHNESS_TTL_DAYS
+     //                  OR unresolved-contradiction OR cell missing from map.
+     //   T2 (skip):     confirmed=true AND verifs≥3 AND age≤FRESHNESS_TTL_DAYS
+     //                  AND no contradiction.
+     // Default FRESHNESS_TTL_DAYS = 7 (configurable via _schema.contracts).
+     //
+     // Agent FORMAT_DISPATCH gate: when (target_modelId, target_benchKey) is
+     // in skipCells, the agent treats the cached value as already-filled and
+     // does NOT issue any fetch for that cell — value is preserved during
+     // gen_unified_artifact merge from the verification map directly.
+     //
+     // Why this is NOT a known-gaps registry redux: T1 dominates uncertainty;
+     // any cell with <3 verifications, missing freshness, or any
+     // contradiction is RE-FETCHED. Vendor scores changing overnight surface
+     // within ≤7d for confirmed cells (freshness expiry); within ONE cycle
+     // for low-verification cells (always T1).
+     //
+     // The "every (modelId, benchKey) every cycle" memory feedback is
+     // scope-clarified, not retired: T1 cells (the majority initially) still
+     // re-fetch every cycle. Only well-corroborated, recently-seen cells
+     // earn the skip pass.
+     skipCells: compute_skip_cells(
+       verification_map,
+       today,
+       active_model_ids,
+       coreBenchKeys,
+       ttl_days=contracts.FRESHNESS_TTL_DAYS or 7,
+       min_verifs=contracts.MIN_VERIFICATIONS_FOR_SKIP or 3,
+     )
+       // Shape: { <modelId>: { <benchKey>: {value, sources[], lastChecked, ageDays, verifications} } }
+       // Plus _meta: {t1Count, t2Count, totalConsidered}
    }
    - `.aicodermap-verification-map.json` is the historical audit log of every (model, bench) cell observation across cycles (value, sources[], lastChecked). Used for contradiction analysis only — never read for skip decisions, since every cell is re-fetched every cycle (UNCAPPED + UNCACHED doctrine, reformed 2026-04-28). Skill creates it (empty {}) on first cycle if missing.
    - `data/models.json` is SSOT for "what models we track" — `currentIds` MUST be derived from this file at the moment the skill runs. Hardcoding the id list in a prompt or agent message is a contract violation (any drift between models.json and what the agent receives surfaces as silent omission of new/renamed models).
@@ -161,10 +245,19 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
    // collects all artifacts at end of last wave and feeds them through
    // gen_unified_artifact.py for merge.
 
+   // FAZ 1.1 (2026-05-07): wave dispatch state machine — ALL waves MUST run.
+   // The 2026-05-06 cycle bug was committing partial wave-0 results without
+   // dispatching wave-1+; the guard at the end of this loop blocks Step 5
+   // until every wave is in wave_state.completed.
+
    plan = compute_dispatch_plan(active_models, coreBenchKeys)  // dispatch.py
    per_batch_artifacts = []
-   for wave_index, wave in enumerate(plan["waves"]):
+   wave_state = {"pending": list(range(len(plan["waves"]))), "completed": []}
+   for wave_index in range(len(plan["waves"])):
      // Sequential between waves; parallel within a wave.
+     // SINGLE-MESSAGE PARALLEL DISPATCH: emit ALL Agent({...}) calls for this
+     // wave in ONE message so Claude Code dispatches them concurrently (up to
+     // MAX_PARALLEL=10 per FAZ 1.2).
      wave_results = parallel([
        Agent({
          subagent_type: "aicodermap-research-agent", model: "sonnet",
@@ -194,6 +287,52 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
        for batch_spec in [b for b in plan.batches if b.waveIndex == wave_index]
      ])
      per_batch_artifacts.extend(wave_results)
+     wave_state["completed"].append(wave_index)
+     wave_state["pending"].remove(wave_index)
+     log(f"✓ wave {wave_index}/{len(plan.waves)} complete: "
+         f"{len(wave_results)} batches returned")
+
+     // FAZ 2.4 (2026-05-07): 0-fill batch auto-retry — single retry per batch.
+     // After each wave completes, scan its results for batches with fills==0
+     // (and cellsAttempted > 0 — distinguish "agent ran but found nothing" from
+     // "agent crashed before any fetch"). For each such batch, dispatch ONE
+     // fresh-context retry with the same params. Retry returns merge into
+     // per_batch_artifacts; if the retry also yields fills==0, log a CHANGELOG
+     // warn and accept the empty result. Cycle 2026-05-06 batch03-google_deepm
+     // 0-fill was the canonical case this protects against.
+     zero_fill = [r for r in wave_results
+                  if (r.runtime.cellsAttempted or 0) > 0 and r.runtime.fills == 0
+                  and not r._retry_attempted]
+     if zero_fill:
+       log(f"⚠ {len(zero_fill)} batches returned 0 fills — dispatching retries")
+       retry_results = parallel([
+         Agent({
+           subagent_type: "aicodermap-research-agent", model: "sonnet",
+           prompt: structured(... same params as original ...,
+                              retry_of: r.batchId,
+                              wallclock_deadline_unix: now() + BATCH_WALLCLOCK_SEC),
+           output_path: f".aicodermap-agent-out-{r.batchId}-retry.json"
+         })
+         for r in zero_fill
+       ])
+       for orig, ret in zip(zero_fill, retry_results):
+         ret._retry_attempted = true
+         if ret.runtime.fills > 0:
+           // Replace zero-fill result with retry's productive output
+           replace_in_list(per_batch_artifacts, orig, ret)
+           log(f"  ✓ {orig.batchId} retry recovered {ret.runtime.fills} fills")
+         else:
+           log(f"  ✗ {orig.batchId} retry also 0 fills; logging warn")
+           changelog_warns.append(f"⚠ {orig.batchId}: 0 fills × 2 (genuinely unreachable)")
+
+   // HARD GUARD — never advance to Step 5 with missing waves.
+   // gap-gen would silently mask a missing wave's cells as ordinary auto-gaps,
+   // which is exactly how the 2026-05-06 partial commit slipped through.
+   if len(wave_state["completed"]) != len(plan["waves"]):
+     log_error(f"✗ wave dispatch incomplete: completed={wave_state['completed']} "
+               f"of {list(range(len(plan.waves)))}. Halting BEFORE Step 5.")
+     halt_workflow()  // user must investigate; gap-gen would corrupt audit trail
+
    artifact = merge_batch_artifacts(per_batch_artifacts)
      // gen_unified_artifact.py reads every .aicodermap-agent-out-batch*.json,
      // merges via union (no value conflicts because each batch covers disjoint
@@ -404,6 +543,30 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
     If agent emitted Phase 0b/0c discovery candidates, append:
     "🔎 New vendor candidates: N (review queue)" and/or
     "🔎 New benchmark candidates: M (review queue)"
+
+11a. CYCLE_TELEMETRY (FAZ 2.4, 2026-05-07):
+    ```
+    from lib.telemetry import aggregate_per_batch_telemetry, write_cycle_telemetry
+    # IMPORTANT: orchestrator MUST inject `_batchId` (and ideally `_wallclockSec`,
+    # `_startedAt`, `_endedAt`) into each artifact dict before passing to the
+    # aggregator. Agent JSON output may omit these; orchestrator derives them
+    # from the artifact filename (`.aicodermap-agent-out-<batchId>.json`)
+    # and the dispatch wallclock measurements:
+    #   for art, batch_id in artifact_pairs:
+    #     art["_batchId"] = batch_id
+    #     art["_wallclockSec"] = dispatch_timings[batch_id].sec
+    telemetry = aggregate_per_batch_telemetry(per_batch_artifacts)
+    write_cycle_telemetry(today_ymd, telemetry)
+    ```
+    Writes `data/_telemetry/<YYYY-MM-DD>.json` with per-batch wallclock,
+    tool-call counts, fills/gaps/na, partialReason, and cycle-level totals
+    (max + p95 wallclock, toolCallSum, zeroFillBatches list).
+    The next cycle's orchestrator MAY read this to auto-tune
+    `dispatch.MAX_BATCH_MODELS` (e.g., shrink batch size if p95 wallclock
+    spent > 540s, expand if p95 < 300s and fills/batch averaged < 80).
+    Auto-tune is opt-in; default behavior is "log telemetry, do not adjust".
+    Telemetry write is non-fatal — failure logs WARN + CONTINUE.
+
 11b. Ensure git hooks installed (idempotent):
     bash scripts/install-hooks.sh
 12. AUTO-EXECUTE git (no user prompt):
@@ -446,13 +609,25 @@ DEPRECATION_GRACE_DAYS             = 60    // vendor "deprecated" → still list
 DEPLOY_WAIT_SEC                    = 90
 AGENT_RETRY                        = 1
 FAMILY_BASELINE_MIN                = 30    // refresh-all: |models[]+newModels[]| floor
+BATCH_WALLCLOCK_SEC                = 600   // FAZ 1.3: hard per-batch wallclock cap (10 min). Orchestrator passes wallclock_deadline_unix=now()+BATCH_WALLCLOCK_SEC to each agent; agent self-stops at deadline-30s. Aşımda orchestrator ne yazıldıysa onu okur, partialReason:timeout işaretler, sonraki wave'e geçer.
+BATCH_WALLCLOCK_SOFT_STOP_SEC      = 30    // FAZ 1.3: agent'a "deadline-30s'de Write+return" kuralı. Soft buffer agent'ın final JSON'u yazıp döndürmesi için.
 // =====================================================================
 // UNCAPPED RESEARCH DOCTRINE (added 2026-04-27 rev3)
 // User policy: "do not put budget/limit/cap on the agent's research effort.
 // Use every available capacity to find every available data point. No
 // timeout. Stop only when research is structurally complete."
 //
-// All previous fetch/wallclock budgets are REMOVED. The agent walks every
+// SCOPE CLARIFICATION (FAZ 1.3, 2026-05-07): UNCAPPED applies to RESEARCH
+// QUALITY (which sources to attempt, how many fallbacks to chain, whether
+// to fabricate gaps) — NOT to per-dispatch resource budgets. Two hard caps
+// remain authoritative because they protect Claude Code's own runtime:
+//   • AGENT_BUDGET_BUFFER (50 tool-calls/agent)  — ceiling enforcement
+//   • BATCH_WALLCLOCK_SEC (600s/batch)           — wallclock enforcement
+// When either cap fires, agent emits whatever it has + partialReason; the
+// next cycle re-attempts unfilled cells (gaps[] preserved across cycles).
+// "UNCAPPED on data quality, capped on per-dispatch resource budgets."
+//
+// All previous fetch budgets are REMOVED. The agent walks every
 // advertised source, attempts every reachable per-model URL + vendor card,
 // runs every fallback chain, and only terminates on COMPLETENESS_TERMINATION.
 // =====================================================================
@@ -494,7 +669,10 @@ SINGLE_ARTIFACT_PATH            = ".aicodermap-agent-out.json"  // ONE artifact,
 |------|-------------------|------------------------------------------------------------|
 | 0 Lineup discovery | `lineup` populated AND ≥10 vendor pages successfully parsed (or all reachable vendors attempted) | If `lineup` empty/missing AND not first run → dispatch ONE retry agent restricted to Step 0. On second-cycle empty: log `gaps[]` entry `lineup:incomplete` and CONTINUE. Unreachable vendors → log `lineup:<vendor>: unreachable`, never block on stale lineup. |
 | 0b Source health check | `runtime.healthChecks` covers ≥3 leaderboard domains with status entries | If <3 domains → dispatch retry agent restricted to PRELIM SOURCE_HEALTH_CHECK. On second-cycle <3: log `gaps[]` entry `health-check:incomplete` and CONTINUE. |
+| 0c Leaderboard prefetch | `data/.leaderboard-snapshots/_index.json` exists AND `_meta.totalSucceeded ≥ 0.5×totalAttempted` | FAZ 2.1 (2026-05-07): non-fatal. Each agent independently falls back to WebFetch for any URL absent from `idea_context.leaderboardSnapshots`. Prefetch is a wallclock optimization, not a correctness gate. If `prefetch-leaderboards.py` exits non-zero → log warning + CONTINUE without `leaderboardSnapshots` map. |
 | 4 Agent survey | `.aicodermap-agent-out-<batchId>.json` exists and parses; `models[]+newModels[]` ≥ FAMILY_BASELINE_MIN OR explicit gaps[] | (1) agent-written file primary; (2) FALLBACK A: `extract-agent-output.py` against subagent jsonl; (3) FALLBACK B: persisted tool-result extraction; (4) on all-3 failure: log to `~/.aicodermap-debug.log` + CONTINUE merge with available data. Family-count shortfall logged to gaps[], never halts. |
+| 4w Wallclock cap | Every batch returns within BATCH_WALLCLOCK_SEC (600s) | FAZ 1.3 (2026-05-07): orchestrator wraps each Agent call with `subprocess.run(timeout=BATCH_WALLCLOCK_SEC)`. On timeout: SIGKILL the agent, attempt Read of partial-written `.aicodermap-agent-out-<batchId>.json`. If file exists with valid JSON head → use it, set `partialReason:{code:'timeout', wallclockSec:BATCH_WALLCLOCK_SEC}`. If file missing/corrupt → emit empty stub `{batchId, models:[], gaps:[], partialReason:{code:'timeout-no-write'}}` and CONTINUE to next wave. Never block on a single batch's timeout. |
+| 4d Wave dispatch completeness | All `plan["waves"]` indices present in `wave_state.completed` | FAZ 1.1 (2026-05-07): hard guard at end of Step 4 wave loop. If incomplete → `halt_workflow()` BEFORE Step 5. gap-gen would mask missing waves as auto-gaps; that pattern slipped the 2026-05-06 partial commit through. SOLE non-push halt path. |
 | 6 Coverage log | `validationCoverage` is a number 0..1 in artifact | Below COVERAGE_TARGET (0.85): set artifact.partialCoverage=true, append "⚠ cumulative provenance coverage" line to CHANGELOG, CONTINUE. Below COVERAGE_HARD_BLOCK (0.50): louder warning, still CONTINUE. No deep-fetch loop (retired 2026-04-28) — agent already walks every cell every cycle. |
 | 7 Contradiction auto-resolve | Every contradiction has autoResolveWinner | TrustScore ties within 0.05 with no I-tier present: prefer most-recent value, then most-verified, then alphabetical-by-source as deterministic tiebreaker — never user prompt |
 | 10 Atomic write | `data/{models,sources}.json` parse-valid + self-check passes | On parse failure: restore from `.bak` + log root cause + retry the merge once with relaxed self-check. On second failure: write the artifact's known-good fields only, mark unhealable fields in gaps[]. CONTINUE — never leave repo in restored-only state |

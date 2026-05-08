@@ -207,6 +207,7 @@
       "spa_full": {
         "description": "Full SPA, no static fallback (BFCL, LiveCodeBench, MathArena)",
         "primaryTool": "skip",
+        "skipWebFetch": true,
         "extractor": "websearch_snippet",
         "extractorPatterns": [
           "bench_score_labeled"
@@ -249,6 +250,7 @@
       "image_embedded": {
         "description": "Vendor announcement with bench tables as PNG (anthropic.com/news, deepmind.google/models)",
         "primaryTool": "scripts/extract-images.py + vision OCR",
+        "skipWebFetch": true,
         "extractor": "image_ocr",
         "extractorPatterns": [
           "bench_score_labeled"
@@ -265,6 +267,7 @@
       "bot_blocked": {
         "description": "403/404-slug-miss (openai.com/blog, x.ai/news)",
         "primaryTool": "skip",
+        "skipWebFetch": true,
         "extractor": "websearch_snippet",
         "extractorPatterns": [
           "bench_score_labeled"

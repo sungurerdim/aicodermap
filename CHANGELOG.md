@@ -65,6 +65,158 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added — 2026-05-07 (FAZ 2.4 — wave telemetry + 0-fill auto-retry)
+
+- `scripts/lib/telemetry.aggregate_per_batch_telemetry()` — walks per-batch
+  artifacts; aggregates wallclock, tool-call counts, fills/gaps/na,
+  partialReason; computes `zeroFillBatches[]` candidates and cycle totals
+  (max + p95 wallclock, toolCallSum).
+- `scripts/lib/telemetry.write_cycle_telemetry(date, data)` — writes
+  `data/_telemetry/<YYYY-MM-DD>.json`. Idempotent on rerun (overwrites
+  same-date file).
+- `SKILL.md` Step 4 wave loop — single-retry on 0-fill batches with
+  `cellsAttempted > 0`. Retry uses fresh agent context, same params,
+  same wallclock deadline. Two consecutive 0-fills logged as CHANGELOG
+  warn ("genuinely unreachable").
+- `SKILL.md` new Step 11a `CYCLE_TELEMETRY` — runs aggregator + writer
+  after merge, before commit. Output enables future auto-tuning of
+  `dispatch.MAX_BATCH_MODELS` (opt-in; default just logs).
+
+Cycle 2026-05-06 batch03-google_deepm 0-fill (2 models × 26 keys → 0 fills,
+43 gaps) was the canonical target this protects against.
+
+### Changed — 2026-05-07 (FAZ 2.3 — priorityCells is authoritative)
+
+- `agent.md` "Matrix awareness" — `priorityCells[]` upgraded from
+  "process FIRST" to "process EXCLUSIVELY". Agent walks the list
+  top-down through Phase 2/3 cascade and SHALL NOT process cells
+  outside the list. Pre-FAZ-2.3 sweep-the-rest behavior burned the
+  budget on low-priority cells (cycle 2026-05-06 batch03 0-fill
+  pattern); the reform makes priorityCells the only valid scope.
+- `scripts/lib/matrix.priority_cells()` —
+  `skip_confirmed_within_days` default 14→7 to align with FAZ 2.2
+  `FRESHNESS_TTL_DAYS`. Two views of the same data: priorityCells
+  says "actively work on this"; skipCells says "use cached value".
+- `SKILL.md` `idea_context.priorityCells` — call signature now
+  passes `verification_map` and `skip_confirmed_within_days=
+  contracts.FRESHNESS_TTL_DAYS` so the work list excludes T2 cells.
+- Cells not reached this cycle re-surface in next cycle's priority
+  queue (no in-cycle auto-stub by the agent).
+
+### Added — 2026-05-07 (FAZ 2.2 — freshness-tiered cell skip)
+
+Partial retirement of the UNCAPPED+UNCACHED doctrine. Permanent skip lists
+(known-gaps.json) remain banned; this reform only adds time-based,
+confirmation-gated skip for cells with strong agreement.
+
+- New `scripts/lib/freshness.py`:
+  - `classify_cell(cell, today)` → returns tier (T1/T2) and skip flag.
+  - `compute_skip_cells(map, today, active_ids, core_keys)` — walks every
+    (modelId, benchKey) cell, returns `{<modelId>: {<benchKey>: {value,
+    sources, lastChecked, ageDays, verifications}}}` for T2 cells.
+  - CLI: `python scripts/lib/freshness.py` prints today's T1/T2 split.
+- T1 (always re-fetch): `confirmed=false` OR `verifs<3` OR
+  `age>FRESHNESS_TTL_DAYS` OR unresolved-contradiction OR cell missing.
+- T2 (skip): `confirmed=true` AND `verifs≥3` AND `age≤7d` AND no
+  contradiction. Default TTL 7d, configurable via
+  `_schema.contracts.FRESHNESS_TTL_DAYS`.
+- `SKILL.md` `idea_context.skipCells` injected to every batch dispatch.
+- `agent.md` FORMAT_DISPATCH dispatch protocol — added FRESHNESS-TIER
+  CELL SKIP gate BEFORE the WebFetch GATE: when target cell is in
+  skipCells, agent emits cached value + cached provenance and skips
+  the cell entirely. No fetch, no fallback chain.
+- `agent.md` UNCAPPED reform comment — scope-clarified to distinguish
+  policy-based skip (banned) from time-based skip (allowed for T2 only).
+- Memory feedback `feedback_known_gaps_registry.md` updated to record
+  the freshness-tier carve-out + the four T2 conditions.
+
+**First-cycle measurement (2026-05-07):** all 168 verification-map cells
+have `lastChecked=2026-04-28` (9 days old) → 0 cells eligible for T2.
+After the next `refresh-all`, lastChecked shifts to today; on cycles 1–7
+days later, ~10–15 % of confirmed cells skip; steady-state savings depend
+on contradiction stability.
+
+### Added — 2026-05-07 (FAZ 2.1 — leaderboard prefetch)
+
+Orchestrator-side single-pass HTTP collapses ~666 duplicated WebFetches/cycle
+(18 sub-agents × 37 leaderboards) into ONE prefetch run.
+
+- New `scripts/prefetch-leaderboards.py` — stdlib-only `urllib`
+  HTTP-GET pass over every healthy whitelist URL whose format is NOT
+  in the FAZ 1.4 banned-list. 8-worker thread pool; per-URL HEAD/GET
+  with 15s timeout; SHA8-named snapshots written to
+  `data/.leaderboard-snapshots/<host>__<sha8>.{html,json}`.
+- New `data/.leaderboard-snapshots/_index.json` — manifest mapping
+  `url → { path, fetchedAt, etag, contentLength, contentType, format,
+  category }`. Loaded by skill orchestrator into
+  `idea_context.leaderboardSnapshots` for every batch dispatch.
+- TTL gating: snapshots stay fresh for 24h. Re-runs within TTL no-op.
+  `--force` flag bypasses TTL when whitelist URLs change.
+- `.gitignore` — `data/.leaderboard-snapshots/` excluded (~40MB,
+  regeneratable).
+- `SKILL.md` — new `PRELIM-B. LEADERBOARD_PREFETCH` step between
+  source-health-check and Phase 0; new SILENT_FAIL_PREVENTION row
+  `0c Leaderboard prefetch` (non-fatal, falls back to WebFetch).
+- `agent.md` FORMAT_DISPATCH dispatch protocol — added SNAPSHOT-FIRST
+  branch: when `entry.url ∈ leaderboardSnapshots`, use `Read(snapshot.path)`
+  instead of WebFetch. Same extractor cascade applies. Saves ~1.5
+  tool-calls + 5–30s per leaderboard per agent.
+
+**First cycle measurements (2026-05-07):** 81 targets, 73 fetched
+successfully, 8 failed (SSL/DNS/404), 15.5s total wallclock, 39MB on
+disk. TTL re-run: `fresh: 73, to-fetch: 8` — only failed URLs retried.
+
+### Added — 2026-05-07 (FAZ 1 — wave dispatch hardening)
+
+Four reforms targeting the 2026-05-06 wave-0 wallclock blowout
+(refresh-all observed 30–90min, only 5/18 batches completed before
+partial-commit). All reforms are spec-only or constants-only — no
+behavioural change without the next refresh-all cycle exercising them.
+
+**1.1 Wave dispatch state machine (`SKILL.md` Step 4):**
+- `wave_state = {pending, completed}` tracked across the wave loop;
+  Step 5 may NOT advance until `len(completed) == len(plan.waves)`.
+- HARD GUARD `halt_workflow()` after the loop — blocks gap-gen from
+  silently masking missing-wave cells as auto-gaps. SOLE non-push
+  halt path in the workflow.
+- New SILENT_FAIL_PREVENTION row `4d Wave dispatch completeness`.
+
+**1.2 MAX_PARALLEL 5→10 (`scripts/lib/dispatch.py`):**
+- `MAX_PARALLEL = 10` (Claude Code single-message ceiling).
+- 18 batches now dispatch in 2 waves (10+8) instead of 4 waves
+  (5+5+5+3). Each wave's wallclock is bounded by its slowest batch,
+  so fewer waves = less total wallclock.
+- Verified via `python scripts/lib/dispatch.py`: totalWaves=2.
+
+**1.3 Hard wallclock per-batch (`SKILL.md` + `agent.md`):**
+- New constants `BATCH_WALLCLOCK_SEC=600` and
+  `BATCH_WALLCLOCK_SOFT_STOP_SEC=30`.
+- Agent INPUT_CONTRACT gets `wallclock_deadline_unix` parameter;
+  agent self-stops at `deadline-30s` (Phase boundary checks).
+- Orchestrator wraps each Agent call with `subprocess.run(timeout=…)`
+  → SIGKILL on overrun; partial Write survives, `partialReason:
+  {code:'timeout'}` recorded.
+- New SILENT_FAIL_PREVENTION row `4w Wallclock cap`.
+- UNCAPPED RESEARCH DOCTRINE clarified: applies to RESEARCH QUALITY
+  (sources, fallbacks, gap fabrication) — NOT to per-dispatch resource
+  budgets. Tool-call ceiling and wallclock ceiling are EQUAL authority.
+
+**1.4 SPA fetch banned-list mekanik enforcement:**
+- `data/sources-whitelist.json` `_schema.formatTaxonomy.{spa_full,
+  image_embedded, bot_blocked}.skipWebFetch=true`.
+- New `scripts/lib/whitelist.banned_fetch_patterns(whitelist)` —
+  derives regex patterns from whitelist entries whose format has
+  `skipWebFetch=true` OR `_runtime.unhealthy=true` OR per-entry
+  `skipWebFetch=true` override. Tested: 6 banned URLs derived
+  (livecodebench, livebench, gorilla BFCL, matharena, epoch.ai,
+  HF Chatbot Arena).
+- `SKILL.md` `idea_context.bannedFetchPatterns` injected to every
+  agent dispatch.
+- `agent.md` FORMAT_DISPATCH dispatch protocol — added HARD WebFetch
+  GATE: three signals (skipWebFetch, primaryTool=='skip',
+  bannedFetchPatterns match) → skip primary, jump to fallback chain.
+  Repeated WebFetch on a banned pattern is a contract violation.
+
 ### Added — 2026-05-06 (FAZ G — agent budget reform + HuggingFace coverage)
 
 Two reforms in one commit. Together they solve the dominant failure mode

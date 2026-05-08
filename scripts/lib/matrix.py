@@ -88,21 +88,30 @@ def priority_cells(
     core_keys: list[str],
     limit: int = 200,
     verification_map: dict[str, Any] | None = None,
-    skip_confirmed_within_days: int = 14,
+    skip_confirmed_within_days: int = 7,
 ) -> list[dict[str, Any]]:
     """Top-N most starved (modelId, benchKey) cells the agent should hit FIRST.
+
+    FAZ 2.3 (2026-05-07): this list is now the AUTHORITATIVE work list — the
+    agent walks ONLY these cells in Phase 2/3 and SHALL NOT process cells
+    outside the list. Cells not reached this cycle remain in the priority
+    queue for the next cycle. See agent.md "Matrix awareness" section.
 
     Ranking heuristic (descending priority):
       1. cells where the bench has fewer total filled hits → starve-the-bench bias
       2. cells in models with fewer total filled hits → starve-the-model bias
       3. lex order on (modelId, benchKey) for deterministic tie-break
 
-    F2 skip-cache: cells confirmed by ≥2 sources in the last
-    `skip_confirmed_within_days` days are excluded from the priority queue.
-    Pass `verification_map` (the `.aicodermap-verification-map.json` cells dict)
-    to activate this behaviour; omit to retain UNCAPPED behaviour.
+    F2 skip-cache (aligned with FAZ 2.2 freshness contract 2026-05-07):
+    cells confirmed AND verified within `skip_confirmed_within_days` are
+    excluded from the priority queue (default 7d, matching
+    `_schema.contracts.FRESHNESS_TTL_DAYS`). The agent gets these cells
+    via `idea_context.skipCells` (FAZ 2.2) instead — same source data, two
+    presentations: skipCells says "use cached value"; priorityCells says
+    "actively work on this." Pass `verification_map` to activate the skip;
+    omit to retain UNCAPPED behaviour for legacy callers.
 
-    Returns: [{modelId, benchKey, benchFillRatio, modelFillRatio, skipped?}], capped at limit.
+    Returns: [{modelId, benchKey, benchFillRatio, modelFillRatio}], capped at limit.
     """
     import datetime as _dt
 

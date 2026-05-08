@@ -44,6 +44,11 @@ coverage/
 .aicodermap-runtime/
 .aicodermap-dispatch/
 
+# FAZ 2.1 (2026-05-07): per-cycle leaderboard prefetch — stdlib-fetched HTML
+# snapshots agent-readable from disk instead of WebFetched per-batch. ~40MB,
+# regeneratable via `python scripts/prefetch-leaderboards.py`.
+data/.leaderboard-snapshots/
+
 # Discovery review queue (human-gated; not committed until promoted)
 data/discoveries.json
 

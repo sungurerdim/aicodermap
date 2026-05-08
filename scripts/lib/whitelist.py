@@ -146,3 +146,65 @@ def not_applicable_rules(whitelist: dict[str, Any]) -> dict[str, Any]:
 def bench_aliases(whitelist: dict[str, Any]) -> dict[str, list[str]]:
     """Bench alias table: canonicalKey → [human aliases]."""
     return schema(whitelist).get("benchAliases") or {}
+
+
+def banned_fetch_patterns(whitelist: dict[str, Any]) -> list[str]:
+    """FAZ 1.4 (2026-05-07): URLs the agent must NEVER WebFetch.
+
+    Three sources of bans, all whitelist-derived (no hardcoded URLs):
+      1. Every URL whose declared `format` has skipWebFetch=true in
+         _schema.formatTaxonomy (currently spa_full, image_embedded,
+         bot_blocked).
+      2. Every URL whose entry-level `_runtime.unhealthy=true` (≥3
+         consecutive failures).
+      3. Every URL whose entry-level `skipWebFetch=true` override.
+
+    Returns: list of regex strings (anchored on URL prefix). Agent's
+    matches_any() iterates these against entry.url BEFORE issuing
+    WebFetch. Repeated WebFetch on a banned URL is a contract violation
+    (logged to runtime.bannedFetchHits[]).
+    """
+    import re
+
+    ft = schema(whitelist).get("formatTaxonomy") or {}
+    banned_formats = {
+        k
+        for k, v in ft.items()
+        if isinstance(v, dict) and v.get("skipWebFetch") is True
+    }
+
+    patterns: list[str] = []
+    seen: set[str] = set()
+
+    def _add(url: str | None) -> None:
+        if not isinstance(url, str) or not url:
+            return
+        # Anchor on full URL prefix; agent's matches_any does
+        # `re.match(pattern, entry.url)`. Escape the URL so any regex
+        # metacharacters in the URL itself are treated as literals.
+        pat = re.escape(url)
+        if pat in seen:
+            return
+        seen.add(pat)
+        patterns.append(pat)
+
+    for cat in ("leaderboards", "aggregators", "community", "local", "registries"):
+        for e in whitelist.get(cat, []) or []:
+            fmt = e.get("format")
+            unhealthy = (e.get("_runtime") or {}).get("unhealthy") is True
+            override = e.get("skipWebFetch") is True
+            if fmt in banned_formats or unhealthy or override:
+                _add(e.get("url"))
+
+    # Vendor URL bundles — every per-vendor URL whose format mirrors one
+    # of the banned format keys gets banned too. Vendors carry a
+    # per-URL `format` map under vendors.<v>.urlFormats (when present).
+    for v in (whitelist.get("vendors") or {}).values():
+        urls = (v or {}).get("urls") or {}
+        formats_map = (v or {}).get("urlFormats") or {}
+        for url_key, url in urls.items():
+            fmt = formats_map.get(url_key)
+            if fmt in banned_formats:
+                _add(url)
+
+    return patterns

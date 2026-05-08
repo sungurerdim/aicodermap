@@ -140,6 +140,141 @@ def write_meta_and_history(meta: dict) -> None:
     )
 
 
+def aggregate_per_batch_telemetry(per_batch_artifacts: list[dict]) -> dict:
+    """FAZ 2.4 (2026-05-07): walk per-batch artifacts, compute cycle telemetry.
+
+    Reads each batch artifact's `runtime.phaseTimings`, `runtime.toolCallCount`,
+    `partialReason`, and fill counts. Returns a single dict suitable for
+    `data/_telemetry/<cycleDate>.json`.
+
+    Returns:
+      {
+        "cycleStartedAt": <iso>,        # earliest batch start
+        "cycleEndedAt": <iso>,          # latest batch end
+        "totalBatches": <int>,
+        "zeroFillBatches": [<batchId>, ...],  # candidates for retry
+        "perBatch": [
+          { "batchId", "wallclockSec", "toolCallCount",
+            "fills", "gaps", "naCount", "partialReason" }
+        ],
+        "totals": {
+          "fills": int, "gaps": int, "na": int,
+          "wallclockSecMax": float,    # slowest batch dominates wave wallclock
+          "wallclockSecP95": float,    # tail latency
+          "toolCallSum": int
+        }
+      }
+    """
+    per_batch: list[dict] = []
+    fills_total = 0
+    gaps_total = 0
+    na_total = 0
+    tool_sum = 0
+    wallclocks: list[float] = []
+    started: list[str] = []
+    ended: list[str] = []
+
+    for art in per_batch_artifacts or []:
+        if not isinstance(art, dict):
+            continue
+        rm = art.get("runtime") or art.get("runMetadata") or {}
+        # Source priority for batch_id:
+        #   1. art.batchId (agent emits it)
+        #   2. runtime.batchId / runMetadata.batchId
+        #   3. art._batchId (orchestrator-injected from artifact filename)
+        #   4. partialReason.batchId (when partialReason is a dict)
+        partial_reason = art.get("partialReason")
+        partial_batch_id = (
+            partial_reason.get("batchId") if isinstance(partial_reason, dict) else None
+        )
+        batch_id = (
+            art.get("batchId")
+            or rm.get("batchId")
+            or art.get("_batchId")
+            or partial_batch_id
+            or "unknown"
+        )
+        models = art.get("models") or []
+        fills = sum(
+            len((m.get("updates") or {}).get("bench") or {})
+            for m in models
+            if isinstance(m, dict)
+        )
+        gaps = len(art.get("gaps") or [])
+        na = sum(
+            len(m.get("notApplicable") or []) for m in models if isinstance(m, dict)
+        )
+        wallclock = float(
+            art.get("_wallclockSec")
+            or rm.get("wallclockSec")
+            or rm.get("elapsedSec")
+            or 0.0
+        )
+        tool_call_count = int(rm.get("toolCallCount") or 0)
+
+        fills_total += fills
+        gaps_total += gaps
+        na_total += na
+        tool_sum += tool_call_count
+        if wallclock > 0:
+            wallclocks.append(wallclock)
+        if rm.get("startedAt"):
+            started.append(rm["startedAt"])
+        if rm.get("endedAt"):
+            ended.append(rm["endedAt"])
+
+        per_batch.append(
+            {
+                "batchId": batch_id,
+                "wallclockSec": wallclock,
+                "toolCallCount": tool_call_count,
+                "fills": fills,
+                "gaps": gaps,
+                "naCount": na,
+                "partialReason": partial_reason,
+            }
+        )
+
+    zero_fill = [pb["batchId"] for pb in per_batch if pb["fills"] == 0]
+
+    if wallclocks:
+        wc_sorted = sorted(wallclocks)
+        wc_max = wc_sorted[-1]
+        wc_p95 = wc_sorted[int(len(wc_sorted) * 0.95)] if len(wc_sorted) > 1 else wc_max
+    else:
+        wc_max = 0.0
+        wc_p95 = 0.0
+
+    return {
+        "cycleStartedAt": min(started) if started else _utc_iso(),
+        "cycleEndedAt": max(ended) if ended else _utc_iso(),
+        "totalBatches": len(per_batch),
+        "zeroFillBatches": zero_fill,
+        "perBatch": per_batch,
+        "totals": {
+            "fills": fills_total,
+            "gaps": gaps_total,
+            "na": na_total,
+            "wallclockSecMax": round(wc_max, 2),
+            "wallclockSecP95": round(wc_p95, 2),
+            "toolCallSum": tool_sum,
+        },
+    }
+
+
+def write_cycle_telemetry(cycle_date: str, telemetry: dict) -> Path:
+    """Write `data/_telemetry/<cycle_date>.json`. Idempotent on rerun
+    (overwrites existing file for the same date). Returns the path."""
+    out_dir = PROJECT / "data" / "_telemetry"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / f"{cycle_date}.json"
+    out_path.write_text(
+        json.dumps(telemetry, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return out_path
+
+
 def metadata_changelog_row(meta: dict) -> str:
     """Compact one-line metadata for the CHANGELOG entry header."""
     fr = meta.get("fillRatio", 0.0) or 0.0

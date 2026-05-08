@@ -1,0 +1,98 @@
+{
+  "cycleEndedAt": "2026-05-07T20:50:03Z",
+  "cycleStartedAt": "2026-05-07T20:50:03Z",
+  "perBatch": [
+    {
+      "batchId": "batch00-anthropic",
+      "fills": 4,
+      "gaps": 36,
+      "naCount": 6,
+      "partialReason": {
+        "cellsAttempted": 78,
+        "cellsFilled": 36,
+        "code": "completeness",
+        "topBlockingSources": [
+          "https://artificialanalysis.ai/models/claude-opus-4-7",
+          "https://artificialanalysis.ai/models/claude-sonnet-4-6-adaptive",
+          "https://artificialanalysis.ai/models/claude-4-5-haiku",
+          "https://gorilla.cs.berkeley.edu/leaderboard.html",
+          "https://lmarena.ai/leaderboard"
+        ]
+      },
+      "toolCallCount": 0,
+      "wallclockSec": 245.0
+    },
+    {
+      "batchId": "batch01-deepseek",
+      "fills": 130,
+      "gaps": 13,
+      "naCount": 10,
+      "partialReason": {
+        "cellsAttempted": 60,
+        "cellsFilled": 8,
+        "code": "completeness",
+        "topBlockingSources": [
+          "https://artificialanalysis.ai/models/deepseek-v4-pro (spa_partial — tau3/aaAgentic not extractable)",
+          "https://gorilla.cs.berkeley.edu/leaderboard.html (spa_full — bfcl not extractable)",
+          "https://livecodebench.github.io/leaderboard.html (spa_full — lcb via websearch only)"
+        ]
+      },
+      "toolCallCount": 48,
+      "wallclockSec": 245.0
+    },
+    {
+      "batchId": "batch02-google_deepm",
+      "fills": 13,
+      "gaps": 16,
+      "naCount": 7,
+      "partialReason": null,
+      "toolCallCount": 0,
+      "wallclockSec": 245.0
+    },
+    {
+      "batchId": "batch03-google_deepm",
+      "fills": 0,
+      "gaps": 43,
+      "naCount": 0,
+      "partialReason": {
+        "cellsAttempted": 52,
+        "cellsFilled": 9,
+        "code": "completeness",
+        "reason": "Edge models not evaluated on 43 of 52 bench cells by Google; all cells attempted, no further sources exist"
+      },
+      "toolCallCount": 0,
+      "wallclockSec": 245.0
+    },
+    {
+      "batchId": "batch04-meta",
+      "fills": 50,
+      "gaps": 17,
+      "naCount": 4,
+      "partialReason": {
+        "cellsAttempted": 52,
+        "cellsFilled": 14,
+        "code": "spa_dead",
+        "topBlockingSources": [
+          "https://artificialanalysis.ai/models/llama-4-maverick",
+          "https://artificialanalysis.ai/models/llama-4-scout",
+          "https://benchlm.ai/models/llama-4-maverick",
+          "https://taubench.com/"
+        ]
+      },
+      "toolCallCount": 0,
+      "wallclockSec": 245.0
+    }
+  ],
+  "totalBatches": 5,
+  "totals": {
+    "fills": 197,
+    "gaps": 125,
+    "na": 27,
+    "toolCallSum": 48,
+    "wallclockSecMax": 245.0,
+    "wallclockSecP95": 245.0
+  },
+  "zeroFillBatches": [
+    "batch03-google_deepm"
+  ]
+}
