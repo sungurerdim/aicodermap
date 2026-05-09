@@ -1,0 +1,256 @@
+{
+  "cycleEndedAt": "2026-05-09T23:45:49Z",
+  "cycleStartedAt": "2026-05-09T14:45:00Z",
+  "mode": "hybrid-haiku-gather-python-synth",
+  "perBatch": [
+    {
+      "agentGaps": 0,
+      "batchId": "batch00-anthropic",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 18,
+      "wallclockSec": 89.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch01-deepseek",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 12,
+      "wallclockSec": 0.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch02-google_deepm",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 8,
+      "wallclockSec": 187.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch03-google_deepm",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 12,
+      "wallclockSec": 50.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch04-meta",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 12,
+      "wallclockSec": 45.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch05-minimax",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 12,
+      "wallclockSec": 0.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch06-mistral_ai",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 8,
+      "wallclockSec": 12.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch07-mistral_ai",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 8,
+      "wallclockSec": 20.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch08-moonshot_ai",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 3,
+      "wallclockSec": 15.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch09-nvidia",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 8,
+      "wallclockSec": 52.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch10-openai",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 28,
+      "wallclockSec": 127.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch11-alibaba_qwen",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 9,
+      "wallclockSec": 45.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch12-alibaba_qwen",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 8,
+      "wallclockSec": 12.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch13-alibaba_qwen",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": {
+        "cellsAttempted": 78,
+        "cellsFilled": 9,
+        "code": "new_models_sparse_leaderboard_data",
+        "explanation": "Qwen 2.5 Coder (released 2026-05-02) and Qwen 3.5-9B (released 2026-04-18) are brand-new open-weight models not yet widely benchmarked. Gather phase extracted 9 benchmark scores (sweV, lcb, tb2 for each model) + full pricing (3 providers × 3 models = 9 entries) + Ollama + Unsloth metadata. Remaining 69 bench cells are genuine gaps (models pre-date most leaderboard datasets or leaderboards haven't updated with new entries). Phase 3 WebSearch fallback deferred to next cycle."
+      },
+      "toolCallCount": 18,
+      "wallclockSec": 840.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch14-stepfun",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 8,
+      "wallclockSec": 45.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch15-xai",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 3,
+      "wallclockSec": 45.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch16-xiaomi",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 5,
+      "wallclockSec": 38.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch17-z.ai_zhipu",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": {
+        "cellsAttempted": 12,
+        "cellsFilled": 11,
+        "code": "snapshot-primary-incomplete",
+        "topBlockingSources": [
+          "https://huggingface.co/THUDM/* (HF model card README phase not initiated in gather mode)",
+          "https://ollama.com/library/* (Ollama pull commands populated; VRAM extraction deferred)"
+        ]
+      },
+      "toolCallCount": 5,
+      "wallclockSec": 8.0
+    }
+  ],
+  "synthStage": {
+    "contradictions": 1,
+    "engine": "Python",
+    "fills": 346,
+    "newModels": 0,
+    "wallclockSec": 1.5
+  },
+  "totalBatches": 18,
+  "totals": {
+    "agentGaps": 0,
+    "fills": 0,
+    "gaps": 0,
+    "na": 0,
+    "orchestratorGaps": 0,
+    "toolCallSum": 185,
+    "wallclockSecMax": 840.0,
+    "wallclockSecP95": 840.0
+  },
+  "zeroFillBatches": [
+    "batch00-anthropic",
+    "batch01-deepseek",
+    "batch02-google_deepm",
+    "batch03-google_deepm",
+    "batch04-meta",
+    "batch05-minimax",
+    "batch06-mistral_ai",
+    "batch07-mistral_ai",
+    "batch08-moonshot_ai",
+    "batch09-nvidia",
+    "batch10-openai",
+    "batch11-alibaba_qwen",
+    "batch12-alibaba_qwen",
+    "batch13-alibaba_qwen",
+    "batch14-stepfun",
+    "batch15-xai",
+    "batch16-xiaomi",
+    "batch17-z.ai_zhipu"
+  ]
+}

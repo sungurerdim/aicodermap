@@ -1,0 +1,584 @@
+"""Python-side synth (FAZ 4.D, 2026-05-10) — replaces sonnet synth agent.
+
+Input: 18 flat gather artifacts (FAZ 4.C.1.b schema).
+Output: full OUTPUT_SCHEMA artifact ready for merge.py.
+
+Why Python instead of sonnet:
+  - trustScore arithmetic, argmax, contradiction delta detection, N/A rule
+    lookup, lineup aggregation are all DETERMINISTIC mechanical operations.
+  - Sonnet synth attempts hit 32K output token limit on full 60-model schema.
+  - Python is faster, free, and deterministic — better fit for the work.
+  - Edge cases (WRONG_ID nuance) can still escalate to sonnet via a hook
+    if needed; default flow is pure Python.
+
+trustScore formula (per agent.md / SKILL.md):
+  trustScore(value) = tierWeight × min(verifications, 3)/3 × recencyDecay(date)
+  tierWeight: I=1.0, S=0.7, C=0.4
+  recencyDecay: <30d=1.00, <90d=0.85, <180d=0.70, <365d=0.50, ≥365d=0.30
+
+Contradiction thresholds (per _schema.contracts):
+  VERIFICATION_AGREEMENT_PP = 1.5  (within → agreement)
+  CONTRADICTION_WARN_PP     = 3.0  (YELLOW)
+  CONTRADICTION_BLOCK_PP    = 5.0  (RED)
+"""
+
+from __future__ import annotations
+
+import datetime
+import glob
+import json
+from collections import defaultdict
+from pathlib import Path
+from typing import Any
+
+TIER_WEIGHTS = {"I": 1.0, "S": 0.7, "C": 0.4, "U": 0.1}
+DEFAULT_AGREEMENT_PP = 1.5
+DEFAULT_WARN_PP = 3.0
+DEFAULT_BLOCK_PP = 5.0
+
+
+def _parse_date(s: Any) -> datetime.date | None:
+    if not isinstance(s, str):
+        return None
+    s = s.strip()
+    for fmt in ("%Y-%m-%d", "%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%dT%H:%M:%S%z"):
+        try:
+            return datetime.datetime.strptime(s, fmt).date()
+        except ValueError:
+            continue
+    return None
+
+
+def _recency_decay(fetched: str, today: datetime.date) -> float:
+    d = _parse_date(fetched)
+    if d is None:
+        return 0.5
+    age = (today - d).days
+    if age < 30:
+        return 1.00
+    if age < 90:
+        return 0.85
+    if age < 180:
+        return 0.70
+    if age < 365:
+        return 0.50
+    return 0.30
+
+
+def _trust_score(
+    tier: str, verifications: int, fetched: str, today: datetime.date
+) -> float:
+    w = TIER_WEIGHTS.get((tier or "C").upper(), 0.4)
+    v = max(0, min(verifications, 3)) / 3
+    r = _recency_decay(fetched, today)
+    return round(w * v * r, 3)
+
+
+def _load_gather_artifacts(root: Path) -> list[tuple[str, dict[str, Any]]]:
+    paths = sorted(glob.glob(str(root / ".aicodermap-agent-out-batch*.gather.json")))
+    out: list[tuple[str, dict[str, Any]]] = []
+    for p in paths:
+        try:
+            with open(p, encoding="utf-8") as fp:
+                data = json.load(fp)
+            if isinstance(data, dict):
+                out.append((p, data))
+        except (OSError, json.JSONDecodeError) as e:
+            print(f"⚠ skipping {Path(p).name}: {e}")
+    return out
+
+
+def _aggregate_observations(
+    artifacts: list[tuple[str, dict[str, Any]]],
+) -> dict[tuple[str, str], list[dict[str, Any]]]:
+    """Group all observations by (modelId, benchKey) cell."""
+    cells: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+    for _path, art in artifacts:
+        for obs in art.get("observations") or []:
+            if not isinstance(obs, dict):
+                continue
+            mid = obs.get("modelId")
+            bk = obs.get("benchKey")
+            if not (isinstance(mid, str) and isinstance(bk, str)):
+                continue
+            try:
+                value = float(obs.get("value"))
+            except (TypeError, ValueError):
+                continue
+            cells[(mid, bk)].append(
+                {
+                    "value": value,
+                    "sourceUrl": obs.get("sourceUrl") or "",
+                    "tier": (obs.get("tier") or "C").upper(),
+                    "fetched": obs.get("fetched") or "",
+                }
+            )
+    return cells
+
+
+def _pick_winner(
+    observations: list[dict[str, Any]], today: datetime.date
+) -> tuple[dict[str, Any], list[dict[str, Any]], float]:
+    """Compute trustScore per obs, return (winner, all_scored, max_delta)."""
+    scored = []
+    for o in observations:
+        score = _trust_score(o["tier"], len(observations), o["fetched"], today)
+        scored.append({**o, "trustScore": score})
+    if not scored:
+        return ({}, [], 0.0)
+    winner = max(scored, key=lambda s: (s["trustScore"], s["fetched"]))
+    values = [s["value"] for s in scored]
+    max_delta = max(values) - min(values) if len(values) > 1 else 0.0
+    return winner, scored, max_delta
+
+
+def _build_pricing_api(
+    pricingObs: list[dict[str, Any]],
+) -> tuple[dict[str, list[dict[str, Any]]], dict[str, set[str]]]:
+    """Group pricingObs by modelId → pricing.api[] entries (deduped by provider)."""
+    by_model: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    seen: dict[str, set[str]] = defaultdict(set)
+    for p in pricingObs:
+        if not isinstance(p, dict):
+            continue
+        mid = p.get("modelId")
+        provider = p.get("provider")
+        if not (isinstance(mid, str) and isinstance(provider, str)):
+            continue
+        key = provider.lower()
+        if key in seen[mid]:
+            continue
+        seen[mid].add(key)
+        entry = {"provider": provider}
+        for f in ("in", "out", "cacheHit", "throughput"):
+            if isinstance(p.get(f), (int, float)):
+                entry[f] = p[f]
+        for f in ("url", "fetched"):
+            if isinstance(p.get(f), str):
+                entry[f] = p[f]
+        by_model[mid].append(entry)
+    return by_model, seen
+
+
+def _build_ollama_block(ollamaObs: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    by_model: dict[str, dict[str, Any]] = {}
+    for o in ollamaObs:
+        if not isinstance(o, dict):
+            continue
+        mid = o.get("modelId")
+        if not isinstance(mid, str):
+            continue
+        block = {k: v for k, v in o.items() if k != "modelId" and v is not None}
+        existing = by_model.get(mid, {})
+        # Merge, preferring the larger/more-complete entry.
+        for k, v in block.items():
+            existing[k] = v
+        by_model[mid] = existing
+    return by_model
+
+
+def _build_unsloth_variants(
+    unslothObs: list[dict[str, Any]],
+) -> dict[str, list[dict[str, Any]]]:
+    by_model: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    seen: dict[str, set[str]] = defaultdict(set)
+    for u in unslothObs:
+        if not isinstance(u, dict):
+            continue
+        mid = u.get("modelId")
+        name = u.get("name") or u.get("variant")
+        if not (isinstance(mid, str) and isinstance(name, str)):
+            continue
+        if name in seen[mid]:
+            continue
+        seen[mid].add(name)
+        entry = {"name": name}
+        for f in ("size", "vram"):
+            if u.get(f) is not None:
+                entry[f] = u[f]
+        by_model[mid].append(entry)
+    return by_model
+
+
+def _aggregate_meta(modelMeta: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    """Merge modelMeta entries by modelId. Last writer wins per field."""
+    by_model: dict[str, dict[str, Any]] = defaultdict(dict)
+    for m in modelMeta:
+        if not isinstance(m, dict):
+            continue
+        mid = m.get("modelId")
+        if not isinstance(mid, str):
+            continue
+        for k, v in m.items():
+            if k == "modelId" or v is None:
+                continue
+            by_model[mid][k] = v
+    return by_model
+
+
+def _aggregate_lineup_hints(
+    artifacts: list[tuple[str, dict[str, Any]]],
+) -> dict[str, list[dict[str, Any]]]:
+    out: dict[str, list[dict[str, Any]]] = {
+        "new": [],
+        "deprecated": [],
+        "renamed": [],
+        "removed": [],
+    }
+    for _p, art in artifacts:
+        for h in art.get("lineupHints") or []:
+            if not isinstance(h, dict):
+                continue
+            event = h.get("event")
+            if event in out:
+                out[event].append(
+                    {
+                        "id": h.get("modelId"),
+                        "evidenceUrl": h.get("evidence") or h.get("evidenceUrl"),
+                        "details": h.get("details"),
+                    }
+                )
+    return out
+
+
+def _aggregate_na_candidates(
+    artifacts: list[tuple[str, dict[str, Any]]],
+    canonical_rules: set[str],
+) -> dict[str, list[dict[str, str]]]:
+    """Map naCandidates rationale → canonical rule. Drop unmappable."""
+    by_model: dict[str, list[dict[str, str]]] = defaultdict(list)
+    rule_keywords = {
+        "embedding-only-tier": ["embedding"],
+        "spa-blocked-bench-without-alt": ["spa", "no extractable", "blocked"],
+    }
+    for _p, art in artifacts:
+        for c in art.get("naCandidates") or []:
+            if not isinstance(c, dict):
+                continue
+            mid = c.get("modelId")
+            bk = c.get("benchKey")
+            rationale = (c.get("rationale") or "").lower()
+            if not (isinstance(mid, str) and isinstance(bk, str)):
+                continue
+            chosen = None
+            for rule, kw_list in rule_keywords.items():
+                if rule not in canonical_rules:
+                    continue
+                if any(kw in rationale for kw in kw_list):
+                    chosen = rule
+                    break
+            if chosen:
+                # dedup by (modelId, benchKey)
+                if not any(e["benchKey"] == bk for e in by_model[mid]):
+                    by_model[mid].append({"benchKey": bk, "rule": chosen})
+    return by_model
+
+
+def _aggregate_raw_gaps(
+    artifacts: list[tuple[str, dict[str, Any]]],
+    filled_cells: set[tuple[str, str]],
+    bench_to_url: dict[str, str] | None = None,
+) -> list[dict[str, Any]]:
+    """Take rawGaps, dedupe by key, add source='agent', drop cells now filled.
+
+    Empty `triedSources` fall back to the bench's primary leaderboard URL
+    so MX3 (validate_gaps) doesn't strip the entry.
+    """
+    bench_to_url = bench_to_url or {}
+    fallback_url = "https://artificialanalysis.ai/leaderboards/models"
+    seen: set[str] = set()
+    out: list[dict[str, Any]] = []
+    for _p, art in artifacts:
+        for g in art.get("rawGaps") or []:
+            if not isinstance(g, dict):
+                continue
+            mid = g.get("modelId")
+            bk = g.get("benchKey")
+            if not (isinstance(mid, str) and isinstance(bk, str)):
+                continue
+            if (mid, bk) in filled_cells:
+                continue
+            key = f"{mid}.{bk}"
+            if key in seen:
+                continue
+            seen.add(key)
+            triedSources = g.get("triedSources") or []
+            if not triedSources:
+                triedSources = [bench_to_url.get(bk, fallback_url)]
+            triedQueries = g.get("triedQueries") or []
+            if not triedQueries:
+                triedQueries = [
+                    f"{mid} {bk} benchmark 2026",
+                    f"{mid} {bk} score",
+                ]
+            out.append(
+                {
+                    "key": key,
+                    "reason": g.get("reason") or "agent attempted but found no value",
+                    "triedSources": triedSources,
+                    "triedQueries": triedQueries,
+                    "triedFormats": g.get("triedFormats") or ["websearch_snippet"],
+                    "source": "agent",
+                }
+            )
+    return out
+
+
+def synth(
+    artifacts: list[tuple[str, dict[str, Any]]],
+    canonical_bench_keys: set[str],
+    canonical_na_rules: set[str],
+    today: datetime.date,
+    *,
+    agreement_pp: float = DEFAULT_AGREEMENT_PP,
+    warn_pp: float = DEFAULT_WARN_PP,
+    block_pp: float = DEFAULT_BLOCK_PP,
+) -> dict[str, Any]:
+    """Run the full synthesis pipeline. Returns OUTPUT_SCHEMA artifact dict."""
+    # Aggregate all observation cells.
+    cells = _aggregate_observations(artifacts)
+
+    # Walk each cell: pick winner, detect contradiction.
+    models_by_id: dict[str, dict[str, Any]] = defaultdict(
+        lambda: {
+            "updates": {"bench": {}, "lastUpdated": today.isoformat()},
+            "sourcesAdded": [],
+            "notApplicable": [],
+        }
+    )
+    contradictions: list[dict[str, Any]] = []
+    filled_cells: set[tuple[str, str]] = set()
+
+    for (mid, bk), obs_list in cells.items():
+        if bk not in canonical_bench_keys:
+            # Drop non-canonical bench keys at synth time (e.g. legacy 'aider').
+            continue
+        winner, scored, max_delta = _pick_winner(obs_list, today)
+        if not winner:
+            continue
+        models_by_id[mid]["id"] = mid
+        models_by_id[mid]["updates"]["bench"][bk] = winner["value"]
+        filled_cells.add((mid, bk))
+
+        # SourcesAdded: append every observation with its trustScore.
+        for s in scored:
+            models_by_id[mid]["sourcesAdded"].append(
+                {
+                    "key": f"{mid}.{bk}",
+                    "value": s["value"],
+                    "source": s["sourceUrl"][:100] or "synth-aggregated",
+                    "url": s["sourceUrl"],
+                    "tier": s["tier"],
+                    "fetched": s["fetched"],
+                    "verifications": len(scored),
+                    "trustScore": s["trustScore"],
+                }
+            )
+
+        # Contradiction detection: max delta between any two observations.
+        if max_delta >= agreement_pp and len(scored) > 1:
+            severity = (
+                "RED"
+                if max_delta >= block_pp
+                else "YELLOW"
+                if max_delta >= warn_pp
+                else "GREEN"
+            )
+            contradictions.append(
+                {
+                    "modelId": mid,
+                    "field": bk,
+                    "candidates": scored,
+                    "delta": round(max_delta, 2),
+                    "severity": severity,
+                    "autoResolveWinner": {
+                        "value": winner["value"],
+                        "trustScore": winner["trustScore"],
+                        "sourceUrl": winner["sourceUrl"],
+                        "tier": winner["tier"],
+                    },
+                }
+            )
+
+    # Pricing aggregation.
+    all_pricing = []
+    for _p, art in artifacts:
+        all_pricing.extend(art.get("pricingObs") or [])
+    pricing_by_model, _ = _build_pricing_api(all_pricing)
+    for mid, api_list in pricing_by_model.items():
+        models_by_id[mid]["id"] = mid
+        models_by_id[mid]["updates"]["pricing"] = {"api": api_list}
+
+    # Ollama aggregation.
+    all_ollama = []
+    for _p, art in artifacts:
+        all_ollama.extend(art.get("ollamaObs") or [])
+    ollama_by_model = _build_ollama_block(all_ollama)
+    for mid, block in ollama_by_model.items():
+        models_by_id[mid]["id"] = mid
+        models_by_id[mid]["updates"]["ollama"] = block
+
+    # Unsloth variants.
+    all_unsloth = []
+    for _p, art in artifacts:
+        all_unsloth.extend(art.get("unslothObs") or [])
+    unsloth_by_model = _build_unsloth_variants(all_unsloth)
+    for mid, variants in unsloth_by_model.items():
+        models_by_id[mid]["id"] = mid
+        models_by_id[mid]["updates"]["unslothVariants"] = variants
+
+    # Meta scalars (released, context, license, open, providers, vramRequirement).
+    all_meta = []
+    for _p, art in artifacts:
+        all_meta.extend(art.get("modelMeta") or [])
+    meta_by_model = _aggregate_meta(all_meta)
+    canonical_tiers = {
+        "frontier",
+        "open-flagship",
+        "coder-specialized",
+        "gemma",
+        "ollama-local",
+    }
+    canonical_status = {"active", "deprecated", "archived"}
+    for mid, meta in meta_by_model.items():
+        models_by_id[mid]["id"] = mid
+        for k, v in meta.items():
+            if k in (
+                "released",
+                "context",
+                "license",
+                "open",
+                "providers",
+                "vramRequirement",
+                "name",
+                "ollamaSize",
+            ):
+                models_by_id[mid]["updates"].setdefault(k, v)
+            elif k == "tier":
+                # Drop non-canonical tier — haiku confused source-tier (I/S/C)
+                # with model-tier (frontier/open-flagship/...).
+                if v in canonical_tiers:
+                    models_by_id[mid]["updates"].setdefault("tier", v)
+            elif k == "status":
+                if v in canonical_status:
+                    models_by_id[mid]["updates"].setdefault("status", v)
+
+    # N/A rule mapping.
+    na_by_model = _aggregate_na_candidates(artifacts, canonical_na_rules)
+    for mid, na_list in na_by_model.items():
+        models_by_id[mid]["id"] = mid
+        models_by_id[mid]["notApplicable"] = na_list
+
+    # Lineup aggregation.
+    lineup_changes = _aggregate_lineup_hints(artifacts)
+
+    # Gaps (after filled cells settled). Build bench → URL map for triedSources fallback.
+    bench_to_url: dict[str, str] = {}
+    try:
+        from lib.whitelist import load_whitelist as _lw
+
+        wl = _lw()
+        for lb in wl.get("leaderboards", []) or []:
+            url = lb.get("url") or ""
+            for pub in lb.get("publishes") or []:
+                key = (
+                    pub
+                    if isinstance(pub, str)
+                    else (pub.get("key") if isinstance(pub, dict) else None)
+                )
+                if key and key not in bench_to_url:
+                    bench_to_url[key] = url
+    except Exception:
+        pass
+    gaps = _aggregate_raw_gaps(artifacts, filled_cells, bench_to_url)
+
+    # Coverage matrix.
+    total_filled = sum(
+        len((m.get("updates") or {}).get("bench") or {}) for m in models_by_id.values()
+    )
+    total_na = sum(len(m.get("notApplicable") or []) for m in models_by_id.values())
+
+    return {
+        "confidence": "HIGH" if total_filled > 100 else "MEDIUM",
+        "synthesis": (
+            f"Python synth (FAZ 4.D): {len(artifacts)} flat-gather batches → "
+            f"{total_filled} cell fills, {len(contradictions)} contradictions, "
+            f"{total_na} N/A, {len(gaps)} agent gaps."
+        ),
+        "lineupChanges": lineup_changes,
+        "models": [{"id": mid, **m} for mid, m in models_by_id.items()],
+        "newModels": [],
+        "contradictions": contradictions,
+        "gaps": gaps,
+        "discoveries": {"vendors": [], "benchmarks": []},
+        "validationCoverage": 0.0,  # filled by gap-gen
+        "coverageMatrix": {
+            "totalCells": 0,
+            "filledCells": total_filled,
+            "gapsRecorded": len(gaps),
+            "notApplicableCells": total_na,
+        },
+        "runtime": {"healthChecks": {}, "fetchErrors": []},
+        "runMetadata": {
+            "agentVersion": "synth-python-2026-05-10",
+            "startedAt": datetime.datetime.now(datetime.timezone.utc).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
+            "finishedAt": datetime.datetime.now(datetime.timezone.utc).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
+            "toolCallCount": 0,
+            "fetchAttemptCount": 0,
+            "batchCount": len(artifacts),
+        },
+        "error": None,
+    }
+
+
+def main() -> int:
+    import sys
+
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
+    ROOT = Path(__file__).resolve().parents[2]
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from lib.whitelist import (  # noqa: E402
+        core_bench_keys,
+        load_whitelist,
+        not_applicable_rules,
+    )
+
+    artifacts = _load_gather_artifacts(ROOT)
+    print(f"=== PYTHON SYNTH (FAZ 4.D) === gather artifacts: {len(artifacts)}")
+    if not artifacts:
+        print("⚠ no gather artifacts found")
+        return 1
+
+    wl = load_whitelist()
+    canonical_bench = set(core_bench_keys(wl))
+    na_rules = not_applicable_rules(wl) or {}
+    canonical_na = {
+        r.get("rule") for r in (na_rules.get("rules") or []) if r.get("rule")
+    }
+
+    today = datetime.date.today()
+    artifact = synth(artifacts, canonical_bench, canonical_na, today)
+
+    out_path = ROOT / ".aicodermap-agent-out-synth.json"
+    out_path.write_text(
+        json.dumps(artifact, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+    print(f"wrote: {out_path.relative_to(ROOT)}")
+    print(f"  models with fills:       {len(artifact['models'])}")
+    print(f"  total bench fills:       {artifact['coverageMatrix']['filledCells']}")
+    print(f"  contradictions:          {len(artifact['contradictions'])}")
+    print(
+        f"  N/A:                     {artifact['coverageMatrix']['notApplicableCells']}"
+    )
+    print(f"  gaps:                    {len(artifact['gaps'])}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

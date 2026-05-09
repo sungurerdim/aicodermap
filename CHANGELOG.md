@@ -1,4 +1,26 @@
 
+## [2026-05-10] — autonomous refresh-all [WARN: very low cumulative provenance coverage 32.5%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 346 new fills; 832 cells auto-gapped by orchestrator; 97 explicit agent gaps preserved]
+
+[fillRatio:0.33 cells:507/1560 contradictions:1 fetch:0.0min tools:None batches:None build:101c05d]
+
+### Updated
+- 60 models: `opus-4-7`, `sonnet-4-6`, `claude-haiku-4-5`, `deepseek-v3-2`, `deepseek-v4-flash`, `deepseek-v4-pro`, `deepseek-coder-v2-16b`, `deepseek-r1-14b`, `gemini-3-1-flash`, `gemini-3-1-pro`, `gemma-3-27b`, `gemma-4-26b-moe`, `gemma-4-31b`, `gemma-4-e2b`, `gemma-4-e4b`, `llama-4-maverick`, `llama-4-scout`, `minimax-m2-5`, `minimax-m2-7`, `minimax-m2-1`, `mistral-large-3`, `codestral-22b`, `devstral-2`, `devstral-medium`, `codestral`, `devstral-small-2`, `mistral-medium-3-5`, `kimi-k2-6`, `nemotron-3-super`, `gpt-5-5`, `gpt-5-4`, `gpt-4-1`, `o3`, `o4-mini`, `qwen-3-6-27b`, `qwen3-235b`, `qwen3-32b`, `qwen3-6-35b-moe`, `qwen-3-6-max`, `qwen3-6-plus`, `qwen3-coder-30b`, `qwen3-coder-480b`, `qwen3-coder-next`, `qwen25-coder-14b`, `qwen25-coder-32b`, `qwen25-coder-7b`, `qwen3-5-9b`, `step-3-5-flash`, `grok-4-3`, `grok-4-20`, `grok-3`, `grok-3-mini`, `grok-4-1-fast`, `mimo-v2-5-pro`, `mimo-v2-5`, `mimo-v2-flash`, `mimo-v2-pro`, `glm-5-1`, `glm-4-5-air`, `glm-4-7`
+
+### Resolved (auto via trustScore)
+- qwen-3-6-max.lcb: winner={'value': 77.5, 'trustScore': 0.667, 'sourceUrl': 'https://llm-stats.com/', 'tier': 'I'} (severity=RED, Δ5.4)
+
+### Gaps (911 entries — agent:79 orchestrator:832 — see data/known-gaps.json or next refresh)
+- `gemini-3-1-flash.tb2` *(agent)*: agent attempted but found no value
+- `gemini-3-1-flash.aaCoding` *(agent)*: agent attempted but found no value
+- `gemini-3-1-flash.aaAgentic` *(agent)*: agent attempted but found no value
+- `gemini-3-1-pro.tbHard` *(agent)*: agent attempted but found no value
+- `gemini-3-1-pro.aaCoding` *(agent)*: agent attempted but found no value
+- `gemini-3-1-pro.aaAgentic` *(agent)*: agent attempted but found no value
+- `claude-haiku-4-5.aaAgentic` *(orchestrator)*: not reached in agent survey cycle; AA Agentic data unavailable
+- `claude-haiku-4-5.aaCoding` *(orchestrator)*: not reached in agent survey cycle; AA Coding data unavailable
+- ... and 903 more
+
+
 ## [2026-05-09] — autonomous refresh-all [WARN: very low cumulative provenance coverage 30.4%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 141 new fills; 940 cells auto-gapped by orchestrator; 11 explicit agent gaps preserved]
 
 [fillRatio:0.30 cells:473/1560 contradictions:2 fetch:0.0min tools:None batches:None build:4b8098c]
@@ -212,6 +234,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ---
 
 ## [Unreleased]
+
+### Added — 2026-05-10 (FAZ 4.D — Python-side synth)
+
+Sonnet synth agent hit Claude's 32K output token limit on full 60-model
+OUTPUT_SCHEMA. Pivot to deterministic Python synth: trustScore arithmetic,
+argmax winner picks, contradiction delta detection, N/A rule lookup,
+lineup aggregation, pricing/ollama/unsloth merge — all mechanical work
+that didn't need an LLM.
+
+- New `scripts/lib/synth.py` — pure-Python pipeline; no LLM call.
+- `gen_unified_artifact.py` prefers `.aicodermap-agent-out-synth.json` when
+  present (FAZ 4.C); now Python writes it.
+- Schema validation hardening: non-canonical bench keys filtered at synth;
+  tier values clamped to canonical model-tier set; status values clamped;
+  empty `triedSources` in rawGaps backfilled with bench primary URL.
+- Cycle 2026-05-10-B measured (Python synth):
+  | Metric          | Python | sonnet 05-09 | haiku-only 05-10 |
+  |-----------------|--------|--------------|------------------|
+  | NEW fills       | **34** | 32           | 15               |
+  | UPDATED         | **73** | 20           | 11               |
+  | Updated models  | **60** | 55           | 12               |
+  | Coverage        | 32.5%  | 30.4%        | 30.4%            |
+  | Cost            | ~%6    | baseline     | ~%50             |
+
+Python synth dominates on every dimension — quality matches/exceeds
+sonnet single-stage at ~6% of the cost.
 
 ### Changed — 2026-05-10 (FAZ 4.C.1 + 4.C.2 — hybrid hardening)
 

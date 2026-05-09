@@ -124,71 +124,122 @@ synth_input_paths: <string[]>              # SYNTH mode only: list of gather art
 
 The agent runs in one of three modes:
 
-### Mode `gather` (haiku, low-cost extraction — STRICT)
+### Mode `gather` (haiku, low-cost extraction — FLAT SCHEMA)
 
-Pure data extraction. Cheap and fast. NO contradiction analysis, NO
-trustScore math, NO autoResolveWinner, NO WRONG_ID detection, NO N/A
-rule citation. Synth handles all reasoning in Stage B.
+Pure data extraction. Cheap and fast. NO reasoning — just observe and record.
 
 **Inputs:** `target_model_ids`, snapshots, whitelist, freshness skipCells.
 
-**Output schema (gather artifact, simplified — EXACT shape required):**
+**FLAT OUTPUT SCHEMA (FAZ 4.C.1.b, 2026-05-10 — haiku-friendly):**
+
+The schema is FLAT — every observation is a single dict with `modelId`
+inside it (NOT nested under a `models[]` array). Haiku produces flat lists
+reliably; nested 2-level structures often degrade.
+
 ```jsonc
 {
   "batchId": "<id>",
   "mode": "gather",
-  "models": [
-    {
-      "id": "<modelId>",
-      "observations": [
-        {"benchKey": "<key>", "value": <number>, "source": {"url": "<url>", "tier": "I|S|C", "fetched": "<date>"}}
-      ],
-      "lineupHints": [{"event": "deprecated|renamed|new|removed", "evidence": "<url>", "details": "<one-line>"}],
-      "naCandidates": [{"benchKey": "<key>", "rationale": "<one-line>"}]
-    }
+  "observations": [
+    {"modelId": "<id>", "benchKey": "<key>", "value": <number>, "sourceUrl": "<url>", "tier": "I"|"S"|"C", "fetched": "YYYY-MM-DD"}
   ],
-  "rawGaps": [{"modelId": "<id>", "benchKey": "<key>", "triedSources": [...], "triedQueries": [...]}],
-  "runtime": {"toolCallCount": N, "wallclockSec": N, "snapshotsRead": N, "perModelObservations": {"<id>": N}},
-  "partialReason": <string|object|null>
+  "modelMeta": [
+    {"modelId": "<id>", "released"?: "YYYY-MM-DD", "context"?: <int>, "license"?: "<string>",
+     "providers"?: <int>, "open"?: <bool>, "vramRequirement"?: <number>}
+  ],
+  "pricingObs": [
+    {"modelId": "<id>", "provider": "<provider>", "in": <number>, "out": <number>,
+     "cacheHit"?: <number>, "throughput"?: <number>, "url": "<url>", "fetched": "YYYY-MM-DD"}
+  ],
+  "ollamaObs": [
+    {"modelId": "<id>", "pullCmd": "<cmd>", "tags": [...], "pullCount"?: "<string>",
+     "parameters": "<string>", "context": <int>, "license": "<string>", "ollamaUrl": "<url>"}
+  ],
+  "unslothObs": [
+    {"modelId": "<id>", "name": "<variant>", "size": "<gb>", "vram": <number>}
+  ],
+  "lineupHints": [
+    {"modelId": "<id>", "event": "deprecated"|"renamed"|"new"|"removed", "evidence": "<url>", "details": "<one-line>"}
+  ],
+  "naCandidates": [
+    {"modelId": "<id>", "benchKey": "<key>", "rationale": "<one-line why this bench is N/A for this model>"}
+  ],
+  "rawGaps": [
+    {"modelId": "<id>", "benchKey": "<key>", "triedSources": ["<url>",...], "triedQueries": ["<q>",...]}
+  ],
+  "runtime": {
+    "toolCallCount": <int>,
+    "wallclockSec": <int>,
+    "snapshotsRead": <int>
+  },
+  "partialReason": null | "<string>"
 }
 ```
 
-**HARD rules (gather mode — non-negotiable):**
+**FEW-SHOT EXAMPLE** (3 models × 2 benches = 6 observations, gather output):
 
-PROHIBITED (synth handles):
-- Do NOT compute trustScore. Just record `tier` from whitelist lookup.
-- Do NOT decide winner for multi-observation cells — emit ALL observations.
-- Do NOT cite notApplicableRules — emit `naCandidates` with rationale.
-- Do NOT do WRONG_ID detection — synth sees cross-batch view.
-- Do NOT enumerate orchestrator-level gaps — only `rawGaps` for cells you tried.
+```json
+{
+  "batchId": "batch00-anthropic",
+  "mode": "gather",
+  "observations": [
+    {"modelId": "opus-4-7", "benchKey": "sweV", "value": 87.6, "sourceUrl": "https://www.anthropic.com/news/claude-opus-4-7", "tier": "S", "fetched": "2026-04-16"},
+    {"modelId": "opus-4-7", "benchKey": "sweV", "value": 86.4, "sourceUrl": "https://artificialanalysis.ai/models/claude-opus-4-7", "tier": "I", "fetched": "2026-04-20"},
+    {"modelId": "opus-4-7", "benchKey": "lcb", "value": 79.2, "sourceUrl": "https://livecodebench.com/", "tier": "I", "fetched": "2026-05-01"},
+    {"modelId": "sonnet-4-6", "benchKey": "sweV", "value": 78.5, "sourceUrl": "https://www.anthropic.com/news/claude-sonnet-4-6", "tier": "S", "fetched": "2026-03-10"},
+    {"modelId": "sonnet-4-6", "benchKey": "tau2", "value": 87.5, "sourceUrl": "https://benchlm.ai/models/sonnet-4-6", "tier": "I", "fetched": "2026-04-26"},
+    {"modelId": "claude-haiku-4-5", "benchKey": "sweV", "value": 65.1, "sourceUrl": "https://artificialanalysis.ai/models/claude-4-5-haiku", "tier": "I", "fetched": "2026-04-22"}
+  ],
+  "modelMeta": [
+    {"modelId": "opus-4-7", "context": 200000, "license": "proprietary", "open": false}
+  ],
+  "pricingObs": [
+    {"modelId": "opus-4-7", "provider": "official", "in": 15, "out": 75, "url": "https://www.anthropic.com/pricing", "fetched": "2026-04-16"}
+  ],
+  "ollamaObs": [],
+  "unslothObs": [],
+  "lineupHints": [],
+  "naCandidates": [],
+  "rawGaps": [
+    {"modelId": "claude-haiku-4-5", "benchKey": "aaAgentic", "triedSources": ["https://artificialanalysis.ai/models/claude-4-5-haiku"], "triedQueries": ["claude haiku 4.5 aa agentic 2026"]}
+  ],
+  "runtime": {"toolCallCount": 22, "wallclockSec": 150, "snapshotsRead": 8},
+  "partialReason": null
+}
+```
 
-REQUIRED (FAZ 4.C.1, 2026-05-10 — strict thresholds):
-- **Minimum observations target:** ≥ 3 observations per model on average.
-  Slice with N models → aim for ≥ 3N observations total. Falling short
-  triggers an orchestrator retry with sonnet (Stage A escalation). Don't
-  return early.
-- **Snapshot enumeration:** read EVERY leaderboard snapshot in
-  `idea_context.leaderboardSnapshots` whose URL has not been read.
-  One Read per snapshot file → multi-cell extraction (one snapshot
-  typically yields 5-15 cells across the slice).
-- **Multi-source per cell:** when a cell has matching values across
-  multiple snapshots, emit one observation per source — not one
-  consolidated observation. Synth needs the multi-source view to
-  compute trustScore + verifications correctly.
-- **Output schema discipline:** EXACT shape above. Do NOT emit `filled`,
-  `gaps`, `na`, or other top-level keys. Telemetry reads `models[].observations[]`
-  and `rawGaps[]` — anything else is invisible.
-- **`runtime.perModelObservations`:** dict mapping each target_model_id to
-  its observation count. Required so the orchestrator can detect weak
-  batches per-model (not just per-batch averages).
-- **Status line format:** `EMITTED batch=<id> mode=gather observations=N
-  models=K rawGaps=R path=...` — terminology MUST be `observations`, not
-  `filled` or `fills`.
+**HARD RULES (gather mode):**
 
-Wallclock + tool-call ceilings still HARD. If approaching deadline-30s
-or budget-5, finish the current observation extraction and emit. Do NOT
-exit early just because "many cells already filled" — keep going until
-the deadline or budget hits.
+1. **TOP-LEVEL KEYS** must be exactly: `batchId`, `mode`, `observations`,
+   `modelMeta`, `pricingObs`, `ollamaObs`, `unslothObs`, `lineupHints`,
+   `naCandidates`, `rawGaps`, `runtime`, `partialReason`. Any other keys
+   (`models`, `updates`, `sourcesAdded`, `gaps`, `confidence`, `synthesis`,
+   `lineupChanges`, `coverageMatrix`, `validationCoverage`, `runMetadata`,
+   `error`) — these belong to FULL/SYNTH mode, NOT gather. The schema
+   validator rejects gather artifacts containing them.
+
+2. **ALL ARRAY ENTRIES carry `modelId` field** — it's the key that
+   distinguishes which target_model the observation is about. Synth
+   groups by modelId in Stage B.
+
+3. **MIN 3 observations per target_model on average.** Slice with N models
+   → aim for ≥ 3N total observations. Falling short triggers a haiku
+   self-retry (NOT sonnet escalation — see FAZ 4.C.1.c).
+
+4. **READ EVERY snapshot** in `idea_context.leaderboardSnapshots` whose URL
+   has not been read. One Read = multi-cell extraction (5-15 obs/snapshot).
+
+5. **MULTI-SOURCE per cell:** when 3 snapshots agree on the same value,
+   emit 3 observations (one per source). Synth aggregates verifications.
+
+6. **NO REASONING.** Don't compute trustScore (just record `tier`). Don't
+   pick winners. Don't cite notApplicableRules (just emit `naCandidates`).
+   Don't detect WRONG_ID. Synth handles ALL of these.
+
+7. **STATUS LINE format:** `EMITTED batch=<id> mode=gather observations=N
+   pricingObs=P ollamaObs=O rawGaps=R path=...`
+
+Wallclock + tool-call ceilings still HARD. Don't exit early.
 
 ### Mode `synth` (sonnet, single dispatch — analyzes ALL gather outputs)
 
