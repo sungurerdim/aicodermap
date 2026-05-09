@@ -49,6 +49,11 @@ coverage/
 # regeneratable via `python scripts/prefetch-leaderboards.py`.
 data/.leaderboard-snapshots/
 
+# FAZ 4.C (2026-05-10): haiku gather agents sometimes write Python helper
+# scripts to root (.gather-*.py) — not part of orchestrator protocol.
+.gather-*.py
+.gather-extract*.py
+
 # Discovery review queue (human-gated; not committed until promoted)
 data/discoveries.json
 
