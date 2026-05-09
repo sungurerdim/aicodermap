@@ -40,6 +40,9 @@ MAX_PARALLEL = 10  # FAZ 1.2: parallel sub-agents per wave.
 FRESHNESS_TTL_DAYS = 7  # T2 cells skip if confirmed AND age ≤ this.
 MIN_VERIFICATIONS_FOR_SKIP = 3  # T2 cells require ≥3 verifications.
 
+# ── Hybrid dispatch (FAZ 4.C) ──────────────────────────────────────────────
+HAIKU_GATHER_MIN_AVG_OBS = 3  # Avg observations per target_model. Below → sonnet retry.
+
 # ── Cycle metadata ─────────────────────────────────────────────────────────
 STALE_DAYS = 14  # M5 freshness gate.
 DEPRECATION_GRACE_DAYS = 60  # vendor deprecated → archive after this.

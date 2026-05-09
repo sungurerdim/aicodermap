@@ -213,6 +213,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed — 2026-05-10 (FAZ 4.C.1 + 4.C.2 — hybrid hardening)
+
+Cycle 2026-05-10 first hybrid run produced 14/18 weak-batch haiku gathers
+(avg <3 observations/model) and ~%50 quality regression vs single-stage
+sonnet baseline. Two-pronged fix:
+
+**FAZ 4.C.1 — Stricter haiku gather prompt (`agent.md` GATHER_MODE):**
+- Required minimum 3 observations per target_model on average.
+- Mandatory snapshot enumeration: read EVERY snapshot. Multi-cell extraction.
+- Multi-source per cell: one observation per source, not consolidated.
+- Output schema discipline: EXACT `models[].observations[]` shape;
+  no top-level `filled`/`gaps`/`na` keys.
+- New `runtime.perModelObservations` for orchestrator-side weak-batch detection.
+
+**FAZ 4.C.2 — Retry-on-empty escalation (`SKILL.md` Step 4 Stage A.5):**
+- Post-Stage A scan: avg observations/target_model < 3 → sonnet retry.
+- Retry uses `model:"sonnet"` + `mode:"gather"`. Sonnet artifact
+  overwrites haiku artifact at same path.
+- New `scripts/lib/constants.HAIKU_GATHER_MIN_AVG_OBS = 3`.
+
 ### Added — 2026-05-09 (FAZ 4.C — hybrid haiku gather + sonnet synth dispatch)
 
 Two-phase dispatch architecture replaces single-stage 18× sonnet:

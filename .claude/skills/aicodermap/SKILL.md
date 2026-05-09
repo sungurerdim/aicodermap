@@ -261,6 +261,49 @@ PRELIM-B. LEADERBOARD_PREFETCH (FAZ 2.1, 2026-05-07 — orchestrator-side single
                f"of {list(range(len(plan.waves)))}. Halting BEFORE Stage B.")
      halt_workflow()
 
+   // ─── Stage A.5: WEAK-BATCH RETRY (FAZ 4.C.2 — escalate to sonnet) ─────
+   // Cycle 2026-05-10 measured haiku gather producing 14/18 weak batches
+   // (avg <3 observations/model). Stricter prompts (FAZ 4.C.1) reduce this
+   // but escalation remains: any batch where avg observations per
+   // target_model < HAIKU_GATHER_MIN_AVG_OBS=3 gets ONE retry with model="sonnet"
+   // mode="gather". Sonnet retry artifact replaces the haiku artifact at
+   // .aicodermap-agent-out-<batchId>.gather.json (sonnet quality, gather schema).
+   weak_batches = []
+   for b in plan["batches"]:
+     gather_path = f".aicodermap-agent-out-{b['batchId']}.gather.json"
+     try:
+       with open(gather_path) as f: g = json.load(f)
+       total_obs = sum(len(m.get('observations') or []) for m in g.get('models', []))
+       avg_obs = total_obs / max(len(b.modelIds), 1)
+       if avg_obs < HAIKU_GATHER_MIN_AVG_OBS:
+         weak_batches.append((b, avg_obs))
+     except (FileNotFoundError, json.JSONDecodeError):
+       weak_batches.append((b, 0))
+
+   if weak_batches:
+     log(f"⚠ {len(weak_batches)} batches below haiku threshold — sonnet retry")
+     // Single-message parallel sonnet retry (same gather schema, full slice)
+     retry_results = parallel([
+       Agent({
+         subagent_type: "aicodermap-research-agent",
+         model: "sonnet",  // escalation — quality model
+         prompt: structured(
+           scope, query,
+           mode: "gather",
+           idea_context: filtered_for_bucket(idea_context, b),
+           target_model_ids: b.modelIds,
+           batch_id: b.batchId + "-sonnet-retry",
+           wallclock_deadline_unix: now() + BATCH_WALLCLOCK_SEC,
+           agent_budget_buffer: 50,
+           require_full_slice: true,  // sonnet must cover all cells
+           reason: "haiku gather avg_obs < 3 — escalating",
+         ),
+         output_path: f".aicodermap-agent-out-{b.batchId}.gather.json"  // overwrite haiku
+       })
+       for b, _avg in weak_batches
+     ])
+     log(f"  ✓ {len(retry_results)} sonnet retries complete; haiku artifacts replaced")
+
    // ─── Stage B: SONNET SYNTH (single dispatch, post-gather) ──────────────
    // FAZ 4.C: synth agent reads ALL gather artifacts, applies analytical
    // work (trustScore, contradictions, autoResolveWinner, WRONG_ID, N/A

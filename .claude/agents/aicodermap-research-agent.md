@@ -124,15 +124,15 @@ synth_input_paths: <string[]>              # SYNTH mode only: list of gather art
 
 The agent runs in one of three modes:
 
-### Mode `gather` (haiku, low-cost extraction)
+### Mode `gather` (haiku, low-cost extraction — STRICT)
 
-Pure data extraction — NO contradiction analysis, NO trustScore math, NO
-autoResolveWinner picking, NO WRONG_ID detection, NO N/A rule citation.
-Just observe values from sources. Cheap and fast.
+Pure data extraction. Cheap and fast. NO contradiction analysis, NO
+trustScore math, NO autoResolveWinner, NO WRONG_ID detection, NO N/A
+rule citation. Synth handles all reasoning in Stage B.
 
 **Inputs:** `target_model_ids`, snapshots, whitelist, freshness skipCells.
 
-**Output schema (gather artifact, simplified):**
+**Output schema (gather artifact, simplified — EXACT shape required):**
 ```jsonc
 {
   "batchId": "<id>",
@@ -148,18 +148,47 @@ Just observe values from sources. Cheap and fast.
     }
   ],
   "rawGaps": [{"modelId": "<id>", "benchKey": "<key>", "triedSources": [...], "triedQueries": [...]}],
-  "runtime": {"toolCallCount": N, "wallclockSec": N},
+  "runtime": {"toolCallCount": N, "wallclockSec": N, "snapshotsRead": N, "perModelObservations": {"<id>": N}},
   "partialReason": <string|object|null>
 }
 ```
 
-**HARD rules (gather mode):**
+**HARD rules (gather mode — non-negotiable):**
+
+PROHIBITED (synth handles):
 - Do NOT compute trustScore. Just record `tier` from whitelist lookup.
-- Do NOT decide which value wins for cells with multiple observations — emit ALL observations; synth picks winner.
-- Do NOT cite notApplicableRules — emit `naCandidates` with rationale; synth maps to canonical rule.
-- Do NOT do WRONG_ID detection — synth handles it from the cross-batch view.
-- Do NOT enumerate orchestrator-level gaps — only emit `rawGaps` for cells you actively tried.
-- Wallclock + tool-call ceilings still HARD.
+- Do NOT decide winner for multi-observation cells — emit ALL observations.
+- Do NOT cite notApplicableRules — emit `naCandidates` with rationale.
+- Do NOT do WRONG_ID detection — synth sees cross-batch view.
+- Do NOT enumerate orchestrator-level gaps — only `rawGaps` for cells you tried.
+
+REQUIRED (FAZ 4.C.1, 2026-05-10 — strict thresholds):
+- **Minimum observations target:** ≥ 3 observations per model on average.
+  Slice with N models → aim for ≥ 3N observations total. Falling short
+  triggers an orchestrator retry with sonnet (Stage A escalation). Don't
+  return early.
+- **Snapshot enumeration:** read EVERY leaderboard snapshot in
+  `idea_context.leaderboardSnapshots` whose URL has not been read.
+  One Read per snapshot file → multi-cell extraction (one snapshot
+  typically yields 5-15 cells across the slice).
+- **Multi-source per cell:** when a cell has matching values across
+  multiple snapshots, emit one observation per source — not one
+  consolidated observation. Synth needs the multi-source view to
+  compute trustScore + verifications correctly.
+- **Output schema discipline:** EXACT shape above. Do NOT emit `filled`,
+  `gaps`, `na`, or other top-level keys. Telemetry reads `models[].observations[]`
+  and `rawGaps[]` — anything else is invisible.
+- **`runtime.perModelObservations`:** dict mapping each target_model_id to
+  its observation count. Required so the orchestrator can detect weak
+  batches per-model (not just per-batch averages).
+- **Status line format:** `EMITTED batch=<id> mode=gather observations=N
+  models=K rawGaps=R path=...` — terminology MUST be `observations`, not
+  `filled` or `fills`.
+
+Wallclock + tool-call ceilings still HARD. If approaching deadline-30s
+or budget-5, finish the current observation extraction and emit. Do NOT
+exit early just because "many cells already filled" — keep going until
+the deadline or budget hits.
 
 ### Mode `synth` (sonnet, single dispatch — analyzes ALL gather outputs)
 
