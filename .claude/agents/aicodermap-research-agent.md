@@ -116,7 +116,74 @@ require_full_matrix: <bool default:true>     # every cell must end as fill | gap
 agent_budget_buffer: <int default:50>      # tool-call ceiling; near (buffer-5), finish current cell + emit
 batch_id: <string>                          # orchestrator batch label; surfaced in runMetadata
 wallclock_deadline_unix: <int>             # epoch seconds. Self-check at every Phase boundary; if Date.now()/1000 >= deadline-30 → STOP fetching, Write artifact, return EMITTED. Orchestrator SIGKILLs at deadline. Cells written survive; mid-flight lost. 30s soft buffer is for the Write call.
+mode: "gather" | "synth" | "full"          # FAZ 4.C dispatch mode (default: "full" — legacy single-stage). See DISPATCH_MODES below.
+synth_input_paths: <string[]>              # SYNTH mode only: list of gather artifact paths to consume.
 ```
+
+## DISPATCH_MODES (FAZ 4.C, 2026-05-09 — hybrid haiku gather + sonnet synth)
+
+The agent runs in one of three modes:
+
+### Mode `gather` (haiku, low-cost extraction)
+
+Pure data extraction — NO contradiction analysis, NO trustScore math, NO
+autoResolveWinner picking, NO WRONG_ID detection, NO N/A rule citation.
+Just observe values from sources. Cheap and fast.
+
+**Inputs:** `target_model_ids`, snapshots, whitelist, freshness skipCells.
+
+**Output schema (gather artifact, simplified):**
+```jsonc
+{
+  "batchId": "<id>",
+  "mode": "gather",
+  "models": [
+    {
+      "id": "<modelId>",
+      "observations": [
+        {"benchKey": "<key>", "value": <number>, "source": {"url": "<url>", "tier": "I|S|C", "fetched": "<date>"}}
+      ],
+      "lineupHints": [{"event": "deprecated|renamed|new|removed", "evidence": "<url>", "details": "<one-line>"}],
+      "naCandidates": [{"benchKey": "<key>", "rationale": "<one-line>"}]
+    }
+  ],
+  "rawGaps": [{"modelId": "<id>", "benchKey": "<key>", "triedSources": [...], "triedQueries": [...]}],
+  "runtime": {"toolCallCount": N, "wallclockSec": N},
+  "partialReason": <string|object|null>
+}
+```
+
+**HARD rules (gather mode):**
+- Do NOT compute trustScore. Just record `tier` from whitelist lookup.
+- Do NOT decide which value wins for cells with multiple observations — emit ALL observations; synth picks winner.
+- Do NOT cite notApplicableRules — emit `naCandidates` with rationale; synth maps to canonical rule.
+- Do NOT do WRONG_ID detection — synth handles it from the cross-batch view.
+- Do NOT enumerate orchestrator-level gaps — only emit `rawGaps` for cells you actively tried.
+- Wallclock + tool-call ceilings still HARD.
+
+### Mode `synth` (sonnet, single dispatch — analyzes ALL gather outputs)
+
+Reads every gather artifact, applies analytical work:
+1. Group observations by `(modelId, benchKey)` cell. Multiple observations →
+   compute trustScore per source, pick autoResolveWinner via argmax. Emit
+   contradictions[] for delta ≥ CONTRADICTION_WARN_PP.
+2. Cross-batch lineup reconciliation (lineupHints → lineupChanges with
+   WRONG_ID_AUTO_FIX detection — agent that saw `devstral-medium`'s wrong
+   data will surface that here).
+3. notApplicable rule citation: take naCandidates and map to
+   `_schema.notApplicableRules.rules[]`; drop ones that don't match a rule.
+4. Emit FULL OUTPUT_SCHEMA artifact at synth_output_path.
+
+**Inputs:** `synth_input_paths` (list of gather artifact files), full
+`idea_context` (whitelist, contracts, etc.).
+
+**Output:** standard OUTPUT_SCHEMA artifact at `output_path` (same as `full` mode).
+
+### Mode `full` (sonnet, legacy single-stage — default)
+
+Pre-FAZ-4.C behavior: agent does both gather + synth in one dispatch.
+Used when hybrid is disabled or for `model <id>` / `deep-fetch` scopes
+where single-batch synth has no parallelism benefit.
 
 **Matrix awareness (HARD — FAZ 4.A reform 2026-05-08):**
 The skill ships `matrixState` + `priorityCells` (after T2-skip removal — see

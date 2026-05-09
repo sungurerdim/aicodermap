@@ -167,6 +167,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added — 2026-05-09 (FAZ 4.C — hybrid haiku gather + sonnet synth dispatch)
+
+Two-phase dispatch architecture replaces single-stage 18× sonnet:
+
+- **Stage A (gather):** 18 batches × **haiku** agent (mode="gather"). Pure
+  data extraction — raw observations + naCandidates + lineupHints. NO
+  contradiction analysis, NO trustScore math, NO autoResolveWinner, NO
+  WRONG_ID detection. Cheap and fast.
+- **Stage B (synth):** 1× **sonnet** agent (mode="synth"). Reads ALL gather
+  artifacts, applies analytical work: trustScore + contradictions +
+  autoResolveWinner + WRONG_ID + N/A rule citation. Emits unified
+  OUTPUT_SCHEMA artifact at `.aicodermap-agent-out-synth.json`.
+
+**Cost:** ~18× sonnet → 18× haiku + 1× sonnet ≈ 1/8 baseline.
+
+**Quality:** edge cases (WRONG_ID, cross-model misattribution, contradiction
+detection) concentrate in the single sonnet pass with full cross-batch view —
+better than 18 scattered sonnet sub-agents that each see only their slice.
+
+Files modified:
+- `agent.md` — new DISPATCH_MODES section: GATHER (haiku, simplified output
+  schema) + SYNTH (sonnet, consumes gather artifacts) + FULL (legacy
+  single-stage). New `mode` and `synth_input_paths` parameters.
+- `SKILL.md` — Step 4 rewritten as two-stage dispatch.
+- `scripts/gen_unified_artifact.py` — prefers synth artifact when present
+  (already in OUTPUT_SCHEMA shape, copied verbatim); falls back to batch
+  union when synth absent.
+
 ### Changed — 2026-05-08 (FAZ 4.A — priorityCells AUTHORITATIVE → ADVISORY)
 
 Reverts the FAZ 2.3 reform after the 2026-05-08 cycle measured its cost:

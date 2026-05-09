@@ -31,6 +31,7 @@ if hasattr(sys.stderr, "reconfigure"):
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT_PATH = ROOT / ".aicodermap-agent-out.json"
+SYNTH_PATH = ROOT / ".aicodermap-agent-out-synth.json"  # FAZ 4.C
 BATCH_GLOB = str(ROOT / ".aicodermap-agent-out-batch*.json")
 
 NOW_ISO = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -355,6 +356,37 @@ def _count_fills(artifact: dict[str, Any]) -> tuple[int, int]:
 
 
 def main() -> int:
+    # FAZ 4.C: prefer Stage B synth artifact when present.
+    if SYNTH_PATH.is_file():
+        try:
+            with SYNTH_PATH.open(encoding="utf-8") as fp:
+                synth = json.load(fp)
+            if isinstance(synth, dict) and synth.get("models"):
+                # Synth output is already in OUTPUT_SCHEMA shape — copy verbatim.
+                OUT_PATH.write_text(
+                    json.dumps(synth, indent=2, ensure_ascii=False),
+                    encoding="utf-8",
+                )
+                models_with_fills, total_fills = _count_fills(synth)
+                nested_sources = sum(
+                    len(m.get("sourcesAdded") or []) for m in synth.get("models", [])
+                )
+                print(f"Written: {OUT_PATH} (FROM SYNTH ARTIFACT — Stage B)")
+                print(f"Source: {SYNTH_PATH.name}")
+                print(f"Models with fills: {models_with_fills}")
+                print(f"Total fills: {total_fills}")
+                print(f"Total gaps recorded: {len(synth.get('gaps') or [])}")
+                print(f"Contradictions: {len(synth.get('contradictions') or [])}")
+                print(f"sourcesAdded (nested in models[]): {nested_sources}")
+                print(f"newModels: {len(synth.get('newModels') or [])}")
+                return 0
+            print(
+                f"⚠ {SYNTH_PATH.name} present but invalid; falling back to gather union"
+            )
+        except (OSError, json.JSONDecodeError) as e:
+            print(f"⚠ {SYNTH_PATH.name} unreadable ({e}); falling back to gather union")
+
+    # Fallback: union per-batch gather/full artifacts.
     arts = _load_batch_artifacts()
     if not arts:
         print(f"⚠ no batch artifacts found matching {BATCH_GLOB}")
@@ -367,7 +399,7 @@ def main() -> int:
     )
 
     models_with_fills, total_fills = _count_fills(artifact)
-    print(f"Written: {OUT_PATH}")
+    print(f"Written: {OUT_PATH} (FROM BATCH UNION — gather/full mode)")
     print(f"Batches merged: {len(arts)}")
     print(f"Models with fills: {models_with_fills}")
     print(f"Total fills: {total_fills}")

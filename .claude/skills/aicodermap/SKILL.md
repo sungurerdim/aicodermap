@@ -160,57 +160,59 @@ PRELIM-B. LEADERBOARD_PREFETCH (FAZ 2.1, 2026-05-07 — orchestrator-side single
    - `data/sources-whitelist.json` is SSOT for "what URLs the agent is allowed to fetch" AND for the bench-key universe (`_schema.coreBenchKeys`). Frontend `BENCH_KEYS` (assets/js/core.js), i18n `benchmarks.*`, and the data-file `bench` cells all mirror this canonical set. `scripts/audit-data-coherence.py` enforces the mirroring by failing loudly on any drift.
    - No skip registry: every (modelId, benchKey) pair is re-attempted every cycle so vendor opt-outs that close are surfaced immediately
    - The agent file (.claude/agents/aicodermap-research-agent.md) only carries PROCEDURE (how) — every list of URLs, vendors, or model IDs lives in data files
-// Adaptive multi-batch dispatch — every batch fits under the agent's
-   // tool-call ceiling (AGENT_BUDGET_BUFFER=50 → MAX_BATCH_CELLS=150).
-   // Plan source: scripts/lib/dispatch.compute_dispatch_plan(active, coreKeys).
-   // Buckets group by provider family; oversize families split into sub-batches
-   // of ≤MAX_BATCH_MODELS. Each sub-agent receives:
-   //   - target_model_ids (its bucket only, ≤8 models × |coreKeys| cells)
-   //   - artifact_path (agent Writes here): .aicodermap-agent-out-<batchId>.json
-   //   - filtered idea_context (F5: only relevant vendor entries)
-   //   - full leaderboards[] + coreBenchKeys + priorityCells filtered to bucket
-   // Waves run sequentially; batches within a wave run in parallel. Token cost:
-   // ~totalBatches× vs single agent. gen_unified_artifact.py merges via union
-   // (disjoint slices, no value conflicts).
-
-   // FAZ 1.1 (2026-05-07): wave dispatch state machine — ALL waves MUST run.
-   // The 2026-05-06 cycle bug was committing partial wave-0 results without
-   // dispatching wave-1+; the guard at the end of this loop blocks Step 5
-   // until every wave is in wave_state.completed.
+// FAZ 4.C (2026-05-09): HYBRID DISPATCH (haiku gather + sonnet synth).
+   // Two-stage pipeline replaces single-stage 18× sonnet:
+   //   Stage A (gather): 18 batches × HAIKU agent (mode="gather"). Cheap
+   //     extraction; emits raw observations + naCandidates + lineupHints.
+   //     NO contradiction analysis, NO trustScore math, NO autoResolveWinner.
+   //   Stage B (synth):   1 batch  × SONNET agent (mode="synth"). Reads ALL
+   //     gather artifacts, applies analytical work: trustScore + contradictions
+   //     + autoResolveWinner + WRONG_ID detection + N/A rule citation.
+   //     Emits full OUTPUT_SCHEMA artifact.
+   //
+   // Cost: ~18× sonnet → 18× haiku + 1× sonnet ≈ 1/8 baseline.
+   // Quality: edge cases (WRONG_ID, cross-model misattribution, contradiction
+   // detection) concentrate in the single sonnet pass — better than scattered
+   // sonnet sub-agents that each see only their slice.
+   //
+   // Adaptive multi-batch dispatch (FAZ 1.2 — unchanged): every batch fits
+   // under AGENT_BUDGET_BUFFER=50 tool-call ceiling. Plan source:
+   // scripts/lib/dispatch.compute_dispatch_plan(active, coreKeys).
+   //
+   // Stage A artifact path: .aicodermap-agent-out-<batchId>.gather.json
+   // Stage B artifact path: .aicodermap-agent-out-synth.json (consumed by
+   //                        gen_unified_artifact.py before merge).
 
    plan = compute_dispatch_plan(active_models, coreBenchKeys)  // dispatch.py
    per_batch_artifacts = []
    wave_state = {"pending": list(range(len(plan["waves"]))), "completed": []}
+
+   // ─── Stage A: HAIKU GATHER (parallel waves) ──────────────────────────
    for wave_index in range(len(plan["waves"])):
      // Sequential between waves; parallel within a wave.
-     // SINGLE-MESSAGE PARALLEL DISPATCH: emit ALL Agent({...}) calls for this
-     // wave in ONE message so Claude Code dispatches them concurrently (up to
-     // MAX_PARALLEL=10 per FAZ 1.2).
      wave_results = parallel([
        Agent({
-         subagent_type: "aicodermap-research-agent", model: "sonnet",
+         subagent_type: "aicodermap-research-agent",
+         model: "haiku",  // FAZ 4.C: gather is cheap extraction work
          prompt: structured(
            scope, query,
+           mode: "gather",  // HARD: no contradiction/autoResolve/WRONG_ID
            idea_context: filtered_for_bucket(idea_context, batch_spec),  // F5
            target_model_ids: batch_spec.modelIds,
            batch_id: batch_spec.batchId,
            expected_total: batch_spec.expectedCells,
-           agent_budget_buffer: plan.agentBudgetBuffer,  // hard reminder
+           agent_budget_buffer: plan.agentBudgetBuffer,
+           wallclock_deadline_unix: now() + BATCH_WALLCLOCK_SEC,
            include_unsloth: true,
            trusted_sources_only: true,
            parallel_sources: 5,
            parallel_models: 5,
            verification_map_path: ".aicodermap-verification-map.json",
-           trust_score_required: true,
            termination: "completeness",
-           require_lineup_populated: (wave_index == 0 and batch_spec.batchId == "batch00-..."),
-           require_health_checks: (wave_index == 0 and batch_spec.batchId == "batch00-..."),
-           priority_queue_size: |batch_priority_cells|,
-           require_priority_first: true,
+           require_priority_first: true,  // ordering only (FAZ 4.A)
            require_full_matrix: true,
-           require_run_metadata: true,  // FAZ C: toolCallCount, fetchAttemptCount, batchCount=1
          ),
-         output_path: f".aicodermap-agent-out-{batch_spec.batchId}.json"
+         output_path: f".aicodermap-agent-out-{batch_spec.batchId}.gather.json"
        })
        for batch_spec in [b for b in plan.batches if b.waveIndex == wave_index]
      ])
@@ -253,18 +255,38 @@ PRELIM-B. LEADERBOARD_PREFETCH (FAZ 2.1, 2026-05-07 — orchestrator-side single
            log(f"  ✗ {orig.batchId} retry also 0 fills; logging warn")
            changelog_warns.append(f"⚠ {orig.batchId}: 0 fills × 2 (genuinely unreachable)")
 
-   // HARD GUARD — never advance to Step 5 with missing waves.
-   // gap-gen would silently mask a missing wave's cells as ordinary auto-gaps,
-   // which is exactly how the 2026-05-06 partial commit slipped through.
+   // HARD GUARD — never advance with missing waves.
    if len(wave_state["completed"]) != len(plan["waves"]):
      log_error(f"✗ wave dispatch incomplete: completed={wave_state['completed']} "
-               f"of {list(range(len(plan.waves)))}. Halting BEFORE Step 5.")
-     halt_workflow()  // user must investigate; gap-gen would corrupt audit trail
+               f"of {list(range(len(plan.waves)))}. Halting BEFORE Stage B.")
+     halt_workflow()
 
+   // ─── Stage B: SONNET SYNTH (single dispatch, post-gather) ──────────────
+   // FAZ 4.C: synth agent reads ALL gather artifacts, applies analytical
+   // work (trustScore, contradictions, autoResolveWinner, WRONG_ID, N/A
+   // citation), emits unified OUTPUT_SCHEMA artifact.
+   //
+   // Synth does NOT fetch — it consumes pre-fetched observations. This
+   // keeps the expensive sonnet pass focused on reasoning, not extraction.
+   gather_paths = [f".aicodermap-agent-out-{b.batchId}.gather.json"
+                   for b in plan.batches]
+   synth_result = Agent({
+     subagent_type: "aicodermap-research-agent",
+     model: "sonnet",  // FAZ 4.C: synth uses sonnet for reasoning quality
+     prompt: structured(
+       scope, query,
+       mode: "synth",
+       synth_input_paths: gather_paths,
+       idea_context: idea_context,  // full context for cross-batch reasoning
+       wallclock_deadline_unix: now() + BATCH_WALLCLOCK_SEC,
+       agent_budget_buffer: 80,  // synth has higher budget — many gather files to read
+     ),
+     output_path: ".aicodermap-agent-out-synth.json"
+   })
+
+   // gen_unified_artifact.py prefers synth output when present, falls back
+   // to gather union otherwise.
    artifact = merge_batch_artifacts(per_batch_artifacts)
-     // gen_unified_artifact.py reads every .aicodermap-agent-out-batch*.json,
-     // merges via union (no value conflicts because each batch covers disjoint
-     // model_ids), and writes the unified .aicodermap-agent-out.json.
 
    **Prompt header MUST surface (verbatim, not paraphrased):**
    ```
