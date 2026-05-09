@@ -1,4 +1,50 @@
 
+## [2026-05-09] — autonomous refresh-all [WARN: very low cumulative provenance coverage 30.4%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 141 new fills; 940 cells auto-gapped by orchestrator; 11 explicit agent gaps preserved]
+
+[fillRatio:0.30 cells:473/1560 contradictions:2 fetch:0.0min tools:None batches:None build:4b8098c]
+
+### Updated
+- 12 models: `gemini-3-1-flash`, `gemini-3-1-pro`, `gemma-3-27b`, `gemma-4-31b`, `llama-4-maverick`, `llama-4-scout`, `kimi-k2-6`, `glm-4-5-air`, `glm-4-7`, `qwen25-coder-32b`, `qwen25-coder-7b`, `qwen3-5-9b`
+
+### Resolved (auto via trustScore)
+- llama-4-maverick.gpqa: winner={'value': 69.8, 'trustScore': 0.6, 'sourceUrl': None, 'tier': 'S'} (severity=RED, Δ15.0)
+- gemma-4-26b-moe.gpqa: winner={'value': 82.3, 'trustScore': 0.7, 'sourceUrl': 'https://blog.google', 'tier': 'S'} (severity=YELLOW, Δ3.1)
+
+### Gaps (947 entries — agent:7 orchestrator:940 — see data/known-gaps.json or next refresh)
+- `opus-4-7.lcb` *(agent)*: Not found in whitelist leaderboards for opus-4-7
+- `opus-4-7.bfcl` *(agent)*: Not found in whitelist leaderboards
+- `llama-4-scout.swePro` *(agent)*: Not on SWE-bench Pro leaderboard for open-weight scout model
+- `devstral-small-2.swePro` *(agent)*: Deprecated model; not benchmarked post-deprecation
+- `mistral-medium-3-5.swePro` *(agent)*: Fresh launch (2026-04-29); not yet on leaderboards
+- `qwen25-coder-7b.sweV` *(agent)*: Released 2026-05-02; not yet on leaderboard snapshots
+- `claude-haiku-4-5.aaAgentic` *(orchestrator)*: not reached in agent survey cycle; AA Agentic data unavailable
+- `claude-haiku-4-5.aaCoding` *(orchestrator)*: not reached in agent survey cycle; AA Coding data unavailable
+- ... and 939 more
+
+
+## [2026-05-09] — autonomous refresh-all [WARN: very low cumulative provenance coverage 30.4%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 141 new fills; 940 cells auto-gapped by orchestrator; 11 explicit agent gaps preserved]
+
+[fillRatio:0.30 cells:473/1560 contradictions:2 fetch:0.0min tools:None batches:None build:4b8098c]
+
+### Updated
+- 12 models: `gemini-3-1-flash`, `gemini-3-1-pro`, `gemma-3-27b`, `gemma-4-31b`, `llama-4-maverick`, `llama-4-scout`, `kimi-k2-6`, `glm-4-5-air`, `glm-4-7`, `qwen25-coder-32b`, `qwen25-coder-7b`, `qwen3-5-9b`
+
+### Resolved (auto via trustScore)
+- llama-4-maverick.gpqa: winner={'value': 69.8, 'trustScore': 0.6, 'sourceUrl': None, 'tier': 'S'} (severity=RED, Δ15.0)
+- gemma-4-26b-moe.gpqa: winner={'value': 82.3, 'trustScore': 0.7, 'sourceUrl': 'https://blog.google', 'tier': 'S'} (severity=YELLOW, Δ3.1)
+
+### Gaps (947 entries — agent:7 orchestrator:940 — see data/known-gaps.json or next refresh)
+- `opus-4-7.lcb` *(agent)*: Not found in whitelist leaderboards for opus-4-7
+- `opus-4-7.bfcl` *(agent)*: Not found in whitelist leaderboards
+- `llama-4-scout.swePro` *(agent)*: Not on SWE-bench Pro leaderboard for open-weight scout model
+- `devstral-small-2.swePro` *(agent)*: Deprecated model; not benchmarked post-deprecation
+- `mistral-medium-3-5.swePro` *(agent)*: Fresh launch (2026-04-29); not yet on leaderboards
+- `qwen25-coder-7b.sweV` *(agent)*: Released 2026-05-02; not yet on leaderboard snapshots
+- `claude-haiku-4-5.aaAgentic` *(orchestrator)*: not reached in agent survey cycle; AA Agentic data unavailable
+- `claude-haiku-4-5.aaCoding` *(orchestrator)*: not reached in agent survey cycle; AA Coding data unavailable
+- ... and 939 more
+
+
 ## [2026-05-09] — autonomous refresh-all [WARN: very low cumulative provenance coverage 29.4%] [MX2: coverage 29.4% < absolute floor 30%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 423 new fills; 534 cells auto-gapped by orchestrator; 444 explicit agent gaps preserved]
 
 [fillRatio:0.29 cells:458/1560 contradictions:29 fetch:0.0min tools:None batches:None build:868107d]

@@ -1,321 +1,273 @@
 {
-  "cycleEndedAt": "2026-05-09T14:45:36Z",
-  "cycleStartedAt": "2026-05-09T14:45:36Z",
+  "cycleEndedAt": "2026-05-09T15:18:55Z",
+  "cycleStartedAt": "2026-05-09T15:18:55Z",
+  "mode": "hybrid-haiku-gather-sonnet-synth",
   "perBatch": [
     {
-      "agentGaps": 35,
+      "agentGaps": 0,
       "batchId": "batch00-anthropic",
-      "fills": 78,
-      "gaps": 35,
-      "naCount": 6,
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
       "orchestratorGaps": 0,
-      "partialReason": {
-        "cellsAttempted": 42,
-        "cellsFilled": 3,
-        "code": "completeness",
-        "topBlockingSources": [
-          "https://livecodebench.github.io/leaderboard.html",
-          "https://gorilla.cs.berkeley.edu/leaderboard.html",
-          "https://artificialanalysis.ai/models/claude-opus-4-7"
-        ]
-      },
-      "toolCallCount": 38,
-      "wallclockSec": 620.9
+      "partialReason": null,
+      "toolCallCount": 17,
+      "wallclockSec": 102.3
     },
     {
-      "agentGaps": 56,
+      "agentGaps": 0,
       "batchId": "batch01-deepseek",
-      "fills": 36,
-      "gaps": 56,
-      "naCount": 4,
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
       "orchestratorGaps": 0,
       "partialReason": {
-        "cellsAttempted": 94,
-        "cellsFilled": 35,
-        "code": "completeness",
-        "topBlockingSources": [
-          "https://artificialanalysis.ai/leaderboards/models (spa_partial — no extractable text)",
-          "https://gorilla.cs.berkeley.edu/leaderboard.html (BFCL — data not available for these models in search)",
-          "tau2/nl2Repo/arcAgi2/tbHard/aaOmni/aaCoding/aaAgentic not evaluated for local/distill models"
-        ]
+        "code": "gather_mode_emit",
+        "rationale": "FAZ 4.C gather-stage simplified output: raw observations only, snapshot-first strategy. No trustScore computation, no winner selection, no N/A rule citation. Ready for skill analysis layer."
       },
-      "toolCallCount": 44,
-      "wallclockSec": 745.5
-    },
-    {
-      "agentGaps": 16,
-      "batchId": "batch02-google_deepm",
-      "fills": 122,
-      "gaps": 16,
-      "naCount": 8,
-      "orchestratorGaps": 0,
-      "partialReason": {
-        "cellsAttempted": 83,
-        "cellsFilled": 58,
-        "code": "completeness",
-        "topBlockingSources": [
-          "https://artificialanalysis.ai (spa_full - aaCoding/aaAgentic not extractable)",
-          "https://gorilla.cs.berkeley.edu/leaderboard.html (spa_full - bfcl not extractable)"
-        ]
-      },
-      "toolCallCount": 39,
-      "wallclockSec": 748.2
+      "toolCallCount": 20,
+      "wallclockSec": 109.7
     },
     {
       "agentGaps": 12,
-      "batchId": "batch03-google_deepm",
-      "fills": 52,
+      "batchId": "batch02-google_deepm",
+      "fills": 0,
       "gaps": 12,
-      "naCount": 30,
-      "orchestratorGaps": 0,
-      "partialReason": null,
-      "toolCallCount": 23,
-      "wallclockSec": 371.0
-    },
-    {
-      "agentGaps": 9,
-      "batchId": "batch04-meta",
-      "fills": 32,
-      "gaps": 9,
       "naCount": 0,
       "orchestratorGaps": 0,
       "partialReason": null,
-      "toolCallCount": 41,
-      "wallclockSec": 589.9
+      "toolCallCount": 35,
+      "wallclockSec": 146.1
     },
     {
-      "agentGaps": 9,
-      "batchId": "batch05-minimax",
-      "fills": 75,
-      "gaps": 9,
-      "naCount": 6,
+      "agentGaps": 0,
+      "batchId": "batch03-google_deepm",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
       "orchestratorGaps": 0,
       "partialReason": null,
-      "toolCallCount": 39,
-      "wallclockSec": 577.6
+      "toolCallCount": 16,
+      "wallclockSec": 90.8
     },
     {
-      "agentGaps": 15,
-      "batchId": "batch06-mistral_ai",
-      "fills": 115,
-      "gaps": 15,
-      "naCount": 10,
-      "orchestratorGaps": 0,
-      "partialReason": {
-        "cellsAttempted": 45,
-        "cellsFilled": 18,
-        "code": "completeness",
-        "topBlockingSources": [
-          "https://artificialanalysis.ai (spa_full — no static extraction possible)",
-          "https://livecodebench.github.io/leaderboard.html (spa_full)",
-          "https://mistral.ai/news (image_embedded — bot-blocked)"
-        ]
-      },
-      "toolCallCount": 34,
-      "wallclockSec": 640.5
-    },
-    {
-      "agentGaps": 40,
-      "batchId": "batch07-mistral_ai",
+      "agentGaps": 1,
+      "batchId": "batch04-meta",
       "fills": 52,
-      "gaps": 40,
+      "gaps": 1,
       "naCount": 4,
       "orchestratorGaps": 0,
       "partialReason": {
-        "cellsAttempted": 52,
-        "cellsFilled": 9,
+        "cellsAttempted": 50,
+        "cellsFilled": 11,
         "code": "completeness",
         "topBlockingSources": [
-          "https://livecodebench.github.io/leaderboard.html",
-          "https://artificialanalysis.ai/models/devstral-small-2",
-          "https://gorilla.cs.berkeley.edu/leaderboard.html"
+          "Scale SEAL (swePro missing for scout)",
+          "HF model card meta-llama/llama-4-scout (detailed bench table)"
         ]
       },
-      "toolCallCount": 24,
-      "wallclockSec": 417.4
+      "toolCallCount": 15,
+      "wallclockSec": 98.0
     },
     {
-      "agentGaps": 9,
-      "batchId": "batch08-moonshot_ai",
-      "fills": 26,
-      "gaps": 9,
-      "naCount": 1,
-      "orchestratorGaps": 0,
-      "partialReason": {
-        "cellsAttempted": 26,
-        "cellsFilled": 16,
-        "code": "completeness",
-        "topBlockingSources": [
-          "https://artificialanalysis.ai/models/kimi-k2-6",
-          "https://gorilla.cs.berkeley.edu/leaderboard.html"
-        ]
-      },
-      "toolCallCount": 31,
-      "wallclockSec": 499.7
-    },
-    {
-      "agentGaps": 13,
-      "batchId": "batch09-nvidia",
-      "fills": 26,
-      "gaps": 13,
-      "naCount": 2,
-      "orchestratorGaps": 0,
-      "partialReason": null,
-      "toolCallCount": 29,
-      "wallclockSec": 436.7
-    },
-    {
-      "agentGaps": 14,
-      "batchId": "batch10-openai",
-      "fills": 125,
-      "gaps": 14,
-      "naCount": 10,
-      "orchestratorGaps": 0,
-      "partialReason": {
-        "cellsAttempted": 56,
-        "cellsFilled": 42,
-        "code": "completeness",
-        "topBlockingSources": [
-          "https://artificialanalysis.ai/models/capabilities/coding",
-          "https://livecodebench.github.io/leaderboard.html",
-          "https://gorilla.cs.berkeley.edu/leaderboard.html"
-        ]
-      },
-      "toolCallCount": 32,
-      "wallclockSec": 592.8
-    },
-    {
-      "agentGaps": 31,
-      "batchId": "batch11-alibaba_qwen",
-      "fills": 120,
-      "gaps": 31,
-      "naCount": 10,
-      "orchestratorGaps": 0,
-      "partialReason": {
-        "cellsAttempted": 95,
-        "cellsFilled": 54,
-        "code": "completeness",
-        "topBlockingSources": [
-          "https://huggingface.co/Qwen/Qwen3.6-27B (dynamic SPA rendering, browseComp/mrcr not in static text)",
-          "https://artificialanalysis.ai (spa_full, blocked for direct fetch)",
-          "https://livecodebench.github.io/leaderboard.html (SPA, no static extraction)"
-        ]
-      },
-      "toolCallCount": 37,
-      "wallclockSec": 663.1
-    },
-    {
-      "agentGaps": 13,
-      "batchId": "batch12-alibaba_qwen",
-      "fills": 21,
-      "gaps": 13,
+      "agentGaps": 51,
+      "batchId": "batch05-minimax",
+      "fills": 0,
+      "gaps": 51,
       "naCount": 0,
       "orchestratorGaps": 0,
       "partialReason": null,
-      "toolCallCount": 41,
-      "wallclockSec": 603.8
+      "toolCallCount": 16,
+      "wallclockSec": 107.5
     },
     {
-      "agentGaps": 64,
-      "batchId": "batch13-alibaba_qwen",
-      "fills": 6,
-      "gaps": 64,
-      "naCount": 6,
+      "agentGaps": 0,
+      "batchId": "batch06-mistral_ai",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
       "orchestratorGaps": 0,
       "partialReason": null,
-      "toolCallCount": 28,
-      "wallclockSec": 651.8
+      "toolCallCount": 16,
+      "wallclockSec": 100.5
     },
     {
-      "agentGaps": 14,
+      "agentGaps": 2,
+      "batchId": "batch07-mistral_ai",
+      "fills": 0,
+      "gaps": 2,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 20,
+      "wallclockSec": 119.5
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch08-moonshot_ai",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 19,
+      "wallclockSec": 108.7
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch09-nvidia",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 16,
+      "wallclockSec": 89.4
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch10-openai",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": {
+        "code": "snapshot-processing-incomplete",
+        "nextSteps": "Full-cycle agent will run WebSearch phase to fill pricing (openrouter, official), benchmark scores from SPA aggregators (AA per-model pages, BenchLM), and vendor announcements",
+        "reason": "Large SPA snapshots (AA, Vellum, BenchLM) require text extraction post-processing. Scale SEAL snapshot not loaded in this batch due to size constraints. Raw observations from static snapshot pages (ProgramBench) extracted. Remaining cells require Phase 3 WebSearch."
+      },
+      "toolCallCount": 10,
+      "wallclockSec": 56.3
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch11-alibaba_qwen",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 12,
+      "wallclockSec": 54.0
+    },
+    {
+      "agentGaps": 5,
+      "batchId": "batch12-alibaba_qwen",
+      "fills": 120,
+      "gaps": 5,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": {
+        "cellsAttempted": 5,
+        "cellsFilled": 0,
+        "code": "gather-phase",
+        "topBlockingSources": [
+          "https://llm-stats.com/",
+          "https://artificialanalysis.ai/leaderboards/models",
+          "https://openrouter.ai/rankings"
+        ]
+      },
+      "toolCallCount": 15,
+      "wallclockSec": 73.7
+    },
+    {
+      "agentGaps": 26,
+      "batchId": "batch13-alibaba_qwen",
+      "fills": 0,
+      "gaps": 26,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 15,
+      "wallclockSec": 101.5
+    },
+    {
+      "agentGaps": 0,
       "batchId": "batch14-stepfun",
       "fills": 26,
-      "gaps": 14,
-      "naCount": 2,
+      "gaps": 0,
+      "naCount": 0,
       "orchestratorGaps": 0,
-      "partialReason": {
-        "cellsAttempted": 26,
-        "cellsFilled": 10,
-        "code": "completeness",
-        "topBlockingSources": [
-          "https://artificialanalysis.ai/models/step-3-5-flash",
-          "https://labs.scale.com/leaderboard/swe_bench_pro_public",
-          "https://gorilla.cs.berkeley.edu/leaderboard.html"
-        ]
-      },
-      "toolCallCount": 35,
-      "wallclockSec": 510.0
+      "partialReason": null,
+      "toolCallCount": 13,
+      "wallclockSec": 45.8
     },
     {
-      "agentGaps": 16,
+      "agentGaps": 0,
       "batchId": "batch15-xai",
-      "fills": 115,
-      "gaps": 16,
-      "naCount": 10,
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
       "orchestratorGaps": 0,
-      "partialReason": {
-        "cellsAttempted": 58,
-        "cellsFilled": 7,
-        "code": "completeness",
-        "topBlockingSources": [
-          "https://x.ai/news",
-          "https://artificialanalysis.ai/models/grok-4-3"
-        ]
-      },
-      "toolCallCount": 42,
-      "wallclockSec": 590.9
+      "partialReason": null,
+      "toolCallCount": 10,
+      "wallclockSec": 51.8
     },
     {
-      "agentGaps": 37,
+      "agentGaps": 15,
       "batchId": "batch16-xiaomi",
-      "fills": 34,
-      "gaps": 37,
-      "naCount": 6,
-      "orchestratorGaps": 0,
-      "partialReason": {
-        "cellsAttempted": 77,
-        "cellsFilled": 35,
-        "code": "completeness",
-        "topBlockingSources": [
-          "https://artificialanalysis.ai/ (spa_full — AA sub-scores inaccessible)",
-          "https://livecodebench.github.io/leaderboard.html (no MiMo entries found)",
-          "https://huggingface.co/XiaomiMiMo/MiMo-V2.5 (WebFetch blocked by context-mode)"
-        ]
-      },
-      "toolCallCount": 31,
-      "wallclockSec": 523.2
-    },
-    {
-      "agentGaps": 43,
-      "batchId": "batch17-z.ai_(zhipu_",
-      "fills": 9,
-      "gaps": 43,
+      "fills": 0,
+      "gaps": 15,
       "naCount": 0,
       "orchestratorGaps": 0,
       "partialReason": {
-        "cellsAttempted": 78,
-        "cellsFilled": 9,
-        "code": "completeness",
+        "cellsAttempted": 16,
+        "cellsFilled": 0,
+        "code": "research_quality_constraint",
         "topBlockingSources": [
-          "https://arxiv.org/pdf/2508.06471",
-          "https://artificialanalysis.ai/models/glm-4-5-air",
-          "https://artificialanalysis.ai/models/glm-4-7"
+          "https://huggingface.co/XiaomiMiMo (HF API context-mode blocked)",
+          "https://mimo.xiaomi.com (vendor blog not in snapshots)",
+          "https://artificialanalysis.ai/leaderboards/models (SPA snapshot, no extractable MiMo rows)"
         ]
       },
-      "toolCallCount": 42,
-      "wallclockSec": 713.0
+      "toolCallCount": 12,
+      "wallclockSec": 64.0
+    },
+    {
+      "agentGaps": 2,
+      "batchId": "batch17-z.ai_(zhipu_",
+      "fills": 75,
+      "gaps": 2,
+      "naCount": 37,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 9,
+      "wallclockSec": 72.5
     }
   ],
+  "synthStage": {
+    "contradictions": 2,
+    "modelsWithFills": 16,
+    "newModels": 3,
+    "toolCallCount": 23,
+    "totalFills": 141,
+    "wallclockSec": 247.9
+  },
   "totalBatches": 18,
   "totals": {
-    "agentGaps": 446,
-    "fills": 1070,
-    "gaps": 446,
-    "na": 115,
+    "agentGaps": 114,
+    "fills": 273,
+    "gaps": 114,
+    "na": 41,
     "orchestratorGaps": 0,
-    "toolCallSum": 630,
-    "wallclockSecMax": 748.2,
-    "wallclockSecP95": 748.2
+    "toolCallSum": 286,
+    "wallclockSecMax": 146.1,
+    "wallclockSecP95": 146.1
   },
-  "zeroFillBatches": []
+  "zeroFillBatches": [
+    "batch00-anthropic",
+    "batch01-deepseek",
+    "batch02-google_deepm",
+    "batch03-google_deepm",
+    "batch05-minimax",
+    "batch06-mistral_ai",
+    "batch07-mistral_ai",
+    "batch08-moonshot_ai",
+    "batch09-nvidia",
+    "batch10-openai",
+    "batch11-alibaba_qwen",
+    "batch13-alibaba_qwen",
+    "batch15-xai",
+    "batch16-xiaomi"
+  ]
 }
