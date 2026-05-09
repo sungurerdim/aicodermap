@@ -1,4 +1,80 @@
 
+## [2026-05-09] — autonomous refresh-all [WARN: very low cumulative provenance coverage 29.4%] [MX2: coverage 29.4% < absolute floor 30%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 423 new fills; 534 cells auto-gapped by orchestrator; 444 explicit agent gaps preserved]
+
+[fillRatio:0.29 cells:458/1560 contradictions:29 fetch:0.0min tools:None batches:None build:868107d]
+
+### Updated
+- 55 models: `opus-4-7`, `claude-haiku-4-5`, `deepseek-v3-2`, `deepseek-v4-flash`, `deepseek-v4-pro`, `deepseek-coder-v2-16b`, `deepseek-r1-14b`, `gemini-3-1-flash`, `gemini-3-1-pro`, `gemma-3-27b`, `gemma-4-26b-moe`, `gemma-4-31b`, `gemma-4-e2b`, `gemma-4-e4b`, `llama-4-maverick`, `llama-4-scout`, `minimax-m2-1`, `minimax-m2-5`, `minimax-m2-7`, `mistral-large-3`, `codestral-22b`, `devstral-2`, `devstral-medium`, `codestral`, `devstral-small-2`, `mistral-medium-3-5`, `kimi-k2-6`, `nemotron-3-super`, `gpt-4-1`, `gpt-5-4`, `o3`, `o4-mini`, `gpt-5-5`, `qwen-3-6-27b`, `qwen-3-6-max`, `qwen3-235b`, `qwen3-32b`, `qwen3-6-35b-moe`, `qwen3-6-plus`, `qwen3-coder-480b`, `qwen3-coder-next`, `qwen25-coder-32b`, `qwen25-coder-7b`, `qwen3-5-9b`, `step-3-5-flash`, `grok-3`, `grok-4-20`, `grok-4-3`, `grok-4-1-fast`, `mimo-v2-5`, `mimo-v2-5-pro`, `mimo-v2-flash`, `glm-5-1`, `glm-4-7`, `glm-4-5-air`
+
+### Resolved (auto via trustScore)
+- deepseek-v3-2.sweV: winner={'value': 73, 'trustScore': 0.78, 'sourceUrl': 'https://benchlm.ai/models/deepseek-v3-2', 'tier': 'I'} (severity=YELLOW, Δ3.0)
+- deepseek-coder-v2-16b.lcb: winner={'value': 24.3, 'trustScore': 0.63, 'sourceUrl': 'https://arxiv.org/html/2406.11931v1', 'tier': 'S'} (severity=RED, Δ19.1)
+- gemini-3-1-flash.lcb: winner={'value': 72, 'trustScore': 0.67, 'sourceUrl': 'https://benchlm.ai/coding', 'tier': 'I'} (severity=RED, Δ19.7)
+- gemma-4-26b-moe.gpqa: winner={'value': 82.3, 'trustScore': 0.62, 'sourceUrl': 'https://tech-insider.org/google-gemma-4-open-model-benchmarks-2026/', 'tier': 'C'} (severity=YELLOW, Δ3.1)
+- gemma-4-e2b.aime26: winner={'value': 37.5, 'trustScore': 0.4, 'sourceUrl': 'https://aurigait.com/blog/gemma-4-features-benchmarks-guide/', 'tier': 'C'} (severity=RED, Δ5.0)
+- gemma-4-e2b.ollamaSize: winner={'value': '7.2GB', 'trustScore': 0.67, 'sourceUrl': 'https://ollama.com/library/gemma4/tags', 'tier': 'I'} (severity=RED, ΔNone)
+- gemma-4-e4b.ollamaSize: winner={'value': '9.6GB', 'trustScore': 0.67, 'sourceUrl': 'https://ollama.com/library/gemma4/tags', 'tier': 'I'} (severity=RED, ΔNone)
+- llama-4-maverick.bench.gpqa: winner={'value': 69.8, 'trustScore': 0.62, 'sourceUrl': 'https://www.llama.com/models/llama-4/', 'tier': 'S'} (severity=RED, Δ17.8)
+- llama-4-maverick.bench.sweV: winner={'value': None, 'trustScore': 0.55, 'sourceUrl': 'https://llm-stats.com/benchmarks/swe-bench-verified', 'tier': 'I'} (severity=RED, Δ76.8)
+- llama-4-scout.bench.sweV: winner={'value': None, 'trustScore': 0.55, 'sourceUrl': 'https://llm-stats.com/benchmarks/swe-bench-verified', 'tier': 'I'} (severity=RED, Δ68)
+- minimax-m2-5.aime26: winner={'value': 86.3, 'trustScore': 0.27, 'sourceUrl': 'https://onyx.app/insights/best-llms-2026', 'tier': 'C'} (severity=RED, Δ41.3)
+- devstral-2.status: winner={'value': 'active', 'trustScore': 0.47, 'sourceUrl': 'https://openrouter.ai/mistralai/devstral-2512', 'tier': 'S'} (severity=GREEN, Δ0)
+- devstral-medium.context: winner={'value': 131072, 'trustScore': 0.47, 'sourceUrl': 'https://openrouter.ai/mistralai/devstral-medium', 'tier': 'S'} (severity=RED, Δ131072)
+- devstral-medium.sweV: winner={'value': 61.6, 'trustScore': 0.47, 'sourceUrl': 'https://mistral.ai/news/devstral-2507', 'tier': 'S'} (severity=YELLOW, Δ6.4)
+- kimi-k2-6.pricing.api.in: winner={'value': 0.75, 'trustScore': 0.9, 'sourceUrl': 'https://openrouter.ai/moonshotai/kimi-k2.6', 'tier': 'I'} (severity=GREEN, Δ0.0052)
+- nemotron-3-super.lcb: winner={'value': 78.7, 'trustScore': 0.55, 'sourceUrl': 'https://arxiv.org/html/2603.19220', 'tier': 'S'} (severity=GREEN, Δ2.5)
+- nemotron-3-super.aime26: winner={'value': 89.8, 'trustScore': 0.55, 'sourceUrl': 'https://arxiv.org/html/2603.19220', 'tier': 'S'} (severity=GREEN, Δ0.41)
+- nemotron-3-super.pricing.api.in: winner={'value': 0.1, 'trustScore': 0.83, 'sourceUrl': 'https://deepinfra.com/blog/nvidia-nemotron-api-pricing-guide-2026', 'tier': 'S'} (severity=GREEN, Δ0.1)
+- gpt-5-5.sweV: winner={'value': 82.6, 'trustScore': 0.85, 'sourceUrl': 'https://www.vals.ai/benchmarks/swebench', 'tier': 'I'} (severity=RED, Δ6.1)
+- gpt-5-4.context: winner={'value': 1048576, 'trustScore': 0.87, 'sourceUrl': 'https://openrouter.ai/openai/gpt-5.4', 'tier': 'I'} (severity=RED, Δ776576)
+- gpt-5-4.pricing.api.in: winner={'value': 2.5, 'trustScore': 0.87, 'sourceUrl': 'https://openrouter.ai/openai/gpt-5.4', 'tier': 'I'} (severity=YELLOW, Δ1.25)
+- qwen-3-6-max.pricing.api.in: winner={'value': 1.04, 'trustScore': 0.67, 'sourceUrl': 'https://openrouter.ai/qwen/qwen3.6-max-preview', 'tier': 'I'} (severity=GREEN, Δ0.78)
+- qwen3-6-35b-moe.mcpA: winner={'value': 37.0, 'trustScore': 0.47, 'sourceUrl': 'https://qwen.ai/blog?id=qwen3.6-35b-a3b', 'tier': 'S'} (severity=RED, Δ25.8)
+- qwen3-coder-30b.sweV: winner={'value': 51.6, 'trustScore': 0.93, 'sourceUrl': 'https://artificialanalysis.ai/models/qwen3-coder-30b-a3b-instruct', 'tier': 'I'} (severity=RED, Δ18.0)
+- step-3-5-flash.gpqa: winner={'value': 83.5, 'trustScore': 0.75, 'sourceUrl': 'https://huggingface.co/stepfun-ai/Step-3.5-Flash', 'tier': 'S'} (severity=GREEN, Δ0.9)
+- grok-4-20.pricing.api.in: winner={'value': 2.0, 'trustScore': 0.7, 'sourceUrl': 'https://docs.x.ai/developers/models', 'tier': 'S'} (severity=GREEN, Δ0.75)
+- mimo-v2-flash.hle: winner={'value': 22.1, 'trustScore': 0.62, 'sourceUrl': 'https://arxiv.org/html/2601.02780v2', 'tier': 'S'} (severity=RED, Δ14.1)
+- mimo-v2-5-pro.hle: winner={'value': 48, 'trustScore': 0.44, 'sourceUrl': 'https://mimo.xiaomi.com/mimo-v2-5-pro/', 'tier': 'S'} (severity=RED, Δ14.2)
+- glm-4-7.pricing.api.in: winner={'value': 0.38, 'trustScore': 0.85, 'sourceUrl': 'https://openrouter.ai/z-ai/glm-4.7', 'tier': 'I'} (severity=GREEN, Δ0.22)
+
+### Gaps (966 entries — agent:432 orchestrator:534 — see data/known-gaps.json or next refresh)
+- `opus-4-7.lcb` *(agent)*: No LiveCodeBench pass@1 score found for Claude Opus 4.7; not in April 2026 release materials
+- `opus-4-7.tbHard` *(agent)*: Terminal-Bench Hard sub-score not separately published for Opus 4.7; only TB2 aggregate reported
+- `opus-4-7.cfElo` *(agent)*: Codeforces ELO not reported for Claude Opus 4.7; LCB Pro SPA format blocks direct fetch
+- `opus-4-7.aime26` *(agent)*: AIME 2026 score not publicly reported for Claude Opus 4.7; Anthropic launch focused on coding/agentic benches
+- `opus-4-7.bfcl` *(agent)*: BFCL score not found for Claude Opus 4.7; BFCL site is SPA with no static data
+- `opus-4-7.simpleQa` *(agent)*: SimpleQA score not found for Claude Opus 4.7 in any source
+- `codestral.aaAgentic` *(orchestrator)*: not reached in agent survey cycle; AA Agentic data unavailable
+- `codestral.aaCoding` *(orchestrator)*: not reached in agent survey cycle; AA Coding data unavailable
+- ... and 958 more
+
+
+## [2026-05-08] — autonomous refresh-all [WARN: very low cumulative provenance coverage 27.3%] [MX2: coverage 27.3% < absolute floor 30%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 51 new fills; 969 cells auto-gapped by orchestrator; 81 explicit agent gaps preserved]
+
+[fillRatio:0.27 cells:426/1560 contradictions:8 fetch:0.0min tools:None batches:None build:868107d]
+
+### Resolved (auto via trustScore)
+- gpt-5-5.hle: winner={'value': 41.4, 'trustScore': 0.7, 'sourceUrl': 'https://openai.com/index/introducing-gpt-5-5/', 'tier': 'S'} (severity=RED, Δ10.8)
+- sonnet-4-6.tau2: winner={'value': 87.5, 'trustScore': 0.67, 'sourceUrl': 'https://benchlm.ai/models/sonnet-4-6', 'tier': 'I'} (severity=RED, Δ7.3)
+- deepseek-v3-2.sweV: winner={'value': 67.8, 'trustScore': 0.7, 'sourceUrl': 'https://github.com/deepseek-ai/DeepSeek-V3.2-Exp', 'tier': 'S'} (severity=GREEN, Δ2.2)
+- deepseek-v3-2.lcb: winner={'value': 74.1, 'trustScore': 0.7, 'sourceUrl': 'https://github.com/deepseek-ai/DeepSeek-V3.2-Exp', 'tier': 'S'} (severity=RED, Δ9.2)
+- deepseek-v3-2.gpqa: winner={'value': 79.9, 'trustScore': 0.7, 'sourceUrl': 'https://github.com/deepseek-ai/DeepSeek-V3.2-Exp', 'tier': 'S'} (severity=GREEN, Δ2.5)
+- deepseek-v3-2.hle: winner={'value': 19.8, 'trustScore': 0.7, 'sourceUrl': 'https://github.com/deepseek-ai/DeepSeek-V3.2-Exp', 'tier': 'S'} (severity=RED, Δ21.0)
+- kimi-k2-6.tb2: winner={'value': 66.7, 'trustScore': 0.7, 'sourceUrl': 'https://platform.moonshot.cn/docs', 'tier': 'S'} (severity=RED, Δ13.5)
+- minimax-m2-5.swePro: winner={'value': 55.4, 'trustScore': 0.7, 'sourceUrl': 'https://platform.minimaxi.com/document', 'tier': 'S'} (severity=RED, Δ18.59)
+
+### Gaps (1021 entries — agent:52 orchestrator:969 — see data/known-gaps.json or next refresh)
+- `gpt-5-5.nl2Repo` *(agent)*: Scale SEAL NL2Repo leaderboard SPA — model not found in search snippets
+- `opus-4-7.nl2Repo` *(agent)*: Scale SEAL NL2Repo leaderboard SPA — model not found in search snippets
+- `sonnet-4-6.nl2Repo` *(agent)*: Scale SEAL NL2Repo leaderboard SPA — model not found in search snippets
+- `claude-haiku-4-5.nl2Repo` *(agent)*: Scale SEAL NL2Repo leaderboard SPA — model not found in search snippets
+- `grok-4-20.nl2Repo` *(agent)*: Scale SEAL NL2Repo leaderboard SPA — model not found in search snippets
+- `grok-4-3.nl2Repo` *(agent)*: Scale SEAL NL2Repo leaderboard SPA — model not found in search snippets
+- `claude-haiku-4-5.aaAgentic` *(orchestrator)*: not reached in agent survey cycle; AA Agentic data unavailable
+- `claude-haiku-4-5.aaCoding` *(orchestrator)*: not reached in agent survey cycle; AA Coding data unavailable
+- ... and 1013 more
+
+
 ## [2026-05-08] — autonomous refresh-all [WARN: very low cumulative provenance coverage 27.3%] [MX2: coverage 27.3% < absolute floor 30%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 51 new fills; 969 cells auto-gapped by orchestrator; 81 explicit agent gaps preserved]
 
 [fillRatio:0.27 cells:426/1560 contradictions:8 fetch:0.0min tools:None batches:None build:c512eaa]
