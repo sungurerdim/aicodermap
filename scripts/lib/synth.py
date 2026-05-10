@@ -88,11 +88,39 @@ def _load_gather_artifacts(root: Path) -> list[tuple[str, dict[str, Any]]]:
     return out
 
 
+def _load_unhealthy_urls(root: Path) -> set[str]:
+    """FAZ 6.A (2026-05-10): observations citing URLs marked unhealthy in
+    data/sources-whitelist.json._runtime.unhealthy MUST be dropped before
+    trustScore math runs. The cycle 2026-05-09 fabricated 26 tb2 values
+    from https://tbench.ai/leaderboard (a SPA shell with empty snapshot)
+    and the I-tier override promoted them over multi-source consensus.
+    """
+    wl_path = root / "data" / "sources-whitelist.json"
+    try:
+        wl = json.loads(wl_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return set()
+    runtime = wl.get("_runtime") or {}
+    unhealthy = runtime.get("unhealthy") or {}
+    return {
+        (u or "").strip().rstrip("/").lower() for u, flag in unhealthy.items() if flag
+    }
+
+
 def _aggregate_observations(
     artifacts: list[tuple[str, dict[str, Any]]],
+    unhealthy_urls: set[str] | None = None,
 ) -> dict[tuple[str, str], list[dict[str, Any]]]:
-    """Group all observations by (modelId, benchKey) cell."""
+    """Group all observations by (modelId, benchKey) cell.
+
+    FAZ 6.A (2026-05-10): observations citing URLs in `unhealthy_urls`
+    (sourced from sources-whitelist.json `_runtime.unhealthy`) are dropped
+    BEFORE trustScore math. This kills the SPA-shell fabrication class
+    without relying on consensus heuristics downstream.
+    """
+    skip_urls = unhealthy_urls or set()
     cells: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+    rejected_count = 0
     for _path, art in artifacts:
         for obs in art.get("observations") or []:
             if not isinstance(obs, dict):
@@ -101,9 +129,16 @@ def _aggregate_observations(
             bk = obs.get("benchKey")
             if not (isinstance(mid, str) and isinstance(bk, str)):
                 continue
+            url_value = obs.get("value")
+            if url_value is None:
+                continue
             try:
-                value = float(obs.get("value"))
+                value = float(url_value)
             except (TypeError, ValueError):
+                continue
+            url = (obs.get("sourceUrl") or "").strip().rstrip("/").lower()
+            if url and url in skip_urls:
+                rejected_count += 1
                 continue
             cells[(mid, bk)].append(
                 {
@@ -113,6 +148,11 @@ def _aggregate_observations(
                     "fetched": obs.get("fetched") or "",
                 }
             )
+    if rejected_count:
+        print(
+            f"⚠ FAZ 6.A SPA guard: dropped {rejected_count} observations citing "
+            f"unhealthy URLs ({sorted(skip_urls)})"
+        )
     return cells
 
 
@@ -397,10 +437,12 @@ def synth(
     agreement_pp: float = DEFAULT_AGREEMENT_PP,
     warn_pp: float = DEFAULT_WARN_PP,
     block_pp: float = DEFAULT_BLOCK_PP,
+    unhealthy_urls: set[str] | None = None,
 ) -> dict[str, Any]:
     """Run the full synthesis pipeline. Returns OUTPUT_SCHEMA artifact dict."""
-    # Aggregate all observation cells.
-    cells = _aggregate_observations(artifacts)
+    # Aggregate all observation cells. FAZ 6.A — drop SPA-shell citations
+    # before trustScore math runs.
+    cells = _aggregate_observations(artifacts, unhealthy_urls=unhealthy_urls)
 
     # Walk each cell: pick winner, detect contradiction.
     models_by_id: dict[str, dict[str, Any]] = defaultdict(
@@ -627,7 +669,16 @@ def main() -> int:
     }
 
     today = datetime.date.today()
-    artifact = synth(artifacts, canonical_bench, canonical_na, today)
+    unhealthy_urls = _load_unhealthy_urls(ROOT)
+    if unhealthy_urls:
+        print(f"FAZ 6.A SPA guard active: {len(unhealthy_urls)} unhealthy URL(s)")
+    artifact = synth(
+        artifacts,
+        canonical_bench,
+        canonical_na,
+        today,
+        unhealthy_urls=unhealthy_urls,
+    )
 
     out_path = ROOT / ".aicodermap-agent-out-synth.json"
     out_path.write_text(

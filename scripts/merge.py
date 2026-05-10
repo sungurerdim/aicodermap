@@ -220,6 +220,34 @@ def build_whitelist_index():
     return idx
 
 
+def load_unhealthy_urls():
+    """FAZ 6.A (2026-05-10): URL set that the SPA-shell guard rejects.
+    Sourced from data/sources-whitelist.json `_runtime.unhealthy`. Any
+    sourcesAdded entry or contradiction candidate citing one of these URLs
+    is dropped before bench values mutate. The cycle 2026-05-09 fabricated
+    26 tb2 values from https://tbench.ai/leaderboard (an empty SPA shell);
+    this guard prevents the same class of regression at the merge layer.
+    """
+    try:
+        with open(WHITELIST, encoding="utf-8") as fp:
+            wl = json.load(fp)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return set()
+    runtime = wl.get("_runtime") or {}
+    unhealthy = runtime.get("unhealthy") or {}
+    return {
+        (u or "").strip().rstrip("/").lower() for u, flag in unhealthy.items() if flag
+    }
+
+
+def _is_unhealthy_source(entry, unhealthy_urls):
+    """True when `entry.url` matches the SPA-shell unhealthy set (after norm)."""
+    if not unhealthy_urls:
+        return False
+    url = (entry.get("url") or "").strip().rstrip("/").lower()
+    return bool(url) and url in unhealthy_urls
+
+
 def format_consistency_warn(source_entry, wl_idx):
     """Log non-blocking warning when a sourcesAdded entry's URL hostname is
     classified as a 'skip primary' format (spa_full / bot_blocked /
@@ -455,6 +483,7 @@ def main():
         sources = json.load(fp)
 
     wl_idx = build_whitelist_index()
+    unhealthy_urls = load_unhealthy_urls()
 
     log = {
         "updated": [],
@@ -466,7 +495,10 @@ def main():
         "format_warnings": [],
         "gaps": [],
         "fabricated_suspicions": fabricated_suspicions,
+        "spa_guard_rejections": 0,
     }
+    if unhealthy_urls:
+        print(f"FAZ 6.A SPA guard active: {len(unhealthy_urls)} unhealthy URL(s)")
 
     for upd in out.get("models", []):
         mid = upd["id"]
@@ -494,6 +526,12 @@ def main():
                 if bk in bench and bench.get(bk) is not None:
                     bench[bk] = None
         for s in upd.get("sourcesAdded", []) or []:
+            if _is_unhealthy_source(s, unhealthy_urls):
+                log["spa_guard_rejections"] += 1
+                log["format_warnings"].append(
+                    f"{mid}: SPA-guard reject {s.get('key')} url={s.get('url')}"
+                )
+                continue
             warn = format_consistency_warn(s, wl_idx)
             if warn:
                 log["format_warnings"].append(f"{mid}: {warn}")
@@ -527,6 +565,37 @@ def main():
         winner = c.get("autoResolveWinner")
         if winner is None:
             continue
+        # FAZ 6.A: if the autoresolve winner cites an unhealthy URL, recompute
+        # winner from remaining candidates. The cycle 2026-05-09 had I-tier
+        # SPA-shell winners override multi-source consensus; without this
+        # fallback, the contradiction codepath could re-introduce the bug
+        # even after observations are filtered upstream.
+        all_candidates = c.get("candidates") or []
+        if _is_unhealthy_source(winner, unhealthy_urls):
+            log["spa_guard_rejections"] += 1
+            healthy = [
+                cand
+                for cand in all_candidates
+                if not _is_unhealthy_source(cand, unhealthy_urls)
+                and cand.get("value") is not None
+            ]
+            if not healthy:
+                log["format_warnings"].append(
+                    f"{mid}.{bench_field}: SPA-guard dropped winner; no healthy candidate — skipping"
+                )
+                continue
+            tier_rank = {"I": 3, "S": 2, "C": 1, "U": 0}
+            winner = max(
+                healthy,
+                key=lambda x: (
+                    float(x.get("trustScore") or 0),
+                    tier_rank.get(x.get("tier") or "", 0),
+                    str(x.get("fetched") or x.get("date") or ""),
+                ),
+            )
+            log["format_warnings"].append(
+                f"{mid}.{bench_field}: SPA-guard reassigned winner to {winner.get('source', '?')[:30]} (was unhealthy)"
+            )
         winner_value = winner["value"]
         m = find(models, mid)
         if m is not None and bench_field in BENCH_KEYS:
@@ -540,7 +609,12 @@ def main():
             if prev_value != winner_value:
                 m["lastUpdated"] = NOW
         key = f"{mid}.{bench_field}"
-        for cand in c.get("candidates", []) or []:
+        for cand in all_candidates:
+            if _is_unhealthy_source(cand, unhealthy_urls):
+                # Drop unhealthy candidates entirely from provenance — keeps
+                # sources.json from re-accumulating SPA-shell entries.
+                log["spa_guard_rejections"] += 1
+                continue
             append_source(
                 sources,
                 key,

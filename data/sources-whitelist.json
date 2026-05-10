@@ -19,8 +19,8 @@
       "imageOCRPatterns": "Vendor-only regex strings; URL match triggers scripts/extract-images.py.",
       "format_lastVerified": "ISO date format last confirmed.",
       "lastVerifiedDate": "ISO date URL last verified reachable.",
-      "consecutiveFailures": "Integer; \u22653 \u2192 auto-demote to spa_full + _runtime.unhealthy.",
-      "publishes": "Array of bench keys this leaderboard publishes. Two shapes accepted (P10.4 reform): legacy string list ['swePro','sweV',...] OR object list [{key:'swePro',priority:'primary'},...]. Priority drives Phase 3 cascade order (primary \u2192 secondary \u2192 tertiary \u2192 WebSearch fallback). scripts/lib/whitelist.py normalizes both shapes."
+      "consecutiveFailures": "Integer; ≥3 → auto-demote to spa_full + _runtime.unhealthy.",
+      "publishes": "Array of bench keys this leaderboard publishes. Two shapes accepted (P10.4 reform): legacy string list ['swePro','sweV',...] OR object list [{key:'swePro',priority:'primary'},...]. Priority drives Phase 3 cascade order (primary → secondary → tertiary → WebSearch fallback). scripts/lib/whitelist.py normalizes both shapes."
     },
     "coreBenchKeys": [
       "sweV",
@@ -83,7 +83,7 @@
       }
     ],
     "_benchKeyNotes": "cfElo stores RAW Codeforces ELO (range 0-3500); webDevElo stores RAW LMArena WebDev Arena Elo (range 950-1300 typical, allowed up to 1500); every other bench key stores 0-100 percentage. compositeScore() in assets/js/data.js normalizes cfElo and webDevElo via core.js normalizeBenchScore() (linear map to 0-100) before weighting. audit-data-coherence.py allows cfElo cells in [0, 3500] and webDevElo cells in [0, 1500].",
-    "benchKeysUsage": "Universe of bench keys = coreBenchKeys \u222a leaderboards[].publishes[]. New leaderboards extending publishes[] auto-extend the universe. Frontend BENCH_KEYS in assets/js/core.js mirrors coreBenchKeys; if you add a new core key here, add it to assets/js/core.js too. NOTE 2026-04-29: dropped `aider` (Aider Polyglot leaderboard frozen 2025-08; no Opus 4.7 / Gemini 3.1 Pro / GPT-5.5 entries). Renamed `lcbV6` \u2192 `lcb` (rolling LiveCodeBench leaderboard supersedes pinned v6). Added: `tbHard`, `cfElo`, `mmluPro`, `simpleQa`, `mrcr`, `arcAgi2`, `browseComp` \u2014 all with strong 2026 vendor adoption.",
+    "benchKeysUsage": "Universe of bench keys = coreBenchKeys ∪ leaderboards[].publishes[]. New leaderboards extending publishes[] auto-extend the universe. Frontend BENCH_KEYS in assets/js/core.js mirrors coreBenchKeys; if you add a new core key here, add it to assets/js/core.js too. NOTE 2026-04-29: dropped `aider` (Aider Polyglot leaderboard frozen 2025-08; no Opus 4.7 / Gemini 3.1 Pro / GPT-5.5 entries). Renamed `lcbV6` → `lcb` (rolling LiveCodeBench leaderboard supersedes pinned v6). Added: `tbHard`, `cfElo`, `mmluPro`, `simpleQa`, `mrcr`, `arcAgi2`, `browseComp` — all with strong 2026 vendor adoption.",
     "formatTaxonomy": {
       "static_html_table": {
         "description": "HTML page with <table> rows + scores",
@@ -215,7 +215,7 @@
         ]
       },
       "meta_tag_extract": {
-        "description": "SEO meta + JSON-LD scores (top-3 typically) \u2014 fetches the SPA URL but extracts only static head content",
+        "description": "SEO meta + JSON-LD scores (top-3 typically) — fetches the SPA URL but extracts only static head content",
         "primaryTool": "WebFetch",
         "extractor": "regex_extract",
         "extractorPatterns": [
@@ -289,7 +289,7 @@
     },
     "extractors": {
       "html_table": {
-        "description": "DOM/markdown table grep \u2014 three-pass discipline",
+        "description": "DOM/markdown table grep — three-pass discipline",
         "passes": [
           "TABLE_BOUNDARY",
           "ROW_SPLIT",
@@ -298,7 +298,7 @@
         "cleanupBeforeExtract": true
       },
       "regex_extract": {
-        "description": "Bench-alias-table run over plain text (cleanup \u2192 patterns)",
+        "description": "Bench-alias-table run over plain text (cleanup → patterns)",
         "passes": [
           "CLEANUP",
           "PATTERN_LOOP"
@@ -343,7 +343,7 @@
         "<aside[^>]{0,200}>[\\s\\S]{0,100000}?</aside>",
         "<!--[\\s\\S]{0,10000}?-->"
       ],
-      "_localeDecimalRule": "If captured number contains both '.' and ',': last occurrence is decimal, other is thousands (strip). Only ',': /^\\d{1,3},\\d{3}(,\\d{3})*$/ \u2192 thousands form (strip); else decimal (replace ',' with '.'). Handles 87.6, 87,6, 1,234.56, 1.234,56, 1 234,56.",
+      "_localeDecimalRule": "If captured number contains both '.' and ',': last occurrence is decimal, other is thousands (strip). Only ',': /^\\d{1,3},\\d{3}(,\\d{3})*$/ → thousands form (strip); else decimal (replace ',' with '.'). Handles 87.6, 87,6, 1,234.56, 1.234,56, 1 234,56.",
       "classes": {
         "DASH_CLASS": {
           "regex": "[\\-\\u2010\\u2011\\u2012\\u2013\\u2014\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]",
@@ -352,7 +352,7 @@
         },
         "WHITESPACE_CLASS": {
           "regex": "[\\s\\u00A0\\u2009\\u202F\\u2007]",
-          "description": "Whitespace incl NBSP, thin-space, narrow-no-break-space, figure-space \u2014 BIPM thousands separator coverage",
+          "description": "Whitespace incl NBSP, thin-space, narrow-no-break-space, figure-space — BIPM thousands separator coverage",
           "version": "v1"
         },
         "EMPTY_PLACEHOLDER": {
@@ -395,7 +395,7 @@
         "bench_score_uncertainty": {
           "regex": "(?<value>\\d{1,3}(?:\\.\\d{1,3})?)\\s*[\\u00B1]\\s*(?<sigma>\\d{1,3}(?:\\.\\d{1,3})?)",
           "flags": "",
-          "description": "'87.6 \u00b1 0.3' or '87.6\u00b10.3'. Symmetric uncertainty; primary value isolated, sigma captured.",
+          "description": "'87.6 ± 0.3' or '87.6±0.3'. Symmetric uncertainty; primary value isolated, sigma captured.",
           "captures": [
             "value",
             "sigma"
@@ -405,7 +405,7 @@
         "bench_score_range": {
           "regex": "(?<min>\\d{1,3}(?:\\.\\d{1,3})?)\\s*[\\u2013\\u2014\\u2015\\-]\\s*(?<max>\\d{1,3}(?:\\.\\d{1,3})?)",
           "flags": "",
-          "description": "'85-90' \u2192 max captured; agent picks max for ranges, logs delta to gaps[].",
+          "description": "'85-90' → max captured; agent picks max for ranges, logs delta to gaps[].",
           "captures": [
             "min",
             "max"
@@ -415,7 +415,7 @@
         "bench_score_qualified": {
           "regex": "(?:up[\\s\\-]?to|max(?:imum)?|peak)\\s+(?<value>\\d{1,3}(?:\\.\\d{1,3})?)\\s*%?",
           "flags": "i",
-          "description": "'up to 87%' / 'max 87%'. Qualifier flags trustScore \u00d7 0.8 (less reliable).",
+          "description": "'up to 87%' / 'max 87%'. Qualifier flags trustScore × 0.8 (less reliable).",
           "captures": [
             "value"
           ],
@@ -424,7 +424,7 @@
         "bench_score_normalized_0_1": {
           "regex": "\\b0\\.(?<frac>\\d{2,4})\\b",
           "flags": "",
-          "description": "'0.876' \u2192 multiply \u00d7100. Only when bench typically reports 0-100 per benchSchema hint; guard against confidence-interval false positives.",
+          "description": "'0.876' → multiply ×100. Only when bench typically reports 0-100 per benchSchema hint; guard against confidence-interval false positives.",
           "captures": [
             "frac"
           ],
@@ -433,7 +433,7 @@
         "bench_score_footnote_strip": {
           "regex": "(?<value>\\d{1,3}(?:\\.\\d{1,3})?)\\s*[\\*\\u2020\\u2021\\u00A7\\u00B6]?\\s*(?:\\[\\d{1,3}\\])?",
           "flags": "",
-          "description": "'87.6*', '87.6\u2020', '87.6 [3]' \u2014 footnote markers ignored after capture.",
+          "description": "'87.6*', '87.6†', '87.6 [3]' — footnote markers ignored after capture.",
           "captures": [
             "value"
           ],
@@ -490,7 +490,7 @@
         "next_image_proxy_url": {
           "regex": "_next\\/image\\?url=(?<encoded>[^&\"'\\s]{1,500})",
           "flags": "",
-          "description": "Next.js _next/image proxy URL \u2014 URL-decode in post-process.",
+          "description": "Next.js _next/image proxy URL — URL-decode in post-process.",
           "captures": [
             "encoded"
           ],
@@ -506,7 +506,7 @@
         "meta_description_score": {
           "regex": "<meta\\s+name=[\"']description[\"']\\s+content=[\"'](?<content>[^\"']{1,2000})[\"']",
           "flags": "i",
-          "description": "<meta name=description content=...> \u2014 then run bench_score_labeled over content. Catches SPA top-N scores in head.",
+          "description": "<meta name=description content=...> — then run bench_score_labeled over content. Catches SPA top-N scores in head.",
           "captures": [
             "content"
           ],
@@ -515,7 +515,7 @@
         "jsonld_score_field": {
           "regex": "<script\\s+type=[\"']application\\/ld\\+json[\"'][^>]{0,200}>(?<json>[^<]{1,10000})</script>",
           "flags": "i",
-          "description": "<script type=application/ld+json>...</script> \u2014 JSON-parse and walk for aggregateRating, score, value, mainEntity.score numeric fields.",
+          "description": "<script type=application/ld+json>...</script> — JSON-parse and walk for aggregateRating, score, value, mainEntity.score numeric fields.",
           "captures": [
             "json"
           ],
@@ -524,7 +524,7 @@
       }
     },
     "perModelExpansion": {
-      "description": "Cascade discovery: when leaderboard aggregate has sparse cells for a model, agent attempts perModelUrlTemplate using slugVariations against model.id. Each {id} in a variation is replaced with the model.id. {family} = model.id with version suffix stripped (e.g., grok-3-mini \u2192 grok). {N} = numeric major version. {YYMMDD} = released-date condensed. {variant} = vendor-specific subfamily token (pro/flash/lite).",
+      "description": "Cascade discovery: when leaderboard aggregate has sparse cells for a model, agent attempts perModelUrlTemplate using slugVariations against model.id. Each {id} in a variation is replaced with the model.id. {family} = model.id with version suffix stripped (e.g., grok-3-mini → grok). {N} = numeric major version. {YYMMDD} = released-date condensed. {variant} = vendor-specific subfamily token (pro/flash/lite).",
       "fields": {
         "perModelUrlTemplate": "URL with {slug} placeholder for per-model page",
         "perModelFormat": "Format key for per-model page (may differ from leaderboard format)",
@@ -535,9 +535,9 @@
       },
       "cascadeOrder": [
         "1. leaderboard aggregate (existing url)",
-        "2. perModelUrlTemplate \u00d7 slugVariations (NEW; for entries that have one)",
-        "3. vendor modelCardUrlTemplate \u00d7 modelCardSlugVariations (NEW)",
-        "4. vendor postUrlPattern \u00d7 postSlugVariations (NEW)",
+        "2. perModelUrlTemplate × slugVariations (NEW; for entries that have one)",
+        "3. vendor modelCardUrlTemplate × modelCardSlugVariations (NEW)",
+        "4. vendor postUrlPattern × postSlugVariations (NEW)",
         "5. WebSearch with site:<domain> \"<modelName>\" \"<benchKey>\" 2026 (existing)"
       ]
     },
@@ -564,7 +564,7 @@
       "_purpose": "Tier/capability based rules that mark a (model, benchKey) cell as naturally not-applicable so it does not count against the matrix invariant. Agent emits cells under these rules into models[].notApplicable[]; orchestrator reconciles.",
       "_schema": {
         "rule": "<rule name>",
-        "appliesTo": "<criteria \u2014 matched against model entry>",
+        "appliesTo": "<criteria — matched against model entry>",
         "excludeBenchKeys": "<list of bench keys naturally undefined>"
       },
       "rules": [
@@ -597,7 +597,7 @@
         {
           "rule": "spa-blocked-bench-without-alt",
           "appliesTo": {
-            "_purpose": "When the canonical publisher is SPA-blocked AND no alt publisher exists, the bench is unfillable for any model \u2014 agent records cells under notApplicable[] citing this rule.",
+            "_purpose": "When the canonical publisher is SPA-blocked AND no alt publisher exists, the bench is unfillable for any model — agent records cells under notApplicable[] citing this rule.",
             "leaderboardFormat": [
               "spa_full"
             ],
@@ -612,11 +612,11 @@
         },
         {
           "rule": "legacy-bench-superseded",
-          "description": "Bench deprecated by vendor in favor of newer eval (e.g. mmluPro \u2192 MMLU-Redux). Re-attempted each cycle; replaced if vendor publishes refresh."
+          "description": "Bench deprecated by vendor in favor of newer eval (e.g. mmluPro → MMLU-Redux). Re-attempted each cycle; replaced if vendor publishes refresh."
         },
         {
           "rule": "closed-weight-no-local-runtime",
-          "description": "Proprietary model has no Ollama/Unsloth equivalent \u2014 vramRequirement, ollamaSize, unslothVariants N/A."
+          "description": "Proprietary model has no Ollama/Unsloth equivalent — vramRequirement, ollamaSize, unslothVariants N/A."
         },
         {
           "rule": "compute-only-public-no-elo",
@@ -633,7 +633,7 @@
       ]
     },
     "benchAliases": {
-      "_purpose": "Canonical bench-key \u2194 human-name mapping. Agent extraction maps scraped names back to canonical keys via this table \u2014 replaces the hardcoded EXTRACTION_DISCIPLINE row 5 table.",
+      "_purpose": "Canonical bench-key ↔ human-name mapping. Agent extraction maps scraped names back to canonical keys via this table — replaces the hardcoded EXTRACTION_DISCIPLINE row 5 table.",
       "swePro": [
         "SWE-bench Pro",
         "SEAL Pro",
@@ -758,10 +758,10 @@
     },
     "deprecatedBenchKeys": [],
     "huggingfaceExtraction": {
-      "_purpose": "HF model card README scraping protocol \u2014 Phase 2 PER_MODEL_URL_EXPANSION priority chain",
+      "_purpose": "HF model card README scraping protocol — Phase 2 PER_MODEL_URL_EXPANSION priority chain",
       "fetchOrder": [
-        "1. hfApi: GET /api/models/{org}/{slug} \u2192 JSON: {modelId, lastModified, downloads, likes, tags, library_name}",
-        "2. hfReadme: GET /<org>/<slug>/raw/main/README.md \u2192 markdown \u2192 bench table extraction",
+        "1. hfApi: GET /api/models/{org}/{slug} → JSON: {modelId, lastModified, downloads, likes, tags, library_name}",
+        "2. hfReadme: GET /<org>/<slug>/raw/main/README.md → markdown → bench table extraction",
         "3. hfModelCard: HTML fallback if README absent or empty"
       ],
       "benchTablePatterns": [
@@ -772,7 +772,7 @@
         "\\|\\s*(?P<bench>MMLU[\\s\\w]*)\\s*\\|",
         "\\|\\s*(?P<bench>HLE)\\s*\\|",
         "\\|\\s*(?P<bench>BFCL[\\s\\w]*)\\s*\\|",
-        "\\|\\s*(?P<bench>\u03c4[-\\s_]?bench|tau[-\\s_]?bench)\\s*\\|"
+        "\\|\\s*(?P<bench>τ[-\\s_]?bench|tau[-\\s_]?bench)\\s*\\|"
       ],
       "tier": "S",
       "trustScoreFloor": 0.55,
@@ -1240,23 +1240,22 @@
       "tier": "I",
       "authority": "TB2 agentic execution",
       "phase": "leaderboard",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
-      "consecutiveFailures": 0,
-      "extractor": "html_table",
+      "format": "spa_full",
+      "skipWebFetch": true,
+      "lastVerifiedDate": "2026-05-10",
+      "consecutiveFailures": 3,
+      "extractor": "websearch_snippet",
       "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
         {
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-05-10",
       "publishes": [
         "tb2",
         "tbHard"
-      ]
+      ],
+      "_demote_note": "FAZ 6.A 2026-05-10 — bare /leaderboard root is JS-rendered SPA shell; snapshot returns 57KB with zero model rows. WebFetch yields no extractable data. Use sub-path https://www.tbench.ai/leaderboard/terminal-bench/2.0 instead (full URL, server-rendered table)."
     },
     {
       "name": "Terminal-Bench (alt)",
@@ -1363,7 +1362,7 @@
         "{id}-fast",
         "{id}-mini"
       ],
-      "slugMismatchNote": "Uses own slug system: opus-4-7 \u2192 claude-opus-4-7; gemini-3-1-flash \u2192 gemini-3-1-flash-lite-preview",
+      "slugMismatchNote": "Uses own slug system: opus-4-7 → claude-opus-4-7; gemini-3-1-flash → gemini-3-1-flash-lite-preview",
       "vendorPrefixMap": {
         "anthropic": "claude-",
         "default": ""
@@ -1865,7 +1864,7 @@
       "name": "llm-stats LiveCodeBench",
       "url": "https://llm-stats.com/benchmarks/livecodebench",
       "tier": "I",
-      "authority": "lcbV6 mirror \u2014 closes the SPA gap on livecodebench.github.io (71 models indexed)",
+      "authority": "lcbV6 mirror — closes the SPA gap on livecodebench.github.io (71 models indexed)",
       "phase": "leaderboard",
       "format": "static_html_article",
       "lastVerifiedDate": "2026-04-27",
@@ -1892,7 +1891,7 @@
       "name": "llm-stats SWE-bench Verified",
       "url": "https://llm-stats.com/benchmarks/swe-bench-verified",
       "tier": "I",
-      "authority": "sweV mirror \u2014 alternative to SPA-broken swebench.com",
+      "authority": "sweV mirror — alternative to SPA-broken swebench.com",
       "phase": "leaderboard",
       "format": "static_html_article",
       "lastVerifiedDate": "2026-04-27",
@@ -1954,7 +1953,7 @@
         "{id}-may-2025",
         "{id}-0324"
       ],
-      "slugMismatchNote": "Older versions get date suffixes: deepseek-v3 \u2192 deepseek-v3-0324",
+      "slugMismatchNote": "Older versions get date suffixes: deepseek-v3 → deepseek-v3-0324",
       "vendorPrefixMap": {
         "anthropic": "claude-",
         "default": ""
@@ -1989,7 +1988,7 @@
       ],
       "lastVerifiedDate": "2026-04-27",
       "consecutiveFailures": 0,
-      "rationale": "Independent community tracker \u2014 single-page cross-view for SWE-bench Verified + SWE-bench Pro + Terminal-Bench 2.0 + Aider Polyglot, 100 entries. Monthly cadence; April 2026 includes Claude Opus 4.7.",
+      "rationale": "Independent community tracker — single-page cross-view for SWE-bench Verified + SWE-bench Pro + Terminal-Bench 2.0 + Aider Polyglot, 100 entries. Monthly cadence; April 2026 includes Claude Opus 4.7.",
       "phase": "leaderboard"
     },
     {
@@ -2011,7 +2010,7 @@
       "extractor": "static_html_table"
     },
     {
-      "name": "BenchLM \u2014 ProgramBench tracker",
+      "name": "BenchLM — ProgramBench tracker",
       "url": "https://benchlm.ai/benchmarks/programBench",
       "domain": "benchlm.ai",
       "tier": "I",
@@ -2350,7 +2349,7 @@
       "name": "SiliconFlow",
       "url": "https://siliconflow.cn/models",
       "tier": "I",
-      "extracts": "Chinese providers \u2014 Qwen / DeepSeek / MiMo critical",
+      "extracts": "Chinese providers — Qwen / DeepSeek / MiMo critical",
       "format": "static_html_table",
       "lastVerifiedDate": null,
       "consecutiveFailures": 0,
@@ -2611,7 +2610,7 @@
       "name": "HuggingFace Unsloth",
       "url": "https://huggingface.co/unsloth",
       "tier": "I",
-      "extracts": "UD dynamic quants (UD-IQ1_S \u2192 UD-Q4_K_XL)",
+      "extracts": "UD dynamic quants (UD-IQ1_S → UD-Q4_K_XL)",
       "phase": "local",
       "format": "static_html_table",
       "extractor": "html_table",
@@ -2817,7 +2816,7 @@
     {
       "name": "HF model index",
       "url": "https://huggingface.co/models?sort=trending",
-      "tier": "S\u2192I",
+      "tier": "S→I",
       "extracts": "trending + filter by license/architecture",
       "format": "static_html_table",
       "extractor": "html_table",
@@ -3111,7 +3110,7 @@
       "format": "spa_partial",
       "lastVerifiedDate": "2026-04-26",
       "consecutiveFailures": 0,
-      "note": "Independent benchmark tracker \u2014 per-model pages partially static; ranking tables visible",
+      "note": "Independent benchmark tracker — per-model pages partially static; ranking tables visible",
       "extractor": "regex_extract",
       "fallbacks": [
         {
@@ -3414,9 +3413,19 @@
         "lastStatus": "ok",
         "lastObservedFormat": "static_html_article",
         "lastProbedAt": "2026-04-27"
+      },
+      "tbench.ai": {
+        "status": "unhealthy:spa_full",
+        "observedFormat": "spa_full",
+        "lastChecked": "2026-05-10",
+        "consecutiveFailures": 3,
+        "note": "bare /leaderboard root is SPA — snapshot empty. Use full /terminal-bench/2.0 sub-path."
       }
     },
     "lastFullCycle": "2026-04-27",
-    "schemaVersion": 2
+    "schemaVersion": 2,
+    "unhealthy": {
+      "https://tbench.ai/leaderboard": true
+    }
   }
 }
