@@ -3426,6 +3426,18 @@
     "schemaVersion": 2,
     "unhealthy": {
       "https://tbench.ai/leaderboard": true
+    },
+    "lowConfidenceUrls": {
+      "_purpose": "Root-listing URLs (whole-leaderboard pages) prone to cross-row misattribution. Agent fetch returns rendered HTML with all models × all benchmarks, but extracting a specific (modelId, benchKey) cell from such a listing is error-prone. trustScore is multiplied by trustPenaltyMultiplier (default 0.5) when a citation's URL matches one of these patterns. Specific bench-path URLs (e.g. https://llm-stats.com/benchmarks/livecodebench) are NOT penalized — they unambiguously identify the bench.",
+      "_purposeAddedAt": "2026-05-10",
+      "trustPenaltyMultiplier": 0.5,
+      "urls": {
+        "https://llm-stats.com/": true,
+        "https://benchlm.ai/": true,
+        "https://artificialanalysis.ai/": true,
+        "https://github.com/sierra-research/tau-bench": true,
+        "https://labs.scale.com/leaderboard/": true
+      }
     }
   }
 }

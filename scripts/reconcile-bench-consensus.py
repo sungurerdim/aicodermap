@@ -37,7 +37,11 @@ if hasattr(sys.stdout, "reconfigure"):
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from lib.synth import _cluster_observations  # noqa: E402  - runtime path
+from lib.synth import (  # noqa: E402  - runtime path
+    _apply_low_confidence_penalty,
+    _cluster_observations,
+    _load_low_confidence_urls,
+)
 
 SOURCES_PATH = ROOT / "data" / "sources.json"
 MODELS_PATH = ROOT / "data" / "models.json"
@@ -116,13 +120,21 @@ def main() -> int:
     MIN_DISTINCT_SAFE = 3
     MIN_DISTINCT_PAIRED = 2
     MIN_SUM_TRUST = 1.5
-    print("=== FAZ 6.B BENCH CONSENSUS RECONCILE ===")
+    print("=== FAZ 6.B/C BENCH CONSENSUS RECONCILE ===")
     print(f"agreement_pp        = {agreement_pp}")
     print(f"override Δ floor    = {block_pp}pp")
     print(
         f"override gate       = distinct >= {MIN_DISTINCT_SAFE}  OR  "
         f"(distinct >= {MIN_DISTINCT_PAIRED} AND sum_trust >= {MIN_SUM_TRUST})"
     )
+
+    # FAZ 6.C: load low-confidence URL set + multiplier so the cluster math
+    # downweights root-listing URLs the same way the forward synth path does.
+    low_conf_urls, low_conf_mult = _load_low_confidence_urls(ROOT)
+    if low_conf_urls:
+        print(
+            f"low-confidence URLs = {len(low_conf_urls)} × {low_conf_mult} multiplier"
+        )
 
     sources = json.loads(SOURCES_PATH.read_text(encoding="utf-8"))
     models = json.loads(MODELS_PATH.read_text(encoding="utf-8"))
@@ -162,6 +174,10 @@ def main() -> int:
         obs = [o for o in (_entry_to_obs(e) for e in entries) if o is not None]
         if not obs:
             continue
+
+        # FAZ 6.C: apply trust penalty for root-listing URLs before clustering.
+        if low_conf_urls:
+            _apply_low_confidence_penalty(obs, low_conf_urls, low_conf_mult)
 
         clusters = _cluster_observations(obs, agreement_pp)
         if not clusters:

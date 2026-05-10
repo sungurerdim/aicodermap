@@ -107,6 +107,30 @@ def _load_unhealthy_urls(root: Path) -> set[str]:
     }
 
 
+def _load_low_confidence_urls(root: Path) -> tuple[set[str], float]:
+    """FAZ 6.C (2026-05-10): root-listing URLs (whole-leaderboard pages) are
+    prone to cross-row misattribution. Specific bench-path URLs are reliable;
+    bare root URLs that list every (model, bench) combination are not.
+    Penalize their trustScore by `trustPenaltyMultiplier` so a single
+    root-cited entry can't out-weigh multi-source bench-path consensus.
+
+    Returns: (url_set, multiplier). When url_set is empty, no penalty applies.
+    """
+    wl_path = root / "data" / "sources-whitelist.json"
+    try:
+        wl = json.loads(wl_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return set(), 1.0
+    runtime = wl.get("_runtime") or {}
+    block = runtime.get("lowConfidenceUrls") or {}
+    multiplier = float(block.get("trustPenaltyMultiplier") or 0.5)
+    urls = block.get("urls") or {}
+    return (
+        {(u or "").strip().rstrip("/").lower() for u, flag in urls.items() if flag},
+        multiplier,
+    )
+
+
 def _aggregate_observations(
     artifacts: list[tuple[str, dict[str, Any]]],
     unhealthy_urls: set[str] | None = None,
@@ -201,11 +225,31 @@ def _cluster_observations(
     return clusters
 
 
+def _apply_low_confidence_penalty(
+    scored: list[dict[str, Any]],
+    low_conf_urls: set[str],
+    multiplier: float,
+) -> list[dict[str, Any]]:
+    """FAZ 6.C: multiply trustScore by `multiplier` for any obs whose URL
+    matches `low_conf_urls`. Mutates list in place; returns the same list
+    for chaining."""
+    if not low_conf_urls or multiplier == 1.0:
+        return scored
+    for s in scored:
+        url = (s.get("sourceUrl") or "").strip().rstrip("/").lower()
+        if url and url in low_conf_urls:
+            s["trustScore"] = round(s["trustScore"] * multiplier, 4)
+            s["_lowConfidence"] = True
+    return scored
+
+
 def _pick_winner(
     observations: list[dict[str, Any]],
     today: datetime.date,
     *,
     agreement_pp: float = DEFAULT_AGREEMENT_PP,
+    low_conf_urls: set[str] | None = None,
+    low_conf_multiplier: float = 1.0,
 ) -> tuple[dict[str, Any], list[dict[str, Any]], float]:
     """Cluster-aware winner selection (FAZ 6.B, 2026-05-10).
 
@@ -236,6 +280,11 @@ def _pick_winner(
             o["tier"], len(observations), o.get("fetched") or "", today
         )
         scored.append({**o, "trustScore": score})
+
+    # FAZ 6.C — root-URL trust penalty before clustering. Lets a 0.4-trust
+    # demoted root citation lose to specific-bench-path multi-source consensus.
+    if low_conf_urls:
+        _apply_low_confidence_penalty(scored, low_conf_urls, low_conf_multiplier)
 
     clusters = _cluster_observations(scored, agreement_pp)
     winning_cluster = clusters[0]
@@ -514,6 +563,8 @@ def synth(
     warn_pp: float = DEFAULT_WARN_PP,
     block_pp: float = DEFAULT_BLOCK_PP,
     unhealthy_urls: set[str] | None = None,
+    low_conf_urls: set[str] | None = None,
+    low_conf_multiplier: float = 1.0,
 ) -> dict[str, Any]:
     """Run the full synthesis pipeline. Returns OUTPUT_SCHEMA artifact dict."""
     # Aggregate all observation cells. FAZ 6.A — drop SPA-shell citations
@@ -536,7 +587,11 @@ def synth(
             # Drop non-canonical bench keys at synth time (e.g. legacy 'aider').
             continue
         winner, scored, max_delta = _pick_winner(
-            obs_list, today, agreement_pp=agreement_pp
+            obs_list,
+            today,
+            agreement_pp=agreement_pp,
+            low_conf_urls=low_conf_urls,
+            low_conf_multiplier=low_conf_multiplier,
         )
         if not winner:
             continue
@@ -748,14 +803,22 @@ def main() -> int:
 
     today = datetime.date.today()
     unhealthy_urls = _load_unhealthy_urls(ROOT)
+    low_conf_urls, low_conf_mult = _load_low_confidence_urls(ROOT)
     if unhealthy_urls:
         print(f"FAZ 6.A SPA guard active: {len(unhealthy_urls)} unhealthy URL(s)")
+    if low_conf_urls:
+        print(
+            f"FAZ 6.C low-confidence guard active: {len(low_conf_urls)} root URL(s) "
+            f"× {low_conf_mult} trust multiplier"
+        )
     artifact = synth(
         artifacts,
         canonical_bench,
         canonical_na,
         today,
         unhealthy_urls=unhealthy_urls,
+        low_conf_urls=low_conf_urls,
+        low_conf_multiplier=low_conf_mult,
     )
 
     out_path = ROOT / ".aicodermap-agent-out-synth.json"
