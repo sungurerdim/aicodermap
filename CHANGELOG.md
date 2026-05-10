@@ -1,4 +1,29 @@
 
+## [2026-05-10] — autonomous refresh-all [WARN: cumulative provenance coverage 73.2% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 281 new fills; 45 cells auto-gapped by orchestrator; 204 explicit agent gaps preserved]
+
+[fillRatio:0.73 cells:439/600 contradictions:4 fetch:0.0min tools:None batches:None build:3fba00c]
+
+### Updated
+- 56 models: `opus-4-7`, `sonnet-4-6`, `claude-haiku-4-5`, `deepseek-v3-2`, `deepseek-v4-flash`, `deepseek-v4-pro`, `deepseek-coder-v2-16b`, `deepseek-r1-14b`, `gemini-3-1-flash`, `gemini-3-1-pro`, `gemma-3-27b`, `gemma-4-26b-moe`, `gemma-4-31b`, `gemma-4-e2b`, `gemma-4-e4b`, `llama-4-maverick`, `llama-4-scout`, `minimax-m2-5`, `minimax-m2-7`, `minimax-m2-1`, `mistral-large-3`, `codestral-22b`, `devstral-2`, `devstral-medium`, `codestral`, `devstral-small-2`, `mistral-medium-3-5`, `kimi-k2-6`, `nemotron-3-super`, `gpt-5-5`, `o3`, `o4-mini`, `gpt-4-1`, `gpt-5-4`, `qwen3-coder-480b`, `qwen3-coder-30b`, `qwen3-6-35b-moe`, `qwen3-6-plus`, `qwen3-235b`, `qwen-3-6-max`, `qwen-3-6-27b`, `qwen3-coder-next`, `qwen25-coder-32b`, `qwen25-coder-7b`, `qwen25-coder-14b`, `qwen3-5-9b`, `step-3-5-flash`, `grok-3`, `grok-3-mini`, `grok-4-20`, `grok-4-3`, `grok-4-1-fast`, `mimo-v2-flash`, `mimo-v2-5-pro`, `glm-5-1`, `glm-4-7`
+
+### Resolved (auto via trustScore)
+- gemini-3-1-flash.lcb: winner={'value': 90.8, 'trustScore': 0.667, 'sourceUrl': 'https://artificialanalysis.ai/models/gemini-3-flash-reasoning', 'tier': 'I'} (severity=RED, Δ18.8)
+- gemma-4-26b-moe.gpqa: winner={'value': 82.3, 'trustScore': 0.467, 'sourceUrl': 'https://deepmind.google/models/gemma/gemma-4/', 'tier': 'S'} (severity=YELLOW, Δ3.1)
+- gemma-4-e4b.gpqa: winner={'value': 58.6, 'trustScore': 0.467, 'sourceUrl': 'https://deepmind.google/models/gemma/gemma-4/', 'tier': 'S'} (severity=RED, Δ10.6)
+- qwen25-coder-32b.lcb: winner={'value': 37.2, 'trustScore': 0.467, 'sourceUrl': 'https://qwenlm.github.io/blog/qwen2.5-coder-family/', 'tier': 'S'} (severity=RED, Δ5.8)
+
+### Gaps (151 entries — agent:106 orchestrator:45 — see data/known-gaps.json or next refresh)
+- `opus-4-7.lcb` *(agent)*: agent attempted but found no value
+- `opus-4-7.aime26` *(agent)*: agent attempted but found no value
+- `sonnet-4-6.aime26` *(agent)*: agent attempted but found no value
+- `claude-haiku-4-5.hle` *(agent)*: agent attempted but found no value
+- `deepseek-v3-2.tau2` *(agent)*: agent attempted but found no value
+- `deepseek-v4-flash.tau2` *(agent)*: agent attempted but found no value
+- `codestral.aime26` *(orchestrator)*: not reached in agent survey cycle; AIME 2026 data unavailable
+- `codestral.gpqa` *(orchestrator)*: not reached in agent survey cycle; GPQA Diamond data unavailable
+- ... and 143 more
+
+
 ## [2026-05-10] — autonomous refresh-all [WARN: cumulative provenance coverage 74.7% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 281 new fills; 38 cells auto-gapped by orchestrator; 204 explicit agent gaps preserved]
 
 [fillRatio:0.75 cells:448/600 contradictions:4 fetch:0.0min tools:None batches:None build:d1b659c]

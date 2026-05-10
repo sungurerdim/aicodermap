@@ -1,7 +1,6 @@
 {
-  "cycleEndedAt": "2026-05-09T23:45:49Z",
-  "cycleStartedAt": "2026-05-09T14:45:00Z",
-  "mode": "hybrid-haiku-gather-python-synth",
+  "cycleEndedAt": "2026-05-10T18:29:59Z",
+  "cycleStartedAt": "2026-05-10T18:29:59Z",
   "perBatch": [
     {
       "agentGaps": 0,
@@ -11,8 +10,8 @@
       "naCount": 0,
       "orchestratorGaps": 0,
       "partialReason": null,
-      "toolCallCount": 18,
-      "wallclockSec": 89.0
+      "toolCallCount": 8,
+      "wallclockSec": 180.0
     },
     {
       "agentGaps": 0,
@@ -23,7 +22,7 @@
       "orchestratorGaps": 0,
       "partialReason": null,
       "toolCallCount": 12,
-      "wallclockSec": 0.0
+      "wallclockSec": 52.0
     },
     {
       "agentGaps": 0,
@@ -33,224 +32,180 @@
       "naCount": 0,
       "orchestratorGaps": 0,
       "partialReason": null,
-      "toolCallCount": 8,
-      "wallclockSec": 187.0
+      "toolCallCount": 29,
+      "wallclockSec": 520.0
     },
     {
       "agentGaps": 0,
-      "batchId": "batch03-google_deepm",
+      "batchId": "batch03-meta",
       "fills": 0,
       "gaps": 0,
       "naCount": 0,
       "orchestratorGaps": 0,
       "partialReason": null,
-      "toolCallCount": 12,
-      "wallclockSec": 50.0
+      "toolCallCount": 16,
+      "wallclockSec": 62.0
     },
     {
       "agentGaps": 0,
-      "batchId": "batch04-meta",
+      "batchId": "batch04-minimax",
       "fills": 0,
       "gaps": 0,
       "naCount": 0,
       "orchestratorGaps": 0,
       "partialReason": null,
-      "toolCallCount": 12,
+      "toolCallCount": 26,
+      "wallclockSec": 280.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch05-mistral_ai",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 10,
+      "wallclockSec": 95.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch06-moonshot_ai-retry",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 22,
+      "wallclockSec": 260.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch07-nvidia",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 7,
       "wallclockSec": 45.0
     },
     {
       "agentGaps": 0,
-      "batchId": "batch05-minimax",
+      "batchId": "batch08-openai",
       "fills": 0,
       "gaps": 0,
       "naCount": 0,
       "orchestratorGaps": 0,
       "partialReason": null,
-      "toolCallCount": 12,
-      "wallclockSec": 0.0
+      "toolCallCount": 27,
+      "wallclockSec": 225.0
     },
     {
       "agentGaps": 0,
-      "batchId": "batch06-mistral_ai",
+      "batchId": "batch09-alibaba_qwen",
       "fills": 0,
       "gaps": 0,
       "naCount": 0,
       "orchestratorGaps": 0,
       "partialReason": null,
-      "toolCallCount": 8,
-      "wallclockSec": 12.0
-    },
-    {
-      "agentGaps": 0,
-      "batchId": "batch07-mistral_ai",
-      "fills": 0,
-      "gaps": 0,
-      "naCount": 0,
-      "orchestratorGaps": 0,
-      "partialReason": null,
-      "toolCallCount": 8,
-      "wallclockSec": 20.0
-    },
-    {
-      "agentGaps": 0,
-      "batchId": "batch08-moonshot_ai",
-      "fills": 0,
-      "gaps": 0,
-      "naCount": 0,
-      "orchestratorGaps": 0,
-      "partialReason": null,
-      "toolCallCount": 3,
-      "wallclockSec": 15.0
-    },
-    {
-      "agentGaps": 0,
-      "batchId": "batch09-nvidia",
-      "fills": 0,
-      "gaps": 0,
-      "naCount": 0,
-      "orchestratorGaps": 0,
-      "partialReason": null,
-      "toolCallCount": 8,
+      "toolCallCount": 10,
       "wallclockSec": 52.0
     },
     {
       "agentGaps": 0,
-      "batchId": "batch10-openai",
+      "batchId": "batch10-alibaba_qwen",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 8,
+      "wallclockSec": 45.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch11-stepfun",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 8,
+      "wallclockSec": 45.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch12-xai",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 8,
+      "wallclockSec": 180.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch13-xiaomi",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 22,
+      "wallclockSec": 340.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch14-z.ai_(zhipu_",
       "fills": 0,
       "gaps": 0,
       "naCount": 0,
       "orchestratorGaps": 0,
       "partialReason": null,
       "toolCallCount": 28,
-      "wallclockSec": 127.0
+      "wallclockSec": 120.0
     },
     {
       "agentGaps": 0,
-      "batchId": "batch11-alibaba_qwen",
+      "batchId": "batch14-z.ai_zhipu",
       "fills": 0,
       "gaps": 0,
       "naCount": 0,
       "orchestratorGaps": 0,
       "partialReason": null,
-      "toolCallCount": 9,
+      "toolCallCount": 11,
       "wallclockSec": 45.0
-    },
-    {
-      "agentGaps": 0,
-      "batchId": "batch12-alibaba_qwen",
-      "fills": 0,
-      "gaps": 0,
-      "naCount": 0,
-      "orchestratorGaps": 0,
-      "partialReason": null,
-      "toolCallCount": 8,
-      "wallclockSec": 12.0
-    },
-    {
-      "agentGaps": 0,
-      "batchId": "batch13-alibaba_qwen",
-      "fills": 0,
-      "gaps": 0,
-      "naCount": 0,
-      "orchestratorGaps": 0,
-      "partialReason": {
-        "cellsAttempted": 78,
-        "cellsFilled": 9,
-        "code": "new_models_sparse_leaderboard_data",
-        "explanation": "Qwen 2.5 Coder (released 2026-05-02) and Qwen 3.5-9B (released 2026-04-18) are brand-new open-weight models not yet widely benchmarked. Gather phase extracted 9 benchmark scores (sweV, lcb, tb2 for each model) + full pricing (3 providers × 3 models = 9 entries) + Ollama + Unsloth metadata. Remaining 69 bench cells are genuine gaps (models pre-date most leaderboard datasets or leaderboards haven't updated with new entries). Phase 3 WebSearch fallback deferred to next cycle."
-      },
-      "toolCallCount": 18,
-      "wallclockSec": 840.0
-    },
-    {
-      "agentGaps": 0,
-      "batchId": "batch14-stepfun",
-      "fills": 0,
-      "gaps": 0,
-      "naCount": 0,
-      "orchestratorGaps": 0,
-      "partialReason": null,
-      "toolCallCount": 8,
-      "wallclockSec": 45.0
-    },
-    {
-      "agentGaps": 0,
-      "batchId": "batch15-xai",
-      "fills": 0,
-      "gaps": 0,
-      "naCount": 0,
-      "orchestratorGaps": 0,
-      "partialReason": null,
-      "toolCallCount": 3,
-      "wallclockSec": 45.0
-    },
-    {
-      "agentGaps": 0,
-      "batchId": "batch16-xiaomi",
-      "fills": 0,
-      "gaps": 0,
-      "naCount": 0,
-      "orchestratorGaps": 0,
-      "partialReason": null,
-      "toolCallCount": 5,
-      "wallclockSec": 38.0
-    },
-    {
-      "agentGaps": 0,
-      "batchId": "batch17-z.ai_zhipu",
-      "fills": 0,
-      "gaps": 0,
-      "naCount": 0,
-      "orchestratorGaps": 0,
-      "partialReason": {
-        "cellsAttempted": 12,
-        "cellsFilled": 11,
-        "code": "snapshot-primary-incomplete",
-        "topBlockingSources": [
-          "https://huggingface.co/THUDM/* (HF model card README phase not initiated in gather mode)",
-          "https://ollama.com/library/* (Ollama pull commands populated; VRAM extraction deferred)"
-        ]
-      },
-      "toolCallCount": 5,
-      "wallclockSec": 8.0
     }
   ],
-  "synthStage": {
-    "contradictions": 1,
-    "engine": "Python",
-    "fills": 346,
-    "newModels": 0,
-    "wallclockSec": 1.5
-  },
-  "totalBatches": 18,
+  "totalBatches": 16,
   "totals": {
     "agentGaps": 0,
     "fills": 0,
     "gaps": 0,
     "na": 0,
     "orchestratorGaps": 0,
-    "toolCallSum": 185,
-    "wallclockSecMax": 840.0,
-    "wallclockSecP95": 840.0
+    "toolCallSum": 252,
+    "wallclockSecMax": 520.0,
+    "wallclockSecP95": 520.0
   },
   "zeroFillBatches": [
     "batch00-anthropic",
     "batch01-deepseek",
     "batch02-google_deepm",
-    "batch03-google_deepm",
-    "batch04-meta",
-    "batch05-minimax",
-    "batch06-mistral_ai",
-    "batch07-mistral_ai",
-    "batch08-moonshot_ai",
-    "batch09-nvidia",
-    "batch10-openai",
-    "batch11-alibaba_qwen",
-    "batch12-alibaba_qwen",
-    "batch13-alibaba_qwen",
-    "batch14-stepfun",
-    "batch15-xai",
-    "batch16-xiaomi",
-    "batch17-z.ai_zhipu"
+    "batch03-meta",
+    "batch04-minimax",
+    "batch05-mistral_ai",
+    "batch06-moonshot_ai-retry",
+    "batch07-nvidia",
+    "batch08-openai",
+    "batch09-alibaba_qwen",
+    "batch10-alibaba_qwen",
+    "batch11-stepfun",
+    "batch12-xai",
+    "batch13-xiaomi",
+    "batch14-z.ai_(zhipu_",
+    "batch14-z.ai_zhipu"
   ]
 }
