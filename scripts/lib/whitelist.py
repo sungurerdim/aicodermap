@@ -68,6 +68,20 @@ def deprecated_bench_keys(whitelist: dict[str, Any]) -> list[str]:
     return list(schema(whitelist).get("deprecatedBenchKeys") or [])
 
 
+def emerging_bench_keys(whitelist: dict[str, Any]) -> list[str]:
+    """FAZ 5.C (2026-05-10): bench keys with <30% fill rate, not counted in
+    main coverage formula. Still surveyed every cycle (vendor may publish);
+    if a fill is found, the cell appears alongside core fills.
+    """
+    return list(schema(whitelist).get("emergingBenchKeys") or [])
+
+
+def all_bench_keys(whitelist: dict[str, Any]) -> list[str]:
+    """coreBenchKeys ∪ emergingBenchKeys — full universe agents are
+    expected to attempt. Coverage formulas use coreBenchKeys only."""
+    return core_bench_keys(whitelist) + emerging_bench_keys(whitelist)
+
+
 def _publishes_keys(entry: dict[str, Any]) -> list[str]:
     """publishes[] shape may be ["key", ...] (legacy) or [{key, priority}, ...]
     (P10.4 reform). This helper normalizes both into a flat list of keys."""

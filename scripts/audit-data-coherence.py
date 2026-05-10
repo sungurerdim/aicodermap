@@ -113,7 +113,13 @@ def main():
         core_src = fp.read()
 
     # === Canonical sets ===
-    canonical_bench = set((whitelist.get("_schema") or {}).get("coreBenchKeys") or [])
+    # FAZ 5.C (2026-05-10): bench universe = coreBenchKeys ∪ emergingBenchKeys.
+    # Coverage formula uses core only; surfaces (core.js, i18n, models.json
+    # cells, sources.json suffixes) may reference either set freely.
+    schema_block = whitelist.get("_schema") or {}
+    core_bench_set = set(schema_block.get("coreBenchKeys") or [])
+    emerging_bench_set = set(schema_block.get("emergingBenchKeys") or [])
+    canonical_bench = core_bench_set | emerging_bench_set
     canonical_ids = {m["id"] for m in models}
     active_ids = {m["id"] for m in _active_models(models)}
 

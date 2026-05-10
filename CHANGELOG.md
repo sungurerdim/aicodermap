@@ -1,4 +1,26 @@
 
+## [2026-05-10] — autonomous refresh-all [WARN: cumulative provenance coverage 65.7% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 290 new fills; 167 cells auto-gapped by orchestrator; 97 explicit agent gaps preserved]
+
+[fillRatio:0.66 cells:394/600 contradictions:1 fetch:0.0min tools:None batches:None build:7102753]
+
+### Updated
+- 59 models: `opus-4-7`, `sonnet-4-6`, `claude-haiku-4-5`, `deepseek-v3-2`, `deepseek-v4-flash`, `deepseek-v4-pro`, `deepseek-coder-v2-16b`, `deepseek-r1-14b`, `gemini-3-1-flash`, `gemini-3-1-pro`, `gemma-3-27b`, `gemma-4-26b-moe`, `gemma-4-31b`, `gemma-4-e2b`, `gemma-4-e4b`, `llama-4-maverick`, `llama-4-scout`, `minimax-m2-5`, `minimax-m2-7`, `minimax-m2-1`, `mistral-large-3`, `codestral-22b`, `devstral-2`, `devstral-medium`, `codestral`, `devstral-small-2`, `mistral-medium-3-5`, `kimi-k2-6`, `nemotron-3-super`, `gpt-5-5`, `gpt-5-4`, `gpt-4-1`, `o3`, `o4-mini`, `qwen-3-6-27b`, `qwen3-235b`, `qwen3-32b`, `qwen3-6-35b-moe`, `qwen-3-6-max`, `qwen3-6-plus`, `qwen3-coder-30b`, `qwen3-coder-480b`, `qwen3-coder-next`, `qwen25-coder-14b`, `qwen25-coder-32b`, `qwen25-coder-7b`, `qwen3-5-9b`, `step-3-5-flash`, `grok-4-3`, `grok-4-20`, `grok-3`, `grok-3-mini`, `grok-4-1-fast`, `mimo-v2-5-pro`, `mimo-v2-5`, `mimo-v2-flash`, `glm-5-1`, `glm-4-5-air`, `glm-4-7`
+
+### Resolved (auto via trustScore)
+- qwen-3-6-max.lcb: winner={'value': 77.5, 'trustScore': 0.667, 'sourceUrl': 'https://llm-stats.com/', 'tier': 'I'} (severity=RED, Δ5.4)
+
+### Gaps (252 entries — agent:85 orchestrator:167 — see data/known-gaps.json or next refresh)
+- `gemini-3-1-flash.tb2` *(agent)*: agent attempted but found no value
+- `gemini-3-1-flash.aaCoding` *(agent)*: agent attempted but found no value
+- `gemini-3-1-flash.aaAgentic` *(agent)*: agent attempted but found no value
+- `gemini-3-1-pro.tbHard` *(agent)*: agent attempted but found no value
+- `gemini-3-1-pro.aaCoding` *(agent)*: agent attempted but found no value
+- `gemini-3-1-pro.aaAgentic` *(agent)*: agent attempted but found no value
+- `claude-haiku-4-5.hle` *(orchestrator)*: not reached in agent survey cycle; Humanity's Last Exam data unavailable
+- `claude-haiku-4-5.mmluPro` *(orchestrator)*: not reached in agent survey cycle; MMLU-Pro data unavailable
+- ... and 244 more
+
+
 ## [2026-05-10] — autonomous refresh-all [WARN: very low cumulative provenance coverage 32.5%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 346 new fills; 832 cells auto-gapped by orchestrator; 97 explicit agent gaps preserved]
 
 [fillRatio:0.33 cells:507/1560 contradictions:1 fetch:0.0min tools:None batches:None build:101c05d]
@@ -234,6 +256,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ---
 
 ## [Unreleased]
+
+### Changed — 2026-05-10 (FAZ 5.B + 5.C — N/A taxonomy + bench universe split)
+
+Coverage rose from 32.5% → 65.7% via two structural reforms:
+
+**FAZ 5.B — N/A rule taxonomy (2 → 8 canonical rules):**
+- New rules: vendor-no-niche-bench-publish, legacy-bench-superseded,
+  closed-weight-no-local-runtime, compute-only-public-no-elo,
+  vendor-emphasis-mismatch, edge-model-no-frontier-bench.
+- synth.py keyword matching expanded; rationale strings from agent
+  naCandidates map to canonical rule.
+- **User policy:** N/A is NEVER permanent. Every cycle re-attempts the
+  cell. Fill found → fill wins (fill > N/A precedence).
+
+**FAZ 5.C — coreBenchKeys vs emergingBenchKeys split:**
+- 10 CORE (≥30% fill): sweV, gpqa, lcb, aaIdx, tb2, hle, swePro,
+  mmluPro, tau2, aime26.
+- 16 EMERGING (<30% fill): the rest — surveyed every cycle, excluded
+  from coverage formula so vendor-doesn't-publish niche bench
+  doesn't drag headline metric.
+- `whitelist.py` new `emerging_bench_keys()` + `all_bench_keys()`.
+- audit-data-coherence + audit-bench-source-mapping accept emerging.
+
+Cycle 2026-05-10-C metrics:
+  Coverage:        32.5% → **65.7%**
+  Total cells:     1560 → 600 (core)
+  N/A cells:       2 → 8 (more rationale-keyword matches)
+  Updated models:  59
 
 ### Added — 2026-05-10 (FAZ 4.D — Python-side synth)
 

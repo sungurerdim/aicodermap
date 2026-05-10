@@ -244,12 +244,73 @@ def _aggregate_lineup_hints(
 def _aggregate_na_candidates(
     artifacts: list[tuple[str, dict[str, Any]]],
     canonical_rules: set[str],
+    filled_cells: set[tuple[str, str]] | None = None,
 ) -> dict[str, list[dict[str, str]]]:
-    """Map naCandidates rationale → canonical rule. Drop unmappable."""
+    """Map naCandidates rationale → canonical rule. Drop unmappable.
+
+    User policy (2026-05-10): N/A is NEVER permanent — every cycle
+    re-attempts the cell. If a fill was found this cycle (cell in
+    `filled_cells`), N/A is suppressed (fill > N/A precedence). If no
+    fill but a rationale matches a canonical rule, the cell remains N/A
+    until the next cycle re-attempts.
+    """
     by_model: dict[str, list[dict[str, str]]] = defaultdict(list)
+    filled_cells = filled_cells or set()
     rule_keywords = {
+        # Original two rules
         "embedding-only-tier": ["embedding"],
-        "spa-blocked-bench-without-alt": ["spa", "no extractable", "blocked"],
+        "spa-blocked-bench-without-alt": [
+            "spa",
+            "no extractable",
+            "blocked",
+            "spa-blocked",
+        ],
+        # FAZ 5.B (2026-05-10): expanded taxonomy.
+        "vendor-no-niche-bench-publish": [
+            "not published",
+            "vendor no self-report",
+            "vendor does not publish",
+            "no vendor self-report",
+            "vendor reporting absent",
+            "no published",
+            "absent from vendor",
+        ],
+        "legacy-bench-superseded": [
+            "deprecated",
+            "superseded",
+            "replaced by",
+            "legacy bench",
+        ],
+        "closed-weight-no-local-runtime": [
+            "closed-weight",
+            "proprietary",
+            "no local runtime",
+            "no ollama",
+            "no unsloth",
+            "api-only",
+            "inference api only",
+        ],
+        "compute-only-public-no-elo": [
+            "lmarena",
+            "elo only",
+            "vote-based",
+            "no public elo",
+            "no chat arena",
+        ],
+        "vendor-emphasis-mismatch": [
+            "vendor emphasis",
+            "different bench focus",
+            "vendor focus",
+            "research-grade",
+            "western leaderboards sparse",
+        ],
+        "edge-model-no-frontier-bench": [
+            "edge model",
+            "edge tier",
+            "small footprint",
+            "on-device",
+            "ultra-small",
+        ],
     }
     for _p, art in artifacts:
         for c in art.get("naCandidates") or []:
@@ -259,6 +320,9 @@ def _aggregate_na_candidates(
             bk = c.get("benchKey")
             rationale = (c.get("rationale") or "").lower()
             if not (isinstance(mid, str) and isinstance(bk, str)):
+                continue
+            # FILL > N/A precedence: if cell was filled this cycle, drop N/A.
+            if (mid, bk) in filled_cells:
                 continue
             chosen = None
             for rule, kw_list in rule_keywords.items():
@@ -464,7 +528,7 @@ def synth(
                     models_by_id[mid]["updates"].setdefault("status", v)
 
     # N/A rule mapping.
-    na_by_model = _aggregate_na_candidates(artifacts, canonical_na_rules)
+    na_by_model = _aggregate_na_candidates(artifacts, canonical_na_rules, filled_cells)
     for mid, na_list in na_by_model.items():
         models_by_id[mid]["id"] = mid
         models_by_id[mid]["notApplicable"] = na_list

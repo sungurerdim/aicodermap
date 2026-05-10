@@ -143,13 +143,17 @@ def main() -> int:
             f"{missing_publisher}"
         )
 
-    # AC7 — all advertised keys (any publisher, live or not) ⊆ core ∪ deprecated
+    # AC7 — all advertised keys (any publisher, live or not) ⊆ core ∪ emerging ∪ deprecated.
+    # FAZ 5.C (2026-05-10): emergingBenchKeys are valid universe members,
+    # just excluded from the main coverage formula.
+    emerging = set((wl.get("_schema") or {}).get("emergingBenchKeys") or [])
     advertised = set(by_bench.keys())
-    rogue = sorted(advertised - (core | deprecated))
+    rogue = sorted(advertised - (core | emerging | deprecated))
     if rogue:
         failures.append(
             f"AC7 — {len(rogue)} bench key(s) appear in leaderboards[].publishes[] "
-            f"but are NOT in coreBenchKeys nor deprecatedBenchKeys: {rogue}"
+            f"but are NOT in coreBenchKeys, emergingBenchKeys, or "
+            f"deprecatedBenchKeys: {rogue}"
         )
 
     # AC8 — single live-publisher benches.
