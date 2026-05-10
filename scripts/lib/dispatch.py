@@ -116,12 +116,55 @@ def split_oversize_batches(
     return out
 
 
+def merge_small_buckets(
+    buckets: list[list[dict[str, Any]]],
+    *,
+    small_threshold: int = 2,
+    max_merged_size: int = 8,
+) -> list[list[dict[str, Any]]]:
+    """FAZ 7.D (2026-05-10) — collapse tiny family buckets into a single
+    `smallVendors` bucket.
+
+    Cycle 2026-05-10 measured 5 batches with ≤1 model each (StepFun, Nvidia,
+    MoonshotAI, single-model Z.ai). Each carried full agent dispatch
+    overhead (one ctx file, one Agent call, one wallclock, one synth slot)
+    for ~10 cells of expected work. Merging them into one batch cuts
+    dispatch overhead by 4-5×.
+
+    Quality preserved: the resulting batch still operates per-model in
+    target_model_ids; the agent walks each model's vendor URLs separately.
+    The only collapse is "one Agent invocation instead of five".
+
+    Buckets larger than `small_threshold` are left untouched. The merged
+    bucket is capped at `max_merged_size` models to stay within the
+    agent's tool-call budget.
+    """
+    if not buckets:
+        return buckets
+    big: list[list[dict[str, Any]]] = []
+    smalls: list[dict[str, Any]] = []
+    for b in buckets:
+        if len(b) <= small_threshold:
+            smalls.extend(b)
+        else:
+            big.append(b)
+    if not smalls:
+        return big
+    # Slice the merged smalls into max_merged_size chunks (rare, but defensive).
+    merged: list[list[dict[str, Any]]] = []
+    for i in range(0, len(smalls), max_merged_size):
+        merged.append(smalls[i : i + max_merged_size])
+    return big + merged
+
+
 def compute_dispatch_plan(
     active: list[dict[str, Any]],
     core_keys: list[str],
     *,
     max_parallel: int = MAX_PARALLEL,
     max_models_override: int | None = None,
+    merge_small: bool = True,
+    small_threshold: int = 2,
 ) -> dict[str, Any]:
     """Plan an adaptive multi-batch dispatch.
 
@@ -145,6 +188,12 @@ def compute_dispatch_plan(
     keys = list(core_keys)
     mpb = max_models_override or models_per_batch(len(keys))
     buckets = family_buckets(active)
+    if merge_small:
+        buckets = merge_small_buckets(
+            buckets,
+            small_threshold=small_threshold,
+            max_merged_size=mpb,
+        )
     sliced = split_oversize_batches(buckets, mpb)
 
     batches = []

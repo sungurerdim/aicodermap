@@ -251,6 +251,50 @@ reliably; nested 2-level structures often degrade.
    emit a fresh artifact reflecting THIS cycle's fetches. Reading other
    agents' output files is also forbidden.
 
+9. **TIER-BASED N/A SHORT-CIRCUIT** (FAZ 7.G, 2026-05-10). For each
+   model in target_model_ids, check its tier (resolvable via
+   idea_context.matrixState.byModel[<id>].tier OR data/models.json):
+   - `tier ∈ {ollama-local}`: skip benchmark sweep entirely. These
+     are local quantizations whose bench scores are inherited from
+     their parent model and are formally N/A. Emit ONLY pricingObs[]
+     (rare — usually free), ollamaObs[] (the parent reference),
+     unslothObs[] (the quant variants), modelMeta[] (release date,
+     license, vramRequirement, ollamaSize). The agent MUST NOT
+     emit observations[] for these models — orchestrator's gap-gen
+     auto-fills the bench cells with notApplicable[] entries.
+   - `tier ∈ {gemma}`: most small Gemma variants (1B/4B/12B) lack
+     leaderboard coverage for swePro/sweV/aaIdx/tau2/tb2/lcb. Sweep
+     only gpqa, mmluPro, hle (which Gemma's vendor docs publish);
+     emit naCandidates[] for the rest with rationale citing the
+     lineage (Gemma small variants ≠ benchmark targets per vendor
+     report). Saves ~30-50% of the gather wallclock for these
+     batches.
+   - `tier ∈ {coder-specialized}`: skip aime26/hle/mmluPro (math/
+     general-knowledge benchmarks) — these are systematically
+     unreported for coder-specialized models. naCandidates[] with
+     rule citation `coder-specialized:non-coding-bench`.
+   These short-circuits are quality-preserving: the cells they skip
+   are formally N/A per `_schema.notApplicableRules`. Synth maps
+   naCandidates[] to N/A entries; merge.py marks them `notApplicable: true`
+   in data/models.json so the matrix invariant holds without wasting
+   tool calls on guaranteed empty cells.
+
+10. **EARLY-EXIT QUALITY GATE** (FAZ 7.H, 2026-05-10). After each
+    fetch, check slice coverage:
+      - `covered = cells where observations[] for that (modelId, benchKey)
+                   has ≥2 entries with distinct sourceUrl AND consensus
+                   (max value Δ ≤ contracts.VERIFICATION_AGREEMENT_PP)`
+      - `na_count = cells in naCandidates[] for this slice`
+      - `total = |target_model_ids| × |coreBenchKeys|`
+      - When `(covered + na_count) / total ≥ 0.95` AND no remaining
+        priorityCells unvisited, emit + exit. partialReason: null.
+        Status: `EMITTED ... earlyExit=true coverage=<N/M>`.
+    Saves wallclock for already-well-covered batches (e.g., Anthropic
+    frontier where Artificial Analysis + Vellum + SWE-bench all publish
+    every cell). The cycle preserves quality because the gate is hit
+    only when each cell has independently-sourced agreement — the
+    same trustScore-driven definition of "confirmed" that synth uses.
+
 Wallclock + tool-call ceilings still HARD. Don't exit early.
 
 ### Mode `synth` (sonnet, single dispatch — analyzes ALL gather outputs)

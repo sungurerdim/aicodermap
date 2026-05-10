@@ -222,3 +222,87 @@ def banned_fetch_patterns(whitelist: dict[str, Any]) -> list[str]:
                 _add(url)
 
     return patterns
+
+
+def filter_for_batch(
+    whitelist: dict[str, Any],
+    providers: set[str] | list[str],
+    *,
+    keep_categories: tuple[str, ...] = ("leaderboards", "aggregators", "local"),
+    bench_keys: set[str] | list[str] | None = None,
+) -> dict[str, Any]:
+    """FAZ 7.B (2026-05-10) — return a slimmed whitelist for per-batch ctx.
+
+    Cuts the per-batch idea_context payload from ~106 KB (full whitelist) to
+    ~25-30 KB by:
+      • Keeping `_schema` in full (bench keys, format taxonomy, contracts,
+        notApplicableRules — all of which the agent reads in every batch).
+      • Filtering `vendors` to only entries matching `providers` (case-
+        insensitive substring + token match against vendor key).
+      • Keeping `keep_categories` (leaderboards/aggregators/local by default)
+        but filtering each entry's `publishes[]` to only bench_keys when
+        provided. `community` and `registries` are dropped by default —
+        agents that need them can fall back to direct file Read.
+
+    Quality is preserved: the agent still sees the universe of bench keys
+    via `_schema.coreBenchKeys`, the format taxonomy via `_schema.formatTaxonomy`,
+    notApplicableRules, and every leaderboard/aggregator URL relevant to the
+    bench keys it surveys. The only thing pruned is unrelated vendor entries
+    and rarely-used `community`/`registries` lists.
+
+    Returns a NEW dict; does not mutate the input.
+    """
+    pset_lower = {str(p).lower() for p in providers}
+
+    def vendor_matches(vendor_key: str) -> bool:
+        kn = vendor_key.lower()
+        for p in pset_lower:
+            if not p:
+                continue
+            if p in kn or kn in p:
+                return True
+            for token in p.replace("_", " ").replace("-", " ").split():
+                if token and token in kn:
+                    return True
+        return False
+
+    out: dict[str, Any] = {}
+    for k, v in whitelist.items():
+        if k == "vendors":
+            continue
+        if k in ("community", "registries") and k not in keep_categories:
+            continue
+        out[k] = v
+
+    # Filter vendors to matching providers only.
+    vendors = whitelist.get("vendors") or {}
+    out["vendors"] = {k: v for k, v in vendors.items() if vendor_matches(k)}
+
+    # Optional: filter publishes[] inside kept categories to bench_keys universe.
+    if bench_keys:
+        bk_set = {str(k) for k in bench_keys}
+        for cat in keep_categories:
+            entries = whitelist.get(cat) or []
+            filtered: list[dict[str, Any]] = []
+            for e in entries:
+                if not isinstance(e, dict):
+                    continue
+                pubs = e.get("publishes") or []
+                kept_pubs: list[Any] = []
+                for item in pubs:
+                    if isinstance(item, str):
+                        if item in bk_set:
+                            kept_pubs.append(item)
+                    elif isinstance(item, dict):
+                        if item.get("key") in bk_set:
+                            kept_pubs.append(item)
+                # Keep entries with at least one matched key, OR entries
+                # with no `publishes` field (treated as universal).
+                if kept_pubs or not pubs:
+                    new_e = dict(e)
+                    if pubs:
+                        new_e["publishes"] = kept_pubs
+                    filtered.append(new_e)
+            out[cat] = filtered
+
+    return out

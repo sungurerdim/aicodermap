@@ -64,6 +64,22 @@ PRELIM-C. STALE_ARTIFACT_PRUNE (FAZ 7.A, 2026-05-10):
    - Orchestrator records `cycle_started_unix = time.time()` AFTER prune; this flows into `idea_context.cycleStartedUnix` and into gather validator's `--cycle-started-unix`.
    - Non-fatal. Opt-out via `AICODERMAP_NO_PRUNE=1`.
 
+PRELIM-D. SNAPSHOT_ROW_EXTRACTION (FAZ 7.F, 2026-05-10):
+   ```
+   python scripts/extract-snapshot-rows.py
+   ```
+   - Walks every `data/.leaderboard-snapshots/*.html|json`, applies the schema's regex/JSON extractors with strict bench-value heuristics (% sign required, value ∈ [5..100]), emits `data/.leaderboard-snapshots/_rows.json` with shape `{ byModel: { <id>: [{benchKey, value, sourceUrl, tier, confidence: "regex-hint", snippet}] } }`.
+   - Why: each gather agent previously re-read the same raw HTML snapshot when looking for its target models. Cycle 2026-05-10 measured ~16 agents × ~75 snapshots = ~1200 redundant Read+parse operations. Pre-extraction does the parse ONCE; agents read the slim `_rows.json` (10-30 KB total).
+   - **Hint quality:** `confidence: "regex-hint"` — the agent verifies any used row by Reading its sourceUrl snapshot OR by an independent fetch. Multi-bench tables can produce duplicate values across keys (e.g., a single 80.2 attributed to both swePro+sweV); the agent's row-validator (FORMAT_DISPATCH) drops these unless an independent source confirms the bench-key assignment.
+   - **Quality gate:** rows are NOT auto-promoted to observations[]. The agent must verify before emitting. `_rows.json` is a STARTING POINT, not a source of record.
+   - Non-fatal. Opt-out via `AICODERMAP_NO_ROW_EXTRACT=1`.
+
+PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-only fast path:
+   - Computes `priorityCells = priority_cells(active, coreBenchKeys, limit=200, vmap, ttl=FRESHNESS_TTL_DAYS)`. If `priorityCells == []` AND every active model's `lastUpdated` is within `contracts.STALE_DAYS - 7` (default 7 days), the orchestrator switches the cycle to **lineup-sync only**: dispatches a single sonnet lineup agent (Step 0 only) and skips Stage A + Stage B + merge entirely. Output is whatever vendor-lineup deltas surface; data/{models,sources}.json values are unchanged.
+   - Why: when the matrix is fully covered AND fresh, there is nothing for gather agents to research that the verification map doesn't already mark `confirmed=true ≤7d`. The cycle's only value is detecting NEW/DEPRECATED/RENAMED models from vendor lineup pages.
+   - **Quality preserved:** the gate is hit only when EVERY active model was fully refreshed within the freshness TTL window. If even one cell is starved, full Stage A/B runs. The freshness check uses the verification map's `confirmed` flag (≥3 distinct sources within VERIFICATION_AGREEMENT_PP); not just the date.
+   - Opt-out: `AICODERMAP_FULL_REFRESH=1` env var forces the full Stage A/B regardless. `--force` flag on `/aicodermap refresh-all --force` does the same.
+
 0. LINEUP DISCOVERY (always run first on refresh-all):
    - Agent fetches each vendor's official "active models" page from VENDOR_LINEUP_SOURCES table
    - Returns canonical lineup: { vendorId: { active: [...], deprecated: [...], renamed: [{from,to}] } }
@@ -78,24 +94,57 @@ PRELIM-C. STALE_ARTIFACT_PRUNE (FAZ 7.A, 2026-05-10):
 1. Read data/{models,sources,sources-whitelist}.json + lineup result from Step 0
 2. Parse arg → resolve scope + target_model_ids
 3. Build idea_context (DATA-DRIVEN — agent never hardcodes data, only procedure):
+
+   **FAZ 7.B/7.C (2026-05-10) — single-helper build:**
+   ```python
+   from lib.idea_context import build_per_batch_ctx
+   ctx = build_per_batch_ctx(
+       batch_spec=batch,
+       full_whitelist=wl,
+       matrix_state=ms,
+       priority_cells=pc,
+       skip_cells=sk,
+       verification_map=vm,
+       leaderboard_snapshots=snap,
+       contracts=ctr,
+       banned_fetch_patterns=bp,
+       cycle_started_unix=time.time(),
+       total_models=len(models),
+       last_refresh=max(...),
+       current_ids=[m['id'] for m in models],
+       bench_keys=core_keys,
+   )
+   # Per-batch ctx: ~25-30 KB (vs 156 KB pre-7.B). Cuts batch ctx I/O 51%+.
+   ```
+
+   The helper writes a slim per-batch dict that:
+   - Filters `sourcesWhitelist` via `lib.whitelist.filter_for_batch(...)`:
+     keeps `_schema` in full, filters `vendors` to providers in this batch,
+     filters `leaderboards`/`aggregators`/`local` `publishes[]` to bench_keys
+     universe, drops `community`/`registries` (rarely used; agent reads
+     directly from data/sources-whitelist.json on demand).
+   - Slices `verificationMap.cells` to ONLY this batch's modelIds (was 93 KB
+     full inline → ~3 KB slice).
+   - Slices `priorityCells` and `skipCells` similarly.
+   - Slims `leaderboardSnapshots` to URL→path only (drops contentLength,
+     contentType, fetchedAt, etag — saves ~10-15 KB).
+   - Adds `cycleStartedUnix` from PRELIM-C anchor (drives validator stale check).
+   - Carries `_batchSpec` (modelIds, providers, expectedCells) for agent self-audit.
+
+   The OUTPUT_SCHEMA below documents the agent-facing keys; the per-batch
+   ctx file is read by the agent via `Read(.aicodermap-ctx-<batchId>.json)`.
+
    {
      title: "AICoderMap",
      total_models: <count from data/models.json>,
      last_refresh: <max(lastUpdated) from data/models.json>,
      currentIds: [<every id in data/models.json, including status='deprecated'>],
+     cycleStartedUnix: <epoch seconds from PRELIM-C>,
      familyGrouping: <models grouped by (provider, tier) for parallel batches>,
-     // F5 REFORM (2026-04-30): Send FILTERED whitelist, not the full 100KB blob.
-     // Per-batch filtering: only vendor entries relevant to this batch's providers.
-     // _schema, leaderboards[], aggregators[], local[], registries[] sent in full
-     // (shared across all batches — bench keys, format taxonomy, contracts live here).
-     // Typical reduction: 30-50KB → 10-15KB per batch agent context.
-     sourcesWhitelist: filtered_for_batch_vendors(
-       data/sources-whitelist.json,
-       batch_provider_set,  // set of provider names for this batch
-       // Keep: vendors matching batch_provider_set, _schema, leaderboards, aggregators, local, registries
-       // Drop: vendor entries for other families (they have their own batch)
-     ),
-     verificationMap: <inline .aicodermap-verification-map.json (or {} on first run)>,
+     // sourcesWhitelist is now SLICED per batch — see helper above.
+     sourcesWhitelist: filter_for_batch(wl, providers, bench_keys=core_keys),
+     // verificationMap is now SLICED per batch — only batch's modelIds' cells.
+     verificationMap: { cells: { ... } },  // batch-slice only, not full
      lineup: <Step 0 result>,
 
      // Matrix-aware context (P7+C plan reform — added 2026-04-29):
@@ -534,7 +583,14 @@ PRELIM-C. STALE_ARTIFACT_PRUNE (FAZ 7.A, 2026-05-10):
     `git commit --no-verify` and only acceptable for documented emergencies.
 
 10. ATOMIC WRITE — schema-complete merge per MERGE_RULES (rotated .bak backup):
-    Outputs:
+
+    **FAZ 7.E (2026-05-10) — single-script finalize wrapper:**
+    ```
+    python scripts/refresh-finalize.py
+    ```
+    Combines the previously-separate `gen_unified_artifact.py` + `.aicodermap-gap-gen.py` + `merge.py` calls into ONE process invocation. Each underlying script is unchanged (idempotent + same logic); the wrapper saves 2 redundant Python interpreter spawns + 2 file load/parse cycles. Failure of any inner step propagates exit code; merge.py's audit (SSOT coherence + MX1 invariant) still gates the commit. Use `--skip-merge` for dry-run preview.
+
+    Outputs (unchanged from per-script behavior):
     - data/models.json (multi-provider pricing array, subscription array, status field, full bench, ollama, unslothVariants, etc.)
     - data/sources.json (append sourcesAdded[] + every contradiction's losing candidate, dedup by (key, url, value), include trustScore per entry)
     - i18n/{tr,en}.json (merge i18nUpdates into models[id]={strengths,weaknesses})

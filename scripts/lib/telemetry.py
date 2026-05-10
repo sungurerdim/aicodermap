@@ -194,25 +194,39 @@ def aggregate_per_batch_telemetry(per_batch_artifacts: list[dict]) -> dict:
             or partial_batch_id
             or "unknown"
         )
-        models = art.get("models") or []
-        fills = sum(
-            len((m.get("updates") or {}).get("bench") or {})
-            for m in models
-            if isinstance(m, dict)
-        )
-        all_gaps = art.get("gaps") or []
-        gaps = len(all_gaps)
-        # FAZ 4.B (2026-05-08): split by source — 'agent' = real research,
-        # 'orchestrator' = auto-stub placeholder. Legacy entries default 'agent'.
-        agent_gaps = sum(
-            1
-            for g in all_gaps
-            if isinstance(g, dict) and g.get("source") != "orchestrator"
-        )
-        orch_gaps = gaps - agent_gaps
-        na = sum(
-            len(m.get("notApplicable") or []) for m in models if isinstance(m, dict)
-        )
+        # FAZ 7.C (2026-05-10): mode-aware fill/gap counting.
+        # Gather artifacts use FLAT schema (observations[], rawGaps[],
+        # naCandidates[]). Synth/full use models[].updates.bench + gaps[]
+        # + notApplicable[]. Prior version always read FULL schema, so
+        # gather-only cycles reported fills=0/gaps=0/na=0 (cycle 2026-05-10).
+        mode = art.get("mode")
+        if mode == "gather":
+            fills = len(art.get("observations") or [])
+            all_gaps = art.get("rawGaps") or []
+            gaps = len(all_gaps)
+            agent_gaps = gaps  # gather rawGaps are always agent-emitted
+            orch_gaps = 0
+            na = len(art.get("naCandidates") or [])
+        else:
+            models = art.get("models") or []
+            fills = sum(
+                len((m.get("updates") or {}).get("bench") or {})
+                for m in models
+                if isinstance(m, dict)
+            )
+            all_gaps = art.get("gaps") or []
+            gaps = len(all_gaps)
+            # FAZ 4.B (2026-05-08): split by source — 'agent' = real research,
+            # 'orchestrator' = auto-stub placeholder. Legacy entries default 'agent'.
+            agent_gaps = sum(
+                1
+                for g in all_gaps
+                if isinstance(g, dict) and g.get("source") != "orchestrator"
+            )
+            orch_gaps = gaps - agent_gaps
+            na = sum(
+                len(m.get("notApplicable") or []) for m in models if isinstance(m, dict)
+            )
         wallclock = float(
             art.get("_wallclockSec")
             or rm.get("wallclockSec")
