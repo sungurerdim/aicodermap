@@ -207,6 +207,11 @@ def _cluster_observations(
                 cl["distinct_sources"] = len(
                     {(m.get("sourceUrl") or "").lower() for m in cl["members"]}
                 )
+                # FAZ 6.D: track latest fetched date per cluster for the
+                # recency tiebreaker.
+                cl["latest_fetched"] = max(
+                    cl.get("latest_fetched") or "", s.get("fetched") or ""
+                )
                 placed = True
                 break
         if not placed:
@@ -216,12 +221,30 @@ def _cluster_observations(
                     "members": [s],
                     "sum_trust": round(s["trustScore"], 4),
                     "distinct_sources": 1,
+                    "latest_fetched": s.get("fetched") or "",
                 }
             )
-    clusters.sort(
-        key=lambda c: (c["sum_trust"], c["distinct_sources"], len(c["members"])),
-        reverse=True,
-    )
+    # FAZ 6.D — recency tiebreaker. When two clusters' sum_trust differ by
+    # less than RECENCY_TIEBREAK_BAND (0.5), the one with the more recent
+    # latest_fetched date wins. Only fires AFTER strict gate (the override
+    # threshold in reconcile/synth still must pass), so it never promotes
+    # a freshly-fabricated single source over an old multi-source consensus
+    # — it only re-orders within the same evidence band.
+    RECENCY_TIEBREAK_BAND = 0.5
+
+    def _rank_key(c: dict[str, Any]) -> tuple[Any, ...]:
+        # Primary: bucket the trust into bands so close clusters compare equal
+        # at this stage; recency then breaks the tie. Bucket size matches the
+        # tiebreak band so two clusters within the band share a primary key.
+        bucket = round(c["sum_trust"] / RECENCY_TIEBREAK_BAND)
+        return (
+            bucket,
+            c["distinct_sources"],
+            c.get("latest_fetched") or "",
+            len(c["members"]),
+        )
+
+    clusters.sort(key=_rank_key, reverse=True)
     return clusters
 
 
@@ -274,11 +297,17 @@ def _pick_winner(
     """
     if not observations:
         return ({}, [], 0.0)
+    # FAZ 6.E (2026-05-10): pass DISTINCT URL count instead of total
+    # observation count to _trust_score. The agent emits one observation
+    # per (modelId, benchKey) per fetch attempt — three obs from the same
+    # Scale SEAL page should count as 1 verification, not 3. Distinct
+    # source count caps the verifications input.
+    distinct_urls = {(o.get("sourceUrl") or "").strip().lower() for o in observations}
+    distinct_urls.discard("")
+    verif_count = len(distinct_urls) or len(observations)
     scored = []
     for o in observations:
-        score = _trust_score(
-            o["tier"], len(observations), o.get("fetched") or "", today
-        )
+        score = _trust_score(o["tier"], verif_count, o.get("fetched") or "", today)
         scored.append({**o, "trustScore": score})
 
     # FAZ 6.C — root-URL trust penalty before clustering. Lets a 0.4-trust

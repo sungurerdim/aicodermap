@@ -41,6 +41,7 @@ from lib.synth import (  # noqa: E402  - runtime path
     _apply_low_confidence_penalty,
     _cluster_observations,
     _load_low_confidence_urls,
+    _load_unhealthy_urls,
 )
 
 SOURCES_PATH = ROOT / "data" / "sources.json"
@@ -135,6 +136,43 @@ def main() -> int:
         print(
             f"low-confidence URLs = {len(low_conf_urls)} × {low_conf_mult} multiplier"
         )
+    # FAZ 6.F: stale-clear policy. When stored value's only evidence is from
+    # unhealthy/low-confidence URLs AND new consensus is below the override
+    # gate, clear stored value to null rather than keep a discredited number.
+    unhealthy_urls = _load_unhealthy_urls(ROOT)
+    print(f"unhealthy URLs (FAZ 6.A) = {len(unhealthy_urls)}")
+
+    def _evidence_is_discredited(entries: list[dict[str, Any]]) -> bool:
+        """True when EVERY value-bearing entry cites a discredited URL.
+
+        sources.json entries use `url` (not `sourceUrl`); be defensive.
+
+        An entry is "credible" when it has a non-empty URL that is NOT in
+        the unhealthy or low-confidence sets. An entry with empty URL is
+        AMBIGUOUS — it neither credits nor discredits the cell. To clear
+        a cell, EVERY value-bearing entry must be either:
+          (a) explicitly cited from an unhealthy/low-conf URL, OR
+          (b) so weakly identified (empty URL + low trust) that we cannot
+              distinguish it from fabrication.
+
+        Conservative: require at least one EXPLICITLY discredited URL
+        before triggering the clear. Pure empty-URL entries do not trip
+        this guard alone — they need an unhealthy/low-conf companion."""
+        valid = [e for e in entries if e.get("value") is not None]
+        if not valid:
+            return False
+        explicit_discredit = False
+        for e in valid:
+            url = (e.get("url") or e.get("sourceUrl") or "").strip().rstrip("/").lower()
+            if not url:
+                continue  # ambiguous; doesn't credit or discredit
+            if url in unhealthy_urls or url in low_conf_urls:
+                explicit_discredit = True
+                continue
+            return False  # found a credible citation
+        # Reached here means every URL'd entry was discredited; require at
+        # least one explicit discredit before clearing.
+        return explicit_discredit
 
     sources = json.loads(SOURCES_PATH.read_text(encoding="utf-8"))
     models = json.loads(MODELS_PATH.read_text(encoding="utf-8"))
@@ -191,6 +229,30 @@ def main() -> int:
         )
         if not passes:
             skipped_weak.append(f"{mid}.{fkey}: cluster={d}× trust_sum={s}")
+            # FAZ 6.F: stale clear. If gate fails AND every credible source
+            # has been excluded (only unhealthy/low-conf citations remain),
+            # the stored value rests on discredited evidence — null it out
+            # rather than preserve a fabrication.
+            if _evidence_is_discredited(entries):
+                old_val = bench.get(fkey)
+                if old_val is not None:
+                    bench[fkey] = None
+                    bench_cells_changed += 1
+                    deltas.append(
+                        {
+                            "cell": f"{mid}.{fkey}",
+                            "old": old_val,
+                            "new": None,
+                            "delta": 0,
+                            "winning_cluster_size": 0,
+                            "winning_cluster_distinct_sources": 0,
+                            "winning_cluster_sum_trust": 0,
+                            "total_clusters": len(clusters),
+                            "winner_source_url": None,
+                            "winner_trust": 0,
+                            "_reason": "FAZ 6.F: discredited evidence cleared",
+                        }
+                    )
             continue
         winner_obs = max(
             winning_cluster["members"],
