@@ -52,6 +52,8 @@ ALLOWED_TIERS = {"I", "S", "C"}
 
 MIN_AVG_OBS_PER_MODEL = 3
 
+STALE_GRACE_SEC = 300
+
 
 def validate_gather(
     artifact: dict[str, Any],
@@ -228,9 +230,18 @@ def feedback_message(
 
 
 def validate_gather_file(
-    path: str | Path, target_model_ids: list[str]
+    path: str | Path,
+    target_model_ids: list[str],
+    cycle_started_unix: float | None = None,
 ) -> dict[str, Any]:
-    """Convenience wrapper — load artifact then validate."""
+    """Convenience wrapper — load artifact then validate.
+
+    When `cycle_started_unix` is set, treats artifacts whose mtime predates
+    `cycle_started_unix - STALE_GRACE_SEC` as STALE: forces zero-fill semantics
+    so the orchestrator dispatches a fresh retry. Defends against the
+    "agent reused prior cycle's gather output without writing" failure mode
+    observed 2026-05-10 (synth file mtime predated cycle start by 4h).
+    """
     p = Path(path)
     if not p.is_file():
         return {
@@ -249,10 +260,29 @@ def validate_gather_file(
             "warnings": [],
             "stats": {},
         }
-    return validate_gather(artifact, target_model_ids)
+    verdict = validate_gather(artifact, target_model_ids)
+    if cycle_started_unix is not None:
+        try:
+            mtime = p.stat().st_mtime
+        except OSError:
+            mtime = 0.0
+        age_sec = cycle_started_unix - mtime
+        if age_sec > STALE_GRACE_SEC:
+            stats = verdict.setdefault("stats", {})
+            stats["stale"] = True
+            stats["mtimeAgeSec"] = round(age_sec, 1)
+            verdict["valid"] = False
+            verdict.setdefault("errors", []).append(
+                f"STALE artifact — mtime predates cycle start by {age_sec:.0f}s "
+                f"(grace={STALE_GRACE_SEC}s). Prior-cycle output reused; "
+                f"orchestrator must overwrite via fresh dispatch."
+            )
+    return verdict
 
 
 if __name__ == "__main__":
+    import argparse
+    import os
     import sys
     import glob
 
@@ -264,6 +294,23 @@ if __name__ == "__main__":
     from lib.matrix import active_models  # noqa: E402
     from lib.whitelist import core_bench_keys, load_whitelist  # noqa: E402
 
+    parser = argparse.ArgumentParser(description="Validate gather artifacts.")
+    parser.add_argument(
+        "--cycle-started-unix",
+        type=float,
+        default=None,
+        help="Reject artifacts whose mtime predates this epoch (stale check).",
+    )
+    args = parser.parse_args()
+    cycle_started = args.cycle_started_unix
+    if cycle_started is None:
+        env = os.environ.get("AICODERMAP_CYCLE_STARTED_UNIX")
+        if env:
+            try:
+                cycle_started = float(env)
+            except ValueError:
+                cycle_started = None
+
     project = Path(__file__).resolve().parents[2]
     with (project / "data" / "models.json").open(encoding="utf-8") as f:
         models = json.load(f)
@@ -272,7 +319,10 @@ if __name__ == "__main__":
     target_by_batch = {b["batchId"]: b["modelIds"] for b in plan["batches"]}
 
     print("=== GATHER VALIDATION ===")
+    if cycle_started is not None:
+        print(f"cycle_started_unix={cycle_started:.0f} grace={STALE_GRACE_SEC}s")
     weak_count = 0
+    stale_count = 0
     valid_count = 0
     for path in sorted(
         glob.glob(str(project / ".aicodermap-agent-out-batch*.gather.json"))
@@ -286,18 +336,26 @@ if __name__ == "__main__":
         if targets is None:
             print(f"[?] {bid}: no target_model_ids found in plan, skipping")
             continue
-        v = validate_gather_file(path, targets)
+        v = validate_gather_file(path, targets, cycle_started_unix=cycle_started)
         s = v["stats"]
-        flag = "OK" if v["valid"] and not s.get("isWeakBatch") else "WEAK"
+        is_stale = s.get("stale") is True
+        if is_stale:
+            flag = "STALE"
+        elif v["valid"] and not s.get("isWeakBatch"):
+            flag = "OK"
+        else:
+            flag = "WEAK"
         print(
-            f"[{flag:4}] {bid:30} obs={s.get('observations', 0):3} "
+            f"[{flag:5}] {bid:30} obs={s.get('observations', 0):3} "
             f"avg={s.get('avgObs', 0):.1f} errors={len(v['errors'])} warnings={len(v['warnings'])}"
         )
         for e in v["errors"][:2]:
             print(f"        ERROR: {e}")
-        if not v["valid"] or s.get("isWeakBatch"):
+        if is_stale:
+            stale_count += 1
+        elif not v["valid"] or s.get("isWeakBatch"):
             weak_count += 1
         if v["valid"]:
             valid_count += 1
 
-    print(f"\nSUMMARY: weak={weak_count} valid={valid_count}")
+    print(f"\nSUMMARY: stale={stale_count} weak={weak_count} valid={valid_count}")

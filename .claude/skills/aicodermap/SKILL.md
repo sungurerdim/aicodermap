@@ -55,6 +55,15 @@ PRELIM-B. LEADERBOARD_PREFETCH (FAZ 2.1, 2026-05-07 — orchestrator-side single
    - **Output to skill:** the orchestrator reads `_index.json` and injects `idea_context.leaderboardSnapshots = { <url>: { path: "<rel>", contentType, contentLength, fetchedAt } }` into every batch dispatch (Step 3).
    - This step CANNOT be skipped on `refresh-all` and `lineup-sync`. It is opt-out via `AICODERMAP_NO_PREFETCH=1` env var only for emergency manual reruns.
 
+PRELIM-C. STALE_ARTIFACT_PRUNE (FAZ 7.A, 2026-05-10):
+   ```
+   python scripts/prune-stale-artifacts.py
+   ```
+   - Renames prior-cycle artifacts to `<name>.stale-<epoch>` so dispatched agents cannot reuse them. Patterns: `.aicodermap-agent-out-batch*.gather.json`, `.aicodermap-agent-out-batch*-gather.json`, `.aicodermap-agent-out-synth.json`, `.aicodermap-agent-out.json`.
+   - Defends against the cycle 2026-05-10 failure mode: gather/synth agents observed prior-cycle artifacts, deemed them complete, emitted EMITTED status without fresh fetches.
+   - Orchestrator records `cycle_started_unix = time.time()` AFTER prune; this flows into `idea_context.cycleStartedUnix` and into gather validator's `--cycle-started-unix`.
+   - Non-fatal. Opt-out via `AICODERMAP_NO_PRUNE=1`.
+
 0. LINEUP DISCOVERY (always run first on refresh-all):
    - Agent fetches each vendor's official "active models" page from VENDOR_LINEUP_SOURCES table
    - Returns canonical lineup: { vendorId: { active: [...], deprecated: [...], renamed: [{from,to}] } }

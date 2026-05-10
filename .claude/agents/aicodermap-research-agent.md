@@ -239,6 +239,18 @@ reliably; nested 2-level structures often degrade.
 7. **STATUS LINE format:** `EMITTED batch=<id> mode=gather observations=N
    pricingObs=P ollamaObs=O rawGaps=R path=...`
 
+8. **WRITE ALWAYS — never preserve prior content** (FAZ 7.A, 2026-05-10).
+   If `output_path` exists, OVERWRITE it from scratch. Do NOT Read your
+   own output file as a cache; do NOT inspect its mtime/runtime/
+   partialReason and emit EMITTED status without doing fresh fetches.
+   Cycle 2026-05-10 measured several haiku gather agents observing an
+   existing artifact, deeming it complete, and emitting status without
+   any new work. The orchestrator's PRELIM-C step renames stale
+   artifacts to `*.stale-<epoch>` before dispatch — any file you find
+   at `output_path` is empty or written by a sibling retry. Either way,
+   emit a fresh artifact reflecting THIS cycle's fetches. Reading other
+   agents' output files is also forbidden.
+
 Wallclock + tool-call ceilings still HARD. Don't exit early.
 
 ### Mode `synth` (sonnet, single dispatch — analyzes ALL gather outputs)
