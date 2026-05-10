@@ -2073,6 +2073,38 @@
           "format": "websearch_snippet"
         }
       ]
+    },
+    {
+      "name": "LiveCodeBench (HF Space mirror)",
+      "url": "https://huggingface.co/spaces/livecodebench/leaderboard",
+      "tier": "I",
+      "format": "static_html_table",
+      "publishes": [
+        "lcb"
+      ],
+      "lastVerifiedDate": "2026-05-10",
+      "_runtime": {
+        "unhealthy": false,
+        "consecutiveFailures": 0
+      },
+      "addedBy": "FAZ-5.A-2026-05-10",
+      "mirrorOf": "https://livecodebench.github.io/leaderboard.html"
+    },
+    {
+      "name": "Berkeley BFCL (HF Space mirror)",
+      "url": "https://huggingface.co/spaces/gorilla-llm/berkeley-function-calling-leaderboard",
+      "tier": "I",
+      "format": "static_html_table",
+      "publishes": [
+        "bfcl"
+      ],
+      "lastVerifiedDate": "2026-05-10",
+      "_runtime": {
+        "unhealthy": false,
+        "consecutiveFailures": 0
+      },
+      "addedBy": "FAZ-5.A-2026-05-10",
+      "mirrorOf": "https://gorilla.cs.berkeley.edu/leaderboard.html"
     }
   ],
   "aggregators": [

@@ -257,6 +257,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added — 2026-05-10 (FAZ 5.A — SPA fallback via HF Space mirror)
+
+Two banned-list SPA leaderboards now have HF Space mirror entries the
+prefetch pipeline can fetch successfully:
+
+- LiveCodeBench → `huggingface.co/spaces/livecodebench/leaderboard` (30KB)
+- Berkeley BFCL → `huggingface.co/spaces/gorilla-llm/berkeley-function-calling-leaderboard` (37KB)
+
+Mirror entries marked `format: static_html_table`, `tier: I`, with
+`mirrorOf` field pointing back to the original SPA. Same `publishes[]` so
+agents see the bench coverage. matharena.ai and epoch.ai remain
+unmirrored — manual investigation needed for those vendors.
+
 ### Changed — 2026-05-10 (FAZ 5.B + 5.C — N/A taxonomy + bench universe split)
 
 Coverage rose from 32.5% → 65.7% via two structural reforms:
