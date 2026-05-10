@@ -156,17 +156,93 @@ def _aggregate_observations(
     return cells
 
 
+def _cluster_observations(
+    scored: list[dict[str, Any]], agreement_pp: float
+) -> list[dict[str, Any]]:
+    """Group same-value observations into clusters. Two observations land in
+    the same cluster when |valueA - valueB| <= agreement_pp. Centroid is the
+    trustScore-weighted mean of cluster members. Returns clusters sorted by
+    summed trustScore (descending) so [0] is the consensus cluster.
+
+    Greedy single-pass clustering. Sorted by trustScore desc so highest-trust
+    obs seeds the cluster centroid before lower-trust outliers join — keeps
+    the cluster representative stable when one source has a typo near the
+    agreement boundary.
+    """
+    clusters: list[dict[str, Any]] = []
+    for s in sorted(scored, key=lambda x: -x["trustScore"]):
+        placed = False
+        for cl in clusters:
+            if abs(s["value"] - cl["centroid"]) <= agreement_pp:
+                cl["members"].append(s)
+                tot = sum(m["trustScore"] for m in cl["members"]) or 1e-6
+                cl["centroid"] = (
+                    sum(m["value"] * m["trustScore"] for m in cl["members"]) / tot
+                )
+                cl["sum_trust"] = round(tot, 4)
+                cl["distinct_sources"] = len(
+                    {(m.get("sourceUrl") or "").lower() for m in cl["members"]}
+                )
+                placed = True
+                break
+        if not placed:
+            clusters.append(
+                {
+                    "centroid": s["value"],
+                    "members": [s],
+                    "sum_trust": round(s["trustScore"], 4),
+                    "distinct_sources": 1,
+                }
+            )
+    clusters.sort(
+        key=lambda c: (c["sum_trust"], c["distinct_sources"], len(c["members"])),
+        reverse=True,
+    )
+    return clusters
+
+
 def _pick_winner(
-    observations: list[dict[str, Any]], today: datetime.date
+    observations: list[dict[str, Any]],
+    today: datetime.date,
+    *,
+    agreement_pp: float = DEFAULT_AGREEMENT_PP,
 ) -> tuple[dict[str, Any], list[dict[str, Any]], float]:
-    """Compute trustScore per obs, return (winner, all_scored, max_delta)."""
+    """Cluster-aware winner selection (FAZ 6.B, 2026-05-10).
+
+    Replaces the prior single-argmax. The previous rule picked the
+    observation with max individual trustScore — that let a single
+    high-tier outlier (verifs=1, fabricated I-tier) override 5+ agreeing
+    lower-tier sources. Concrete failure: deepseek-v4-pro.swePro had 6
+    sources at 55.4 (incl. Scale SEAL trust=0.87) but a single
+    benchlm.ai/ root-URL fabrication at 20.12 (trust=0.333) was emitted
+    as the winner because it was the most recent/most-recent-tied entry.
+
+    New rule:
+      1. Cluster observations by value (members within agreement_pp join).
+      2. Pick the cluster with max sum(trustScore) — multi-source cluster
+         with mid-trust members beats single-source cluster with high-trust
+         outlier.
+      3. Tiebreak: distinct sources desc, then member count desc.
+      4. Within the winning cluster, the winner is the highest-individual-
+         trustScore member (most authoritative source for the consensus).
+
+    Returns (winner_obs, all_scored, max_delta_across_all_obs).
+    """
+    if not observations:
+        return ({}, [], 0.0)
     scored = []
     for o in observations:
-        score = _trust_score(o["tier"], len(observations), o["fetched"], today)
+        score = _trust_score(
+            o["tier"], len(observations), o.get("fetched") or "", today
+        )
         scored.append({**o, "trustScore": score})
-    if not scored:
-        return ({}, [], 0.0)
-    winner = max(scored, key=lambda s: (s["trustScore"], s["fetched"]))
+
+    clusters = _cluster_observations(scored, agreement_pp)
+    winning_cluster = clusters[0]
+    winner = max(
+        winning_cluster["members"],
+        key=lambda m: (m["trustScore"], m.get("fetched") or ""),
+    )
     values = [s["value"] for s in scored]
     max_delta = max(values) - min(values) if len(values) > 1 else 0.0
     return winner, scored, max_delta
@@ -459,7 +535,9 @@ def synth(
         if bk not in canonical_bench_keys:
             # Drop non-canonical bench keys at synth time (e.g. legacy 'aider').
             continue
-        winner, scored, max_delta = _pick_winner(obs_list, today)
+        winner, scored, max_delta = _pick_winner(
+            obs_list, today, agreement_pp=agreement_pp
+        )
         if not winner:
             continue
         models_by_id[mid]["id"] = mid

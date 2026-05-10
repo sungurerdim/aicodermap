@@ -556,6 +556,73 @@ def main():
             log["added"].append(nm["id"])
 
     BENCH_KEYS = _load_bench_key_universe()
+    # FAZ 6.B (2026-05-10): cluster-consensus winner override. The agent
+    # may emit autoResolveWinner per single-argmax trustScore, which lets
+    # a high-tier outlier override multi-source consensus. Re-cluster the
+    # candidates here and prefer the cluster with max sum(trustScore).
+    sys.path.insert(0, f"{PROJECT}/scripts")
+    from lib.synth import _cluster_observations  # noqa: E402
+
+    AGREEMENT_PP = 1.5
+    MIN_DISTINCT_SAFE = 3
+    MIN_DISTINCT_PAIRED = 2
+    MIN_SUM_TRUST_PAIRED = 1.5
+
+    def _consensus_winner(
+        candidates_list: list[dict], fallback: dict | None
+    ) -> tuple[dict | None, str]:
+        """Return (winner, reason). When candidates form a stronger
+        cluster than `fallback` is part of, return cluster's winner.
+        Otherwise return fallback unchanged."""
+        obs = []
+        tier_w = {"I": 1.0, "S": 0.7, "C": 0.4, "U": 0.1}
+        for c_ in candidates_list:
+            if c_.get("value") is None:
+                continue
+            ts = c_.get("trustScore")
+            if ts is None:
+                tw = tier_w.get((c_.get("tier") or "C").upper(), 0.4)
+                v = max(1, min(int(c_.get("verifications") or 1), 3))
+                ts = round(tw * (v / 3), 3)
+            obs.append(
+                {
+                    "value": float(c_["value"]),
+                    "trustScore": float(ts),
+                    "sourceUrl": c_.get("url") or "",
+                    "tier": (c_.get("tier") or "C").upper(),
+                    "fetched": c_.get("fetched") or c_.get("date") or "",
+                    "_orig": c_,
+                }
+            )
+        if not obs:
+            return fallback, "no observations"
+        clusters = _cluster_observations(obs, AGREEMENT_PP)
+        if not clusters:
+            return fallback, "no clusters"
+        best = clusters[0]
+        d = best["distinct_sources"]
+        s = best["sum_trust"]
+        gate_passed = d >= MIN_DISTINCT_SAFE or (
+            d >= MIN_DISTINCT_PAIRED and s >= MIN_SUM_TRUST_PAIRED
+        )
+        if not gate_passed:
+            return fallback, f"weak cluster d={d} s={s} — keep fallback"
+        cluster_winner = max(
+            best["members"],
+            key=lambda m: (m["trustScore"], m.get("fetched") or ""),
+        )
+        # If fallback's value is in this winning cluster, keep fallback.
+        if fallback is not None and fallback.get("value") is not None:
+            try:
+                if (
+                    abs(float(fallback["value"]) - float(best["centroid"]))
+                    <= AGREEMENT_PP
+                ):
+                    return fallback, f"fallback in winning cluster (d={d}, s={s})"
+            except (TypeError, ValueError):
+                pass
+        return cluster_winner["_orig"], f"cluster d={d} s={s} overrode fallback"
+
     for c in out.get("contradictions", []) or []:
         mid = c["modelId"]
         # Agent contract: `field` is the bare bench key, `autoResolveWinner` is
@@ -565,37 +632,38 @@ def main():
         winner = c.get("autoResolveWinner")
         if winner is None:
             continue
-        # FAZ 6.A: if the autoresolve winner cites an unhealthy URL, recompute
-        # winner from remaining candidates. The cycle 2026-05-09 had I-tier
-        # SPA-shell winners override multi-source consensus; without this
-        # fallback, the contradiction codepath could re-introduce the bug
-        # even after observations are filtered upstream.
         all_candidates = c.get("candidates") or []
+        # FAZ 6.A: drop unhealthy SPA-shell URLs from candidate pool.
+        healthy_candidates = [
+            cand
+            for cand in all_candidates
+            if not _is_unhealthy_source(cand, unhealthy_urls)
+            and cand.get("value") is not None
+        ]
         if _is_unhealthy_source(winner, unhealthy_urls):
             log["spa_guard_rejections"] += 1
-            healthy = [
-                cand
-                for cand in all_candidates
-                if not _is_unhealthy_source(cand, unhealthy_urls)
-                and cand.get("value") is not None
-            ]
-            if not healthy:
+            if not healthy_candidates:
                 log["format_warnings"].append(
                     f"{mid}.{bench_field}: SPA-guard dropped winner; no healthy candidate — skipping"
                 )
                 continue
+            # Provisional fallback if cluster doesn't override.
             tier_rank = {"I": 3, "S": 2, "C": 1, "U": 0}
             winner = max(
-                healthy,
+                healthy_candidates,
                 key=lambda x: (
                     float(x.get("trustScore") or 0),
                     tier_rank.get(x.get("tier") or "", 0),
                     str(x.get("fetched") or x.get("date") or ""),
                 ),
             )
+        # FAZ 6.B: re-cluster + prefer multi-source consensus.
+        new_winner, reason = _consensus_winner(healthy_candidates, winner)
+        if new_winner is not winner and new_winner is not None:
             log["format_warnings"].append(
-                f"{mid}.{bench_field}: SPA-guard reassigned winner to {winner.get('source', '?')[:30]} (was unhealthy)"
+                f"{mid}.{bench_field}: consensus override — {reason}"
             )
+            winner = new_winner
         winner_value = winner["value"]
         m = find(models, mid)
         if m is not None and bench_field in BENCH_KEYS:
