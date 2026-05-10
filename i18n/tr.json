@@ -390,16 +390,46 @@
       "strengths": "Terminal-Bench 2.0'da %82.7 lider; GPQA %93.6; 1M token bağlam; natif çok modallu (omni); MCP-Atlas %75.3; SWE-bench Pro %58.6.",
       "weaknesses": "SWE-bench Pro'da Opus 4.7'nin 5.7 puan gerisinde; HLE %41.4 (Opus 4.7 = %46.9); $5/$30 yüksek API fiyatı; kapalı ağırlıklar."
     },
-    "glm-4-5-air.strengths": "12B aktif parametreli MoE; self-host icin maliyet-yetenek dengesi iyi; MIT lisansli.",
-    "glm-4-5-air.weaknesses": "Bench kapsami bekliyor; yayin aninda agentic kolonlar buyuk olcude test edilmemis.",
-    "glm-4-7.strengths": "GLM serisinde acik-agirlikli kodlama lideri; MIT altinda frontier-sinifi SWE davranisi hedefler.",
-    "glm-4-7.weaknesses": "Kullanilabilir quantlarda 40GB+ VRAM ister; tuketici GPU icin gercekci degil.",
-    "mistral-medium-3-5.strengths": "Avrupa dilleri destegi guclu, fiyati ongorulebilir orta-seviye Mistral modeli.",
-    "mistral-medium-3-5.weaknesses": "Modified-MIT lisansi ticari yeniden dagitimi kisitlar; yalnizca cloud.",
-    "qwen3-5-9b.strengths": "6-8GB tuketici GPU icin uygun kompakt 9B Qwen; Apache 2.0 kisitsiz.",
-    "qwen3-5-9b.weaknesses": "Coklu-dosya refaktorde 27B/35B kardeslerinden daha dusuk kapasite; agentic bosluklar bekleniyor.",
-    "minimax-m2-1.strengths": "Token basina 1$ altinda 1M-token baglam penceresi; uzun-dokuman ve coklu-dosya gorevleri icin faydali.",
-    "minimax-m2-1.weaknesses": "Tam hassasiyette yerel calistirma pratik degil; cloud-oncelikli dagitim."
+    "glm-4-5-air": {
+      "strengths": "12B aktif parametreli MoE; self-host icin maliyet-yetenek dengesi iyi; MIT lisansli.",
+      "weaknesses": "Bench kapsami bekliyor; yayin aninda agentic kolonlar buyuk olcude test edilmemis."
+    },
+    "glm-4-7": {
+      "strengths": "GLM serisinde acik-agirlikli kodlama lideri; MIT altinda frontier-sinifi SWE davranisi hedefler.",
+      "weaknesses": "Kullanilabilir quantlarda 40GB+ VRAM ister; tuketici GPU icin gercekci degil."
+    },
+    "mistral-medium-3-5": {
+      "strengths": "Avrupa dilleri destegi guclu, fiyati ongorulebilir orta-seviye Mistral modeli.",
+      "weaknesses": "Modified-MIT lisansi ticari yeniden dagitimi kisitlar; yalnizca cloud."
+    },
+    "qwen3-5-9b": {
+      "strengths": "6-8GB tuketici GPU icin uygun kompakt 9B Qwen; Apache 2.0 kisitsiz.",
+      "weaknesses": "Coklu-dosya refaktorde 27B/35B kardeslerinden daha dusuk kapasite; agentic bosluklar bekleniyor."
+    },
+    "minimax-m2-1": {
+      "strengths": "Token basina 1$ altinda 1M-token baglam penceresi; uzun-dokuman ve coklu-dosya gorevleri icin faydali.",
+      "weaknesses": "Tam hassasiyette yerel calistirma pratik degil; cloud-oncelikli dagitim."
+    },
+    "claude-haiku-4-5": {
+      "strengths": "",
+      "weaknesses": ""
+    },
+    "codestral": {
+      "strengths": "",
+      "weaknesses": ""
+    },
+    "grok-4-1-fast": {
+      "strengths": "",
+      "weaknesses": ""
+    },
+    "grok-4-20": {
+      "strengths": "",
+      "weaknesses": ""
+    },
+    "grok-4-3": {
+      "strengths": "",
+      "weaknesses": ""
+    }
   },
   "benchmarks": {
     "swePro": {

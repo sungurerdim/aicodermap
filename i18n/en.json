@@ -390,16 +390,46 @@
       "strengths": "Leads Terminal-Bench 2.0 at 82.7%; GPQA 93.6%; 1M token context; natively omnimodal; MCP-Atlas 75.3%; SWE-bench Pro 58.6%.",
       "weaknesses": "5.7 points behind Opus 4.7 on SWE-bench Pro; HLE 41.4% (vs Opus 4.7 46.9%); expensive at $5/$30 per 1M tokens; closed weights."
     },
-    "glm-4-5-air.strengths": "MoE with 12B active parameters; balanced cost-vs-capability for self-host; MIT-licensed.",
-    "glm-4-5-air.weaknesses": "Bench coverage pending; agentic columns largely untested at publish time.",
-    "glm-4-7.strengths": "Open-weight coding leader within the GLM series; targets frontier-class SWE behavior under MIT.",
-    "glm-4-7.weaknesses": "Requires 40GB+ VRAM at usable quants; not realistic for consumer GPUs.",
-    "mistral-medium-3-5.strengths": "Mid-tier Mistral with strong European-language support and predictable pricing.",
-    "mistral-medium-3-5.weaknesses": "Modified-MIT licensing restricts commercial redistribution; cloud-only.",
-    "qwen3-5-9b.strengths": "Compact 9B Qwen suitable for 6-8GB consumer GPUs; Apache 2.0 unrestricted.",
-    "qwen3-5-9b.weaknesses": "Smaller capacity than 27B/35B siblings on multi-file refactor; agentic gaps expected.",
-    "minimax-m2-1.strengths": "1M-token context window at sub-$1/M tokens; useful for long-document and multi-file context tasks.",
-    "minimax-m2-1.weaknesses": "Local execution is impractical at full precision; cloud-first deployment."
+    "glm-4-5-air": {
+      "strengths": "MoE with 12B active parameters; balanced cost-vs-capability for self-host; MIT-licensed.",
+      "weaknesses": "Bench coverage pending; agentic columns largely untested at publish time."
+    },
+    "glm-4-7": {
+      "strengths": "Open-weight coding leader within the GLM series; targets frontier-class SWE behavior under MIT.",
+      "weaknesses": "Requires 40GB+ VRAM at usable quants; not realistic for consumer GPUs."
+    },
+    "mistral-medium-3-5": {
+      "strengths": "Mid-tier Mistral with strong European-language support and predictable pricing.",
+      "weaknesses": "Modified-MIT licensing restricts commercial redistribution; cloud-only."
+    },
+    "qwen3-5-9b": {
+      "strengths": "Compact 9B Qwen suitable for 6-8GB consumer GPUs; Apache 2.0 unrestricted.",
+      "weaknesses": "Smaller capacity than 27B/35B siblings on multi-file refactor; agentic gaps expected."
+    },
+    "minimax-m2-1": {
+      "strengths": "1M-token context window at sub-$1/M tokens; useful for long-document and multi-file context tasks.",
+      "weaknesses": "Local execution is impractical at full precision; cloud-first deployment."
+    },
+    "claude-haiku-4-5": {
+      "strengths": "",
+      "weaknesses": ""
+    },
+    "codestral": {
+      "strengths": "",
+      "weaknesses": ""
+    },
+    "grok-4-1-fast": {
+      "strengths": "",
+      "weaknesses": ""
+    },
+    "grok-4-20": {
+      "strengths": "",
+      "weaknesses": ""
+    },
+    "grok-4-3": {
+      "strengths": "",
+      "weaknesses": ""
+    }
   },
   "benchmarks": {
     "swePro": {
