@@ -1,4 +1,53 @@
 
+## [2026-05-11] — autonomous refresh-all [WARN: cumulative provenance coverage 75.5% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 281 new fills; 137 cells auto-gapped by orchestrator; 252 explicit agent gaps preserved]
+
+[fillRatio:0.76 cells:453/600 contradictions:28 fetch:0.0min tools:None batches:None build:8d59db9]
+
+### Updated
+- 44 models: `o4-mini`, `minimax-m2-7`, `gemma-3-27b`, `gemma-4-26b-moe`, `glm-4-7`, `gemini-3-1-pro`, `kimi-k2-6`, `llama-4-scout`, `qwen3-235b`, `qwen3-coder-next`, `grok-3-mini`, `qwen-3-6-max`, `step-3-5-flash`, `gemini-3-1-flash`, `deepseek-v4-pro`, `grok-3`, `qwen3-5-9b`, `glm-4-5-air`, `opus-4-7`, `gemma-4-e4b`, `sonnet-4-6`, `nemotron-3-super`, `grok-4-1-fast`, `deepseek-v3-2`, `qwen25-coder-32b`, `mistral-medium-3-5`, `qwen3-32b`, `llama-4-maverick`, `claude-haiku-4-5`, `gpt-4-1`, `gpt-5-5`, `o3`, `devstral-2`, `qwen3-6-35b-moe`, `deepseek-r1-14b`, `devstral-small-2`, `deepseek-v4-flash`, `mistral-large-3`, `codestral-22b`, `devstral-medium`, `gpt-5-4`, `deepseek-coder-v2-16b`, `codestral`, `grok-4-20`
+
+### Resolved (auto via trustScore)
+- opus-4-7.sweV: winner={'value': 87.6, 'trustScore': 0.6667, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- opus-4-7.lcb: winner={'value': 87.6, 'trustScore': 0.3333, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- opus-4-7.tb2: winner={'value': 97.8, 'trustScore': 0.3333, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- opus-4-7.hle: winner={'value': 97.8, 'trustScore': 0.3333, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- opus-4-7.gpqa: winner={'value': 97.8, 'trustScore': 0.3333, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- opus-4-7.aime26: winner={'value': 97.8, 'trustScore': 0.3333, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- sonnet-4-6.swePro: winner={'value': 79.6, 'trustScore': 0.3333, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- sonnet-4-6.sweV: winner={'value': 79.6, 'trustScore': 0.3333, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- sonnet-4-6.lcb: winner={'value': 65.55, 'trustScore': 0.3333, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- sonnet-4-6.tb2: winner={'value': 79.6, 'trustScore': 0.3333, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- sonnet-4-6.mmluPro: winner={'value': 63.3, 'trustScore': 0.3333, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- sonnet-4-6.gpqa: winner={'value': 63.3, 'trustScore': 0.3333, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- sonnet-4-6.aime26: winner={'value': 63.3, 'trustScore': 0.3333, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- claude-haiku-4-5.swePro: winner={'value': 39.45, 'trustScore': 0.3333, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-04-26'} (severity=red, ΔNone)
+- deepseek-v3-2.sweV: winner={'value': 42.0, 'trustScore': 0.3333, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- gpt-4-1.sweV: winner={'value': 73.4, 'trustScore': 0.3333, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- gpt-4-1.lcb: winner={'value': 68.2, 'trustScore': 0.3333, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- gpt-4-1.aaIdx: winner={'value': 71.2, 'trustScore': 0.3333, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- o3.sweV: winner={'value': 71.7, 'trustScore': 0.6667, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- o3.aaIdx: winner={'value': 79.4, 'trustScore': 0.3333, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- o3.aime26: winner={'value': 88.9, 'trustScore': 0.3333, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- gpt-5-5.sweV: winner={'value': 88.7, 'trustScore': 0.3333, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- qwen3-32b.gpqa: winner={'value': 66.8, 'trustScore': 0.2333, 'tier': 'S', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- qwen3-32b.mmluPro: winner={'value': 79.8, 'trustScore': 0.2333, 'tier': 'S', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- grok-3.aime26: winner={'value': 93.3, 'trustScore': 0.2333, 'tier': 'S', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- grok-4-20.gpqa: winner={'value': 87.5, 'trustScore': 0.2333, 'tier': 'S', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- grok-4-20.aime26: winner={'value': 95.0, 'trustScore': 0.2333, 'tier': 'S', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=yellow, ΔNone)
+- llama-4-maverick.lcb: winner={'value': 43.4, 'trustScore': 0.2333, 'tier': 'S', 'verifications': 1, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+
+### Gaps (240 entries — agent:103 orchestrator:137 — see data/known-gaps.json or next refresh)
+- `None` *(agent)*: None
+- `None` *(agent)*: None
+- `None` *(agent)*: None
+- `None` *(agent)*: None
+- `None` *(agent)*: None
+- `None` *(agent)*: None
+- `claude-haiku-4-5.hle` *(orchestrator)*: not reached in agent survey cycle; Humanity's Last Exam data unavailable
+- `codestral.aime26` *(orchestrator)*: not reached in agent survey cycle; AIME 2026 data unavailable
+- ... and 232 more
+
+
 ## [2026-05-10] — autonomous refresh-all [WARN: cumulative provenance coverage 73.2% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 281 new fills; 45 cells auto-gapped by orchestrator; 204 explicit agent gaps preserved]
 
 [fillRatio:0.73 cells:439/600 contradictions:4 fetch:0.0min tools:None batches:None build:3fba00c]
@@ -306,6 +355,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ---
 
 ## [Unreleased]
+
+### Updated
+- data: refresh-all cycle 2026-05-11 — 60 models, 281 new bench fills, 28 contradictions auto-resolved, coverage 75.5%
+
 
 ### Added — 2026-05-10 (FAZ 5.A — SPA fallback via HF Space mirror)
 
