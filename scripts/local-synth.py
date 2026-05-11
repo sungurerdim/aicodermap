@@ -66,6 +66,39 @@ def main() -> int:
     artifacts = find_batch_artifacts()
     print(f"Reading {len(artifacts)} gather artifacts")
 
+    # CRITICAL — preload HISTORICAL sources.json entries into cluster pool.
+    # Without this, single new low-tier observations override strong historical
+    # consensus (cycle 2026-05-11 wrote 80.6 to deepseek-v4-pro.swePro from a
+    # blog post, overriding 6 prior sources clustered at 55.4 including Scale SEAL).
+    historical_path = ROOT / "data" / "sources.json"
+    historical: dict[tuple, list] = defaultdict(list)
+    if historical_path.exists():
+        hist = json.load(open(historical_path, encoding="utf-8"))
+        for full_key, entries in hist.items():
+            if "." not in full_key:
+                continue
+            mid, bk = full_key.split(".", 1)
+            if bk not in core_keys:
+                continue
+            for e in entries:
+                v = e.get("value")
+                if v is None:
+                    continue
+                try:
+                    v = float(v)
+                except Exception:
+                    continue
+                historical[(mid, bk)].append(
+                    {
+                        "value": v,
+                        "sourceUrl": e.get("url") or "",
+                        "tier": (e.get("tier") or "C").upper(),
+                        "fetched": e.get("date") or "2026-01-01",
+                        "source": e.get("source") or "",
+                        "_historical": True,
+                    }
+                )
+
     cells: dict[tuple, list] = defaultdict(list)
     all_pricing: dict[str, list] = defaultdict(list)
     all_ollama: dict[str, list] = defaultdict(list)
@@ -110,6 +143,28 @@ def main() -> int:
                 }
             )
             runtime_total["observationsTotal"] += 1
+
+    # Merge historical observations into the cluster pool for any cell touched
+    # by this cycle. We do NOT inject historical for cells with zero new obs —
+    # those should remain as they are in data/models.json (untouched).
+    historical_injected = 0
+    for (mid, bk), new_obs in list(cells.items()):
+        for h in historical.get((mid, bk), []):
+            # Skip exact-URL dupes already in new_obs
+            already = any(
+                no["sourceUrl"] == h["sourceUrl"] and no["value"] == h["value"]
+                for no in new_obs
+            )
+            if not already:
+                cells[(mid, bk)].append(h)
+                historical_injected += 1
+    runtime_total["historicalObsInjected"] = historical_injected
+
+    for p in artifacts:
+        try:
+            art = json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
         for po in art.get("pricingObs") or []:
             mid = po.get("modelId")
             if mid in active_ids:
@@ -155,55 +210,112 @@ def main() -> int:
     fills_count = 0
 
     for (mid, bk), entries in cells.items():
-        # Dedupe by (sourceUrl, value), aggregate verifications, use max recency
-        by_value: dict[float, dict] = {}
+        # Build per-observation list with trustScore for sum-based cluster ranking.
+        obs_list = []
         for e in entries:
-            val = e["value"]
-            if val not in by_value:
-                by_value[val] = {
-                    "value": val,
-                    "sources": [],
+            ts = trust_score(e["tier"], 1, e["fetched"])
+            obs_list.append(
+                {
+                    "value": e["value"],
+                    "url": e["sourceUrl"],
                     "tier": e["tier"],
-                    "latestDate": e["fetched"],
-                    "verifications": 0,
+                    "fetched": e["fetched"],
+                    "source": e["source"],
+                    "trustScore": ts,
+                    "_historical": e.get("_historical", False),
                 }
-            bv = by_value[val]
-            url = e["sourceUrl"]
-            existing_urls = {s["url"] for s in bv["sources"]}
-            if url and url not in existing_urls:
-                bv["sources"].append(
-                    {
-                        "url": url,
-                        "tier": e["tier"],
-                        "fetched": e["fetched"],
-                        "source": e["source"],
-                    }
-                )
-                bv["verifications"] += 1
-            # Pick highest-tier among same-value cluster
-            if TIER_WEIGHT.get(e["tier"], 0) > TIER_WEIGHT.get(bv["tier"], 0):
-                bv["tier"] = e["tier"]
-            if e["fetched"] > bv["latestDate"]:
-                bv["latestDate"] = e["fetched"]
-            if bv["verifications"] == 0:
-                bv["verifications"] = 1
+            )
 
-        # Compute trustScore per value cluster
-        ranked = []
-        for val, bv in by_value.items():
-            ts = trust_score(bv["tier"], bv["verifications"], bv["latestDate"])
-            ranked.append((ts, val, bv))
-        ranked.sort(key=lambda x: (-x[0], -x[2]["verifications"], -x[1]))
+        # Cluster observations within AGREEMENT_PP. Greedy single-pass: sort
+        # by value, group consecutive within tolerance, centroid = median.
+        obs_list.sort(key=lambda o: o["value"])
+        clusters: list[list[dict]] = []
+        for o in obs_list:
+            placed = False
+            for cl in clusters:
+                centroid = sum(x["value"] for x in cl) / len(cl)
+                if abs(o["value"] - centroid) <= agreement_pp:
+                    cl.append(o)
+                    placed = True
+                    break
+            if not placed:
+                clusters.append([o])
 
-        # Contradiction check: distinct values that differ by > VERIFICATION_AGREEMENT_PP
-        distinct_vals = [v for _, v, _ in ranked]
-        is_contradiction = False
-        if len(distinct_vals) >= 2:
-            spread = max(distinct_vals) - min(distinct_vals)
-            if spread > agreement_pp:
-                is_contradiction = True
+        # Rank clusters by: distinct_sources DESC, sum_trust DESC, latest DESC.
+        cluster_meta = []
+        for cl in clusters:
+            distinct_urls = {x["url"] for x in cl if x["url"]}
+            n_dist = len(distinct_urls) if distinct_urls else len(cl)
+            sum_trust = sum(x["trustScore"] for x in cl)
+            latest = max(x["fetched"] for x in cl)
+            centroid = sum(x["value"] for x in cl) / len(cl)
+            # Winner inside cluster = highest individual trustScore
+            cluster_winner = max(cl, key=lambda x: (x["trustScore"], x["fetched"]))
+            cluster_meta.append(
+                {
+                    "centroid": round(centroid, 2),
+                    "members": cl,
+                    "n_distinct": n_dist,
+                    "sum_trust": round(sum_trust, 4),
+                    "latest": latest,
+                    "winner": cluster_winner,
+                }
+            )
+        cluster_meta.sort(
+            key=lambda c: (-c["n_distinct"], -c["sum_trust"], c["latest"]),
+            reverse=False,
+        )
+        cluster_meta = sorted(
+            cluster_meta,
+            key=lambda c: (-c["n_distinct"], -c["sum_trust"]),
+        )
 
-        winner_ts, winner_val, winner_bv = ranked[0]
+        best_cluster = cluster_meta[0]
+        winner_obs = best_cluster["winner"]
+        winner_val = winner_obs["value"]
+        winner_ts = winner_obs["trustScore"]
+
+        # Build a winner_bv-equivalent dict for downstream sourcesAdded
+        winner_bv = {
+            "value": winner_val,
+            "sources": [
+                {
+                    "url": x["url"],
+                    "tier": x["tier"],
+                    "fetched": x["fetched"],
+                    "source": x["source"],
+                }
+                for x in best_cluster["members"]
+                if x["url"]
+            ][:5],
+            "tier": winner_obs["tier"],
+            "latestDate": best_cluster["latest"],
+            "verifications": best_cluster["n_distinct"],
+        }
+
+        # Contradiction = any rival cluster outside agreement_pp with ≥1 source
+        is_contradiction = len(cluster_meta) >= 2
+
+        # Build by_value-equivalent for contradictions[] reporting
+        by_value = {}
+        for cm in cluster_meta:
+            v = cm["centroid"]
+            by_value[v] = {
+                "value": v,
+                "sources": [
+                    {"url": x["url"], "tier": x["tier"], "fetched": x["fetched"]}
+                    for x in cm["members"]
+                    if x["url"]
+                ],
+                "tier": cm["winner"]["tier"],
+                "latestDate": cm["latest"],
+                "verifications": cm["n_distinct"],
+            }
+        ranked = [
+            (cm["winner"]["trustScore"], cm["centroid"], by_value[cm["centroid"]])
+            for cm in cluster_meta
+        ]
+        distinct_vals = [r[1] for r in ranked]
         per_model[mid]["updates"]["bench"][bk] = winner_val
         fills_count += 1
 
