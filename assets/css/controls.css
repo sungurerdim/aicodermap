@@ -68,6 +68,17 @@
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
+/* Weights excluded by the active preset are visually dimmed so users
+ * see at a glance which signals the preset ignores. Sliders still work
+ * (the row stays interactive) but the cell fades into the background. */
+.weight-row.excluded {
+  opacity: 0.42;
+  background: transparent;
+  border-color: color-mix(in srgb, var(--border) 55%, transparent);
+}
+.weight-row.excluded .label { font-weight: 500; }
+.weight-row.excluded:hover,
+.weight-row.excluded:focus-within { opacity: 0.85; }
 
 /* Filter toolbar — compact horizontal grid that wraps when needed.
  * Each control is a single row (label + input/select). The reset button
@@ -124,6 +135,57 @@
 }
 .gpu-status-line:empty { display: none; }
 #filters-reset.btn-compact { justify-self: end; }
+
+/* Search row — primary filter, gets icon affordance + wider span. The
+ * "Ara" / "Search" text label is visually hidden (screen readers still
+ * read it); the magnifier icon serves as the visible affordance. */
+.select-row:has(#filter-search) {
+  position: relative;
+  grid-column: span 2;
+}
+.select-row:has(#filter-search) > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.select-row:has(#filter-search)::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  background-color: var(--muted);
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='7'/><path d='m21 21-4.3-4.3'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='7'/><path d='m21 21-4.3-4.3'/></svg>");
+  mask-size: contain;
+  -webkit-mask-size: contain;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  pointer-events: none;
+  transition: background-color 120ms ease;
+}
+.select-row:has(#filter-search:focus)::before { background-color: var(--accent); }
+#filter-search {
+  padding-left: 30px;
+  padding-right: 8px;
+}
+#filter-search::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background-color: var(--muted);
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round'><line x1='6' y1='6' x2='18' y2='18'/><line x1='6' y1='18' x2='18' y2='6'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round'><line x1='6' y1='6' x2='18' y2='18'/><line x1='6' y1='18' x2='18' y2='6'/></svg>");
+  mask-size: contain;
+  -webkit-mask-size: contain;
+  cursor: pointer;
+}
 .muted-note {
   margin: 0;
   color: var(--muted);

@@ -158,7 +158,12 @@
       "button": "Copy share link",
       "copied": "Link copied",
       "failed": "Could not copy link"
-    }
+    },
+    "pricing": {
+      "byProvider": "Pricing by provider"
+    },
+    "deprecated": "DEPRECATED",
+    "archived": "ARCHIVED"
   },
   "pricing": {
     "blended": "BLENDED $/1M",
@@ -634,5 +639,10 @@
     "missingTip": "missing benches",
     "notInScoreTag": "not in score",
     "notInScore": "Independent reference — NOT part of AICoderMap composite score"
+  },
+  "compat": {
+    "errors": {
+      "webgpuUnsupported": "WebGPU not supported in this browser"
+    }
   }
 }

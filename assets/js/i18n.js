@@ -18,7 +18,7 @@ export function t(path) {
     }
     if (fb != null) return fb;
   }
-  return path;
+  return null;
 }
 
 export function applyI18n(root) {

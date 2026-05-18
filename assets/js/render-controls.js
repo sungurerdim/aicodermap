@@ -14,8 +14,14 @@ export function renderWeightsEditor(onChange) {
   const grid = document.getElementById('weights-grid');
   if (!grid) return;
   clear(grid);
+  const activePreset = detectMatchingPreset(State.weights);
+  const presets = getPresets();
+  const presetMap = (activePreset !== 'custom')
+    ? (presets[activePreset] || PRESETS[activePreset])
+    : null;
   for (const k of BENCH_KEYS) {
     const row = el('div', { class: 'weight-row' });
+    if (presetMap && !(presetMap[k] > 0)) row.classList.add('excluded');
     const benchName = t(`benchmarks.${k}.name`);
     row.appendChild(el('span', { class: 'label' }, benchName));
 
@@ -105,12 +111,8 @@ export function syncPresetSelect() {
 }
 
 export function resetWeights(onChange) {
-  State.weights = { ...DEFAULT_WEIGHTS };
-  writeStorage(STORAGE.weights, State.weights);
-  const sel = document.getElementById('weights-preset');
-  if (sel) sel.value = 'balanced';
-  renderWeightsEditor(onChange);
-  if (typeof onChange === 'function') onChange();
+  // Reset = default preset = swe-focused (was balanced).
+  applyPreset('swe-focused', onChange);
 }
 
 export function applyTheme(theme) {

@@ -158,7 +158,12 @@
       "button": "Paylaşım linkini kopyala",
       "copied": "Link kopyalandı",
       "failed": "Link kopyalanamadı"
-    }
+    },
+    "pricing": {
+      "byProvider": "Sağlayıcıya göre fiyatlandırma"
+    },
+    "deprecated": "KULLANIMDAN KALDIRILDI",
+    "archived": "ARŞİVLENDİ"
   },
   "pricing": {
     "blended": "KARMA $/1M",
@@ -634,5 +639,10 @@
     "missingTip": "eksik benchler",
     "notInScoreTag": "skorda değil",
     "notInScore": "Bağımsız referans — AICoderMap composite skoruna dahil DEĞİL"
+  },
+  "compat": {
+    "errors": {
+      "webgpuUnsupported": "WebGPU bu tarayıcıda desteklenmiyor"
+    }
   }
 }

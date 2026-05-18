@@ -2,7 +2,7 @@
 // at <50 lines.
 
 import {
-  State, STORAGE, DEFAULT_WEIGHTS, readStorage, validateWeights,
+  State, STORAGE, DEFAULT_WEIGHTS, PRESETS, readStorage, validateWeights,
 } from './core.js';
 import { loadI18n, applyI18n } from './i18n.js';
 import { loadData } from './data.js';
@@ -50,7 +50,13 @@ function bootstrapPrefs() {
 
   const storedWeights = readStorage(STORAGE.weights, null);
   const validW = validateWeights(storedWeights);
-  State.weights = validW || { ...DEFAULT_WEIGHTS };
+  // Default preset is swe-focused for first-time visitors. Stored weights
+  // (whatever preset the user last picked) win when present.
+  const sweFocused = Object.fromEntries(
+    Object.keys(DEFAULT_WEIGHTS).map(k => [k, 0]),
+  );
+  Object.assign(sweFocused, PRESETS['swe-focused'] || {});
+  State.weights = validW || sweFocused;
 
   const storedFilters = readStorage(STORAGE.filters, null);
   if (storedFilters && typeof storedFilters === 'object') {
