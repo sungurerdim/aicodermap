@@ -52,43 +52,139 @@ def is_independent(tier: str) -> bool:
     return (tier or "").upper() == "I"
 
 
-def recency_decay(date_str: Any) -> float:
-    """Compute recency decay multiplier from an ISO date string.
+# Phase R5: per-source-type recency decay curves. Each entry is a list of
+# (max_age_days, weight) tuples in strictly ascending age. The first tuple
+# whose threshold exceeds the observation age supplies the multiplier.
+# `default` matches the pre-R5 piecewise; longer-cadence sources (vendor
+# quarterly/annual releases) age more slowly, weekly community blogs age
+# faster. Choosing the right curve depends on the publisher's update
+# rhythm — derived from the whitelist via vendor_update_interval().
+INTERVAL_DECAY_CURVES: dict[str, list[tuple[int, float]]] = {
+    "default": [
+        (30, 1.00),
+        (90, 0.85),
+        (180, 0.70),
+        (365, 0.50),
+        (10**9, 0.30),
+    ],
+    "weekly": [
+        (30, 0.80),
+        (90, 0.40),
+        (180, 0.10),
+        (10**9, 0.00),
+    ],
+    "monthly": [
+        (30, 0.95),
+        (90, 0.75),
+        (180, 0.50),
+        (365, 0.20),
+        (10**9, 0.05),
+    ],
+    "quarterly": [
+        (30, 1.00),
+        (90, 0.95),
+        (180, 0.85),
+        (365, 0.60),
+        (10**9, 0.30),
+    ],
+    "annual": [
+        (30, 1.00),
+        (90, 1.00),
+        (180, 0.95),
+        (365, 0.85),
+        (10**9, 0.60),
+    ],
+}
 
-    age <  30d → 1.00
-    age <  90d → 0.85
-    age < 180d → 0.70
-    age < 365d → 0.50
-    age ≥ 365d → 0.30
-    """
+
+def _age_days(date_str: Any) -> int | None:
+    """Parse an ISO date and return its age in days from today. Returns
+    None when the input is missing or unparseable."""
     if not date_str:
-        return 0.50
+        return None
     try:
         s = str(date_str).strip()
         for fmt in ("%Y-%m-%d", "%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%dT%H:%M:%S%z"):
             try:
                 dt = datetime.datetime.strptime(s[: len(fmt.replace("%", "XX"))], fmt)
-                age = (
+                return (
                     datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
                     - dt
                 ).days
-                break
             except ValueError:
                 continue
-        else:
-            # ISO-8601 slice fallback
-            age = (datetime.date.today() - datetime.date.fromisoformat(s[:10])).days
+        return (datetime.date.today() - datetime.date.fromisoformat(s[:10])).days
     except Exception:
+        return None
+
+
+def recency_decay(date_str: Any, *, source_type: str = "default") -> float:
+    """Recency-decay multiplier for an ISO date.
+
+    Phase R5: `source_type` selects the curve from `INTERVAL_DECAY_CURVES`.
+    Unknown source_types fall back to the `default` curve so any caller
+    written before R5 keeps the pre-R5 behaviour exactly.
+
+    Missing/unparseable dates return 0.50 (legacy contract).
+    """
+    age = _age_days(date_str)
+    if age is None:
         return 0.50
-    if age < 30:
-        return 1.00
-    if age < 90:
-        return 0.85
-    if age < 180:
-        return 0.70
-    if age < 365:
-        return 0.50
-    return 0.30
+    curve = INTERVAL_DECAY_CURVES.get(
+        source_type or "default", INTERVAL_DECAY_CURVES["default"]
+    )
+    for threshold, weight in curve:
+        if age < threshold:
+            return weight
+    return curve[-1][1]
+
+
+def vendor_update_interval(url: str, whitelist_vendors: dict | None) -> str:
+    """Return the vendorUpdateInterval ('weekly' | 'monthly' | 'quarterly'
+    | 'annual') for a URL by matching its hostname against the whitelist's
+    vendor entries. Returns 'default' when no match.
+
+    Walks every vendor.urls list (the whitelist tags vendors with multiple
+    canonical hostnames). Case-insensitive, www-stripped.
+    """
+    if not url or not whitelist_vendors:
+        return "default"
+    try:
+        from urllib.parse import urlparse
+
+        host = (urlparse(str(url)).hostname or "").lower().strip()
+    except Exception:
+        return "default"
+    if host.startswith("www."):
+        host = host[4:]
+    if not host:
+        return "default"
+    for vendor in whitelist_vendors.values():
+        if not isinstance(vendor, dict):
+            continue
+        interval = vendor.get("vendorUpdateInterval")
+        if not interval:
+            continue
+        # urls may be either a list of URL strings or a dict mapping role -> URL.
+        urls_field = vendor.get("urls") or []
+        if isinstance(urls_field, dict):
+            url_values = list(urls_field.values())
+        elif isinstance(urls_field, list):
+            url_values = urls_field
+        else:
+            url_values = []
+        for u in url_values:
+            try:
+                from urllib.parse import urlparse
+
+                vh = (urlparse(str(u)).hostname or "").lower().strip()
+                if vh.startswith("www."):
+                    vh = vh[4:]
+                if vh and vh == host:
+                    return str(interval)
+            except Exception:
+                continue
+    return "default"
 
 
 VERIF_FACTOR_CAP: float = 1.5
@@ -120,18 +216,25 @@ def verif_factor(verifications: int) -> float:
     return min(math.log(1.0 + float(verifications)) / math.log(4.0), VERIF_FACTOR_CAP)
 
 
-def trust_score(tier: str, verifications: int, date_str: Any) -> float:
-    """Canonical trust score formula (Phase R2).
+def trust_score(
+    tier: str,
+    verifications: int,
+    date_str: Any,
+    *,
+    source_type: str = "default",
+) -> float:
+    """Canonical trust score formula (Phase R2+R5).
 
-    trustScore = tierWeight × verif_factor(verifications) × recencyDecay(date)
+    trustScore = tierWeight × verif_factor(verifications)
+                 × recencyDecay(date, source_type)
 
-    `verif_factor` is the information-theoretic scaling defined above; it
-    replaced the prior linear `min(v, 3) / 3` in Phase R2 to preserve the
-    Shannon contribution of independent measurements beyond v = 3.
+    `verif_factor` (R2) is the information-theoretic scaling; `source_type`
+    (R5) picks the recency curve so vendor-release sources age slower than
+    weekly community blogs. Default falls back to the pre-R5 piecewise.
     """
     tw = tier_weight(tier)
     vf = verif_factor(int(verifications) if verifications is not None else 0)
-    rd = recency_decay(date_str)
+    rd = recency_decay(date_str, source_type=source_type)
     return round(tw * vf * rd, 4)
 
 
@@ -166,6 +269,7 @@ def effective_trust_score(
     *,
     source_url: str = "",
     bench_key: str = "",
+    source_type: str = "default",
     reliability_ledger: dict | None = None,
     is_pseudo: bool = False,
 ) -> float:
@@ -182,7 +286,7 @@ def effective_trust_score(
     the cold-start threshold the multiplier is 1.0, leaving trust_score
     unchanged — new sources are not penalized.
     """
-    base = trust_score(tier, verifications, date_str)
+    base = trust_score(tier, verifications, date_str, source_type=source_type)
     if is_pseudo:
         return round(base * 0.2, 4)
     if reliability_ledger and source_url:

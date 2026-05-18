@@ -38,6 +38,7 @@ from .tiers import (
     is_pseudo_source,
     recency_decay,
     tier_rank,
+    vendor_update_interval,
 )
 
 # Phase R4 thresholds for the exceptional-source override. When a single
@@ -381,6 +382,7 @@ def pick_winner(
     block_pp: float = DEFAULT_BLOCK_PP,
     today: datetime.date | None = None,
     reliability_ledger: dict[str, Any] | None = None,
+    vendor_whitelist: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Select the winning observation and detect contradictions.
 
@@ -448,16 +450,25 @@ def pick_winner(
     verif_count = len(distinct_urls) or len(valid)
 
     scored: list[dict[str, Any]] = []
+    # Phase R5: resolve per-source recency curve when a whitelist is supplied.
+    # vendor_whitelist is the full whitelist dict; we only need its `vendors`
+    # subtree for the lookup. None => every obs gets the "default" curve.
+    _vendor_idx = (vendor_whitelist or {}).get("vendors") if vendor_whitelist else None
     for o in valid:
+        url = o.get("sourceUrl") or ""
+        source_type = (
+            vendor_update_interval(url, _vendor_idx) if _vendor_idx else "default"
+        )
         # Phase R3: effective_trust_score applies the Beta-Binomial
-        # reliability multiplier when a ledger is supplied; without it,
-        # the call is mathematically equivalent to trust_score().
+        # reliability multiplier when a ledger is supplied; Phase R5 lets
+        # vendor-cadence sources age more slowly via `source_type`.
         ts = effective_trust_score(
             o.get("tier", "C"),
             verif_count,
             o.get("fetched") or "",
-            source_url=o.get("sourceUrl") or "",
+            source_url=url,
             bench_key=bench_key,
+            source_type=source_type,
             reliability_ledger=reliability_ledger,
             is_pseudo=False,
         )

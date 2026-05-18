@@ -828,7 +828,8 @@
       "vendorPrefixMap": {
         "anthropic": "claude-",
         "default": ""
-      }
+      },
+      "vendorUpdateInterval": "quarterly"
     },
     "openai": {
       "name": "OpenAI",
@@ -849,7 +850,8 @@
       ],
       "postFormat": "bot_blocked",
       "fallback": "websearch_snippet",
-      "lastVerifiedDate": "2026-04-27"
+      "lastVerifiedDate": "2026-04-27",
+      "vendorUpdateInterval": "quarterly"
     },
     "google_deepmind": {
       "name": "Google DeepMind",
@@ -881,7 +883,8 @@
       "vendorSuffixMap": {
         "google_deepmind:flash": "-lite",
         "default": ""
-      }
+      },
+      "vendorUpdateInterval": "quarterly"
     },
     "mistral": {
       "name": "Mistral AI",
@@ -903,7 +906,8 @@
       ],
       "postFormat": "image_embedded",
       "urlsNote": "Slug rarely matches model.id directly; WebSearch needed to discover canonical slug",
-      "lastVerifiedDate": "2026-04-27"
+      "lastVerifiedDate": "2026-04-27",
+      "vendorUpdateInterval": "quarterly"
     },
     "deepseek": {
       "name": "DeepSeek",
@@ -925,7 +929,8 @@
       ],
       "postFormat": "image_embedded",
       "urlsNote": "Date-coded slugs (e.g., news260424 = 2026-04-24); use model.released field to derive",
-      "lastVerifiedDate": "2026-04-27"
+      "lastVerifiedDate": "2026-04-27",
+      "vendorUpdateInterval": "quarterly"
     },
     "xai": {
       "name": "xAI",
@@ -945,7 +950,8 @@
       ],
       "postFormat": "bot_blocked",
       "fallback": "websearch_snippet",
-      "lastVerifiedDate": "2026-04-27"
+      "lastVerifiedDate": "2026-04-27",
+      "vendorUpdateInterval": "quarterly"
     },
     "alibaba_qwen": {
       "name": "Alibaba (Qwen)",
@@ -970,7 +976,8 @@
       ],
       "postFormat": "static_markdown",
       "urlsNote": "Migrating to qwen.ai/blog?id={slug}; bench data shown as images",
-      "lastVerifiedDate": "2026-04-27"
+      "lastVerifiedDate": "2026-04-27",
+      "vendorUpdateInterval": "quarterly"
     },
     "moonshot_kimi": {
       "name": "Moonshot AI (Kimi)",
@@ -979,7 +986,8 @@
         "lineup": "https://platform.moonshot.cn/docs",
         "news": "https://www.kimi.com/blog"
       },
-      "extracts": "Kimi K-series catalog"
+      "extracts": "Kimi K-series catalog",
+      "vendorUpdateInterval": "quarterly"
     },
     "zai_glm": {
       "name": "Z.ai (GLM)",
@@ -989,7 +997,8 @@
         "news": "https://z.ai/news",
         "docs": "https://docs.z.ai"
       },
-      "extracts": "GLM active list"
+      "extracts": "GLM active list",
+      "vendorUpdateInterval": "quarterly"
     },
     "xiaomi_mimo": {
       "name": "Xiaomi (MiMo)",
@@ -1002,7 +1011,8 @@
         "hfReadme": "https://huggingface.co/XiaomiMiMo/{slug}/raw/main/README.md",
         "hfApi": "https://huggingface.co/api/models/XiaomiMiMo/{slug}"
       },
-      "extracts": "MiMo series"
+      "extracts": "MiMo series",
+      "vendorUpdateInterval": "quarterly"
     },
     "minimax": {
       "name": "MiniMax",
@@ -1015,7 +1025,8 @@
         "hfReadme": "https://huggingface.co/MiniMaxAI/{slug}/raw/main/README.md",
         "hfApi": "https://huggingface.co/api/models/MiniMaxAI/{slug}"
       },
-      "extracts": "M-series"
+      "extracts": "M-series",
+      "vendorUpdateInterval": "quarterly"
     },
     "nvidia": {
       "name": "Nvidia",
@@ -1028,7 +1039,8 @@
         "hfReadme": "https://huggingface.co/nvidia/{slug}/raw/main/README.md",
         "hfApi": "https://huggingface.co/api/models/nvidia/{slug}"
       },
-      "extracts": "Nemotron variants, NIM catalog"
+      "extracts": "Nemotron variants, NIM catalog",
+      "vendorUpdateInterval": "quarterly"
     },
     "meta_llama": {
       "name": "Meta (Llama)",
@@ -1050,7 +1062,8 @@
         "{family}"
       ],
       "postFormat": "image_embedded",
-      "lastVerifiedDate": "2026-04-27"
+      "lastVerifiedDate": "2026-04-27",
+      "vendorUpdateInterval": "quarterly"
     },
     "google_gemma": {
       "name": "Google (Gemma)",
@@ -1062,7 +1075,8 @@
         "hfReadme": "https://huggingface.co/google/{slug}/raw/main/README.md",
         "hfApi": "https://huggingface.co/api/models/google/{slug}"
       },
-      "extracts": "Gemma releases"
+      "extracts": "Gemma releases",
+      "vendorUpdateInterval": "quarterly"
     },
     "stepfun": {
       "name": "StepFun",
@@ -1074,7 +1088,8 @@
         "hfReadme": "https://huggingface.co/stepfun-ai/{slug}/raw/main/README.md",
         "hfApi": "https://huggingface.co/api/models/stepfun-ai/{slug}"
       },
-      "extracts": "Step series"
+      "extracts": "Step series",
+      "vendorUpdateInterval": "quarterly"
     },
     "all_hands_ai": {
       "name": "All Hands AI (Devstral co-developer)",
@@ -1088,7 +1103,8 @@
       },
       "extracts": "Devstral co-development announcements",
       "postFormat": "static_html_article",
-      "lastVerifiedDate": "2026-04-27"
+      "lastVerifiedDate": "2026-04-27",
+      "vendorUpdateInterval": "quarterly"
     }
   },
   "leaderboards": [

@@ -23,7 +23,7 @@ PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT / "scripts"))
 
 from lib.synth_core import bayesian_aggregate  # noqa: E402
-from lib.tiers import verif_factor  # noqa: E402
+from lib.tiers import recency_decay, verif_factor, vendor_update_interval  # noqa: E402
 from lib.winner import pick_winner  # noqa: E402
 
 # core.js normalizeBenchScore mirror -- used to validate the cfElo +
@@ -264,8 +264,89 @@ def test_9_verif_information_scaling():
     expect("9.cap", verif_factor(100), lambda v: v == 1.5, "v=100 -> capped at 1.5")
 
 
+def test_10_quarterly_decay_slower_than_default():
+    """Phase R5 — vendor with quarterly cadence ages slower.
+
+    Same date, age ~100 days: default curve drops to 0.70 (< 180 bucket),
+    quarterly stays at 0.85 (< 180 bucket but slower curve). Confirms
+    INTERVAL_DECAY_CURVES selection works.
+    """
+    import datetime as _dt
+
+    print("\n#10 recency_decay -- quarterly slower than default (R5)")
+    age_days = 100
+    target_date = (_dt.date.today() - _dt.timedelta(days=age_days)).isoformat()
+    default_weight = recency_decay(target_date)
+    quarterly_weight = recency_decay(target_date, source_type="quarterly")
+    expect(
+        "10.default100",
+        default_weight,
+        lambda v: abs(v - 0.70) < 0.001,
+        "default 100d -> 0.70",
+    )
+    expect(
+        "10.quarterly100",
+        quarterly_weight,
+        lambda v: abs(v - 0.85) < 0.001,
+        "quarterly 100d -> 0.85 (slower)",
+    )
+
+
+def test_11_weekly_decay_faster_than_default():
+    """Phase R5 — weekly publishers age fastest.
+
+    Same date, age ~20 days: default curve still 1.00 (< 30 bucket),
+    weekly drops immediately to 0.80 (high churn assumption).
+    """
+    import datetime as _dt
+
+    print("\n#11 recency_decay -- weekly faster than default (R5)")
+    age_days = 20
+    target_date = (_dt.date.today() - _dt.timedelta(days=age_days)).isoformat()
+    default_weight = recency_decay(target_date)
+    weekly_weight = recency_decay(target_date, source_type="weekly")
+    expect(
+        "11.default20",
+        default_weight,
+        lambda v: abs(v - 1.00) < 0.001,
+        "default 20d -> 1.00",
+    )
+    expect(
+        "11.weekly20",
+        weekly_weight,
+        lambda v: abs(v - 0.80) < 0.001,
+        "weekly 20d -> 0.80 (faster)",
+    )
+
+
+def test_12_vendor_update_interval_lookup():
+    """Phase R5 — whitelist lookup wires vendorUpdateInterval -> source_type."""
+    print("\n#12 vendor_update_interval -- whitelist hostname lookup (R5)")
+    wl_vendors = {
+        "anthropic": {
+            "vendorUpdateInterval": "quarterly",
+            "urls": {
+                "news": "https://www.anthropic.com/news",
+                "docs": "https://docs.claude.com",
+            },
+        }
+    }
+    expect(
+        "12.match",
+        vendor_update_interval("https://www.anthropic.com/news/foo", wl_vendors),
+        lambda v: v == "quarterly",
+        "anthropic.com -> quarterly",
+    )
+    expect(
+        "12.miss",
+        vendor_update_interval("https://random-blog.example/post", wl_vendors),
+        lambda v: v == "default",
+        "unknown hostname -> default",
+    )
+
+
 def main() -> int:
-    print("FAZ 8.A.3b regression suite -- 9 cells (R2 +1)")
+    print("FAZ 8.A.3b regression suite -- 12 cells (R2 +1, R5 +3)")
     test_1_grok_4_20_swe_v_scaffold()
     test_2_glm_5_1_hle_three_cluster()
     test_3_deepseek_v3_2_swe_v_category_bleed()
@@ -275,12 +356,15 @@ def main() -> int:
     test_7_gpt_5_5_cf_elo_piecewise()
     test_8_sonnet_4_6_aa_omni_inverted()
     test_9_verif_information_scaling()
+    test_10_quarterly_decay_slower_than_default()
+    test_11_weekly_decay_faster_than_default()
+    test_12_vendor_update_interval_lookup()
 
     print("\n" + "=" * 50)
     if FAILED:
         print(f"FAILED ({len(FAILED)}): {FAILED}")
         return 1
-    print("PASS: 9/9")
+    print("PASS: 12/12")
     return 0
 
 

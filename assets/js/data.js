@@ -60,6 +60,18 @@ export async function loadData() {
     : { schemaVersion: 'v1', halfLifeCycles: 3, coldStartN: 10, sources: {} };
 }
 
+// Phase R5: mirror of scripts/lib/tiers.py:INTERVAL_DECAY_CURVES. Exposed
+// so future card/tooltip rendering can label per-source recency curves
+// without duplicating the lookup. Each curve is a list of
+// [maxAgeDays, weight] pairs in ascending threshold order.
+export const INTERVAL_DECAY_CURVES = Object.freeze({
+  default: [[30, 1.00], [90, 0.85], [180, 0.70], [365, 0.50], [1e9, 0.30]],
+  weekly:  [[30, 0.80], [90, 0.40], [180, 0.10], [1e9, 0.00]],
+  monthly: [[30, 0.95], [90, 0.75], [180, 0.50], [365, 0.20], [1e9, 0.05]],
+  quarterly: [[30, 1.00], [90, 0.95], [180, 0.85], [365, 0.60], [1e9, 0.30]],
+  annual:  [[30, 1.00], [90, 1.00], [180, 0.95], [365, 0.85], [1e9, 0.60]],
+});
+
 // Mirror of scripts/lib/reliability.py:source_identity — canonical hostname,
 // lowercased, www-stripped. Returns empty string when the URL is unusable.
 function sourceIdentity(url) {
