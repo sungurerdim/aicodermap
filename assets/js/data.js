@@ -409,15 +409,26 @@ export function vendorComposites(model, presetName) {
   return out;
 }
 
-// Vendor consensus score = average of normalized vendor composites for this
-// model. Used as the primary score in 'consensus' preset (Pozisyon B
-// default) and as cross-validation reference for atomic presets.
+// Vendor consensus score = coverage-penalized average of normalized vendor
+// composites. F1+F2 bugfix (2026-05-18): early version averaged only present
+// values which let a single-bench model (e.g., qwen3-32b with only aaIdx)
+// outrank a 3-vendor model (opus-4-7 with aaIdx + aaCoding + aaOmni). Now
+// applies coverage shrinkage = sqrt(present / expected) so sparse-but-strong
+// values are honestly discounted. Also requires at least 1 vendor present
+// AND coverage >= minConsensusCoverage (default 0.34 = at least 1 of 3, but
+// 1-of-3 gets a 0.58 shrinkage which significantly demotes it).
 export function vendorConsensusScore(model, presetName) {
   const vc = vendorComposites(model, presetName);
+  const expected = vc.length;                          // size of preset.vendorCompositeView
+  if (!expected) return null;
   const vals = vc.filter(v => v.normalized != null && Number.isFinite(v.normalized))
                  .map(v => v.normalized);
   if (!vals.length) return null;
-  return vals.reduce((a, b) => a + b, 0) / vals.length;
+  const raw = vals.reduce((a, b) => a + b, 0) / vals.length;
+  const coverage = vals.length / expected;
+  const policy = getCompositePolicy();
+  const expo = policy.coverageShrinkageExponent > 0 ? policy.coverageShrinkageExponent : 2;
+  return raw * Math.pow(coverage, 1 / expo);
 }
 
 // Agreement indicator between AICoderMap composite rank and vendor consensus
