@@ -58,8 +58,10 @@ from lib.telemetry import (  # noqa: E402
 from lib.telemetry import (  # noqa: E402
     write_meta_and_history as _telemetry_write,
 )
+from lib import reliability as _reliability  # type: ignore  # noqa: E402
 
 
+LEDGER_PATH = Path(PROJECT) / "data" / "source-reliability.json"
 BYPASS_FLOOR_CHECK = "--bypass-floor-check" in sys.argv
 
 # Formats whose primary fetch is "skip" — fetching their canonical URL directly
@@ -746,6 +748,16 @@ def main():
                 pass
         return cluster_winner["_orig"], f"cluster d={d} s={s} overrode fallback"
 
+    # R1 (Source Reliability v2): load + decay the per-(source, bench) ledger
+    # at cycle start. Phase R1 is BEHAVIOR-NEUTRAL — the multiplier is not yet
+    # wired into trust_score (that happens in Phase R3); we only populate the
+    # ledger here so the Bayesian posterior accumulates across cycles.
+    reliability_ledger = _reliability.load_ledger(LEDGER_PATH)
+    _reliability.decay_counters(reliability_ledger, TODAY)
+    # Track (modelId, benchKey) pairs processed by the contradictions loop so
+    # the GREEN-cell sweep below does not double-credit the same observations.
+    _contradicted_cells: set[tuple[str, str]] = set()
+
     for c in out.get("contradictions", []) or []:
         mid = c["modelId"]
         # Agent contract: `field` is the bare bench key, `autoResolveWinner` is
@@ -823,9 +835,78 @@ def main():
                 },
             )
             log["sources_appended"] += 1
+        # R1: credit healthy candidates' reliability based on agreement with
+        # the resolved winner. Only healthy_candidates (SPA-guard-filtered)
+        # contribute to the Beta-Binomial posterior.
+        _winner_val_raw = winner.get("value") if isinstance(winner, dict) else None
+        if _winner_val_raw is not None:
+            try:
+                _winner_val = float(_winner_val_raw)
+            except (TypeError, ValueError):
+                _winner_val = None
+            if _winner_val is not None:
+                _contradicted_cells.add((mid, bench_field))
+                for cand in healthy_candidates:
+                    cand_url = cand.get("url")
+                    if not cand_url:
+                        continue
+                    try:
+                        cand_val = float(cand.get("value"))
+                    except (TypeError, ValueError):
+                        continue
+                    agreed = abs(cand_val - _winner_val) <= AGREEMENT_PP
+                    _reliability.update_reliability(
+                        reliability_ledger,
+                        cand_url,
+                        bench_field,
+                        agreed,
+                        TODAY,
+                    )
         log["contradictions"].append(
             f"{key}: winner={winner} (severity={c.get('severity') or 'GREEN'}, Δ{c.get('delta')})"
         )
+
+    # R1: GREEN-cell sweep — credit non-contradicted cells where >=2 fresh
+    # (date == TODAY) sources agree within AGREEMENT_PP. Skips cells already
+    # processed by the contradictions loop. Historical entries (date != TODAY)
+    # never get re-credited; they were tallied in their original cycle.
+    for cell_key, entries in sources.items():
+        if not isinstance(cell_key, str) or "." not in cell_key:
+            continue
+        try:
+            mid_parsed, bench_key = cell_key.rsplit(".", 1)
+        except ValueError:
+            continue
+        if (mid_parsed, bench_key) in _contradicted_cells:
+            continue
+        fresh = [
+            e
+            for e in (entries or [])
+            if isinstance(e, dict)
+            and (e.get("date") or "") == TODAY
+            and e.get("value") is not None
+        ]
+        if len(fresh) < 2:
+            continue
+        try:
+            vals = [float(e["value"]) for e in fresh]
+        except (TypeError, ValueError):
+            continue
+        if max(vals) - min(vals) > AGREEMENT_PP:
+            # Latent contradiction not flagged by the agent — don't credit.
+            continue
+        for e in fresh:
+            url = e.get("url")
+            if not url:
+                continue
+            _reliability.update_reliability(
+                reliability_ledger,
+                url,
+                bench_key,
+                True,
+                TODAY,
+                source_label=e.get("source") or "",
+            )
 
     lineup = out.get("lineupChanges", {}) or {}
     for d in lineup.get("deprecated", []) or []:
@@ -867,6 +948,8 @@ def main():
     with open(sources_path, "w", encoding="utf-8") as fp:
         json.dump(sources, fp, indent=2, ensure_ascii=False)
         fp.write("\n")
+    # R1: persist the source-reliability ledger after sources.json is on disk.
+    _reliability.save_ledger(LEDGER_PATH, reliability_ledger)
 
     coverage = out.get("validationCoverage", 0)
     cov_pct = round(coverage * 100, 1)
