@@ -1,7 +1,542 @@
 {
-  "schemaVersion": "v1",
-  "halfLifeCycles": 3,
   "coldStartN": 10,
-  "lastCycle": null,
-  "sources": {}
+  "halfLifeCycles": 3,
+  "lastCycle": "2026-05-18",
+  "schemaVersion": "v1",
+  "sources": {
+    "aiwiki.ai": {
+      "byBench": {
+        "hle": {
+          "agree": 0.0,
+          "disagree": 4.0,
+          "rawAgree": 0,
+          "rawDisagree": 4
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 0.0,
+        "disagree": 4.0,
+        "rawAgree": 0,
+        "rawDisagree": 4
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "anthropic.com": {
+      "byBench": {
+        "gpqa": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
+          "rawDisagree": 0
+        },
+        "hle": {
+          "agree": 6.0,
+          "disagree": 0.0,
+          "rawAgree": 6,
+          "rawDisagree": 0
+        },
+        "swePro": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "tb2": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 10.0,
+        "disagree": 0.0,
+        "rawAgree": 10,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "api.minimax.io": {
+      "byBench": {
+        "lcb": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 4.0,
+        "disagree": 0.0,
+        "rawAgree": 4,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "artificialanalysis.ai": {
+      "byBench": {
+        "aaIdx": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "gpqa": {
+          "agree": 12.0,
+          "disagree": 0.0,
+          "rawAgree": 12,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 13.0,
+        "disagree": 0.0,
+        "rawAgree": 13,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "assets.anthropic.com": {
+      "byBench": {
+        "tb2": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "benchlm.ai": {
+      "byBench": {
+        "hle": {
+          "agree": 6.0,
+          "disagree": 0.0,
+          "rawAgree": 6,
+          "rawDisagree": 0
+        },
+        "sweV": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 10.0,
+        "disagree": 0.0,
+        "rawAgree": 10,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "businesswire.com": {
+      "byBench": {
+        "tb2": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "datacamp.com": {
+      "byBench": {
+        "sweV": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "deepmind.google": {
+      "byBench": {
+        "sweV": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 4.0,
+        "disagree": 0.0,
+        "rawAgree": 4,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "dev.to": {
+      "byBench": {
+        "tb2": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "docs.z.ai": {
+      "byBench": {
+        "gpqa": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        },
+        "tb2": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 5.0,
+        "disagree": 0.0,
+        "rawAgree": 5,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "humiris.substack.com": {
+      "byBench": {
+        "swePro": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "klu.ai": {
+      "byBench": {
+        "gpqa": {
+          "agree": 0.0,
+          "disagree": 8.0,
+          "rawAgree": 0,
+          "rawDisagree": 8
+        },
+        "lcb": {
+          "agree": 0.0,
+          "disagree": 8.0,
+          "rawAgree": 0,
+          "rawDisagree": 8
+        },
+        "sweV": {
+          "agree": 0.0,
+          "disagree": 4.0,
+          "rawAgree": 0,
+          "rawDisagree": 4
+        },
+        "tb2": {
+          "agree": 0.0,
+          "disagree": 4.0,
+          "rawAgree": 0,
+          "rawDisagree": 4
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 0.0,
+        "disagree": 24.0,
+        "rawAgree": 0,
+        "rawDisagree": 24
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "livecodebench.github.io": {
+      "byBench": {
+        "lcb": {
+          "agree": 8.0,
+          "disagree": 0.0,
+          "rawAgree": 8,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 8.0,
+        "disagree": 0.0,
+        "rawAgree": 8,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "llm-stats.com": {
+      "byBench": {
+        "gpqa": {
+          "agree": 2.0,
+          "disagree": 4.0,
+          "rawAgree": 2,
+          "rawDisagree": 4
+        },
+        "sweV": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 4.0,
+        "disagree": 4.0,
+        "rawAgree": 4,
+        "rawDisagree": 4
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "mistral.ai": {
+      "byBench": {
+        "sweV": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 4.0,
+        "disagree": 0.0,
+        "rawAgree": 4,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "morphllm.com": {
+      "byBench": {
+        "tb2": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "openai.com": {
+      "byBench": {
+        "aime26": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        },
+        "gpqa": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        },
+        "sweV": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 9.0,
+        "disagree": 0.0,
+        "rawAgree": 9,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "qwenlm.github.io": {
+      "byBench": {
+        "lcb": {
+          "agree": 0.0,
+          "disagree": 4.0,
+          "rawAgree": 0,
+          "rawDisagree": 4
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 0.0,
+        "disagree": 4.0,
+        "rawAgree": 0,
+        "rawDisagree": 4
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "scale.com": {
+      "byBench": {
+        "swePro": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "swebench.com": {
+      "byBench": {
+        "sweV": {
+          "agree": 5.0,
+          "disagree": 0.0,
+          "rawAgree": 5,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 5.0,
+        "disagree": 0.0,
+        "rawAgree": 5,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "tech-insider.org": {
+      "byBench": {
+        "swePro": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "terminal-bench.com": {
+      "byBench": {
+        "tb2": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 4.0,
+        "disagree": 0.0,
+        "rawAgree": 4,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "vellum.ai": {
+      "byBench": {
+        "aime26": {
+          "agree": 0.0,
+          "disagree": 4.0,
+          "rawAgree": 0,
+          "rawDisagree": 4
+        },
+        "gpqa": {
+          "agree": 0.0,
+          "disagree": 4.0,
+          "rawAgree": 0,
+          "rawDisagree": 4
+        },
+        "sweV": {
+          "agree": 2.0,
+          "disagree": 4.0,
+          "rawAgree": 2,
+          "rawDisagree": 4
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 2.0,
+        "disagree": 12.0,
+        "rawAgree": 2,
+        "rawDisagree": 12
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "x.com": {
+      "byBench": {
+        "aaIdx": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    }
+  }
 }

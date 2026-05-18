@@ -1,4 +1,31 @@
 
+## [2026-05-18] — autonomous refresh-all [WARN: very low cumulative provenance coverage 47.7%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 46 new fills; 0 cells auto-gapped by orchestrator; 454 explicit agent gaps preserved]
+
+[fillRatio:0.48 cells:457/960 contradictions:11 fetch:0.0min tools:None batches:None build:3246226]
+
+### Updated
+- 20 models: `opus-4-7`, `sonnet-4-6`, `claude-haiku-4-5`, `deepseek-v3-2`, `gemini-3-1-flash`, `gemini-3-1-pro`, `gemma-3-27b`, `gpt-4-1`, `o3`, `o4-mini`, `qwen3-235b`, `qwen3-coder-30b`, `grok-3`, `grok-3-mini`, `glm-4-7`, `llama-4-maverick`, `llama-4-scout`, `mistral-large-3`, `codestral-22b`, `devstral-medium`
+
+### Resolved (auto via trustScore)
+- opus-4-7.hle: winner={'value': 46.9, 'trustScore': 0.555, 'sourceUrl': 'https://www.anthropic.com/news/claude-opus-4-7', 'tier': 'S'} (severity=RED, Δ7.8)
+- deepseek-v3-2.sweV: winner={'value': 74.2, 'trustScore': 0.5, 'sourceUrl': 'https://www.swebench.com', 'tier': 'I'} (severity=RED, Δ6.4)
+- deepseek-v3-2.tb2: winner={'value': 46.4, 'trustScore': 0.5, 'sourceUrl': 'https://terminal-bench.com', 'tier': 'I'} (severity=RED, Δ11.2)
+- deepseek-v3-2.gpqa: winner={'value': 78.5, 'trustScore': 0.5, 'sourceUrl': 'https://artificialanalysis.ai/models/deepseek-v3-2', 'tier': 'I'} (severity=RED, Δ7.2)
+- deepseek-v3-2.lcb: winner={'value': 60.3, 'trustScore': 0.5, 'sourceUrl': 'https://livecodebench.github.io/leaderboard.html', 'tier': 'I'} (severity=RED, Δ13.8)
+- o4-mini.aime26: winner={'value': 99.5, 'trustScore': 0.35, 'sourceUrl': 'https://openai.com/index/o4-mini', 'tier': 'S'} (severity=RED, Δ6.8)
+- qwen3-235b.gpqa: winner={'value': 70.0, 'trustScore': 0.5, 'sourceUrl': 'https://artificialanalysis.ai/models/qwen3-235b', 'tier': 'I'} (severity=RED, Δ14.4)
+- qwen3-235b.lcb: winner={'value': 62.2, 'trustScore': 0.5, 'sourceUrl': 'https://livecodebench.github.io/leaderboard.html', 'tier': 'I'} (severity=RED, Δ8.5)
+- glm-4-7.gpqa: winner={'value': 85.7, 'trustScore': 0.5, 'sourceUrl': 'https://docs.z.ai/models/glm-4-7', 'tier': 'S'} (severity=RED, Δ43.7)
+- minimax-m2-5.lcb: winner={'value': 69.5, 'trustScore': 0.35, 'sourceUrl': 'https://api.minimax.io/news/minimax-m2', 'tier': 'S'} (severity=YELLOW, Δ4.5)
+- o3.gpqa: winner={'value': 87.7, 'trustScore': 0.555, 'sourceUrl': 'https://openai.com/index/o3', 'tier': 'S'} (severity=YELLOW, Δ4.4)
+
+### Gaps (398 entries — agent:1 orchestrator:397 — see data/known-gaps.json or next refresh)
+- `deepseek-v3-2.tau2` *(agent)*: No independent source found
+- `claude-haiku-4-5.aaAgentic` *(orchestrator)*: not reached in agent survey cycle; AA Agentic data unavailable
+- `claude-haiku-4-5.aaCoding` *(orchestrator)*: not reached in agent survey cycle; AA Coding data unavailable
+- ... and 395 more
+
+
 ## [2026-05-18] — phase 3a: purge pseudo-source contamination
 
 Removed 1281 pseudo-source entries from `data/sources.json` (33.2% of total):
