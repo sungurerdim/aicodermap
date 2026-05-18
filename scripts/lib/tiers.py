@@ -11,6 +11,7 @@ All callers import from here. No magic numbers in individual scripts.
 from __future__ import annotations
 
 import datetime
+import math
 from typing import Any
 
 # Canonical tier weights (SKILL.md TRUST_SCORE_FORMULA)
@@ -90,15 +91,48 @@ def recency_decay(date_str: Any) -> float:
     return 0.30
 
 
-def trust_score(tier: str, verifications: int, date_str: Any) -> float:
-    """Canonical trust score formula.
+VERIF_FACTOR_CAP: float = 1.5
 
-    trustScore = tierWeight × min(verifications, 3)/3 × recencyDecay(date)
+
+def verif_factor(verifications: int) -> float:
+    """Information-theoretic verification factor (Phase R2).
+
+    Replaces the prior linear `min(v, 3) / 3` with a log-scale curve that
+    rewards additional independent measurements beyond the 3-source anchor.
+
+    Calibration (anchored at log base 4):
+        v=0   -> 0.00   (no signal)
+        v=1   -> 0.50   (log 2 / log 4)
+        v=3   -> 1.00   (log 4 / log 4 — anchor matches prior formula)
+        v=5   -> 1.29   (log 6 / log 4)
+        v=10  -> 1.66   -> capped at 1.5
+        v=100 -> 3.33   -> capped at 1.5
+
+    Rationale (Shannon information accumulation): each independent
+    measurement contributes ~1 bit of information when the consensus is
+    unanimous; per Bayesian information theory, posterior precision grows
+    logarithmically with the sample count. The log-base-4 calibration
+    preserves the 3-source = 1.0 anchor of the prior linear formula while
+    granting diminishing-but-positive returns for v > 3.
+    """
+    if verifications is None or verifications <= 0:
+        return 0.0
+    return min(math.log(1.0 + float(verifications)) / math.log(4.0), VERIF_FACTOR_CAP)
+
+
+def trust_score(tier: str, verifications: int, date_str: Any) -> float:
+    """Canonical trust score formula (Phase R2).
+
+    trustScore = tierWeight × verif_factor(verifications) × recencyDecay(date)
+
+    `verif_factor` is the information-theoretic scaling defined above; it
+    replaced the prior linear `min(v, 3) / 3` in Phase R2 to preserve the
+    Shannon contribution of independent measurements beyond v = 3.
     """
     tw = tier_weight(tier)
-    v = min(max(int(verifications), 1), 3) / 3.0
-    r = recency_decay(date_str)
-    return round(tw * v * r, 4)
+    vf = verif_factor(int(verifications) if verifications is not None else 0)
+    rd = recency_decay(date_str)
+    return round(tw * vf * rd, 4)
 
 
 # FAZ 8.A.3b (2026-05-18): pseudo-source tags — observations that pretend

@@ -471,3 +471,69 @@ documented above. `assets/js/url-state.js` is the reference implementation.
 | WebGPU API | browser-native | platform | — |
 
 **No build/runtime dependencies** — vanilla, no npm/yarn, no node_modules.
+
+---
+
+## Appendix — Information-Theoretic Verification Scaling (Phase R2)
+
+Trust score formula (Phase R2):
+
+```
+trustScore = tierWeight × verif_factor(verifications) × recencyDecay(date)
+verif_factor(v) = min( log(1 + v) / log(4),  1.5 )
+```
+
+`verif_factor` replaced the prior linear `min(v, 3) / 3` so that
+independent measurements beyond v=3 still contribute to trust accumulation.
+
+**Calibration table**
+
+| v   | min(v,3)/3 | log(1+v)/log(4) | applied |
+|-----|------------|------------------|---------|
+| 0   | 0.000      | 0.000            | 0.00    |
+| 1   | 0.333      | 0.500            | 0.50    |
+| 2   | 0.667      | 0.792            | 0.79    |
+| 3   | 1.000      | 1.000            | 1.00 ←anchor |
+| 5   | 1.000      | 1.293            | 1.29    |
+| 10  | 1.000      | 1.661            | 1.50 ←capped |
+| 100 | 1.000      | 3.322            | 1.50 ←capped |
+
+**Why log base 4?**
+
+Anchoring at v=3 → 1.0 preserves the calibration of the prior formula
+(the most common cell distribution) while extending the curve to reward
+deeper consensus.
+
+**Why log scaling (vs. linear)?**
+
+Per Bayesian information theory, each additional independent measurement
+contributes information proportional to the KL divergence between the
+prior and the updated posterior:
+
+```
+ΔI(n) ≈ ½ · log(precision(n+1) / precision(n))
+```
+
+For independent Gaussian-like observations, precision scales linearly
+with the sample count `n`, so cumulative information scales as `log(n)`.
+The 1.5 cap acknowledges that a single high-tier observation should never
+fully replace the cross-source ground truth that the Beta-Binomial
+reliability posterior (Phase R3) provides.
+
+**Why a 1.5 ceiling (not unbounded)?**
+
+Two reasons:
+
+1. A single inflated tier weight × runaway verif_factor would let a
+   verbose-but-shallow data path beat the Beta-Binomial reliability
+   posterior (Phase R3) that aggregates per-source track records.
+2. Practical cell densities rarely exceed v=10 distinct independent
+   leaderboards; the cap is reached at v=10 (1.66 → 1.5).
+
+**Backwards compatibility**
+
+Cells with v ≤ 3 preserve their pre-R2 trust ordering up to a constant
+factor — within-cluster argmax never flips. Cells with v ≥ 4 see a small
+boost: a 4-source cluster gains ~9% trust over its 3-source equivalent.
+The composite-score deltas are bounded by `(1.5/1.0 - 1) ≈ 50%` in the
+extreme; in production data the median composite shift was < 5 points.

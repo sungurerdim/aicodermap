@@ -23,6 +23,7 @@ PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT / "scripts"))
 
 from lib.synth_core import bayesian_aggregate  # noqa: E402
+from lib.tiers import verif_factor  # noqa: E402
 from lib.winner import pick_winner  # noqa: E402
 
 # core.js normalizeBenchScore mirror -- used to validate the cfElo +
@@ -233,8 +234,38 @@ def test_8_sonnet_4_6_aa_omni_inverted():
     expect("8.aaOmni0", n2, lambda v: v == 100.0, "0 -> 100 (best)")
 
 
+def test_9_verif_information_scaling():
+    """Phase R2 — verif_factor calibration.
+
+    Replaces the prior linear `min(v, 3) / 3` with a log-base-4 curve so the
+    3-source anchor stays at 1.0 while additional independent measurements
+    still contribute (capped at 1.5).
+    """
+    print("\n#9 verif_factor -- information-theoretic scaling (R2)")
+    expect("9.v0", verif_factor(0), lambda v: v == 0.0, "v=0 -> 0.0 (no signal)")
+    expect(
+        "9.v1",
+        verif_factor(1),
+        lambda v: abs(v - 0.5) < 0.01,
+        "v=1 -> ~0.50 (log 2 / log 4)",
+    )
+    expect(
+        "9.v3",
+        verif_factor(3),
+        lambda v: abs(v - 1.0) < 0.01,
+        "v=3 -> 1.00 (anchor matches prior min(v,3)/3 formula)",
+    )
+    expect(
+        "9.v5",
+        verif_factor(5),
+        lambda v: abs(v - 1.293) < 0.01,
+        "v=5 -> ~1.29 (rewards beyond-3 sources)",
+    )
+    expect("9.cap", verif_factor(100), lambda v: v == 1.5, "v=100 -> capped at 1.5")
+
+
 def main() -> int:
-    print("FAZ 8.A.3b regression suite -- 8 cells")
+    print("FAZ 8.A.3b regression suite -- 9 cells (R2 +1)")
     test_1_grok_4_20_swe_v_scaffold()
     test_2_glm_5_1_hle_three_cluster()
     test_3_deepseek_v3_2_swe_v_category_bleed()
@@ -243,12 +274,13 @@ def main() -> int:
     test_6_deepseek_v4_pro_swe_pro_bayesian_smooth()
     test_7_gpt_5_5_cf_elo_piecewise()
     test_8_sonnet_4_6_aa_omni_inverted()
+    test_9_verif_information_scaling()
 
     print("\n" + "=" * 50)
     if FAILED:
         print(f"FAILED ({len(FAILED)}): {FAILED}")
         return 1
-    print("PASS: 8/8")
+    print("PASS: 9/9")
     return 0
 
 
