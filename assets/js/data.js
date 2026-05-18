@@ -446,10 +446,33 @@ export function crossValidationAgreement(model, allModels, weights, presetName) 
 // State.scoreFn (set by applyPreset). UI consumers (render-table /
 // render-card) can call this single helper instead of branching on
 // preset kind. Returns null when score cannot be computed.
+// F1+F2 (2026-05-18): when policy.imputationEnabled, AICM path uses
+// compositeScoreImputed (peer-tier median fill for missing imputable cells,
+// capped by maxImputedWeightShare). Vendor consensus path unaffected.
 export function effectiveScore(model, weights, presetName) {
   const fn = State.scoreFn || 'aicm';
   if (fn === 'vendorConsensus') return vendorConsensusScore(model, presetName || State.activePresetName);
+  const policy = getCompositePolicy();
+  if (policy.imputationEnabled) {
+    const out = compositeScoreImputed(model, weights, State.models, presetName);
+    return out.score;
+  }
   return compositeScore(model, weights);
+}
+
+// Same as effectiveScore but also returns the imputedKeys list (for UI
+// "estimated" badge). Returns { score, imputedKeys, mode }.
+export function effectiveScoreInfo(model, weights, presetName) {
+  const fn = State.scoreFn || 'aicm';
+  if (fn === 'vendorConsensus') {
+    return { score: vendorConsensusScore(model, presetName || State.activePresetName), imputedKeys: [], mode: 'vendorConsensus' };
+  }
+  const policy = getCompositePolicy();
+  if (policy.imputationEnabled) {
+    const out = compositeScoreImputed(model, weights, State.models, presetName);
+    return { score: out.score, imputedKeys: out.imputedKeys, mode: 'aicm-imputed' };
+  }
+  return { score: compositeScore(model, weights), imputedKeys: [], mode: 'aicm' };
 }
 
 // Tiered missing-data analysis for a model under a preset. Used by UI to
@@ -608,28 +631,51 @@ export function impute(model, key, allModels) {
   return vals.reduce((a, b) => a + b, 0) / vals.length;
 }
 
-// Composite score computed with Tier-2 imputed values for empty cells.
+// Composite score with peer-tier imputation for missing cells.
+// F1+F2 (2026-05-18): atomic-only contract + respects preset.imputableBenches
+// (only imputable keys get filled) + caps imputed share via policy.maxImputedWeightShare.
 // Returns { score, imputedKeys } where imputedKeys lists which bench keys
-// were imputed (so UI can show the toggle badge).
-export function compositeScoreImputed(model, weights, allModels) {
+// were imputed (so UI can show the "estimated" badge).
+export function compositeScoreImputed(model, weights, allModels, presetName) {
+  const policy = getCompositePolicy();
+  const tiers = getPresetTiers(presetName || State.activePresetName || 'balanced');
+  const expo = policy.coverageShrinkageExponent > 0 ? policy.coverageShrinkageExponent : 2;
+  const confFactor = policy.imputedConfidenceFactor || 0.5;
+  const maxImputed = policy.maxImputedWeightShare || 0.30;
   let coveredWeight = 0;
   let activeWeight = 0;
   let weightedSum = 0;
+  let imputedWeight = 0;
   const imputedKeys = [];
   for (const k of BENCH_KEYS) {
     const w = weights[k];
     if (!w) continue;
+    if (isVendorComposite(k)) continue;       // atomic-only
     activeWeight += w;
-    const raw = model.bench?.[k] ?? impute(model, k, allModels);
-    const s = normalizeBenchScore(k, raw);
+    const haveRaw = model.bench?.[k];
+    let s = null, isImputed = false;
+    if (haveRaw != null && Number.isFinite(haveRaw)) {
+      s = normalizeBenchScore(k, haveRaw);
+    } else if (tiers.imputable.has(k)) {       // only imputable per preset
+      const imp = impute(model, k, allModels);
+      if (imp != null) { s = imp; isImputed = true; }
+    }
     if (s == null || !Number.isFinite(s)) continue;
-    coveredWeight += w;
-    weightedSum += w * s;
-    if (model.bench?.[k] == null) imputedKeys.push(k);
+    if (isImputed) {
+      // Cap total imputed contribution to maxImputedWeightShare of active weight.
+      if ((imputedWeight + w) / activeWeight > maxImputed) continue;
+      coveredWeight += w * confFactor;
+      weightedSum += w * s * confFactor;
+      imputedWeight += w;
+      imputedKeys.push(k);
+    } else {
+      coveredWeight += w;
+      weightedSum += w * s;
+    }
   }
   if (activeWeight === 0 || coveredWeight === 0) return { score: null, imputedKeys };
   const coverage = coveredWeight / activeWeight;
-  return { score: (weightedSum / coveredWeight) * Math.sqrt(coverage), imputedKeys };
+  return { score: (weightedSum / coveredWeight) * Math.pow(coverage, 1 / expo), imputedKeys };
 }
 
 export function isLocalRunnable(m) {

@@ -19,7 +19,8 @@ AICoderMap answers the questions that actually shape the decision:
 
 | Question | AICoderMap's answer |
 |----------|---------------------|
-| **"Which model fits my workflow?"** | Slide the weights to your priorities (SWE-focused, agentic-focused, balanced, or custom) — ranking updates instantly. Four built-in presets plus your own custom mix. |
+| **"Which model fits my workflow?"** | Pick a preset (Vendor Consensus default, or SWE-focused / agentic-focused / reasoning-focused / balanced) — ranking updates instantly. Move the sliders for full custom weighting. Our composite uses only atomic benchmarks (no double-counting of vendor aggregate scores); vendor composites surface separately. |
+| **"Does AICoderMap actually know better than AA / LLM-Stats?"** | We don't claim to. Every model card shows an agreement indicator (🟢 consensus / 🟡 mild gap / 🔴 controversy) between our composite and the vendor composites. 🟢 = high-confidence pick; 🔴 = investigate, the weights might be tilted somewhere. |
 | **"SWE-Verified 87 vs SWE-Pro 64 — which is real?"** | Every score carries a ⚠ / 🚨 flag when sources disagree. The tooltip lists each source (Anthropic / Scale SEAL / community) with its tier (S = self-reported, I = independent, C = community). Decide on raw evidence, not inflated headlines. |
 | **"What runs on my RTX 3070?"** | WebGPU auto-detects your hardware on page load. Every local model gets a label like *"Fits (10 GB · UD-IQ2_XXS)"* — exact quant name plus GB. For models that overflow, you also see *"+3 GB RAM"* offload recommendations. |
 | **"How fresh is the data?"** | Each row shows its last-updated date. Refreshed every 14 days at most — none of Aider's 5-month staleness. |

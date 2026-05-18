@@ -97,12 +97,13 @@ Manual via Claude Code skill (see `docs/WORKFLOW.md`):
 
 ## Compound Moat
 
-Four advantages — none of which any competitor combines:
+Five advantages — none of which any competitor combines:
 
 - **A** Multi-language TR + EN coverage
 - **B** Reusable skill+agent template (cloneable to other tracker domains)
-- **C** Coding-focused composite + user-editable weights UI ("our default, you change")
-- **D** Cross-source contradiction flagging + manual verification discipline
+- **C** **Coding-focused, user-editable composite, on top of vendor consensus** — site default is honest "vendor consensus" (median rank across AA Idx + AA Coding + AA Agentic); SWE-focused / agentic-focused / reasoning-focused / balanced editorial presets remain prominent for users who want a coding-oriented lens; full slider customization for everyone who knows their own workload.
+- **D** Cross-source contradiction flagging + manual verification discipline (provenance trail + trustScore on every cell + ⚠/🚨 rozet)
+- **E** **Cross-validation panel (AICM vs vendor composite)** — every model card surfaces an agreement indicator (🟢 consensus / 🟡 mild gap / 🔴 controversy) between our atomic-only composite and the vendor-aggregated composites we deliberately excluded from our score (no double-counting). Gives users a free second opinion + flags suspicious rankings automatically.
 
 ## Critical Files
 

@@ -953,7 +953,7 @@
       "coverageShrinkageExponent": 2,
       "_coverageShrinkageNote": "composite = raw * (coverage ^ (1/exponent)). 2 = sqrt (current behavior). >2 = gentler penalty for low coverage. 1 = linear. 0 = no penalty.",
       "imputation": {
-        "enabled": false,
+        "enabled": true,
         "mode": "tier-median",
         "_modeOptions": [
           "tier-median",
@@ -964,7 +964,7 @@
         "maxImputedWeightShare": 0.3,
         "imputedConfidenceFactor": 0.5,
         "annotateInUi": true,
-        "_disabledNote": "Set enabled=true to activate. Until then, missing cells follow coverage-shrinkage policy only."
+        "_disabledNote": "Enabled 2026-05-18. effectiveScore() dispatches to compositeScoreImputed which fills missing imputable benches with peer-tier median (≥3 peers, normalized via _schema.normalization). Imputed cells weighted at imputedConfidenceFactor (0.5); total imputed share capped at maxImputedWeightShare (0.30)."
       },
       "minCoverageDisplay": 0.3,
       "_minCoverageDisplayNote": "Models below this fraction of preset coverage get 'limited data' UI badge."
