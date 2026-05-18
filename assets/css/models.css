@@ -540,6 +540,27 @@ table#comparison-table .coverage-mini.cov-low { color: var(--warn-2, #e07320); b
 }
 .sources-footer .sources-list a:hover { text-decoration: underline; }
 
+/* Phase R6: per-source reliability badge. Renders a small glyph before
+   high-track-record and low-track-record sources so users can scan the
+   list and tell which citations are load-bearing at a glance. Cold-start
+   sources (insufficient ledger samples) get no badge and behave exactly
+   like pre-R6 plain links. */
+.sources-footer .source-link[data-reliability="exceptional"]::before {
+  content: "⭐ ";
+  margin-right: 2px;
+}
+.sources-footer .source-link[data-reliability="low"]::before {
+  content: "⚠ ";
+  margin-right: 2px;
+  color: var(--warn);
+}
+.sources-footer .source-link[data-reliability="exceptional"] {
+  font-weight: 600;
+}
+.sources-footer .source-link[data-reliability="low"] {
+  opacity: 0.85;
+}
+
 /* Contradiction tooltip (JS-positioned) */
 .tooltip {
   position: fixed;

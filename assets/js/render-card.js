@@ -7,6 +7,7 @@ import {
   compositeScore, coverageOf, disputedCount, fmtScore, contradictionFor,
   pricingView, fmtPriceMoney, fmtPriceRange, fmtPriceCell, fmtContext,
   fmtLastUpdated, formatBenchValue, isCellStale, getCellFreshness,
+  sourceReliabilityBadge,
 } from './data.js';
 import { gpuCompat, getActiveVram } from './gpu.js';
 import { el, cameraIconButton, docIconButton } from './dom.js';
@@ -357,9 +358,21 @@ function sourcesFooter(model) {
       if (i > 0) list.appendChild(document.createTextNode(', '));
       const text = s.count > 1 ? `${s.source} ×${s.count}` : s.source;
       if (s.url) {
-        list.appendChild(el('a', {
+        const badge = sourceReliabilityBadge(s.url);
+        const attrs = {
           href: s.url, target: '_blank', rel: 'noopener noreferrer', title: s.url,
-        }, text));
+          class: 'source-link',
+        };
+        if (badge) {
+          attrs['data-reliability'] = badge.kind;
+          const accPct = Math.round(badge.accuracy * 100);
+          const nStr = badge.n.toFixed(1);
+          let qualifier = '';
+          if (badge.kind === 'exceptional') qualifier = ' ' + (t('reliability.exceptional') || 'exceptional source');
+          else if (badge.kind === 'low') qualifier = ' ' + (t('reliability.lowConfidence') || 'low confidence');
+          attrs['data-tip'] = `${t('reliability.label') || 'Reliability'}: ${accPct}% (n=${nStr})${qualifier}`;
+        }
+        list.appendChild(el('a', attrs, text));
       } else {
         list.appendChild(document.createTextNode(text));
       }

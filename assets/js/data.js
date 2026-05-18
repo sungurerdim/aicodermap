@@ -95,6 +95,45 @@ function posteriorMean(agree, disagree) {
   return denom > 0 ? a / denom : 0.5;
 }
 
+// Phase R6: badge state for a source link. Returns null when cold-start
+// (no badge), otherwise an object describing how the link should render:
+//   kind:     'exceptional' (>=0.85) | 'low' (<=0.55) | 'normal' (between)
+//   accuracy: posterior mean in [0,1]
+//   n:        decayed sample count (audit visibility)
+// Frontend wraps each source link in `data-reliability="<kind>"` so CSS
+// can prefix a glyph and tooltip can show the percentage.
+export function sourceReliabilityBadge(url, benchKey = '') {
+  const ledger = State.reliability;
+  if (!ledger || typeof ledger !== 'object') return null;
+  const sid = sourceIdentity(url);
+  if (!sid) return null;
+  const src = (ledger.sources || {})[sid];
+  if (!src) return null;
+  const coldStart = Number(ledger.coldStartN || 10);
+  let agree = 0;
+  let disagree = 0;
+  if (benchKey) {
+    const bench = (src.byBench || {})[benchKey];
+    if (bench) {
+      agree = Number(bench.agree || 0);
+      disagree = Number(bench.disagree || 0);
+    }
+  }
+  let n = agree + disagree;
+  if (n < coldStart) {
+    const g = src.global || {};
+    agree = Number(g.agree || 0);
+    disagree = Number(g.disagree || 0);
+    n = agree + disagree;
+  }
+  if (n < coldStart) return null;
+  const accuracy = posteriorMean(agree, disagree);
+  let kind = 'normal';
+  if (accuracy >= 0.85) kind = 'exceptional';
+  else if (accuracy <= 0.55) kind = 'low';
+  return { kind, accuracy, n };
+}
+
 // Mirror of scripts/lib/reliability.py:reliability_multiplier with the
 // same hierarchical fallback: per-(source, bench) -> per-source global ->
 // cold-start neutral 1.0. Clamped to [0.3, 1.0]. Returns 1.0 when the
