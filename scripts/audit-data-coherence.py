@@ -317,6 +317,84 @@ def main():
             f"bench key(s): {bad_na[:5]}{' ...' if len(bad_na) > 5 else ''}"
         )
 
+    # === AC11 — privacy block shape (BLOCK) ===
+    # model.privacy is optional; if present it MUST be a dict with only
+    # canonical keys and canonical values per
+    # sources-whitelist._schema.privacyFieldNormalize.
+    privacy_canonical_keys = {
+        "trainingDataOptOut",
+        "dataResidency",
+        "soc2",
+        "gdpr",
+        "apiLogging",
+    }
+    optout_values = {"available", "none", "unknown"}
+    residency_codes = {
+        "US",
+        "EU",
+        "JP",
+        "SG",
+        "AU",
+        "CA",
+        "UK",
+        "IN",
+        "BR",
+        "MX",
+        "DE",
+        "FR",
+        "KR",
+        "global",
+    }
+    logging_values = {
+        "not_logged",
+        "opt_out",
+        "default_off",
+        "default_on",
+        "unknown",
+    }
+    bad_privacy: list[str] = []
+    for m in models:
+        p = m.get("privacy")
+        if p is None:
+            continue
+        if not isinstance(p, dict):
+            bad_privacy.append(
+                f"{m['id']}.privacy: not a dict (got {type(p).__name__})"
+            )
+            continue
+        for pk, pv in p.items():
+            if pk not in privacy_canonical_keys:
+                bad_privacy.append(f"{m['id']}.privacy.{pk}: unknown field")
+                continue
+            if pk == "trainingDataOptOut":
+                if pv is not None and pv not in optout_values:
+                    bad_privacy.append(
+                        f"{m['id']}.privacy.trainingDataOptOut={pv!r}: not in {sorted(optout_values)}"
+                    )
+            elif pk == "dataResidency":
+                if pv is not None and not (
+                    isinstance(pv, list)
+                    and all(isinstance(c, str) and c in residency_codes for c in pv)
+                ):
+                    bad_privacy.append(
+                        f"{m['id']}.privacy.dataResidency={pv!r}: must be list of codes from {sorted(residency_codes)}"
+                    )
+            elif pk in ("soc2", "gdpr"):
+                if pv is not None and not isinstance(pv, bool):
+                    bad_privacy.append(
+                        f"{m['id']}.privacy.{pk}={pv!r}: must be boolean or null"
+                    )
+            elif pk == "apiLogging":
+                if pv is not None and pv not in logging_values:
+                    bad_privacy.append(
+                        f"{m['id']}.privacy.apiLogging={pv!r}: not in {sorted(logging_values)}"
+                    )
+    if bad_privacy:
+        failures.append(
+            f"AC11 — privacy shape drift in {len(bad_privacy)} cell(s): "
+            f"{bad_privacy[:5]}{' ...' if len(bad_privacy) > 5 else ''}"
+        )
+
     # === MX4 — every filled bench cell has ≥1 sources.json entry (BLOCK) ===
     no_source_filled: list[str] = []
     for m in models:

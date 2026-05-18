@@ -158,6 +158,11 @@ reliably; nested 2-level structures often degrade.
   "unslothObs": [
     {"modelId": "<id>", "name": "<variant>", "size": "<gb>", "vram": <number>}
   ],
+  "privacyObs": [
+    {"modelId": "<id>", "field": "trainingDataOptOut"|"dataResidency"|"soc2"|"gdpr"|"apiLogging",
+     "value": <see _schema.privacyFieldNormalize for canonical values>,
+     "sourceUrl": "<url>", "tier": "I"|"S"|"C", "fetched": "YYYY-MM-DD"}
+  ],
   "lineupHints": [
     {"modelId": "<id>", "event": "deprecated"|"renamed"|"new"|"removed", "evidence": "<url>", "details": "<one-line>"}
   ],
@@ -198,6 +203,13 @@ reliably; nested 2-level structures often degrade.
   ],
   "ollamaObs": [],
   "unslothObs": [],
+  "privacyObs": [
+    {"modelId": "opus-4-7", "field": "soc2", "value": true, "sourceUrl": "https://trust.anthropic.com/", "tier": "S", "fetched": "2026-05-19"},
+    {"modelId": "opus-4-7", "field": "gdpr", "value": true, "sourceUrl": "https://www.anthropic.com/legal/privacy", "tier": "S", "fetched": "2026-05-19"},
+    {"modelId": "opus-4-7", "field": "dataResidency", "value": ["US", "EU"], "sourceUrl": "https://docs.claude.com/en/docs/legal/data-residency", "tier": "S", "fetched": "2026-05-19"},
+    {"modelId": "opus-4-7", "field": "apiLogging", "value": "opt_out", "sourceUrl": "https://privacy.anthropic.com/", "tier": "S", "fetched": "2026-05-19"},
+    {"modelId": "opus-4-7", "field": "trainingDataOptOut", "value": "available", "sourceUrl": "https://privacy.anthropic.com/", "tier": "S", "fetched": "2026-05-19"}
+  ],
   "lineupHints": [],
   "naCandidates": [],
   "rawGaps": [
@@ -211,7 +223,7 @@ reliably; nested 2-level structures often degrade.
 **HARD RULES (gather mode):**
 
 1. **TOP-LEVEL KEYS** must be exactly: `batchId`, `mode`, `observations`,
-   `modelMeta`, `pricingObs`, `ollamaObs`, `unslothObs`, `lineupHints`,
+   `modelMeta`, `pricingObs`, `ollamaObs`, `unslothObs`, `privacyObs`, `lineupHints`,
    `naCandidates`, `rawGaps`, `runtime`, `partialReason`. Any other keys
    (`models`, `updates`, `sourcesAdded`, `gaps`, `confidence`, `synthesis`,
    `lineupChanges`, `coverageMatrix`, `validationCoverage`, `runMetadata`,
@@ -948,6 +960,37 @@ severity:
 autoResolveWinner = candidate with max(trustScore)
 ties: prefer I-tier, then most recent, then highest verifications
 ```
+
+## PRIVACY_EXTRACTION (gather mode, scope=full or scope=privacy)
+
+When privacy/compliance data is part of the survey, the agent emits `privacyObs[]` alongside `observations[]`. Discovery + extraction follows a parallel three-phase pipeline:
+
+**Phase P1 — Independent aggregators (I-tier, run FIRST):**
+   - Walk `idea_context.sourcesWhitelist.complianceAggregators[]` for entries whose `vendorScope` is missing/matches this batch's providers OR whose `scope` is generic (multi/soc2/gdpr/iso27001/hipaa).
+   - AWS/GCP/Azure compliance scope pages, AICPA SOC registry, ISO/IEC 27001, EDPB enforcement register → cross-check for vendor presence.
+   - Hits become I-tier observations (`tier: "I"`).
+
+**Phase P2 — Vendor trust portals + privacy pages (S-tier):**
+   - Probe each vendor's domain for `/privacy`, `/legal/privacy`, `/policies/privacy-policy`, `/trust`, `/security`, `/compliance` paths (in that order). WebSearch fallback if root probes fail (`"<vendor> privacy policy"`, `"<vendor> SOC 2"`, `"<vendor> GDPR DPA"`).
+   - Successfully reached vendor URLs → emit `whitelistAdditions[]` so subsequent cycles fetch directly. Hits become S-tier observations (`tier: "S"`).
+
+**Phase P3 — Field extraction (parse hits into canonical values):**
+
+Each privacy field follows a canonical normalize table (whitelist `_schema.privacyFieldNormalize`):
+
+| field | shape | canonical values | extraction heuristic |
+|-------|-------|------------------|----------------------|
+| `trainingDataOptOut` | string | `"available"`, `"none"`, `"unknown"` | Look for: "opt out of training", "data not used for training", "training data opt-out" (=available); "may be used to improve our models" / "data is used to train" (=none) |
+| `dataResidency` | string[] | ISO-2 codes + `"global"` | Match "data centers in <country>", "available regions: ..." against {US, EU, UK, JP, SG, AU, CA, IN, BR, MX, DE, FR, KR}; aggregate to array; if "any region" or "globally available" → `["global"]` |
+| `soc2` | boolean\|null | `true`, `false`, `null` | true=any of: "SOC 2 Type II", "SOC2 certified", AICPA registry hit; false=explicit "not SOC 2 audited"; null=no mention |
+| `gdpr` | boolean\|null | `true`, `false`, `null` | true=any of: "GDPR compliant", "DPA available", "Standard Contractual Clauses", "EU data residency"; false=explicit non-compliance; null=no mention |
+| `apiLogging` | string | `"not_logged"`, `"opt_out"`, `"default_off"`, `"default_on"`, `"unknown"` | "zero data retention" / "not logged" (=not_logged); "logs by default, can opt out" (=opt_out); "logging is off by default" (=default_off); "logs all requests" / "30-day retention by default" (=default_on) |
+
+**Mandatory rules:**
+- Every `privacyObs[]` entry MUST include a precise `sourceUrl` that the agent actually fetched and parsed. Citing the vendor's home page without verifying the specific privacy claim is a contract violation; emit a gap instead.
+- The 5 fields are independent — partial coverage is fine. If only `soc2` + `gdpr` reachable for a model, emit those two; the rest stay null/unknown and synth treats them as gaps.
+- For closed-vendor / closed-data scenarios (e.g., research preview, no public privacy policy), emit `naCandidates[]` entries with reasonHint `"no-public-privacy-policy"`.
+- **Tier override (S vs I):** by HARD RULE 5 in `## EVIDENCE_REQUIRED`, vendor self-report is S-tier (verifications=1, trustScore=0.7). Independent audit registry confirmation is I-tier (verifications≥1, trustScore=1.0). Synth's pick_winner picks I over S when both present — vendor claims override only when no independent registry covers the (model, field) pair.
 
 ## VALIDATION_RULES
 1. **Triangulation**: bench score requires ≥2 independent source. Single = tier="S" + emit gaps[]

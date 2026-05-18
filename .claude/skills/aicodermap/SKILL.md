@@ -829,9 +829,9 @@ Single source of truth for the unified shape between every layer. Mirrored verba
 
 | Layer        | File / channel        | Shape                                                                                                                         |
 |--------------|-----------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| **Storage**  | `data/models.json`    | Flat scalars. `bench.<key>` = number, `context` = number, `pricing.api[].in/out/cacheHit/throughput` = number. NO `{value, trustScore}` wrappers. |
+| **Storage**  | `data/models.json`    | Flat scalars. `bench.<key>` = number, `context` = number, `pricing.api[].in/out/cacheHit/throughput` = number. `privacy.<field>` = canonical value (see AC11). NO `{value, trustScore}` wrappers. |
 | **Provenance** | `data/sources.json` | Wrapped: `{value, source, url, tier, date, verifications, trustScore, contradictionRole?}`. Sole on-disk home of `trustScore`. |
-| **Transit**  | agent → skill JSON    | `models[].updates.<field>` = Storage shape; `models[].sourcesAdded[]` = Provenance shape; NEVER cross-mix.                    |
+| **Transit**  | agent → skill JSON    | `models[].updates.<field>` = Storage shape; `models[].sourcesAdded[]` = Provenance shape; `privacyObs[]` = independent gather array (top-level, NOT under models[]); NEVER cross-mix. |
 | **Verification** | `.aicodermap-verification-map.json` (gitignored) | **Cross-cycle cache:** `cells.<modelId>.<benchKey> = {value, verifications[], confirmed, lastChecked}`. Skill reads at cycle start (skip confirmed cells), updates post-merge from sourcesAdded[]. NOT a render input — purely orchestrator state. |
 | **Render**   | `assets/js/render-card.js` + `render-table.js` | Reads Storage scalars; looks up Provenance for tooltips by `<modelId>.<field>`. Entry: `assets/js/main.js` (ES module). |
 
@@ -883,6 +883,7 @@ ARRAY FIELDS (NEW SCHEMA):
 COMPUTED FIELDS:  pricing.range            (computed from pricing.api[] at write time)
 
 OBJECT FIELDS:    ollama (full pullCmd/tags/pullCount/architecture/parameters/license/releasedISO/ollamaUrl block — preserve atomically; replace only if new object has more keys)
+                  privacy (per-field dict merge: {trainingDataOptOut, dataResidency[], soc2, gdpr, apiLogging}. synth's _build_privacy_block clusters by (modelId, field) and picks highest-tier observation (I > S > C) with most-recent fetched as tiebreak. I-tier audit registry overrides S-tier vendor self-report; sources in data/sources-whitelist.json `complianceAggregators[]` + vendor-discovered `urls.privacy`/`urls.trust`. Canonical values enforced by audit-data-coherence.py AC11 — drift → merge rollback.)
 
 BENCH KEYS (dynamic universe = whitelist `_schema.coreBenchKeys` ∪ `_schema.emergingBenchKeys`):
                   core (16): swePro, sweV, lcb, tb2, tbHard, cfElo, nl2Repo,

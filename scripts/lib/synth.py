@@ -400,6 +400,48 @@ def _build_ollama_block(ollamaObs: list[dict[str, Any]]) -> dict[str, dict[str, 
     return by_model
 
 
+_PRIVACY_FIELDS = (
+    "trainingDataOptOut",
+    "dataResidency",
+    "soc2",
+    "gdpr",
+    "apiLogging",
+)
+_PRIVACY_TIER_RANK = {"I": 3, "S": 2, "C": 1}
+
+
+def _build_privacy_block(
+    privacyObs: list[dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    """Group privacyObs by (modelId, field); pick highest-tier winner,
+    then most-recent fetched. I-tier audit registries override S-tier
+    vendor self-report. Returns {modelId: {field: value, ...}}.
+    """
+    by_cell: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+    for p in privacyObs:
+        if not isinstance(p, dict):
+            continue
+        mid = p.get("modelId")
+        field = p.get("field")
+        if not (isinstance(mid, str) and field in _PRIVACY_FIELDS):
+            continue
+        if "value" not in p:
+            continue
+        by_cell[(mid, field)].append(p)
+
+    def _rank(o: dict[str, Any]) -> int:
+        t = o.get("tier")
+        return _PRIVACY_TIER_RANK.get(t, 0) if isinstance(t, str) else 0
+
+    by_model: dict[str, dict[str, Any]] = defaultdict(dict)
+    for (mid, field), obs_list in by_cell.items():
+        top_tier = max(_rank(o) for o in obs_list)
+        top = [o for o in obs_list if _rank(o) == top_tier]
+        top.sort(key=lambda o: o.get("fetched") or "", reverse=True)
+        by_model[mid][field] = top[0]["value"]
+    return by_model
+
+
 def _build_unsloth_variants(
     unslothObs: list[dict[str, Any]],
 ) -> dict[str, list[dict[str, Any]]]:
@@ -726,6 +768,16 @@ def synth(
     for mid, variants in unsloth_by_model.items():
         models_by_id[mid]["id"] = mid
         models_by_id[mid]["updates"]["unslothVariants"] = variants
+
+    # Privacy / compliance aggregation. I-tier audit registries override
+    # S-tier vendor self-report; ties broken by most-recent fetched date.
+    all_privacy = []
+    for _p, art in artifacts:
+        all_privacy.extend(art.get("privacyObs") or [])
+    privacy_by_model = _build_privacy_block(all_privacy)
+    for mid, block in privacy_by_model.items():
+        models_by_id[mid]["id"] = mid
+        models_by_id[mid]["updates"]["privacy"] = block
 
     # Meta scalars (released, context, license, open, providers, vramRequirement).
     all_meta = []

@@ -346,6 +346,16 @@ def apply_model_update(model, updates):
         elif k == "ollama" and isinstance(v, dict):
             model["ollama"] = v
             touched = True
+        elif k == "privacy" and isinstance(v, dict):
+            # Per-field dict merge — preserves previously-known fields when
+            # the current cycle only resolves a subset. Bad values are caught
+            # by audit-data-coherence.py (AC11) and trigger merge rollback.
+            if "privacy" not in model or not isinstance(model.get("privacy"), dict):
+                model["privacy"] = {}
+            for pk, pv in v.items():
+                if model["privacy"].get(pk) != pv:
+                    model["privacy"][pk] = pv
+                    touched = True
         elif k == "lastUpdated":
             continue
         else:

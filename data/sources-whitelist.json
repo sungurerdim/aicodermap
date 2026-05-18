@@ -8,7 +8,8 @@
       "aggregators": "Multi-provider inference catalogs. tier='I'. Used by Phase 2 multi-provider pricing mining.",
       "local": "Local-runtime catalogs (Ollama, Unsloth, quants). tier='I'. Used per-model when tier='ollama' or vramRequirement is sought.",
       "registries": "Model metadata registries (HF leaderboard, llmfit). tier='I'.",
-      "community": "Aggregator blogs / expert commentary. tier='C'. Used only when no I/S source carries the value."
+      "community": "Aggregator blogs / expert commentary. tier='C'. Used only when no I/S source carries the value.",
+      "complianceAggregators": "Vendor-agnostic compliance/audit registries. tier='I' (independent). Used by privacy/compliance survey for SOC2/HIPAA/ISO/GDPR verification — independent override over vendor self-report."
     },
     "perEntryFields": {
       "format": "One of formatTaxonomy keys (default static_html_table). Drives adapter selection.",
@@ -1391,6 +1392,66 @@
           "artificialanalysis.ai"
         ],
         "rationale": "Codeforces Elo is a raw score in the 1500-3500 range; only vendor-or-AA report. Single source acceptable but flagged."
+      }
+    },
+    "privacyFieldNormalize": {
+      "trainingDataOptOut": {
+        "shape": "string",
+        "values": [
+          "available",
+          "none",
+          "unknown"
+        ],
+        "definition": "available=user can opt out of training; none=no opt-out offered; unknown=undocumented"
+      },
+      "dataResidency": {
+        "shape": "string[]",
+        "values": [
+          "US",
+          "EU",
+          "JP",
+          "SG",
+          "AU",
+          "CA",
+          "UK",
+          "IN",
+          "BR",
+          "MX",
+          "DE",
+          "FR",
+          "KR",
+          "global"
+        ],
+        "definition": "ISO-2 country/region codes where API processes data; 'global' = any region"
+      },
+      "soc2": {
+        "shape": "boolean|null",
+        "values": [
+          true,
+          false,
+          null
+        ],
+        "definition": "true=SOC2 Type II audited (vendor or audit registry confirmed); false=not audited; null=unverified"
+      },
+      "gdpr": {
+        "shape": "boolean|null",
+        "values": [
+          true,
+          false,
+          null
+        ],
+        "definition": "true=GDPR compliant (DPA available, EU residency or SCCs); false=not compliant; null=unverified"
+      },
+      "apiLogging": {
+        "shape": "string",
+        "values": [
+          "not_logged",
+          "opt_out",
+          "default_off",
+          "default_on",
+          "unknown"
+        ],
+        "definition": "not_logged=zero retention; opt_out=user can disable; default_off=off by default; default_on=on by default"
       }
     }
   },
@@ -4085,5 +4146,164 @@
         "https://labs.scale.com/leaderboard/": true
       }
     }
-  }
+  },
+  "complianceAggregators": [
+    {
+      "url": "https://aws.amazon.com/compliance/services-in-scope/",
+      "name": "AWS Compliance Services in Scope",
+      "scope": "multi",
+      "publishes": [
+        "soc2",
+        "gdpr",
+        "iso27001",
+        "hipaa"
+      ],
+      "format": "static_html_table",
+      "tier": "I",
+      "lastVerifiedDate": "2026-05-19",
+      "consecutiveFailures": 0
+    },
+    {
+      "url": "https://cloud.google.com/security/compliance/offerings",
+      "name": "Google Cloud Compliance Offerings",
+      "scope": "multi",
+      "publishes": [
+        "soc2",
+        "gdpr",
+        "iso27001",
+        "hipaa"
+      ],
+      "format": "static_html_article",
+      "tier": "I",
+      "lastVerifiedDate": "2026-05-19",
+      "consecutiveFailures": 0
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/azure/compliance/",
+      "name": "Microsoft Azure Compliance",
+      "scope": "multi",
+      "publishes": [
+        "soc2",
+        "gdpr",
+        "iso27001",
+        "hipaa"
+      ],
+      "format": "static_html_article",
+      "tier": "I",
+      "lastVerifiedDate": "2026-05-19",
+      "consecutiveFailures": 0
+    },
+    {
+      "url": "https://compliance.microsoft.com/compliancemanager",
+      "name": "Microsoft Compliance Manager",
+      "scope": "multi",
+      "publishes": [
+        "soc2",
+        "gdpr",
+        "iso27001"
+      ],
+      "format": "static_html_article",
+      "tier": "I",
+      "lastVerifiedDate": "2026-05-19",
+      "consecutiveFailures": 0
+    },
+    {
+      "url": "https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-for-service-organizations",
+      "name": "AICPA SOC for Service Organizations",
+      "scope": "soc2",
+      "publishes": [
+        "soc2"
+      ],
+      "format": "static_html_article",
+      "tier": "I",
+      "lastVerifiedDate": "2026-05-19",
+      "consecutiveFailures": 0
+    },
+    {
+      "url": "https://www.iso.org/standard/27001",
+      "name": "ISO/IEC 27001 Information Security",
+      "scope": "iso27001",
+      "publishes": [
+        "iso27001"
+      ],
+      "format": "static_html_article",
+      "tier": "I",
+      "lastVerifiedDate": "2026-05-19",
+      "consecutiveFailures": 0
+    },
+    {
+      "url": "https://gdpr-info.eu/",
+      "name": "GDPR Reference (EU Regulation)",
+      "scope": "gdpr",
+      "publishes": [
+        "gdpr"
+      ],
+      "format": "static_html_article",
+      "tier": "I",
+      "lastVerifiedDate": "2026-05-19",
+      "consecutiveFailures": 0
+    },
+    {
+      "url": "https://edpb.europa.eu/our-work-tools/consistency-findings/register-for-decisions_en",
+      "name": "European Data Protection Board (EDPB) Decisions Register",
+      "scope": "gdpr",
+      "publishes": [
+        "gdpr"
+      ],
+      "format": "static_html_table",
+      "tier": "I",
+      "lastVerifiedDate": "2026-05-19",
+      "consecutiveFailures": 0
+    },
+    {
+      "url": "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html",
+      "name": "US HHS HIPAA Security Rule",
+      "scope": "hipaa",
+      "publishes": [
+        "hipaa"
+      ],
+      "format": "static_html_article",
+      "tier": "I",
+      "lastVerifiedDate": "2026-05-19",
+      "consecutiveFailures": 0
+    },
+    {
+      "url": "https://trust.openai.com/",
+      "name": "OpenAI Trust Portal",
+      "scope": "vendor-trust",
+      "publishes": [
+        "soc2",
+        "gdpr",
+        "iso27001",
+        "hipaa"
+      ],
+      "format": "spa_full",
+      "skipWebFetch": true,
+      "tier": "S",
+      "lastVerifiedDate": "2026-05-19",
+      "consecutiveFailures": 0,
+      "vendorScope": [
+        "openai"
+      ]
+    },
+    {
+      "url": "https://trust.anthropic.com/",
+      "name": "Anthropic Trust Portal",
+      "scope": "vendor-trust",
+      "publishes": [
+        "soc2",
+        "gdpr",
+        "iso27001",
+        "hipaa"
+      ],
+      "format": "spa_full",
+      "skipWebFetch": true,
+      "tier": "S",
+      "lastVerifiedDate": "2026-05-19",
+      "consecutiveFailures": 0,
+      "vendorScope": [
+        "anthropic"
+      ]
+    }
+  ]
 }
