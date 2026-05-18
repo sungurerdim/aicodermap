@@ -4,6 +4,24 @@
   "lastCycle": "2026-05-18",
   "schemaVersion": "v1",
   "sources": {
+    "ai.google.dev": {
+      "byBench": {
+        "gpqa": {
+          "agree": 2.0,
+          "disagree": 2.0,
+          "rawAgree": 2,
+          "rawDisagree": 2
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 2.0,
+        "disagree": 2.0,
+        "rawAgree": 2,
+        "rawDisagree": 2
+      },
+      "lastSeen": "2026-05-18"
+    },
     "aiwiki.ai": {
       "byBench": {
         "hle": {
@@ -25,9 +43,9 @@
     "anthropic.com": {
       "byBench": {
         "gpqa": {
-          "agree": 4.0,
+          "agree": 6.0,
           "disagree": 0.0,
-          "rawAgree": 4,
+          "rawAgree": 6,
           "rawDisagree": 0
         },
         "hle": {
@@ -37,23 +55,23 @@
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 3.0,
+          "agree": 6.0,
           "disagree": 0.0,
-          "rawAgree": 3,
+          "rawAgree": 6,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 3.0,
+          "agree": 5.0,
           "disagree": 0.0,
-          "rawAgree": 3,
+          "rawAgree": 5,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 18.0,
+        "agree": 25.0,
         "disagree": 0.0,
-        "rawAgree": 18,
+        "rawAgree": 25,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
@@ -79,23 +97,89 @@
     "artificialanalysis.ai": {
       "byBench": {
         "aaIdx": {
-          "agree": 3.0,
+          "agree": 4.0,
           "disagree": 0.0,
-          "rawAgree": 3,
+          "rawAgree": 4,
           "rawDisagree": 0
         },
+        "aaOmni": {
+          "agree": 0.0,
+          "disagree": 2.0,
+          "rawAgree": 0,
+          "rawDisagree": 2
+        },
         "gpqa": {
-          "agree": 20.0,
+          "agree": 31.0,
           "disagree": 0.0,
-          "rawAgree": 20,
+          "rawAgree": 31,
+          "rawDisagree": 0
+        },
+        "hle": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "lcb": {
+          "agree": 5.0,
+          "disagree": 0.0,
+          "rawAgree": 5,
+          "rawDisagree": 0
+        },
+        "mmluPro": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "swePro": {
+          "agree": 0.0,
+          "disagree": 2.0,
+          "rawAgree": 0,
+          "rawDisagree": 2
+        },
+        "sweV": {
+          "agree": 12.0,
+          "disagree": 0.0,
+          "rawAgree": 12,
+          "rawDisagree": 0
+        },
+        "tau2": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 23.0,
+        "agree": 56.0,
+        "disagree": 4.0,
+        "rawAgree": 56,
+        "rawDisagree": 4
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "arxiv.org": {
+      "byBench": {
+        "gpqa": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "lcb": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 2.0,
         "disagree": 0.0,
-        "rawAgree": 23,
+        "rawAgree": 2,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
@@ -103,30 +187,276 @@
     "assets.anthropic.com": {
       "byBench": {
         "tb2": {
-          "agree": 3.0,
+          "agree": 5.0,
           "disagree": 0.0,
-          "rawAgree": 3,
+          "rawAgree": 5,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 3.0,
+        "agree": 5.0,
         "disagree": 0.0,
-        "rawAgree": 3,
+        "rawAgree": 5,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "aurigait.com": {
+      "byBench": {
+        "mmluPro": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
     },
     "benchlm.ai": {
       "byBench": {
-        "hle": {
-          "agree": 8.0,
+        "aaOmni": {
+          "agree": 2.0,
           "disagree": 0.0,
-          "rawAgree": 8,
+          "rawAgree": 2,
+          "rawDisagree": 0
+        },
+        "aime26": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "arcAgi2": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "gpqa": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "hle": {
+          "agree": 11.0,
+          "disagree": 0.0,
+          "rawAgree": 11,
+          "rawDisagree": 0
+        },
+        "lcb": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
+          "rawDisagree": 0
+        },
+        "swePro": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
           "rawDisagree": 0
         },
         "sweV": {
+          "agree": 6.0,
+          "disagree": 0.0,
+          "rawAgree": 6,
+          "rawDisagree": 0
+        },
+        "tb2": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 27.0,
+        "disagree": 0.0,
+        "rawAgree": 27,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "blog.google": {
+      "byBench": {
+        "mmluPro": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "buildfastwithai.com": {
+      "byBench": {
+        "sweV": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "businesswire.com": {
+      "byBench": {
+        "tb2": {
+          "agree": 5.0,
+          "disagree": 0.0,
+          "rawAgree": 5,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 5.0,
+        "disagree": 0.0,
+        "rawAgree": 5,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "datacamp.com": {
+      "byBench": {
+        "sweV": {
+          "agree": 5.0,
+          "disagree": 0.0,
+          "rawAgree": 5,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 5.0,
+        "disagree": 0.0,
+        "rawAgree": 5,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "deepmind.google": {
+      "byBench": {
+        "arcAgi2": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "gpqa": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
+          "rawDisagree": 0
+        },
+        "hle": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "sweV": {
+          "agree": 12.0,
+          "disagree": 0.0,
+          "rawAgree": 12,
+          "rawDisagree": 0
+        },
+        "tb2": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 17.0,
+        "disagree": 0.0,
+        "rawAgree": 17,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "dev.to": {
+      "byBench": {
+        "tb2": {
+          "agree": 5.0,
+          "disagree": 0.0,
+          "rawAgree": 5,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 5.0,
+        "disagree": 0.0,
+        "rawAgree": 5,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "developer.nvidia.com": {
+      "byBench": {
+        "gpqa": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "docs.z.ai": {
+      "byBench": {
+        "aime26": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "gpqa": {
+          "agree": 6.0,
+          "disagree": 0.0,
+          "rawAgree": 6,
+          "rawDisagree": 0
+        },
+        "hle": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "tb2": {
           "agree": 6.0,
           "disagree": 0.0,
           "rawAgree": 6,
@@ -142,116 +472,74 @@
       },
       "lastSeen": "2026-05-18"
     },
-    "businesswire.com": {
+    "github.com": {
       "byBench": {
-        "tb2": {
-          "agree": 3.0,
+        "mmluPro": {
+          "agree": 1.0,
           "disagree": 0.0,
-          "rawAgree": 3,
-          "rawDisagree": 0
-        }
-      },
-      "firstSeen": "2026-05-18",
-      "global": {
-        "agree": 3.0,
-        "disagree": 0.0,
-        "rawAgree": 3,
-        "rawDisagree": 0
-      },
-      "lastSeen": "2026-05-18"
-    },
-    "datacamp.com": {
-      "byBench": {
-        "sweV": {
-          "agree": 3.0,
-          "disagree": 0.0,
-          "rawAgree": 3,
-          "rawDisagree": 0
-        }
-      },
-      "firstSeen": "2026-05-18",
-      "global": {
-        "agree": 3.0,
-        "disagree": 0.0,
-        "rawAgree": 3,
-        "rawDisagree": 0
-      },
-      "lastSeen": "2026-05-18"
-    },
-    "deepmind.google": {
-      "byBench": {
-        "sweV": {
-          "agree": 8.0,
-          "disagree": 0.0,
-          "rawAgree": 8,
-          "rawDisagree": 0
-        }
-      },
-      "firstSeen": "2026-05-18",
-      "global": {
-        "agree": 8.0,
-        "disagree": 0.0,
-        "rawAgree": 8,
-        "rawDisagree": 0
-      },
-      "lastSeen": "2026-05-18"
-    },
-    "dev.to": {
-      "byBench": {
-        "tb2": {
-          "agree": 3.0,
-          "disagree": 0.0,
-          "rawAgree": 3,
-          "rawDisagree": 0
-        }
-      },
-      "firstSeen": "2026-05-18",
-      "global": {
-        "agree": 3.0,
-        "disagree": 0.0,
-        "rawAgree": 3,
-        "rawDisagree": 0
-      },
-      "lastSeen": "2026-05-18"
-    },
-    "docs.z.ai": {
-      "byBench": {
-        "gpqa": {
-          "agree": 6.0,
-          "disagree": 0.0,
-          "rawAgree": 6,
+          "rawAgree": 1,
           "rawDisagree": 0
         },
-        "tb2": {
-          "agree": 3.0,
+        "sweV": {
+          "agree": 1.0,
           "disagree": 0.0,
-          "rawAgree": 3,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "tau2": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 9.0,
+        "agree": 3.0,
         "disagree": 0.0,
-        "rawAgree": 9,
+        "rawAgree": 3,
         "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "huggingface.co": {
+      "byBench": {
+        "gpqa": {
+          "agree": 0.0,
+          "disagree": 2.0,
+          "rawAgree": 0,
+          "rawDisagree": 2
+        },
+        "sweV": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 2.0,
+        "disagree": 2.0,
+        "rawAgree": 2,
+        "rawDisagree": 2
       },
       "lastSeen": "2026-05-18"
     },
     "humiris.substack.com": {
       "byBench": {
         "swePro": {
-          "agree": 3.0,
+          "agree": 5.0,
           "disagree": 0.0,
-          "rawAgree": 3,
+          "rawAgree": 5,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 3.0,
+        "agree": 5.0,
         "disagree": 0.0,
-        "rawAgree": 3,
+        "rawAgree": 5,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
@@ -292,45 +580,165 @@
       },
       "lastSeen": "2026-05-18"
     },
-    "livecodebench.github.io": {
+    "latenode.com": {
       "byBench": {
-        "lcb": {
-          "agree": 12.0,
+        "gpqa": {
+          "agree": 1.0,
           "disagree": 0.0,
-          "rawAgree": 12,
+          "rawAgree": 1,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 12.0,
+        "agree": 1.0,
         "disagree": 0.0,
-        "rawAgree": 12,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "livecodebench.github.io": {
+      "byBench": {
+        "lcb": {
+          "agree": 13.0,
+          "disagree": 0.0,
+          "rawAgree": 13,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 13.0,
+        "disagree": 0.0,
+        "rawAgree": 13,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
     },
     "llm-stats.com": {
       "byBench": {
+        "aime26": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
+          "rawDisagree": 0
+        },
         "gpqa": {
-          "agree": 4.0,
+          "agree": 9.0,
           "disagree": 6.0,
-          "rawAgree": 4,
+          "rawAgree": 9,
           "rawDisagree": 6
+        },
+        "hle": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "lcb": {
+          "agree": 1.0,
+          "disagree": 2.0,
+          "rawAgree": 1,
+          "rawDisagree": 2
+        },
+        "mmluPro": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
+          "rawDisagree": 0
         },
         "sweV": {
           "agree": 4.0,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
+        },
+        "tau2": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
+          "rawDisagree": 0
+        },
+        "tb2": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
+          "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 8.0,
-        "disagree": 6.0,
-        "rawAgree": 8,
-        "rawDisagree": 6
+        "agree": 23.0,
+        "disagree": 8.0,
+        "rawAgree": 23,
+        "rawDisagree": 8
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "macaron.im": {
+      "byBench": {
+        "mmluPro": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "minimax.io": {
+      "byBench": {
+        "aime26": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "gpqa": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "hle": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
+          "rawDisagree": 0
+        },
+        "lcb": {
+          "agree": 0.0,
+          "disagree": 2.0,
+          "rawAgree": 0,
+          "rawDisagree": 2
+        },
+        "mmluPro": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "tau2": {
+          "agree": 1.0,
+          "disagree": 2.0,
+          "rawAgree": 1,
+          "rawDisagree": 2
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 6.0,
+        "disagree": 4.0,
+        "rawAgree": 6,
+        "rawDisagree": 4
       },
       "lastSeen": "2026-05-18"
     },
@@ -354,18 +762,30 @@
     },
     "morphllm.com": {
       "byBench": {
-        "tb2": {
-          "agree": 3.0,
+        "hle": {
+          "agree": 1.0,
           "disagree": 0.0,
-          "rawAgree": 3,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "lcb": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "tb2": {
+          "agree": 5.0,
+          "disagree": 0.0,
+          "rawAgree": 5,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 3.0,
+        "agree": 7.0,
         "disagree": 0.0,
-        "rawAgree": 3,
+        "rawAgree": 7,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
@@ -373,9 +793,9 @@
     "openai.com": {
       "byBench": {
         "aime26": {
-          "agree": 6.0,
+          "agree": 8.0,
           "disagree": 0.0,
-          "rawAgree": 6,
+          "rawAgree": 8,
           "rawDisagree": 0
         },
         "gpqa": {
@@ -385,53 +805,101 @@
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 3.0,
+          "agree": 7.0,
           "disagree": 0.0,
-          "rawAgree": 3,
+          "rawAgree": 7,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 15.0,
+        "agree": 21.0,
         "disagree": 0.0,
-        "rawAgree": 15,
+        "rawAgree": 21,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
     },
     "qwenlm.github.io": {
       "byBench": {
+        "gpqa": {
+          "agree": 0.0,
+          "disagree": 2.0,
+          "rawAgree": 0,
+          "rawDisagree": 2
+        },
         "lcb": {
           "agree": 0.0,
-          "disagree": 6.0,
+          "disagree": 8.0,
           "rawAgree": 0,
-          "rawDisagree": 6
+          "rawDisagree": 8
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
         "agree": 0.0,
-        "disagree": 6.0,
+        "disagree": 10.0,
         "rawAgree": 0,
-        "rawDisagree": 6
+        "rawDisagree": 10
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "researchgate.net": {
+      "byBench": {
+        "gpqa": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "lcb": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 2.0,
+        "disagree": 0.0,
+        "rawAgree": 2,
+        "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
     },
     "scale.com": {
       "byBench": {
         "swePro": {
-          "agree": 3.0,
+          "agree": 5.0,
           "disagree": 0.0,
-          "rawAgree": 3,
+          "rawAgree": 5,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 3.0,
+        "agree": 5.0,
         "disagree": 0.0,
-        "rawAgree": 3,
+        "rawAgree": 5,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "smartchunks.com": {
+      "byBench": {
+        "hle": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
@@ -439,17 +907,17 @@
     "swebench.com": {
       "byBench": {
         "sweV": {
-          "agree": 9.0,
+          "agree": 11.0,
           "disagree": 0.0,
-          "rawAgree": 9,
+          "rawAgree": 11,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 9.0,
+        "agree": 11.0,
         "disagree": 0.0,
-        "rawAgree": 9,
+        "rawAgree": 11,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
@@ -457,17 +925,17 @@
     "tech-insider.org": {
       "byBench": {
         "swePro": {
-          "agree": 3.0,
+          "agree": 5.0,
           "disagree": 0.0,
-          "rawAgree": 3,
+          "rawAgree": 5,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 3.0,
+        "agree": 5.0,
         "disagree": 0.0,
-        "rawAgree": 3,
+        "rawAgree": 5,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
@@ -490,6 +958,48 @@
       },
       "lastSeen": "2026-05-18"
     },
+    "terminalbench.io": {
+      "byBench": {
+        "tb2": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "vals.ai": {
+      "byBench": {
+        "gpqa": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "sweV": {
+          "agree": 0.0,
+          "disagree": 2.0,
+          "rawAgree": 0,
+          "rawDisagree": 2
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 2.0,
+        "rawAgree": 1,
+        "rawDisagree": 2
+      },
+      "lastSeen": "2026-05-18"
+    },
     "vellum.ai": {
       "byBench": {
         "aime26": {
@@ -504,36 +1014,72 @@
           "rawAgree": 0,
           "rawDisagree": 6
         },
+        "swePro": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
         "sweV": {
-          "agree": 4.0,
-          "disagree": 6.0,
-          "rawAgree": 4,
-          "rawDisagree": 6
+          "agree": 8.0,
+          "disagree": 8.0,
+          "rawAgree": 8,
+          "rawDisagree": 8
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 4.0,
-        "disagree": 18.0,
-        "rawAgree": 4,
-        "rawDisagree": 18
+        "agree": 9.0,
+        "disagree": 20.0,
+        "rawAgree": 9,
+        "rawDisagree": 20
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "x.ai": {
+      "byBench": {
+        "aime26": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "gpqa": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
+          "rawDisagree": 0
+        },
+        "sweV": {
+          "agree": 6.0,
+          "disagree": 0.0,
+          "rawAgree": 6,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 9.0,
+        "disagree": 0.0,
+        "rawAgree": 9,
+        "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
     },
     "x.com": {
       "byBench": {
         "aaIdx": {
-          "agree": 3.0,
+          "agree": 4.0,
           "disagree": 0.0,
-          "rawAgree": 3,
+          "rawAgree": 4,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 3.0,
+        "agree": 4.0,
         "disagree": 0.0,
-        "rawAgree": 3,
+        "rawAgree": 4,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"

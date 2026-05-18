@@ -1,4 +1,30 @@
 
+## [2026-05-18] — autonomous refresh-all [WARN: very low cumulative provenance coverage 48.3%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 274 new fills; 32 cells auto-gapped by orchestrator; 355 explicit agent gaps preserved]
+
+[fillRatio:0.46 cells:445/960 contradictions:11 fetch:0.0min tools:None batches:None build:a98aee1]
+
+### Updated
+- 54 models: `opus-4-7`, `sonnet-4-6`, `claude-haiku-4-5`, `gemini-3-1-flash`, `gemma-3-27b`, `gemma-4-31b`, `gemma-4-26b-moe`, `gemma-4-e2b`, `gemma-4-e4b`, `deepseek-v3-2`, `deepseek-v4-flash`, `deepseek-v4-pro`, `deepseek-coder-v2-16b`, `deepseek-r1-14b`, `minimax-m2-5`, `minimax-m2-7`, `minimax-m2-1`, `mistral-large-3`, `devstral-2`, `devstral-medium`, `devstral-small-2`, `mistral-medium-3-5`, `codestral`, `codestral-22b`, `o3`, `o4-mini`, `grok-3-mini`, `grok-4-20`, `grok-4-3`, `grok-4-1-fast`, `qwen-3-6-27b`, `qwen-3-6-max`, `qwen3-235b`, `qwen3-32b`, `qwen3-6-35b-moe`, `qwen3-6-plus`, `qwen3-coder-30b`, `qwen3-coder-480b`, `qwen3-coder-next`, `qwen3-5-9b`, `qwen25-coder-14b`, `qwen25-coder-32b`, `qwen25-coder-7b`, `mimo-v2-5`, `mimo-v2-5-pro`, `mimo-v2-flash`, `mimo-v2-pro`, `glm-4-7`, `glm-4-5-air`, `llama-4-maverick`, `llama-4-scout`, `kimi-k2-6`, `nemotron-3-super`, `step-3-5-flash`
+
+### Resolved (auto via trustScore)
+- deepseek-v3-2.sweV: winner={'value': 74.2, 'trustScore': 1.0, 'sourceUrl': 'https://artificialanalysis.ai/models/deepseek-v3', 'tier': 'I'} (severity=RED, Δ6.4)
+- gemini-3-1-flash.gpqa: winner={'value': 86.9, 'trustScore': 1.0, 'sourceUrl': 'https://artificialanalysis.ai/models/gemini-3-1-flash', 'tier': 'I'} (severity=YELLOW, Δ3.5)
+- mistral-large-3.sweV: winner={'value': 48.5, 'trustScore': 0.93, 'sourceUrl': 'https://artificialanalysis.ai/models/mistral-large-3', 'tier': 'I'} (severity=RED, Δ13.2)
+- minimax-m2-1.swePro: winner={'value': 44.1, 'trustScore': 0.93, 'sourceUrl': 'https://benchlm.ai/models/minimax-m2-1', 'tier': 'I'} (severity=RED, Δ7.29)
+- minimax-m2-1.tau2: winner={'value': 87.0, 'trustScore': 0.93, 'sourceUrl': 'https://artificialanalysis.ai/models/minimax-m2-1', 'tier': 'I'} (severity=YELLOW, Δ4.0)
+- minimax-m2-1.lcb: winner={'value': 86.0, 'trustScore': 0.93, 'sourceUrl': 'https://benchlm.ai/models/minimax-m2-1', 'tier': 'I'} (severity=RED, Δ5.0)
+- gpt-5-5.aaOmni: winner={'value': 43.0, 'trustScore': 0.93, 'sourceUrl': 'https://benchlm.ai/models/gpt-5-5', 'tier': 'I'} (severity=RED, Δ14.0)
+- grok-4-1-fast.lcb: winner={'value': 39.9, 'trustScore': 0.93, 'sourceUrl': 'https://artificialanalysis.ai/models/grok-4-1-fast', 'tier': 'I'} (severity=RED, Δ42.3)
+- qwen3-6-35b-moe.gpqa: winner={'value': 82.3, 'trustScore': 0.93, 'sourceUrl': 'https://artificialanalysis.ai/models/qwen3-6-35b-moe', 'tier': 'I'} (severity=YELLOW, Δ3.7)
+- qwen3-5-9b.lcb: winner={'value': 65.6, 'trustScore': 0.93, 'sourceUrl': 'https://artificialanalysis.ai/models/qwen3-5-9b', 'tier': 'I'} (severity=RED, Δ17.1)
+- mimo-v2-5-pro.gpqa: winner={'value': 86.6, 'trustScore': 0.93, 'sourceUrl': 'https://artificialanalysis.ai/models/mimo-v2-5-pro', 'tier': 'I'} (severity=RED, Δ19.9)
+
+### Gaps (387 entries — agent:0 orchestrator:387 — see data/known-gaps.json or next refresh)
+- `claude-haiku-4-5.aaAgentic` *(orchestrator)*: not reached in agent survey cycle; AA Agentic data unavailable
+- `claude-haiku-4-5.aaCoding` *(orchestrator)*: not reached in agent survey cycle; AA Coding data unavailable
+- ... and 385 more
+
+
 ## [2026-05-18] — autonomous refresh-all [WARN: very low cumulative provenance coverage 47.7%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 46 new fills; 0 cells auto-gapped by orchestrator; 454 explicit agent gaps preserved]
 
 [fillRatio:0.48 cells:457/960 contradictions:11 fetch:0.0min tools:None batches:None build:a1b9577]

@@ -50,7 +50,7 @@
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": 90.4,
+      "gpqa": 86.9,
       "sweMulti": null,
       "hle": 35.0,
       "aaIdx": 21.0,
@@ -75,15 +75,15 @@
     "vramRequirement": null,
     "strengthsKey": "gemini-3-1-flash.strengths",
     "weaknessesKey": "gemini-3-1-flash.weaknesses",
-    "lastUpdated": "2026-05-18T13:49:41Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-11",
       "gpqa": "2026-05-18",
       "hle": "2026-05-18",
       "aaIdx": "2026-05-18",
-      "lcb": "2026-05-14",
-      "mmluPro": "2026-05-14",
+      "lcb": "2026-05-18",
+      "mmluPro": "2026-05-18",
       "sweV": "2026-05-18",
       "tau2": "2026-05-10",
       "aime26": "2026-05-18"
@@ -120,11 +120,11 @@
         "winning_cluster_distinct_sources": 4
       },
       "hle": {
-        "from": 28.1,
+        "from": 33.7,
         "to": 35.0,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 4.281,
+        "winning_cluster_sum_trust": 4.238,
         "winning_cluster_distinct_sources": 4
       },
       "aaIdx": {
@@ -235,11 +235,11 @@
       "aime26": "2026-05-18",
       "aaOmni": "2026-05-10",
       "lcb": "2026-05-14",
-      "browseComp": "2026-05-10",
-      "arcAgi2": "2026-05-10",
+      "browseComp": "2026-05-18",
+      "arcAgi2": "2026-05-18",
       "mmluPro": "2026-05-14",
       "cfElo": "2026-05-10",
-      "mrcr": "2026-05-10"
+      "mrcr": "2026-05-18"
     },
     "notApplicableBenchKeys": [
       "programBench",
@@ -409,11 +409,11 @@
     "bench.gpqa": 66.3,
     "benchUpdated": {
       "sweV": "2026-05-18",
-      "gpqa": "2026-05-14",
+      "gpqa": "2026-05-18",
       "swePro": "2026-05-11",
-      "aaIdx": "2026-05-14",
+      "aaIdx": "2026-05-18",
       "lcb": "2026-05-11",
-      "mmluPro": "2026-05-14",
+      "mmluPro": "2026-05-18",
       "aime26": "2026-05-11"
     }
   },
@@ -517,19 +517,19 @@
       "swePro": "2026-05-18",
       "sweV": "2026-05-18",
       "tb2": "2026-05-18",
-      "mcpA": "2026-05-10",
+      "mcpA": "2026-05-18",
       "gpqa": "2026-05-18",
       "hle": "2026-05-18",
-      "aaIdx": "2026-05-14",
+      "aaIdx": "2026-05-18",
       "aime26": "2026-05-18",
-      "browseComp": "2026-05-10",
-      "mrcr": "2026-05-10",
+      "browseComp": "2026-05-18",
+      "mrcr": "2026-05-18",
       "tau2": "2026-05-11",
-      "arcAgi2": "2026-05-10",
+      "arcAgi2": "2026-05-18",
       "mmluPro": "2026-05-11",
-      "cfElo": "2026-05-10",
-      "aaOmni": "2026-05-10",
-      "nl2Repo": "2026-05-10",
+      "cfElo": "2026-05-18",
+      "aaOmni": "2026-05-18",
+      "nl2Repo": "2026-05-18",
       "lcb": "2026-05-11"
     },
     "notApplicableBenchKeys": [
@@ -670,8 +670,8 @@
     "status": "deprecated",
     "benchUpdated": {
       "gpqa": "2026-05-18",
-      "hle": "2026-05-10",
-      "aaIdx": "2026-05-11",
+      "hle": "2026-05-18",
+      "aaIdx": "2026-05-18",
       "lcb": "2026-05-11",
       "aime26": "2026-05-18",
       "sweV": "2026-05-18"
@@ -737,18 +737,18 @@
     },
     "bench": {
       "swePro": null,
-      "sweV": 46.8,
+      "sweV": 52.0,
       "tb2": null,
       "tau2": 90.4,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": 74.5,
+      "gpqa": 79.5,
       "sweMulti": null,
-      "hle": 11.1,
-      "aaIdx": 32.0,
+      "hle": 15.5,
+      "aaIdx": 22.0,
       "bfcl": null,
-      "aime26": 95.8,
+      "aime26": 90.0,
       "aaOmni": null,
       "lcb": 80.4,
       "tbHard": null,
@@ -768,7 +768,7 @@
     "vramRequirement": null,
     "strengthsKey": "grok-3-mini.strengths",
     "weaknessesKey": "grok-3-mini.weaknesses",
-    "lastUpdated": "2026-05-18T11:20:57Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "deprecated",
     "deprecatedAt": "2026-04-01",
     "successor": "grok-4-20",
@@ -782,10 +782,10 @@
     "bench.gpqa": 79.1,
     "benchUpdated": {
       "lcb": "2026-05-11",
-      "aime26": "2026-05-11",
+      "aime26": "2026-05-18",
       "gpqa": "2026-05-18",
-      "aaIdx": "2026-05-11",
-      "hle": "2026-05-11",
+      "aaIdx": "2026-05-18",
+      "hle": "2026-05-18",
       "mmluPro": "2026-05-11",
       "tau2": "2026-05-11",
       "sweV": "2026-05-18"
@@ -867,17 +867,17 @@
     "vramRequirement": null,
     "strengthsKey": "mistral-large-3.strengths",
     "weaknessesKey": "mistral-large-3.weaknesses",
-    "lastUpdated": "2026-05-18T11:20:57Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "benchUpdated": {
       "sweV": "2026-05-18",
       "gpqa": "2026-05-18",
-      "lcb": "2026-05-14",
+      "lcb": "2026-05-18",
       "tau2": "2026-05-10",
       "swePro": "2026-05-10",
       "tb2": "2026-05-10",
       "aaIdx": "2026-05-14",
-      "mmluPro": "2026-05-14",
+      "mmluPro": "2026-05-18",
       "aime26": "2026-05-18"
     },
     "notApplicableBenchKeys": [
@@ -893,12 +893,28 @@
     "bench.gpqa": 43.9,
     "benchReconciled": {
       "gpqa": {
-        "from": 73.8,
+        "from": 74.0,
         "to": 43.9,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 5.898,
+        "winning_cluster_sum_trust": 6.037,
         "winning_cluster_distinct_sources": 5
+      },
+      "lcb": {
+        "from": 35.0,
+        "to": 82.8,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 4.41,
+        "winning_cluster_distinct_sources": 5
+      },
+      "mmluPro": {
+        "from": 74.0,
+        "to": 73.11,
+        "cycle": "2026-05-18",
+        "confidence": 0.5283,
+        "winning_cluster_sum_trust": 1.521,
+        "winning_cluster_distinct_sources": 2
       }
     }
   },
@@ -953,8 +969,8 @@
       }
     },
     "bench": {
-      "swePro": 78.5,
-      "sweV": 69.1,
+      "swePro": 71.7,
+      "sweV": 71.7,
       "tb2": null,
       "tau2": 83.5,
       "aaCoding": null,
@@ -962,16 +978,16 @@
       "mcpA": null,
       "gpqa": 87.7,
       "sweMulti": null,
-      "hle": 20.3,
-      "aaIdx": 79.4,
+      "hle": 46.9,
+      "aaIdx": 51.0,
       "bfcl": null,
-      "aime26": 96.7,
+      "aime26": 99.5,
       "aaOmni": null,
-      "lcb": 75.8,
+      "lcb": 69.1,
       "tbHard": null,
       "cfElo": 2727.0,
       "browseComp": null,
-      "mmluPro": 88.2,
+      "mmluPro": 87.0,
       "simpleQa": null,
       "mrcr": null,
       "arcAgi2": 87.5,
@@ -985,10 +1001,10 @@
     "vramRequirement": null,
     "strengthsKey": "o3.strengths",
     "weaknessesKey": "o3.weaknesses",
-    "lastUpdated": "2026-05-18T13:49:41Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "deprecated",
-    "deprecatedAt": "2026-02-13",
-    "successor": "gpt-5-4",
+    "deprecatedAt": "2026-04-16",
+    "successor": "gpt-5-5",
     "notApplicableBenchKeys": [
       "programBench",
       "webDevElo"
@@ -1003,12 +1019,12 @@
       "gpqa": "2026-05-18",
       "aime26": "2026-05-18",
       "arcAgi2": "2026-05-10",
-      "lcb": "2026-05-11",
-      "hle": "2026-05-11",
-      "swePro": "2026-05-11",
-      "mmluPro": "2026-05-11",
+      "lcb": "2026-05-18",
+      "hle": "2026-05-18",
+      "swePro": "2026-05-18",
+      "mmluPro": "2026-05-18",
       "tau2": "2026-05-11",
-      "aaIdx": "2026-05-11",
+      "aaIdx": "2026-05-18",
       "cfElo": "2026-05-18"
     }
   },
@@ -1063,25 +1079,25 @@
       }
     },
     "bench": {
-      "swePro": 65.3,
-      "sweV": 68.4,
-      "tb2": 72.4,
+      "swePro": 55.2,
+      "sweV": 68.1,
+      "tb2": 45.0,
       "tau2": 71.8,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
       "gpqa": 81.4,
       "sweMulti": null,
-      "hle": 71.8,
+      "hle": 36.8,
       "aaIdx": 73.6,
       "bfcl": null,
       "aime26": 99.5,
       "aaOmni": null,
-      "lcb": 80.2,
+      "lcb": 60.0,
       "tbHard": null,
       "cfElo": null,
       "browseComp": null,
-      "mmluPro": 78.1,
+      "mmluPro": 80.0,
       "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
@@ -1095,10 +1111,10 @@
     "vramRequirement": null,
     "strengthsKey": "o4-mini.strengths",
     "weaknessesKey": "o4-mini.weaknesses",
-    "lastUpdated": "2026-05-18T13:49:41Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "deprecated",
-    "deprecatedAt": "2026-02-13",
-    "successor": "gpt-5-4",
+    "deprecatedAt": "2026-04-16",
+    "successor": "gpt-5-5",
     "notApplicableBenchKeys": [
       "programBench",
       "webDevElo"
@@ -1108,15 +1124,15 @@
     "bench.lcb": 80.2,
     "bench.gpqa": 81.4,
     "benchUpdated": {
-      "gpqa": "2026-05-11",
+      "gpqa": "2026-05-18",
       "tau2": "2026-05-11",
       "sweV": "2026-05-18",
-      "lcb": "2026-05-11",
+      "lcb": "2026-05-18",
       "aime26": "2026-05-18",
-      "swePro": "2026-05-11",
-      "mmluPro": "2026-05-11",
-      "tb2": "2026-05-11",
-      "hle": "2026-05-11",
+      "swePro": "2026-05-18",
+      "mmluPro": "2026-05-18",
+      "tb2": "2026-05-18",
+      "hle": "2026-05-18",
       "aaIdx": "2026-05-11"
     }
   },
@@ -1124,18 +1140,18 @@
     "id": "opus-4-7",
     "name": "Claude Opus 4.7",
     "provider": "Anthropic",
-    "released": "2026-05-08",
+    "released": "2026-04-16",
     "tier": "frontier",
     "open": false,
     "license": "proprietary",
-    "context": 200000,
+    "context": 1000000,
     "pricing": {
       "api": [
         {
           "provider": "official",
-          "in": 15.0,
-          "out": 75.0,
-          "cacheHit": 1.5,
+          "in": 5.0,
+          "out": 25.0,
+          "cacheHit": null,
           "throughput": null,
           "url": "https://www.anthropic.com/pricing",
           "fetched": "2026-05-18"
@@ -1171,16 +1187,13 @@
       "range": {
         "in": [
           5.0,
-          15.0
+          5.0
         ],
         "out": [
           25.0,
-          75.0
+          25.0
         ],
-        "cacheHit": [
-          1.5,
-          1.5
-        ]
+        "cacheHit": null
       }
     },
     "bench": {
@@ -1194,7 +1207,7 @@
       "gpqa": 94.2,
       "sweMulti": 79.3,
       "hle": 46.9,
-      "aaIdx": 57,
+      "aaIdx": 57.0,
       "bfcl": null,
       "aime26": 97.8,
       "aaOmni": 26,
@@ -1216,7 +1229,7 @@
     "vramRequirement": null,
     "strengthsKey": "opus-4-7.strengths",
     "weaknessesKey": "opus-4-7.weaknesses",
-    "lastUpdated": "2026-05-18T13:49:41Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-18",
@@ -1260,12 +1273,12 @@
     "bench.hle": 46.9,
     "benchReconciled": {
       "tb2": {
-        "from": 69.4,
+        "from": 64.1,
         "to": 68.54,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 11.295,
-        "winning_cluster_distinct_sources": 6
+        "winning_cluster_sum_trust": 12.479,
+        "winning_cluster_distinct_sources": 7
       },
       "mcpA": {
         "from": 78.2,
@@ -1282,6 +1295,38 @@
         "confidence": 0.6,
         "winning_cluster_sum_trust": 1.0,
         "winning_cluster_distinct_sources": 1
+      },
+      "sweV": {
+        "from": 72.5,
+        "to": 87.6,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 13.105,
+        "winning_cluster_distinct_sources": 10
+      },
+      "gpqa": {
+        "from": 92.1,
+        "to": 94.2,
+        "cycle": "2026-05-18",
+        "confidence": 0.85,
+        "winning_cluster_sum_trust": 11.169,
+        "winning_cluster_distinct_sources": 10
+      },
+      "hle": {
+        "from": 43.2,
+        "to": 46.9,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 6.095,
+        "winning_cluster_distinct_sources": 5
+      },
+      "aaIdx": {
+        "from": 65.0,
+        "to": 57.0,
+        "cycle": "2026-05-18",
+        "confidence": 0.9194,
+        "winning_cluster_sum_trust": 2.758,
+        "winning_cluster_distinct_sources": 3
       }
     }
   },
@@ -1289,11 +1334,11 @@
     "id": "sonnet-4-6",
     "name": "Claude Sonnet 4.6",
     "provider": "Anthropic",
-    "released": "2026-03-12",
+    "released": "2026-02-17",
     "tier": "frontier",
     "open": false,
     "license": "proprietary",
-    "context": 200000,
+    "context": 1000000,
     "pricing": {
       "api": [
         {
@@ -1354,7 +1399,7 @@
       "bfcl": null,
       "aime26": 63.3,
       "aaOmni": 18.0,
-      "lcb": 65.55,
+      "lcb": 80.0,
       "tbHard": null,
       "cfElo": null,
       "browseComp": 74.0,
@@ -1372,7 +1417,7 @@
     "vramRequirement": null,
     "strengthsKey": "sonnet-4-6.strengths",
     "weaknessesKey": "sonnet-4-6.weaknesses",
-    "lastUpdated": "2026-05-18T13:49:41Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "benchUpdated": {
       "sweV": "2026-05-18",
@@ -1380,7 +1425,7 @@
       "gpqa": "2026-05-18",
       "aaIdx": "2026-05-18",
       "arcAgi2": "2026-05-09",
-      "swePro": "2026-05-14",
+      "swePro": "2026-05-18",
       "tau2": "2026-05-18",
       "mcpA": "2026-05-10",
       "sweMulti": "2026-05-10",
@@ -1406,12 +1451,12 @@
     "bench.gpqa": 74.1,
     "benchReconciled": {
       "aaIdx": {
-        "from": 60.3,
+        "from": 54.0,
         "to": 52.0,
         "cycle": "2026-05-18",
-        "confidence": 0.95,
-        "winning_cluster_sum_trust": 2.85,
-        "winning_cluster_distinct_sources": 3
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 4.27,
+        "winning_cluster_distinct_sources": 4
       },
       "aime26": {
         "from": 32.4,
@@ -1422,12 +1467,36 @@
         "winning_cluster_distinct_sources": 1
       },
       "lcb": {
-        "from": 80.0,
-        "to": 65.55,
+        "from": 65.55,
+        "to": 80.0,
+        "cycle": "2026-05-18",
+        "confidence": 0.4364,
+        "winning_cluster_sum_trust": 1.127,
+        "winning_cluster_distinct_sources": 2
+      },
+      "sweV": {
+        "from": 72.7,
+        "to": 79.6,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 1.0,
-        "winning_cluster_distinct_sources": 1
+        "winning_cluster_sum_trust": 10.522,
+        "winning_cluster_distinct_sources": 9
+      },
+      "swePro": {
+        "from": 56.0,
+        "to": 40.2,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 2.472,
+        "winning_cluster_distinct_sources": 3
+      },
+      "gpqa": {
+        "from": 84.5,
+        "to": 74.1,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 8.439,
+        "winning_cluster_distinct_sources": 9
       }
     }
   },
@@ -1518,7 +1587,7 @@
     "vramRequirement": 14,
     "strengthsKey": "codestral-22b.strengths",
     "weaknessesKey": "codestral-22b.weaknesses",
-    "lastUpdated": "2026-05-18T11:20:57Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "deprecated",
     "ollama": {
       "pullCmd": "ollama pull codestral:22b",
@@ -1555,7 +1624,7 @@
       "releasedISO": "2024-05-01",
       "ollamaUrl": "https://ollama.com/library/codestral"
     },
-    "deprecatedAt": "2026-02-01",
+    "deprecatedAt": "2026-04-01",
     "successor": "codestral",
     "notApplicableBenchKeys": [
       "programBench",
@@ -1666,16 +1735,16 @@
     "vramRequirement": null,
     "strengthsKey": "deepseek-v3-2.strengths",
     "weaknessesKey": "deepseek-v3-2.weaknesses",
-    "lastUpdated": "2026-05-18T13:49:41Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "benchUpdated": {
       "sweV": "2026-05-18",
       "swePro": "2026-05-10",
       "gpqa": "2026-05-18",
-      "hle": "2026-05-11",
-      "aaIdx": "2026-05-14",
+      "hle": "2026-05-18",
+      "aaIdx": "2026-05-18",
       "lcb": "2026-05-18",
-      "mmluPro": "2026-05-14",
+      "mmluPro": "2026-05-18",
       "browseComp": "2026-05-08",
       "simpleQa": "2026-05-08",
       "cfElo": "2026-05-08",
@@ -1720,12 +1789,12 @@
     },
     "benchReconciled": {
       "gpqa": {
-        "from": 78.5,
+        "from": 80.5,
         "to": 82.4,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 3.775,
-        "winning_cluster_distinct_sources": 4
+        "winning_cluster_sum_trust": 5.487,
+        "winning_cluster_distinct_sources": 5
       },
       "sweMulti": {
         "from": 70.2,
@@ -1736,20 +1805,52 @@
         "winning_cluster_distinct_sources": 1
       },
       "aaIdx": {
-        "from": 32,
+        "from": 57.0,
         "to": 16.0,
         "cycle": "2026-05-18",
-        "confidence": 0.3012,
-        "winning_cluster_sum_trust": 0.753,
-        "winning_cluster_distinct_sources": 1
+        "confidence": 0.4372,
+        "winning_cluster_sum_trust": 1.457,
+        "winning_cluster_distinct_sources": 2
       },
       "lcb": {
-        "from": 60.3,
+        "from": 57.1,
         "to": 83.3,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 3.887,
+        "winning_cluster_sum_trust": 4.141,
         "winning_cluster_distinct_sources": 4
+      },
+      "tb2": {
+        "from": 51.0,
+        "to": 46.4,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 3.385,
+        "winning_cluster_distinct_sources": 3
+      },
+      "hle": {
+        "from": 40.0,
+        "to": 25.1,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 5.908,
+        "winning_cluster_distinct_sources": 4
+      },
+      "aime26": {
+        "from": 87.0,
+        "to": 89.3,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 4.351,
+        "winning_cluster_distinct_sources": 4
+      },
+      "mmluPro": {
+        "from": 82.0,
+        "to": 85.0,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 8.211,
+        "winning_cluster_distinct_sources": 7
       }
     }
   },
@@ -1816,8 +1917,8 @@
       "mcpA": null,
       "gpqa": 79.4,
       "sweMulti": null,
-      "hle": 22.1,
-      "aaIdx": 47,
+      "hle": 27.0,
+      "aaIdx": 47.0,
       "bfcl": null,
       "aime26": null,
       "aaOmni": null,
@@ -1839,7 +1940,7 @@
     "vramRequirement": null,
     "strengthsKey": "deepseek-v4-flash.strengths",
     "weaknessesKey": "deepseek-v4-flash.weaknesses",
-    "lastUpdated": "2026-05-18T00:18:54Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "ollama": {
       "pullCmd": "ollama pull deepseek-v4-flash:cloud",
       "ollamaUrl": "https://ollama.com/library/deepseek-v4-flash",
@@ -1855,10 +1956,10 @@
       "swePro": "2026-05-18",
       "gpqa": "2026-05-18",
       "hle": "2026-05-18",
-      "aaIdx": "2026-05-14",
+      "aaIdx": "2026-05-18",
       "lcb": "2026-05-18",
       "tb2": "2026-05-14",
-      "mmluPro": "2026-05-14",
+      "mmluPro": "2026-05-18",
       "simpleQa": "2026-05-09",
       "tau2": "2026-05-11"
     },
@@ -1882,44 +1983,52 @@
     "bench.hle": 34.8,
     "benchReconciled": {
       "sweV": {
-        "from": 71.3,
+        "from": 62.5,
         "to": 79.0,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 3.93,
+        "winning_cluster_sum_trust": 4.085,
         "winning_cluster_distinct_sources": 4
       },
       "swePro": {
-        "from": 48.2,
+        "from": 38.0,
         "to": 52.3,
         "cycle": "2026-05-18",
-        "confidence": 0.2944,
-        "winning_cluster_sum_trust": 0.736,
-        "winning_cluster_distinct_sources": 1
+        "confidence": 0.5793,
+        "winning_cluster_sum_trust": 1.931,
+        "winning_cluster_distinct_sources": 2
       },
       "gpqa": {
-        "from": 88.1,
+        "from": 75.0,
         "to": 79.4,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 1.34,
+        "winning_cluster_sum_trust": 1.361,
         "winning_cluster_distinct_sources": 1
       },
       "lcb": {
-        "from": 68.5,
+        "from": 52.0,
         "to": 91.2,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 12.693,
-        "winning_cluster_distinct_sources": 6
+        "winning_cluster_sum_trust": 14.686,
+        "winning_cluster_distinct_sources": 8
       },
       "mmluPro": {
-        "from": 86.2,
+        "from": 76.0,
         "to": 86.4,
         "cycle": "2026-05-18",
-        "confidence": 0.7,
-        "winning_cluster_sum_trust": 1.5,
-        "winning_cluster_distinct_sources": 3
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 2.809,
+        "winning_cluster_distinct_sources": 4
+      },
+      "aaIdx": {
+        "from": 43.0,
+        "to": 47.0,
+        "cycle": "2026-05-18",
+        "confidence": 0.4857,
+        "winning_cluster_sum_trust": 1.457,
+        "winning_cluster_distinct_sources": 2
       }
     }
   },
@@ -1997,7 +2106,7 @@
       "subscription": null
     },
     "bench": {
-      "sweV": 80.6,
+      "sweV": 80.2,
       "tb2": 67.9,
       "swePro": 55.4,
       "tau2": 88.0,
@@ -2007,7 +2116,7 @@
       "gpqa": 88.1,
       "sweMulti": 76.2,
       "hle": 37.7,
-      "aaIdx": 52,
+      "aaIdx": 52.0,
       "bfcl": null,
       "aime26": null,
       "aaOmni": null,
@@ -2029,7 +2138,7 @@
     "vramRequirement": null,
     "strengthsKey": "deepseek-v4-pro.strengths",
     "weaknessesKey": "deepseek-v4-pro.weaknesses",
-    "lastUpdated": "2026-05-18T00:18:54Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "benchUpdated": {
       "sweV": "2026-05-18",
@@ -2039,9 +2148,9 @@
       "gpqa": "2026-05-18",
       "sweMulti": "2026-05-09",
       "hle": "2026-05-18",
-      "aaIdx": "2026-05-11",
+      "aaIdx": "2026-05-18",
       "lcb": "2026-05-18",
-      "mmluPro": "2026-05-14",
+      "mmluPro": "2026-05-18",
       "simpleQa": "2026-05-09",
       "cfElo": "2026-05-09",
       "mrcr": "2026-05-09",
@@ -2075,44 +2184,60 @@
     "bench.hle": 37.7,
     "benchReconciled": {
       "sweV": {
-        "from": 80.2,
-        "to": 80.6,
+        "from": 66.0,
+        "to": 80.2,
         "cycle": "2026-05-18",
-        "confidence": 0.85,
-        "winning_cluster_sum_trust": 6.888,
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 7.324,
         "winning_cluster_distinct_sources": 5
       },
       "swePro": {
-        "from": 61.8,
+        "from": 44.0,
         "to": 55.4,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 6.536,
-        "winning_cluster_distinct_sources": 6
+        "winning_cluster_sum_trust": 8.095,
+        "winning_cluster_distinct_sources": 7
       },
       "gpqa": {
-        "from": 90.1,
+        "from": 82.0,
         "to": 88.1,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 1.432,
+        "winning_cluster_sum_trust": 1.455,
         "winning_cluster_distinct_sources": 1
       },
       "hle": {
-        "from": 38.2,
+        "from": 35.0,
         "to": 37.7,
         "cycle": "2026-05-18",
         "confidence": 1.0,
-        "winning_cluster_sum_trust": 3.168,
-        "winning_cluster_distinct_sources": 4
+        "winning_cluster_sum_trust": 5.675,
+        "winning_cluster_distinct_sources": 6
       },
       "lcb": {
-        "from": 72.4,
+        "from": 60.0,
         "to": 93.5,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 9.325,
-        "winning_cluster_distinct_sources": 7
+        "winning_cluster_sum_trust": 9.858,
+        "winning_cluster_distinct_sources": 8
+      },
+      "aaIdx": {
+        "from": 51.0,
+        "to": 52.0,
+        "cycle": "2026-05-18",
+        "confidence": 0.4857,
+        "winning_cluster_sum_trust": 1.457,
+        "winning_cluster_distinct_sources": 2
+      },
+      "mmluPro": {
+        "from": 80.0,
+        "to": 87.5,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 4.798,
+        "winning_cluster_distinct_sources": 5
       }
     }
   },
@@ -2188,7 +2313,7 @@
     "vramRequirement": 75,
     "strengthsKey": "devstral-2.strengths",
     "weaknessesKey": "devstral-2.weaknesses",
-    "lastUpdated": "2026-05-18T00:18:54Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "ollama": {
       "pullCmd": "ollama pull devstral-2",
       "tags": [],
@@ -2232,11 +2357,11 @@
     "bench.gpqa": 59.4,
     "benchReconciled": {
       "sweV": {
-        "from": 68.4,
+        "from": 59.0,
         "to": 72.2,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 6.778,
+        "winning_cluster_sum_trust": 6.801,
         "winning_cluster_distinct_sources": 7
       },
       "aaIdx": {
@@ -2296,21 +2421,21 @@
       "subscription": null
     },
     "bench": {
-      "sweV": 58.7,
+      "sweV": 61.6,
       "swePro": 37.2,
       "tb2": null,
       "tau2": 19.9,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": 59.4,
+      "gpqa": 70.8,
       "sweMulti": null,
       "hle": null,
       "aaIdx": 54.6,
       "bfcl": null,
       "aime26": null,
       "aaOmni": null,
-      "lcb": 44.8,
+      "lcb": 33.7,
       "tbHard": null,
       "cfElo": null,
       "browseComp": null,
@@ -2328,20 +2453,21 @@
     "vramRequirement": null,
     "strengthsKey": "devstral-medium.strengths",
     "weaknessesKey": "devstral-medium.weaknesses",
-    "lastUpdated": "2026-05-18T11:20:57Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "deprecated",
     "benchUpdated": {
       "sweV": "2026-05-18",
       "tb2": "2026-05-10",
       "tau2": "2026-04-28",
-      "gpqa": "2026-05-11",
-      "hle": "2026-04-28",
-      "lcb": "2026-05-11",
+      "gpqa": "2026-05-18",
+      "hle": "2026-05-18",
+      "lcb": "2026-05-18",
       "swePro": "2026-05-10",
-      "aaIdx": "2026-05-10"
+      "aaIdx": "2026-05-10",
+      "mmluPro": "2026-05-18"
     },
-    "deprecatedAt": "2026-02-27",
-    "successor": "mistral-medium-3-5",
+    "deprecatedAt": "2026-05-01",
+    "successor": "devstral-2",
     "notApplicableBenchKeys": [
       "programBench",
       "webDevElo",
@@ -2614,7 +2740,7 @@
       "mcpA": 66.6,
       "gpqa": 90.5,
       "sweMulti": 47.3,
-      "aaIdx": 54,
+      "aaIdx": 54.0,
       "bfcl": null,
       "aime26": 96.4,
       "aaOmni": null,
@@ -2653,22 +2779,22 @@
     "vramRequirement": 350,
     "strengthsKey": "kimi-k2-6.strengths",
     "weaknessesKey": "kimi-k2-6.weaknesses",
-    "lastUpdated": "2026-05-14",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "benchUpdated": {
-      "swePro": "2026-05-14",
-      "sweV": "2026-05-14",
+      "swePro": "2026-05-18",
+      "sweV": "2026-05-18",
       "tb2": "2026-05-11",
-      "hle": "2026-05-11",
+      "hle": "2026-05-18",
       "tau2": "2026-05-14",
-      "gpqa": "2026-05-14",
+      "gpqa": "2026-05-18",
       "sweMulti": "2026-05-09",
-      "aaIdx": "2026-05-11",
-      "aime26": "2026-05-14",
-      "lcb": "2026-05-14",
+      "aaIdx": "2026-05-18",
+      "aime26": "2026-05-18",
+      "lcb": "2026-05-18",
       "browseComp": "2026-05-09",
       "mcpA": "2026-05-09",
-      "mmluPro": "2026-05-10",
+      "mmluPro": "2026-05-18",
       "simpleQa": "2026-05-09",
       "mrcr": "2026-05-09",
       "webDevElo": "2026-05-09"
@@ -2708,6 +2834,70 @@
         "confidence": 0.2219,
         "winning_cluster_sum_trust": 0.555,
         "winning_cluster_distinct_sources": 1
+      },
+      "swePro": {
+        "from": 47.0,
+        "to": 58.6,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 10.997,
+        "winning_cluster_distinct_sources": 11
+      },
+      "sweV": {
+        "from": 65.8,
+        "to": 80.2,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 10.663,
+        "winning_cluster_distinct_sources": 9
+      },
+      "hle": {
+        "from": 24.0,
+        "to": 54.0,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 5.77,
+        "winning_cluster_distinct_sources": 6
+      },
+      "gpqa": {
+        "from": 79.0,
+        "to": 90.5,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 10.438,
+        "winning_cluster_distinct_sources": 9
+      },
+      "aaIdx": {
+        "from": 45.0,
+        "to": 54.0,
+        "cycle": "2026-05-18",
+        "confidence": 0.9194,
+        "winning_cluster_sum_trust": 2.758,
+        "winning_cluster_distinct_sources": 3
+      },
+      "aime26": {
+        "from": 79.0,
+        "to": 96.4,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 9.117,
+        "winning_cluster_distinct_sources": 8
+      },
+      "lcb": {
+        "from": 60.0,
+        "to": 89.6,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 9.278,
+        "winning_cluster_distinct_sources": 8
+      },
+      "mmluPro": {
+        "from": 78.0,
+        "to": 84.6,
+        "cycle": "2026-05-18",
+        "confidence": 0.8444,
+        "winning_cluster_sum_trust": 2.602,
+        "winning_cluster_distinct_sources": 4
       }
     }
   },
@@ -2783,7 +2973,7 @@
       "gpqa": 69.8,
       "sweMulti": null,
       "hle": null,
-      "aaIdx": 18,
+      "aaIdx": 18.0,
       "bfcl": null,
       "aime26": 96.1,
       "aaOmni": null,
@@ -2811,7 +3001,7 @@
     "vramRequirement": 100,
     "strengthsKey": "llama-4-maverick.strengths",
     "weaknessesKey": "llama-4-maverick.weaknesses",
-    "lastUpdated": "2026-05-18T13:49:41Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "ollama": {
       "pullCmd": "ollama run llama4:128x17b",
       "context": 1048576,
@@ -2823,10 +3013,10 @@
       "swePro": "2026-05-10",
       "sweV": "2026-05-18",
       "gpqa": "2026-05-18",
-      "aaIdx": "2026-05-11",
-      "lcb": "2026-05-14",
-      "aime26": "2026-05-10",
-      "mmluPro": "2026-05-14"
+      "aaIdx": "2026-05-18",
+      "lcb": "2026-05-18",
+      "aime26": "2026-05-18",
+      "mmluPro": "2026-05-18"
     },
     "notApplicableBenchKeys": [
       "programBench",
@@ -2842,20 +3032,52 @@
     "bench.aime26": 96.1,
     "benchReconciled": {
       "sweV": {
-        "from": 72.4,
+        "from": 65.8,
         "to": 76.8,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 2.778,
+        "winning_cluster_sum_trust": 3.341,
         "winning_cluster_distinct_sources": 3
       },
       "gpqa": {
-        "from": 81.2,
+        "from": 80.5,
         "to": 69.8,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 3.589,
-        "winning_cluster_distinct_sources": 4
+        "winning_cluster_sum_trust": 4.752,
+        "winning_cluster_distinct_sources": 5
+      },
+      "aaIdx": {
+        "from": 49.0,
+        "to": 18.0,
+        "cycle": "2026-05-18",
+        "confidence": 0.7286,
+        "winning_cluster_sum_trust": 2.012,
+        "winning_cluster_distinct_sources": 2
+      },
+      "aime26": {
+        "from": 85.0,
+        "to": 96.1,
+        "cycle": "2026-05-18",
+        "confidence": 0.7273,
+        "winning_cluster_sum_trust": 2.855,
+        "winning_cluster_distinct_sources": 3
+      },
+      "lcb": {
+        "from": 62.0,
+        "to": 43.4,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 5.345,
+        "winning_cluster_distinct_sources": 5
+      },
+      "mmluPro": {
+        "from": 80.0,
+        "to": 80.5,
+        "cycle": "2026-05-18",
+        "confidence": 0.94,
+        "winning_cluster_sum_trust": 5.111,
+        "winning_cluster_distinct_sources": 5
       }
     }
   },
@@ -2924,7 +3146,7 @@
     },
     "bench": {
       "swePro": null,
-      "sweV": 68.0,
+      "sweV": 58.0,
       "tb2": null,
       "tau2": null,
       "aaCoding": null,
@@ -2933,9 +3155,9 @@
       "gpqa": 57.2,
       "sweMulti": null,
       "hle": null,
-      "aaIdx": 14,
+      "aaIdx": 14.0,
       "bfcl": 81.1,
-      "aime26": 78.4,
+      "aime26": 78.0,
       "aaOmni": null,
       "lcb": 32.8,
       "tbHard": null,
@@ -2966,7 +3188,7 @@
     "vramRequirement": 26,
     "strengthsKey": "llama-4-scout.strengths",
     "weaknessesKey": "llama-4-scout.weaknesses",
-    "lastUpdated": "2026-05-18T13:49:41Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "ollama": {
       "pullCmd": "ollama run llama4:16x17b",
       "context": 10000000,
@@ -2977,9 +3199,9 @@
     "benchUpdated": {
       "sweV": "2026-05-18",
       "gpqa": "2026-05-18",
-      "aaIdx": "2026-05-11",
-      "lcb": "2026-05-14",
-      "mmluPro": "2026-05-14",
+      "aaIdx": "2026-05-18",
+      "lcb": "2026-05-18",
+      "mmluPro": "2026-05-18",
       "bfcl": "2026-05-10",
       "aime26": "2026-05-18"
     },
@@ -2987,7 +3209,9 @@
       "programBench",
       "webDevElo"
     ],
-    "benchQuarantine": {},
+    "benchQuarantine": {
+      "aime26": true
+    },
     "bench.sweV": 68,
     "bench.lcb": 32.8,
     "bench.aaIdx": 14,
@@ -3002,12 +3226,36 @@
         "winning_cluster_distinct_sources": 2
       },
       "gpqa": {
-        "from": 74.8,
+        "from": 74.0,
         "to": 57.2,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 3.702,
-        "winning_cluster_distinct_sources": 4
+        "winning_cluster_sum_trust": 5.157,
+        "winning_cluster_distinct_sources": 5
+      },
+      "aaIdx": {
+        "from": 38.0,
+        "to": 14.0,
+        "cycle": "2026-05-18",
+        "confidence": 0.4857,
+        "winning_cluster_sum_trust": 1.457,
+        "winning_cluster_distinct_sources": 2
+      },
+      "lcb": {
+        "from": 52.0,
+        "to": 32.8,
+        "cycle": "2026-05-18",
+        "confidence": 0.4364,
+        "winning_cluster_sum_trust": 1.665,
+        "winning_cluster_distinct_sources": 3
+      },
+      "mmluPro": {
+        "from": 74.0,
+        "to": 74.3,
+        "cycle": "2026-05-18",
+        "confidence": 0.7273,
+        "winning_cluster_sum_trust": 2.155,
+        "winning_cluster_distinct_sources": 3
       }
     }
   },
@@ -3061,7 +3309,7 @@
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": 72.4,
+      "gpqa": 84.9,
       "sweMulti": 72.2,
       "hle": 33.8,
       "aaIdx": 49.0,
@@ -3086,7 +3334,7 @@
     "vramRequirement": null,
     "strengthsKey": "mimo-v2-5.strengths",
     "weaknessesKey": "mimo-v2-5.weaknesses",
-    "lastUpdated": "2026-05-18T00:18:54Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-10",
@@ -3119,12 +3367,20 @@
     "bench.hle": 33.8,
     "benchReconciled": {
       "sweV": {
-        "from": 38.2,
+        "from": 50.0,
         "to": 78.9,
         "cycle": "2026-05-18",
-        "confidence": 0.42,
-        "winning_cluster_sum_trust": 1.1,
+        "confidence": 0.4876,
+        "winning_cluster_sum_trust": 1.277,
         "winning_cluster_distinct_sources": 2
+      },
+      "gpqa": {
+        "from": 75.0,
+        "to": 84.9,
+        "cycle": "2026-05-18",
+        "confidence": 0.5123,
+        "winning_cluster_sum_trust": 0.768,
+        "winning_cluster_distinct_sources": 1
       }
     }
   },
@@ -3213,19 +3469,19 @@
     "vramRequirement": null,
     "strengthsKey": "mimo-v2-5-pro.strengths",
     "weaknessesKey": "mimo-v2-5-pro.weaknesses",
-    "lastUpdated": "2026-05-18T00:18:54Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-14",
       "gpqa": "2026-05-18",
-      "hle": "2026-05-14",
+      "hle": "2026-05-18",
       "sweV": "2026-05-18",
       "tb2": "2026-05-18",
       "tbHard": "2026-05-09",
       "aaIdx": "2026-05-14",
       "webDevElo": "2026-05-09",
       "tau2": "2026-05-14",
-      "mmluPro": "2026-05-10"
+      "mmluPro": "2026-05-18"
     },
     "notApplicableBenchKeys": [
       "programBench",
@@ -3245,19 +3501,27 @@
     "bench.hle": 48,
     "benchReconciled": {
       "sweV": {
-        "from": 58.4,
+        "from": 56.0,
         "to": 78.9,
         "cycle": "2026-05-18",
         "confidence": 1.0,
-        "winning_cluster_sum_trust": 4.983,
-        "winning_cluster_distinct_sources": 6
+        "winning_cluster_sum_trust": 6.943,
+        "winning_cluster_distinct_sources": 8
       },
       "hle": {
-        "from": 34,
+        "from": 18.0,
         "to": 48.0,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 3.037,
+        "winning_cluster_sum_trust": 2.998,
+        "winning_cluster_distinct_sources": 3
+      },
+      "mmluPro": {
+        "from": 78.0,
+        "to": 68.5,
+        "cycle": "2026-05-18",
+        "confidence": 0.7,
+        "winning_cluster_sum_trust": 2.1,
         "winning_cluster_distinct_sources": 3
       }
     }
@@ -3351,14 +3615,14 @@
     "vramRequirement": 96,
     "strengthsKey": "mimo-v2-flash.strengths",
     "weaknessesKey": "mimo-v2-flash.weaknesses",
-    "lastUpdated": "2026-05-14",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "benchUpdated": {
-      "sweV": "2026-05-14",
-      "gpqa": "2026-05-10",
-      "hle": "2026-05-10",
-      "aime26": "2026-05-10",
-      "lcb": "2026-05-10",
+      "sweV": "2026-05-18",
+      "gpqa": "2026-05-18",
+      "hle": "2026-05-18",
+      "aime26": "2026-05-18",
+      "lcb": "2026-05-18",
       "mmluPro": "2026-05-10",
       "tau2": "2026-05-10",
       "sweMulti": "2026-05-10",
@@ -3402,6 +3666,38 @@
         "confidence": 1.0,
         "winning_cluster_sum_trust": 3.541,
         "winning_cluster_distinct_sources": 4
+      },
+      "sweV": {
+        "from": 48.0,
+        "to": 73.4,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 9.891,
+        "winning_cluster_distinct_sources": 10
+      },
+      "hle": {
+        "from": 16.0,
+        "to": 22.1,
+        "cycle": "2026-05-18",
+        "confidence": 0.4876,
+        "winning_cluster_sum_trust": 2.438,
+        "winning_cluster_distinct_sources": 3
+      },
+      "aime26": {
+        "from": 78.0,
+        "to": 94.1,
+        "cycle": "2026-05-18",
+        "confidence": 0.42,
+        "winning_cluster_sum_trust": 1.4,
+        "winning_cluster_distinct_sources": 2
+      },
+      "lcb": {
+        "from": 52.0,
+        "to": 80.6,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 4.204,
+        "winning_cluster_distinct_sources": 4
       }
     }
   },
@@ -3439,14 +3735,14 @@
       }
     },
     "bench": {
-      "sweV": 78,
+      "sweV": 78.0,
       "swePro": null,
       "tb2": 86.7,
       "tau2": 95.0,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": 87,
+      "gpqa": 87.0,
       "sweMulti": null,
       "hle": 28.3,
       "aaIdx": 49,
@@ -3471,17 +3767,17 @@
     "vramRequirement": null,
     "strengthsKey": "mimo-v2-pro.strengths",
     "weaknessesKey": "mimo-v2-pro.weaknesses",
-    "lastUpdated": "2026-05-14",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "benchUpdated": {
-      "gpqa": "2026-05-10",
-      "hle": "2026-05-10",
+      "gpqa": "2026-05-18",
+      "hle": "2026-05-18",
       "tau2": "2026-05-10",
       "tbHard": "2026-05-09",
       "aaIdx": "2026-05-14",
-      "sweV": "2026-05-14",
+      "sweV": "2026-05-18",
       "tb2": "2026-05-14",
-      "lcb": "2026-05-10"
+      "lcb": "2026-05-18"
     },
     "notApplicableBenchKeys": [
       "programBench",
@@ -3504,6 +3800,38 @@
         "cycle": "2026-05-18",
         "confidence": 0.95,
         "winning_cluster_sum_trust": 1.35,
+        "winning_cluster_distinct_sources": 2
+      },
+      "sweV": {
+        "from": 58.0,
+        "to": 78.0,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 5.966,
+        "winning_cluster_distinct_sources": 5
+      },
+      "gpqa": {
+        "from": 88.0,
+        "to": 87.0,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 3.564,
+        "winning_cluster_distinct_sources": 4
+      },
+      "hle": {
+        "from": 20.0,
+        "to": 28.3,
+        "cycle": "2026-05-18",
+        "confidence": 0.9194,
+        "winning_cluster_sum_trust": 2.019,
+        "winning_cluster_distinct_sources": 3
+      },
+      "lcb": {
+        "from": 64.0,
+        "to": 87.0,
+        "cycle": "2026-05-18",
+        "confidence": 0.4857,
+        "winning_cluster_sum_trust": 1.283,
         "winning_cluster_distinct_sources": 2
       }
     }
@@ -3561,9 +3889,9 @@
       "sweMulti": 51.3,
       "hle": 19.4,
       "bfcl": 76.8,
-      "aime26": 86.3,
+      "aime26": 88.75,
       "aaOmni": null,
-      "lcb": 69.5,
+      "lcb": 76.0,
       "tbHard": null,
       "cfElo": null,
       "browseComp": 76.3,
@@ -3607,16 +3935,16 @@
     "vramRequirement": null,
     "strengthsKey": "minimax-m2-5.strengths",
     "weaknessesKey": "minimax-m2-5.weaknesses",
-    "lastUpdated": "2026-05-18T11:20:57Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-18",
       "sweMulti": "2026-05-10",
       "browseComp": "2026-05-10",
       "sweV": "2026-05-18",
-      "gpqa": "2026-05-10",
-      "aime26": "2026-05-10",
-      "hle": "2026-05-11",
+      "gpqa": "2026-05-18",
+      "aime26": "2026-05-18",
+      "hle": "2026-05-18",
       "bfcl": "2026-05-10",
       "aaIdx": "2026-05-10",
       "lcb": "2026-05-18",
@@ -3650,12 +3978,44 @@
     },
     "benchReconciled": {
       "aime26": {
-        "from": 88.75,
-        "to": 86.3,
+        "from": 90.0,
+        "to": 88.75,
         "cycle": "2026-05-18",
-        "confidence": 0.4876,
-        "winning_cluster_sum_trust": 1.277,
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 1.81,
         "winning_cluster_distinct_sources": 2
+      },
+      "sweV": {
+        "from": 70.4,
+        "to": 80.2,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 8.104,
+        "winning_cluster_distinct_sources": 7
+      },
+      "swePro": {
+        "from": 50.5,
+        "to": 55.4,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 8.211,
+        "winning_cluster_distinct_sources": 6
+      },
+      "gpqa": {
+        "from": 83.3,
+        "to": 85.2,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 3.928,
+        "winning_cluster_distinct_sources": 4
+      },
+      "hle": {
+        "from": 30.0,
+        "to": 19.4,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 3.43,
+        "winning_cluster_distinct_sources": 4
       }
     }
   },
@@ -3702,7 +4062,7 @@
     },
     "bench": {
       "sweV": 78.0,
-      "tb2": 57,
+      "tb2": 57.0,
       "aaIdx": 50,
       "swePro": 56.22,
       "tau2": 84.8,
@@ -3715,7 +4075,7 @@
       "bfcl": null,
       "aime26": null,
       "aaOmni": null,
-      "lcb": 78.0,
+      "lcb": 79.93,
       "tbHard": null,
       "cfElo": null,
       "browseComp": null,
@@ -3764,18 +4124,18 @@
     "vramRequirement": null,
     "strengthsKey": "minimax-m2-7.strengths",
     "weaknessesKey": "minimax-m2-7.weaknesses",
-    "lastUpdated": "2026-05-14",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "benchUpdated": {
-      "swePro": "2026-05-14",
-      "sweV": "2026-05-14",
-      "tb2": "2026-05-11",
-      "gpqa": "2026-05-14",
+      "swePro": "2026-05-18",
+      "sweV": "2026-05-18",
+      "tb2": "2026-05-18",
+      "gpqa": "2026-05-18",
       "sweMulti": "2026-05-10",
       "aaIdx": "2026-05-11",
-      "hle": "2026-05-14",
-      "lcb": "2026-05-14",
-      "tau2": "2026-05-14",
+      "hle": "2026-05-18",
+      "lcb": "2026-05-18",
+      "tau2": "2026-05-18",
       "nl2Repo": "2026-05-10"
     },
     "notApplicableBenchKeys": [
@@ -3803,36 +4163,60 @@
     },
     "benchReconciled": {
       "tau2": {
-        "from": 57.0,
+        "from": 83.0,
         "to": 84.8,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 2.677,
+        "winning_cluster_sum_trust": 3.129,
         "winning_cluster_distinct_sources": 3
       },
       "gpqa": {
-        "from": 78.0,
+        "from": 86.7,
         "to": 87.4,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 10.119,
-        "winning_cluster_distinct_sources": 6
+        "winning_cluster_sum_trust": 11.492,
+        "winning_cluster_distinct_sources": 8
       },
       "hle": {
-        "from": 12.5,
+        "from": 35.0,
         "to": 28.1,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 2.355,
-        "winning_cluster_distinct_sources": 3
+        "winning_cluster_sum_trust": 3.959,
+        "winning_cluster_distinct_sources": 5
       },
       "lcb": {
-        "from": 79.93,
+        "from": 80.5,
+        "to": 79.93,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 2.282,
+        "winning_cluster_distinct_sources": 2
+      },
+      "sweV": {
+        "from": 74.5,
         "to": 78.0,
         "cycle": "2026-05-18",
-        "confidence": 0.5385,
-        "winning_cluster_sum_trust": 1.077,
-        "winning_cluster_distinct_sources": 2
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 5.04,
+        "winning_cluster_distinct_sources": 5
+      },
+      "tb2": {
+        "from": 50.0,
+        "to": 57.0,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 3.278,
+        "winning_cluster_distinct_sources": 5
+      },
+      "swePro": {
+        "from": 57.9,
+        "to": 56.22,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 10.069,
+        "winning_cluster_distinct_sources": 8
       }
     }
   },
@@ -3911,7 +4295,7 @@
       "tbHard": 29,
       "cfElo": null,
       "browseComp": null,
-      "mmluPro": 83.7,
+      "mmluPro": 83.73,
       "simpleQa": null,
       "mrcr": 91.75,
       "arcAgi2": null,
@@ -3930,7 +4314,7 @@
     "vramRequirement": 64,
     "strengthsKey": "nemotron-3-super.strengths",
     "weaknessesKey": "nemotron-3-super.weaknesses",
-    "lastUpdated": "2026-05-11T14:23:51Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "ollama": {
       "status": "not-available-on-ollama",
@@ -3940,16 +4324,16 @@
       "fetched": "2026-05-09"
     },
     "benchUpdated": {
-      "sweV": "2026-05-11",
-      "gpqa": "2026-05-11",
+      "sweV": "2026-05-18",
+      "gpqa": "2026-05-18",
       "sweMulti": "2026-05-09",
-      "hle": "2026-05-11",
+      "hle": "2026-05-18",
       "aaIdx": "2026-05-11",
       "tb2": "2026-05-11",
-      "aime26": "2026-05-10",
-      "lcb": "2026-05-11",
+      "aime26": "2026-05-18",
+      "lcb": "2026-05-18",
       "mrcr": "2026-05-09",
-      "mmluPro": "2026-05-11",
+      "mmluPro": "2026-05-18",
       "tbHard": "2026-05-09"
     },
     "notApplicableBenchKeys": [
@@ -3967,7 +4351,57 @@
     "bench.mrcr": 91.75,
     "bench.gpqa": 79.23,
     "bench.aime26": 90.2,
-    "bench.hle": 18.26
+    "bench.hle": 18.26,
+    "benchReconciled": {
+      "sweV": {
+        "from": 52.0,
+        "to": 60.47,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 8.686,
+        "winning_cluster_distinct_sources": 9
+      },
+      "gpqa": {
+        "from": 76.0,
+        "to": 79.23,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 7.851,
+        "winning_cluster_distinct_sources": 7
+      },
+      "hle": {
+        "from": 17.0,
+        "to": 18.26,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 4.562,
+        "winning_cluster_distinct_sources": 5
+      },
+      "aime26": {
+        "from": 75.0,
+        "to": 89.8,
+        "cycle": "2026-05-18",
+        "confidence": 0.7273,
+        "winning_cluster_sum_trust": 2.127,
+        "winning_cluster_distinct_sources": 3
+      },
+      "lcb": {
+        "from": 45.0,
+        "to": 81.19,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 7.814,
+        "winning_cluster_distinct_sources": 5
+      },
+      "mmluPro": {
+        "from": 74.0,
+        "to": 83.73,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 6.993,
+        "winning_cluster_distinct_sources": 6
+      }
+    }
   },
   {
     "id": "qwen-3-6-27b",
@@ -4062,7 +4496,7 @@
     "vramRequirement": 18,
     "strengthsKey": "qwen-3-6-27b.strengths",
     "weaknessesKey": "qwen-3-6-27b.weaknesses",
-    "lastUpdated": "2026-05-14",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "ollama": {
       "pullCmd": "ollama pull batiai/qwen3.6-27b:iq4",
       "tags": [
@@ -4082,14 +4516,14 @@
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-14",
-      "sweV": "2026-05-14",
+      "sweV": "2026-05-18",
       "tb2": "2026-05-14",
-      "gpqa": "2026-05-14",
+      "gpqa": "2026-05-18",
       "sweMulti": "2026-05-09",
-      "hle": "2026-05-09",
-      "aime26": "2026-05-14",
-      "lcb": "2026-05-11",
-      "mmluPro": "2026-05-14",
+      "hle": "2026-05-18",
+      "aime26": "2026-05-18",
+      "lcb": "2026-05-18",
+      "mmluPro": "2026-05-18",
       "nl2Repo": "2026-05-09",
       "tau2": "2026-05-10",
       "aaIdx": "2026-05-10"
@@ -4101,7 +4535,8 @@
     "benchQuarantine": {
       "tau2": true,
       "aaIdx": true,
-      "nl2Repo": true
+      "nl2Repo": true,
+      "hle": true
     },
     "bench.swePro": 53.5,
     "bench.sweV": 77.2,
@@ -4113,12 +4548,44 @@
     "bench.hle": 24,
     "benchReconciled": {
       "gpqa": {
-        "from": 87.8,
+        "from": 82.5,
         "to": 72.4,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 1.234,
+        "winning_cluster_sum_trust": 1.253,
         "winning_cluster_distinct_sources": 1
+      },
+      "sweV": {
+        "from": 69.0,
+        "to": 77.2,
+        "cycle": "2026-05-18",
+        "confidence": 0.5896,
+        "winning_cluster_sum_trust": 4.345,
+        "winning_cluster_distinct_sources": 5
+      },
+      "aime26": {
+        "from": 84.0,
+        "to": 94.1,
+        "cycle": "2026-05-18",
+        "confidence": 0.7,
+        "winning_cluster_sum_trust": 1.8,
+        "winning_cluster_distinct_sources": 3
+      },
+      "lcb": {
+        "from": 63.0,
+        "to": 83.9,
+        "cycle": "2026-05-18",
+        "confidence": 0.42,
+        "winning_cluster_sum_trust": 1.1,
+        "winning_cluster_distinct_sources": 2
+      },
+      "mmluPro": {
+        "from": 79.0,
+        "to": 86.2,
+        "cycle": "2026-05-18",
+        "confidence": 0.7,
+        "winning_cluster_sum_trust": 1.61,
+        "winning_cluster_distinct_sources": 3
       }
     }
   },
@@ -4197,19 +4664,19 @@
     "vramRequirement": null,
     "strengthsKey": "qwen-3-6-max.strengths",
     "weaknessesKey": "qwen-3-6-max.weaknesses",
-    "lastUpdated": "2026-05-14",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "benchUpdated": {
-      "sweV": "2026-05-10",
+      "sweV": "2026-05-18",
       "tb2": "2026-05-14",
       "simpleQa": "2026-05-09",
       "nl2Repo": "2026-05-09",
-      "gpqa": "2026-05-14",
-      "aime26": "2026-05-14",
-      "hle": "2026-05-14",
-      "mmluPro": "2026-05-14",
+      "gpqa": "2026-05-18",
+      "aime26": "2026-05-18",
+      "hle": "2026-05-18",
+      "mmluPro": "2026-05-18",
       "swePro": "2026-05-11",
-      "lcb": "2026-05-10",
+      "lcb": "2026-05-18",
       "aaIdx": "2026-05-14",
       "tau2": "2026-05-10"
     },
@@ -4230,7 +4697,57 @@
     "bench.lcb": 79,
     "bench.aaIdx": 52,
     "bench.gpqa": 86,
-    "bench.hle": 51
+    "bench.hle": 51,
+    "benchReconciled": {
+      "sweV": {
+        "from": 71.0,
+        "to": 78.8,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 1.585,
+        "winning_cluster_distinct_sources": 2
+      },
+      "gpqa": {
+        "from": 84.0,
+        "to": 86.0,
+        "cycle": "2026-05-18",
+        "confidence": 0.85,
+        "winning_cluster_sum_trust": 2.867,
+        "winning_cluster_distinct_sources": 4
+      },
+      "hle": {
+        "from": 26.0,
+        "to": 51.0,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 2.809,
+        "winning_cluster_distinct_sources": 4
+      },
+      "aime26": {
+        "from": 87.0,
+        "to": 93.0,
+        "cycle": "2026-05-18",
+        "confidence": 0.7,
+        "winning_cluster_sum_trust": 1.5,
+        "winning_cluster_distinct_sources": 3
+      },
+      "lcb": {
+        "from": 66.0,
+        "to": 77.5,
+        "cycle": "2026-05-18",
+        "confidence": 0.4364,
+        "winning_cluster_sum_trust": 1.427,
+        "winning_cluster_distinct_sources": 2
+      },
+      "mmluPro": {
+        "from": 81.0,
+        "to": 79.0,
+        "cycle": "2026-05-18",
+        "confidence": 0.7,
+        "winning_cluster_sum_trust": 1.5,
+        "winning_cluster_distinct_sources": 3
+      }
+    }
   },
   {
     "id": "qwen3-235b",
@@ -4293,16 +4810,16 @@
     },
     "bench": {
       "swePro": 21.4,
-      "sweV": 77.3,
-      "tb2": 82.5,
+      "sweV": 79.0,
+      "tb2": 65.0,
       "tau2": 37.0,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
       "gpqa": 70.0,
       "sweMulti": null,
-      "hle": 38.2,
-      "aaIdx": 88.2,
+      "hle": 42.0,
+      "aaIdx": 60.0,
       "bfcl": 70.8,
       "aime26": 92.3,
       "aaOmni": null,
@@ -4330,7 +4847,7 @@
     "vramRequirement": 47,
     "strengthsKey": "qwen3-235b.strengths",
     "weaknessesKey": "qwen3-235b.weaknesses",
-    "lastUpdated": "2026-05-18T13:49:41Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "ollama": {
       "pullCmd": "ollama pull qwen3:235b",
       "ollamaUrl": "https://ollama.com/library/qwen3",
@@ -4342,14 +4859,14 @@
       "gpqa": "2026-05-18",
       "lcb": "2026-05-18",
       "aime26": "2026-05-18",
-      "mmluPro": "2026-05-14",
+      "mmluPro": "2026-05-18",
       "cfElo": "2026-05-09",
       "bfcl": "2026-05-10",
       "sweV": "2026-05-18",
       "hle": "2026-05-18",
-      "tau2": "2026-05-09",
-      "tb2": "2026-05-10",
-      "aaIdx": "2026-05-14"
+      "tau2": "2026-05-18",
+      "tb2": "2026-05-18",
+      "aaIdx": "2026-05-18"
     },
     "notApplicableBenchKeys": [
       "programBench",
@@ -4358,7 +4875,8 @@
     "benchQuarantine": {
       "tau2": true,
       "hle": true,
-      "cfElo": true
+      "cfElo": true,
+      "tb2": true
     },
     "bench.swePro": 21.41,
     "bench.lcb": 74.8,
@@ -4369,20 +4887,20 @@
     "bench.aime26": 92.3,
     "benchReconciled": {
       "swePro": {
-        "from": 56.1,
+        "from": 59.7,
         "to": 21.4,
         "cycle": "2026-05-18",
-        "confidence": 0.3333,
-        "winning_cluster_sum_trust": 1.0,
-        "winning_cluster_distinct_sources": 1
+        "confidence": 0.7925,
+        "winning_cluster_sum_trust": 2.35,
+        "winning_cluster_distinct_sources": 2
       },
       "gpqa": {
-        "from": 70.0,
-        "to": 81.1,
+        "from": 86.5,
+        "to": 70.0,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 4.043,
-        "winning_cluster_distinct_sources": 5
+        "winning_cluster_sum_trust": 2.955,
+        "winning_cluster_distinct_sources": 2
       },
       "aaIdx": {
         "from": 30,
@@ -4401,20 +4919,36 @@
         "winning_cluster_distinct_sources": 2
       },
       "aime26": {
-        "from": 94.8,
+        "from": 93.0,
         "to": 92.3,
         "cycle": "2026-05-18",
-        "confidence": 0.42,
-        "winning_cluster_sum_trust": 1.4,
-        "winning_cluster_distinct_sources": 2
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 1.91,
+        "winning_cluster_distinct_sources": 3
       },
       "lcb": {
-        "from": 62.2,
+        "from": 74.0,
         "to": 74.1,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 8.246,
+        "winning_cluster_sum_trust": 9.018,
         "winning_cluster_distinct_sources": 6
+      },
+      "tau2": {
+        "from": 80.0,
+        "to": 37.0,
+        "cycle": "2026-05-18",
+        "confidence": 0.5283,
+        "winning_cluster_sum_trust": 0.959,
+        "winning_cluster_distinct_sources": 2
+      },
+      "mmluPro": {
+        "from": 85.0,
+        "to": 84.4,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 1.21,
+        "winning_cluster_distinct_sources": 2
       }
     }
   },
@@ -4470,7 +5004,7 @@
     },
     "bench": {
       "swePro": 3.4,
-      "sweV": 3.4,
+      "sweV": 72.0,
       "tb2": 56.3,
       "tau2": 29.8,
       "aaCoding": null,
@@ -4512,7 +5046,7 @@
     "vramRequirement": 22,
     "strengthsKey": "qwen3-32b.strengths",
     "weaknessesKey": "qwen3-32b.weaknesses",
-    "lastUpdated": "2026-05-18T00:18:54Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "ollama": {
       "pullCmd": "ollama pull qwen3:32b",
       "ollamaUrl": "https://ollama.com/library/qwen3",
@@ -4520,12 +5054,12 @@
     },
     "status": "active",
     "benchUpdated": {
-      "mmluPro": "2026-05-14",
+      "mmluPro": "2026-05-18",
       "sweV": "2026-05-18",
       "gpqa": "2026-05-18",
-      "hle": "2026-05-11",
+      "hle": "2026-05-18",
       "aime26": "2026-05-18",
-      "lcb": "2026-05-14",
+      "lcb": "2026-05-18",
       "bfcl": "2026-05-10",
       "swePro": "2026-05-09",
       "tb2": "2026-05-10",
@@ -4558,19 +5092,43 @@
         "winning_cluster_distinct_sources": 1
       },
       "gpqa": {
-        "from": 84.2,
+        "from": 81.0,
         "to": 66.8,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 1.909,
-        "winning_cluster_distinct_sources": 2
+        "winning_cluster_sum_trust": 2.531,
+        "winning_cluster_distinct_sources": 3
       },
       "aime26": {
-        "from": 89.1,
+        "from": 88.0,
         "to": 81.5,
         "cycle": "2026-05-18",
         "confidence": 1.0,
-        "winning_cluster_sum_trust": 2.1,
+        "winning_cluster_sum_trust": 1.61,
+        "winning_cluster_distinct_sources": 3
+      },
+      "hle": {
+        "from": 28.0,
+        "to": 8.3,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 2.129,
+        "winning_cluster_distinct_sources": 3
+      },
+      "lcb": {
+        "from": 62.0,
+        "to": 54.4,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 3.269,
+        "winning_cluster_distinct_sources": 4
+      },
+      "mmluPro": {
+        "from": 79.0,
+        "to": 79.8,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 2.472,
         "winning_cluster_distinct_sources": 3
       }
     }
@@ -4670,7 +5228,7 @@
     "vramRequirement": 22,
     "strengthsKey": "qwen3-6-35b-moe.strengths",
     "weaknessesKey": "qwen3-6-35b-moe.weaknesses",
-    "lastUpdated": "2026-05-18T00:18:54Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "ollama": {
       "pullCmd": "ollama run qwen3.6:35b-a3b",
       "tags": [
@@ -4686,18 +5244,18 @@
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-14",
-      "mmluPro": "2026-05-11",
+      "mmluPro": "2026-05-18",
       "tau3": "2026-05-08",
       "nl2Repo": "2026-05-09",
       "sweV": "2026-05-18",
-      "lcb": "2026-05-11",
+      "lcb": "2026-05-18",
       "gpqa": "2026-05-18",
       "aime26": "2026-05-18",
       "tb2": "2026-05-14",
       "mcpA": "2026-05-09",
       "sweMulti": "2026-05-09",
       "tau2": "2026-05-11",
-      "hle": "2026-05-10"
+      "hle": "2026-05-18"
     },
     "notApplicableBenchKeys": [
       "programBench",
@@ -4718,12 +5276,12 @@
     "bench.aime26": 92.7,
     "benchReconciled": {
       "sweV": {
-        "from": 65.2,
+        "from": 65.0,
         "to": 73.4,
         "cycle": "2026-05-18",
-        "confidence": 0.9047,
-        "winning_cluster_sum_trust": 3.835,
-        "winning_cluster_distinct_sources": 5
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 6.098,
+        "winning_cluster_distinct_sources": 6
       },
       "mcpA": {
         "from": 37.0,
@@ -4742,11 +5300,35 @@
         "winning_cluster_distinct_sources": 1
       },
       "aime26": {
-        "from": 87.3,
+        "from": 85.0,
         "to": 93.33,
         "cycle": "2026-05-18",
         "confidence": 0.7,
-        "winning_cluster_sum_trust": 2.8,
+        "winning_cluster_sum_trust": 3.5,
+        "winning_cluster_distinct_sources": 3
+      },
+      "hle": {
+        "from": 26.0,
+        "to": 79.1,
+        "cycle": "2026-05-18",
+        "confidence": 0.5283,
+        "winning_cluster_sum_trust": 1.347,
+        "winning_cluster_distinct_sources": 2
+      },
+      "lcb": {
+        "from": 60.0,
+        "to": 80.4,
+        "cycle": "2026-05-18",
+        "confidence": 0.595,
+        "winning_cluster_sum_trust": 1.4,
+        "winning_cluster_distinct_sources": 2
+      },
+      "mmluPro": {
+        "from": 77.0,
+        "to": 85.2,
+        "cycle": "2026-05-18",
+        "confidence": 0.7,
+        "winning_cluster_sum_trust": 1.61,
         "winning_cluster_distinct_sources": 3
       }
     }
@@ -4827,17 +5409,17 @@
     "vramRequirement": null,
     "strengthsKey": "qwen3-6-plus.strengths",
     "weaknessesKey": "qwen3-6-plus.weaknesses",
-    "lastUpdated": "2026-05-14",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "benchUpdated": {
-      "swePro": "2026-05-11",
+      "swePro": "2026-05-18",
       "tb2": "2026-05-14",
-      "sweV": "2026-05-14",
+      "sweV": "2026-05-18",
       "tau2": "2026-05-10",
-      "lcb": "2026-05-10",
-      "aime26": "2026-05-10",
+      "lcb": "2026-05-18",
+      "aime26": "2026-05-18",
       "mmluPro": "2026-05-10",
-      "hle": "2026-05-10",
+      "hle": "2026-05-18",
       "aaIdx": "2026-05-14",
       "gpqa": "2026-05-10"
     },
@@ -4865,6 +5447,46 @@
         "confidence": 0.3012,
         "winning_cluster_sum_trust": 0.753,
         "winning_cluster_distinct_sources": 1
+      },
+      "swePro": {
+        "from": 52.0,
+        "to": 56.6,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 3.559,
+        "winning_cluster_distinct_sources": 4
+      },
+      "sweV": {
+        "from": 73.0,
+        "to": 78.8,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 7.98,
+        "winning_cluster_distinct_sources": 8
+      },
+      "hle": {
+        "from": 30.0,
+        "to": 78.8,
+        "cycle": "2026-05-18",
+        "confidence": 0.5283,
+        "winning_cluster_sum_trust": 1.521,
+        "winning_cluster_distinct_sources": 2
+      },
+      "aime26": {
+        "from": 89.0,
+        "to": 75.3,
+        "cycle": "2026-05-18",
+        "confidence": 0.4857,
+        "winning_cluster_sum_trust": 1.283,
+        "winning_cluster_distinct_sources": 2
+      },
+      "lcb": {
+        "from": 68.0,
+        "to": 87.1,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 3.622,
+        "winning_cluster_distinct_sources": 4
       }
     }
   },
@@ -4922,7 +5544,7 @@
       "bfcl": null,
       "aime26": null,
       "aaOmni": null,
-      "lcb": 56.3,
+      "lcb": 68.0,
       "tbHard": null,
       "cfElo": null,
       "browseComp": null,
@@ -4940,7 +5562,7 @@
     "vramRequirement": 21,
     "strengthsKey": "qwen3-coder-30b.strengths",
     "weaknessesKey": "qwen3-coder-30b.weaknesses",
-    "lastUpdated": "2026-05-18T11:20:57Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "ollama": {
       "pullCmd": "ollama pull qwen3-coder:30b",
       "pullCount": "4.9M pulls",
@@ -4957,11 +5579,11 @@
       "gpqa": "2026-05-10",
       "tb2": "2026-05-10",
       "aaIdx": "2026-05-11",
-      "lcb": "2026-05-10",
+      "lcb": "2026-05-18",
       "aime26": "2026-05-10",
       "tau2": "2026-05-10",
       "mmluPro": "2026-05-10",
-      "swePro": "2026-05-10",
+      "swePro": "2026-05-18",
       "hle": "2026-05-10"
     },
     "notApplicableBenchKeys": [
@@ -4970,7 +5592,8 @@
       "gpqa",
       "mmluPro",
       "hle",
-      "aime26"
+      "aime26",
+      "tau2"
     ],
     "benchQuarantine": {
       "swePro": true,
@@ -4982,7 +5605,25 @@
     },
     "bench.sweV": 69.6,
     "bench.tb2": 36.2,
-    "bench.aaIdx": 20
+    "bench.aaIdx": 20,
+    "benchReconciled": {
+      "swePro": {
+        "from": 52.0,
+        "to": 65.3,
+        "cycle": "2026-05-18",
+        "confidence": 0.5283,
+        "winning_cluster_sum_trust": 0.959,
+        "winning_cluster_distinct_sources": 2
+      },
+      "sweV": {
+        "from": 75.0,
+        "to": 51.6,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 5.936,
+        "winning_cluster_distinct_sources": 4
+      }
+    }
   },
   {
     "id": "qwen3-coder-480b",
@@ -5033,10 +5674,10 @@
       }
     },
     "bench": {
-      "swePro": 38.7,
-      "sweV": 69.6,
+      "swePro": 66.0,
+      "sweV": 83.0,
       "tb2": 23.9,
-      "tau2": 77.5,
+      "tau2": null,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
@@ -5081,7 +5722,7 @@
     "vramRequirement": null,
     "strengthsKey": "qwen3-coder-480b.strengths",
     "weaknessesKey": "qwen3-coder-480b.weaknesses",
-    "lastUpdated": "2026-05-14",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "ollama": {
       "pullCmd": "ollama pull qwen3-coder:480b",
@@ -5094,14 +5735,14 @@
       "fetched": "2026-05-09"
     },
     "benchUpdated": {
-      "swePro": "2026-05-14",
-      "sweV": "2026-05-14",
+      "swePro": "2026-05-18",
+      "sweV": "2026-05-18",
       "cfElo": "2026-05-06",
       "bfcl": "2026-05-10",
       "aaIdx": "2026-05-11",
       "tau2": "2026-05-14",
-      "tb2": "2026-05-10",
-      "lcb": "2026-05-10",
+      "tb2": "2026-05-18",
+      "lcb": "2026-05-18",
       "gpqa": "2026-05-10",
       "aime26": "2026-05-10",
       "mmluPro": "2026-05-10",
@@ -5113,7 +5754,8 @@
       "gpqa",
       "mmluPro",
       "hle",
-      "aime26"
+      "aime26",
+      "tau2"
     ],
     "benchQuarantine": {
       "swePro": true,
@@ -5130,7 +5772,25 @@
     "bench.sweV": 69.6,
     "bench.tb2": 23.9,
     "bench.bfcl": 68.7,
-    "bench.aaIdx": 25
+    "bench.aaIdx": 25,
+    "benchReconciled": {
+      "tb2": {
+        "from": 70.0,
+        "to": 23.9,
+        "cycle": "2026-05-18",
+        "confidence": 0.3698,
+        "winning_cluster_sum_trust": 0.721,
+        "winning_cluster_distinct_sources": 2
+      },
+      "lcb": {
+        "from": 78.0,
+        "to": 68.0,
+        "cycle": "2026-05-18",
+        "confidence": 0.5283,
+        "winning_cluster_sum_trust": 0.959,
+        "winning_cluster_distinct_sources": 2
+      }
+    }
   },
   {
     "id": "qwen3-coder-next",
@@ -5138,7 +5798,7 @@
     "provider": "Alibaba Qwen",
     "released": "2026-05-01",
     "tier": "open-flagship",
-    "open": false,
+    "open": true,
     "license": "proprietary",
     "context": 262144,
     "pricing": {
@@ -5180,7 +5840,7 @@
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": null,
+      "gpqa": 75.1,
       "sweMulti": 62.8,
       "hle": null,
       "aaIdx": null,
@@ -5211,7 +5871,7 @@
     "vramRequirement": 18,
     "strengthsKey": "qwen3-coder-next.strengths",
     "weaknessesKey": "qwen3-coder-next.weaknesses",
-    "lastUpdated": "2026-05-18T00:18:54Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "ollama": {
       "pullCmd": "ollama pull qwen3-coder-next",
       "tags": [],
@@ -5224,11 +5884,12 @@
     },
     "status": "active",
     "benchUpdated": {
-      "swePro": "2026-05-14",
-      "sweV": "2026-05-14",
+      "swePro": "2026-05-18",
+      "sweV": "2026-05-18",
       "sweMulti": "2026-05-10",
       "tb2": "2026-05-10",
-      "lcb": "2026-05-10"
+      "lcb": "2026-05-18",
+      "gpqa": "2026-05-18"
     },
     "notApplicableBenchKeys": [
       "programBench",
@@ -5242,7 +5903,41 @@
     "bench.swePro": 44.3,
     "bench.sweV": 70.6,
     "bench.sweMulti": 62.8,
-    "bench.tb2": 36.2
+    "bench.tb2": 36.2,
+    "benchReconciled": {
+      "sweV": {
+        "from": 85.0,
+        "to": 70.6,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 11.883,
+        "winning_cluster_distinct_sources": 7
+      },
+      "swePro": {
+        "from": 68.0,
+        "to": 44.3,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 4.911,
+        "winning_cluster_distinct_sources": 5
+      },
+      "gpqa": {
+        "from": 80.0,
+        "to": 75.1,
+        "cycle": "2026-05-18",
+        "confidence": 0.3698,
+        "winning_cluster_sum_trust": 1.109,
+        "winning_cluster_distinct_sources": 2
+      },
+      "lcb": {
+        "from": 81.0,
+        "to": 68.9,
+        "cycle": "2026-05-18",
+        "confidence": 0.4364,
+        "winning_cluster_sum_trust": 1.427,
+        "winning_cluster_distinct_sources": 2
+      }
+    }
   },
   {
     "id": "step-3-5-flash",
@@ -5302,7 +5997,7 @@
       "mcpA": null,
       "gpqa": 83.5,
       "sweMulti": null,
-      "hle": 23.1,
+      "hle": 22.6,
       "aaIdx": 38,
       "bfcl": null,
       "aime26": 97.3,
@@ -5331,20 +6026,20 @@
     "vramRequirement": 120,
     "strengthsKey": "step-3-5-flash.strengths",
     "weaknessesKey": "step-3-5-flash.weaknesses",
-    "lastUpdated": "2026-05-14",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "benchUpdated": {
-      "sweV": "2026-05-14",
+      "sweV": "2026-05-18",
       "tb2": "2026-05-14",
-      "gpqa": "2026-05-14",
-      "hle": "2026-05-11",
+      "gpqa": "2026-05-18",
+      "hle": "2026-05-18",
       "mmluPro": "2026-05-11",
-      "lcb": "2026-05-14",
+      "lcb": "2026-05-18",
       "tau2": "2026-05-14",
       "aaIdx": "2026-05-11",
       "browseComp": "2026-05-10",
       "simpleQa": "2026-05-09",
-      "aime26": "2026-05-14"
+      "aime26": "2026-05-18"
     },
     "notApplicableBenchKeys": [
       "programBench",
@@ -5363,11 +6058,43 @@
     "bench.hle": 22.6,
     "benchReconciled": {
       "gpqa": {
-        "from": 69.0,
+        "from": 72.0,
         "to": 83.5,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 8.4,
+        "winning_cluster_sum_trust": 9.855,
+        "winning_cluster_distinct_sources": 7
+      },
+      "sweV": {
+        "from": 55.0,
+        "to": 74.4,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 9.78,
+        "winning_cluster_distinct_sources": 8
+      },
+      "hle": {
+        "from": 18.0,
+        "to": 22.6,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 5.712,
+        "winning_cluster_distinct_sources": 5
+      },
+      "aime26": {
+        "from": 76.0,
+        "to": 97.3,
+        "cycle": "2026-05-18",
+        "confidence": 0.3698,
+        "winning_cluster_sum_trust": 1.109,
+        "winning_cluster_distinct_sources": 2
+      },
+      "lcb": {
+        "from": 48.0,
+        "to": 86.4,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 7.376,
         "winning_cluster_distinct_sources": 6
       }
     }
@@ -5408,17 +6135,17 @@
       "swePro": null,
       "sweV": null,
       "tb2": null,
-      "tau2": 6.6,
+      "tau2": null,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
       "gpqa": 42.4,
       "sweMulti": null,
-      "hle": 4.7,
+      "hle": 10.5,
       "bfcl": null,
       "aime26": 20.8,
       "aaOmni": null,
-      "lcb": 29.1,
+      "lcb": null,
       "tbHard": null,
       "cfElo": null,
       "browseComp": null,
@@ -5436,19 +6163,19 @@
     "vramRequirement": 24,
     "strengthsKey": "gemma-3-27b.strengths",
     "weaknessesKey": "gemma-3-27b.weaknesses",
-    "lastUpdated": "2026-05-18T13:49:41Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-10",
       "gpqa": "2026-05-18",
       "aime26": "2026-05-14",
       "lcb": "2026-05-14",
-      "mmluPro": "2026-05-14",
+      "mmluPro": "2026-05-18",
       "tau2": "2026-05-14",
       "aaIdx": "2026-05-10",
       "sweV": "2026-05-10",
       "tb2": "2026-05-11",
-      "hle": "2026-05-11"
+      "hle": "2026-05-18"
     },
     "notApplicableBenchKeys": [
       "programBench",
@@ -5456,7 +6183,9 @@
       "sweV",
       "swePro",
       "tb2",
-      "aaIdx"
+      "aaIdx",
+      "lcb",
+      "tau2"
     ],
     "benchQuarantine": {
       "tb2": true,
@@ -5478,12 +6207,20 @@
     },
     "benchReconciled": {
       "gpqa": {
-        "from": 67.5,
+        "from": 68.5,
         "to": 42.4,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 6.727,
+        "winning_cluster_sum_trust": 7.198,
         "winning_cluster_distinct_sources": 5
+      },
+      "mmluPro": {
+        "from": 67.0,
+        "to": 67.5,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 5.782,
+        "winning_cluster_distinct_sources": 6
       }
     }
   },
@@ -5514,7 +6251,7 @@
       "sweV": null,
       "swePro": null,
       "tb2": null,
-      "tau2": 86.4,
+      "tau2": null,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
@@ -5525,7 +6262,7 @@
       "bfcl": null,
       "aime26": 88.3,
       "aaOmni": null,
-      "lcb": 77.1,
+      "lcb": null,
       "tbHard": null,
       "cfElo": null,
       "browseComp": null,
@@ -5555,7 +6292,7 @@
     "vramRequirement": 16,
     "strengthsKey": "gemma-4-26b-moe.strengths",
     "weaknessesKey": "gemma-4-26b-moe.weaknesses",
-    "lastUpdated": "2026-05-14",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "ollama": {
       "pullCmd": "ollama pull gemma4:26b",
@@ -5570,10 +6307,10 @@
       "ollamaUrl": "https://ollama.com/library/gemma4"
     },
     "benchUpdated": {
-      "gpqa": "2026-05-14",
-      "aime26": "2026-05-14",
+      "gpqa": "2026-05-18",
+      "aime26": "2026-05-18",
       "lcb": "2026-05-14",
-      "mmluPro": "2026-05-14",
+      "mmluPro": "2026-05-18",
       "aaIdx": "2026-05-11",
       "webDevElo": "2026-05-10",
       "sweV": "2026-05-10",
@@ -5586,7 +6323,9 @@
       "swePro",
       "tb2",
       "hle",
-      "aaIdx"
+      "aaIdx",
+      "lcb",
+      "tau2"
     ],
     "benchQuarantine": {
       "tau2": true,
@@ -5595,7 +6334,33 @@
     "bench.sweV": 64,
     "bench.lcb": 77.1,
     "bench.gpqa": 82.3,
-    "bench.aime26": 88.3
+    "bench.aime26": 88.3,
+    "benchReconciled": {
+      "gpqa": {
+        "from": 74.1,
+        "to": 82.3,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 7.999,
+        "winning_cluster_distinct_sources": 9
+      },
+      "aime26": {
+        "from": 52.0,
+        "to": 88.3,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 6.395,
+        "winning_cluster_distinct_sources": 7
+      },
+      "mmluPro": {
+        "from": 75.0,
+        "to": 82.6,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 3.463,
+        "winning_cluster_distinct_sources": 4
+      }
+    }
   },
   {
     "id": "gemma-4-31b",
@@ -5644,19 +6409,19 @@
     "bench": {
       "sweV": null,
       "gpqa": 84.3,
-      "tau2": 86.4,
+      "tau2": null,
       "swePro": null,
-      "tb2": 42.9,
+      "tb2": null,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
       "sweMulti": null,
       "hle": null,
-      "aaIdx": 39,
+      "aaIdx": null,
       "bfcl": null,
       "aime26": 89.2,
       "aaOmni": null,
-      "lcb": 80,
+      "lcb": null,
       "tbHard": 36,
       "cfElo": 2150,
       "browseComp": null,
@@ -5686,7 +6451,7 @@
     "vramRequirement": 24,
     "strengthsKey": "gemma-4-31b.strengths",
     "weaknessesKey": "gemma-4-31b.weaknesses",
-    "lastUpdated": "2026-05-14",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "ollama": {
       "pullCmd": "ollama pull gemma4:31b",
@@ -5703,23 +6468,27 @@
     "benchUpdated": {
       "sweV": "2026-05-10",
       "tau2": "2026-05-14",
-      "gpqa": "2026-05-14",
-      "aime26": "2026-05-14",
+      "gpqa": "2026-05-18",
+      "aime26": "2026-05-18",
       "lcb": "2026-05-14",
-      "mmluPro": "2026-05-14",
+      "mmluPro": "2026-05-18",
       "cfElo": "2026-05-10",
       "tbHard": "2026-05-10",
       "aaIdx": "2026-05-14",
       "mrcr": "2026-05-10",
       "webDevElo": "2026-05-10",
-      "hle": "2026-05-11",
+      "hle": "2026-05-18",
       "tb2": "2026-05-14"
     },
     "notApplicableBenchKeys": [
       "programBench",
       "sweV",
       "swePro",
-      "hle"
+      "hle",
+      "lcb",
+      "tb2",
+      "tau2",
+      "aaIdx"
     ],
     "benchQuarantine": {
       "tb2": true
@@ -5730,7 +6499,33 @@
     "bench.cfElo": 2150,
     "bench.mmluPro": 85.2,
     "bench.gpqa": 84.3,
-    "bench.aime26": 89.2
+    "bench.aime26": 89.2,
+    "benchReconciled": {
+      "gpqa": {
+        "from": 78.4,
+        "to": 84.3,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 6.922,
+        "winning_cluster_distinct_sources": 8
+      },
+      "aime26": {
+        "from": 62.0,
+        "to": 89.2,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 7.774,
+        "winning_cluster_distinct_sources": 8
+      },
+      "mmluPro": {
+        "from": 79.0,
+        "to": 85.2,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 5.731,
+        "winning_cluster_distinct_sources": 6
+      }
+    }
   },
   {
     "id": "gemma-4-e2b",
@@ -5774,7 +6569,7 @@
       "bfcl": null,
       "aime26": 42.5,
       "aaOmni": null,
-      "lcb": 44,
+      "lcb": null,
       "tbHard": null,
       "cfElo": null,
       "browseComp": null,
@@ -5798,7 +6593,7 @@
     "vramRequirement": 2,
     "strengthsKey": "gemma-4-e2b.strengths",
     "weaknessesKey": "gemma-4-e2b.weaknesses",
-    "lastUpdated": "2026-05-14",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "ollama": {
       "pullCmd": "ollama pull gemma4:e2b",
@@ -5816,8 +6611,8 @@
       "aime26": "2026-05-14",
       "lcb": "2026-05-14",
       "aaIdx": "2026-05-11",
-      "mmluPro": "2026-05-14",
-      "gpqa": "2026-05-10"
+      "mmluPro": "2026-05-18",
+      "gpqa": "2026-05-18"
     },
     "notApplicableBenchKeys": [
       "programBench",
@@ -5837,7 +6632,8 @@
       "aaAgentic",
       "hle",
       "aaIdx",
-      "gpqa"
+      "gpqa",
+      "lcb"
     ],
     "benchQuarantine": {},
     "bench.lcb": 44,
@@ -5851,6 +6647,14 @@
         "confidence": 0.5428,
         "winning_cluster_sum_trust": 3.231,
         "winning_cluster_distinct_sources": 3
+      },
+      "mmluPro": {
+        "from": 58.0,
+        "to": 60.0,
+        "cycle": "2026-05-18",
+        "confidence": 0.8127,
+        "winning_cluster_sum_trust": 2.86,
+        "winning_cluster_distinct_sources": 4
       }
     }
   },
@@ -5892,11 +6696,11 @@
       "gpqa": null,
       "sweMulti": null,
       "hle": null,
-      "aaIdx": 15.0,
+      "aaIdx": null,
       "bfcl": null,
       "aime26": 42.5,
       "aaOmni": null,
-      "lcb": 52,
+      "lcb": null,
       "tbHard": null,
       "cfElo": null,
       "browseComp": null,
@@ -5920,7 +6724,7 @@
     "vramRequirement": 8,
     "strengthsKey": "gemma-4-e4b.strengths",
     "weaknessesKey": "gemma-4-e4b.weaknesses",
-    "lastUpdated": "2026-05-14",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "ollama": {
       "pullCmd": "ollama pull gemma4:e4b",
@@ -5935,11 +6739,11 @@
       "ollamaUrl": "https://ollama.com/library/gemma4:e4b"
     },
     "benchUpdated": {
-      "gpqa": "2026-05-10",
+      "gpqa": "2026-05-18",
       "aime26": "2026-05-14",
       "lcb": "2026-05-14",
       "aaIdx": "2026-05-14",
-      "mmluPro": "2026-05-14"
+      "mmluPro": "2026-05-18"
     },
     "notApplicableBenchKeys": [
       "programBench",
@@ -5958,7 +6762,9 @@
       "aaCoding",
       "aaAgentic",
       "hle",
-      "gpqa"
+      "gpqa",
+      "lcb",
+      "aaIdx"
     ],
     "benchQuarantine": {},
     "bench.lcb": 52,
@@ -5972,6 +6778,14 @@
         "confidence": 0.4266,
         "winning_cluster_sum_trust": 0.753,
         "winning_cluster_distinct_sources": 1
+      },
+      "mmluPro": {
+        "from": 67.5,
+        "to": 69.4,
+        "cycle": "2026-05-18",
+        "confidence": 0.8127,
+        "winning_cluster_sum_trust": 2.511,
+        "winning_cluster_distinct_sources": 4
       }
     }
   },
@@ -6008,7 +6822,7 @@
     },
     "bench": {
       "swePro": null,
-      "sweV": 15.9,
+      "sweV": 43.0,
       "tb2": null,
       "tau2": null,
       "aaCoding": null,
@@ -6050,7 +6864,7 @@
     "vramRequirement": 9,
     "strengthsKey": "deepseek-coder-v2-16b.strengths",
     "weaknessesKey": "deepseek-coder-v2-16b.weaknesses",
-    "lastUpdated": "2026-05-18T00:18:54Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "ollama": {
       "pullCmd": "ollama pull deepseek-coder-v2:16b",
       "tags": [
@@ -6102,12 +6916,12 @@
         "winning_cluster_distinct_sources": 2
       },
       "lcb": {
-        "from": 43.2,
+        "from": 33.2,
         "to": 43.4,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 2.786,
-        "winning_cluster_distinct_sources": 3
+        "winning_cluster_sum_trust": 5.248,
+        "winning_cluster_distinct_sources": 5
       }
     }
   },
@@ -6186,7 +7000,7 @@
     "vramRequirement": 9,
     "strengthsKey": "deepseek-r1-14b.strengths",
     "weaknessesKey": "deepseek-r1-14b.weaknesses",
-    "lastUpdated": "2026-05-18T00:18:54Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "ollama": {
       "pullCmd": "ollama pull deepseek-r1:14b",
       "tags": [
@@ -6241,20 +7055,20 @@
     "bench.aime26": 80,
     "benchReconciled": {
       "gpqa": {
-        "from": 68.7,
+        "from": 70.5,
         "to": 59.1,
         "cycle": "2026-05-18",
-        "confidence": 0.6,
-        "winning_cluster_sum_trust": 2.224,
-        "winning_cluster_distinct_sources": 3
+        "confidence": 0.4876,
+        "winning_cluster_sum_trust": 2.438,
+        "winning_cluster_distinct_sources": 4
       },
       "aime26": {
-        "from": 52.8,
+        "from": 72.0,
         "to": 69.7,
         "cycle": "2026-05-18",
-        "confidence": 0.7925,
-        "winning_cluster_sum_trust": 1.219,
-        "winning_cluster_distinct_sources": 2
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 2.427,
+        "winning_cluster_distinct_sources": 3
       }
     }
   },
@@ -6319,7 +7133,7 @@
     "vramRequirement": 11,
     "strengthsKey": "qwen25-coder-14b.strengths",
     "weaknessesKey": "qwen25-coder-14b.weaknesses",
-    "lastUpdated": "2026-05-14",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "ollama": {
       "pullCmd": "ollama pull qwen2.5-coder:14b",
       "tags": [],
@@ -6333,7 +7147,7 @@
     "status": "active",
     "benchUpdated": {
       "lcb": "2026-05-10",
-      "sweV": "2026-05-14",
+      "sweV": "2026-05-18",
       "tb2": "2026-05-10",
       "swePro": "2026-05-14"
     },
@@ -6341,18 +7155,21 @@
       "programBench",
       "webDevElo",
       "aime26",
-      "gpqa"
+      "gpqa",
+      "hle",
+      "mmluPro",
+      "tau2"
     ],
     "benchQuarantine": {
       "swePro": true
     },
     "benchReconciled": {
       "sweV": {
-        "from": 47.2,
+        "from": 42.0,
         "to": 28.4,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 1.538,
+        "winning_cluster_sum_trust": 2.005,
         "winning_cluster_distinct_sources": 2
       }
     }
@@ -6432,7 +7249,7 @@
       "tbHard": null,
       "cfElo": null,
       "browseComp": null,
-      "mmluPro": 78.2,
+      "mmluPro": null,
       "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
@@ -6452,7 +7269,7 @@
     "vramRequirement": 70,
     "strengthsKey": "qwen25-coder-32b.strengths",
     "weaknessesKey": "qwen25-coder-32b.weaknesses",
-    "lastUpdated": "2026-05-14",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "ollama": {
       "pullCmd": "ollama pull qwen2.5-coder:32b",
       "tags": [],
@@ -6465,7 +7282,7 @@
     },
     "status": "active",
     "benchUpdated": {
-      "sweV": "2026-05-14",
+      "sweV": "2026-05-18",
       "mmluPro": "2026-05-10",
       "lcb": "2026-05-11",
       "tb2": "2026-05-10",
@@ -6473,7 +7290,11 @@
     },
     "notApplicableBenchKeys": [
       "programBench",
-      "webDevElo"
+      "webDevElo",
+      "hle",
+      "aime26",
+      "mmluPro",
+      "tau2"
     ],
     "benchQuarantine": {
       "swePro": true
@@ -6481,11 +7302,11 @@
     "bench.sweV": 69.6,
     "benchReconciled": {
       "sweV": {
-        "from": 54.4,
+        "from": 50.0,
         "to": 51.8,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 1.988,
+        "winning_cluster_sum_trust": 2.425,
         "winning_cluster_distinct_sources": 2
       },
       "lcb": {
@@ -6554,7 +7375,7 @@
     },
     "bench": {
       "swePro": 18.5,
-      "sweV": 38.7,
+      "sweV": 38.5,
       "tb2": null,
       "tau2": null,
       "aaCoding": null,
@@ -6591,7 +7412,7 @@
     "vramRequirement": 16,
     "strengthsKey": "qwen25-coder-7b.strengths",
     "weaknessesKey": "qwen25-coder-7b.weaknesses",
-    "lastUpdated": "2026-05-14",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "ollama": {
       "pullCmd": "ollama pull qwen2.5-coder:7b",
       "tags": [],
@@ -6604,7 +7425,7 @@
     },
     "status": "active",
     "benchUpdated": {
-      "sweV": "2026-05-14",
+      "sweV": "2026-05-18",
       "lcb": "2026-05-11",
       "tb2": "2026-05-10",
       "swePro": "2026-05-14"
@@ -6613,12 +7434,25 @@
       "programBench",
       "webDevElo",
       "aime26",
-      "gpqa"
+      "gpqa",
+      "hle",
+      "mmluPro",
+      "tau2"
     ],
     "benchQuarantine": {
       "swePro": true
     },
-    "bench.lcb": 37.6
+    "bench.lcb": 37.6,
+    "benchReconciled": {
+      "sweV": {
+        "from": 35.0,
+        "to": 38.5,
+        "cycle": "2026-05-18",
+        "confidence": 0.85,
+        "winning_cluster_sum_trust": 3.077,
+        "winning_cluster_distinct_sources": 3
+      }
+    }
   },
   {
     "id": "codestral",
@@ -6665,7 +7499,7 @@
     },
     "bench": {
       "swePro": 2.0,
-      "sweV": 76.2,
+      "sweV": 45.5,
       "tb2": null,
       "tau2": null,
       "aaCoding": null,
@@ -6696,7 +7530,7 @@
     "vramRequirement": null,
     "strengthsKey": "codestral.strengths",
     "weaknessesKey": "codestral.weaknesses",
-    "lastUpdated": "2026-05-14",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "notApplicableBenchKeys": [
       "programBench",
@@ -6718,7 +7552,7 @@
     "bench.lcb": 37.9,
     "benchUpdated": {
       "swePro": "2026-05-14",
-      "sweV": "2026-05-11",
+      "sweV": "2026-05-18",
       "lcb": "2026-05-10",
       "gpqa": "2026-05-10",
       "aaIdx": "2026-05-10"
@@ -6763,7 +7597,7 @@
     "tier": "coder-specialized",
     "open": false,
     "license": "proprietary",
-    "context": 8000,
+    "context": 384000,
     "pricing": {
       "api": [
         {
@@ -6831,17 +7665,17 @@
     "vramRequirement": 14,
     "strengthsKey": "devstral-small-2.strengths",
     "weaknessesKey": "devstral-small-2.weaknesses",
-    "lastUpdated": "2026-05-11T14:16:10Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "ollama": {
       "pullCmd": "ollama pull devstral-small-2",
       "ollamaUrl": "https://ollama.com/library/devstral-small-2",
       "context": 256000
     },
     "status": "deprecated",
-    "deprecatedAt": "2026-02-27",
+    "deprecatedAt": "2026-05-01",
     "successor": "devstral-2",
     "benchUpdated": {
-      "sweV": "2026-05-11",
+      "sweV": "2026-05-18",
       "tb2": "2026-05-10",
       "tau2": "2026-05-09",
       "gpqa": "2026-05-09",
@@ -6865,7 +7699,7 @@
     "id": "claude-haiku-4-5",
     "name": "Claude Haiku 4.5",
     "provider": "Anthropic",
-    "released": "2025-10-01",
+    "released": "2025-10-15",
     "tier": "frontier",
     "open": false,
     "license": "proprietary",
@@ -6875,21 +7709,21 @@
       "api": [
         {
           "provider": "official",
-          "in": 0.8,
-          "out": 4.0,
-          "cacheHit": 0.08,
+          "in": 1.0,
+          "out": 5.0,
+          "cacheHit": null,
           "throughput": null,
           "url": "https://www.anthropic.com/pricing",
           "fetched": "2026-05-18"
         },
         {
           "provider": "openrouter",
-          "in": 0.8,
-          "out": 4.0,
-          "cacheHit": 0.08,
+          "in": 1.0,
+          "out": 5.0,
+          "cacheHit": null,
           "throughput": null,
-          "url": "https://openrouter.ai",
-          "fetched": "2026-05-13"
+          "url": "https://openrouter.ai/anthropic/claude-haiku-4-5",
+          "fetched": "2026-05-18"
         }
       ],
       "subscription": [
@@ -6903,17 +7737,14 @@
       ],
       "range": {
         "in": [
-          0.8,
-          0.8
+          1.0,
+          1.0
         ],
         "out": [
-          4.0,
-          4.0
+          5.0,
+          5.0
         ],
-        "cacheHit": [
-          0.08,
-          0.08
-        ]
+        "cacheHit": null
       }
     },
     "bench": {
@@ -6949,12 +7780,12 @@
     "vramRequirement": null,
     "strengthsKey": "claude-haiku-4-5.strengths",
     "weaknessesKey": "claude-haiku-4-5.weaknesses",
-    "lastUpdated": "2026-05-18T13:49:41Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "benchUpdated": {
       "swePro": "2026-05-18",
       "sweV": "2026-05-18",
       "aaIdx": "2026-05-18",
-      "gpqa": "2026-05-14",
+      "gpqa": "2026-05-18",
       "lcb": "2026-05-10",
       "tb2": "2026-05-18",
       "tau2": "2026-05-14",
@@ -6983,24 +7814,32 @@
         "to": 39.5,
         "cycle": "2026-05-18",
         "confidence": 1.0,
-        "winning_cluster_sum_trust": 11.685,
-        "winning_cluster_distinct_sources": 8
+        "winning_cluster_sum_trust": 13.476,
+        "winning_cluster_distinct_sources": 9
       },
       "sweV": {
         "from": 65.1,
         "to": 73.3,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 10.485,
+        "winning_cluster_sum_trust": 10.639,
         "winning_cluster_distinct_sources": 10
       },
       "aaIdx": {
-        "from": 40.33,
+        "from": 36.0,
         "to": 31.0,
         "cycle": "2026-05-18",
-        "confidence": 0.5019,
-        "winning_cluster_sum_trust": 1.506,
-        "winning_cluster_distinct_sources": 2
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 2.839,
+        "winning_cluster_distinct_sources": 3
+      },
+      "gpqa": {
+        "from": 74.5,
+        "to": 67.2,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 4.23,
+        "winning_cluster_distinct_sources": 4
       }
     }
   },
@@ -7078,7 +7917,7 @@
       "simpleQa": null,
       "mrcr": 87.5,
       "arcAgi2": 85,
-      "aaOmni": 57,
+      "aaOmni": 57.0,
       "programBench": null,
       "lcb": null,
       "aime26": 87.9,
@@ -7089,7 +7928,7 @@
     "providers": 2,
     "strengthsKey": "gpt-5-5.strengths",
     "weaknessesKey": "gpt-5-5.weaknesses",
-    "lastUpdated": "2026-05-18T00:18:54Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "sourcesAdded": [
       {
@@ -7126,7 +7965,7 @@
       "arcAgi2": "2026-05-10",
       "mrcr": "2026-05-10",
       "cfElo": "2026-05-10",
-      "aaOmni": "2026-05-10",
+      "aaOmni": "2026-05-18",
       "lcb": "2026-05-11",
       "aime26": "2026-05-18",
       "mmluPro": "2026-05-14"
@@ -7172,6 +8011,14 @@
         "confidence": 0.6,
         "winning_cluster_sum_trust": 2.52,
         "winning_cluster_distinct_sources": 2
+      },
+      "aaOmni": {
+        "from": 43.0,
+        "to": 57.0,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 3.202,
+        "winning_cluster_distinct_sources": 3
       }
     }
   },
@@ -7229,7 +8076,7 @@
     "bench": {
       "gpqa": 88.0,
       "hle": 24.0,
-      "sweV": 76.7,
+      "sweV": 72.0,
       "swePro": 51.8,
       "tb2": 47.1,
       "tau2": 93.0,
@@ -7239,7 +8086,7 @@
       "bfcl": null,
       "aime26": 95.0,
       "aaOmni": null,
-      "aaIdx": 49,
+      "aaIdx": 49.0,
       "lcb": 79.4,
       "tbHard": null,
       "cfElo": 1491,
@@ -7253,7 +8100,7 @@
     },
     "strengthsKey": "grok-4-20.strengths",
     "weaknessesKey": "grok-4-20.weaknesses",
-    "lastUpdated": "2026-05-18T00:18:54Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "benchUpdated": {
       "swePro": "2026-05-18",
       "sweV": "2026-05-18",
@@ -7263,9 +8110,9 @@
       "tau2": "2026-05-11",
       "aaCoding": "2026-05-09",
       "aaAgentic": "2026-05-09",
-      "aaIdx": "2026-05-14",
-      "lcb": "2026-05-11",
-      "mmluPro": "2026-05-11",
+      "aaIdx": "2026-05-18",
+      "lcb": "2026-05-18",
+      "mmluPro": "2026-05-18",
       "arcAgi2": "2026-05-09",
       "browseComp": "2026-05-09",
       "cfElo": "2026-05-09",
@@ -7294,36 +8141,60 @@
     "bench.hle": 32.2,
     "benchReconciled": {
       "gpqa": {
-        "from": 88.4,
+        "from": 88.5,
         "to": 88.0,
         "cycle": "2026-05-18",
         "confidence": 0.85,
-        "winning_cluster_sum_trust": 5.599,
-        "winning_cluster_distinct_sources": 4
+        "winning_cluster_sum_trust": 8.396,
+        "winning_cluster_distinct_sources": 6
       },
       "hle": {
-        "from": 44.1,
+        "from": 38.0,
         "to": 24.0,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 3.554,
-        "winning_cluster_distinct_sources": 3
+        "winning_cluster_sum_trust": 4.838,
+        "winning_cluster_distinct_sources": 4
       },
       "swePro": {
-        "from": 52.4,
+        "from": 55.0,
         "to": 51.8,
         "cycle": "2026-05-18",
-        "confidence": 0.57,
-        "winning_cluster_sum_trust": 1.879,
-        "winning_cluster_distinct_sources": 2
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 3.309,
+        "winning_cluster_distinct_sources": 3
       },
       "aime26": {
-        "from": 93.2,
+        "from": 96.0,
         "to": 95.0,
         "cycle": "2026-05-18",
         "confidence": 1.0,
-        "winning_cluster_sum_trust": 2.65,
-        "winning_cluster_distinct_sources": 3
+        "winning_cluster_sum_trust": 3.885,
+        "winning_cluster_distinct_sources": 4
+      },
+      "aaIdx": {
+        "from": 55.0,
+        "to": 49.0,
+        "cycle": "2026-05-18",
+        "confidence": 0.5101,
+        "winning_cluster_sum_trust": 1.494,
+        "winning_cluster_distinct_sources": 2
+      },
+      "lcb": {
+        "from": 72.0,
+        "to": 79.4,
+        "cycle": "2026-05-18",
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 4.455,
+        "winning_cluster_distinct_sources": 4
+      },
+      "mmluPro": {
+        "from": 84.0,
+        "to": 86.6,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 6.181,
+        "winning_cluster_distinct_sources": 4
       }
     }
   },
@@ -7378,7 +8249,7 @@
       ]
     },
     "bench": {
-      "swePro": 54.8,
+      "swePro": 60.5,
       "sweV": 79.6,
       "tb2": null,
       "tau2": 98.0,
@@ -7388,9 +8259,9 @@
       "gpqa": 93.2,
       "sweMulti": null,
       "hle": 53.0,
-      "aaIdx": 53,
+      "aaIdx": 53.0,
       "bfcl": null,
-      "aime26": 95.6,
+      "aime26": 98.0,
       "aaOmni": null,
       "lcb": null,
       "tbHard": null,
@@ -7410,16 +8281,18 @@
     "vramRequirement": null,
     "strengthsKey": "grok-4-3.strengths",
     "weaknessesKey": "grok-4-3.weaknesses",
-    "lastUpdated": "2026-05-18T00:18:54Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "notApplicableBenchKeys": [
       "programBench",
       "webDevElo"
     ],
     "benchQuarantine": {
-      "cfElo": true
+      "cfElo": true,
+      "swePro": true,
+      "aime26": true
     },
     "benchUpdated": {
-      "aaIdx": "2026-05-14",
+      "aaIdx": "2026-05-18",
       "tau2": "2026-05-11",
       "gpqa": "2026-05-18",
       "hle": "2026-05-18",
@@ -7430,28 +8303,36 @@
     },
     "benchReconciled": {
       "sweV": {
-        "from": 79.4,
+        "from": 79.0,
         "to": 79.6,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 2.541,
-        "winning_cluster_distinct_sources": 3
+        "winning_cluster_sum_trust": 3.95,
+        "winning_cluster_distinct_sources": 4
       },
       "gpqa": {
-        "from": 90.1,
+        "from": 91.0,
         "to": 93.2,
         "cycle": "2026-05-18",
-        "confidence": 0.4241,
-        "winning_cluster_sum_trust": 0.748,
+        "confidence": 0.4355,
+        "winning_cluster_sum_trust": 0.768,
         "winning_cluster_distinct_sources": 1
       },
       "hle": {
-        "from": 46.2,
+        "from": 42.0,
         "to": 53.0,
         "cycle": "2026-05-18",
-        "confidence": 0.5019,
-        "winning_cluster_sum_trust": 1.506,
-        "winning_cluster_distinct_sources": 2
+        "confidence": 0.9194,
+        "winning_cluster_sum_trust": 2.566,
+        "winning_cluster_distinct_sources": 3
+      },
+      "aaIdx": {
+        "from": 62.0,
+        "to": 53.0,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 3.72,
+        "winning_cluster_distinct_sources": 4
       }
     }
   },
@@ -7507,20 +8388,20 @@
     },
     "bench": {
       "swePro": null,
-      "sweV": 76.9,
+      "sweV": 64.0,
       "tb2": null,
       "tau2": 72.8,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": 85.3,
+      "gpqa": 83.0,
       "sweMulti": null,
-      "hle": 17.6,
-      "aaIdx": 38.0,
+      "hle": 30.0,
+      "aaIdx": 45.0,
       "bfcl": null,
       "aime26": null,
       "aaOmni": null,
-      "lcb": 82.2,
+      "lcb": 39.9,
       "tbHard": 24.2,
       "cfElo": null,
       "browseComp": null,
@@ -7540,21 +8421,21 @@
     "vramRequirement": null,
     "strengthsKey": "grok-4-1-fast.strengths",
     "weaknessesKey": "grok-4-1-fast.weaknesses",
-    "lastUpdated": "2026-05-14",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "notApplicableBenchKeys": [
       "programBench",
       "webDevElo"
     ],
     "benchQuarantine": {},
     "benchUpdated": {
-      "lcb": "2026-05-10",
-      "gpqa": "2026-05-10",
-      "hle": "2026-05-10",
+      "lcb": "2026-05-18",
+      "gpqa": "2026-05-18",
+      "hle": "2026-05-18",
       "mmluPro": "2026-05-10",
       "tbHard": "2026-05-09",
       "tau2": "2026-05-10",
-      "aaIdx": "2026-05-14",
-      "sweV": "2026-05-10"
+      "aaIdx": "2026-05-18",
+      "sweV": "2026-05-18"
     },
     "deprecatedAt": "2026-05-15",
     "successor": "grok-4-3"
@@ -7572,21 +8453,21 @@
       "api": [
         {
           "provider": "official",
-          "in": 0.2,
-          "out": 1.1,
-          "cacheHit": null,
-          "throughput": null,
-          "url": "https://docs.z.ai/guides/llm/glm-4.5",
-          "fetched": "2026-05-13"
-        },
-        {
-          "provider": "openrouter",
           "in": 0.13,
           "out": 0.85,
           "cacheHit": null,
-          "throughput": 79.0,
-          "url": "https://openrouter.ai/z-ai/glm-4.5-air",
-          "fetched": "2026-05-13"
+          "throughput": null,
+          "url": "https://docs.z.ai/guides/overview/pricing",
+          "fetched": "2026-05-18"
+        },
+        {
+          "provider": "openrouter",
+          "in": 0.0,
+          "out": 0.0,
+          "cacheHit": null,
+          "throughput": null,
+          "url": "https://openrouter.ai/z-ai/glm-4.5-air:free",
+          "fetched": "2026-05-18"
         },
         {
           "provider": "together",
@@ -7601,12 +8482,12 @@
       "subscription": null,
       "range": {
         "in": [
-          0.13,
-          0.2
+          0.0,
+          0.17
         ],
         "out": [
-          0.85,
-          1.1
+          0.0,
+          0.98
         ],
         "cacheHit": null
       }
@@ -7641,16 +8522,16 @@
     },
     "benchUpdated": {
       "bfcl": "2026-05-09",
-      "mmluPro": "2026-05-14",
-      "tau2": "2026-05-14",
+      "mmluPro": "2026-05-18",
+      "tau2": "2026-05-18",
       "swePro": "2026-05-09",
       "sweV": "2026-05-10",
       "tb2": "2026-05-09",
       "gpqa": "2026-05-09",
       "hle": "2026-05-09",
-      "aaIdx": "2026-05-14",
+      "aaIdx": "2026-05-18",
       "aaOmni": "2026-05-09",
-      "aime26": "2026-05-14",
+      "aime26": "2026-05-18",
       "lcb": "2026-05-10",
       "nl2Repo": "2026-05-09",
       "webDevElo": "2026-05-09"
@@ -7681,20 +8562,20 @@
     },
     "unslothVariants": [
       {
-        "name": "Q4_K_M",
-        "size": "~50GB",
-        "vram": "24GB+RAM"
+        "name": "UD-Q4_K_XL",
+        "size": null,
+        "vram": 40
       },
       {
-        "name": "UD-Q4_K_XL",
-        "size": "~80GB",
-        "vram": "24GB+RAM"
+        "name": "Q8_K_XL",
+        "size": null,
+        "vram": 60
       }
     ],
     "vramRequirement": 24,
     "strengthsKey": "glm-4-5-air.strengths",
     "weaknessesKey": "glm-4-5-air.weaknesses",
-    "lastUpdated": "2026-05-14",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "_stubReason": "lineup-discovery placeholder; bench cells pending next /aicodermap refresh cycle",
     "_stubAddedDate": "2026-05-06",
@@ -7704,9 +8585,9 @@
         "from": 77.9,
         "to": 79.1,
         "cycle": "2026-05-18",
-        "confidence": 0.5572,
-        "winning_cluster_sum_trust": 1.629,
-        "winning_cluster_distinct_sources": 2
+        "confidence": 0.6,
+        "winning_cluster_sum_trust": 2.727,
+        "winning_cluster_distinct_sources": 3
       },
       "bfcl": {
         "from": 76.4,
@@ -7726,15 +8607,17 @@
     "tier": "open-flagship",
     "open": true,
     "license": "MIT",
-    "context": 202752,
+    "context": 203000,
     "pricing": {
       "api": [
         {
           "provider": "official",
-          "in": 1.0,
-          "out": 3.0,
-          "url": "https://z.ai/pricing",
-          "fetched": "2026-05-09"
+          "in": 0.38,
+          "out": 1.74,
+          "cacheHit": null,
+          "throughput": null,
+          "url": "https://docs.z.ai/guides/overview/pricing",
+          "fetched": "2026-05-18"
         },
         {
           "provider": "openrouter",
@@ -7758,12 +8641,12 @@
       "subscription": null,
       "range": {
         "in": [
-          0.4,
-          1.0
+          0.38,
+          0.6
         ],
         "out": [
-          1.75,
-          3.0
+          1.74,
+          2.2
         ],
         "cacheHit": null
       }
@@ -7775,7 +8658,7 @@
       "sweMulti": 66.7,
       "nl2Repo": 39.4,
       "lcb": 84.9,
-      "tb2": 40.2,
+      "tb2": 41.0,
       "tbHard": null,
       "tau2": 87.4,
       "tau3": null,
@@ -7799,13 +8682,13 @@
     "benchUpdated": {
       "sweV": "2026-05-18",
       "sweMulti": "2026-05-06",
-      "lcb": "2026-05-14",
-      "tau2": "2026-05-14",
+      "lcb": "2026-05-18",
+      "tau2": "2026-05-18",
       "browseComp": "2026-05-06",
-      "hle": "2026-05-14",
+      "hle": "2026-05-18",
       "gpqa": "2026-05-18",
       "aime26": "2026-05-18",
-      "mmluPro": "2026-05-14",
+      "mmluPro": "2026-05-18",
       "tb2": "2026-05-18",
       "swePro": "2026-05-09",
       "aaIdx": "2026-05-14",
@@ -7843,15 +8726,25 @@
     },
     "unslothVariants": [
       {
+        "name": "UD-Q2_K_XL",
+        "size": "135GB",
+        "vram": 24
+      },
+      {
         "name": "Q4_K_M",
-        "size": "~200GB",
-        "vram": "40GB+165GB RAM"
+        "size": null,
+        "vram": 40
+      },
+      {
+        "name": "UD-TQ1_0",
+        "size": null,
+        "vram": 24
       }
     ],
     "vramRequirement": 40,
     "strengthsKey": "glm-4-7.strengths",
     "weaknessesKey": "glm-4-7.weaknesses",
-    "lastUpdated": "2026-05-18T11:20:57Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "_stubReason": "lineup-discovery placeholder; bench cells pending next /aicodermap refresh cycle",
     "_stubAddedDate": "2026-05-06",
@@ -7973,18 +8866,18 @@
     "vramRequirement": 80,
     "strengthsKey": "mistral-medium-3-5.strengths",
     "weaknessesKey": "mistral-medium-3-5.weaknesses",
-    "lastUpdated": "2026-05-18T00:18:54Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "_stubReason": "lineup-discovery placeholder; bench cells pending next /aicodermap refresh cycle",
     "_stubAddedDate": "2026-05-06",
     "_stubSource": "user-supplied lineup table 2026-05-06",
     "benchReconciled": {
       "sweV": {
-        "from": 61.2,
+        "from": 44.0,
         "to": 77.6,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 7.451,
+        "winning_cluster_sum_trust": 7.789,
         "winning_cluster_distinct_sources": 7
       }
     }
@@ -8052,7 +8945,7 @@
       "sweV": 42.3,
       "sweMulti": null,
       "nl2Repo": null,
-      "lcb": 82.7,
+      "lcb": 65.6,
       "tb2": null,
       "tbHard": null,
       "tau2": 79.1,
@@ -8075,9 +8968,9 @@
       "programBench": null
     },
     "benchUpdated": {
-      "gpqa": "2026-05-14",
-      "lcb": "2026-05-11",
-      "mmluPro": "2026-05-11",
+      "gpqa": "2026-05-18",
+      "lcb": "2026-05-18",
+      "mmluPro": "2026-05-18",
       "aaIdx": "2026-05-11",
       "sweV": "2026-05-14",
       "tb2": "2026-05-10",
@@ -8113,7 +9006,7 @@
     "vramRequirement": 20,
     "strengthsKey": "qwen3-5-9b.strengths",
     "weaknessesKey": "qwen3-5-9b.weaknesses",
-    "lastUpdated": "2026-05-14",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "_stubReason": "lineup-discovery placeholder; bench cells pending next /aicodermap refresh cycle",
     "_stubAddedDate": "2026-05-06",
@@ -8126,6 +9019,22 @@
         "confidence": 0.6,
         "winning_cluster_sum_trust": 1.538,
         "winning_cluster_distinct_sources": 2
+      },
+      "gpqa": {
+        "from": 68.0,
+        "to": 81.7,
+        "cycle": "2026-05-18",
+        "confidence": 1.0,
+        "winning_cluster_sum_trust": 7.005,
+        "winning_cluster_distinct_sources": 8
+      },
+      "mmluPro": {
+        "from": 70.0,
+        "to": 82.5,
+        "cycle": "2026-05-18",
+        "confidence": 0.8127,
+        "winning_cluster_sum_trust": 2.554,
+        "winning_cluster_distinct_sources": 4
       }
     }
   },
@@ -8176,12 +9085,12 @@
       "aaIdx": 39.0,
       "swePro": 44.1,
       "sweV": 74.0,
-      "sweMulti": 49.0,
+      "sweMulti": 48.6,
       "nl2Repo": null,
       "lcb": 86.0,
       "tb2": null,
       "tbHard": null,
-      "tau2": 91.0,
+      "tau2": 87.0,
       "tau3": null,
       "mcpA": null,
       "bfcl": null,
@@ -8202,15 +9111,15 @@
     },
     "benchUpdated": {
       "sweMulti": "2026-05-10",
-      "mmluPro": "2026-05-11",
+      "mmluPro": "2026-05-18",
       "gpqa": "2026-05-18",
-      "hle": "2026-05-10",
-      "lcb": "2026-05-14",
-      "tau2": "2026-05-14",
+      "hle": "2026-05-18",
+      "lcb": "2026-05-18",
+      "tau2": "2026-05-18",
       "sweV": "2026-05-18",
       "swePro": "2026-05-18",
       "aaIdx": "2026-05-11",
-      "aime26": "2026-05-10"
+      "aime26": "2026-05-18"
     },
     "notApplicableBenchKeys": [
       "programBench",
@@ -8258,26 +9167,26 @@
     "vramRequirement": null,
     "strengthsKey": "minimax-m2-1.strengths",
     "weaknessesKey": "minimax-m2-1.weaknesses",
-    "lastUpdated": "2026-05-18T00:18:54Z",
+    "lastUpdated": "2026-05-18T15:37:35Z",
     "status": "active",
     "_stubReason": "lineup-discovery placeholder; bench cells pending next /aicodermap refresh cycle",
     "_stubAddedDate": "2026-05-06",
     "_stubSource": "user-supplied lineup table 2026-05-06",
     "benchReconciled": {
       "sweV": {
-        "from": 69.8,
+        "from": 78.5,
         "to": 74.0,
         "cycle": "2026-05-18",
         "confidence": 1.0,
-        "winning_cluster_sum_trust": 2.38,
-        "winning_cluster_distinct_sources": 3
+        "winning_cluster_sum_trust": 4.403,
+        "winning_cluster_distinct_sources": 5
       },
       "sweMulti": {
-        "from": 48.6,
-        "to": 49.0,
+        "from": 49.0,
+        "to": 48.6,
         "cycle": "2026-05-18",
         "confidence": 1.0,
-        "winning_cluster_sum_trust": 3.947,
+        "winning_cluster_sum_trust": 3.519,
         "winning_cluster_distinct_sources": 4
       },
       "lcb": {
@@ -8297,12 +9206,28 @@
         "winning_cluster_distinct_sources": 1
       },
       "gpqa": {
-        "from": 83.0,
+        "from": 89.0,
         "to": 80.5,
         "cycle": "2026-05-18",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 1.234,
+        "winning_cluster_sum_trust": 1.361,
         "winning_cluster_distinct_sources": 1
+      },
+      "aime26": {
+        "from": 97.0,
+        "to": 81.5,
+        "cycle": "2026-05-18",
+        "confidence": 0.9655,
+        "winning_cluster_sum_trust": 1.774,
+        "winning_cluster_distinct_sources": 3
+      },
+      "hle": {
+        "from": 40.0,
+        "to": 17.8,
+        "cycle": "2026-05-18",
+        "confidence": 0.85,
+        "winning_cluster_sum_trust": 2.143,
+        "winning_cluster_distinct_sources": 2
       }
     }
   }
