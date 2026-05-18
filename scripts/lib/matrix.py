@@ -134,7 +134,13 @@ def priority_cells(
     if verification_map and isinstance(verification_map, dict):
         vm_cells = verification_map.get("cells") or {}
 
-    candidates: list[tuple[float, float, str, str]] = []
+    # FAZ 8.A.3d (2026-05-18): starvation queue — cells whose gapHistory
+    # shows ≥2 consecutive cycles of being un-filled get pulled to the
+    # front of the queue with a -1.0 priority key, so they're always
+    # researched FIRST regardless of bench/model fill ratios. Prevents
+    # the same 90-cell auto-gap cluster from recurring cycle after cycle.
+    # Tuple shape: (starve_key, bench_ratio, model_ratio, modelId, benchKey).
+    candidates: list[tuple[float, float, float, str, str]] = []
     n_models = max(len(active), 1)
     for m in active:
         for k in keys:
@@ -143,33 +149,36 @@ def priority_cells(
             v = (m.get("bench") or {}).get(k)
             if v is not None:
                 continue
+            cell_key = f"{m['id']}.{k}"
+            vm_entry = vm_cells.get(cell_key) or {} if vm_cells else {}
             # F2: skip cells recently confirmed by ≥2 independent sources
-            if vm_cells:
-                cell_key = f"{m['id']}.{k}"
-                vm_entry = vm_cells.get(cell_key) or {}
-                if vm_entry.get("confirmed"):
-                    last_checked = vm_entry.get("lastChecked") or ""
-                    try:
-                        checked_date = _dt.date.fromisoformat(last_checked[:10])
-                        age_days = (today - checked_date).days
-                        if age_days < skip_confirmed_within_days:
-                            continue  # skip — recently confirmed, not yet stale
-                    except (ValueError, TypeError):
-                        pass  # malformed date → include cell (safe fallback)
+            if vm_entry.get("confirmed"):
+                last_checked = vm_entry.get("lastChecked") or ""
+                try:
+                    checked_date = _dt.date.fromisoformat(last_checked[:10])
+                    age_days = (today - checked_date).days
+                    if age_days < skip_confirmed_within_days:
+                        continue  # skip — recently confirmed, not yet stale
+                except (ValueError, TypeError):
+                    pass  # malformed date → include cell (safe fallback)
+            # Starvation flag: ≥2 consecutive gap cycles -> -1.0 (front).
+            gap_hist = vm_entry.get("gapHistory") or []
+            starve_key = -1.0 if len(gap_hist) >= 2 else 0.0
             bench_ratio = bench_filled[k] / n_models
             model_ratio = model_filled[m["id"]] / max(len(keys), 1)
-            candidates.append((bench_ratio, model_ratio, m["id"], k))
-    candidates.sort(key=lambda t: (t[0], t[1], t[2], t[3]))
+            candidates.append((starve_key, bench_ratio, model_ratio, m["id"], k))
+    candidates.sort(key=lambda t: (t[0], t[1], t[2], t[3], t[4]))
     out = []
-    for bench_ratio, model_ratio, mid, k in candidates[:limit]:
-        out.append(
-            {
-                "modelId": mid,
-                "benchKey": k,
-                "benchFillRatio": round(bench_ratio, 3),
-                "modelFillRatio": round(model_ratio, 3),
-            }
-        )
+    for starve_key, bench_ratio, model_ratio, mid, k in candidates[:limit]:
+        entry = {
+            "modelId": mid,
+            "benchKey": k,
+            "benchFillRatio": round(bench_ratio, 3),
+            "modelFillRatio": round(model_ratio, 3),
+        }
+        if starve_key < 0:
+            entry["starved"] = True
+        out.append(entry)
     return out
 
 

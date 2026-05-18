@@ -138,6 +138,117 @@ def merge_pricing(dst_pricing, src_pricing):
         }
 
 
+def apply_quarantine_and_gap_policy(models, sources, cycle_id):
+    """FAZ 8.A.3d (2026-05-18): merge-time quarantine + gap policy.
+
+    Read .aicodermap-verification-map.json (additive fields, safe on
+    missing) and, for every (modelId, benchKey) cell that satisfies one
+    of the trigger conditions below, stamp the appropriate flag.
+
+    Triggers:
+      - force_quarantine    (consecutive gap cycles ≥ 5) -> benchQuarantine[bk]=True
+      - auto_na_candidate   (≥ 3)                         -> append to naCandidates[]
+      - confidence < 0.2    (cell-level pick_winner)      -> benchQuarantine[bk]=True
+
+    New gap cells (no prior gapHistory) get gapSince=cycle_id stamped.
+
+    Returns the mutated verification map dict so the caller can write it
+    back to disk.
+    """
+    sys.path.insert(0, f"{PROJECT}/scripts")
+    from lib.synth_core import compute_gap_age  # noqa: E402
+    from lib.winner import compute_cell_confidence, pick_winner  # noqa: E402
+
+    vmap_path = Path(PROJECT) / ".aicodermap-verification-map.json"
+    if vmap_path.exists():
+        try:
+            vmap = json.loads(vmap_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            vmap = {"cells": {}}
+    else:
+        vmap = {"cells": {}}
+    cells = vmap.setdefault("cells", {})
+
+    quarantined_count = 0
+    auto_na_count = 0
+    gap_stamps = 0
+
+    for m in models:
+        mid = m.get("id")
+        if not mid or m.get("status") not in (None, "active"):
+            continue
+        bench = m.get("bench") or {}
+        for bk, val in bench.items():
+            cell_key = f"{mid}.{bk}"
+            cell_entry = cells.setdefault(
+                cell_key,
+                {
+                    "value": None,
+                    "verifications": [],
+                    "lastChecked": TODAY,
+                    "gapHistory": [],
+                    "gapSince": None,
+                    "confidence": 0.0,
+                    "stability": None,
+                    "bayesianPoint": None,
+                },
+            )
+            cell_entry.setdefault("gapHistory", [])
+            cell_entry.setdefault("gapSince", None)
+            cell_entry.setdefault("confidence", 0.0)
+
+            is_gap = val is None
+            if is_gap:
+                hist = cell_entry["gapHistory"]
+                if not hist or hist[-1] != cycle_id:
+                    hist.append(cycle_id)
+                if not cell_entry.get("gapSince"):
+                    cell_entry["gapSince"] = cycle_id
+                    gap_stamps += 1
+                age = compute_gap_age(cell_key, vmap, cycle_id)
+                if age["force_quarantine"]:
+                    m.setdefault("benchQuarantine", {})[bk] = True
+                    quarantined_count += 1
+                if age["auto_na_candidate"]:
+                    nc = m.setdefault("naCandidates", [])
+                    if bk not in nc:
+                        nc.append(bk)
+                        auto_na_count += 1
+            else:
+                # Cell filled this cycle — clear the gap run.
+                cell_entry["gapHistory"] = []
+                cell_entry["gapSince"] = None
+
+            # Confidence from current-cycle observations in sources.json.
+            obs = sources.get(cell_key) or []
+            if isinstance(obs, list) and obs:
+                pw_obs = [
+                    {
+                        "value": e.get("value"),
+                        "tier": (e.get("tier") or "C").upper(),
+                        "sourceUrl": e.get("url") or "",
+                        "fetched": e.get("date") or e.get("fetched") or "",
+                        "verifications": e.get("verifications") or 1,
+                        "source": e.get("source") or "",
+                    }
+                    for e in obs
+                    if isinstance(e, dict) and e.get("value") is not None
+                ]
+                if pw_obs:
+                    result = pick_winner(pw_obs)
+                    conf = compute_cell_confidence(result)
+                    cell_entry["confidence"] = conf
+                    if conf < 0.2:
+                        m.setdefault("benchQuarantine", {})[bk] = True
+                        quarantined_count += 1
+
+    print(
+        f"quarantine + gap policy: quarantined={quarantined_count} "
+        f"auto_na={auto_na_count} new_gap_stamps={gap_stamps}"
+    )
+    return vmap
+
+
 def apply_model_update(model, updates):
     touched = False
     for k, v in updates.items():
@@ -165,6 +276,18 @@ def apply_model_update(model, updates):
                     model["bench"][bk] = bv
                     touched = True
                 model["benchUpdated"][bk] = TODAY
+        elif k == "benchQuarantine" and isinstance(v, dict):
+            # FAZ 8.A.3d (2026-05-18): dict-merge quarantine flags. Never
+            # silently clear existing flags — only the explicit setter (or
+            # apply_quarantine_and_gap_policy) clears them by setting False.
+            if "benchQuarantine" not in model or not isinstance(
+                model.get("benchQuarantine"), dict
+            ):
+                model["benchQuarantine"] = {}
+            for bk, flag in v.items():
+                if model["benchQuarantine"].get(bk) != bool(flag):
+                    model["benchQuarantine"][bk] = bool(flag)
+                    touched = True
         elif k == "ollama" and isinstance(v, dict):
             model["ollama"] = v
             touched = True
@@ -716,6 +839,16 @@ def main():
             log["lineup_deprecated"].append(d["id"])
     for r in lineup.get("renamed", []) or []:
         log["lineup_renamed"].append(f"{r.get('from')} -> {r.get('to')}")
+
+    # FAZ 8.A.3d (2026-05-18): quarantine + gap policy must run BEFORE the
+    # final models.json write so the stamps appear in the persisted shape
+    # the frontend reads.
+    vmap_updated = apply_quarantine_and_gap_policy(models, sources, cycle_id=TODAY)
+    vmap_path = Path(PROJECT) / ".aicodermap-verification-map.json"
+    vmap_path.write_text(
+        json.dumps(vmap_updated, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
 
     issues = []
     for m in models:
