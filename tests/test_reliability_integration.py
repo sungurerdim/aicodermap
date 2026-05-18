@@ -223,12 +223,12 @@ class TestPickWinnerReliabilityIntegration(unittest.TestCase):
             unreliable_cl["sum_trust"],
         )
 
-    def test_single_outlier_guard_demotes_until_R4(self):
-        """R3 deliberately leaves the single-outlier guard intact. Phase R4
-        adds an exceptional-source override that bypasses it when n>=20,
-        accuracy>=0.90, fresh, and I-tier. Until then, the 5-source cluster
-        keeps winning despite having lower sum_trust — this test documents
-        that contract so R4 can flip the assertion."""
+    def test_exceptional_override_lets_trusted_solo_win(self):
+        """R4: trusted single I-tier source (n>=20, posterior>=0.90, fresh)
+        survives _single_outlier_guard via the exceptional-source override.
+
+        Mirror of R3's `test_single_outlier_guard_demotes_until_R4` with the
+        assertion flipped now that R4 is wired."""
         ledger = _one_vs_five_ledger()
         result = pick_winner(
             _one_vs_five_obs(),
@@ -238,12 +238,98 @@ class TestPickWinnerReliabilityIntegration(unittest.TestCase):
             block_pp=5,
             reliability_ledger=ledger,
         )
-        self.assertEqual(result["winner_value"], 60.0)
+        self.assertEqual(result["winner_value"], 75.0)
+        self.assertEqual(result["override_mode"], "exceptional-source-override")
 
     def test_ledger_absent_keeps_prior_behavior(self):
         """Without ledger the same setup behaves identically to pre-R3."""
         result = pick_winner(_one_vs_five_obs(), bench_key="sweV", agreement_pp=1.5)
         self.assertEqual(result["winner_value"], 60.0)
+
+
+class TestExceptionalOverrideGates(unittest.TestCase):
+    """R4 negative-path coverage: each gate must independently block."""
+
+    def _trusted_solo_setup(
+        self, *, trusted_n: int, trusted_acc: float, fetched: str
+    ) -> tuple[dict, list[dict]]:
+        ledger = _ledger_with_two_sources(trusted_n=trusted_n, trusted_acc=trusted_acc)
+        for host in ("blog-b.com", "blog-c.com", "blog-d.com", "blog-e.com"):
+            ledger["sources"][host] = ledger["sources"]["blog-a.com"]
+        obs = [
+            {
+                "value": 75.0,
+                "tier": "I",
+                "sourceUrl": "https://trusted.com/leaderboard",
+                "fetched": fetched,
+                "verifications": 2,
+            },
+            *[
+                {
+                    "value": 60.0,
+                    "tier": "C",
+                    "sourceUrl": f"https://{host}/post",
+                    "fetched": "2026-05-18",
+                }
+                for host in (
+                    "blog-a.com",
+                    "blog-b.com",
+                    "blog-c.com",
+                    "blog-d.com",
+                    "blog-e.com",
+                )
+            ],
+        ]
+        return ledger, obs
+
+    def test_override_blocks_when_n_too_small(self):
+        """n=15 < EXCEPTIONAL_SAMPLE_MIN=20 -> no override -> cluster wins."""
+        ledger, obs = self._trusted_solo_setup(
+            trusted_n=15, trusted_acc=0.95, fetched="2026-05-18"
+        )
+        result = pick_winner(
+            obs,
+            bench_key="sweV",
+            agreement_pp=1.5,
+            warn_pp=3,
+            block_pp=5,
+            reliability_ledger=ledger,
+        )
+        self.assertEqual(result["winner_value"], 60.0)
+        self.assertNotEqual(result["override_mode"], "exceptional-source-override")
+
+    def test_override_blocks_when_accuracy_too_low(self):
+        """posterior ~= 0.85 < 0.90 threshold -> no override."""
+        ledger, obs = self._trusted_solo_setup(
+            trusted_n=20, trusted_acc=0.85, fetched="2026-05-18"
+        )
+        result = pick_winner(
+            obs,
+            bench_key="sweV",
+            agreement_pp=1.5,
+            warn_pp=3,
+            block_pp=5,
+            reliability_ledger=ledger,
+        )
+        self.assertEqual(result["winner_value"], 60.0)
+        self.assertNotEqual(result["override_mode"], "exceptional-source-override")
+
+    def test_override_blocks_when_stale(self):
+        """Trusted source fetched >90 days ago (recency_decay = 0.70 < 0.85)
+        -> no override even with strong accuracy + n."""
+        ledger, obs = self._trusted_solo_setup(
+            trusted_n=20, trusted_acc=0.95, fetched="2026-01-10"
+        )
+        result = pick_winner(
+            obs,
+            bench_key="sweV",
+            agreement_pp=1.5,
+            warn_pp=3,
+            block_pp=5,
+            reliability_ledger=ledger,
+        )
+        self.assertEqual(result["winner_value"], 60.0)
+        self.assertNotEqual(result["override_mode"], "exceptional-source-override")
 
 
 class TestColdStartIsNeutral(unittest.TestCase):

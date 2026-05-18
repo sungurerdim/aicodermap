@@ -36,8 +36,20 @@ from .tiers import (
     I_TIER_MIN_VERIFICATIONS,
     effective_trust_score,
     is_pseudo_source,
+    recency_decay,
     tier_rank,
 )
+
+# Phase R4 thresholds for the exceptional-source override. When a single
+# I-tier observation has enough Bayesian evidence (n >= 20, accuracy >= 0.90)
+# and is fresh (recency_decay >= 0.85, i.e. < ~90 days old), it bypasses the
+# single-outlier guard so it can survive against larger but less reliable
+# clusters. Every override fires only on (source, bench) pairs that have
+# *earned* the override via accumulated track record — no hardcoded source
+# allowlists.
+EXCEPTIONAL_RELIABILITY_THRESHOLD: float = 0.90
+EXCEPTIONAL_SAMPLE_MIN: int = 20
+EXCEPTIONAL_RECENCY_MIN: float = 0.85
 
 # Global fallback thresholds (overridden per-bench via benchTypes)
 DEFAULT_AGREEMENT_PP: float = 1.5
@@ -311,6 +323,55 @@ def _single_outlier_guard(
     return top
 
 
+def _exceptional_source_override(
+    clusters: list[dict[str, Any]],
+    reliability_ledger: dict[str, Any] | None,
+    bench_key: str,
+) -> tuple[dict[str, Any] | None, str | None]:
+    """Phase R4: bypass _single_outlier_guard for highly trusted singletons.
+
+    Returns (cluster, override_mode) when a single-source I-tier cluster meets
+    every gate: ≥20 prior samples, Beta-Binomial posterior ≥0.90 on this
+    bench, and recency_decay ≥0.85 (roughly: < 90 days old). Otherwise
+    returns (None, None). Every threshold is data-derived; no source allowlist.
+    """
+    if not reliability_ledger or not clusters:
+        return None, None
+    from .reliability import posterior_accuracy, source_identity  # type: ignore
+
+    sources_idx = (reliability_ledger or {}).get("sources") or {}
+    for cl in clusters:
+        if cl.get("distinct_sources") != 1:
+            continue
+        members = cl.get("members") or []
+        if not members:
+            continue
+        member = members[0]
+        if (member.get("tier") or "C").upper() != "I":
+            continue
+        url = member.get("sourceUrl") or ""
+        if not url:
+            continue
+        sid = source_identity(url, "")
+        if not sid:
+            continue
+        bench_data = (sources_idx.get(sid) or {}).get("byBench", {}).get(
+            bench_key
+        ) or {}
+        agree = float(bench_data.get("agree", 0.0))
+        disagree = float(bench_data.get("disagree", 0.0))
+        n = agree + disagree
+        if n < EXCEPTIONAL_SAMPLE_MIN:
+            continue
+        accuracy = posterior_accuracy(agree, disagree)
+        if accuracy < EXCEPTIONAL_RELIABILITY_THRESHOLD:
+            continue
+        if recency_decay(member.get("fetched")) < EXCEPTIONAL_RECENCY_MIN:
+            continue
+        return cl, "exceptional-source-override"
+    return None, None
+
+
 def pick_winner(
     observations: list[dict[str, Any]],
     *,
@@ -415,8 +476,23 @@ def pick_winner(
     elif i_cluster and clusters[0] is i_cluster:
         override_mode = "independent-override"
 
-    # Rule 3 — single-outlier guard (applied to post-override cluster order)
-    winning_cluster = _single_outlier_guard(clusters)
+    # Phase R4 — exceptional single-source override. When a single I-tier
+    # observation has earned enough Bayesian track record (n>=20, posterior
+    # accuracy >= 0.90, fresh < ~90d) on this bench, it bypasses the
+    # single-outlier guard and wins directly. Every gate is data-derived;
+    # no source allowlist.
+    ex_cluster, ex_mode = _exceptional_source_override(
+        clusters, reliability_ledger, bench_key
+    )
+    if ex_cluster is not None:
+        if clusters[0] is not ex_cluster:
+            clusters.remove(ex_cluster)
+            clusters.insert(0, ex_cluster)
+        winning_cluster = ex_cluster
+        override_mode = ex_mode
+    else:
+        # Rule 3 — single-outlier guard (applied to post-override cluster order)
+        winning_cluster = _single_outlier_guard(clusters)
 
     # Rule 4 — best individual within winning cluster
     winner_obs = max(
