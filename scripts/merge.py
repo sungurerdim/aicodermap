@@ -249,6 +249,53 @@ def apply_quarantine_and_gap_policy(
                     if conf < 0.2:
                         m.setdefault("benchQuarantine", {})[bk] = True
                         quarantined_count += 1
+                    # Winner-authoritative reconciliation (fix: synth-emitted
+                    # single-observation values can disagree with the
+                    # multi-source consensus across data/sources.json).
+                    # pick_winner already aggregates the full provenance
+                    # cluster (sum trustScore + recency + reliability ledger);
+                    # apply its winner_value when it confidently differs from
+                    # what the artifact merge wrote.
+                    wv = result.get("winner_value")
+                    wc = result.get("winning_cluster") or {}
+                    # Only reconcile when consensus is real:
+                    #   - winner has multi-source backing (>=2 distinct urls)
+                    #   - OR exceptional-source-override (Phase R4) fired
+                    # Single-source winners cannot evict an existing value
+                    # (they go to data/sources.json for audit; the existing
+                    # value stays canonical until a 2nd source confirms).
+                    multi_source = wc.get("distinct_sources", 0) >= 2
+                    is_override = result.get("override_mode") in (
+                        "exceptional-source-override",
+                        "independent-override",
+                    )
+                    if (
+                        wv is not None
+                        and conf >= 0.2
+                        and not result.get("quarantine")
+                        and val is not None
+                        and isinstance(wv, (int, float))
+                        and isinstance(val, (int, float))
+                        and abs(float(wv) - float(val)) > 0.05
+                        and (multi_source or is_override)
+                    ):
+                        bench[bk] = wv
+                        reconciled = m.setdefault("benchReconciled", {})
+                        reconciled[bk] = {
+                            "from": val,
+                            "to": wv,
+                            "cycle": cycle_id,
+                            "confidence": conf,
+                            "winning_cluster_sum_trust": round(
+                                (result.get("winning_cluster") or {}).get(
+                                    "sum_trust", 0.0
+                                ),
+                                3,
+                            ),
+                            "winning_cluster_distinct_sources": (
+                                result.get("winning_cluster") or {}
+                            ).get("distinct_sources", 0),
+                        }
 
     print(
         f"quarantine + gap policy: quarantined={quarantined_count} "
