@@ -812,7 +812,7 @@ def main() -> int:
     ROOT = Path(__file__).resolve().parents[2]
     sys.path.insert(0, str(ROOT / "scripts"))
     from lib.whitelist import (  # noqa: E402
-        core_bench_keys,
+        all_bench_keys,
         load_whitelist,
         not_applicable_rules,
     )
@@ -824,7 +824,11 @@ def main() -> int:
         return 1
 
     wl = load_whitelist()
-    canonical_bench = set(core_bench_keys(wl))
+    # FAZ 8.A (2026-05-18): canonical universe is core ∪ emerging so the
+    # synth drop-filter doesn't discard valid emerging-key fills that
+    # gather agents emit. Prior `core_bench_keys()` alone dropped ~295
+    # cells/cycle, the most expensive recurring data loss.
+    canonical_bench = set(all_bench_keys(wl))
     na_rules = not_applicable_rules(wl) or {}
     canonical_na = {
         r.get("rule") for r in (na_rules.get("rules") or []) if r.get("rule")

@@ -76,8 +76,7 @@ type ModelEntry = {
     swePro: number | null;
     sweV: number | null;
     tb2: number | null;
-    lcbV6: number | null;
-    aider: number | null;
+    lcb: number | null;
     tau2: number | null;
     aaCoding: number | null;
     aaAgentic: number | null;
@@ -327,8 +326,10 @@ async function loadData() {
 Weights are integers 0-100 summing to exactly 100. The 19-key default set
 covers the coding-centric and agentic columns; reasoning-only keys
 (`aime26`, `aaOmni`, `simpleQa`) are zeroed in the default and surface via
-the `reasoning-focused` preset. The full 25-key universe lives in
-`BENCH_KEYS` — every preset zero-bases against it (no leak from default).
+the `reasoning-focused` preset. The full bench universe (16 core + 10
+emerging = 26 keys) lives in `BENCH_KEYS` — every preset zero-bases against
+it (no leak from default). The authoritative list lives in
+`data/sources-whitelist.json _schema.coreBenchKeys / emergingBenchKeys`.
 
 ```javascript
 const DEFAULT_WEIGHTS = {

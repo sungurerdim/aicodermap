@@ -855,10 +855,16 @@ COMPUTED FIELDS:  pricing.range            (computed from pricing.api[] at write
 
 OBJECT FIELDS:    ollama (full pullCmd/tags/pullCount/architecture/parameters/license/releasedISO/ollamaUrl block — preserve atomically; replace only if new object has more keys)
 
-BENCH KEYS (dynamic universe = whitelist `_schema.coreBenchKeys` ∪ `leaderboards[].publishes[]`):
-                  swePro, sweV, sweMulti, tb2, lcbV6, aider, tau2, mcpA, bfcl,
-                  aaCoding, aaAgentic, aaIdx, aaOmni, gpqa, aime26, hle, …
-                  (extends automatically when a leaderboard's publishes[] adds a key)
+BENCH KEYS (dynamic universe = whitelist `_schema.coreBenchKeys` ∪ `_schema.emergingBenchKeys`):
+                  core (16): swePro, sweV, lcb, tb2, tbHard, cfElo, nl2Repo,
+                             aaCoding, aaAgentic, aaIdx, tau2, gpqa, mmluPro,
+                             hle, aime26, arcAgi2
+                  emerging (10): sweMulti, mcpA, bfcl, browseComp, webDevElo,
+                                 aaOmni, mrcr, simpleQa, tau3, programBench
+                  deprecated (3): lcbV6, aider, aiderPoly  (silently dropped by synth filter)
+                  (authoritative: data/sources-whitelist.json _schema.coreBenchKeys
+                   + _schema.emergingBenchKeys; extends automatically when a leaderboard's
+                   publishes[] adds a key)
                   → trustScore-driven contradiction resolution per bench key
 ```
 

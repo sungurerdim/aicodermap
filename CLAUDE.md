@@ -157,7 +157,7 @@ Entry: index.html → assets/vendor/html2canvas.min.js (defer, SRI)
 Modules:
   assets/js/        → 15 ES modules (browser-loaded, no build, every file <500L)
     main.js         → bootstrap orchestrator (split-phase init)
-    core.js         → State + STORAGE + BENCH_KEYS (25) + DEFAULTS + PRESETS (5) + schema validation
+    core.js         → State + STORAGE + BENCH_KEYS (26) + DEFAULTS + PRESETS (5) + schema validation
     i18n.js         → t() + applyI18n + loadI18n
     data.js         → fetch + score + contradiction + pricing + format
     gpu.js          → gpuCompat + WebGPU detect + filter predicate
@@ -179,7 +179,7 @@ Modules:
     models.json     → 60 models, schema v2 multi-provider pricing, 26 bench keys
     sources.json    → per-(modelId,benchKey) provenance with trustScore
     gpu-database.json     → NVIDIA / Apple / AMD / Intel + webgpuVendorMap + 8 featuredPresets
-    sources-whitelist.json → research-agent allowed-fetch list (26 coreBenchKeys, 35 leaderboards)
+    sources-whitelist.json → research-agent allowed-fetch list (16 coreBenchKeys + 10 emerging + 3 deprecated, 35 leaderboards)
   i18n/             → content translations (tr.json + en.json, 323 keys each, 0 drift)
   scripts/          → skill helpers (stdlib-only Python + 2 Node scripts)
   auto/             → ds-tune harness (eval.py + bench.sh/bat + fixtures.json)

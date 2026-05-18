@@ -32,7 +32,13 @@
       "swePro",
       "mmluPro",
       "tau2",
-      "aime26"
+      "aime26",
+      "tbHard",
+      "cfElo",
+      "nl2Repo",
+      "aaCoding",
+      "aaAgentic",
+      "arcAgi2"
     ],
     "benchCategories": [
       {
@@ -757,22 +763,9 @@
       ]
     },
     "deprecatedBenchKeys": [
-      "aaAgentic",
-      "aaCoding",
-      "aaOmni",
-      "arcAgi2",
-      "bfcl",
-      "browseComp",
-      "cfElo",
-      "mcpA",
-      "mrcr",
-      "nl2Repo",
-      "programBench",
-      "simpleQa",
-      "sweMulti",
-      "tau3",
-      "tbHard",
-      "webDevElo"
+      "lcbV6",
+      "aider",
+      "aiderPoly"
     ],
     "huggingfaceExtraction": {
       "_purpose": "HF model card README scraping protocol — Phase 2 PER_MODEL_URL_EXPANSION priority chain",
@@ -796,21 +789,15 @@
       "addedDate": "2026-05-06"
     },
     "emergingBenchKeys": [
-      "sweMulti",
-      "browseComp",
       "mcpA",
-      "cfElo",
-      "mrcr",
-      "nl2Repo",
-      "aaOmni",
-      "tbHard",
-      "arcAgi2",
-      "bfcl",
       "webDevElo",
+      "browseComp",
+      "sweMulti",
+      "bfcl",
       "simpleQa",
+      "mrcr",
       "tau3",
-      "aaCoding",
-      "aaAgentic",
+      "aaOmni",
       "programBench"
     ],
     "_deprecatedBenchKeysNote": "FAZ 5.B/C 2026-05-09 split bench universe from 26 → 10 core keys. These 16 legacy keys still hold values in data/models.json (preserved for historical accuracy) but are no longer refreshed by gather agents and not surfaced in priorityCells. Audit accepts them as 'deprecated' rather than 'unknown'. Front-end may render them in a 'historical' section or hide entirely."
