@@ -7,7 +7,6 @@ import { applyI18n, loadI18n } from './i18n.js';
 import {
   applyPreset, resetWeights, syncPresetSelect, switchTheme, syncLangToggleUi,
   renderWeightsEditor, renderDeployStamp, populateProviderFilter,
-  renderPricingBaselineDropdown,
 } from './render-controls.js';
 import { renderAll, renderTable } from './render-table.js';
 import { renderPrivacyTable } from './render-privacy.js';
@@ -281,7 +280,6 @@ export function wireEvents() {
   wireSearchInput();
   wireFilterControls();
   wireGpuControls();
-  renderPricingBaselineDropdown(renderAll);
   wireExports();
   wireShareLink();
   wireUrlSync();
