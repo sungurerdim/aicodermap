@@ -63,6 +63,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 83.7,
+      "source": "Anthropic Blog",
+      "url": "https://www.anthropic.com/news/claude-haiku-4-5",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "claude-haiku-4-5.bench.aime26": [
@@ -174,6 +183,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 78.2,
+      "source": "Anthropic Blog",
+      "url": "https://www.anthropic.com/news/claude-haiku-4-5",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "claude-haiku-4-5.lcb": [
@@ -416,12 +434,12 @@
   "claude-haiku-4-5.sweV": [
     {
       "date": "2026-04-26",
-      "source": "https://www.anthropic.com/news/claude-haiku-4-5",
+      "source": "Anthropic Blog",
       "tier": "S",
-      "trustScore": 0.7,
+      "trustScore": 0.8,
       "url": "https://www.anthropic.com/news/claude-haiku-4-5",
       "value": 73.3,
-      "verifications": 1
+      "verifications": 2
     },
     {
       "date": "2026-04-26",
@@ -1181,6 +1199,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 24.3,
+      "source": "DeepSeek Blog",
+      "url": "https://arxiv.org/abs/2406.11931",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "deepseek-coder-v2-16b.mmluPro": [
@@ -1420,6 +1447,15 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 59.1,
+      "source": "DeepSeek Tech Report",
+      "url": "https://arxiv.org/abs/2501.12948",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "deepseek-r1-14b.hle": [
@@ -2379,6 +2415,25 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 67.8,
+      "source": "Artificial Analysis",
+      "url": "https://artificialanalysis.ai/models/deepseek-v3-2",
+      "date": "2026-05-19",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.85
+    },
+    {
+      "value": 72.0,
+      "source": "Community Blog",
+      "url": "https://blog.neverendingai.com/deepseek-v3-2-full-analysis",
+      "date": "2026-05-19",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.4,
+      "contradictionRole": "loser"
     }
   ],
   "deepseek-v3-2.tb2": [
@@ -4026,12 +4081,12 @@
     },
     {
       "value": 72.2,
-      "source": "Mistral blog",
+      "source": "Mistral Blog",
       "url": "https://mistral.ai/news/devstral-2",
       "date": "2026-05-18",
       "tier": "S",
-      "verifications": 3,
-      "trustScore": 0.7
+      "verifications": 2,
+      "trustScore": 0.8
     },
     {
       "value": 72.2,
@@ -4739,6 +4794,15 @@
       "url": "https://artificialanalysis.ai/models/devstral-small-2",
       "value": 68.0,
       "verifications": 2
+    },
+    {
+      "value": 68.0,
+      "source": "Mistral Blog",
+      "url": "https://mistral.ai/news/devstral-2",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "devstral-small-2.tau2": [
@@ -4828,6 +4892,15 @@
       "url": "https://artificialanalysis.ai/models/gemini-3-flash-reasoning",
       "value": 71.0,
       "verifications": 2
+    },
+    {
+      "value": 71,
+      "source": "Artificial Analysis",
+      "url": "https://artificialanalysis.ai/models/gemini-3-1-flash",
+      "date": "2026-05-19",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.85
     }
   ],
   "gemini-3-1-flash.bench.gpqa": [
@@ -5122,6 +5195,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 90.8,
+      "source": "LiveCodeBench",
+      "url": "https://livecodebench.github.io/leaderboard.html",
+      "date": "2026-05-19",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.85
     }
   ],
   "gemini-3-1-flash.mmluPro": [
@@ -5356,6 +5438,15 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 78.0,
+      "source": "Artificial Analysis",
+      "url": "https://artificialanalysis.ai/models/gemini-3-1-flash",
+      "date": "2026-05-19",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.85
     }
   ],
   "gemini-3-1-flash.tau2": [
@@ -5609,6 +5700,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 77.1,
+      "source": "Google DeepMind Blog",
+      "url": "https://deepmind.google/models/gemini/gemini-3-1-pro",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "gemini-3-1-pro.bench.gpqa": [
@@ -5935,6 +6035,15 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 94.1,
+      "source": "Google DeepMind Blog",
+      "url": "https://deepmind.google/models/gemini/gemini-3-1-pro",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 3,
+      "trustScore": 0.95
     }
   ],
   "gemini-3-1-pro.hle": [
@@ -6241,6 +6350,15 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 84.9,
+      "source": "Google DeepMind Blog",
+      "url": "https://deepmind.google/models/gemini/gemini-3-1-pro",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "gemini-3-1-pro.pricing.api": [
@@ -6456,6 +6574,15 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 80.6,
+      "source": "Artificial Analysis",
+      "url": "https://artificialanalysis.ai/models/gemini-3-1-pro",
+      "date": "2026-05-19",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.85
     }
   ],
   "gemini-3-1-pro.tau2": [
@@ -6809,6 +6936,15 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 63.0,
+      "source": "Google Tech Report",
+      "url": "https://arxiv.org/abs/2503.19786",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "gemma-3-27b.hle": [
@@ -7418,6 +7554,15 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 78.5,
+      "source": "Google Tech Report",
+      "url": "https://storage.googleapis.com/deepmind-media/gemma/gemma4-technical-report.pdf",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "gemma-4-26b-moe.hle": [
@@ -9139,6 +9284,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 60.8,
+      "source": "Zhipu Blog",
+      "url": "https://open.bigmodel.cn/blog/glm-4-5-air-launch",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "glm-4-7.aaIdx": [
@@ -9603,6 +9757,15 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 73.8,
+      "source": "Zhipu Blog",
+      "url": "https://open.bigmodel.cn/blog/glm-4-7-launch",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "glm-4-7.tau2": [
@@ -10791,7 +10954,7 @@
       "date": "2026-05-18",
       "tier": "I",
       "verifications": 2,
-      "trustScore": 0.93
+      "trustScore": 0.85
     },
     {
       "value": 79.2,
@@ -12539,6 +12702,26 @@
       "url": "https://llm-stats.com/benchmarks/swe-bench-verified",
       "value": 82.6,
       "verifications": 2
+    },
+    {
+      "value": 88.7,
+      "source": "OpenAI Blog",
+      "url": "https://openai.com/index/gpt-5-5",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.85,
+      "contradictionRole": "winner"
+    },
+    {
+      "value": 82.6,
+      "source": "Vals.ai",
+      "url": "https://www.vals.ai/benchmarks/swe-bench-verified",
+      "date": "2026-05-19",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.75,
+      "contradictionRole": "loser"
     }
   ],
   "gpt-5-5.tau2": [
@@ -12758,6 +12941,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 79.1,
+      "source": "xAI Blog",
+      "url": "https://x.ai/news/grok-3-mini",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "grok-3-mini.hle": [
@@ -12976,12 +13168,12 @@
     },
     {
       "date": "2026-05-10",
-      "source": "https://artificialanalysis.ai/models/grok-3",
+      "source": "Artificial Analysis",
       "tier": "I",
-      "trustScore": 0.3333,
+      "trustScore": 0.85,
       "url": "https://artificialanalysis.ai/models/grok-3",
       "value": 84.6,
-      "verifications": 4
+      "verifications": 2
     },
     {
       "date": "2026-05-11",
@@ -14568,6 +14760,26 @@
       "url": "https://artificialanalysis.ai/models/grok-4-3",
       "value": 93.2,
       "verifications": 1
+    },
+    {
+      "value": 90.1,
+      "source": "Artificial Analysis",
+      "url": "https://artificialanalysis.ai/models/grok-4-3",
+      "date": "2026-05-19",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.85,
+      "contradictionRole": "winner"
+    },
+    {
+      "value": 88.0,
+      "source": "xAI Blog",
+      "url": "https://x.ai/news/grok-4-3",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7,
+      "contradictionRole": "loser"
     }
   ],
   "grok-4-3.hle": [
@@ -16818,6 +17030,26 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 57.2,
+      "source": "Meta Blog",
+      "url": "https://ai.meta.com/blog/llama-4-scout",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.85,
+      "contradictionRole": "winner"
+    },
+    {
+      "value": 74.3,
+      "source": "Community Blog",
+      "url": "https://blog.eleuther.ai/llama4-review",
+      "date": "2026-05-19",
+      "tier": "C",
+      "verifications": 1,
+      "trustScore": 0.4,
+      "contradictionRole": "loser"
     }
   ],
   "llama-4-scout.lcb": [
@@ -18169,6 +18401,16 @@
       "verifications": 2,
       "trustScore": 1.0,
       "contradictionRole": "winner"
+    },
+    {
+      "value": 84.3,
+      "source": "HuggingFace",
+      "url": "https://huggingface.co/XiaomiMiMo/MiMo-7B-V2-Flash",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7,
+      "contradictionRole": "loser"
     }
   ],
   "mimo-v2-flash.hle": [
@@ -19288,6 +19530,15 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 74.0,
+      "source": "MiniMax Blog",
+      "url": "https://www.minimaxi.com/news/minimax-m2-1-launch",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "minimax-m2-1.tau2": [
@@ -19760,6 +20011,15 @@
       "tier": "I",
       "verifications": 2,
       "trustScore": 0.93
+    },
+    {
+      "value": 65.0,
+      "source": "MiniMax Blog",
+      "url": "https://www.minimaxi.com/news/minimax-m2-5-launch",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "minimax-m2-5.mmluPro": [
@@ -20036,6 +20296,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 80.2,
+      "source": "MiniMax Blog",
+      "url": "https://www.minimaxi.com/news/minimax-m2-5-launch",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "minimax-m2-7.aaIdx": [
@@ -20634,6 +20903,15 @@
       "tier": "S",
       "verifications": 2,
       "trustScore": 0.7
+    },
+    {
+      "value": 78.0,
+      "source": "MiniMax Blog",
+      "url": "https://www.minimaxi.com/news/minimax-m2-7-launch",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "minimax-m2-7.tau2": [
@@ -20892,6 +21170,15 @@
       "date": "2026-05-18",
       "tier": "S",
       "verifications": 2,
+      "trustScore": 0.7
+    },
+    {
+      "value": 43.9,
+      "source": "Mistral Blog",
+      "url": "https://mistral.ai/news/mistral-large-3",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
       "trustScore": 0.7
     }
   ],
@@ -21358,6 +21645,15 @@
       "tier": "I",
       "verifications": 2,
       "trustScore": 0.93
+    },
+    {
+      "value": 77.6,
+      "source": "Mistral Blog",
+      "url": "https://mistral.ai/news/mistral-medium-3-5",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "mistral-medium-3-5.tau2": [
@@ -22326,6 +22622,15 @@
       "tier": "S",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 91.6,
+      "source": "OpenAI Blog",
+      "url": "https://openai.com/index/o3",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "o3.arcAgi2": [
@@ -22710,6 +23015,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 69.1,
+      "source": "Artificial Analysis",
+      "url": "https://artificialanalysis.ai/models/o3",
+      "date": "2026-05-19",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.85
     }
   ],
   "o3.tau2": [
@@ -22800,12 +23114,12 @@
     },
     {
       "value": 99.5,
-      "source": "OpenAI",
+      "source": "OpenAI Blog",
       "url": "https://openai.com/index/o4-mini",
       "date": "2026-05-18",
       "tier": "S",
-      "verifications": 1,
-      "trustScore": 0.35
+      "verifications": 2,
+      "trustScore": 0.85
     },
     {
       "value": 92.7,
@@ -22815,6 +23129,16 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": 0.2,
+      "contradictionRole": "loser"
+    },
+    {
+      "value": 92.7,
+      "source": "Artificial Analysis",
+      "url": "https://artificialanalysis.ai/models/o4-mini",
+      "date": "2026-05-19",
+      "tier": "I",
+      "verifications": 1,
+      "trustScore": 0.75,
       "contradictionRole": "loser"
     }
   ],
@@ -23222,12 +23546,12 @@
   "opus-4-7.aaIdx": [
     {
       "date": "2026-04-20",
-      "source": "https://artificialanalysis.ai/models/claude-opus-4-7",
+      "source": "Artificial Analysis",
       "tier": "I",
-      "trustScore": 1.0,
+      "trustScore": 0.85,
       "url": "https://artificialanalysis.ai/models/claude-opus-4-7",
       "value": 57,
-      "verifications": 1
+      "verifications": 2
     },
     {
       "date": "2026-04-28",
@@ -23692,12 +24016,12 @@
     },
     {
       "value": 54.7,
-      "source": "https://www.anthropic.com/news/claude-opus-4-7",
+      "source": "Anthropic Blog",
       "url": "https://www.anthropic.com/news/claude-opus-4-7",
       "date": "2026-05-18",
       "tier": "S",
-      "verifications": 1,
-      "trustScore": null
+      "verifications": 2,
+      "trustScore": 0.8
     },
     {
       "value": 54.7,
@@ -23741,12 +24065,12 @@
   "opus-4-7.mcpA": [
     {
       "date": "2026-04-16",
-      "source": "https://www.anthropic.com/news/claude-opus-4-7",
+      "source": "Anthropic Blog",
       "tier": "S",
-      "trustScore": 0.233,
+      "trustScore": 0.95,
       "url": "https://www.anthropic.com/news/claude-opus-4-7",
       "value": 77.3,
-      "verifications": 1
+      "verifications": 3
     },
     {
       "date": "2026-04-29",
@@ -23975,17 +24299,26 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 64.3,
+      "source": "Artificial Analysis",
+      "url": "https://artificialanalysis.ai/models/claude-opus-4-7",
+      "date": "2026-05-19",
+      "tier": "I",
+      "verifications": 3,
+      "trustScore": 1.0
     }
   ],
   "opus-4-7.sweV": [
     {
       "date": "2026-04-16",
-      "source": "https://www.anthropic.com/news/claude-opus-4-7",
+      "source": "Anthropic Blog",
       "tier": "S",
-      "trustScore": 0.7,
+      "trustScore": 0.95,
       "url": "https://www.anthropic.com/news/claude-opus-4-7",
       "value": 87.6,
-      "verifications": 1
+      "verifications": 3
     },
     {
       "date": "2026-04-20",
@@ -24098,12 +24431,12 @@
   "opus-4-7.tb2": [
     {
       "date": "2026-04-16",
-      "source": "https://www.anthropic.com/news/claude-opus-4-7",
+      "source": "Anthropic Blog",
       "tier": "S",
-      "trustScore": 0.555,
+      "trustScore": 0.8,
       "url": "https://www.anthropic.com/news/claude-opus-4-7",
       "value": 69.4,
-      "verifications": 1
+      "verifications": 2
     },
     {
       "date": "2026-04-26",
@@ -24125,12 +24458,12 @@
     },
     {
       "date": "2026-04-30",
-      "source": "vals.ai Terminal-Bench 2",
+      "source": "Vals.ai Terminal Bench 2",
       "tier": "I",
-      "trustScore": 0.3333,
+      "trustScore": 0.75,
       "url": "https://www.vals.ai/benchmarks/terminal-bench-2",
       "value": 68.54,
-      "verifications": 5
+      "verifications": 1
     },
     {
       "date": "2026-05-06",
@@ -24212,6 +24545,15 @@
       "tier": "I",
       "verifications": 2,
       "trustScore": 1.0
+    },
+    {
+      "value": 69.4,
+      "source": "BenchLM",
+      "url": "https://benchlm.ai/benchmarks/terminalBench2",
+      "date": "2026-05-19",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.85
     }
   ],
   "qwen-3-6-27b.aaIdx": [
@@ -24635,6 +24977,15 @@
       "tier": "S",
       "verifications": 2,
       "trustScore": 0.7
+    },
+    {
+      "value": 77.2,
+      "source": "Qwen Blog",
+      "url": "https://qwenlm.github.io/blog/qwen3-6",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "qwen-3-6-27b.tau2": [
@@ -25099,6 +25450,15 @@
       "url": "https://qwen.ai/blog?id=qwen3.6-max-preview",
       "value": 58.4,
       "verifications": 1
+    },
+    {
+      "value": 57.3,
+      "source": "Qwen Blog",
+      "url": "https://qwenlm.github.io/blog/qwen3-6",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "qwen-3-6-max.sweV": [
@@ -25217,6 +25577,15 @@
       "url": "https://llm-stats.com/benchmarks/livecodebench",
       "value": 37.6,
       "verifications": 1
+    },
+    {
+      "value": 53.0,
+      "source": "Qwen Blog",
+      "url": "https://qwenlm.github.io/blog/qwen2-5-coder",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "qwen25-coder-14b.swePro": [
@@ -25324,6 +25693,15 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 63.8,
+      "source": "Qwen Blog",
+      "url": "https://qwenlm.github.io/blog/qwen2-5-coder",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "qwen25-coder-32b.mmluPro": [
@@ -25537,6 +25915,15 @@
       "url": "https://ai-scholar.tech/en/articles/large-language-models/Qwen2.5-Coder",
       "value": 37.6,
       "verifications": 2
+    },
+    {
+      "value": 42.8,
+      "source": "Qwen Blog",
+      "url": "https://qwenlm.github.io/blog/qwen2-5-coder",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "qwen25-coder-7b.open": [
@@ -25910,8 +26297,8 @@
       "url": "https://artificialanalysis.ai/models/qwen3-235b",
       "date": "2026-05-18",
       "tier": "I",
-      "verifications": 1,
-      "trustScore": 0.5
+      "verifications": 2,
+      "trustScore": 0.9
     },
     {
       "value": 84.4,
@@ -25949,6 +26336,16 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 81.1,
+      "source": "Qwen Blog",
+      "url": "https://qwenlm.github.io/blog/qwen3",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7,
+      "contradictionRole": "loser"
     }
   ],
   "qwen3-235b.hle": [
@@ -26114,6 +26511,25 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 74.1,
+      "source": "llm-stats",
+      "url": "https://llm-stats.com/benchmarks/livecodebench",
+      "date": "2026-05-19",
+      "tier": "I",
+      "verifications": 2,
+      "trustScore": 0.85
+    },
+    {
+      "value": 70.7,
+      "source": "Qwen Blog",
+      "url": "https://qwenlm.github.io/blog/qwen3",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7,
+      "contradictionRole": "loser"
     }
   ],
   "qwen3-235b.mmluPro": [
@@ -26601,6 +27017,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 66.8,
+      "source": "Qwen Blog",
+      "url": "https://qwenlm.github.io/blog/qwen3",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "qwen3-32b.hle": [
@@ -27045,6 +27470,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 81.7,
+      "source": "Qwen Blog",
+      "url": "https://qwenlm.github.io/blog/qwen3-5",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "qwen3-5-9b.lcb": [
@@ -27730,6 +28164,15 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 73.4,
+      "source": "Qwen Blog",
+      "url": "https://qwenlm.github.io/blog/qwen3-6",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ],
   "qwen3-6-35b-moe.tau2": [
@@ -28157,12 +28600,12 @@
     },
     {
       "value": 78.8,
-      "source": "Qwen blog",
+      "source": "Qwen Blog",
       "url": "https://qwenlm.github.io/blog/qwen3-6",
       "date": "2026-05-18",
       "tier": "S",
-      "verifications": 3,
-      "trustScore": 0.7
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "qwen3-6-plus.tau2": [
@@ -28867,7 +29310,7 @@
     },
     {
       "value": 66.5,
-      "source": "Qwen blog",
+      "source": "Qwen Blog",
       "url": "https://qwenlm.github.io/blog/qwen3-coder",
       "date": "2026-05-18",
       "tier": "S",
@@ -29059,6 +29502,26 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 68.4,
+      "source": "arxiv tech report",
+      "url": "https://arxiv.org/abs/2506.09964",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.75,
+      "contradictionRole": "winner"
+    },
+    {
+      "value": 53.7,
+      "source": "Qwen website",
+      "url": "https://qwen.ai/models/qwen3-coder-next",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7,
+      "contradictionRole": "loser"
     }
   ],
   "qwen3-coder-next.pricing.api.openrouter": [
@@ -29267,6 +29730,15 @@
       "tier": "S",
       "verifications": 2,
       "trustScore": 0.7
+    },
+    {
+      "value": 70.6,
+      "source": "Qwen arxiv",
+      "url": "https://arxiv.org/abs/2506.09964",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.85
     }
   ],
   "qwen3-coder-next.tb2": [
@@ -29318,12 +29790,12 @@
     },
     {
       "date": "2026-05-08",
-      "source": "Artificial Analysis Intelligence Index non-reasoning high-effort variant",
+      "source": "Artificial Analysis",
       "tier": "I",
-      "trustScore": 0.3333,
+      "trustScore": 0.85,
       "url": "https://artificialanalysis.ai/models/claude-sonnet-4-6",
       "value": 52,
-      "verifications": 3
+      "verifications": 2
     },
     {
       "value": 52.0,
@@ -29601,6 +30073,15 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": null
+    },
+    {
+      "value": 89.9,
+      "source": "Anthropic System Card",
+      "url": "https://www.anthropic.com/claude-sonnet-4-6-system-card",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "sonnet-4-6.hle": [
@@ -29639,6 +30120,15 @@
       "url": "https://lmcouncil.ai/benchmarks",
       "value": 32.4,
       "verifications": 1
+    },
+    {
+      "value": 51.0,
+      "source": "Anthropic Blog",
+      "url": "https://www.anthropic.com/news/claude-opus-4-6",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 2,
+      "trustScore": 0.8
     }
   ],
   "sonnet-4-6.lcb": [
@@ -30014,12 +30504,12 @@
     },
     {
       "date": "2026-05-18",
-      "source": "https://www.vellum.ai/llm-leaderboard",
+      "source": "Vellum Leaderboard",
       "tier": "I",
       "trustScore": 1.0,
       "url": "https://www.vellum.ai/llm-leaderboard",
       "value": 79.6,
-      "verifications": 1
+      "verifications": 3
     },
     {
       "value": 72.7,
@@ -31300,6 +31790,37 @@
       "tier": "C",
       "verifications": 1,
       "trustScore": null
+    }
+  ],
+  "minimax-m2-1.bfcl": [
+    {
+      "value": 37.4,
+      "source": "Vertu MiniMax M2.5 Benchmarks",
+      "url": "https://vertu.com/ai-tools/minimax-m2-5-officially-released-comprehensive-benchmarks-comparison/",
+      "date": "2026-05-19",
+      "tier": "C",
+      "verifications": 2,
+      "trustScore": 0.4
+    },
+    {
+      "value": 37.4,
+      "source": "Medium MiniMax M2.5",
+      "url": "https://medium.com/@mlabonne/minimax-m2-5-the-1-hour-frontier-model-92168de195b8",
+      "date": "2026-05-19",
+      "tier": "C",
+      "verifications": 2,
+      "trustScore": 0.4
+    }
+  ],
+  "grok-3.mrcr": [
+    {
+      "value": 91.5,
+      "source": "xAI Grok 3 Announcement",
+      "url": "https://x.ai/news/grok-3",
+      "date": "2026-05-19",
+      "tier": "S",
+      "verifications": 1,
+      "trustScore": 0.7
     }
   ]
 }

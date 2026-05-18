@@ -1,0 +1,150 @@
+{
+  "cycleEndedAt": "2026-05-18T22:56:12Z",
+  "cycleStartedAt": "2026-05-18T22:56:12Z",
+  "perBatch": [
+    {
+      "agentGaps": 19,
+      "batchId": "batch00-anthropic",
+      "fills": 50,
+      "gaps": 19,
+      "naCount": 6,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 0,
+      "wallclockSec": 280.0
+    },
+    {
+      "agentGaps": 22,
+      "batchId": "batch01-deepseek",
+      "fills": 54,
+      "gaps": 22,
+      "naCount": 23,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 18,
+      "wallclockSec": 300.0
+    },
+    {
+      "agentGaps": 15,
+      "batchId": "batch02-google_deepm",
+      "fills": 64,
+      "gaps": 15,
+      "naCount": 10,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 14,
+      "wallclockSec": 280.0
+    },
+    {
+      "agentGaps": 8,
+      "batchId": "batch03-minimax",
+      "fills": 40,
+      "gaps": 8,
+      "naCount": 19,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 18,
+      "wallclockSec": 180.0
+    },
+    {
+      "agentGaps": 23,
+      "batchId": "batch04-mistral_ai",
+      "fills": 20,
+      "gaps": 23,
+      "naCount": 61,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 22,
+      "wallclockSec": 420.0
+    },
+    {
+      "agentGaps": 6,
+      "batchId": "batch05-openai",
+      "fills": 46,
+      "gaps": 6,
+      "naCount": 67,
+      "orchestratorGaps": 0,
+      "partialReason": "o3/o4-mini missing lcbV6, bfcl confirmed gaps; gpt-4-1 missing tau2, tb2, swePro confirmed N/A candidates; gpt-5-4/gpt-5-5 missing lcbV6, aider, hle partially attempted",
+      "toolCallCount": 24,
+      "wallclockSec": 180.0
+    },
+    {
+      "agentGaps": 24,
+      "batchId": "batch06-alibaba_qwen",
+      "fills": 39,
+      "gaps": 24,
+      "naCount": 8,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 18,
+      "wallclockSec": 280.0
+    },
+    {
+      "agentGaps": 4,
+      "batchId": "batch07-alibaba_qwen",
+      "fills": 25,
+      "gaps": 4,
+      "naCount": 67,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 26,
+      "wallclockSec": 420.0
+    },
+    {
+      "agentGaps": 30,
+      "batchId": "batch08-xai",
+      "fills": 37,
+      "gaps": 30,
+      "naCount": 18,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 9,
+      "wallclockSec": 180.0
+    },
+    {
+      "agentGaps": 25,
+      "batchId": "batch09-xiaomi",
+      "fills": 35,
+      "gaps": 25,
+      "naCount": 11,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 11,
+      "wallclockSec": 280.0
+    },
+    {
+      "agentGaps": 10,
+      "batchId": "batch10-z_ai__zhipu_",
+      "fills": 47,
+      "gaps": 10,
+      "naCount": 5,
+      "orchestratorGaps": 0,
+      "partialReason": "GLM-4.5-Air individual per-benchmark scores (sweV, gpqa, lcb, tb2, hle) not broken out from flagship GLM-4.5 in publicly available sources; only composite rank and tau-bench airline (60.8%) found. GLM-5.1 sweV pending as self-report vs independent distinction unclear.",
+      "toolCallCount": 14,
+      "wallclockSec": 240.0
+    },
+    {
+      "agentGaps": 18,
+      "batchId": "batch11-meta",
+      "fills": 43,
+      "gaps": 18,
+      "naCount": 12,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 14,
+      "wallclockSec": 280.0
+    }
+  ],
+  "totalBatches": 12,
+  "totals": {
+    "agentGaps": 204,
+    "fills": 500,
+    "gaps": 204,
+    "na": 307,
+    "orchestratorGaps": 0,
+    "toolCallSum": 188,
+    "wallclockSecMax": 420.0,
+    "wallclockSecP95": 420.0
+  },
+  "zeroFillBatches": []
+}

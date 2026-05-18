@@ -1,4 +1,30 @@
 
+## [2026-05-19] — autonomous refresh-all [WARN: very low cumulative provenance coverage 45.3%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 138 new fills; 429 cells auto-gapped by orchestrator; 1 explicit agent gaps preserved]
+
+[fillRatio:0.45 cells:461/1020 contradictions:10 fetch:0.0min tools:None batches:None build:fb2f730]
+
+### Updated
+- 34 models: `opus-4-7`, `sonnet-4-6`, `claude-haiku-4-5`, `deepseek-v3-2`, `deepseek-r1-14b`, `gemma-3-27b`, `gemma-4-26b-moe`, `minimax-m2-5`, `minimax-m2-7`, `minimax-m2-1`, `mistral-large-3`, `mistral-medium-3-5`, `devstral-2`, `devstral-small-2`, `gpt-4-1`, `o3`, `o4-mini`, `qwen3-235b`, `qwen3-32b`, `qwen3-coder-480b`, `qwen-3-6-27b`, `qwen3-6-35b-moe`, `qwen3-6-plus`, `qwen-3-6-max`, `qwen3-coder-next`, `qwen3-5-9b`, `grok-3`, `grok-3-mini`, `glm-4-5-air`, `glm-4-7`, `qwen25-coder-7b`, `qwen25-coder-14b`, `qwen25-coder-32b`, `deepseek-coder-v2-16b`
+
+### Resolved (auto via trustScore)
+- qwen3-235b.gpqa: winner={'value': 70.0, 'trustScore': 0.9, 'sourceUrl': 'https://artificialanalysis.ai/models/qwen3-235b', 'tier': 'I'} (severity=RED, Δ11.1)
+- qwen3-235b.lcb: winner={'value': 74.1, 'trustScore': 0.85, 'sourceUrl': 'https://llm-stats.com/benchmarks/livecodebench', 'tier': 'I'} (severity=AMBER, Δ3.4)
+- o4-mini.aime26: winner={'value': 99.5, 'trustScore': 0.85, 'sourceUrl': 'https://openai.com/index/o4-mini', 'tier': 'S'} (severity=RED, Δ6.8)
+- gpt-5-5.sweV: winner={'value': 88.7, 'trustScore': 0.85, 'sourceUrl': 'https://openai.com/index/gpt-5-5', 'tier': 'S'} (severity=RED, Δ6.1)
+- llama-4-scout.gpqa: winner={'value': 57.2, 'trustScore': 0.85, 'sourceUrl': 'https://ai.meta.com/blog/llama-4-scout', 'tier': 'S'} (severity=RED, Δ17.1)
+- qwen3-coder-next.lcb: winner={'value': 68.4, 'trustScore': 0.75, 'sourceUrl': 'https://arxiv.org/abs/2506.09964', 'tier': 'S'} (severity=RED, Δ14.7)
+- deepseek-v3-2.sweV: winner={'value': 67.8, 'trustScore': 0.85, 'sourceUrl': 'https://artificialanalysis.ai/models/deepseek-v3-2', 'tier': 'I'} (severity=AMBER, Δ4.2)
+- grok-4-3.gpqa: winner={'value': 90.1, 'trustScore': 0.85, 'sourceUrl': 'https://artificialanalysis.ai/models/grok-4-3', 'tier': 'I'} (severity=GREEN, Δ2.1)
+- mimo-v2-flash.gpqa: winner={'value': 83.7, 'trustScore': 0.7, 'sourceUrl': 'https://github.com/XiaomiMiMo/MiMo', 'tier': 'S'} (severity=GREEN, Δ0.6)
+- opus-4-7.tb2: winner={'value': 69.4, 'trustScore': 0.8, 'sourceUrl': 'https://www.anthropic.com/news/claude-opus-4-7', 'tier': 'S'} (severity=GREEN, Δ0.86)
+
+### Gaps (430 entries — agent:1 orchestrator:429 — see data/known-gaps.json or next refresh)
+- `opus-4-7.tau2` *(agent)*: Not published on any surveyed leaderboard for this model
+- `claude-haiku-4-5.aaAgentic` *(orchestrator)*: not reached in agent survey cycle; AA Agentic data unavailable
+- `claude-haiku-4-5.aaCoding` *(orchestrator)*: not reached in agent survey cycle; AA Coding data unavailable
+- ... and 427 more
+
+
 ## [2026-05-18] — autonomous refresh-all [WARN: very low cumulative provenance coverage 47.6%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 214 new fills; 377 cells auto-gapped by orchestrator; 6 explicit agent gaps preserved]
 
 [fillRatio:0.47 cells:452/960 contradictions:12 fetch:0.0min tools:None batches:None build:8a1e0a0]
