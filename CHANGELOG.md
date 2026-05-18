@@ -1,4 +1,26 @@
 
+## [2026-05-18] — autonomous refresh-all [WARN: cumulative provenance coverage 70.8% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 117 new fills; 3 cells auto-gapped by orchestrator; 87 explicit agent gaps preserved]
+
+[fillRatio:0.70 cells:421/600 contradictions:7 fetch:0.0min tools:None batches:None build:7c7fe54]
+
+### Updated
+- 29 models: `opus-4-7`, `sonnet-4-6`, `claude-haiku-4-5`, `deepseek-v3-2`, `deepseek-r1-14b`, `deepseek-coder-v2-16b`, `deepseek-v4-flash`, `deepseek-v4-pro`, `gemini-3-1-pro`, `gemini-3-1-flash`, `minimax-m2-5`, `minimax-m2-1`, `mistral-medium-3-5`, `devstral-2`, `mistral-large-3`, `gpt-5-5`, `gpt-5-4`, `qwen3-235b`, `qwen3-32b`, `qwen3-6-35b-moe`, `qwen3-coder-next`, `grok-4-20`, `grok-4-3`, `mimo-v2-5`, `mimo-v2-5-pro`, `glm-5-1`, `glm-4-7`, `llama-4-maverick`, `llama-4-scout`
+
+### Resolved (auto via trustScore)
+- deepseek-v3-2.sweV: winner={'value': 74.2, 'trustScore': 0.67, 'sourceUrl': 'https://marc0.dev/leaderboard', 'tier': 'I'} (severity=RED, Δ15.5)
+- grok-4-20.sweV: winner={'value': 76.7, 'trustScore': 0.67, 'sourceUrl': 'https://marc0.dev/leaderboard', 'tier': 'I'} (severity=RED, Δ18.1)
+- llama-4-maverick.sweV: winner={'value': 76.8, 'trustScore': 0.67, 'sourceUrl': 'https://www.vellum.ai/open-llm-leaderboard', 'tier': 'I'} (severity=RED, Δ18.2)
+- minimax-m2-5.swePro: winner={'value': 55.4, 'trustScore': 0.7, 'sourceUrl': 'https://platform.minimaxi.com', 'tier': 'S'} (severity=RED, Δ24.8)
+- mimo-v2-5-pro.gpqa: winner={'value': 86.6, 'trustScore': 0.67, 'sourceUrl': 'https://artificialanalysis.ai/models/mimo-v2-5-pro', 'tier': 'I'} (severity=RED, Δ19.9)
+- minimax-m2-1.gpqa: winner={'value': 80.5, 'trustScore': 0.7, 'sourceUrl': 'https://platform.minimaxi.com', 'tier': 'S'} (severity=YELLOW, Δ5.0)
+- deepseek-v3-2.aime26: winner={'value': 89.3, 'trustScore': 0.7, 'sourceUrl': 'https://api.deepseek.com/v3', 'tier': 'S'} (severity=RED, Δ9.8)
+
+### Gaps (90 entries — agent:0 orchestrator:90 — see data/known-gaps.json or next refresh)
+- `claude-haiku-4-5.hle` *(orchestrator)*: not reached in agent survey cycle; Humanity's Last Exam data unavailable
+- `codestral-22b.aime26` *(orchestrator)*: not reached in agent survey cycle; AIME 2026 data unavailable
+- ... and 88 more
+
+
 ## [2026-05-14] — autonomous refresh-all [WARN: cumulative provenance coverage 75.2% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 216 new fills; 58 cells auto-gapped by orchestrator; 149 explicit agent gaps preserved]
 
 [fillRatio:0.69 cells:414/600 contradictions:5 fetch:0.0min tools:None batches:None build:cd09a5f]

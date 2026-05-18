@@ -100,9 +100,18 @@ def main() -> int:
             return rc
         rc_total |= rc
 
-    # 2. .aicodermap-gap-gen.py (project-root script)
+    # 2. scripts/gap_gen.py (F1.3: moved from project root to scripts/)
     if not args.skip_gap_gen:
-        gapgen = PROJECT / ".aicodermap-gap-gen.py"
+        # Canonical path (F1.3); backwards-compat fallback to old root location.
+        gapgen = SCRIPTS / "gap_gen.py"
+        if not gapgen.is_file():
+            gapgen = PROJECT / ".aicodermap-gap-gen.py"
+            if gapgen.is_file():
+                print(
+                    "\n=== gap-gen === ⚠ using legacy root path (.aicodermap-gap-gen.py); "
+                    "update to scripts/gap_gen.py",
+                    flush=True,
+                )
         if gapgen.is_file():
             rc = runner(gapgen, name="gap-gen")
             if rc != 0:
@@ -114,7 +123,9 @@ def main() -> int:
             rc_total |= rc
         else:
             print("\n=== gap-gen ===", flush=True)
-            print(f"  ! gap-gen script missing at {gapgen}; skipping", flush=True)
+            print(
+                "  ! gap-gen script missing at scripts/gap_gen.py; skipping", flush=True
+            )
 
     # 3. merge.py
     if not args.skip_merge:

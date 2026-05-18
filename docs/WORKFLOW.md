@@ -1,3 +1,5 @@
+<!-- AUTO-GENERATED FROM SKILL.md - DO NOT EDIT MANUALLY -->
+
 # AICoderMap — Workflow Documentation
 
 **Version:** 1.0 | **April 24, 2026** | **Audience:** Sungur (operational reference)
@@ -12,7 +14,7 @@
 ├──────────────────────────────────────────────────────────────────┤
 │ 1. User → Claude Code → /aicodermap (skill invoke)    │
 │ 2. Skill reads idea context (last launch, known models, defs)    │
-│ 3. Skill asks: "Full refresh? Specific model? New release?"      │
+│ 3. Skill resolves scope (refresh-all / specific / new-release)   │
 │ 4. Scope selection:                                              │
 │    - Full refresh → all models                                   │
 │    - Specific model → single-model deep                          │
@@ -28,10 +30,10 @@
 │    - Changed fields highlight                                    │
 │    - New models list                                             │
 │    - Contradictions table                                        │
-│10. User review + approve (or override per-entry)                 │
+│10. Skill auto-validates diff (no manual approval — autonomous)    │
 │11. Skill writes data/models.json + data/sources.json             │
 │12. Skill appends CHANGELOG.md entry                              │
-│13. User git commit + push (or skill auto with confirmation)      │
+│13. Skill: git add + commit + push (auto on clean self-check)      │
 │14. GitHub Pages auto-deploy (~1-2 min) → confirmation            │
 └──────────────────────────────────────────────────────────────────┘
 ```
@@ -227,7 +229,7 @@ satisfied OR with explicit rollback.
    key with its human-readable aliases.
 3. `data/sources-whitelist.json.leaderboards[*].publishes` — at least ONE
    leaderboard entry must list the key (else AC6 blocks).
-4. `assets/js/core.js BENCH_KEYS` — append to mirror canonical universe.
+4. Run `python scripts/gen-bench-keys.py` (auto-syncs core.js BENCH_KEYS from whitelist).
 5. `assets/js/core.js DEFAULT_WEIGHTS` and any `PRESETS[*]` — add weight slots.
 6. `i18n/{tr,en}.json` `benchmarks.*` — add `short` + `name` for both locales.
 7. Run `python scripts/audit-data-coherence.py && python scripts/audit-bench-source-mapping.py`

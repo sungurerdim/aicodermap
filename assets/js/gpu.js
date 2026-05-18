@@ -80,18 +80,56 @@ export async function detectGpu() {
       info = await adapter.requestAdapterInfo();
     }
     if (!info) return null;
+
     const vendor = (info.vendor || '').toLowerCase().replace(/\s+/g, '_');
-    const arch = (info.architecture || info.device || '').toLowerCase().replace(/\s+/g, '_');
-    const candidates = [`${vendor}_${arch}`, vendor, arch];
-    for (const c of candidates) {
-      const path = State.gpu.webgpuVendorMap?.[c];
-      if (path) {
-        const [g, m] = path.split('.');
-        const found = State.gpu[g]?.[m];
-        if (found) return { id: path, ...found };
+    const arch = (info.architecture || '').toLowerCase();
+    const device = (info.device || '').toLowerCase().replace(/\s+/g, '_');
+    const vmap = State.gpu.webgpuVendorMap || {};
+    // Support old flat format (no byModel key) for backwards compat during transition
+    const byModel = (vmap.byModel && typeof vmap.byModel === 'object') ? vmap.byModel : vmap;
+    const byArch = vmap.byArchitecture || null;
+
+    // 1. byModel exact match — tries vendor+device, vendor+arch, vendor alone, device alone
+    const modelKeys = [
+      vendor && device ? `${vendor}_${device}` : '',
+      vendor && arch ? `${vendor}_${arch.replace(/-/g, '_')}` : '',
+      vendor,
+      device,
+    ].filter(Boolean);
+    for (const c of modelKeys) {
+      const path = byModel[c];
+      if (!path) continue;
+      const [g, m] = path.split('.');
+      const found = State.gpu[g]?.[m];
+      if (found) return { id: path, detectionMode: 'exact', ...found };
+    }
+
+    // 2. byArchitecture family fallback — WebGPU returns arch strings like "ada-lovelace"
+    if (byArch && arch) {
+      const entry = byArch[arch];
+      if (entry) {
+        const [g, m] = entry.fallbackId.split('.');
+        const base = State.gpu[g]?.[m] || {};
+        const vram = base.vram ?? (entry.vramRange
+          ? Math.round((entry.vramRange[0] + entry.vramRange[1]) / 2)
+          : null);
+        return {
+          id: entry.fallbackId,
+          detectionMode: 'approximate',
+          architectureLabel: entry.label,
+          vramRange: entry.vramRange,
+          ...base,
+          vram,
+        };
       }
     }
-    return { id: null, vendor, arch, raw: info };
+
+    // 3. Privacy-stripped: WebGPU present but browser stripped all device info
+    if (!vendor && !arch && !device) {
+      return { id: null, detectionMode: 'privacy-stripped' };
+    }
+
+    return { id: null, detectionMode: 'unknown', vendor, arch };
   } catch (_) {
     return null;
   }
@@ -180,13 +218,38 @@ export function updateGpuStatus() {
   const sel = document.getElementById('filter-gpu-select');
   if (!status || !sel) return;
 
+  // Bind orphan i18n key: webgpuUnsupported — shown when browser lacks WebGPU entirely
+  if (!('gpu' in navigator) || !navigator.gpu) {
+    status.textContent = t('compat.errors.webgpuUnsupported') || 'WebGPU not supported — select GPU manually';
+    const autoOpt = sel.querySelector('option[value="auto"]');
+    if (autoOpt) {
+      autoOpt.disabled = true;
+      autoOpt.title = t('ui.filter.gpuAutoUnavailable') || '';
+      if (sel.value === 'auto') sel.value = '';
+    }
+    return;
+  }
+
   const autoOpt = sel.querySelector('option[value="auto"]');
   const detected = State.detectedGpu;
 
+  // Privacy-stripped path: WebGPU present but browser hid all device info
+  if (detected?.detectionMode === 'privacy-stripped') {
+    status.textContent = t('ui.filter.gpuPrivacyStripped') || 'GPU detected — browser hides device info, select GPU manually';
+    if (autoOpt) {
+      autoOpt.disabled = true;
+      if (sel.value === 'auto') sel.value = '';
+    }
+    return;
+  }
+
   if (autoOpt) {
-    if (detected && Number.isFinite(detected.vram)) {
+    if (detected && (Number.isFinite(detected.vram) || detected.vramRange)) {
       autoOpt.disabled = false;
-      autoOpt.title = `${detected.id || detected.raw || ''} (~${detected.vram} GB)`;
+      const suffix = detected.detectionMode === 'approximate'
+        ? ` · ${detected.architectureLabel || ''}`
+        : '';
+      autoOpt.title = `${detected.id || '?'}${suffix} (~${detected.vram ?? '?'} GB)`;
     } else {
       autoOpt.disabled = true;
       autoOpt.title = t('ui.filter.gpuAutoUnavailable') || 'Auto-detect unavailable in this browser';
@@ -198,6 +261,9 @@ export function updateGpuStatus() {
     status.textContent = autoOpt && autoOpt.disabled
       ? (t('ui.filter.gpuAutoUnavailable') || 'Auto-detect unavailable')
       : '';
+  } else if (detected?.detectionMode === 'approximate') {
+    const approxLabel = t('ui.filter.gpuApproximate') || 'approx.';
+    status.textContent = `~${State.vram} GB · ${detected.architectureLabel || ''} (${approxLabel})`;
   } else {
     status.textContent = `~${State.vram} GB`;
   }

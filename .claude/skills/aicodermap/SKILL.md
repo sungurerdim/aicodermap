@@ -24,7 +24,7 @@ Orchestrate AI coding LLM tracker updates: discover **official vendor lineup** �
 | arg | scope | model | typical_duration |
 |-----|-------|-------|------------------|
 | (none) | interactive prompt | — | — |
-| `refresh-all` | full (lineup + bench + pricing + local) | sonnet | 30-90min (4 waves × 17 batches; per-batch wallclock 5-30min depending on SPA-fetch fallbacks) |
+| `refresh-all` | full (lineup + bench + pricing + local) | sonnet | 20-60min (N waves × batches, all sonnet gather; per-batch wallclock 5-15min) |
 | `lineup-sync` | vendor lineup discovery only (Step 0) | sonnet | 3-6min (single batch, vendors in parallel) |
 | `model <id>` | specific | sonnet | 3-8min (single-batch, single-model deep sweep) |
 | `new-release` | new-release detection | sonnet | 4-10min |
@@ -218,20 +218,28 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
    - `data/sources-whitelist.json` is SSOT for "what URLs the agent is allowed to fetch" AND for the bench-key universe (`_schema.coreBenchKeys`). Frontend `BENCH_KEYS` (assets/js/core.js), i18n `benchmarks.*`, and the data-file `bench` cells all mirror this canonical set. `scripts/audit-data-coherence.py` enforces the mirroring by failing loudly on any drift.
    - No skip registry: every (modelId, benchKey) pair is re-attempted every cycle so vendor opt-outs that close are surfaced immediately
    - The agent file (.claude/agents/aicodermap-research-agent.md) only carries PROCEDURE (how) — every list of URLs, vendors, or model IDs lives in data files
-// FAZ 4.C (2026-05-09): HYBRID DISPATCH (haiku gather + sonnet synth).
-   // Two-stage pipeline replaces single-stage 18× sonnet:
-   //   Stage A (gather): 18 batches × HAIKU agent (mode="gather"). Cheap
-   //     extraction; emits raw observations + naCandidates + lineupHints.
-   //     NO contradiction analysis, NO trustScore math, NO autoResolveWinner.
+// FAZ 4.C (2026-05-09, revised 2026-05-17): SONNET GATHER + SONNET SYNTH.
+   // Two-stage pipeline: gather (N batches × sonnet) + synth (1 × sonnet).
+   //   Stage A (gather): N batches × SONNET agent (mode="gather").
+   //     Full research quality from the first pass; emits raw observations
+   //     + naCandidates + lineupHints. NO contradiction analysis, NO trustScore
+   //     math, NO autoResolveWinner — that stays in Stage B.
    //   Stage B (synth):   1 batch  × SONNET agent (mode="synth"). Reads ALL
    //     gather artifacts, applies analytical work: trustScore + contradictions
    //     + autoResolveWinner + WRONG_ID detection + N/A rule citation.
    //     Emits full OUTPUT_SCHEMA artifact.
    //
-   // Cost: ~18× sonnet → 18× haiku + 1× sonnet ≈ 1/8 baseline.
+   // Rationale for dropping haiku gather (FAZ 4.C.2 retired):
+   //   Empirical result — 14/18 haiku batches came back weak (avg_obs < 3),
+   //   triggering sonnet escalation anyway. Net result: haiku cost + sonnet
+   //   cost + 2× latency. Models without leaderboard presence (MiniMax, MiMo,
+   //   GLM, Mistral-small) are data-sparse regardless of model quality;
+   //   haiku didn't help. Going straight to sonnet eliminates the escalation
+   //   loop, halves cycle latency, and simplifies the orchestrator.
+   //   The 0-fill auto-retry (FAZ 2.4) remains as the sole safety net.
+   //
    // Quality: edge cases (WRONG_ID, cross-model misattribution, contradiction
-   // detection) concentrate in the single sonnet pass — better than scattered
-   // sonnet sub-agents that each see only their slice.
+   // detection) concentrate in the single sonnet synth pass.
    //
    // Adaptive multi-batch dispatch (FAZ 1.2 — unchanged): every batch fits
    // under AGENT_BUDGET_BUFFER=50 tool-call ceiling. Plan source:
@@ -245,13 +253,13 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
    per_batch_artifacts = []
    wave_state = {"pending": list(range(len(plan["waves"]))), "completed": []}
 
-   // ─── Stage A: HAIKU GATHER (parallel waves) ──────────────────────────
+   // ─── Stage A: SONNET GATHER (parallel waves) ─────────────────────────
    for wave_index in range(len(plan["waves"])):
      // Sequential between waves; parallel within a wave.
      wave_results = parallel([
        Agent({
          subagent_type: "aicodermap-research-agent",
-         model: "haiku",  // FAZ 4.C: gather is cheap extraction work
+         model: "sonnet",  // FAZ 4.C revised: sonnet directly — haiku escalation retired
          prompt: structured(
            scope, query,
            mode: "gather",  // HARD: no contradiction/autoResolve/WRONG_ID
@@ -319,48 +327,8 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
                f"of {list(range(len(plan.waves)))}. Halting BEFORE Stage B.")
      halt_workflow()
 
-   // ─── Stage A.5: WEAK-BATCH RETRY (FAZ 4.C.2 — escalate to sonnet) ─────
-   // Cycle 2026-05-10 measured haiku gather producing 14/18 weak batches
-   // (avg <3 observations/model). Stricter prompts (FAZ 4.C.1) reduce this
-   // but escalation remains: any batch where avg observations per
-   // target_model < HAIKU_GATHER_MIN_AVG_OBS=3 gets ONE retry with model="sonnet"
-   // mode="gather". Sonnet retry artifact replaces the haiku artifact at
-   // .aicodermap-agent-out-<batchId>.gather.json (sonnet quality, gather schema).
-   weak_batches = []
-   for b in plan["batches"]:
-     gather_path = f".aicodermap-agent-out-{b['batchId']}.gather.json"
-     try:
-       with open(gather_path) as f: g = json.load(f)
-       total_obs = sum(len(m.get('observations') or []) for m in g.get('models', []))
-       avg_obs = total_obs / max(len(b.modelIds), 1)
-       if avg_obs < HAIKU_GATHER_MIN_AVG_OBS:
-         weak_batches.append((b, avg_obs))
-     except (FileNotFoundError, json.JSONDecodeError):
-       weak_batches.append((b, 0))
-
-   if weak_batches:
-     log(f"⚠ {len(weak_batches)} batches below haiku threshold — sonnet retry")
-     // Single-message parallel sonnet retry (same gather schema, full slice)
-     retry_results = parallel([
-       Agent({
-         subagent_type: "aicodermap-research-agent",
-         model: "sonnet",  // escalation — quality model
-         prompt: structured(
-           scope, query,
-           mode: "gather",
-           idea_context: filtered_for_bucket(idea_context, b),
-           target_model_ids: b.modelIds,
-           batch_id: b.batchId + "-sonnet-retry",
-           wallclock_deadline_unix: now() + BATCH_WALLCLOCK_SEC,
-           agent_budget_buffer: 50,
-           require_full_slice: true,  // sonnet must cover all cells
-           reason: "haiku gather avg_obs < 3 — escalating",
-         ),
-         output_path: f".aicodermap-agent-out-{b.batchId}.gather.json"  // overwrite haiku
-       })
-       for b, _avg in weak_batches
-     ])
-     log(f"  ✓ {len(retry_results)} sonnet retries complete; haiku artifacts replaced")
+   // Stage A.5 (RETIRED 2026-05-17): haiku weak-batch escalation removed.
+   // Sonnet gather runs first-pass; FAZ 2.4 0-fill retry is the sole safety net.
 
    // ─── Stage B: SONNET SYNTH (single dispatch, post-gather) ──────────────
    // FAZ 4.C: synth agent reads ALL gather artifacts, applies analytical
@@ -458,7 +426,7 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
     // The agent's gaps[] contains only cells it actively attempted and failed;
     // it does NOT enumerate cells it never touched (that caused infinite loops).
 
-    python .aicodermap-gap-gen.py
+    python scripts/gap_gen.py
     // gap-gen reads data/models.json (current state) + sources-whitelist.json
     // and writes .aicodermap-agent-out.json, MERGING the agent's found values
     // into the existing artifact and adding gaps[] for all remaining unfilled cells.

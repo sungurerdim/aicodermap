@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "agent-in.schema.v1",
+  "title": "AICoderMap agent dispatch input (per-batch context)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["batchId", "mode", "target_model_ids"],
+  "properties": {
+    "batchId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique batch identifier, used as artifact filename suffix"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["gather", "synth", "full"],
+      "description": "Dispatch mode: gather=haiku extraction, synth=sonnet reasoning, full=legacy"
+    },
+    "target_model_ids": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "description": "Model IDs this batch is responsible for"
+    },
+    "idea_context_path": {
+      "type": "string",
+      "description": "Path to the per-batch ctx JSON file (.aicodermap-ctx-<batchId>.json)"
+    },
+    "wallclock_deadline_unix": {
+      "type": "number",
+      "description": "Unix epoch seconds. Agent must emit before this time."
+    },
+    "agent_budget_buffer": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Maximum tool calls for this dispatch"
+    },
+    "require_priority_first": {
+      "type": "boolean",
+      "description": "Agent should resolve priorityCells before sweeping remaining slice"
+    },
+    "require_full_matrix": {
+      "type": "boolean",
+      "description": "Agent must attempt every (modelId, benchKey) in its slice"
+    },
+    "synth_input_paths": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Gather artifact paths for synth mode"
+    },
+    "retry_of": {
+      "type": "string",
+      "description": "Original batchId this dispatch is retrying"
+    },
+    "reason": {
+      "type": "string",
+      "description": "Human-readable escalation reason (e.g. haiku gather avg_obs < 3)"
+    },
+    "_telemetry": {
+      "type": "object",
+      "description": "Orchestrator-injected dispatch metadata",
+      "properties": {
+        "_batchId":     { "type": "string" },
+        "_dispatchedAt": { "type": "number" },
+        "_waveIndex":   { "type": "integer" }
+      }
+    }
+  }
+}

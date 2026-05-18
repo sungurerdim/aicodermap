@@ -107,6 +107,17 @@
         "expectedTotal":     { "type": "integer", "minimum": 0 }
       }
     },
-    "validationCoverage": { "type": "number", "minimum": 0, "maximum": 1 }
+    "validationCoverage": { "type": "number", "minimum": 0, "maximum": 1 },
+    "_telemetry": {
+      "type": "object",
+      "description": "Per-batch telemetry injected by orchestrator post-dispatch",
+      "properties": {
+        "_batchId":     { "type": "string", "minLength": 1 },
+        "_wallclockSec":{ "type": "number", "minimum": 0 },
+        "_startedAt":   { "type": "number" },
+        "_endedAt":     { "type": "number" },
+        "_toolCalls":   { "type": "integer", "minimum": 0 }
+      }
+    }
   }
 }
