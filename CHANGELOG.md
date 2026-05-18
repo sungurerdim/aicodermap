@@ -1,4 +1,21 @@
 
+## [2026-05-18] — phase 3a: purge pseudo-source contamination
+
+Removed 1281 pseudo-source entries from `data/sources.json` (33.2% of total):
+- `snapshot-extraction` (871)
+- `auto-resolution candidate` (361)
+- `synth-backfill` (49)
+
+These entries lacked verifiable URLs and contributed zero real evidence
+while inflating verification counts and trustScore weights in composite
+calculations.
+
+568 orphan cells (pseudo-only, no backing models.json value) dropped
+entirely. 12 cells rescued (sole-evidence pseudo entries re-tagged
+`rescued: true` for re-fetch in next refresh cycle). Total cell count
+`1549 → 981`. Backup at `data/sources.json.bak3`.
+
+
 ## [2026-05-18] — autonomous refresh-all [WARN: cumulative provenance coverage 70.8% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 117 new fills; 3 cells auto-gapped by orchestrator; 87 explicit agent gaps preserved]
 
 [fillRatio:0.70 cells:421/600 contradictions:7 fetch:0.0min tools:None batches:None build:7c7fe54]
