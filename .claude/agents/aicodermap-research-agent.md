@@ -836,7 +836,20 @@ Three shapes, never mixed:
             "lcbVersion": "v5|v6"
           },
           "confidence": <number 0..1>,           // optional, mirrors pick_winner.confidence
-          "quarantine": <boolean>                // optional, mirrors pick_winner.quarantine
+          "quarantine": <boolean>,               // optional, mirrors pick_winner.quarantine
+          // Phase R3+R4 (Source Reliability v2) — optional Beta-Binomial
+          // snapshot for the source on THIS bench. The agent SHOULD emit
+          // this when it has crossed the cold-start threshold (n >= 10)
+          // for the (sourceUrl, bench) pair. The orchestrator's reliability
+          // ledger (data/source-reliability.json) is the authoritative
+          // record; this field is a per-emit informational mirror.
+          "reliability": {                       // optional
+            "accuracy":   <number 0..1>,         // posterior mean
+            "ci":         [<low>, <high>],       // 95% CI on the posterior
+            "n":          <number>,              // decayedAgree + decayedDisagree
+            "decayedN":   <number>,              // same as n; kept for clarity
+            "exceptional": <boolean>             // true when accuracy>=0.90 AND n>=20
+          }
         }
       ]
     }

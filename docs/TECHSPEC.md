@@ -537,3 +537,125 @@ factor — within-cluster argmax never flips. Cells with v ≥ 4 see a small
 boost: a 4-source cluster gains ~9% trust over its 3-source equivalent.
 The composite-score deltas are bounded by `(1.5/1.0 - 1) ≈ 50%` in the
 extreme; in production data the median composite shift was < 5 points.
+
+---
+
+## Appendix — Source Reliability v2 (Phases R1 – R6)
+
+The reliability subsystem layers a Beta-Binomial posterior on top of the
+verif-factor formula. The goal: rank a source's contribution by *how
+often it has agreed with cross-source consensus on this benchmark*,
+without hardcoded allowlists.
+
+### Composite trust formula
+
+```
+T(obs) = tierWeight × verif_factor(v) × reliability(s, b) × recencyDecay(date, type)
+
+verif_factor(v)        = min(log(1+v)/log(4), 1.5)                  ← Phase R2
+reliability(s, b)      = posterior_mean if n(s,b) ≥ COLD_START_N    ← Phase R3
+                         else posterior_mean of source global pool
+                         else 1.0                                    (cold-start neutral)
+recencyDecay(date, t)  = piecewise INTERVAL_DECAY_CURVES[t]         ← Phase R5
+```
+
+### Beta-Binomial posterior
+
+`reliability(s, b)` is the posterior mean of a Beta-Binomial conjugate
+update with uniform prior Beta(1, 1):
+
+```
+α_post(s, b) = 1 + decayedAgree(s, b)
+β_post(s, b) = 1 + decayedDisagree(s, b)
+mean         = α_post / (α_post + β_post)
+CI_95(p)     = p ± 1.96·√(p(1-p)/n)    (Wald approximation; n ≥ 30 for tight bounds)
+```
+
+Each cycle:
+
+1. **Decay** — every counter shrinks by `0.5^(Δdays / 21)` (3-cycle
+   half-life × 7 days/cycle = 21-day half-life). Decay is applied before
+   any new evidence so single-cycle spikes can't permanently anchor the
+   ledger.
+2. **Update** — `update_reliability(url, bench, agreed)` increments
+   `decayedAgree` or `decayedDisagree` by 1.0 and the raw lifetime
+   counter by 1. Raw counters are audit-only and never decayed.
+3. **Lookup** — `reliability_multiplier(ledger, url, bench)` walks the
+   hierarchy: per-(source, bench) → per-source global → cold-start 1.0.
+
+The hierarchy is a manual James-Stein-style shrinkage: sparse cells
+borrow the source's global track record before falling back to neutral.
+
+### Cold-start
+
+A source with fewer than `COLD_START_N = 10` decayed samples on the bench
+*and* fewer than 10 globally returns multiplier 1.0 — its trust score is
+identical to pre-R3. Fresh sources are never penalized; they enter the
+ledger via the normal update path and earn or lose reliability over time.
+
+### Exceptional source override (R4)
+
+Phase R4 adds `_exceptional_source_override` between the I-tier override
+and `_single_outlier_guard`. A single I-tier observation bypasses the
+multi-source guard when, on the specific bench:
+
+| Gate | Threshold | Why |
+|------|-----------|-----|
+| `n` (decayedAgree + decayedDisagree) | ≥ 20 | Wilson CI tight enough |
+| posterior accuracy | ≥ 0.90 | track record matters, not just tier |
+| recency_decay | ≥ 0.85 | < ~90 days old |
+| tier | "I" | independent leaderboards only |
+
+This is the "1 trusted source can beat 5 unreliable sources" rule, but
+*every gate is data-derived* — no source allowlist, no hardcoded patches.
+A source has to earn the override by surviving cycles of agreement.
+
+### Per-source recency curves (R5)
+
+`recency_decay(date, source_type)` picks a curve from
+`INTERVAL_DECAY_CURVES` based on the source's publishing cadence. The
+default curve matches the pre-R5 piecewise; vendor entries with
+`vendorUpdateInterval: "quarterly"` use a flatter curve so a 100-day-old
+vendor release notes page still carries 0.85 weight (vs 0.70 default).
+
+### Worked example: 1-vs-5
+
+Setup: one I-tier source (`trusted.com`, n=20, 95% accuracy, today's
+fetch) vs five C-tier sources (n=20, 40% accuracy, today's fetch).
+
+```
+verif_factor(6 distinct URLs) = log(7)/log(4) = 1.404
+
+Trusted obs:
+  T = tier(I) × verif_factor × reliability × recency
+    = 1.0 × 1.404 × (1+19)/(2+20) × 1.0
+    = 1.0 × 1.404 × 0.909 × 1.0
+    = 1.277
+
+Each unreliable obs:
+  T = 0.4 × 1.404 × (1+8)/(2+20) × 1.0
+    = 0.4 × 1.404 × 0.409 × 1.0
+    = 0.230
+
+Cluster sum_trust:
+  trusted_cluster   = 1.277  (1 member)
+  unreliable_cluster = 1.150  (5 × 0.230)
+```
+
+Even before R4, the trusted cluster wins on raw `sum_trust`. The
+`_single_outlier_guard` would normally demote it, so R4 lets it survive
+when its track record meets the override gates. The math falls out
+naturally — no thresholds hardcoded into the winner-selection path.
+
+### Frontend mirror (R6)
+
+`assets/js/data.js` mirrors:
+- `sourceIdentity` — hostname canonicalization.
+- `posteriorMean` — Beta posterior mean.
+- `sourceReliability(url, benchKey)` — hierarchical multiplier.
+- `sourceReliabilityBadge(url, benchKey)` — `{kind, accuracy, n}` for the
+  card-footer badge (`exceptional` / `low` / `normal`, null for
+  cold-start).
+
+`INTERVAL_DECAY_CURVES` is also mirrored as a frozen export for future
+documentation/visualisation needs.

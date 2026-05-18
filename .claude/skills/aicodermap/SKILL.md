@@ -695,7 +695,7 @@ Lineup return shape (per vendor):
 ## TRUST_SCORE_FORMULA (used by Step 7 auto-resolution + every sources.json entry)
 
 ```
-trustScore(value) = tierWeight × min(verifications, 3)/3 × recencyDecay(date)
+trustScore(obs) = tierWeight × verif_factor(v) × reliability(s, b) × recencyDecay(date, type)
 
 tierWeight:
   I = 1.0   (independent leaderboard: Scale SEAL, SWE-bench Verified, Terminal-Bench, Aider, tau-bench, MCP-Atlas, Artificial Analysis, Vellum, livecodebench.com, lmarena.ai, livebench.ai, BFCL, BigCodeBench, EvalPlus, paperswithcode.com, BenchLM, Open LLM Leaderboard, swebench.com)
@@ -703,14 +703,25 @@ tierWeight:
   C = 0.4   (community/3rd-party: aggregator blog, walkthrough, review)
   U = 0.1   (forum/social: Reddit, Twitter — never written to data, only as cross-check signal)
 
-verifications: number of distinct sources reporting the same value (capped at 3)
+verif_factor(v)        — Phase R2 (replaced linear min(v,3)/3)
+  = min(log(1+v)/log(4), 1.5)
+  v=1 → 0.50  v=3 → 1.00  v=5 → 1.29  v≥10 → 1.50 (capped)
 
-recencyDecay(date):
-  age <  30d → 1.00
-  age <  90d → 0.85
-  age < 180d → 0.70
-  age < 365d → 0.50
-  age ≥ 365d → 0.30
+reliability(s, b)      — Phase R3 (per-(source, bench) Beta-Binomial posterior)
+  = (1 + decayedAgree) / (2 + decayedAgree + decayedDisagree)   if n(s,b) ≥ 10
+  = global posterior of source                                  if n(s)  ≥ 10
+  = 1.0                                                         else (cold-start neutral)
+
+recencyDecay(date, type) — Phase R5 (per-source-type curve)
+  default:   <30d=1.00  <90d=0.85  <180d=0.70  <365d=0.50  else 0.30
+  quarterly: <30d=1.00  <90d=0.95  <180d=0.85  <365d=0.60  else 0.30
+  weekly:    <30d=0.80  <90d=0.40  <180d=0.10  else 0.00
+  (vendor whitelist supplies `vendorUpdateInterval` per source)
+
+Exceptional single-source override — Phase R4
+  bypasses _single_outlier_guard when a single I-tier observation satisfies
+  all of: n(s,b) ≥ 20, posterior accuracy ≥ 0.90, recency_decay ≥ 0.85
+  override_mode = "exceptional-source-override"
 
 Tiebreak (when trustScores within 0.05): prefer I-tier, then most recent, then highest verifications.
 ```
