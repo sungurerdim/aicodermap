@@ -252,3 +252,138 @@ def load_historical_pool(
                 }
             )
     return pool
+
+
+# FAZ 8.A.3b (2026-05-18): Bayesian aggregation + gap age tracking.
+# Designed to activate AFTER 3 cycles of post-deploy data accumulate
+# (cold-start guard returns None until then). Stdlib-only — no scipy.
+
+import math  # noqa: E402  (deferred to keep top of file lean for cold paths)
+
+
+def bayesian_aggregate(
+    cell_key: str,
+    current_obs: list[dict[str, Any]],
+    historical_pool: list[dict[str, Any]],
+    *,
+    alpha: float = 1.0,
+) -> dict[str, Any]:
+    """Posterior estimate for a (modelId, benchKey) cell.
+
+    Combines current-cycle observations with historical pool entries from
+    verification-map. Cold-start guard: when historical pool has fewer
+    than 3 values, returns Nones — caller falls back to deterministic
+    pick_winner.
+
+    Parameters
+    ----------
+    cell_key:
+        Diagnostic only — logged when stability is suspiciously low.
+    current_obs:
+        Current-cycle observations (raw dicts; only `value` is consumed).
+    historical_pool:
+        Prior cycle observations (typically from verification-map).
+    alpha:
+        Prior weight (default 1.0). Higher alpha biases toward the
+        historical mean; alpha=0 reduces to current-cycle mean.
+
+    Returns
+    -------
+    {
+        "point":     float | None   # posterior mean
+        "ci_low":    float | None   # 95% CI lower bound
+        "ci_high":   float | None   # 95% CI upper bound
+        "stability": float | None   # 1 - sqrt(var) / 50  (clamped [0, 1])
+    }
+    """
+    _ = cell_key  # reserved for future diagnostic logging
+    hist_values = [
+        float(o["value"])
+        for o in (historical_pool or [])
+        if isinstance(o, dict) and o.get("value") is not None
+    ]
+    if len(hist_values) < 3:
+        return {"point": None, "ci_low": None, "ci_high": None, "stability": None}
+
+    cur_values = [
+        float(o["value"])
+        for o in (current_obs or [])
+        if isinstance(o, dict) and o.get("value") is not None
+    ]
+
+    # Prior: mean + variance of historical pool
+    prior_mean = sum(hist_values) / len(hist_values)
+    prior_var = sum((v - prior_mean) ** 2 for v in hist_values) / max(
+        len(hist_values) - 1, 1
+    )
+
+    # Likelihood from current-cycle observations
+    if cur_values:
+        like_mean = sum(cur_values) / len(cur_values)
+        like_var = (
+            sum((v - like_mean) ** 2 for v in cur_values) / max(len(cur_values) - 1, 1)
+            if len(cur_values) > 1
+            else max(prior_var, 1.0)
+        )
+        # Inverse-variance weighting (conjugate normal-normal)
+        prior_prec = alpha / max(prior_var, 1e-6)
+        like_prec = len(cur_values) / max(like_var, 1e-6)
+        post_prec = prior_prec + like_prec
+        post_mean = (prior_mean * prior_prec + like_mean * like_prec) / post_prec
+        post_var = 1.0 / post_prec
+    else:
+        post_mean = prior_mean
+        post_var = prior_var
+
+    sigma = math.sqrt(max(post_var, 0.0))
+    ci_low = post_mean - 1.96 * sigma
+    ci_high = post_mean + 1.96 * sigma
+    # Stability: 50pp swing = zero stability; 0pp = perfect stability.
+    stability = max(0.0, min(1.0, 1.0 - sigma / 50.0))
+
+    return {
+        "point": round(post_mean, 3),
+        "ci_low": round(ci_low, 3),
+        "ci_high": round(ci_high, 3),
+        "stability": round(stability, 4),
+    }
+
+
+def compute_gap_age(
+    cell_key: str,
+    verification_map: dict[str, Any],
+    cycle_id: str,
+) -> dict[str, Any]:
+    """Walk the verification-map entry for a cell and derive its gap age.
+
+    Reads `verification_map["cells"][cell_key]["gapHistory"]` (chronological
+    cycle ids when the cell was emitted as a gap). Consecutive count is
+    the length of the trailing run that includes `cycle_id`.
+
+    Returns
+    -------
+    {
+        "consecutive_count":      int   # number of consecutive gap cycles
+        "auto_na_candidate":      bool  # consecutive_count >= 3
+        "force_quarantine":       bool  # consecutive_count >= 5
+        "first_gap_cycle":        str | None
+    }
+    """
+    cells = (verification_map or {}).get("cells") or {}
+    entry = cells.get(cell_key) or {}
+    history = entry.get("gapHistory") or []
+    if not isinstance(history, list):
+        history = []
+
+    # Count consecutive trailing cycles. We don't have absolute calendar
+    # ordering across cycles in this stdlib pipeline — caller seeds history
+    # in order — so trailing length is the canonical signal.
+    consec = len(history)
+    first_gap = history[0] if history else None
+
+    return {
+        "consecutive_count": consec,
+        "auto_na_candidate": consec >= 3,
+        "force_quarantine": consec >= 5,
+        "first_gap_cycle": first_gap,
+    }

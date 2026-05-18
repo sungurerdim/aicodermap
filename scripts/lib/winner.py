@@ -32,7 +32,12 @@ from __future__ import annotations
 import datetime
 from typing import Any
 
-from .tiers import tier_rank, trust_score
+from .tiers import (
+    I_TIER_MIN_VERIFICATIONS,
+    is_pseudo_source,
+    tier_rank,
+    trust_score,
+)
 
 # Global fallback thresholds (overridden per-bench via benchTypes)
 DEFAULT_AGREEMENT_PP: float = 1.5
@@ -42,6 +47,9 @@ DEFAULT_BLOCK_PP: float = 5.0
 # Minimum I-tier cluster reliability to trigger independent-override
 I_TIER_MIN_SOURCES: int = 2
 I_TIER_MIN_RELIABILITY: float = 0.6
+
+# Confidence severity penalties (FAZ 8.A.3b)
+_SEVERITY_PENALTY = {"GREEN": 0.0, "YELLOW": 0.15, "RED": 0.4}
 
 
 def _cluster(
@@ -90,8 +98,16 @@ def _cluster(
 
 def _i_tier_cluster(
     clusters: list[dict[str, Any]],
+    *,
+    require_min_verifications: bool = True,
 ) -> dict[str, Any] | None:
-    """Return the first cluster that satisfies the I-tier override rule, or None."""
+    """Return the first cluster that satisfies the I-tier override rule, or None.
+
+    FAZ 8.A.3b: when `require_min_verifications` is True, a single I-tier
+    observation with `verifications < I_TIER_MIN_VERIFICATIONS` cannot
+    trigger the override — it stays in the cluster sort but won't promote
+    above a multi-source S-tier consensus.
+    """
     for cl in clusters:
         i_members = [m for m in cl["members"] if tier_rank(m.get("tier", "C")) == 3]
         if not i_members:
@@ -101,9 +117,180 @@ def _i_tier_cluster(
         i_urls.discard("")
         n_distinct_i = len(i_urls) if i_urls else len(i_members)
         avg_trust = sum(m["trustScore"] for m in i_members) / len(i_members)
+        # FAZ 8.A.3b: single-shot I-tier dampening
+        if require_min_verifications:
+            i_verifs = max(
+                (int(m.get("verifications") or 0) for m in i_members),
+                default=0,
+            )
+            if (
+                n_distinct_i < I_TIER_MIN_SOURCES
+                and i_verifs < I_TIER_MIN_VERIFICATIONS
+            ):
+                continue
         if n_distinct_i >= I_TIER_MIN_SOURCES or avg_trust >= I_TIER_MIN_RELIABILITY:
             return cl
     return None
+
+
+def filter_pseudo_sources(
+    observations: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Split observations into (primary, pseudo).
+
+    Pseudo entries (snapshot-extraction / auto-resolution candidate /
+    synth-backfill) lack verifiable URLs — exclude from clustering so
+    they don't anchor consensus. Returned pseudo list is preserved for
+    audit/telemetry surfacing.
+    """
+    primary: list[dict[str, Any]] = []
+    pseudo: list[dict[str, Any]] = []
+    for o in observations or []:
+        if is_pseudo_source(o):
+            pseudo.append(o)
+        else:
+            primary.append(o)
+    return primary, pseudo
+
+
+def tag_evaluation_context(
+    observations: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Annotate observations with an `evaluationContext` field when source
+    hints reveal scaffold / tool-condition / benchmark-version splits.
+
+    Detects three signals from notes/sourceUrl heuristically:
+      - 'scaffold=<name>' or '/scaffold/' path segments -> scaffold variant
+      - 'tools=on|off' or '/agentic/' path segments    -> tool condition split
+      - 'lcb-v6' / 'v6' suffixes on lcb-family URLs    -> benchmark version
+
+    The signal lives only on the observation; downstream clustering can
+    use it to split clusters by context (caller decision).
+    """
+    out: list[dict[str, Any]] = []
+    for o in observations or []:
+        if not isinstance(o, dict):
+            out.append(o)
+            continue
+        url = (o.get("sourceUrl") or "").lower()
+        notes = (o.get("notes") or "").lower()
+        ctx: dict[str, Any] = {}
+        # Scaffold variants (e.g. "agentless", "swe-agent", "aider")
+        for sf in ("agentless", "swe-agent", "aider", "openhands", "moatless"):
+            if sf in notes or sf in url:
+                ctx["scaffold"] = sf
+                break
+        # Tool conditions
+        if "tools=on" in notes or "/tools-on/" in url:
+            ctx["condition"] = "tools-on"
+        elif "tools=off" in notes or "/tools-off/" in url:
+            ctx["condition"] = "tools-off"
+        # Benchmark version on lcb family
+        if "lcb-v6" in url or "lcb_v6" in url or "lcb-v6" in notes:
+            ctx["lcbVersion"] = "v6"
+        elif "lcb-v5" in url or "lcb_v5" in url:
+            ctx["lcbVersion"] = "v5"
+        if ctx:
+            o = {**o, "evaluationContext": ctx}
+        out.append(o)
+    return out
+
+
+def detect_category_bleed(
+    observations: list[dict[str, Any]],
+    bench_key: str,
+    *,
+    all_cell_obs: dict[tuple[str, str], list[dict[str, Any]]] | None = None,
+) -> list[dict[str, Any]]:
+    """Flag observations whose URL also feeds another bench cell with the
+    same value — symptom of an extractor mis-routing a row across bench
+    columns (e.g. deepseek-v3-2.sweV pulling 83.3 from an LCB row).
+
+    Returns a new list with `_categoryBleed: True` set on flagged entries.
+    When `all_cell_obs` is None, returns input untouched (no cross-cell
+    visibility; callers like local-synth pass the full cell map).
+    """
+    if not all_cell_obs:
+        return list(observations or [])
+    out: list[dict[str, Any]] = []
+    for o in observations or []:
+        if not isinstance(o, dict):
+            out.append(o)
+            continue
+        url = (o.get("sourceUrl") or "").strip().lower()
+        val = o.get("value")
+        if not url or val is None:
+            out.append(o)
+            continue
+        flagged = False
+        for (mid, bk), other_obs in all_cell_obs.items():
+            if bk == bench_key:
+                continue
+            for other in other_obs or []:
+                if not isinstance(other, dict):
+                    continue
+                if (other.get("sourceUrl") or "").strip().lower() != url:
+                    continue
+                if other.get("value") == val:
+                    flagged = True
+                    break
+            if flagged:
+                break
+        if flagged:
+            o = {**o, "_categoryBleed": True}
+        out.append(o)
+    return out
+
+
+def compute_cell_confidence(result: dict[str, Any]) -> float:
+    """Confidence score in [0, 1] for a pick_winner result.
+
+    Formula:
+        verifications_factor = min(N_primary / 3, 1)
+        trust_factor         = winner_trust / I_weight (=1.0 cap)
+        severity_penalty     = {GREEN: 0, YELLOW: 0.15, RED: 0.4}
+        confidence = verifications_factor × trust_factor × (1 - severity_penalty)
+    """
+    scored = result.get("scored") or []
+    primary = [s for s in scored if not is_pseudo_source(s)]
+    n_primary = len(primary)
+    verif_factor = min(n_primary / 3.0, 1.0)
+    winner_obs = result.get("winner_obs") or {}
+    winner_trust = float(winner_obs.get("trustScore") or 0.0)
+    trust_factor = min(winner_trust / 1.0, 1.0)
+    severity = result.get("severity", "GREEN")
+    penalty = _SEVERITY_PENALTY.get(severity, 0.0)
+    conf = verif_factor * trust_factor * (1.0 - penalty)
+    return round(max(0.0, min(1.0, conf)), 4)
+
+
+def should_quarantine(
+    result: dict[str, Any],
+    primary_obs: list[dict[str, Any]] | None = None,
+) -> bool:
+    """FAZ 8.A.3b quarantine triggers:
+    - confidence < 0.2
+    - distinct primary values > 5 (extreme dispersion)
+    - any observation flagged as scaffold-variant (different evaluation
+      contexts shouldn't share a single composite cell)
+    """
+    conf = float(result.get("confidence") or 0.0)
+    if conf < 0.2:
+        return True
+    scored = result.get("scored") or []
+    distinct_values = {
+        round(float(s["value"]), 2) for s in scored if s.get("value") is not None
+    }
+    if len(distinct_values) > 5:
+        return True
+    pool = list(primary_obs or scored)
+    for o in pool:
+        if not isinstance(o, dict):
+            continue
+        ctx = o.get("evaluationContext") or {}
+        if isinstance(ctx, dict) and ctx.get("scaffold"):
+            return True
+    return False
 
 
 def _single_outlier_guard(
@@ -166,19 +353,32 @@ def pick_winner(
     _today = today or datetime.date.today()
     del _today  # recency decay uses wall-clock inside tiers.trust_score
 
-    valid = [o for o in (observations or []) if o.get("value") is not None]
-    if not valid:
+    raw_valid = [o for o in (observations or []) if o.get("value") is not None]
+    if not raw_valid:
         return {
             "winner_value": None,
             "winner_obs": {},
             "winning_cluster": {},
             "all_clusters": [],
             "scored": [],
+            "pseudo_observations": [],
             "is_contradiction": False,
             "severity": "GREEN",
             "max_delta": 0.0,
             "override_mode": None,
+            "confidence": 0.0,
+            "quarantine": False,
+            "bayesianPoint": None,
         }
+
+    # FAZ 8.A.3b: separate pseudo entries — they survive into the returned
+    # payload (for audit) but do NOT participate in clustering.
+    primary, pseudo = filter_pseudo_sources(raw_valid)
+    valid = primary or raw_valid  # fallback to pseudo-only when nothing else
+
+    # Tag evaluation context (scaffold / tool condition / lcb-version) so
+    # downstream consumers can split clusters when needed.
+    valid = tag_evaluation_context(valid)
 
     # Distinct URL count for verifications cap (FAZ 6.E)
     distinct_urls = {(o.get("sourceUrl") or "").strip().lower() for o in valid}
@@ -192,9 +392,9 @@ def pick_winner(
 
     clusters = _cluster(scored, agreement_pp)
 
-    # Rule 1 — I-tier override
+    # Rule 1 — I-tier override (with FAZ 8.A.3b single-shot dampening)
     override_mode: str | None = None
-    i_cluster = _i_tier_cluster(clusters)
+    i_cluster = _i_tier_cluster(clusters, require_min_verifications=True)
     if i_cluster and clusters[0] is not i_cluster:
         # I-tier cluster is not already on top — promote it
         clusters.remove(i_cluster)
@@ -213,7 +413,7 @@ def pick_winner(
     )
     winner_value = winner_obs["value"]
 
-    # Contradiction detection — max delta across ALL observations
+    # Contradiction detection — max delta across primary observations only
     all_values = [s["value"] for s in scored]
     max_delta = max(all_values) - min(all_values) if len(all_values) > 1 else 0.0
     is_contradiction = max_delta >= agreement_pp and len(clusters) > 1
@@ -224,17 +424,23 @@ def pick_winner(
     else:
         severity = "GREEN"
 
-    return {
+    result = {
         "winner_value": winner_value,
         "winner_obs": winner_obs,
         "winning_cluster": winning_cluster,
         "all_clusters": clusters,
         "scored": scored,
+        "pseudo_observations": pseudo,
         "is_contradiction": is_contradiction,
         "severity": severity,
         "max_delta": round(max_delta, 2),
         "override_mode": override_mode,
+        "bayesianPoint": None,  # populated by synth_core when historical pool ≥3
     }
+    result["confidence"] = compute_cell_confidence(result)
+    # Pass the tagged scored list so evaluationContext flags propagate.
+    result["quarantine"] = should_quarantine(result, scored)
+    return result
 
 
 def build_contradiction_entry(

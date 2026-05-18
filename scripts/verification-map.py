@@ -29,7 +29,14 @@ Map shape (canonical, mirrored in agent.md DATA_CONTRACT):
       "<modelId>.<benchKey>": {
         "value": <number | null>,            // last consensus value (null on contradiction)
         "verifications": [{source, url, tier, fetched}, ...],
-        "lastChecked": "YYYY-MM-DD"
+        "lastChecked": "YYYY-MM-DD",
+        // FAZ 8.A.3b additive fields (2026-05-18) — readers safe-default
+        // via .get(k, default) when older maps lack them.
+        "gapHistory": [<cycleId>, ...],     // chronological cycles where cell was a gap
+        "gapSince":   "YYYY-MM-DD"|null,    // first gap cycle of the current run
+        "confidence": <float [0,1]>,        // last pick_winner.confidence
+        "stability":  <float [0,1]>|null,   // bayesian variance (≥3 cycles)
+        "bayesianPoint": <float|null>       // posterior mean (≥3 cycles)
       }
     }
   }
@@ -99,8 +106,19 @@ def update_map():
                     "value": None,
                     "verifications": [],
                     "lastChecked": TODAY,
+                    "gapHistory": [],
+                    "gapSince": None,
+                    "confidence": 0.0,
+                    "stability": None,
+                    "bayesianPoint": None,
                 },
             )
+            # Backfill additive fields on older cells (idempotent).
+            cell.setdefault("gapHistory", [])
+            cell.setdefault("gapSince", None)
+            cell.setdefault("confidence", 0.0)
+            cell.setdefault("stability", None)
+            cell.setdefault("bayesianPoint", None)
             # `confirmed` field retired — strip on read so legacy maps don't
             # leak the field forward.
             cell.pop("confirmed", None)
@@ -209,6 +227,11 @@ def bootstrap_from_sources():
                 "value": None,
                 "verifications": [],
                 "lastChecked": TODAY,
+                "gapHistory": [],
+                "gapSince": None,
+                "confidence": 0.0,
+                "stability": None,
+                "bayesianPoint": None,
             },
         )
         seen_urls = set()

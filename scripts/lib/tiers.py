@@ -99,3 +99,46 @@ def trust_score(tier: str, verifications: int, date_str: Any) -> float:
     v = min(max(int(verifications), 1), 3) / 3.0
     r = recency_decay(date_str)
     return round(tw * v * r, 4)
+
+
+# FAZ 8.A.3b (2026-05-18): pseudo-source tags — observations that pretend
+# to be canonical provenance but lack verifiable URLs. The Phase 3a purge
+# removed all such entries from sources.json, but research-agent fresh
+# emits may still inject them. winner.py.filter_pseudo_sources() walks
+# this set before clustering.
+PSEUDO_SOURCE_TAGS = frozenset(
+    {"snapshot-extraction", "auto-resolution candidate", "synth-backfill"}
+)
+
+# Minimum verifications a single I-tier observation needs before it can
+# override an existing multi-source S-tier consensus. Without this gate,
+# one fresh fetch from an independent leaderboard outranks 3-source vendor
+# data — the FAZ 8.A.3b doctrine treats single-shot I-tier as suggestive
+# evidence, not authoritative override.
+I_TIER_MIN_VERIFICATIONS = 2
+
+
+def is_pseudo_source(obs: dict) -> bool:
+    """Return True if observation carries a pseudo-source tag (FAZ 8.A.3b)."""
+    if not isinstance(obs, dict):
+        return False
+    return obs.get("source") in PSEUDO_SOURCE_TAGS
+
+
+def effective_trust_score(
+    tier: str,
+    verifications: int,
+    date_str: Any,
+    *,
+    is_pseudo: bool = False,
+) -> float:
+    """Trust score with pseudo-source dampening.
+
+    Pseudo entries (FAZ 8.A.3b) get a 0.2 multiplier — signal only, never
+    anchor. Used when pseudo entries SURVIVE into clustering (rescue mode)
+    so they don't dominate composite calculations.
+    """
+    base = trust_score(tier, verifications, date_str)
+    if is_pseudo:
+        return round(base * 0.2, 4)
+    return base
