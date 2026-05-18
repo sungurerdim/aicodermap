@@ -1,0 +1,808 @@
+{
+  "batchId": "batch02-google_deepm",
+  "mode": "gather",
+  "observations": [
+    {
+      "modelId": "gemini-3-1-flash",
+      "benchKey": "sweV",
+      "value": 22.0,
+      "sourceUrl": "https://benchlm.ai/compare/gemini-3-1-flash-lite-vs-gemini-3-flash",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemini-3-1-flash",
+      "benchKey": "gpqa",
+      "value": 86.9,
+      "sourceUrl": "https://blog.google/products-and-platforms/products/gemini/gemini-3-flash/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemini-3-1-flash",
+      "benchKey": "gpqa",
+      "value": 86.9,
+      "sourceUrl": "https://iternal.ai/llm-selection-guide",
+      "tier": "C",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemini-3-1-flash",
+      "benchKey": "lcb",
+      "value": 72.0,
+      "sourceUrl": "https://layerlens.ai/blog/gemini-3-1-flash-lite-benchmark-results-efficiency-model-comparison",
+      "tier": "C",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemini-3-1-flash",
+      "benchKey": "mmluPro",
+      "value": 83.0,
+      "sourceUrl": "https://layerlens.ai/blog/gemini-3-1-flash-lite-benchmark-results-efficiency-model-comparison",
+      "tier": "C",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemini-3-1-flash",
+      "benchKey": "hle",
+      "value": 8.5,
+      "sourceUrl": "https://layerlens.ai/blog/gemini-3-1-flash-lite-benchmark-results-efficiency-model-comparison",
+      "tier": "C",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemini-3-1-flash",
+      "benchKey": "aime26",
+      "value": 16.7,
+      "sourceUrl": "https://layerlens.ai/blog/gemini-3-1-flash-lite-benchmark-results-efficiency-model-comparison",
+      "tier": "C",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemini-3-1-flash",
+      "benchKey": "aaIdx",
+      "value": 34,
+      "sourceUrl": "https://artificialanalysis.ai/models/gemini-3-1-flash-lite-preview",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemini-3-1-pro",
+      "benchKey": "sweV",
+      "value": 80.6,
+      "sourceUrl": "https://deepmind.google/models/model-cards/gemini-3-1-pro/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemini-3-1-pro",
+      "benchKey": "sweV",
+      "value": 80.6,
+      "sourceUrl": "https://www.marc0.dev/en/leaderboard",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemini-3-1-pro",
+      "benchKey": "swePro",
+      "value": 80.6,
+      "sourceUrl": "https://deepmind.google/models/model-cards/gemini-3-1-pro/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemini-3-1-pro",
+      "benchKey": "tb2",
+      "value": 68.5,
+      "sourceUrl": "https://deepmind.google/models/model-cards/gemini-3-1-pro/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemini-3-1-pro",
+      "benchKey": "gpqa",
+      "value": 94.3,
+      "sourceUrl": "https://deepmind.google/models/model-cards/gemini-3-1-pro/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemini-3-1-pro",
+      "benchKey": "gpqa",
+      "value": 94.3,
+      "sourceUrl": "https://smartchunks.com/gemini-3-1-pro-benchmarks-gpqa-hle-lmsys-frontiermath/",
+      "tier": "C",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemini-3-1-pro",
+      "benchKey": "hle",
+      "value": 44.4,
+      "sourceUrl": "https://deepmind.google/models/model-cards/gemini-3-1-pro/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemini-3-1-pro",
+      "benchKey": "aime26",
+      "value": 98.1,
+      "sourceUrl": "https://deepmind.google/models/model-cards/gemini-3-1-pro/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemini-3-1-pro",
+      "benchKey": "mcpA",
+      "value": 69.2,
+      "sourceUrl": "https://deepmind.google/models/model-cards/gemini-3-1-pro/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemini-3-1-pro",
+      "benchKey": "aaIdx",
+      "value": 57,
+      "sourceUrl": "https://artificialanalysis.ai/articles/gemini-3-1-pro-preview-new-leader-in-ai",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemini-3-1-pro",
+      "benchKey": "aaIdx",
+      "value": 57,
+      "sourceUrl": "https://smartchunks.com/artificial-analysis-intelligence-index-april-2026-explained/",
+      "tier": "C",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemini-3-1-pro",
+      "benchKey": "tau2",
+      "value": 76.5,
+      "sourceUrl": "https://deepmind.google/models/model-cards/gemini-3-1-pro/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-3-27b",
+      "benchKey": "gpqa",
+      "value": 42.4,
+      "sourceUrl": "https://deepmind.google/models/gemma/gemma-4/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-3-27b",
+      "benchKey": "gpqa",
+      "value": 42.4,
+      "sourceUrl": "https://artificialanalysis.ai/models/gemma-3-27b",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-3-27b",
+      "benchKey": "aime26",
+      "value": 20.8,
+      "sourceUrl": "https://deepmind.google/models/gemma/gemma-4/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-3-27b",
+      "benchKey": "lcb",
+      "value": 29.1,
+      "sourceUrl": "https://deepmind.google/models/gemma/gemma-4/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-3-27b",
+      "benchKey": "tau2",
+      "value": 6.6,
+      "sourceUrl": "https://deepmind.google/models/gemma/gemma-4/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-3-27b",
+      "benchKey": "mmluPro",
+      "value": 67.5,
+      "sourceUrl": "https://llm-stats.com/models/gemma-3-27b-it",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-26b-moe",
+      "benchKey": "gpqa",
+      "value": 82.3,
+      "sourceUrl": "https://huggingface.co/google/gemma-4-26B-A4B-it",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-26b-moe",
+      "benchKey": "gpqa",
+      "value": 79.2,
+      "sourceUrl": "https://blog.google/innovation-and-ai/technology/developers-tools/gemma-4/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-26b-moe",
+      "benchKey": "aime26",
+      "value": 88.3,
+      "sourceUrl": "https://deepmind.google/models/gemma/gemma-4/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-26b-moe",
+      "benchKey": "lcb",
+      "value": 77.1,
+      "sourceUrl": "https://deepmind.google/models/gemma/gemma-4/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-26b-moe",
+      "benchKey": "mmluPro",
+      "value": 82.6,
+      "sourceUrl": "https://aurigait.com/blog/gemma-4-features-benchmarks-guide/",
+      "tier": "C",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-26b-moe",
+      "benchKey": "tau2",
+      "value": 86.4,
+      "sourceUrl": "https://deepmind.google/models/gemma/gemma-4/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-31b",
+      "benchKey": "gpqa",
+      "value": 84.3,
+      "sourceUrl": "https://deepmind.google/models/gemma/gemma-4/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-31b",
+      "benchKey": "gpqa",
+      "value": 84.3,
+      "sourceUrl": "https://artificialanalysis.ai/articles/gemma-4-everything-you-need-to-know",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-31b",
+      "benchKey": "aime26",
+      "value": 89.2,
+      "sourceUrl": "https://deepmind.google/models/gemma/gemma-4/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-31b",
+      "benchKey": "lcb",
+      "value": 80.0,
+      "sourceUrl": "https://deepmind.google/models/gemma/gemma-4/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-31b",
+      "benchKey": "mmluPro",
+      "value": 85.2,
+      "sourceUrl": "https://deepmind.google/models/gemma/gemma-4/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-31b",
+      "benchKey": "tau2",
+      "value": 86.4,
+      "sourceUrl": "https://deepmind.google/models/gemma/gemma-4/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-31b",
+      "benchKey": "tb2",
+      "value": 42.9,
+      "sourceUrl": "https://deepmind.google/models/gemma/gemma-4/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-31b",
+      "benchKey": "hle",
+      "value": 23.0,
+      "sourceUrl": "https://artificialanalysis.ai/articles/gemma-4-everything-you-need-to-know",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-e2b",
+      "benchKey": "aime26",
+      "value": 37.5,
+      "sourceUrl": "https://deepmind.google/models/gemma/gemma-4/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-e2b",
+      "benchKey": "aime26",
+      "value": 37.5,
+      "sourceUrl": "https://aurigait.com/blog/gemma-4-features-benchmarks-guide/",
+      "tier": "C",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-e2b",
+      "benchKey": "lcb",
+      "value": 44.0,
+      "sourceUrl": "https://deepmind.google/models/gemma/gemma-4/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-e2b",
+      "benchKey": "lcb",
+      "value": 44.0,
+      "sourceUrl": "https://aurigait.com/blog/gemma-4-features-benchmarks-guide/",
+      "tier": "C",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-e2b",
+      "benchKey": "mmluPro",
+      "value": 60.0,
+      "sourceUrl": "https://deepmind.google/models/gemma/gemma-4/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-e2b",
+      "benchKey": "mmluPro",
+      "value": 60.0,
+      "sourceUrl": "https://aurigait.com/blog/gemma-4-features-benchmarks-guide/",
+      "tier": "C",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-e4b",
+      "benchKey": "aime26",
+      "value": 42.5,
+      "sourceUrl": "https://deepmind.google/models/gemma/gemma-4/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-e4b",
+      "benchKey": "aime26",
+      "value": 42.5,
+      "sourceUrl": "https://aurigait.com/blog/gemma-4-features-benchmarks-guide/",
+      "tier": "C",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-e4b",
+      "benchKey": "lcb",
+      "value": 52.0,
+      "sourceUrl": "https://deepmind.google/models/gemma/gemma-4/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-e4b",
+      "benchKey": "lcb",
+      "value": 52.0,
+      "sourceUrl": "https://aurigait.com/blog/gemma-4-features-benchmarks-guide/",
+      "tier": "C",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-e4b",
+      "benchKey": "mmluPro",
+      "value": 69.4,
+      "sourceUrl": "https://deepmind.google/models/gemma/gemma-4/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-e4b",
+      "benchKey": "mmluPro",
+      "value": 69.4,
+      "sourceUrl": "https://aurigait.com/blog/gemma-4-features-benchmarks-guide/",
+      "tier": "C",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-e4b",
+      "benchKey": "aaIdx",
+      "value": 19.0,
+      "sourceUrl": "https://artificialanalysis.ai/models/gemma-3-27b",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    }
+  ],
+  "modelMeta": [
+    {
+      "modelId": "gemini-3-1-flash",
+      "released": "2026-03-03",
+      "context": 1048576,
+      "license": "proprietary",
+      "open": false
+    },
+    {
+      "modelId": "gemini-3-1-pro",
+      "released": "2026-02-19",
+      "context": 2000000,
+      "license": "proprietary",
+      "open": false
+    },
+    {
+      "modelId": "gemma-3-27b",
+      "released": "2025-03-12",
+      "context": 131072,
+      "license": "Apache-2.0",
+      "open": true
+    },
+    {
+      "modelId": "gemma-4-26b-moe",
+      "released": "2026-04-02",
+      "context": 262144,
+      "license": "Apache-2.0",
+      "open": true
+    },
+    {
+      "modelId": "gemma-4-31b",
+      "released": "2026-04-02",
+      "context": 262144,
+      "license": "Apache-2.0",
+      "open": true
+    },
+    {
+      "modelId": "gemma-4-e2b",
+      "released": "2026-04-02",
+      "context": 131072,
+      "license": "Apache-2.0",
+      "open": true,
+      "vramRequirement": 2
+    },
+    {
+      "modelId": "gemma-4-e4b",
+      "released": "2026-04-02",
+      "context": 131072,
+      "license": "Apache-2.0",
+      "open": true,
+      "vramRequirement": 8
+    }
+  ],
+  "pricingObs": [
+    {
+      "modelId": "gemini-3-1-flash",
+      "provider": "official",
+      "in": 0.25,
+      "out": 1.50,
+      "cacheHit": null,
+      "throughput": 381.9,
+      "url": "https://openrouter.ai/google/gemini-3.1-flash-lite",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemini-3-1-pro",
+      "provider": "official",
+      "in": 2.0,
+      "out": 12.0,
+      "cacheHit": null,
+      "throughput": 114.0,
+      "url": "https://ai.google.dev/gemini-api/docs/pricing",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-26b-moe",
+      "provider": "openrouter",
+      "in": 0.07,
+      "out": 0.34,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://openrouter.ai/google/gemma-4-26b-a4b-it",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "gemma-4-31b",
+      "provider": "openrouter",
+      "in": 0.12,
+      "out": 0.37,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://openrouter.ai/google/gemma-4-31b-it",
+      "fetched": "2026-05-18"
+    }
+  ],
+  "ollamaObs": [
+    {
+      "modelId": "gemma-3-27b",
+      "pullCmd": "ollama pull gemma3:27b-it",
+      "tags": [],
+      "parameters": "27B",
+      "context": 131072,
+      "license": "Gemma",
+      "ollamaUrl": "https://ollama.com/library/gemma3"
+    },
+    {
+      "modelId": "gemma-4-26b-moe",
+      "pullCmd": "ollama pull gemma4:26b",
+      "tags": ["26b"],
+      "parameters": "26B (3.8B active)",
+      "context": 262144,
+      "license": "Apache-2.0",
+      "ollamaUrl": "https://ollama.com/library/gemma4"
+    },
+    {
+      "modelId": "gemma-4-31b",
+      "pullCmd": "ollama pull gemma4:31b",
+      "tags": ["31b"],
+      "parameters": "31B",
+      "context": 262144,
+      "license": "Apache-2.0",
+      "ollamaUrl": "https://ollama.com/library/gemma4"
+    },
+    {
+      "modelId": "gemma-4-e2b",
+      "pullCmd": "ollama pull gemma4:e2b",
+      "tags": ["e2b"],
+      "parameters": "2B effective (5.1B total)",
+      "context": 131072,
+      "license": "Apache-2.0",
+      "ollamaUrl": "https://ollama.com/library/gemma4"
+    },
+    {
+      "modelId": "gemma-4-e4b",
+      "pullCmd": "ollama pull gemma4:e4b",
+      "tags": ["e4b"],
+      "parameters": "4B effective (8B total)",
+      "context": 131072,
+      "license": "Apache-2.0",
+      "ollamaUrl": "https://ollama.com/library/gemma4"
+    }
+  ],
+  "unslothObs": [
+    {
+      "modelId": "gemma-4-26b-moe",
+      "name": "unsloth/gemma-4-26B-A4B-it-GGUF Q4",
+      "size": "18gb",
+      "vram": 18
+    },
+    {
+      "modelId": "gemma-4-26b-moe",
+      "name": "unsloth/gemma-4-26B-A4B-it-GGUF Q8",
+      "size": "28gb",
+      "vram": 28
+    },
+    {
+      "modelId": "gemma-4-31b",
+      "name": "unsloth/gemma-4-31B-it-GGUF Q4",
+      "size": "20gb",
+      "vram": 20
+    },
+    {
+      "modelId": "gemma-4-31b",
+      "name": "unsloth/gemma-4-31B-it-GGUF Q8",
+      "size": "34gb",
+      "vram": 34
+    },
+    {
+      "modelId": "gemma-4-e2b",
+      "name": "unsloth/gemma-4-E2B-it-GGUF Q4",
+      "size": "1.5gb",
+      "vram": 2
+    },
+    {
+      "modelId": "gemma-4-e4b",
+      "name": "unsloth/gemma-4-E4B-it-GGUF Q4",
+      "size": "5gb",
+      "vram": 5
+    }
+  ],
+  "lineupHints": [
+    {
+      "modelId": "gemini-3-1-flash",
+      "event": "renamed",
+      "evidence": "https://benchlm.ai/models/gemini-3-1-flash-lite",
+      "details": "gemini-3-1-flash in DB corresponds to Gemini 3.1 Flash Lite; no standalone Gemini 3.1 Flash exists as of May 2026"
+    }
+  ],
+  "naCandidates": [
+    {
+      "modelId": "gemini-3-1-flash",
+      "benchKey": "swePro",
+      "rationale": "Flash Lite is efficiency tier; SWE-bench Pro not reported by vendor or leaderboards for this model"
+    },
+    {
+      "modelId": "gemini-3-1-flash",
+      "benchKey": "tb2",
+      "rationale": "Terminal-Bench 2.0 not reported for Flash Lite efficiency tier models"
+    },
+    {
+      "modelId": "gemini-3-1-flash",
+      "benchKey": "tau2",
+      "rationale": "tau-bench not reported for Flash Lite efficiency tier"
+    },
+    {
+      "modelId": "gemma-3-27b",
+      "benchKey": "sweV",
+      "rationale": "Gemma 3 27B is gemma-tier; SWE-bench Verified not published by vendor or major leaderboards for this model"
+    },
+    {
+      "modelId": "gemma-3-27b",
+      "benchKey": "swePro",
+      "rationale": "SWE-bench Pro not published for Gemma 3 27B (gemma-tier)"
+    },
+    {
+      "modelId": "gemma-3-27b",
+      "benchKey": "tb2",
+      "rationale": "Terminal-Bench 2.0 not reported for Gemma 3 27B (gemma-tier)"
+    },
+    {
+      "modelId": "gemma-3-27b",
+      "benchKey": "aaIdx",
+      "rationale": "Artificial Analysis Intelligence Index not published for Gemma 3 27B (gemma-tier small model)"
+    },
+    {
+      "modelId": "gemma-4-26b-moe",
+      "benchKey": "sweV",
+      "rationale": "SWE-bench Verified not published for Gemma 4 26B MoE (gemma-tier)"
+    },
+    {
+      "modelId": "gemma-4-26b-moe",
+      "benchKey": "swePro",
+      "rationale": "SWE-bench Pro not published for Gemma 4 26B MoE (gemma-tier)"
+    },
+    {
+      "modelId": "gemma-4-26b-moe",
+      "benchKey": "hle",
+      "rationale": "HLE not individually reported for 26B MoE variant; only 31B Dense and comparisons referenced"
+    },
+    {
+      "modelId": "gemma-4-31b",
+      "benchKey": "sweV",
+      "rationale": "SWE-bench Verified not published for Gemma 4 31B (gemma-tier open model)"
+    },
+    {
+      "modelId": "gemma-4-31b",
+      "benchKey": "swePro",
+      "rationale": "SWE-bench Pro not published for Gemma 4 31B (gemma-tier)"
+    },
+    {
+      "modelId": "gemma-4-e2b",
+      "benchKey": "sweV",
+      "rationale": "Edge model - SWE-bench Verified not reported for E2B (gemma-tier edge)"
+    },
+    {
+      "modelId": "gemma-4-e2b",
+      "benchKey": "swePro",
+      "rationale": "Edge model - SWE-bench Pro not reported for E2B (gemma-tier edge)"
+    },
+    {
+      "modelId": "gemma-4-e2b",
+      "benchKey": "gpqa",
+      "rationale": "GPQA not reported for E2B edge model in vendor documentation"
+    },
+    {
+      "modelId": "gemma-4-e2b",
+      "benchKey": "hle",
+      "rationale": "HLE not reported for E2B edge model"
+    },
+    {
+      "modelId": "gemma-4-e2b",
+      "benchKey": "tau2",
+      "rationale": "tau-bench not reported for E2B edge model"
+    },
+    {
+      "modelId": "gemma-4-e2b",
+      "benchKey": "tb2",
+      "rationale": "Terminal-Bench 2.0 not reported for E2B edge model"
+    },
+    {
+      "modelId": "gemma-4-e4b",
+      "benchKey": "sweV",
+      "rationale": "Edge model - SWE-bench Verified not reported for E4B (gemma-tier edge)"
+    },
+    {
+      "modelId": "gemma-4-e4b",
+      "benchKey": "swePro",
+      "rationale": "SWE-bench Pro not reported for E4B edge model"
+    },
+    {
+      "modelId": "gemma-4-e4b",
+      "benchKey": "gpqa",
+      "rationale": "GPQA not reported for E4B edge model in vendor documentation"
+    },
+    {
+      "modelId": "gemma-4-e4b",
+      "benchKey": "hle",
+      "rationale": "HLE not reported for E4B edge model"
+    },
+    {
+      "modelId": "gemma-4-e4b",
+      "benchKey": "tau2",
+      "rationale": "tau-bench not reported for E4B edge model"
+    },
+    {
+      "modelId": "gemma-4-e4b",
+      "benchKey": "tb2",
+      "rationale": "Terminal-Bench 2.0 not reported for E4B edge model"
+    }
+  ],
+  "rawGaps": [
+    {
+      "modelId": "gemini-3-1-flash",
+      "benchKey": "aaCoding",
+      "triedSources": ["https://artificialanalysis.ai/models/gemini-3-1-flash-lite-preview", "https://benchlm.ai/models/gemini-3-1-flash-lite"],
+      "triedQueries": ["Gemini 3.1 Flash Lite aaCoding benchmark 2026", "Gemini 3.1 Flash Lite artificial analysis coding score"]
+    },
+    {
+      "modelId": "gemini-3-1-flash",
+      "benchKey": "aaAgentic",
+      "triedSources": ["https://artificialanalysis.ai/models/gemini-3-1-flash-lite-preview"],
+      "triedQueries": ["Gemini 3.1 Flash Lite aaAgentic benchmark 2026", "Gemini 3.1 Flash Lite agentic score"]
+    },
+    {
+      "modelId": "gemini-3-1-flash",
+      "benchKey": "bfcl",
+      "triedSources": ["https://layerlens.ai/blog/gemini-3-1-flash-lite-benchmark-results-efficiency-model-comparison"],
+      "triedQueries": ["Gemini 3.1 Flash Lite BFCL function calling benchmark 2026", "Gemini 3.1 Flash Lite bfcl score"]
+    },
+    {
+      "modelId": "gemini-3-1-pro",
+      "benchKey": "sweMulti",
+      "triedSources": ["https://deepmind.google/models/model-cards/gemini-3-1-pro/", "https://benchlm.ai/models/gemini-3-1-pro"],
+      "triedQueries": ["Gemini 3.1 Pro SWE-bench Multilingual 2026", "Gemini 3.1 Pro sweMulti score"]
+    },
+    {
+      "modelId": "gemini-3-1-pro",
+      "benchKey": "aaCoding",
+      "triedSources": ["https://artificialanalysis.ai/models/gemini-3-1-pro-preview"],
+      "triedQueries": ["Gemini 3.1 Pro aaCoding artificial analysis 2026", "Gemini 3.1 Pro coding index score"]
+    },
+    {
+      "modelId": "gemini-3-1-pro",
+      "benchKey": "aaAgentic",
+      "triedSources": ["https://artificialanalysis.ai/models/gemini-3-1-pro-preview"],
+      "triedQueries": ["Gemini 3.1 Pro aaAgentic artificial analysis 2026", "Gemini 3.1 Pro agentic index score"]
+    },
+    {
+      "modelId": "gemma-3-27b",
+      "benchKey": "hle",
+      "triedSources": ["https://artificialanalysis.ai/models/gemma-3-27b", "https://deepmind.google/models/gemma/gemma-4/"],
+      "triedQueries": ["Gemma 3 27B HLE Humanity Last Exam score 2026", "Gemma 3 27B hle benchmark"]
+    },
+    {
+      "modelId": "gemma-4-26b-moe",
+      "benchKey": "hle",
+      "triedSources": ["https://deepmind.google/models/gemma/gemma-4/", "https://artificialanalysis.ai/articles/gemma-4-everything-you-need-to-know"],
+      "triedQueries": ["Gemma 4 26B MoE HLE score 2026", "Gemma 4 26B A4B Humanity Last Exam benchmark"]
+    },
+    {
+      "modelId": "gemma-4-e2b",
+      "benchKey": "aaIdx",
+      "triedSources": ["https://artificialanalysis.ai/models/gemma-3-27b", "https://deepmind.google/models/gemma/gemma-4/"],
+      "triedQueries": ["Gemma 4 E2B artificial analysis intelligence index 2026", "Gemma 4 E2B aaIdx score"]
+    },
+    {
+      "modelId": "gemma-4-e2b",
+      "benchKey": "aime26",
+      "triedSources": ["https://deepmind.google/models/gemma/gemma-4/"],
+      "triedQueries": ["Gemma 4 E2B AIME 2026 benchmark score", "Gemma 4 E2B aime26"]
+    }
+  ],
+  "runtime": {
+    "toolCallCount": 28,
+    "wallclockSec": 420,
+    "snapshotsRead": 3
+  },
+  "partialReason": null
+}

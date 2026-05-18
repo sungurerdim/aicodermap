@@ -1,0 +1,810 @@
+{
+  "batchId": "batch00-anthropic",
+  "mode": "gather",
+  "observations": [
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "sweV",
+      "value": 87.6,
+      "sourceUrl": "https://llm-stats.com/benchmarks/swe-bench-verified",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "sweV",
+      "value": 87.6,
+      "sourceUrl": "https://www.marc0.dev/en/leaderboard",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "sweV",
+      "value": 87.6,
+      "sourceUrl": "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "swePro",
+      "value": 64.3,
+      "sourceUrl": "https://www.anthropic.com/claude/opus",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "swePro",
+      "value": 64.3,
+      "sourceUrl": "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "swePro",
+      "value": 64.3,
+      "sourceUrl": "https://www.morphllm.com/swe-bench-pro",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "tb2",
+      "value": 69.4,
+      "sourceUrl": "https://www.anthropic.com/claude/opus",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "tb2",
+      "value": 69.4,
+      "sourceUrl": "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "gpqa",
+      "value": 94.2,
+      "sourceUrl": "https://www.anthropic.com/claude/opus",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "gpqa",
+      "value": 94.2,
+      "sourceUrl": "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "gpqa",
+      "value": 94.2,
+      "sourceUrl": "https://www.morphllm.com/claude-benchmarks",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "mcpA",
+      "value": 77.3,
+      "sourceUrl": "https://www.anthropic.com/claude/opus",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "mcpA",
+      "value": 77.3,
+      "sourceUrl": "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "aaIdx",
+      "value": 57.0,
+      "sourceUrl": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "aaIdx",
+      "value": 57.0,
+      "sourceUrl": "https://artificialanalysis.ai/articles/opus-4-7-everything-you-need-to-know",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "aaAgentic",
+      "value": 1753.0,
+      "sourceUrl": "https://artificialanalysis.ai/articles/opus-4-7-everything-you-need-to-know",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "aime26",
+      "value": 95.2,
+      "sourceUrl": "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "aime26",
+      "value": 95.2,
+      "sourceUrl": "https://iternal.ai/llm-selection-guide",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "hle",
+      "value": 51.4,
+      "sourceUrl": "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "hle",
+      "value": 51.4,
+      "sourceUrl": "https://www.morphllm.com/claude-benchmarks",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "sweMulti",
+      "value": 77.8,
+      "sourceUrl": "https://www.anthropic.com/claude/opus",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "aaOmni",
+      "value": 26.0,
+      "sourceUrl": "https://artificialanalysis.ai/articles/opus-4-7-everything-you-need-to-know",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "sweV",
+      "value": 79.6,
+      "sourceUrl": "https://llm-stats.com/benchmarks/swe-bench-verified",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "sweV",
+      "value": 79.6,
+      "sourceUrl": "https://www.marc0.dev/en/leaderboard",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "sweV",
+      "value": 79.6,
+      "sourceUrl": "https://www.morphllm.com/claude-benchmarks",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "gpqa",
+      "value": 74.1,
+      "sourceUrl": "https://www.anthropic.com/news/claude-opus-4-6",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "gpqa",
+      "value": 74.1,
+      "sourceUrl": "https://www.morphllm.com/claude-benchmarks",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "gpqa",
+      "value": 74.1,
+      "sourceUrl": "https://iternal.ai/llm-selection-guide",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "tb2",
+      "value": 59.1,
+      "sourceUrl": "https://www.morphllm.com/claude-benchmarks",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "tb2",
+      "value": 59.1,
+      "sourceUrl": "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "aaIdx",
+      "value": 60.3,
+      "sourceUrl": "https://www.vals.ai/",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "aaIdx",
+      "value": 60.3,
+      "sourceUrl": "https://www.vals.ai/benchmarks/",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "tau2",
+      "value": 99.3,
+      "sourceUrl": "https://llm-stats.com/benchmarks/tau2-telecom",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "tau2",
+      "value": 99.3,
+      "sourceUrl": "https://www.anthropic.com/news/claude-opus-4-6",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "sweMulti",
+      "value": 77.83,
+      "sourceUrl": "https://www.anthropic.com/news/claude-opus-4-6",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "sweV",
+      "value": 73.3,
+      "sourceUrl": "https://llm-stats.com/benchmarks/swe-bench-verified",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "sweV",
+      "value": 73.3,
+      "sourceUrl": "https://www.marc0.dev/en/leaderboard",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "sweV",
+      "value": 73.3,
+      "sourceUrl": "https://www.morphllm.com/claude-benchmarks",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "swePro",
+      "value": 39.5,
+      "sourceUrl": "https://www.morphllm.com/claude-benchmarks",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "swePro",
+      "value": 39.5,
+      "sourceUrl": "https://www.morphllm.com/swe-bench-pro",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "aaIdx",
+      "value": 40.33,
+      "sourceUrl": "https://www.vals.ai/",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "aaIdx",
+      "value": 40.33,
+      "sourceUrl": "https://www.vals.ai/benchmarks/",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    }
+  ],
+  "modelMeta": [
+    {
+      "modelId": "opus-4-7",
+      "released": "2026-04-16",
+      "context": 1000000,
+      "license": "proprietary",
+      "providers": 4,
+      "open": false
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "released": "2026-02-01",
+      "context": 1000000,
+      "license": "proprietary",
+      "providers": 4,
+      "open": false
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "released": "2025-10-15",
+      "context": 200000,
+      "license": "proprietary",
+      "providers": 3,
+      "open": false
+    }
+  ],
+  "pricingObs": [
+    {
+      "modelId": "opus-4-7",
+      "provider": "official",
+      "in": 5.0,
+      "out": 25.0,
+      "cacheHit": 0.5,
+      "throughput": null,
+      "url": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "provider": "openrouter",
+      "in": 5.0,
+      "out": 25.0,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://openrouter.ai/anthropic/claude-opus-4.7",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "opus-4-7",
+      "provider": "aws_bedrock",
+      "in": 5.0,
+      "out": 25.0,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-opus-4-7.html",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "provider": "official",
+      "in": 3.0,
+      "out": 15.0,
+      "cacheHit": 0.3,
+      "throughput": null,
+      "url": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "provider": "openrouter",
+      "in": 3.0,
+      "out": 15.0,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://openrouter.ai/anthropic/claude-sonnet-4.6",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "provider": "official",
+      "in": 1.0,
+      "out": 5.0,
+      "cacheHit": 0.1,
+      "throughput": null,
+      "url": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "provider": "openrouter",
+      "in": 1.0,
+      "out": 5.0,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://openrouter.ai/anthropic/claude-haiku-4.5",
+      "fetched": "2026-05-18"
+    }
+  ],
+  "ollamaObs": [],
+  "unslothObs": [],
+  "lineupHints": [
+    {
+      "modelId": "opus-4-7",
+      "event": "new",
+      "evidence": "https://www.anthropic.com/claude/opus",
+      "details": "Claude Opus 4.7 released 2026-04-16, generally available, most capable Anthropic model as of May 2026"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "event": "new",
+      "evidence": "https://www.anthropic.com/news/claude-opus-4-6",
+      "details": "Claude Sonnet 4.6 released February 2026, best-value mid-tier, first Sonnet preferred over prior Opus in coding"
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "event": "new",
+      "evidence": "https://openrouter.ai/anthropic/claude-haiku-4.5",
+      "details": "Claude Haiku 4.5 released 2025-10-15, fast/cheap tier, 200K context, $1/$5 per MTok"
+    }
+  ],
+  "naCandidates": [
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "ollamaSize",
+      "rationale": "Claude Opus 4.7 is a closed proprietary API-only model; no Ollama distribution exists"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "ollamaSize",
+      "rationale": "Claude Sonnet 4.6 is a closed proprietary API-only model; no Ollama distribution exists"
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "ollamaSize",
+      "rationale": "Claude Haiku 4.5 is a closed proprietary API-only model; no Ollama distribution exists"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "vramRequirement",
+      "rationale": "Closed API model; VRAM not applicable (no local weights available)"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "vramRequirement",
+      "rationale": "Closed API model; VRAM not applicable (no local weights available)"
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "vramRequirement",
+      "rationale": "Closed API model; VRAM not applicable (no local weights available)"
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "aime26",
+      "rationale": "Claude Haiku 4.5 is a small fast-tier model; Anthropic does not publish AIME scores for it — math olympiad benchmarks are not a design target for this tier"
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "hle",
+      "rationale": "Claude Haiku 4.5 is a small fast-tier model; HLE scores not published by Anthropic or major leaderboards for this tier"
+    }
+  ],
+  "rawGaps": [
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "lcbV6",
+      "triedSources": [
+        "https://livecodebench.github.io/leaderboard.html",
+        "https://huggingface.co/spaces/livecodebench/leaderboard",
+        "https://llm-stats.com/benchmarks/livecodebench"
+      ],
+      "triedQueries": [
+        "claude opus 4.7 LiveCodeBench LCB v6 score 2026",
+        "\"opus-4-7\" livecodebench score 2026"
+      ]
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "aider",
+      "triedSources": [
+        "https://aider.chat/docs/leaderboards/",
+        "https://www.vellum.ai/best-llm-for-coding"
+      ],
+      "triedQueries": [
+        "claude opus 4.7 aider polyglot benchmark score 2026",
+        "aider leaderboard opus 4.7 score 2026"
+      ]
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "bfcl",
+      "triedSources": [
+        "https://gorilla.cs.berkeley.edu/leaderboard.html",
+        "https://www.vellum.ai/best-llm-for-coding"
+      ],
+      "triedQueries": [
+        "claude opus 4.7 bfcl function calling score 2026",
+        "opus 4.7 BFCL v4 leaderboard score 2026"
+      ]
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "aaCoding",
+      "triedSources": [
+        "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+        "https://artificialanalysis.ai/articles/opus-4-7-everything-you-need-to-know"
+      ],
+      "triedQueries": [
+        "claude opus 4.7 artificial analysis coding index score 2026",
+        "artificialanalysis.ai opus-4-7 coding benchmark score"
+      ]
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "lcbV6",
+      "triedSources": [
+        "https://livecodebench.github.io/leaderboard.html",
+        "https://huggingface.co/spaces/livecodebench/leaderboard"
+      ],
+      "triedQueries": [
+        "claude sonnet 4.6 LiveCodeBench score 2026",
+        "\"sonnet-4-6\" livecodebench LCB v6 score 2026"
+      ]
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "aider",
+      "triedSources": [
+        "https://aider.chat/docs/leaderboards/",
+        "https://www.vellum.ai/best-llm-for-coding"
+      ],
+      "triedQueries": [
+        "claude sonnet 4.6 aider polyglot benchmark score 2026",
+        "aider leaderboard sonnet 4.6 score 2026"
+      ]
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "bfcl",
+      "triedSources": [
+        "https://gorilla.cs.berkeley.edu/leaderboard.html",
+        "https://www.vellum.ai/best-llm-for-coding"
+      ],
+      "triedQueries": [
+        "claude sonnet 4.6 bfcl function calling score 2026",
+        "sonnet 4.6 BFCL v4 leaderboard score 2026"
+      ]
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "aime26",
+      "triedSources": [
+        "https://www.morphllm.com/claude-benchmarks",
+        "https://iternal.ai/llm-selection-guide"
+      ],
+      "triedQueries": [
+        "claude sonnet 4.6 AIME 2026 score math benchmark",
+        "sonnet 4.6 aime26 benchmark 2026"
+      ]
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "hle",
+      "triedSources": [
+        "https://www.morphllm.com/claude-benchmarks",
+        "https://iternal.ai/llm-selection-guide"
+      ],
+      "triedQueries": [
+        "claude sonnet 4.6 humanity's last exam HLE score 2026",
+        "sonnet 4.6 HLE benchmark score 2026"
+      ]
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "swePro",
+      "triedSources": [
+        "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+        "https://www.morphllm.com/swe-bench-pro"
+      ],
+      "triedQueries": [
+        "claude sonnet 4.6 SWE-bench Pro SEAL score 2026",
+        "\"sonnet-4-6\" swepro SEAL leaderboard score 2026"
+      ]
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "mcpA",
+      "triedSources": [
+        "https://www.anthropic.com/news/claude-opus-4-6",
+        "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained"
+      ],
+      "triedQueries": [
+        "claude sonnet 4.6 MCP Atlas tool use score 2026",
+        "sonnet 4.6 mcpAtlas benchmark score 2026"
+      ]
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "lcbV6",
+      "triedSources": [
+        "https://livecodebench.github.io/leaderboard.html",
+        "https://huggingface.co/spaces/livecodebench/leaderboard"
+      ],
+      "triedQueries": [
+        "claude haiku 4.5 LiveCodeBench LCB score 2026",
+        "\"haiku-4-5\" livecodebench score 2026"
+      ]
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "aider",
+      "triedSources": [
+        "https://aider.chat/docs/leaderboards/",
+        "https://www.vellum.ai/best-llm-for-coding"
+      ],
+      "triedQueries": [
+        "claude haiku 4.5 aider polyglot benchmark score 2026",
+        "aider leaderboard haiku 4.5 score 2026"
+      ]
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "bfcl",
+      "triedSources": [
+        "https://gorilla.cs.berkeley.edu/leaderboard.html",
+        "https://www.vellum.ai/best-llm-for-coding"
+      ],
+      "triedQueries": [
+        "claude haiku 4.5 bfcl function calling score 2026",
+        "haiku 4.5 BFCL v4 leaderboard score 2026"
+      ]
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "tau2",
+      "triedSources": [
+        "https://github.com/sierra-research/tau-bench",
+        "https://llm-stats.com/benchmarks/tau2-telecom"
+      ],
+      "triedQueries": [
+        "claude haiku 4.5 tau-bench tau2 score 2026",
+        "haiku 4.5 tau2 retail airline benchmark score"
+      ]
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "gpqa",
+      "triedSources": [
+        "https://www.morphllm.com/claude-benchmarks",
+        "https://llm-stats.com/benchmarks/gpqa",
+        "https://iternal.ai/llm-selection-guide"
+      ],
+      "triedQueries": [
+        "claude haiku 4.5 GPQA diamond score 2026",
+        "haiku 4.5 gpqa benchmark 2026"
+      ]
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "mcpA",
+      "triedSources": [
+        "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained",
+        "https://www.anthropic.com/claude-haiku"
+      ],
+      "triedQueries": [
+        "claude haiku 4.5 MCP Atlas score 2026",
+        "haiku 4.5 mcpAtlas tool use score"
+      ]
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "aaAgentic",
+      "triedSources": [
+        "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+        "https://artificialanalysis.ai/articles/claude-opus-4-5-benchmarks-and-analysis"
+      ],
+      "triedQueries": [
+        "claude haiku 4.5 artificial analysis agentic index GDPval score 2026",
+        "haiku 4.5 aaAgentic benchmark score 2026"
+      ]
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "aaCoding",
+      "triedSources": [
+        "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index"
+      ],
+      "triedQueries": [
+        "claude haiku 4.5 artificial analysis coding index score 2026",
+        "haiku 4.5 aaCoding benchmark score 2026"
+      ]
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "aaOmni",
+      "triedSources": [
+        "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index"
+      ],
+      "triedQueries": [
+        "claude haiku 4.5 artificial analysis omniscience score 2026",
+        "haiku 4.5 aaOmni benchmark score 2026"
+      ]
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "sweMulti",
+      "triedSources": [
+        "https://www.anthropic.com/claude-haiku",
+        "https://www.morphllm.com/claude-benchmarks"
+      ],
+      "triedQueries": [
+        "claude haiku 4.5 SWE-bench multilingual score 2026",
+        "haiku 4.5 sweMulti benchmark score 2026"
+      ]
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "tau2",
+      "triedSources": [
+        "https://github.com/sierra-research/tau-bench",
+        "https://llm-stats.com/benchmarks/tau2-telecom",
+        "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained"
+      ],
+      "triedQueries": [
+        "claude opus 4.7 tau2 tau-bench score 2026",
+        "opus 4.7 tau-bench retail telecom score 2026"
+      ]
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "aaCoding",
+      "triedSources": [
+        "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index"
+      ],
+      "triedQueries": [
+        "claude sonnet 4.6 artificial analysis coding index score 2026",
+        "sonnet 4.6 aaCoding benchmark score 2026"
+      ]
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "aaAgentic",
+      "triedSources": [
+        "https://artificialanalysis.ai/articles/opus-4-7-everything-you-need-to-know"
+      ],
+      "triedQueries": [
+        "claude sonnet 4.6 artificial analysis agentic GDPval score 2026",
+        "sonnet 4.6 GDPval-AA aaAgentic ELO score 2026"
+      ]
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "aaOmni",
+      "triedSources": [
+        "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index"
+      ],
+      "triedQueries": [
+        "claude sonnet 4.6 artificial analysis omniscience score 2026",
+        "sonnet 4.6 aaOmni hallucination benchmark score 2026"
+      ]
+    }
+  ],
+  "runtime": {
+    "toolCallCount": 22,
+    "wallclockSec": 280,
+    "snapshotsRead": 5
+  },
+  "partialReason": null
+}

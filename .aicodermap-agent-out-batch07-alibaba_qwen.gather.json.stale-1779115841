@@ -1,0 +1,694 @@
+{
+  "batchId": "batch07-alibaba_qwen",
+  "mode": "gather",
+  "observations": [
+    {
+      "modelId": "qwen3-coder-next",
+      "benchKey": "sweV",
+      "value": 70.6,
+      "sourceUrl": "https://qwen.ai/blog?id=qwen3-coder-next",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-coder-next",
+      "benchKey": "sweV",
+      "value": 70.6,
+      "sourceUrl": "https://arxiv.org/html/2603.00729v1",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-coder-next",
+      "benchKey": "sweV",
+      "value": 71.3,
+      "sourceUrl": "https://localaimaster.com/models/qwen-3-coder-next",
+      "tier": "C",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-coder-next",
+      "benchKey": "sweMulti",
+      "value": 62.8,
+      "sourceUrl": "https://arxiv.org/html/2603.00729v1",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-coder-next",
+      "benchKey": "sweMulti",
+      "value": 62.8,
+      "sourceUrl": "https://qwen.ai/blog?id=qwen3-coder-next",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-coder-next",
+      "benchKey": "swePro",
+      "value": 44.3,
+      "sourceUrl": "https://arxiv.org/html/2603.00729v1",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-coder-next",
+      "benchKey": "swePro",
+      "value": 44.3,
+      "sourceUrl": "https://qwen.ai/blog?id=qwen3-coder-next",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-coder-next",
+      "benchKey": "lcbV6",
+      "value": 53.7,
+      "sourceUrl": "https://arxiv.org/html/2603.00729v1",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-coder-next",
+      "benchKey": "lcbV6",
+      "value": 53.7,
+      "sourceUrl": "https://localaimaster.com/models/qwen-3-coder-next",
+      "tier": "C",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-coder-next",
+      "benchKey": "tb2",
+      "value": null,
+      "sourceUrl": "https://arxiv.org/html/2603.00729v1",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen25-coder-32b",
+      "benchKey": "sweV",
+      "value": 69.6,
+      "sourceUrl": "https://qwenlm.github.io/blog/qwen2.5-coder-family/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen25-coder-32b",
+      "benchKey": "sweV",
+      "value": 69.6,
+      "sourceUrl": "https://llm-stats.com/models/qwen-2.5-coder-32b-instruct",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen25-coder-32b",
+      "benchKey": "aider",
+      "value": 73.7,
+      "sourceUrl": "https://qwenlm.github.io/blog/qwen2.5-coder-family/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen25-coder-32b",
+      "benchKey": "aider",
+      "value": 73.7,
+      "sourceUrl": "https://ollama.com/library/qwen2.5-coder:32b",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen25-coder-14b",
+      "benchKey": "aider",
+      "value": 69.0,
+      "sourceUrl": "https://qwenlm.github.io/blog/qwen2.5-coder-family/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen25-coder-7b",
+      "benchKey": "aider",
+      "value": 58.0,
+      "sourceUrl": "https://qwenlm.github.io/blog/qwen2.5-coder-family/",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-5-9b",
+      "benchKey": "gpqa",
+      "value": 81.7,
+      "sourceUrl": "https://qwen.ai/blog?id=qwen3.5",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-5-9b",
+      "benchKey": "gpqa",
+      "value": 81.7,
+      "sourceUrl": "https://artificialanalysis.ai/models/qwen3-5-9b",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-5-9b",
+      "benchKey": "mmluPro",
+      "value": 82.5,
+      "sourceUrl": "https://qwen.ai/blog?id=qwen3.5",
+      "tier": "S",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-5-9b",
+      "benchKey": "mmluPro",
+      "value": 82.5,
+      "sourceUrl": "https://llm-stats.com/models/qwen3.5-9b",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-5-9b",
+      "benchKey": "lcbV6",
+      "value": 65.6,
+      "sourceUrl": "https://artificialanalysis.ai/models/qwen3-5-9b",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-5-9b",
+      "benchKey": "aaIdx",
+      "value": 32.0,
+      "sourceUrl": "https://artificialanalysis.ai/models/qwen3-5-9b",
+      "tier": "I",
+      "fetched": "2026-05-18"
+    }
+  ],
+  "modelMeta": [
+    {
+      "modelId": "qwen3-coder-next",
+      "released": "2026-02-03",
+      "context": 262144,
+      "license": "Apache-2.0",
+      "open": true,
+      "vramRequirement": 48,
+      "providers": 4
+    },
+    {
+      "modelId": "qwen25-coder-32b",
+      "released": "2024-11-01",
+      "context": 131072,
+      "license": "Apache-2.0",
+      "open": true,
+      "vramRequirement": 22,
+      "ollamaSize": "20 GB"
+    },
+    {
+      "modelId": "qwen25-coder-14b",
+      "released": "2024-11-01",
+      "context": 131072,
+      "license": "Apache-2.0",
+      "open": true,
+      "vramRequirement": 10
+    },
+    {
+      "modelId": "qwen25-coder-7b",
+      "released": "2024-11-01",
+      "context": 131072,
+      "license": "Apache-2.0",
+      "open": true,
+      "vramRequirement": 6
+    },
+    {
+      "modelId": "qwen3-5-9b",
+      "released": "2026-03-02",
+      "context": 262144,
+      "license": "Apache-2.0",
+      "open": true,
+      "vramRequirement": 8,
+      "ollamaSize": "6.6 GB"
+    }
+  ],
+  "pricingObs": [
+    {
+      "modelId": "qwen3-coder-next",
+      "provider": "openrouter",
+      "in": 0.11,
+      "out": 0.80,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://openrouter.ai/qwen/qwen3-coder-next",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen25-coder-32b",
+      "provider": "openrouter",
+      "in": 0.66,
+      "out": 1.00,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://openrouter.ai/qwen/qwen-2.5-coder-32b-instruct",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-5-9b",
+      "provider": "openrouter",
+      "in": 0.04,
+      "out": 0.15,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://pricepertoken.com/pricing-page/model/qwen-qwen3.5-9b",
+      "fetched": "2026-05-18"
+    }
+  ],
+  "ollamaObs": [
+    {
+      "modelId": "qwen25-coder-32b",
+      "pullCmd": "ollama pull qwen2.5-coder:32b",
+      "tags": [
+        { "name": "qwen2.5-coder:32b", "size": "20 GB", "vram": 22, "recommended": true },
+        { "name": "qwen2.5-coder:14b", "size": "9.0 GB", "vram": 10, "recommended": false },
+        { "name": "qwen2.5-coder:7b", "size": "4.7 GB", "vram": 6, "recommended": false },
+        { "name": "qwen2.5-coder:latest", "size": "4.7 GB", "vram": 6, "recommended": false }
+      ],
+      "pullCount": "15.6M pulls",
+      "parameters": "32B",
+      "context": 131072,
+      "license": "Apache-2.0",
+      "ollamaUrl": "https://ollama.com/library/qwen2.5-coder"
+    },
+    {
+      "modelId": "qwen25-coder-14b",
+      "pullCmd": "ollama pull qwen2.5-coder:14b",
+      "tags": [
+        { "name": "qwen2.5-coder:14b", "size": "9.0 GB", "vram": 10, "recommended": true }
+      ],
+      "pullCount": null,
+      "parameters": "14B",
+      "context": 131072,
+      "license": "Apache-2.0",
+      "ollamaUrl": "https://ollama.com/library/qwen2.5-coder:14b"
+    },
+    {
+      "modelId": "qwen25-coder-7b",
+      "pullCmd": "ollama pull qwen2.5-coder:7b",
+      "tags": [
+        { "name": "qwen2.5-coder:7b", "size": "4.7 GB", "vram": 6, "recommended": true }
+      ],
+      "pullCount": null,
+      "parameters": "7B",
+      "context": 131072,
+      "license": "Apache-2.0",
+      "ollamaUrl": "https://ollama.com/library/qwen2.5-coder:7b"
+    },
+    {
+      "modelId": "qwen3-coder-next",
+      "pullCmd": "ollama pull qwen3-coder-next",
+      "tags": [
+        { "name": "qwen3-coder-next:q4_K_M", "size": "48.2 GB", "vram": 48, "recommended": true }
+      ],
+      "pullCount": null,
+      "parameters": "80B / 3B active",
+      "context": 262144,
+      "license": "Apache-2.0",
+      "ollamaUrl": "https://ollama.com/library/qwen3-coder-next"
+    },
+    {
+      "modelId": "qwen3-5-9b",
+      "pullCmd": "ollama pull qwen3.5:9b",
+      "tags": [
+        { "name": "qwen3.5:9b", "size": "6.6 GB", "vram": 8, "recommended": true },
+        { "name": "qwen3.5:9b-q4_K_M", "size": "6.6 GB", "vram": 8, "recommended": false },
+        { "name": "qwen3.5:9b-q8_0", "size": "9.8 GB", "vram": 12, "recommended": false }
+      ],
+      "pullCount": null,
+      "parameters": "9.65B",
+      "context": 262144,
+      "license": "Apache-2.0",
+      "ollamaUrl": "https://ollama.com/library/qwen3.5:9b"
+    }
+  ],
+  "unslothObs": [
+    {
+      "modelId": "qwen3-coder-next",
+      "name": "unsloth/Qwen3-Coder-Next-UD-Q4_K_XL",
+      "size": "48.2 GB",
+      "vram": 48
+    },
+    {
+      "modelId": "qwen3-coder-next",
+      "name": "unsloth/Qwen3-Coder-Next-Q3_K_XL",
+      "size": "30 GB",
+      "vram": 30
+    },
+    {
+      "modelId": "qwen3-coder-next",
+      "name": "unsloth/Qwen3-Coder-Next-Q8_0",
+      "size": "80 GB",
+      "vram": 85
+    },
+    {
+      "modelId": "qwen25-coder-32b",
+      "name": "unsloth/Qwen2.5-Coder-32B-Instruct-GGUF-Q4_K_M",
+      "size": "20 GB",
+      "vram": 22
+    },
+    {
+      "modelId": "qwen25-coder-32b",
+      "name": "unsloth/Qwen2.5-Coder-32B-Instruct-GGUF-Q8_0",
+      "size": "34 GB",
+      "vram": 36
+    },
+    {
+      "modelId": "qwen25-coder-14b",
+      "name": "unsloth/Qwen2.5-Coder-14B-Instruct-GGUF-Q4_K_M",
+      "size": "9.0 GB",
+      "vram": 10
+    },
+    {
+      "modelId": "qwen25-coder-14b",
+      "name": "unsloth/Qwen2.5-Coder-14B-Instruct-128K-GGUF",
+      "size": "9.0 GB",
+      "vram": 10
+    },
+    {
+      "modelId": "qwen25-coder-7b",
+      "name": "unsloth/Qwen2.5-Coder-7B-Instruct-128K-GGUF-Q4_K_M",
+      "size": "4.7 GB",
+      "vram": 6
+    },
+    {
+      "modelId": "qwen25-coder-7b",
+      "name": "unsloth/Qwen2.5-Coder-7B-Instruct-GGUF-Q8_0",
+      "size": "7.7 GB",
+      "vram": 9
+    }
+  ],
+  "lineupHints": [
+    {
+      "modelId": "qwen25-coder-32b",
+      "event": "deprecated",
+      "evidence": "https://qwen.ai/blog?id=qwen3-coder",
+      "details": "Qwen3-Coder launched July 2025 as successor; Qwen2.5-Coder 32B still active but superseded by Qwen3-Coder generation"
+    },
+    {
+      "modelId": "qwen25-coder-14b",
+      "event": "deprecated",
+      "evidence": "https://deepinfra.com/blog/qwen-api-pricing-2026-guide",
+      "details": "DeepInfra redirected Qwen2.5-Coder-7B to Qwen3-14B due to low usage; 14B variant has limited 2026 provider listings"
+    },
+    {
+      "modelId": "qwen3-coder-next",
+      "event": "new",
+      "evidence": "https://qwen.ai/blog?id=qwen3-coder-next",
+      "details": "Released 2026-02-03 as Alibaba's latest open-weight coding agent model; 80B MoE with 3B active params"
+    },
+    {
+      "modelId": "qwen3-5-9b",
+      "event": "new",
+      "evidence": "https://qwen.ai/blog?id=qwen3.5",
+      "details": "Qwen3.5-9B released 2026-03-02 — hybrid DeltaNet multimodal 9B model with 262K context"
+    }
+  ],
+  "naCandidates": [
+    {
+      "modelId": "qwen25-coder-7b",
+      "benchKey": "sweV",
+      "rationale": "Qwen2.5-Coder-7B is a small coder-specialized model; SWE-bench Verified leaderboard entries for 7B model not found; only 32B variant has documented score"
+    },
+    {
+      "modelId": "qwen25-coder-14b",
+      "benchKey": "sweV",
+      "rationale": "Qwen2.5-Coder-14B is a small coder-specialized model; no separate SWE-bench Verified score published; only 32B has documented score"
+    },
+    {
+      "modelId": "qwen25-coder-7b",
+      "benchKey": "swePro",
+      "rationale": "SWE-bench Pro scores not reported for 7B variant; coder-specialized small model outside scope of this leaderboard"
+    },
+    {
+      "modelId": "qwen25-coder-14b",
+      "benchKey": "swePro",
+      "rationale": "SWE-bench Pro scores not reported for 14B variant; coder-specialized small model outside scope of this leaderboard"
+    },
+    {
+      "modelId": "qwen25-coder-7b",
+      "benchKey": "gpqa",
+      "rationale": "coder-specialized:non-coding-bench — GPQA Diamond systematically unreported for small coder-specialized variants"
+    },
+    {
+      "modelId": "qwen25-coder-14b",
+      "benchKey": "gpqa",
+      "rationale": "coder-specialized:non-coding-bench — GPQA Diamond systematically unreported for small coder-specialized variants"
+    },
+    {
+      "modelId": "qwen25-coder-32b",
+      "benchKey": "gpqa",
+      "rationale": "coder-specialized:non-coding-bench — GPQA Diamond not reported for Qwen2.5-Coder 32B in official benchmarks"
+    },
+    {
+      "modelId": "qwen25-coder-7b",
+      "benchKey": "mmluPro",
+      "rationale": "coder-specialized:non-coding-bench — MMLU-Pro not in Qwen2.5-Coder family benchmark report"
+    },
+    {
+      "modelId": "qwen25-coder-14b",
+      "benchKey": "mmluPro",
+      "rationale": "coder-specialized:non-coding-bench — MMLU-Pro not in Qwen2.5-Coder family benchmark report"
+    },
+    {
+      "modelId": "qwen25-coder-32b",
+      "benchKey": "mmluPro",
+      "rationale": "coder-specialized:non-coding-bench — MMLU-Pro not prominently reported for Qwen2.5-Coder 32B"
+    },
+    {
+      "modelId": "qwen25-coder-7b",
+      "benchKey": "hle",
+      "rationale": "coder-specialized:non-coding-bench — HLE not reported for small coder models"
+    },
+    {
+      "modelId": "qwen25-coder-14b",
+      "benchKey": "hle",
+      "rationale": "coder-specialized:non-coding-bench — HLE not reported for small coder models"
+    },
+    {
+      "modelId": "qwen25-coder-32b",
+      "benchKey": "hle",
+      "rationale": "coder-specialized:non-coding-bench — HLE not reported for Qwen2.5-Coder 32B"
+    },
+    {
+      "modelId": "qwen3-coder-next",
+      "benchKey": "mmluPro",
+      "rationale": "coder-specialized:non-coding-bench — MMLU-Pro not published for Qwen3-Coder-Next; model is coder-agent focused"
+    },
+    {
+      "modelId": "qwen3-coder-next",
+      "benchKey": "hle",
+      "rationale": "coder-specialized:non-coding-bench — HLE not reported for Qwen3-Coder-Next"
+    },
+    {
+      "modelId": "qwen3-5-9b",
+      "benchKey": "sweV",
+      "rationale": "Qwen3.5-9B is a general multimodal model, not a coder-specialized model; no SWE-bench entry found for this variant"
+    },
+    {
+      "modelId": "qwen3-5-9b",
+      "benchKey": "swePro",
+      "rationale": "Qwen3.5-9B general multimodal model; SWE-bench Pro not reported"
+    },
+    {
+      "modelId": "qwen3-5-9b",
+      "benchKey": "sweMulti",
+      "rationale": "Qwen3.5-9B general multimodal model; SWE-bench Multilingual not reported"
+    },
+    {
+      "modelId": "qwen3-5-9b",
+      "benchKey": "aider",
+      "rationale": "Qwen3.5-9B is a general reasoning/multimodal model; Aider score not published in 2026 leaderboards"
+    }
+  ],
+  "rawGaps": [
+    {
+      "modelId": "qwen3-coder-next",
+      "benchKey": "tb2",
+      "triedSources": [
+        "https://arxiv.org/html/2603.00729v1",
+        "https://qwen.ai/blog?id=qwen3-coder-next",
+        "https://llm-stats.com/benchmarks/swe-bench-verified"
+      ],
+      "triedQueries": [
+        "Qwen3-Coder-Next TerminalBench 2.0 score 2026",
+        "Qwen3-Coder-Next tb2 terminalBench score percent"
+      ]
+    },
+    {
+      "modelId": "qwen3-coder-next",
+      "benchKey": "tau2",
+      "triedSources": [
+        "https://arxiv.org/html/2603.00729v1",
+        "https://qwen.ai/blog?id=qwen3-coder-next"
+      ],
+      "triedQueries": [
+        "Qwen3-Coder-Next tau-bench score 2026",
+        "qwen3-coder-next LiveCodeBench aaIdx tau2 score"
+      ]
+    },
+    {
+      "modelId": "qwen3-coder-next",
+      "benchKey": "gpqa",
+      "triedSources": [
+        "https://arxiv.org/html/2603.00729v1",
+        "https://qwen.ai/blog?id=qwen3-coder-next"
+      ],
+      "triedQueries": [
+        "Qwen3-Coder-Next GPQA Diamond score 2026",
+        "qwen3-coder-next GPQA benchmark 2026"
+      ]
+    },
+    {
+      "modelId": "qwen3-coder-next",
+      "benchKey": "aider",
+      "triedSources": [
+        "https://qwen.ai/blog?id=qwen3-coder-next",
+        "https://aider.chat/docs/leaderboards/"
+      ],
+      "triedQueries": [
+        "Qwen3-Coder-Next aider polyglot benchmark score 2026",
+        "qwen3-coder-next aider score"
+      ]
+    },
+    {
+      "modelId": "qwen25-coder-32b",
+      "benchKey": "sweMulti",
+      "triedSources": [
+        "https://qwenlm.github.io/blog/qwen2.5-coder-family/",
+        "https://llm-stats.com/models/qwen-2.5-coder-32b-instruct"
+      ],
+      "triedQueries": [
+        "Qwen2.5-Coder 32B SWE-bench Multilingual score 2026",
+        "qwen2.5-coder-32b sweMulti benchmark"
+      ]
+    },
+    {
+      "modelId": "qwen25-coder-32b",
+      "benchKey": "swePro",
+      "triedSources": [
+        "https://qwenlm.github.io/blog/qwen2.5-coder-family/",
+        "https://labs.scale.com/leaderboard/swe_bench_pro_public"
+      ],
+      "triedQueries": [
+        "Qwen2.5-Coder 32B SWE-bench Pro score 2026",
+        "qwen2.5-coder-32b swePro benchmark scale AI"
+      ]
+    },
+    {
+      "modelId": "qwen25-coder-32b",
+      "benchKey": "lcbV6",
+      "triedSources": [
+        "https://qwenlm.github.io/blog/qwen2.5-coder-family/",
+        "https://llm-stats.com/benchmarks/livecodebench-v6"
+      ],
+      "triedQueries": [
+        "Qwen2.5-Coder 32B LiveCodeBench v6 score 2026",
+        "qwen2.5-coder-32b livecodebench v6 score"
+      ]
+    },
+    {
+      "modelId": "qwen25-coder-32b",
+      "benchKey": "tau2",
+      "triedSources": [
+        "https://qwenlm.github.io/blog/qwen2.5-coder-family/",
+        "https://artificialanalysis.ai/models/qwen2-5-coder-32b-instruct"
+      ],
+      "triedQueries": [
+        "Qwen2.5-Coder 32B tau-bench score 2026",
+        "qwen2.5-coder-32b tau2 benchmark"
+      ]
+    },
+    {
+      "modelId": "qwen25-coder-32b",
+      "benchKey": "tb2",
+      "triedSources": [
+        "https://qwenlm.github.io/blog/qwen2.5-coder-family/",
+        "https://artificialanalysis.ai/models/qwen2-5-coder-32b-instruct"
+      ],
+      "triedQueries": [
+        "Qwen2.5-Coder 32B TerminalBench score 2026",
+        "qwen2.5-coder-32b terminalBench tb2"
+      ]
+    },
+    {
+      "modelId": "qwen25-coder-32b",
+      "benchKey": "aaIdx",
+      "triedSources": [
+        "https://artificialanalysis.ai/models/qwen2-5-coder-32b-instruct",
+        "https://llm-stats.com/models/qwen-2.5-coder-32b-instruct"
+      ],
+      "triedQueries": [
+        "Qwen2.5-Coder 32B Artificial Analysis intelligence index score",
+        "qwen2.5-coder-32b aaIdx artificialanalysis"
+      ]
+    },
+    {
+      "modelId": "qwen25-coder-14b",
+      "benchKey": "lcbV6",
+      "triedSources": [
+        "https://qwenlm.github.io/blog/qwen2.5-coder-family/",
+        "https://llm-stats.com/benchmarks/livecodebench-v6"
+      ],
+      "triedQueries": [
+        "Qwen2.5-Coder 14B LiveCodeBench v6 score",
+        "qwen2.5-coder-14b benchmark livecodebench 2025"
+      ]
+    },
+    {
+      "modelId": "qwen25-coder-7b",
+      "benchKey": "lcbV6",
+      "triedSources": [
+        "https://qwenlm.github.io/blog/qwen2.5-coder-family/",
+        "https://llm-stats.com/benchmarks/livecodebench-v6"
+      ],
+      "triedQueries": [
+        "Qwen2.5-Coder 7B LiveCodeBench v6 score",
+        "qwen2.5-coder-7b benchmark livecodebench 2025"
+      ]
+    },
+    {
+      "modelId": "qwen3-5-9b",
+      "benchKey": "hle",
+      "triedSources": [
+        "https://artificialanalysis.ai/models/qwen3-5-9b",
+        "https://llm-stats.com/models/qwen3.5-9b"
+      ],
+      "triedQueries": [
+        "Qwen3.5-9B HLE Humanity Last Exam score 2026",
+        "qwen3.5-9b hle benchmark score"
+      ]
+    },
+    {
+      "modelId": "qwen3-5-9b",
+      "benchKey": "tb2",
+      "triedSources": [
+        "https://artificialanalysis.ai/models/qwen3-5-9b",
+        "https://llm-stats.com/models/qwen3.5-9b"
+      ],
+      "triedQueries": [
+        "Qwen3.5-9B TerminalBench score 2026",
+        "qwen3.5-9b tb2 terminalBench"
+      ]
+    },
+    {
+      "modelId": "qwen3-5-9b",
+      "benchKey": "tau2",
+      "triedSources": [
+        "https://artificialanalysis.ai/models/qwen3-5-9b",
+        "https://llm-stats.com/models/qwen3.5-9b"
+      ],
+      "triedQueries": [
+        "Qwen3.5-9B tau-bench score 2026",
+        "qwen3.5-9b tau2 benchmark"
+      ]
+    }
+  ],
+  "runtime": {
+    "toolCallCount": 12,
+    "wallclockSec": 180,
+    "snapshotsRead": 0
+  },
+  "partialReason": null
+}

@@ -1,0 +1,363 @@
+{
+  "batchId": "batch10-z.ai_(zhipu_",
+  "mode": "gather",
+  "observations": [
+    {"modelId": "glm-5-1", "benchKey": "sweV", "value": 77.8, "sourceUrl": "https://z.ai/blog/glm-5.1", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "glm-5-1", "benchKey": "swePro", "value": 58.4, "sourceUrl": "https://z.ai/blog/glm-5.1", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "glm-5-1", "benchKey": "swePro", "value": 58.4, "sourceUrl": "https://lushbinary.com/blog/glm-5-1-benchmarks-breakdown-swe-bench-pro-nl2repo-cybergym/", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "glm-5-1", "benchKey": "swePro", "value": 58.4, "sourceUrl": "https://winbuzzer.com/2026/04/09/z-ai-releases-glm-5-1-754b-model-tops-swe-bench-pro-xcxwbn/", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "glm-5-1", "benchKey": "tb2", "value": 63.5, "sourceUrl": "https://z.ai/blog/glm-5.1", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "glm-5-1", "benchKey": "tb2", "value": 63.5, "sourceUrl": "https://lushbinary.com/blog/glm-5-1-benchmarks-breakdown-swe-bench-pro-nl2repo-cybergym/", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "glm-5-1", "benchKey": "gpqa", "value": 86.2, "sourceUrl": "https://z.ai/blog/glm-5.1", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "glm-5-1", "benchKey": "gpqa", "value": 86.2, "sourceUrl": "https://lushbinary.com/blog/glm-5-1-benchmarks-breakdown-swe-bench-pro-nl2repo-cybergym/", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "glm-5-1", "benchKey": "hle", "value": 31.0, "sourceUrl": "https://z.ai/blog/glm-5.1", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "glm-5-1", "benchKey": "hle", "value": 31.0, "sourceUrl": "https://www.buildfastwithai.com/blogs/glm-5-1-review-vs-claude-opus-coding", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "glm-5-1", "benchKey": "aime26", "value": 95.3, "sourceUrl": "https://z.ai/blog/glm-5.1", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "glm-5-1", "benchKey": "aime26", "value": 95.3, "sourceUrl": "https://unsloth.ai/docs/models/glm-5.1", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "glm-5-1", "benchKey": "mcpA", "value": 52.1, "sourceUrl": "https://artificialanalysis.ai/models/glm-5-1", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "glm-5-1", "benchKey": "mcpA", "value": 71.8, "sourceUrl": "https://www.buildfastwithai.com/blogs/glm-5-1-review-vs-claude-opus-coding", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "glm-5-1", "benchKey": "aaIdx", "value": 51.0, "sourceUrl": "https://artificialanalysis.ai/models/glm-5-1", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "glm-5-1", "benchKey": "aaOmni", "value": 51.0, "sourceUrl": "https://artificialanalysis.ai/models/glm-5-1", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "glm-5-1", "benchKey": "browseComp", "value": 68.0, "sourceUrl": "https://z.ai/blog/glm-5.1", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "glm-5-1", "benchKey": "browseComp", "value": 68.0, "sourceUrl": "https://www.buildfastwithai.com/blogs/glm-5-1-review-vs-claude-opus-coding", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-5-air", "benchKey": "tau2", "value": 77.9, "sourceUrl": "https://artificialanalysis.ai/evaluations/tau2-bench", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-5-air", "benchKey": "bfcl", "value": 76.4, "sourceUrl": "https://gorilla.cs.berkeley.edu/leaderboard.html", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-5-air", "benchKey": "aime26", "value": 89.4, "sourceUrl": "https://huggingface.co/zai-org/GLM-4.5-Air", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-5-air", "benchKey": "mmluPro", "value": 81.4, "sourceUrl": "https://artificialanalysis.ai/models/glm-4-5-air", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-5-air", "benchKey": "aaIdx", "value": 23.0, "sourceUrl": "https://artificialanalysis.ai/models/glm-4-5-air", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-5-air", "benchKey": "aaOmni", "value": 38.0, "sourceUrl": "https://artificialanalysis.ai/models/glm-4-5-air", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-7", "benchKey": "sweV", "value": 73.8, "sourceUrl": "https://huggingface.co/zai-org/GLM-4.7", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-7", "benchKey": "sweV", "value": 73.8, "sourceUrl": "https://docs.z.ai/guides/llm/glm-4.7", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-7", "benchKey": "sweMulti", "value": 66.7, "sourceUrl": "https://huggingface.co/zai-org/GLM-4.7", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-7", "benchKey": "tb2", "value": 41.0, "sourceUrl": "https://huggingface.co/zai-org/GLM-4.7", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-7", "benchKey": "tb2", "value": 41.0, "sourceUrl": "https://docs.z.ai/guides/llm/glm-4.7", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-7", "benchKey": "lcb", "value": 84.9, "sourceUrl": "https://huggingface.co/zai-org/GLM-4.7", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-7", "benchKey": "lcb", "value": 84.9, "sourceUrl": "https://benchlm.ai/models/glm-4-7", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-7", "benchKey": "tau2", "value": 87.4, "sourceUrl": "https://huggingface.co/zai-org/GLM-4.7", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-7", "benchKey": "tau2", "value": 87.4, "sourceUrl": "https://artificialanalysis.ai/evaluations/tau2-bench", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-7", "benchKey": "gpqa", "value": 85.7, "sourceUrl": "https://huggingface.co/zai-org/GLM-4.7", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-7", "benchKey": "gpqa", "value": 85.7, "sourceUrl": "https://benchlm.ai/models/glm-4-7", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-7", "benchKey": "aime26", "value": 95.7, "sourceUrl": "https://huggingface.co/zai-org/GLM-4.7", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-7", "benchKey": "hle", "value": 42.8, "sourceUrl": "https://huggingface.co/zai-org/GLM-4.7", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-7", "benchKey": "hle", "value": 42.8, "sourceUrl": "https://medium.com/@leucopsis/a-technical-analysis-of-glm-4-7-db7fcc54210a", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-7", "benchKey": "mmluPro", "value": 84.3, "sourceUrl": "https://huggingface.co/zai-org/GLM-4.7", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-7", "benchKey": "mmluPro", "value": 84.3, "sourceUrl": "https://llm-stats.com/models/glm-4.7", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-7", "benchKey": "browseComp", "value": 67.0, "sourceUrl": "https://huggingface.co/zai-org/GLM-4.7", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-7", "benchKey": "aaIdx", "value": 42.0, "sourceUrl": "https://artificialanalysis.ai/models/glm-4-7", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "glm-4-7", "benchKey": "aaOmni", "value": 42.0, "sourceUrl": "https://artificialanalysis.ai/models/glm-4-7", "tier": "I", "fetched": "2026-05-18"}
+  ],
+  "modelMeta": [
+    {
+      "modelId": "glm-5-1",
+      "released": "2026-04-07",
+      "context": 202752,
+      "license": "MIT",
+      "open": true,
+      "providers": 3
+    },
+    {
+      "modelId": "glm-4-5-air",
+      "released": "2025-07-28",
+      "context": 131072,
+      "license": "MIT",
+      "open": true,
+      "providers": 4,
+      "vramRequirement": 24
+    },
+    {
+      "modelId": "glm-4-7",
+      "released": "2025-12-22",
+      "context": 202752,
+      "license": "MIT",
+      "open": true,
+      "providers": 5
+    }
+  ],
+  "pricingObs": [
+    {
+      "modelId": "glm-5-1",
+      "provider": "official",
+      "in": 1.4,
+      "out": 4.4,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://www.requesty.ai/models/fireworks/glm-5-1",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "glm-5-1",
+      "provider": "openrouter",
+      "in": 0.98,
+      "out": 3.08,
+      "cacheHit": 0.18,
+      "throughput": null,
+      "url": "https://openrouter.ai/z-ai/glm-5.1",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "glm-4-5-air",
+      "provider": "official",
+      "in": 0.2,
+      "out": 1.1,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://docs.z.ai/guides/llm/glm-4.5",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "glm-4-5-air",
+      "provider": "openrouter",
+      "in": 0.13,
+      "out": 0.85,
+      "cacheHit": null,
+      "throughput": 79.0,
+      "url": "https://openrouter.ai/z-ai/glm-4.5-air",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "glm-4-5-air",
+      "provider": "openrouter-free",
+      "in": 0.0,
+      "out": 0.0,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://openrouter.ai/z-ai/glm-4.5-air:free",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "glm-4-5-air",
+      "provider": "together",
+      "in": 0.17,
+      "out": 0.98,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://www.together.ai/models/glm-4-5-air",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "glm-4-7",
+      "provider": "official",
+      "in": 1.0,
+      "out": 3.0,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://z.ai/pricing",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "glm-4-7",
+      "provider": "openrouter",
+      "in": 0.4,
+      "out": 1.75,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://openrouter.ai/z-ai/glm-4.7",
+      "fetched": "2026-05-18"
+    }
+  ],
+  "ollamaObs": [
+    {
+      "modelId": "glm-5-1",
+      "pullCmd": "ollama pull glm-5.1:cloud",
+      "tags": ["cloud"],
+      "pullCount": null,
+      "parameters": "754B (40B active)",
+      "context": 202752,
+      "license": "MIT",
+      "ollamaUrl": "https://ollama.com/library/glm-5.1"
+    },
+    {
+      "modelId": "glm-4-5-air",
+      "pullCmd": "ollama pull glm-4.5-air",
+      "tags": [],
+      "pullCount": null,
+      "parameters": "106B (12B active)",
+      "context": 131072,
+      "license": "MIT",
+      "ollamaUrl": "https://ollama.com/library/glm-4.5-air"
+    },
+    {
+      "modelId": "glm-4-7",
+      "pullCmd": "ollama pull glm-4.7:cloud",
+      "tags": ["cloud"],
+      "pullCount": null,
+      "parameters": "358B",
+      "context": 202752,
+      "license": "MIT",
+      "ollamaUrl": "https://ollama.com/library/glm-4.7"
+    }
+  ],
+  "unslothObs": [
+    {
+      "modelId": "glm-5-1",
+      "name": "UD-Q2_K_XL",
+      "size": "~241GB",
+      "vram": 256
+    },
+    {
+      "modelId": "glm-5-1",
+      "name": "UD-Q4_K_XL",
+      "size": "~320GB",
+      "vram": 320
+    },
+    {
+      "modelId": "glm-5-1",
+      "name": "UD-TQ1_0",
+      "size": "~176GB",
+      "vram": 180
+    },
+    {
+      "modelId": "glm-4-5-air",
+      "name": "Q4_K_M",
+      "size": "~50GB",
+      "vram": 24
+    },
+    {
+      "modelId": "glm-4-5-air",
+      "name": "UD-Q4_K_XL",
+      "size": "~80GB",
+      "vram": 24
+    }
+  ],
+  "lineupHints": [
+    {
+      "modelId": "glm-5",
+      "event": "deprecated",
+      "evidence": "https://forums.developer.nvidia.com/t/urgent-glm-5-deprecation-april-20-2026-replacement-z-ai-glm-5-1-not-available-in-nim-api/366610",
+      "details": "GLM-5 deprecated on NVIDIA NIM on April 20, 2026; successor is glm-5-1"
+    },
+    {
+      "modelId": "glm-5-1",
+      "event": "new",
+      "evidence": "https://z.ai/blog/glm-5.1",
+      "details": "GLM-5.1 released April 7, 2026 — 754B MoE, MIT license, top SWE-bench Pro"
+    }
+  ],
+  "naCandidates": [
+    {
+      "modelId": "glm-5-1",
+      "benchKey": "programBench",
+      "rationale": "No published programBench score for GLM-5.1; not evaluated on this bench per vendor report"
+    },
+    {
+      "modelId": "glm-5-1",
+      "benchKey": "webDevElo",
+      "rationale": "WebDev Elo not available for GLM-5.1 in current vendor/leaderboard sources"
+    },
+    {
+      "modelId": "glm-4-5-air",
+      "benchKey": "sweV",
+      "rationale": "GLM-4.5 Air SWE-bench Verified score not individually published; paper (arXiv:2508.06471) reports only flagship GLM-4.5 scores separately"
+    },
+    {
+      "modelId": "glm-4-5-air",
+      "benchKey": "gpqa",
+      "rationale": "GLM-4.5 Air GPQA score not individually published; only aggregate ranking reported"
+    },
+    {
+      "modelId": "glm-4-5-air",
+      "benchKey": "hle",
+      "rationale": "GLM-4.5 Air HLE score not individually published; compact model paper does not break out Air-specific scores"
+    },
+    {
+      "modelId": "glm-4-5-air",
+      "benchKey": "lcb",
+      "rationale": "GLM-4.5 Air LiveCodeBench score not individually published; only GLM-4.5 flagship (72.9%) reported in paper"
+    },
+    {
+      "modelId": "glm-4-5-air",
+      "benchKey": "tb2",
+      "rationale": "GLM-4.5 Air Terminal-Bench 2 score not individually published; only GLM-4.5 flagship (37.5%) reported in paper"
+    },
+    {
+      "modelId": "glm-4-5-air",
+      "benchKey": "swePro",
+      "rationale": "GLM-4.5 Air SWE-bench Pro not published; model predates SWE-bench Pro's widespread adoption and Air variant lacks individual reporting"
+    },
+    {
+      "modelId": "glm-4-7",
+      "benchKey": "swePro",
+      "rationale": "GLM-4.7 has no published SWE-bench Pro score per BenchLM and search results; notApplicableBenchKeys already includes swePro"
+    }
+  ],
+  "rawGaps": [
+    {
+      "modelId": "glm-5-1",
+      "benchKey": "tau2",
+      "triedSources": ["https://artificialanalysis.ai/evaluations/tau2-bench", "https://benchlm.ai/models/glm-5-1", "https://llm-stats.com/models/glm-5.1"],
+      "triedQueries": ["GLM-5.1 tau-bench tau2 score LiveCodeBench LCB score 2026", "GLM-5.1 tau2 score Z.ai 2026"]
+    },
+    {
+      "modelId": "glm-5-1",
+      "benchKey": "lcb",
+      "triedSources": ["https://benchlm.ai/models/glm-5-1", "https://llm-stats.com/benchmarks/livecodebench-v6", "https://www.vals.ai/benchmarks/lcb"],
+      "triedQueries": ["GLM-5.1 LiveCodeBench score tau-bench mmluPro bfcl 2026", "GLM-5.1 LCB score percentage 2026"]
+    },
+    {
+      "modelId": "glm-5-1",
+      "benchKey": "mmluPro",
+      "triedSources": ["https://artificialanalysis.ai/evaluations/mmlu-pro", "https://llm-stats.com/benchmarks/mmlu-pro", "https://benchlm.ai/models/glm-5-1"],
+      "triedQueries": ["GLM-5.1 mmlu-pro score 2026 Z.ai", "GLM-5.1 LiveCodeBench score tau-bench mmluPro bfcl 2026"]
+    },
+    {
+      "modelId": "glm-5-1",
+      "benchKey": "bfcl",
+      "triedSources": ["https://gorilla.cs.berkeley.edu/leaderboard.html", "https://llm-stats.com/benchmarks/bfcl", "https://benchlm.ai/models/glm-5-1"],
+      "triedQueries": ["GLM-5.1 LiveCodeBench score tau-bench mmluPro bfcl 2026", "GLM-5.1 BFCL function calling score 2026"]
+    },
+    {
+      "modelId": "glm-5-1",
+      "benchKey": "aaCoding",
+      "triedSources": ["https://artificialanalysis.ai/models/glm-5-1"],
+      "triedQueries": ["GLM-5.1 artificialanalysis aaCoding aaAgentic score 2026"]
+    },
+    {
+      "modelId": "glm-5-1",
+      "benchKey": "aaAgentic",
+      "triedSources": ["https://artificialanalysis.ai/models/glm-5-1"],
+      "triedQueries": ["GLM-5.1 artificialanalysis aaCoding aaAgentic score 2026"]
+    },
+    {
+      "modelId": "glm-5-1",
+      "benchKey": "sweMulti",
+      "triedSources": ["https://benchlm.ai/models/glm-5-1", "https://llm-stats.com/models/glm-5.1"],
+      "triedQueries": ["GLM-5.1 SWE-bench multilingual score 2026"]
+    },
+    {
+      "modelId": "glm-4-7",
+      "benchKey": "bfcl",
+      "triedSources": ["https://gorilla.cs.berkeley.edu/leaderboard.html", "https://llm-stats.com/benchmarks/bfcl", "https://benchlm.ai/models/glm-4-7"],
+      "triedQueries": ["GLM-4.7 BFCL tbHard terminal-bench hard score 2025", "GLM-4.7 benchmark scores Z.ai 2025 2026"]
+    },
+    {
+      "modelId": "glm-4-7",
+      "benchKey": "tbHard",
+      "triedSources": ["https://artificialanalysis.ai/evaluations/terminalbench-hard", "https://llm-stats.com/models/glm-4.7"],
+      "triedQueries": ["GLM-4.7 BFCL tbHard terminal-bench hard score 2025", "GLM-4.7 swePro benchmark score 2025 2026 Z.ai docs"]
+    },
+    {
+      "modelId": "glm-4-7",
+      "benchKey": "mcpA",
+      "triedSources": ["https://artificialanalysis.ai/models/glm-4-7", "https://benchlm.ai/models/glm-4-7"],
+      "triedQueries": ["GLM-4.7 MCP-Atlas mcpA score 2025 2026"]
+    },
+    {
+      "modelId": "glm-4-5-air",
+      "benchKey": "mcpA",
+      "triedSources": ["https://artificialanalysis.ai/models/glm-4-5-air", "https://benchlm.ai/benchmarks"],
+      "triedQueries": ["GLM-4.5 Air MCP-Atlas score 2025 2026"]
+    },
+    {
+      "modelId": "glm-4-5-air",
+      "benchKey": "sweMulti",
+      "triedSources": ["https://huggingface.co/zai-org/GLM-4.5-Air", "https://arxiv.org/abs/2508.06471"],
+      "triedQueries": ["GLM-4.5 Air SWE-bench multilingual score 2025"]
+    }
+  ],
+  "runtime": {
+    "toolCallCount": 38,
+    "wallclockSec": 480,
+    "snapshotsRead": 6
+  },
+  "partialReason": null
+}

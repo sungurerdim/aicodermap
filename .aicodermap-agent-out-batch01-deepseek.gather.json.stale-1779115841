@@ -1,0 +1,412 @@
+{
+  "batchId": "batch01-deepseek",
+  "mode": "gather",
+  "observations": [
+    {"modelId": "deepseek-v3-2", "benchKey": "sweV", "value": 74.2, "sourceUrl": "https://benchlm.ai/models/deepseek-v3-2", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v3-2", "benchKey": "sweV", "value": 72.0, "sourceUrl": "https://codersera.com/blog/deepseek-v4-pro-review-benchmarks-pricing-2026/", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v3-2", "benchKey": "sweV", "value": 67.8, "sourceUrl": "https://www.morphllm.com/deepseek-v4", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v3-2", "benchKey": "lcb", "value": 74.1, "sourceUrl": "https://www.morphllm.com/deepseek-v4", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v3-2", "benchKey": "lcb", "value": 60.3, "sourceUrl": "https://benchlm.ai/models/deepseek-v3-2", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v3-2", "benchKey": "gpqa", "value": 78.5, "sourceUrl": "https://benchlm.ai/models/deepseek-v3-2", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v3-2", "benchKey": "gpqa", "value": 85.7, "sourceUrl": "https://llm-stats.com/models/deepseek-v3.2-speciale", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v3-2", "benchKey": "mmluPro", "value": 85.0, "sourceUrl": "https://benchlm.ai/models/deepseek-v3-2", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v3-2", "benchKey": "mmluPro", "value": 85.0, "sourceUrl": "https://www.morphllm.com/deepseek-v4", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v3-2", "benchKey": "aime26", "value": 89.3, "sourceUrl": "https://www.morphllm.com/deepseek-v4", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v3-2", "benchKey": "aime26", "value": 89.3, "sourceUrl": "https://codersera.com/blog/deepseek-v4-pro-review-benchmarks-pricing-2026/", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v3-2", "benchKey": "tb2", "value": 35.2, "sourceUrl": "https://llm-stats.com/models/deepseek-v3.2-speciale", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v3-2", "benchKey": "tb2", "value": 46.4, "sourceUrl": "https://benchlm.ai/models/deepseek-v3-2", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v3-2", "benchKey": "hle", "value": 25.1, "sourceUrl": "https://benchlm.ai/models/deepseek-v3-2", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v3-2", "benchKey": "hle", "value": 26.3, "sourceUrl": "https://llm-stats.com/models/deepseek-v3.2-speciale", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v3-2", "benchKey": "sweMulti", "value": 70.2, "sourceUrl": "https://benchlm.ai/models/deepseek-v3-2", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v3-2", "benchKey": "sweMulti", "value": 57.8, "sourceUrl": "https://llm-stats.com/models/deepseek-v3.2-speciale", "tier": "C", "fetched": "2026-05-18"},
+
+    {"modelId": "deepseek-v4-flash", "benchKey": "sweV", "value": 79.0, "sourceUrl": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-flash", "benchKey": "sweV", "value": 79.0, "sourceUrl": "https://codersera.com/blog/deepseek-v4-flash-deep-dive/", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-flash", "benchKey": "sweV", "value": 79.0, "sourceUrl": "https://www.buildfastwithai.com/blogs/deepseek-v4-flash-review-2026", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-flash", "benchKey": "lcb", "value": 91.6, "sourceUrl": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-flash", "benchKey": "lcb", "value": 91.6, "sourceUrl": "https://codersera.com/blog/deepseek-v4-flash-deep-dive/", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-flash", "benchKey": "lcb", "value": 91.6, "sourceUrl": "https://www.morphllm.com/deepseek-v4", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-flash", "benchKey": "gpqa", "value": 88.1, "sourceUrl": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-flash", "benchKey": "gpqa", "value": 88.1, "sourceUrl": "https://www.datacamp.com/blog/deepseek-v4", "tier": "C", "fetched": "2026-05-18"},
+
+    {"modelId": "deepseek-v4-pro", "benchKey": "sweV", "value": 80.6, "sourceUrl": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "sweV", "value": 80.6, "sourceUrl": "https://codersera.com/blog/deepseek-v4-pro-review-benchmarks-pricing-2026/", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "sweV", "value": 80.6, "sourceUrl": "https://artificialanalysis.ai/models/deepseek-v4-pro", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "lcb", "value": 93.5, "sourceUrl": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "lcb", "value": 93.5, "sourceUrl": "https://artificialanalysis.ai/models/deepseek-v4-pro", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "lcb", "value": 93.5, "sourceUrl": "https://codersera.com/blog/deepseek-v4-pro-review-benchmarks-pricing-2026/", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "gpqa", "value": 90.1, "sourceUrl": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "gpqa", "value": 90.1, "sourceUrl": "https://artificialanalysis.ai/models/deepseek-v4-pro", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "gpqa", "value": 90.1, "sourceUrl": "https://www.datacamp.com/blog/deepseek-v4", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "mmluPro", "value": 87.5, "sourceUrl": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "mmluPro", "value": 87.5, "sourceUrl": "https://codersera.com/blog/deepseek-v4-pro-review-benchmarks-pricing-2026/", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "tb2", "value": 67.9, "sourceUrl": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "tb2", "value": 67.9, "sourceUrl": "https://codersera.com/blog/deepseek-v4-pro-review-benchmarks-pricing-2026/", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "sweMulti", "value": 76.2, "sourceUrl": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "swePro", "value": 55.4, "sourceUrl": "https://codersera.com/blog/deepseek-v4-pro-review-benchmarks-pricing-2026/", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "swePro", "value": 55.4, "sourceUrl": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "mcpA", "value": 73.6, "sourceUrl": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "hle", "value": 38.2, "sourceUrl": "https://artificialanalysis.ai/models/deepseek-v4-pro", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "browseComp", "value": 83.4, "sourceUrl": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "mrcr", "value": 83.5, "sourceUrl": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "cfElo", "value": 3206, "sourceUrl": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-v4-pro", "benchKey": "aaIdx", "value": 52, "sourceUrl": "https://artificialanalysis.ai/models/deepseek-v4-pro", "tier": "I", "fetched": "2026-05-18"},
+
+    {"modelId": "deepseek-coder-v2-16b", "benchKey": "lcb", "value": 24.3, "sourceUrl": "https://arxiv.org/html/2406.11931v1", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-coder-v2-16b", "benchKey": "lcb", "value": 24.3, "sourceUrl": "https://github.com/deepseek-ai/DeepSeek-Coder-V2", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-coder-v2-16b", "benchKey": "sweV", "value": 19.8, "sourceUrl": "https://benchlm.ai/models/deepseek-v3-2", "tier": "I", "fetched": "2026-05-18"},
+
+    {"modelId": "deepseek-r1-14b", "benchKey": "gpqa", "value": 59.1, "sourceUrl": "https://huggingface.co/deepseek-ai/DeepSeek-R1", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-r1-14b", "benchKey": "gpqa", "value": 59.1, "sourceUrl": "https://github.com/deepseek-ai/deepseek-r1", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-r1-14b", "benchKey": "gpqa", "value": 59.1, "sourceUrl": "https://arxiv.org/html/2501.12948v1", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-r1-14b", "benchKey": "lcb", "value": 53.1, "sourceUrl": "https://huggingface.co/deepseek-ai/DeepSeek-R1", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-r1-14b", "benchKey": "lcb", "value": 53.1, "sourceUrl": "https://github.com/deepseek-ai/deepseek-r1", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-r1-14b", "benchKey": "lcb", "value": 53.1, "sourceUrl": "https://arxiv.org/html/2501.12948v1", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-r1-14b", "benchKey": "aime26", "value": 80.0, "sourceUrl": "https://huggingface.co/deepseek-ai/DeepSeek-R1", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-r1-14b", "benchKey": "aime26", "value": 80.0, "sourceUrl": "https://github.com/deepseek-ai/deepseek-r1", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "deepseek-r1-14b", "benchKey": "aime26", "value": 80.0, "sourceUrl": "https://arxiv.org/html/2501.12948v1", "tier": "I", "fetched": "2026-05-18"}
+  ],
+  "modelMeta": [
+    {
+      "modelId": "deepseek-v3-2",
+      "context": 128000,
+      "license": "MIT",
+      "open": true,
+      "released": "2025-12-01"
+    },
+    {
+      "modelId": "deepseek-v4-flash",
+      "context": 1000000,
+      "license": "MIT",
+      "open": true,
+      "released": "2026-04-24",
+      "providers": 13
+    },
+    {
+      "modelId": "deepseek-v4-pro",
+      "context": 1000000,
+      "license": "MIT",
+      "open": true,
+      "released": "2026-04-24",
+      "providers": 5
+    },
+    {
+      "modelId": "deepseek-coder-v2-16b",
+      "context": 128000,
+      "license": "DeepSeek License",
+      "open": true,
+      "vramRequirement": 9
+    },
+    {
+      "modelId": "deepseek-r1-14b",
+      "context": 128000,
+      "license": "MIT",
+      "open": true,
+      "vramRequirement": 9
+    }
+  ],
+  "pricingObs": [
+    {
+      "modelId": "deepseek-v3-2",
+      "provider": "official",
+      "in": 0.28,
+      "out": 0.42,
+      "cacheHit": 0.028,
+      "url": "https://api-docs.deepseek.com/quick_start/pricing",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "deepseek-v3-2",
+      "provider": "openrouter",
+      "in": 0.252,
+      "out": 0.378,
+      "url": "https://openrouter.ai/deepseek/deepseek-v3.2",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "deepseek-v4-flash",
+      "provider": "official",
+      "in": 0.14,
+      "out": 0.28,
+      "cacheHit": 0.0028,
+      "url": "https://api-docs.deepseek.com/quick_start/pricing",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "deepseek-v4-flash",
+      "provider": "openrouter",
+      "in": 0.112,
+      "out": 0.224,
+      "url": "https://openrouter.ai/deepseek/deepseek-v4-flash",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "deepseek-v4-pro",
+      "provider": "official",
+      "in": 1.74,
+      "out": 3.48,
+      "cacheHit": 0.0145,
+      "url": "https://api-docs.deepseek.com/quick_start/pricing",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "deepseek-v4-pro",
+      "provider": "openrouter",
+      "in": 0.435,
+      "out": 0.87,
+      "url": "https://openrouter.ai/deepseek/deepseek-v4-pro",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "deepseek-v4-pro",
+      "provider": "deepinfra",
+      "in": 1.74,
+      "out": 3.48,
+      "cacheHit": 0.145,
+      "url": "https://deepinfra.com/blog/deepseek-v4-pro-pricing-guide-2026-providers-cost-analysis",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "deepseek-v4-pro",
+      "provider": "together",
+      "in": 1.74,
+      "out": 3.48,
+      "url": "https://www.together.ai/models/deepseek-v4-pro",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "deepseek-v4-pro",
+      "provider": "fireworks",
+      "in": 1.74,
+      "out": 3.48,
+      "url": "https://www.requesty.ai/models/fireworks/deepseek-v4-pro",
+      "fetched": "2026-05-18"
+    }
+  ],
+  "ollamaObs": [
+    {
+      "modelId": "deepseek-r1-14b",
+      "pullCmd": "ollama pull deepseek-r1:14b",
+      "tags": ["14b", "14b-q8_0", "14b-qwen-distill-q4_K_M"],
+      "parameters": "14B",
+      "context": 128000,
+      "license": "MIT",
+      "ollamaUrl": "https://ollama.com/library/deepseek-r1"
+    },
+    {
+      "modelId": "deepseek-coder-v2-16b",
+      "pullCmd": "ollama pull deepseek-coder-v2:16b",
+      "tags": ["16b", "16b-lite-instruct-q4_K_M", "16b-lite-base-fp16"],
+      "parameters": "16B (2.4B active)",
+      "context": 128000,
+      "license": "DeepSeek License",
+      "ollamaUrl": "https://ollama.com/library/deepseek-coder-v2"
+    }
+  ],
+  "unslothObs": [
+    {
+      "modelId": "deepseek-r1-14b",
+      "name": "DeepSeek-R1-Distill-Qwen-14B Q4_K_M",
+      "size": "8.0GB",
+      "vram": 9
+    },
+    {
+      "modelId": "deepseek-r1-14b",
+      "name": "DeepSeek-R1-Distill-Qwen-14B Q5_K_M",
+      "size": "9.8GB",
+      "vram": 12
+    },
+    {
+      "modelId": "deepseek-coder-v2-16b",
+      "name": "deepseek-coder-v2-16b Q4_K_M",
+      "size": "5.3GB",
+      "vram": 8
+    },
+    {
+      "modelId": "deepseek-coder-v2-16b",
+      "name": "deepseek-coder-v2-16b Q5_K_M",
+      "size": "6.5GB",
+      "vram": 12
+    }
+  ],
+  "lineupHints": [
+    {
+      "modelId": "deepseek-v4-flash",
+      "event": "renamed",
+      "evidence": "https://api-docs.deepseek.com/updates",
+      "details": "deepseek-chat and deepseek-reasoner aliases now point to deepseek-v4-flash; deprecated 2026-07-24"
+    },
+    {
+      "modelId": "deepseek-v4-pro",
+      "event": "new",
+      "evidence": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+      "details": "Released 2026-04-24, 1.6T/49B active MoE, 1M context, MIT license"
+    },
+    {
+      "modelId": "deepseek-v4-flash",
+      "event": "new",
+      "evidence": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash",
+      "details": "Released 2026-04-24, 284B/13B active MoE, 1M context, MIT license; free tier on OpenRouter"
+    }
+  ],
+  "naCandidates": [
+    {
+      "modelId": "deepseek-coder-v2-16b",
+      "benchKey": "tb2",
+      "rationale": "coder-specialized tier: terminal-bench/agentic not systematically reported for code-specialist models per vendor report"
+    },
+    {
+      "modelId": "deepseek-coder-v2-16b",
+      "benchKey": "tau2",
+      "rationale": "coder-specialized tier: tau-bench not reported for code-specialist models"
+    },
+    {
+      "modelId": "deepseek-coder-v2-16b",
+      "benchKey": "hle",
+      "rationale": "coder-specialized tier: HLE (general knowledge) not reported for code-specialist models"
+    },
+    {
+      "modelId": "deepseek-coder-v2-16b",
+      "benchKey": "aime26",
+      "rationale": "coder-specialized tier: AIME math olympiad not systematically reported for code-specialist models"
+    },
+    {
+      "modelId": "deepseek-coder-v2-16b",
+      "benchKey": "mmluPro",
+      "rationale": "coder-specialized tier: MMLU-Pro general knowledge not reported for code-specialist models"
+    },
+    {
+      "modelId": "deepseek-coder-v2-16b",
+      "benchKey": "mcpA",
+      "rationale": "coder-specialized tier: MCP-Atlas agentic not systematically reported for code-specialist models"
+    },
+    {
+      "modelId": "deepseek-coder-v2-16b",
+      "benchKey": "swePro",
+      "rationale": "coder-specialized 16B lite variant: SWE-Pro not published for the Lite 16B variant specifically"
+    },
+    {
+      "modelId": "deepseek-r1-14b",
+      "benchKey": "tb2",
+      "rationale": "coder-specialized distill: terminal-bench not reported for small distilled reasoning models"
+    },
+    {
+      "modelId": "deepseek-r1-14b",
+      "benchKey": "tau2",
+      "rationale": "coder-specialized distill: tau-bench not reported for small distilled reasoning models"
+    },
+    {
+      "modelId": "deepseek-r1-14b",
+      "benchKey": "mcpA",
+      "rationale": "coder-specialized distill: MCP-Atlas not reported for 14B distilled models"
+    },
+    {
+      "modelId": "deepseek-r1-14b",
+      "benchKey": "sweMulti",
+      "rationale": "coder-specialized distill: SWE-Multilingual not reported for small distilled models"
+    },
+    {
+      "modelId": "deepseek-r1-14b",
+      "benchKey": "mmluPro",
+      "rationale": "coder-specialized distill: MMLU-Pro not in official R1-14B distill benchmark table"
+    }
+  ],
+  "rawGaps": [
+    {
+      "modelId": "deepseek-v3-2",
+      "benchKey": "tau2",
+      "triedSources": ["https://benchlm.ai/models/deepseek-v3-2", "https://artificialanalysis.ai/models"],
+      "triedQueries": ["deepseek v3.2 tau-bench score 2026", "deepseek v3.2 tau2 telecom benchmark"]
+    },
+    {
+      "modelId": "deepseek-v3-2",
+      "benchKey": "bfcl",
+      "triedSources": ["https://benchlm.ai/models/deepseek-v3-2"],
+      "triedQueries": ["deepseek v3.2 BFCL function calling benchmark 2026", "deepseek-v3-2 bfcl score"]
+    },
+    {
+      "modelId": "deepseek-v4-flash",
+      "benchKey": "swePro",
+      "triedSources": ["https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash", "https://benchlm.ai/models/deepseek-v4-flash"],
+      "triedQueries": ["deepseek v4 flash SWE-bench Pro score 2026", "deepseek v4 flash swePro benchmark"]
+    },
+    {
+      "modelId": "deepseek-v4-flash",
+      "benchKey": "tb2",
+      "triedSources": ["https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash", "https://codersera.com/blog/deepseek-v4-flash-deep-dive/"],
+      "triedQueries": ["deepseek v4 flash terminal-bench score 2026", "deepseek v4 flash tb2 benchmark exact score"]
+    },
+    {
+      "modelId": "deepseek-v4-flash",
+      "benchKey": "tau2",
+      "triedSources": ["https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash", "https://artificialanalysis.ai/models/deepseek-v4-pro"],
+      "triedQueries": ["deepseek v4 flash tau-bench tau2 score 2026", "deepseek v4 flash tau bench telecom"]
+    },
+    {
+      "modelId": "deepseek-v4-flash",
+      "benchKey": "mmluPro",
+      "triedSources": ["https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash", "https://benchlm.ai/models/deepseek-v4-flash"],
+      "triedQueries": ["deepseek v4 flash MMLU-Pro score 2026", "deepseek v4 flash mmlu benchmark"]
+    },
+    {
+      "modelId": "deepseek-v4-flash",
+      "benchKey": "hle",
+      "triedSources": ["https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash", "https://benchlm.ai/models/deepseek-v4-flash"],
+      "triedQueries": ["deepseek v4 flash HLE humanity last exam score 2026", "deepseek v4 flash hle benchmark"]
+    },
+    {
+      "modelId": "deepseek-v4-pro",
+      "benchKey": "tau2",
+      "triedSources": ["https://artificialanalysis.ai/models/deepseek-v4-pro", "https://benchlm.ai/models/deepseek-v4-pro"],
+      "triedQueries": ["deepseek v4 pro tau-bench score 2026", "deepseek v4 pro tau2 telecom benchmark result"]
+    },
+    {
+      "modelId": "deepseek-v4-pro",
+      "benchKey": "bfcl",
+      "triedSources": ["https://benchlm.ai/models/deepseek-v4-pro", "https://artificialanalysis.ai/models/deepseek-v4-pro"],
+      "triedQueries": ["deepseek v4 pro BFCL function calling score 2026", "deepseek v4 pro bfcl benchmark"]
+    },
+    {
+      "modelId": "deepseek-v4-pro",
+      "benchKey": "aime26",
+      "triedSources": ["https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro", "https://codersera.com/blog/deepseek-v4-pro-review-benchmarks-pricing-2026/"],
+      "triedQueries": ["deepseek v4 pro AIME 2026 score", "deepseek v4 pro aime26 math benchmark"]
+    },
+    {
+      "modelId": "deepseek-coder-v2-16b",
+      "benchKey": "gpqa",
+      "triedSources": ["https://arxiv.org/html/2406.11931v1", "https://benchlm.ai/models/deepseek-v3-2"],
+      "triedQueries": ["deepseek coder v2 16b GPQA Diamond score", "deepseek-coder-v2-lite gpqa benchmark 2026"]
+    },
+    {
+      "modelId": "deepseek-coder-v2-16b",
+      "benchKey": "sweV",
+      "triedSources": ["https://arxiv.org/html/2406.11931v1", "https://www.swebench.com/verified.html"],
+      "triedQueries": ["deepseek coder v2 16b SWE-bench Verified score", "deepseek-coder-v2-lite-instruct sweV 2026"]
+    },
+    {
+      "modelId": "deepseek-r1-14b",
+      "benchKey": "sweV",
+      "triedSources": ["https://huggingface.co/deepseek-ai/DeepSeek-R1", "https://www.swebench.com/verified.html"],
+      "triedQueries": ["deepseek r1 14b SWE-bench Verified score", "deepseek-r1-distill-qwen-14b sweV benchmark"]
+    },
+    {
+      "modelId": "deepseek-r1-14b",
+      "benchKey": "swePro",
+      "triedSources": ["https://huggingface.co/deepseek-ai/DeepSeek-R1", "https://benchlm.ai/models/deepseek-v3-2"],
+      "triedQueries": ["deepseek r1 14b SWE-bench Pro score", "deepseek-r1-14b swePro benchmark result"]
+    },
+    {
+      "modelId": "deepseek-r1-14b",
+      "benchKey": "hle",
+      "triedSources": ["https://huggingface.co/deepseek-ai/DeepSeek-R1", "https://arxiv.org/html/2501.12948v1"],
+      "triedQueries": ["deepseek r1 14b HLE humanity last exam score", "deepseek-r1-distill-qwen-14b hle benchmark"]
+    }
+  ],
+  "runtime": {
+    "toolCallCount": 22,
+    "wallclockSec": 240,
+    "snapshotsRead": 0
+  },
+  "partialReason": null
+}

@@ -1,0 +1,449 @@
+{
+  "batchId": "batch06-alibaba_qwen",
+  "mode": "gather",
+  "observations": [
+    {"modelId": "qwen-3-6-27b", "benchKey": "sweV", "value": 77.2, "sourceUrl": "https://qwen.ai/blog?id=qwen3.6-27b", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "qwen-3-6-27b", "benchKey": "sweV", "value": 77.2, "sourceUrl": "https://www.buildfastwithai.com/blogs/qwen3-6-27b-review-2026", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen-3-6-27b", "benchKey": "swePro", "value": 53.5, "sourceUrl": "https://qwen.ai/blog?id=qwen3.6-27b", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "qwen-3-6-27b", "benchKey": "gpqa", "value": 87.8, "sourceUrl": "https://qwen.ai/blog?id=qwen3.6-27b", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "qwen-3-6-27b", "benchKey": "gpqa", "value": 87.8, "sourceUrl": "https://www.buildfastwithai.com/blogs/qwen3-6-27b-review-2026", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen-3-6-27b", "benchKey": "tb2", "value": 59.3, "sourceUrl": "https://qwen.ai/blog?id=qwen3.6-27b", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "qwen-3-6-27b", "benchKey": "tb2", "value": 59.3, "sourceUrl": "https://www.buildfastwithai.com/blogs/qwen3-6-27b-review-2026", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen-3-6-27b", "benchKey": "lcb", "value": 71.78, "sourceUrl": "https://livecodebench.github.io/leaderboard.html", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "qwen-3-6-27b", "benchKey": "aaIdx", "value": 46.0, "sourceUrl": "https://artificialanalysis.ai/models/qwen3-6-27b", "tier": "I", "fetched": "2026-05-18"},
+
+    {"modelId": "qwen-3-6-max", "benchKey": "sweV", "value": 83.5, "sourceUrl": "https://tokenmix.ai/blog/qwen3-6-max-preview-benchmark-review-2026", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen-3-6-max", "benchKey": "gpqa", "value": 86.0, "sourceUrl": "https://tokenmix.ai/blog/qwen3-6-max-preview-benchmark-review-2026", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen-3-6-max", "benchKey": "gpqa", "value": 86.0, "sourceUrl": "https://www.buildfastwithai.com/blogs/qwen3-6-max-preview-review-2026", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen-3-6-max", "benchKey": "hle", "value": 51.0, "sourceUrl": "https://www.buildfastwithai.com/blogs/qwen3-6-max-preview-review-2026", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen-3-6-max", "benchKey": "mmluPro", "value": 79.0, "sourceUrl": "https://www.buildfastwithai.com/blogs/qwen3-6-max-preview-review-2026", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen-3-6-max", "benchKey": "aime26", "value": 93.0, "sourceUrl": "https://www.buildfastwithai.com/blogs/qwen3-6-max-preview-review-2026", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen-3-6-max", "benchKey": "aaIdx", "value": 52.0, "sourceUrl": "https://artificialanalysis.ai/models/qwen3-6-plus", "tier": "I", "fetched": "2026-05-18"},
+
+    {"modelId": "qwen3-235b", "benchKey": "lcb", "value": 62.2, "sourceUrl": "https://artificialanalysis.ai/", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-235b", "benchKey": "lcb", "value": 70.7, "sourceUrl": "https://arxiv.org/pdf/2505.09388", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-235b", "benchKey": "gpqa", "value": 70.0, "sourceUrl": "https://artificialanalysis.ai/", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-235b", "benchKey": "gpqa", "value": 84.4, "sourceUrl": "https://rankedagi.com/models/qwen-3-a22b-thinking-235b", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-235b", "benchKey": "hle", "value": 11.7, "sourceUrl": "https://artificialanalysis.ai/", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-235b", "benchKey": "mmluPro", "value": 82.8, "sourceUrl": "https://artificialanalysis.ai/", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-235b", "benchKey": "aime26", "value": 81.5, "sourceUrl": "https://arxiv.org/pdf/2505.09388", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-235b", "benchKey": "tau2", "value": 24.0, "sourceUrl": "https://artificialanalysis.ai/", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-235b", "benchKey": "bfcl", "value": 70.8, "sourceUrl": "https://arxiv.org/pdf/2505.09388", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-235b", "benchKey": "cfElo", "value": 2056.0, "sourceUrl": "https://arxiv.org/pdf/2505.09388", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-235b", "benchKey": "sweV", "value": 61.7, "sourceUrl": "https://nebius.com/blog/posts/openhands-trajectories-with-qwen3-coder-480b", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-235b", "benchKey": "aaIdx", "value": 19.8, "sourceUrl": "https://artificialanalysis.ai/", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-235b", "benchKey": "aaAgentic", "value": 15.1, "sourceUrl": "https://artificialanalysis.ai/", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-235b", "benchKey": "aaCoding", "value": 17.4, "sourceUrl": "https://artificialanalysis.ai/", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-235b", "benchKey": "tbHard", "value": 6.1, "sourceUrl": "https://artificialanalysis.ai/", "tier": "I", "fetched": "2026-05-18"},
+
+    {"modelId": "qwen3-32b", "benchKey": "gpqa", "value": 66.8, "sourceUrl": "https://designforonline.com/ai-models/qwen-qwen3-32b/", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-32b", "benchKey": "mmluPro", "value": 79.8, "sourceUrl": "https://designforonline.com/ai-models/qwen-qwen3-32b/", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-32b", "benchKey": "aime26", "value": 73.0, "sourceUrl": "https://designforonline.com/ai-models/qwen-qwen3-32b/", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-32b", "benchKey": "lcb", "value": 54.6, "sourceUrl": "https://designforonline.com/ai-models/qwen-qwen3-32b/", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-32b", "benchKey": "hle", "value": 8.3, "sourceUrl": "https://designforonline.com/ai-models/qwen-qwen3-32b/", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-32b", "benchKey": "bfcl", "value": 75.7, "sourceUrl": "https://awesomeagents.ai/leaderboards/function-calling-benchmarks-leaderboard/", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-32b", "benchKey": "aaIdx", "value": 15.0, "sourceUrl": "https://artificialanalysis.ai/models/qwen3-32b-instruct", "tier": "I", "fetched": "2026-05-18"},
+
+    {"modelId": "qwen3-6-35b-moe", "benchKey": "sweV", "value": 73.4, "sourceUrl": "https://qwen.ai/blog?id=qwen3.6-35b-a3b", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-6-35b-moe", "benchKey": "sweV", "value": 73.4, "sourceUrl": "https://www.buildfastwithai.com/blogs/qwen3-6-35b-a3b-review", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-6-35b-moe", "benchKey": "swePro", "value": 49.5, "sourceUrl": "https://qwen.ai/blog?id=qwen3.6-35b-a3b", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-6-35b-moe", "benchKey": "gpqa", "value": 86.0, "sourceUrl": "https://qwen.ai/blog?id=qwen3.6-35b-a3b", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-6-35b-moe", "benchKey": "gpqa", "value": 86.0, "sourceUrl": "https://www.buildfastwithai.com/blogs/qwen3-6-35b-a3b-review", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-6-35b-moe", "benchKey": "tb2", "value": 51.5, "sourceUrl": "https://qwen.ai/blog?id=qwen3.6-35b-a3b", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-6-35b-moe", "benchKey": "aime26", "value": 92.7, "sourceUrl": "https://qwen.ai/blog?id=qwen3.6-35b-a3b", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-6-35b-moe", "benchKey": "mmluPro", "value": 85.2, "sourceUrl": "https://qwen.ai/blog?id=qwen3.6-35b-a3b", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-6-35b-moe", "benchKey": "aaIdx", "value": 32.0, "sourceUrl": "https://artificialanalysis.ai/models/qwen3-6-35b-a3b-non-reasoning", "tier": "I", "fetched": "2026-05-18"},
+
+    {"modelId": "qwen3-6-plus", "benchKey": "sweV", "value": 78.8, "sourceUrl": "https://qwen.ai/blog?id=qwen3.6", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-6-plus", "benchKey": "sweV", "value": 78.8, "sourceUrl": "https://tokenmix.ai/blog/qwen-3-6-plus-review-benchmark-pricing-2026", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-6-plus", "benchKey": "swePro", "value": 56.6, "sourceUrl": "https://qwen.ai/blog?id=qwen3.6", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-6-plus", "benchKey": "swePro", "value": 56.6, "sourceUrl": "https://benchlm.ai/benchmarks/swePro", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-6-plus", "benchKey": "tb2", "value": 61.6, "sourceUrl": "https://qwen.ai/blog?id=qwen3.6", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-6-plus", "benchKey": "tb2", "value": 61.6, "sourceUrl": "https://tokenmix.ai/blog/qwen-3-6-plus-review-benchmark-pricing-2026", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-6-plus", "benchKey": "lcb", "value": 87.1, "sourceUrl": "https://llm-stats.com/benchmarks/livecodebench-v6", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-6-plus", "benchKey": "aaIdx", "value": 50.0, "sourceUrl": "https://artificialanalysis.ai/models/qwen3-6-plus", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-6-plus", "benchKey": "aaAgentic", "value": 70.7, "sourceUrl": "https://benchlm.ai/models/qwen3-6-plus", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-6-plus", "benchKey": "tau2", "value": 70.7, "sourceUrl": "https://benchlm.ai/benchmarks/tau3Bench", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-6-plus", "benchKey": "sweMulti", "value": 73.8, "sourceUrl": "https://tokenmix.ai/blog/qwen-3-6-plus-review-benchmark-pricing-2026", "tier": "C", "fetched": "2026-05-18"},
+
+    {"modelId": "qwen3-coder-30b", "benchKey": "sweV", "value": 51.6, "sourceUrl": "https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct/discussions/30", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-coder-30b", "benchKey": "sweV", "value": 50.0, "sourceUrl": "https://nebius.com/blog/posts/openhands-trajectories-with-qwen3-coder-480b", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-coder-30b", "benchKey": "aaIdx", "value": 20.0, "sourceUrl": "https://artificialanalysis.ai/models/qwen3-coder-30b-a3b-instruct", "tier": "I", "fetched": "2026-05-18"},
+
+    {"modelId": "qwen3-coder-480b", "benchKey": "sweV", "value": 66.5, "sourceUrl": "https://qwenlm.github.io/blog/qwen3-coder/", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-coder-480b", "benchKey": "sweV", "value": 66.5, "sourceUrl": "https://www.together.ai/blog/qwen-3-coder", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-coder-480b", "benchKey": "sweV", "value": 66.5, "sourceUrl": "https://deepinfra.com/blog/qwen3-coder-480b-a35b-api-benchmarks", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-coder-480b", "benchKey": "tau2", "value": 77.5, "sourceUrl": "https://qwenlm.github.io/blog/qwen3-coder/", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-coder-480b", "benchKey": "bfcl", "value": 68.7, "sourceUrl": "https://qwenlm.github.io/blog/qwen3-coder/", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-coder-480b", "benchKey": "bfcl", "value": 68.7, "sourceUrl": "https://awesomeagents.ai/leaderboards/function-calling-benchmarks-leaderboard/", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "qwen3-coder-480b", "benchKey": "aaIdx", "value": 25.0, "sourceUrl": "https://artificialanalysis.ai/models/qwen3-coder-480b-a35b-instruct", "tier": "I", "fetched": "2026-05-18"}
+  ],
+  "modelMeta": [
+    {
+      "modelId": "qwen-3-6-27b",
+      "released": "2026-04-22",
+      "context": 262144,
+      "license": "Apache-2.0",
+      "open": true,
+      "vramRequirement": 18
+    },
+    {
+      "modelId": "qwen-3-6-max",
+      "released": "2026-04-20",
+      "context": 262144,
+      "license": "proprietary",
+      "open": false,
+      "vramRequirement": null
+    },
+    {
+      "modelId": "qwen3-235b",
+      "released": "2025-05-01",
+      "context": 131072,
+      "license": "Apache-2.0",
+      "open": true,
+      "vramRequirement": 47
+    },
+    {
+      "modelId": "qwen3-32b",
+      "released": "2025-04-28",
+      "context": 131072,
+      "license": "Apache-2.0",
+      "open": true,
+      "vramRequirement": 22
+    },
+    {
+      "modelId": "qwen3-6-35b-moe",
+      "released": "2026-04-16",
+      "context": 262144,
+      "license": "Apache-2.0",
+      "open": true,
+      "vramRequirement": 22
+    },
+    {
+      "modelId": "qwen3-6-plus",
+      "released": "2026-03-30",
+      "context": 1000000,
+      "license": "proprietary",
+      "open": false,
+      "vramRequirement": null
+    },
+    {
+      "modelId": "qwen3-coder-30b",
+      "released": "2025-08-01",
+      "context": 256000,
+      "license": "Apache-2.0",
+      "open": true,
+      "vramRequirement": 21
+    },
+    {
+      "modelId": "qwen3-coder-480b",
+      "released": "2025-08-01",
+      "context": 256000,
+      "license": "Apache-2.0",
+      "open": true,
+      "vramRequirement": null
+    }
+  ],
+  "pricingObs": [
+    {
+      "modelId": "qwen-3-6-27b",
+      "provider": "openrouter",
+      "in": 0.32,
+      "out": 3.20,
+      "cacheHit": 0.0,
+      "throughput": null,
+      "url": "https://openrouter.ai/qwen/qwen3.6-27b",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen-3-6-max",
+      "provider": "openrouter",
+      "in": 1.04,
+      "out": 6.24,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://openrouter.ai/qwen/qwen3.6-max-preview",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-235b",
+      "provider": "openrouter",
+      "in": 0.455,
+      "out": 1.82,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://openrouter.ai/qwen/qwen3-235b-a22b",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-32b",
+      "provider": "openrouter",
+      "in": 0.08,
+      "out": 0.28,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://openrouter.ai/qwen/qwen3-32b",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-32b",
+      "provider": "official",
+      "in": 0.08,
+      "out": 0.28,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://qwen.readthedocs.io/en/latest/getting_started/speed_benchmark.html",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-6-plus",
+      "provider": "openrouter",
+      "in": 0.325,
+      "out": 1.95,
+      "cacheHit": null,
+      "throughput": 53.1,
+      "url": "https://openrouter.ai/qwen/qwen3.6-plus",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-coder-30b",
+      "provider": "openrouter",
+      "in": 0.07,
+      "out": 0.27,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://openrouter.ai/qwen/qwen3-coder-30b-a3b-instruct",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-coder-30b",
+      "provider": "official",
+      "in": 0.07,
+      "out": 0.27,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://costbench.com/software/llm-api-providers/qwen-api/",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-coder-480b",
+      "provider": "openrouter",
+      "in": 0.22,
+      "out": 1.80,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://openrouter.ai/qwen/qwen3-coder",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-coder-480b",
+      "provider": "deepinfra",
+      "in": 0.30,
+      "out": 1.00,
+      "cacheHit": null,
+      "throughput": null,
+      "url": "https://deepinfra.com/blog/qwen3-coder-480b-a35b-api-benchmarks",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "qwen3-coder-480b",
+      "provider": "official",
+      "in": 0.30,
+      "out": 1.80,
+      "cacheHit": null,
+      "throughput": 64.6,
+      "url": "https://artificialanalysis.ai/models/qwen3-coder-480b-a35b-instruct",
+      "fetched": "2026-05-18"
+    }
+  ],
+  "ollamaObs": [
+    {
+      "modelId": "qwen3-32b",
+      "pullCmd": "ollama pull qwen3:32b",
+      "tags": [{"name": "32b", "size": "20GB", "vram": 22, "recommended": true}],
+      "pullCount": "25.7M pulls",
+      "parameters": "32B",
+      "context": 40960,
+      "license": "Apache-2.0",
+      "ollamaUrl": "https://ollama.com/library/qwen3:32b"
+    },
+    {
+      "modelId": "qwen3-235b",
+      "pullCmd": "ollama pull qwen3:235b",
+      "tags": [{"name": "235b", "size": "142GB", "vram": null, "recommended": false}],
+      "pullCount": "29.1M pulls (qwen3 family)",
+      "parameters": "235B / 22B active",
+      "context": 131072,
+      "license": "Apache-2.0",
+      "ollamaUrl": "https://ollama.com/library/qwen3"
+    },
+    {
+      "modelId": "qwen3-coder-30b",
+      "pullCmd": "ollama pull qwen3-coder:30b",
+      "tags": [],
+      "pullCount": "4.9M pulls",
+      "parameters": "30B / 3B active",
+      "context": 256000,
+      "license": "Apache-2.0",
+      "ollamaUrl": "https://ollama.com/library/qwen3-coder"
+    },
+    {
+      "modelId": "qwen3-coder-480b",
+      "pullCmd": "ollama pull qwen3-coder:480b",
+      "tags": [],
+      "pullCount": "4.9M pulls",
+      "parameters": "480B / 35B active",
+      "context": 256000,
+      "license": "Apache-2.0",
+      "ollamaUrl": "https://ollama.com/library/qwen3-coder:480b"
+    }
+  ],
+  "unslothObs": [
+    {
+      "modelId": "qwen3-6-35b-moe",
+      "name": "Qwen3.6-35B-A3B-GGUF-UD-Q4_K_XL",
+      "size": "20.9GB",
+      "vram": 22
+    },
+    {
+      "modelId": "qwen3-6-35b-moe",
+      "name": "Qwen3.6-35B-A3B-GGUF-UD-Q3_K_XL",
+      "size": "17GB",
+      "vram": 18
+    },
+    {
+      "modelId": "qwen3-6-35b-moe",
+      "name": "Qwen3.6-35B-A3B-GGUF-Q4_K_M",
+      "size": "20.9GB",
+      "vram": 22
+    },
+    {
+      "modelId": "qwen3-235b",
+      "name": "Qwen3-235B-A22B-GGUF-UD-Q2_K_XL",
+      "size": "180GB",
+      "vram": null
+    }
+  ],
+  "lineupHints": [
+    {
+      "modelId": "qwen-3-6-27b",
+      "event": "new",
+      "evidence": "https://qwen.ai/blog?id=qwen3.6-27b",
+      "details": "Released 2026-04-22 as open-weight dense 27B Apache-2.0 model"
+    },
+    {
+      "modelId": "qwen-3-6-max",
+      "event": "new",
+      "evidence": "https://qwen.ai/blog?id=qwen3.6",
+      "details": "Released 2026-04-20 as closed-weight flagship; first Qwen proprietary model"
+    },
+    {
+      "modelId": "qwen3-6-35b-moe",
+      "event": "new",
+      "evidence": "https://qwen.ai/blog?id=qwen3.6-35b-a3b",
+      "details": "Released 2026-04-16 as open-weight MoE 35B/3B active Apache-2.0"
+    },
+    {
+      "modelId": "qwen3-6-plus",
+      "event": "new",
+      "evidence": "https://qwen.ai/blog?id=qwen3.6",
+      "details": "Released 2026-03-30 as hosted proprietary model; successor to Qwen3.5-Plus"
+    }
+  ],
+  "naCandidates": [
+    {"modelId": "qwen-3-6-max", "benchKey": "sweMulti", "rationale": "Closed-weight proprietary model; no open-source multilingual SWE eval published"},
+    {"modelId": "qwen-3-6-max", "benchKey": "nl2Repo", "rationale": "No nl2Repo evaluation published for closed-weight Qwen3.6-Max-Preview"},
+    {"modelId": "qwen-3-6-max", "benchKey": "cfElo", "rationale": "No Codeforces ELO evaluation reported for Qwen3.6-Max-Preview"},
+    {"modelId": "qwen3-32b", "benchKey": "sweV", "rationale": "No SWE-bench Verified score found in any leaderboard for Qwen3-32B; not listed on swebench.com or llm-stats sweV leaderboard — coder-specialized bench not typically evaluated for general dense models"},
+    {"modelId": "qwen3-32b", "benchKey": "sweMulti", "rationale": "No sweMulti score for Qwen3-32B found across leaderboards"},
+    {"modelId": "qwen3-32b", "benchKey": "nl2Repo", "rationale": "No nl2Repo evaluation found for Qwen3-32B"},
+    {"modelId": "qwen3-coder-30b", "benchKey": "aime26", "rationale": "coder-specialized model; math/competition benchmarks not published in Qwen3-Coder-30b vendor report"},
+    {"modelId": "qwen3-coder-30b", "benchKey": "hle", "rationale": "coder-specialized model; HLE not in vendor report for Qwen3-Coder-30b"},
+    {"modelId": "qwen3-coder-30b", "benchKey": "mmluPro", "rationale": "coder-specialized model; MMLU-Pro not in vendor report for Qwen3-Coder-30b"},
+    {"modelId": "qwen3-coder-30b", "benchKey": "gpqa", "rationale": "coder-specialized model; GPQA not in vendor report for Qwen3-Coder-30b"},
+    {"modelId": "qwen3-coder-480b", "benchKey": "aime26", "rationale": "coder-specialized model; AIME not in vendor report for Qwen3-Coder-480B"},
+    {"modelId": "qwen3-coder-480b", "benchKey": "hle", "rationale": "coder-specialized model; HLE not reported for Qwen3-Coder-480B"},
+    {"modelId": "qwen3-coder-480b", "benchKey": "mmluPro", "rationale": "coder-specialized model; MMLU-Pro not reported for Qwen3-Coder-480B"},
+    {"modelId": "qwen3-coder-480b", "benchKey": "gpqa", "rationale": "coder-specialized model; GPQA not in vendor report for Qwen3-Coder-480B"},
+    {"modelId": "qwen3-coder-480b", "benchKey": "nl2Repo", "rationale": "No nl2Repo score found for Qwen3-Coder-480B"},
+    {"modelId": "qwen3-coder-30b", "benchKey": "nl2Repo", "rationale": "No nl2Repo score found for Qwen3-Coder-30B"},
+    {"modelId": "qwen3-6-plus", "benchKey": "cfElo", "rationale": "No Codeforces ELO published for Qwen3.6-Plus"},
+    {"modelId": "qwen3-6-plus", "benchKey": "nl2Repo", "rationale": "No nl2Repo evaluation found for Qwen3.6-Plus"},
+    {"modelId": "qwen-3-6-27b", "benchKey": "nl2Repo", "rationale": "No nl2Repo evaluation found for Qwen3.6-27B"}
+  ],
+  "rawGaps": [
+    {"modelId": "qwen-3-6-27b", "benchKey": "swePro", "triedSources": ["https://qwen.ai/blog?id=qwen3.6-27b", "https://www.buildfastwithai.com/blogs/qwen3-6-27b-review-2026"], "triedQueries": ["Qwen3.6-27B SWE-bench Pro score 2026", "qwen3.6 27b swePro benchmark"]},
+    {"modelId": "qwen-3-6-27b", "benchKey": "hle", "triedSources": ["https://qwen.ai/blog?id=qwen3.6-27b", "https://artificialanalysis.ai/models/qwen3-6-27b"], "triedQueries": ["Qwen3.6-27B HLE benchmark score 2026", "qwen 3.6 27b humanity last exam"]},
+    {"modelId": "qwen-3-6-27b", "benchKey": "mmluPro", "triedSources": ["https://qwen.ai/blog?id=qwen3.6-27b", "https://artificialanalysis.ai/models/qwen3-6-27b"], "triedQueries": ["Qwen3.6-27B mmlu-pro score 2026", "qwen3.6 27b mmluPro benchmark"]},
+    {"modelId": "qwen-3-6-27b", "benchKey": "tau2", "triedSources": ["https://qwen.ai/blog?id=qwen3.6-27b", "https://benchlm.ai/models/qwen3-6-plus"], "triedQueries": ["Qwen3.6-27B tau-bench score 2026", "qwen3.6 27b tau2 benchmark"]},
+    {"modelId": "qwen-3-6-27b", "benchKey": "bfcl", "triedSources": ["https://qwen.ai/blog?id=qwen3.6-27b", "https://artificialanalysis.ai/models/qwen3-6-27b"], "triedQueries": ["Qwen3.6-27B BFCL score 2026", "qwen3.6 27b function calling benchmark"]},
+    {"modelId": "qwen-3-6-27b", "benchKey": "tbHard", "triedSources": ["https://qwen.ai/blog?id=qwen3.6-27b"], "triedQueries": ["Qwen3.6-27B terminal-bench-hard score 2026", "qwen3.6 27b tbHard"]},
+    {"modelId": "qwen-3-6-27b", "benchKey": "cfElo", "triedSources": ["https://qwen.ai/blog?id=qwen3.6-27b"], "triedQueries": ["Qwen3.6-27B Codeforces ELO 2026", "qwen3.6 27b cfElo"]},
+    {"modelId": "qwen-3-6-27b", "benchKey": "aaCoding", "triedSources": ["https://artificialanalysis.ai/models/qwen3-6-27b"], "triedQueries": ["Qwen3.6-27B aaCoding index 2026"]},
+    {"modelId": "qwen-3-6-27b", "benchKey": "aaAgentic", "triedSources": ["https://artificialanalysis.ai/models/qwen3-6-27b"], "triedQueries": ["Qwen3.6-27B aaAgentic index 2026"]},
+    {"modelId": "qwen-3-6-27b", "benchKey": "sweMulti", "triedSources": ["https://qwen.ai/blog?id=qwen3.6-27b"], "triedQueries": ["Qwen3.6-27B SWE-bench multilingual score 2026"]},
+    {"modelId": "qwen-3-6-27b", "benchKey": "arcAgi2", "triedSources": ["https://qwen.ai/blog?id=qwen3.6-27b"], "triedQueries": ["Qwen3.6-27B ARC-AGI-2 score 2026"]},
+    {"modelId": "qwen-3-6-max", "benchKey": "lcb", "triedSources": ["https://qwen.ai/blog?id=qwen3.6", "https://tokenmix.ai/blog/qwen3-6-max-preview-benchmark-review-2026"], "triedQueries": ["Qwen3.6-Max LiveCodeBench score 2026", "qwen3.6 max lcb benchmark"]},
+    {"modelId": "qwen-3-6-max", "benchKey": "tb2", "triedSources": ["https://tokenmix.ai/blog/qwen3-6-max-preview-benchmark-review-2026"], "triedQueries": ["Qwen3.6-Max terminal-bench score 2026"]},
+    {"modelId": "qwen-3-6-max", "benchKey": "tau2", "triedSources": ["https://tokenmix.ai/blog/qwen3-6-max-preview-benchmark-review-2026"], "triedQueries": ["Qwen3.6-Max tau-bench score 2026"]},
+    {"modelId": "qwen-3-6-max", "benchKey": "bfcl", "triedSources": ["https://tokenmix.ai/blog/qwen3-6-max-preview-benchmark-review-2026"], "triedQueries": ["Qwen3.6-Max BFCL score 2026"]},
+    {"modelId": "qwen-3-6-max", "benchKey": "swePro", "triedSources": ["https://qwen.ai/blog?id=qwen3.6", "https://tokenmix.ai/blog/qwen3-6-max-preview-benchmark-review-2026"], "triedQueries": ["Qwen3.6-Max SWE-bench Pro score 2026"]},
+    {"modelId": "qwen-3-6-max", "benchKey": "tbHard", "triedSources": ["https://tokenmix.ai/blog/qwen3-6-max-preview-benchmark-review-2026"], "triedQueries": ["Qwen3.6-Max tbHard score 2026"]},
+    {"modelId": "qwen-3-6-max", "benchKey": "aaIdx", "triedSources": ["https://artificialanalysis.ai/models/qwen3-6-plus"], "triedQueries": ["Qwen3.6-Max artificial analysis index 2026"]},
+    {"modelId": "qwen-3-6-max", "benchKey": "arcAgi2", "triedSources": ["https://tokenmix.ai/blog/qwen3-6-max-preview-benchmark-review-2026"], "triedQueries": ["Qwen3.6-Max ARC-AGI-2 2026"]},
+    {"modelId": "qwen3-235b", "benchKey": "swePro", "triedSources": ["https://arxiv.org/pdf/2505.09388", "https://nebius.com/blog/posts/openhands-trajectories-with-qwen3-coder-480b"], "triedQueries": ["Qwen3-235B SWE-bench Pro score 2026", "qwen3 235b swePro"]},
+    {"modelId": "qwen3-235b", "benchKey": "sweMulti", "triedSources": ["https://arxiv.org/pdf/2505.09388"], "triedQueries": ["Qwen3-235B SWE-bench multilingual 2026"]},
+    {"modelId": "qwen3-235b", "benchKey": "nl2Repo", "triedSources": ["https://arxiv.org/pdf/2505.09388"], "triedQueries": ["Qwen3-235B nl2Repo 2026"]},
+    {"modelId": "qwen3-235b", "benchKey": "arcAgi2", "triedSources": ["https://arxiv.org/pdf/2505.09388"], "triedQueries": ["Qwen3-235B ARC-AGI-2 2026"]},
+    {"modelId": "qwen3-32b", "benchKey": "swePro", "triedSources": ["https://labs.scale.com/leaderboard/swe_bench_pro_public", "https://llm-stats.com/models/qwen3-32b"], "triedQueries": ["Qwen3-32B SWE-bench Pro score 2026", "qwen3 32b swePro"]},
+    {"modelId": "qwen3-32b", "benchKey": "tau2", "triedSources": ["https://artificialanalysis.ai/models/qwen3-32b-instruct"], "triedQueries": ["Qwen3-32B tau-bench 2026", "qwen3 32b tau2"]},
+    {"modelId": "qwen3-32b", "benchKey": "tb2", "triedSources": ["https://artificialanalysis.ai/models/qwen3-32b-instruct"], "triedQueries": ["Qwen3-32B terminal-bench 2026", "qwen3 32b tb2"]},
+    {"modelId": "qwen3-32b", "benchKey": "tbHard", "triedSources": ["https://artificialanalysis.ai/models/qwen3-32b-instruct"], "triedQueries": ["Qwen3-32B tbHard 2026"]},
+    {"modelId": "qwen3-32b", "benchKey": "aaAgentic", "triedSources": ["https://artificialanalysis.ai/models/qwen3-32b-instruct"], "triedQueries": ["Qwen3-32B agentic index 2026"]},
+    {"modelId": "qwen3-32b", "benchKey": "aaCoding", "triedSources": ["https://artificialanalysis.ai/models/qwen3-32b-instruct"], "triedQueries": ["Qwen3-32B coding index 2026"]},
+    {"modelId": "qwen3-32b", "benchKey": "arcAgi2", "triedSources": ["https://artificialanalysis.ai/models/qwen3-32b-instruct"], "triedQueries": ["Qwen3-32B ARC-AGI-2 2026"]},
+    {"modelId": "qwen3-6-35b-moe", "benchKey": "lcb", "triedSources": ["https://qwen.ai/blog?id=qwen3.6-35b-a3b", "https://llm-stats.com/models/qwen3.6-35b-a3b"], "triedQueries": ["Qwen3.6-35B-A3B LiveCodeBench score 2026", "qwen3.6 35b a3b lcb"]},
+    {"modelId": "qwen3-6-35b-moe", "benchKey": "tau2", "triedSources": ["https://qwen.ai/blog?id=qwen3.6-35b-a3b", "https://benchlm.ai/benchmarks/tau3Bench"], "triedQueries": ["Qwen3.6-35B-A3B tau-bench score 2026", "qwen3.6 35b moe tau2"]},
+    {"modelId": "qwen3-6-35b-moe", "benchKey": "bfcl", "triedSources": ["https://qwen.ai/blog?id=qwen3.6-35b-a3b"], "triedQueries": ["Qwen3.6-35B-A3B BFCL score 2026"]},
+    {"modelId": "qwen3-6-35b-moe", "benchKey": "hle", "triedSources": ["https://qwen.ai/blog?id=qwen3.6-35b-a3b"], "triedQueries": ["Qwen3.6-35B-A3B HLE score 2026"]},
+    {"modelId": "qwen3-6-35b-moe", "benchKey": "cfElo", "triedSources": ["https://qwen.ai/blog?id=qwen3.6-35b-a3b"], "triedQueries": ["Qwen3.6-35B-A3B Codeforces ELO 2026"]},
+    {"modelId": "qwen3-6-35b-moe", "benchKey": "nl2Repo", "triedSources": ["https://qwen.ai/blog?id=qwen3.6-35b-a3b"], "triedQueries": ["Qwen3.6-35B-A3B nl2Repo 2026"]},
+    {"modelId": "qwen3-6-35b-moe", "benchKey": "tbHard", "triedSources": ["https://qwen.ai/blog?id=qwen3.6-35b-a3b"], "triedQueries": ["Qwen3.6-35B-A3B terminal-bench-hard 2026"]},
+    {"modelId": "qwen3-6-35b-moe", "benchKey": "sweMulti", "triedSources": ["https://qwen.ai/blog?id=qwen3.6-35b-a3b"], "triedQueries": ["Qwen3.6-35B-A3B SWE multilingual 2026"]},
+    {"modelId": "qwen3-6-35b-moe", "benchKey": "arcAgi2", "triedSources": ["https://qwen.ai/blog?id=qwen3.6-35b-a3b"], "triedQueries": ["Qwen3.6-35B-A3B ARC-AGI-2 2026"]},
+    {"modelId": "qwen3-6-plus", "benchKey": "gpqa", "triedSources": ["https://qwen.ai/blog?id=qwen3.6", "https://llm-stats.com/models/qwen3.6-plus"], "triedQueries": ["Qwen3.6-Plus GPQA score 2026", "qwen3.6 plus gpqa diamond"]},
+    {"modelId": "qwen3-6-plus", "benchKey": "hle", "triedSources": ["https://qwen.ai/blog?id=qwen3.6", "https://llm-stats.com/models/qwen3.6-plus"], "triedQueries": ["Qwen3.6-Plus HLE score 2026"]},
+    {"modelId": "qwen3-6-plus", "benchKey": "mmluPro", "triedSources": ["https://qwen.ai/blog?id=qwen3.6"], "triedQueries": ["Qwen3.6-Plus mmluPro score 2026"]},
+    {"modelId": "qwen3-6-plus", "benchKey": "aime26", "triedSources": ["https://qwen.ai/blog?id=qwen3.6"], "triedQueries": ["Qwen3.6-Plus AIME 2026 score"]},
+    {"modelId": "qwen3-6-plus", "benchKey": "bfcl", "triedSources": ["https://qwen.ai/blog?id=qwen3.6"], "triedQueries": ["Qwen3.6-Plus BFCL score 2026"]},
+    {"modelId": "qwen3-6-plus", "benchKey": "tbHard", "triedSources": ["https://qwen.ai/blog?id=qwen3.6"], "triedQueries": ["Qwen3.6-Plus tbHard 2026"]},
+    {"modelId": "qwen3-6-plus", "benchKey": "arcAgi2", "triedSources": ["https://qwen.ai/blog?id=qwen3.6"], "triedQueries": ["Qwen3.6-Plus ARC-AGI-2 2026"]},
+    {"modelId": "qwen3-6-plus", "benchKey": "aaCoding", "triedSources": ["https://artificialanalysis.ai/models/qwen3-6-plus"], "triedQueries": ["Qwen3.6-Plus aaCoding index 2026"]},
+    {"modelId": "qwen3-coder-30b", "benchKey": "lcb", "triedSources": ["https://artificialanalysis.ai/models/qwen3-coder-30b-a3b-instruct"], "triedQueries": ["Qwen3-Coder-30B LiveCodeBench score 2026", "qwen3-coder-30b lcb"]},
+    {"modelId": "qwen3-coder-30b", "benchKey": "swePro", "triedSources": ["https://labs.scale.com/leaderboard/swe_bench_pro_public", "https://qwenlm.github.io/blog/qwen3-coder/"], "triedQueries": ["Qwen3-Coder-30B SWE-bench Pro 2026"]},
+    {"modelId": "qwen3-coder-30b", "benchKey": "tb2", "triedSources": ["https://artificialanalysis.ai/models/qwen3-coder-30b-a3b-instruct"], "triedQueries": ["Qwen3-Coder-30B terminal-bench 2026"]},
+    {"modelId": "qwen3-coder-30b", "benchKey": "bfcl", "triedSources": ["https://qwenlm.github.io/blog/qwen3-coder/"], "triedQueries": ["Qwen3-Coder-30B BFCL score 2026"]},
+    {"modelId": "qwen3-coder-30b", "benchKey": "tau2", "triedSources": ["https://qwenlm.github.io/blog/qwen3-coder/"], "triedQueries": ["Qwen3-Coder-30B tau-bench 2026"]},
+    {"modelId": "qwen3-coder-30b", "benchKey": "cfElo", "triedSources": ["https://qwenlm.github.io/blog/qwen3-coder/"], "triedQueries": ["Qwen3-Coder-30B Codeforces ELO 2026"]},
+    {"modelId": "qwen3-coder-30b", "benchKey": "tbHard", "triedSources": ["https://artificialanalysis.ai/models/qwen3-coder-30b-a3b-instruct"], "triedQueries": ["Qwen3-Coder-30B tbHard 2026"]},
+    {"modelId": "qwen3-coder-30b", "benchKey": "arcAgi2", "triedSources": ["https://artificialanalysis.ai/models/qwen3-coder-30b-a3b-instruct"], "triedQueries": ["Qwen3-Coder-30B ARC-AGI-2 2026"]},
+    {"modelId": "qwen3-coder-30b", "benchKey": "sweMulti", "triedSources": ["https://artificialanalysis.ai/models/qwen3-coder-30b-a3b-instruct"], "triedQueries": ["Qwen3-Coder-30B sweMulti 2026"]},
+    {"modelId": "qwen3-coder-30b", "benchKey": "aaAgentic", "triedSources": ["https://artificialanalysis.ai/models/qwen3-coder-30b-a3b-instruct"], "triedQueries": ["Qwen3-Coder-30B agentic index 2026"]},
+    {"modelId": "qwen3-coder-30b", "benchKey": "aaCoding", "triedSources": ["https://artificialanalysis.ai/models/qwen3-coder-30b-a3b-instruct"], "triedQueries": ["Qwen3-Coder-30B coding index 2026"]},
+    {"modelId": "qwen3-coder-480b", "benchKey": "lcb", "triedSources": ["https://qwenlm.github.io/blog/qwen3-coder/", "https://artificialanalysis.ai/models/qwen3-coder-480b-a35b-instruct"], "triedQueries": ["Qwen3-Coder-480B LiveCodeBench score 2026", "qwen3-coder-480b lcb"]},
+    {"modelId": "qwen3-coder-480b", "benchKey": "swePro", "triedSources": ["https://labs.scale.com/leaderboard/swe_bench_pro_public", "https://qwenlm.github.io/blog/qwen3-coder/"], "triedQueries": ["Qwen3-Coder-480B SWE-bench Pro 2026"]},
+    {"modelId": "qwen3-coder-480b", "benchKey": "tb2", "triedSources": ["https://artificialanalysis.ai/models/qwen3-coder-480b-a35b-instruct"], "triedQueries": ["Qwen3-Coder-480B terminal-bench 2026"]},
+    {"modelId": "qwen3-coder-480b", "benchKey": "tbHard", "triedSources": ["https://artificialanalysis.ai/models/qwen3-coder-480b-a35b-instruct"], "triedQueries": ["Qwen3-Coder-480B tbHard 2026"]},
+    {"modelId": "qwen3-coder-480b", "benchKey": "cfElo", "triedSources": ["https://qwenlm.github.io/blog/qwen3-coder/"], "triedQueries": ["Qwen3-Coder-480B Codeforces ELO 2026"]},
+    {"modelId": "qwen3-coder-480b", "benchKey": "sweMulti", "triedSources": ["https://qwenlm.github.io/blog/qwen3-coder/"], "triedQueries": ["Qwen3-Coder-480B sweMulti 2026"]},
+    {"modelId": "qwen3-coder-480b", "benchKey": "aaAgentic", "triedSources": ["https://artificialanalysis.ai/models/qwen3-coder-480b-a35b-instruct"], "triedQueries": ["Qwen3-Coder-480B aaAgentic 2026"]},
+    {"modelId": "qwen3-coder-480b", "benchKey": "aaCoding", "triedSources": ["https://artificialanalysis.ai/models/qwen3-coder-480b-a35b-instruct"], "triedQueries": ["Qwen3-Coder-480B aaCoding 2026"]},
+    {"modelId": "qwen3-coder-480b", "benchKey": "arcAgi2", "triedSources": ["https://artificialanalysis.ai/models/qwen3-coder-480b-a35b-instruct"], "triedQueries": ["Qwen3-Coder-480B ARC-AGI-2 2026"]}
+  ],
+  "runtime": {
+    "toolCallCount": 34,
+    "wallclockSec": 420,
+    "snapshotsRead": 0
+  },
+  "partialReason": null
+}

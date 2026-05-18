@@ -1,0 +1,4931 @@
+{
+  "cycleDate": "2026-05-18",
+  "generatedAt": "2026-05-18T00:18:53Z",
+  "partialReturn": true,
+  "partialReason": "gap-gen supplement: agent found 117 new fills; 3 cells auto-gapped by orchestrator; 87 explicit agent gaps preserved",
+  "models": [
+    {
+      "id": "opus-4-7",
+      "updates": {
+        "bench": {
+          "sweV": 87.6,
+          "swePro": 64.3,
+          "tb2": 69.4,
+          "gpqa": 94.2,
+          "aaIdx": 57.0,
+          "aime26": 95.2,
+          "hle": 51.4,
+          "tau2": null,
+          "lcb": null,
+          "mmluPro": null
+        },
+        "pricing": {
+          "api": [
+            {
+              "provider": "official",
+              "in": 5.0,
+              "out": 25.0,
+              "cacheHit": null,
+              "throughput": null,
+              "url": "https://www.anthropic.com/pricing",
+              "fetched": "2026-05-18"
+            },
+            {
+              "provider": "openrouter",
+              "in": 5.0,
+              "out": 25.0,
+              "cacheHit": null,
+              "throughput": null,
+              "url": "https://openrouter.ai/anthropic/claude-opus-4-7",
+              "fetched": "2026-05-18"
+            },
+            {
+              "provider": "aws_bedrock",
+              "in": 5.0,
+              "out": 25.0,
+              "cacheHit": null,
+              "throughput": null,
+              "url": "https://aws.amazon.com/bedrock/pricing",
+              "fetched": "2026-05-18"
+            }
+          ]
+        },
+        "context": 200000,
+        "license": "proprietary",
+        "open": false,
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "opus-4-7.sweV",
+          "value": 87.6,
+          "source": "Vellum LLM Leaderboard",
+          "url": "https://www.vellum.ai/llm-leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 3,
+          "trustScore": 1.0
+        },
+        {
+          "key": "opus-4-7.sweV",
+          "value": 87.6,
+          "source": "Artificial Analysis",
+          "url": "https://artificialanalysis.ai/models/claude-opus-4-7",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 3,
+          "trustScore": 1.0
+        },
+        {
+          "key": "opus-4-7.sweV",
+          "value": 87.6,
+          "source": "Anthropic",
+          "url": "https://www.anthropic.com/news/claude-opus-4-7",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 3,
+          "trustScore": 0.7
+        },
+        {
+          "key": "opus-4-7.swePro",
+          "value": 64.3,
+          "source": "Scale SEAL",
+          "url": "https://scale.com/leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.93
+        },
+        {
+          "key": "opus-4-7.swePro",
+          "value": 64.3,
+          "source": "Anthropic",
+          "url": "https://www.anthropic.com/news/claude-opus-4-7",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.7
+        },
+        {
+          "key": "opus-4-7.tb2",
+          "value": 69.4,
+          "source": "TerminalBench",
+          "url": "https://terminalbench.io",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.7
+        },
+        {
+          "key": "opus-4-7.gpqa",
+          "value": 94.2,
+          "source": "Anthropic",
+          "url": "https://www.anthropic.com/news/claude-opus-4-7",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 3,
+          "trustScore": 0.7
+        },
+        {
+          "key": "opus-4-7.gpqa",
+          "value": 94.2,
+          "source": "Artificial Analysis",
+          "url": "https://artificialanalysis.ai/models/claude-opus-4-7",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 3,
+          "trustScore": 1.0
+        },
+        {
+          "key": "opus-4-7.mcpA",
+          "value": 77.3,
+          "source": "MCP Atlas",
+          "url": "https://mcpatlas.com",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        },
+        {
+          "key": "opus-4-7.aaIdx",
+          "value": 57.0,
+          "source": "Artificial Analysis",
+          "url": "https://artificialanalysis.ai/models/claude-opus-4-7",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        },
+        {
+          "key": "opus-4-7.aime26",
+          "value": 95.2,
+          "source": "Anthropic",
+          "url": "https://www.anthropic.com/news/claude-opus-4-7",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.7
+        },
+        {
+          "key": "opus-4-7.hle",
+          "value": 51.4,
+          "source": "Anthropic",
+          "url": "https://www.anthropic.com/news/claude-opus-4-7",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.7
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "sonnet-4-6",
+      "updates": {
+        "bench": {
+          "sweV": 79.6,
+          "swePro": null,
+          "tb2": 59.1,
+          "gpqa": 74.1,
+          "tau2": 99.3,
+          "aaIdx": 60.3,
+          "aime26": null,
+          "hle": null,
+          "lcb": null,
+          "mmluPro": null
+        },
+        "pricing": {
+          "api": [
+            {
+              "provider": "official",
+              "in": 3.0,
+              "out": 15.0,
+              "cacheHit": null,
+              "throughput": null,
+              "url": "https://www.anthropic.com/pricing",
+              "fetched": "2026-05-18"
+            },
+            {
+              "provider": "openrouter",
+              "in": 3.0,
+              "out": 15.0,
+              "cacheHit": null,
+              "throughput": null,
+              "url": "https://openrouter.ai/anthropic/claude-sonnet-4-6",
+              "fetched": "2026-05-18"
+            }
+          ]
+        },
+        "context": 200000,
+        "license": "proprietary",
+        "open": false,
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "sonnet-4-6.sweV",
+          "value": 79.6,
+          "source": "Vellum LLM Leaderboard",
+          "url": "https://www.vellum.ai/llm-leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 3,
+          "trustScore": 1.0
+        },
+        {
+          "key": "sonnet-4-6.gpqa",
+          "value": 74.1,
+          "source": "Artificial Analysis",
+          "url": "https://artificialanalysis.ai/models/claude-sonnet-4-6",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.93
+        },
+        {
+          "key": "sonnet-4-6.tau2",
+          "value": 99.3,
+          "source": "tau2 leaderboard",
+          "url": "https://tau2benchmark.com",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        },
+        {
+          "key": "sonnet-4-6.sweMulti",
+          "value": 77.83,
+          "source": "SWE-bench Multi",
+          "url": "https://www.swebench.com",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "claude-haiku-4-5",
+      "updates": {
+        "bench": {
+          "sweV": 73.3,
+          "swePro": 39.5,
+          "aaIdx": 40.33,
+          "gpqa": null,
+          "tb2": null,
+          "tau2": null,
+          "aime26": null,
+          "hle": null,
+          "lcb": null,
+          "mmluPro": null
+        },
+        "pricing": {
+          "api": [
+            {
+              "provider": "official",
+              "in": 0.8,
+              "out": 4.0,
+              "cacheHit": null,
+              "throughput": null,
+              "url": "https://www.anthropic.com/pricing",
+              "fetched": "2026-05-18"
+            }
+          ]
+        },
+        "context": 200000,
+        "license": "proprietary",
+        "open": false,
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "claude-haiku-4-5.sweV",
+          "value": 73.3,
+          "source": "Artificial Analysis",
+          "url": "https://artificialanalysis.ai/models/claude-haiku-4-5",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.93
+        },
+        {
+          "key": "claude-haiku-4-5.swePro",
+          "value": 39.5,
+          "source": "Scale SEAL",
+          "url": "https://scale.com/leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "deepseek-v3-2",
+      "updates": {
+        "bench": {
+          "sweV": 74.2,
+          "swePro": null,
+          "tb2": null,
+          "gpqa": 78.5,
+          "aime26": 89.3,
+          "hle": null,
+          "lcb": 60.3,
+          "tau2": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "deepseek-v3-2.sweV",
+          "value": 74.2,
+          "source": "marc0.dev leaderboard",
+          "url": "https://marc0.dev/leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        },
+        {
+          "key": "deepseek-v3-2.aime26",
+          "value": 89.3,
+          "source": "DeepSeek official",
+          "url": "https://api.deepseek.com/v3",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.7
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "deepseek-r1-14b",
+      "updates": {
+        "bench": {
+          "sweV": 43.2,
+          "gpqa": 68.7,
+          "aime26": 52.8,
+          "lcb": 38.4,
+          "tb2": null,
+          "swePro": null,
+          "tau2": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "hle": null
+        },
+        "open": true,
+        "license": "MIT",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "deepseek-r1-14b.sweV",
+          "value": 43.2,
+          "source": "Vellum LLM Leaderboard",
+          "url": "https://www.vellum.ai/llm-leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "notApplicable": [
+        {
+          "benchKey": "tb2",
+          "rule": "coder-specialized:non-coding-bench"
+        },
+        {
+          "benchKey": "tau2",
+          "rule": "coder-specialized:non-coding-bench"
+        },
+        {
+          "benchKey": "mcpA",
+          "rule": "coder-specialized:non-coding-bench"
+        },
+        {
+          "benchKey": "hle",
+          "rule": "coder-specialized:non-coding-bench"
+        },
+        {
+          "benchKey": "sweV",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "swePro",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "aaIdx",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "mmluPro",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "deepseek-coder-v2-16b",
+      "updates": {
+        "bench": {
+          "sweV": 19.8,
+          "lcb": 43.2,
+          "tb2": null,
+          "swePro": null,
+          "gpqa": null,
+          "tau2": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "hle": null,
+          "aime26": null
+        },
+        "open": true,
+        "license": "DeepSeek License",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "deepseek-coder-v2-16b.sweV",
+          "value": 19.8,
+          "source": "SWE-bench leaderboard",
+          "url": "https://www.swebench.com",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "notApplicable": [
+        {
+          "benchKey": "tb2",
+          "rule": "coder-specialized:non-coding-bench"
+        },
+        {
+          "benchKey": "tau2",
+          "rule": "coder-specialized:non-coding-bench"
+        },
+        {
+          "benchKey": "mcpA",
+          "rule": "coder-specialized:non-coding-bench"
+        },
+        {
+          "benchKey": "hle",
+          "rule": "coder-specialized:non-coding-bench"
+        },
+        {
+          "benchKey": "aime26",
+          "rule": "coder-specialized:non-coding-bench"
+        },
+        {
+          "benchKey": "aaIdx",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "mmluPro",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "swePro",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "deepseek-v4-flash",
+      "updates": {
+        "bench": {
+          "sweV": 71.3,
+          "swePro": 48.2,
+          "gpqa": 79.4,
+          "lcb": 68.5,
+          "hle": 22.1,
+          "tb2": null,
+          "tau2": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "released": "2026-04-15",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "deepseek-v4-flash.sweV",
+          "value": 71.3,
+          "source": "BenchLM",
+          "url": "https://benchlm.ai/models/deepseek-v4-flash",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.93
+        },
+        {
+          "key": "deepseek-v4-flash.gpqa",
+          "value": 79.4,
+          "source": "Artificial Analysis",
+          "url": "https://artificialanalysis.ai/models/deepseek-v4-flash",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.93
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "deepseek-v4-pro",
+      "updates": {
+        "bench": {
+          "sweV": 80.2,
+          "swePro": 61.8,
+          "gpqa": 88.1,
+          "lcb": 72.4,
+          "hle": 38.2,
+          "tb2": null,
+          "tau2": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "released": "2026-04-15",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "deepseek-v4-pro.sweV",
+          "value": 80.2,
+          "source": "BenchLM",
+          "url": "https://benchlm.ai/models/deepseek-v4-pro",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.93
+        },
+        {
+          "key": "deepseek-v4-pro.gpqa",
+          "value": 88.1,
+          "source": "Artificial Analysis",
+          "url": "https://artificialanalysis.ai/models/deepseek-v4-pro",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.93
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "gemini-3-1-pro",
+      "updates": {
+        "bench": {
+          "sweV": 80.6,
+          "swePro": 80.6,
+          "tb2": 68.5,
+          "gpqa": 94.3,
+          "hle": 44.4,
+          "aime26": 98.1,
+          "tau2": 76.5,
+          "aaIdx": 57.0,
+          "lcb": null,
+          "mmluPro": null
+        },
+        "pricing": {
+          "api": [
+            {
+              "provider": "official",
+              "in": 1.25,
+              "out": 5.0,
+              "cacheHit": null,
+              "throughput": null,
+              "url": "https://ai.google.dev/pricing",
+              "fetched": "2026-05-18"
+            },
+            {
+              "provider": "openrouter",
+              "in": 1.25,
+              "out": 5.0,
+              "cacheHit": null,
+              "throughput": null,
+              "url": "https://openrouter.ai/google/gemini-3-1-pro",
+              "fetched": "2026-05-18"
+            }
+          ]
+        },
+        "context": 1000000,
+        "license": "proprietary",
+        "open": false,
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "gemini-3-1-pro.sweV",
+          "value": 80.6,
+          "source": "DeepMind model card",
+          "url": "https://deepmind.google/models/gemini/3-1-pro",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.7
+        },
+        {
+          "key": "gemini-3-1-pro.gpqa",
+          "value": 94.3,
+          "source": "DeepMind model card",
+          "url": "https://deepmind.google/models/gemini/3-1-pro",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.7
+        },
+        {
+          "key": "gemini-3-1-pro.aime26",
+          "value": 98.1,
+          "source": "DeepMind model card",
+          "url": "https://deepmind.google/models/gemini/3-1-pro",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.7
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "gemini-3-1-flash",
+      "updates": {
+        "bench": {
+          "sweV": 67.2,
+          "gpqa": 88.4,
+          "aaIdx": 61.5,
+          "aime26": 92.3,
+          "hle": 28.1,
+          "tb2": null,
+          "swePro": null,
+          "tau2": null,
+          "mmluPro": null,
+          "lcb": null
+        },
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "gemini-3-1-flash.sweV",
+          "value": 67.2,
+          "source": "Artificial Analysis",
+          "url": "https://artificialanalysis.ai/models/gemini-3-1-flash",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.93
+        }
+      ],
+      "notApplicable": [
+        {
+          "benchKey": "tb2",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "swePro",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "tau2",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "aime26",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "gemini-3-1-flash-thinking",
+      "updates": {
+        "bench": {
+          "sweV": 72.4,
+          "gpqa": 91.2,
+          "aime26": 96.5,
+          "tb2": null,
+          "swePro": null,
+          "tau2": null,
+          "mmluPro": null,
+          "lcb": null,
+          "hle": null,
+          "aaIdx": null
+        },
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "gemini-3-1-flash-thinking.sweV",
+          "value": 72.4,
+          "source": "Vellum LLM Leaderboard",
+          "url": "https://www.vellum.ai/llm-leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "gemini-3-0-flash",
+      "updates": {
+        "bench": {
+          "sweV": 44.8,
+          "gpqa": 82.1,
+          "aaIdx": 52.3,
+          "aime26": 78.2,
+          "tb2": null,
+          "swePro": null,
+          "tau2": null,
+          "mmluPro": null,
+          "lcb": null,
+          "hle": null
+        },
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "gemini-3-0-flash.sweV",
+          "value": 44.8,
+          "source": "Artificial Analysis",
+          "url": "https://artificialanalysis.ai/models/gemini-3-0-flash",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "gemma-4-27b",
+      "updates": {
+        "bench": {
+          "gpqa": 67.4,
+          "aime26": 58.3,
+          "mmluPro": 72.1,
+          "sweV": null,
+          "swePro": null,
+          "tb2": null,
+          "tau2": null,
+          "aaIdx": null,
+          "hle": null,
+          "lcb": null
+        },
+        "open": true,
+        "license": "Gemma Terms of Use",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "gemma-4-27b.gpqa",
+          "value": 67.4,
+          "source": "Google tech report",
+          "url": "https://storage.googleapis.com/deepmind-media/gemma/gemma4-report.pdf",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.7
+        }
+      ],
+      "notApplicable": [
+        {
+          "benchKey": "sweV",
+          "rule": "gemma-tier:no-sweV-coverage"
+        },
+        {
+          "benchKey": "swePro",
+          "rule": "gemma-tier:no-sweV-coverage"
+        },
+        {
+          "benchKey": "tb2",
+          "rule": "gemma-tier:no-sweV-coverage"
+        },
+        {
+          "benchKey": "tau2",
+          "rule": "gemma-tier:no-sweV-coverage"
+        },
+        {
+          "benchKey": "mcpA",
+          "rule": "gemma-tier:no-sweV-coverage"
+        }
+      ]
+    },
+    {
+      "id": "gemma-4-12b",
+      "updates": {
+        "bench": {
+          "gpqa": 59.2,
+          "mmluPro": 65.8,
+          "sweV": null,
+          "swePro": null,
+          "tb2": null,
+          "tau2": null,
+          "aaIdx": null,
+          "hle": null,
+          "lcb": null,
+          "aime26": null
+        },
+        "open": true,
+        "license": "Gemma Terms of Use",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [],
+      "notApplicable": [
+        {
+          "benchKey": "sweV",
+          "rule": "gemma-tier:no-sweV-coverage"
+        },
+        {
+          "benchKey": "swePro",
+          "rule": "gemma-tier:no-sweV-coverage"
+        },
+        {
+          "benchKey": "tb2",
+          "rule": "gemma-tier:no-sweV-coverage"
+        },
+        {
+          "benchKey": "tau2",
+          "rule": "gemma-tier:no-sweV-coverage"
+        },
+        {
+          "benchKey": "mcpA",
+          "rule": "gemma-tier:no-sweV-coverage"
+        }
+      ]
+    },
+    {
+      "id": "gemma-4-4b",
+      "updates": {
+        "bench": {
+          "gpqa": 51.2,
+          "mmluPro": 58.3,
+          "sweV": null,
+          "swePro": null,
+          "tb2": null,
+          "tau2": null,
+          "aaIdx": null,
+          "hle": null,
+          "lcb": null,
+          "aime26": null
+        },
+        "open": true,
+        "license": "Gemma Terms of Use",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [],
+      "notApplicable": [
+        {
+          "benchKey": "sweV",
+          "rule": "gemma-tier:no-sweV-coverage"
+        },
+        {
+          "benchKey": "swePro",
+          "rule": "gemma-tier:no-sweV-coverage"
+        },
+        {
+          "benchKey": "tb2",
+          "rule": "gemma-tier:no-sweV-coverage"
+        },
+        {
+          "benchKey": "tau2",
+          "rule": "gemma-tier:no-sweV-coverage"
+        },
+        {
+          "benchKey": "mcpA",
+          "rule": "gemma-tier:no-sweV-coverage"
+        }
+      ]
+    },
+    {
+      "id": "gemma-4-1b",
+      "updates": {
+        "bench": {
+          "gpqa": null,
+          "mmluPro": null,
+          "sweV": null,
+          "swePro": null,
+          "tb2": null,
+          "tau2": null,
+          "aaIdx": null,
+          "hle": null,
+          "lcb": null,
+          "aime26": null
+        },
+        "open": true,
+        "license": "Gemma Terms of Use",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [],
+      "notApplicable": [
+        {
+          "benchKey": "sweV",
+          "rule": "gemma-tier:no-sweV-coverage"
+        },
+        {
+          "benchKey": "swePro",
+          "rule": "gemma-tier:no-sweV-coverage"
+        },
+        {
+          "benchKey": "tb2",
+          "rule": "gemma-tier:no-sweV-coverage"
+        },
+        {
+          "benchKey": "tau2",
+          "rule": "gemma-tier:no-sweV-coverage"
+        },
+        {
+          "benchKey": "mcpA",
+          "rule": "gemma-tier:no-sweV-coverage"
+        },
+        {
+          "benchKey": "aime26",
+          "rule": "gemma-small:insufficient-capacity"
+        },
+        {
+          "benchKey": "gpqa",
+          "rule": "gemma-small:insufficient-capacity"
+        },
+        {
+          "benchKey": "hle",
+          "rule": "gemma-small:insufficient-capacity"
+        }
+      ]
+    },
+    {
+      "id": "minimax-m2-5",
+      "updates": {
+        "bench": {
+          "sweV": 80.2,
+          "swePro": 55.4,
+          "gpqa": null,
+          "tb2": null,
+          "tau2": null,
+          "aime26": null,
+          "hle": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "released": "2026-04-01",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "minimax-m2-5.sweV",
+          "value": 80.2,
+          "source": "BenchLM",
+          "url": "https://benchlm.ai/models/minimax-m2-5",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.93
+        },
+        {
+          "key": "minimax-m2-5.swePro",
+          "value": 55.4,
+          "source": "MiniMax official",
+          "url": "https://platform.minimaxi.com",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.7
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "minimax-m2-1",
+      "updates": {
+        "bench": {
+          "sweV": 69.8,
+          "swePro": 44.1,
+          "gpqa": 80.5,
+          "tb2": null,
+          "tau2": null,
+          "aime26": null,
+          "hle": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "minimax-m2-1.gpqa",
+          "value": 80.5,
+          "source": "Artificial Analysis",
+          "url": "https://artificialanalysis.ai/models/minimax-m2-1",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.93
+        },
+        {
+          "key": "minimax-m2-1.sweMulti",
+          "value": 49.0,
+          "source": "SWE-bench leaderboard",
+          "url": "https://www.swebench.com",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "minimax-m1",
+      "updates": {
+        "bench": {
+          "sweV": 60.4,
+          "gpqa": 74.2,
+          "tb2": null,
+          "swePro": null,
+          "tau2": null,
+          "aime26": null,
+          "hle": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "minimax-m1.sweV",
+          "value": 60.4,
+          "source": "Vellum LLM Leaderboard",
+          "url": "https://www.vellum.ai/llm-leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "mistral-medium-3-5",
+      "updates": {
+        "name": "Mistral Medium 3.5",
+        "released": "2026-04-29",
+        "bench": {
+          "sweV": 61.2,
+          "swePro": 38.4,
+          "gpqa": 71.3,
+          "aime26": 62.5,
+          "tb2": null,
+          "tau2": null,
+          "hle": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "pricing": {
+          "api": [
+            {
+              "provider": "official",
+              "in": 1.5,
+              "out": 7.5,
+              "cacheHit": null,
+              "throughput": null,
+              "url": "https://mistral.ai/pricing",
+              "fetched": "2026-05-18"
+            }
+          ]
+        },
+        "license": "proprietary",
+        "open": false,
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "mistral-medium-3-5.sweV",
+          "value": 61.2,
+          "source": "Mistral AI official",
+          "url": "https://mistral.ai/news/mistral-medium-3-5",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.7
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "devstral-2",
+      "updates": {
+        "name": "Devstral 2",
+        "released": "2026-04-29",
+        "bench": {
+          "sweV": 68.4,
+          "swePro": 46.2,
+          "lcb": 62.1,
+          "tb2": null,
+          "tau2": null,
+          "gpqa": null,
+          "hle": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "aime26": null
+        },
+        "pricing": {
+          "api": [
+            {
+              "provider": "official",
+              "in": 0.5,
+              "out": 1.5,
+              "cacheHit": null,
+              "throughput": null,
+              "url": "https://mistral.ai/pricing",
+              "fetched": "2026-05-18"
+            }
+          ]
+        },
+        "open": true,
+        "license": "Apache-2.0",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "devstral-2.sweV",
+          "value": 68.4,
+          "source": "Mistral AI official",
+          "url": "https://mistral.ai/news/devstral",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.7
+        },
+        {
+          "key": "devstral-2.sweV",
+          "value": 68.4,
+          "source": "BenchLM",
+          "url": "https://benchlm.ai/models/devstral-2",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.93
+        }
+      ],
+      "notApplicable": [
+        {
+          "benchKey": "hle",
+          "rule": "coder-specialized:non-coding-bench"
+        },
+        {
+          "benchKey": "aime26",
+          "rule": "coder-specialized:non-coding-bench"
+        },
+        {
+          "benchKey": "gpqa",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "mmluPro",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "devstral-small-3",
+      "updates": {
+        "bench": {
+          "sweV": 52.1,
+          "swePro": 28.7,
+          "tb2": null,
+          "tau2": null,
+          "gpqa": null,
+          "hle": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "lcb": null,
+          "aime26": null
+        },
+        "open": true,
+        "license": "Apache-2.0",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "devstral-small-3.sweV",
+          "value": 52.1,
+          "source": "Mistral AI official",
+          "url": "https://mistral.ai/news/devstral-small-3",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.7
+        }
+      ],
+      "notApplicable": [
+        {
+          "benchKey": "hle",
+          "rule": "coder-specialized:non-coding-bench"
+        },
+        {
+          "benchKey": "aime26",
+          "rule": "coder-specialized:non-coding-bench"
+        }
+      ]
+    },
+    {
+      "id": "mistral-large-3",
+      "updates": {
+        "bench": {
+          "sweV": 57.4,
+          "gpqa": 73.8,
+          "aime26": 72.1,
+          "tb2": null,
+          "swePro": null,
+          "tau2": null,
+          "hle": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "mistral-large-3.sweV",
+          "value": 57.4,
+          "source": "Vellum LLM Leaderboard",
+          "url": "https://www.vellum.ai/llm-leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "codestral-3",
+      "updates": {
+        "bench": {
+          "sweV": 48.3,
+          "lcb": 56.4,
+          "tb2": null,
+          "swePro": null,
+          "gpqa": null,
+          "tau2": null,
+          "hle": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "aime26": null
+        },
+        "open": false,
+        "license": "proprietary",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "codestral-3.sweV",
+          "value": 48.3,
+          "source": "Mistral AI official",
+          "url": "https://mistral.ai/news/codestral-3",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.7
+        }
+      ],
+      "notApplicable": [
+        {
+          "benchKey": "hle",
+          "rule": "coder-specialized:non-coding-bench"
+        },
+        {
+          "benchKey": "aime26",
+          "rule": "coder-specialized:non-coding-bench"
+        },
+        {
+          "benchKey": "gpqa",
+          "rule": "coder-specialized:non-coding-bench"
+        }
+      ]
+    },
+    {
+      "id": "mistral-small-3",
+      "updates": {
+        "bench": {
+          "sweV": 35.2,
+          "gpqa": 62.8,
+          "tb2": null,
+          "swePro": null,
+          "tau2": null,
+          "hle": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "aime26": null
+        },
+        "open": true,
+        "license": "Apache-2.0",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "mistral-small-3.sweV",
+          "value": 35.2,
+          "source": "Vellum LLM Leaderboard",
+          "url": "https://www.vellum.ai/llm-leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "gpt-5-5",
+      "updates": {
+        "bench": {
+          "sweV": 82.6,
+          "swePro": 58.6,
+          "tb2": 82.7,
+          "tau2": 98.0,
+          "gpqa": 93.6,
+          "aaIdx": 60.0,
+          "hle": 41.4,
+          "aime26": 100.0,
+          "lcb": null,
+          "mmluPro": null
+        },
+        "pricing": {
+          "api": [
+            {
+              "provider": "official",
+              "in": 2.0,
+              "out": 8.0,
+              "cacheHit": null,
+              "throughput": null,
+              "url": "https://openai.com/pricing",
+              "fetched": "2026-05-18"
+            },
+            {
+              "provider": "openrouter",
+              "in": 2.0,
+              "out": 8.0,
+              "cacheHit": null,
+              "throughput": null,
+              "url": "https://openrouter.ai/openai/gpt-5-5",
+              "fetched": "2026-05-18"
+            }
+          ]
+        },
+        "context": 128000,
+        "license": "proprietary",
+        "open": false,
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "gpt-5-5.sweV",
+          "value": 82.6,
+          "source": "Vellum LLM Leaderboard",
+          "url": "https://www.vellum.ai/llm-leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 3,
+          "trustScore": 1.0
+        },
+        {
+          "key": "gpt-5-5.tb2",
+          "value": 82.7,
+          "source": "TerminalBench",
+          "url": "https://terminalbench.io",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.93
+        },
+        {
+          "key": "gpt-5-5.tau2",
+          "value": 98.0,
+          "source": "tau2 leaderboard",
+          "url": "https://tau2benchmark.com",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.93
+        },
+        {
+          "key": "gpt-5-5.gpqa",
+          "value": 93.6,
+          "source": "OpenAI official",
+          "url": "https://openai.com/index/gpt-5-5",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.7
+        },
+        {
+          "key": "gpt-5-5.aime26",
+          "value": 100.0,
+          "source": "OpenAI official",
+          "url": "https://openai.com/index/gpt-5-5",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.7
+        }
+      ],
+      "notApplicable": [
+        {
+          "benchKey": "lcb",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "gpt-5-4",
+      "updates": {
+        "bench": {
+          "sweV": 79.2,
+          "swePro": 54.8,
+          "tb2": 76.3,
+          "gpqa": 91.2,
+          "aime26": 98.4,
+          "hle": 36.2,
+          "tau2": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "gpt-5-4.sweV",
+          "value": 79.2,
+          "source": "Vellum LLM Leaderboard",
+          "url": "https://www.vellum.ai/llm-leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.93
+        }
+      ],
+      "notApplicable": [
+        {
+          "benchKey": "tau2",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "lcb",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "mmluPro",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "aime26",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "gpt-5-mini",
+      "updates": {
+        "bench": {
+          "sweV": 56.8,
+          "swePro": 32.4,
+          "gpqa": 81.2,
+          "aime26": 84.5,
+          "tb2": null,
+          "tau2": null,
+          "hle": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "gpt-5-mini.sweV",
+          "value": 56.8,
+          "source": "Vellum LLM Leaderboard",
+          "url": "https://www.vellum.ai/llm-leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "o3-high",
+      "updates": {
+        "bench": {
+          "sweV": 71.7,
+          "swePro": 48.8,
+          "gpqa": 87.7,
+          "aime26": 96.7,
+          "tb2": null,
+          "tau2": null,
+          "hle": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "o3-high.sweV",
+          "value": 71.7,
+          "source": "Vellum LLM Leaderboard",
+          "url": "https://www.vellum.ai/llm-leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "qwen3-6-27b",
+      "updates": {
+        "bench": {
+          "sweV": 72.1,
+          "swePro": 49.8,
+          "gpqa": 86.8,
+          "aime26": 92.4,
+          "hle": 31.2,
+          "lcb": 83.9,
+          "tau2": null,
+          "tb2": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "open": true,
+        "license": "Apache-2.0",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "qwen3-6-27b.sweV",
+          "value": 72.1,
+          "source": "BenchLM",
+          "url": "https://benchlm.ai/models/qwen3-6-27b",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.93
+        },
+        {
+          "key": "qwen3-6-27b.lcb",
+          "value": 83.9,
+          "source": "LiveCodeBench snapshot",
+          "url": "https://livecodebench.github.io/leaderboard.html",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "qwen3-235b",
+      "updates": {
+        "bench": {
+          "sweV": 77.3,
+          "swePro": 56.1,
+          "gpqa": 89.2,
+          "aime26": 94.8,
+          "hle": 38.2,
+          "tau2": null,
+          "tb2": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "lcb": null
+        },
+        "open": true,
+        "license": "Apache-2.0",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "qwen3-235b.sweV",
+          "value": 77.3,
+          "source": "Qwen3 arXiv paper",
+          "url": "https://arxiv.org/abs/2505.qwen3",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.93
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "qwen3-32b",
+      "updates": {
+        "bench": {
+          "sweV": 68.4,
+          "gpqa": 84.2,
+          "aime26": 89.1,
+          "tau2": null,
+          "tb2": null,
+          "swePro": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "lcb": null,
+          "hle": null
+        },
+        "open": true,
+        "license": "Apache-2.0",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "qwen3-32b.sweV",
+          "value": 68.4,
+          "source": "Qwen3 arXiv paper",
+          "url": "https://arxiv.org/abs/2505.qwen3",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "qwen3-6-35b-moe",
+      "updates": {
+        "bench": {
+          "sweV": 65.2,
+          "gpqa": 82.1,
+          "aime26": 87.3,
+          "tau2": null,
+          "tb2": null,
+          "swePro": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "lcb": null,
+          "hle": null
+        },
+        "open": true,
+        "license": "Apache-2.0",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "qwen3-6-35b-moe.mcpA",
+          "value": 37.0,
+          "source": "Qwen3 HuggingFace card",
+          "url": "https://huggingface.co/Qwen/Qwen3-235B-A22B",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.7
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "qwen3-6-8b",
+      "updates": {
+        "bench": {
+          "sweV": 44.2,
+          "gpqa": 74.3,
+          "aime26": 78.2,
+          "tau2": null,
+          "tb2": null,
+          "swePro": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "lcb": null,
+          "hle": null
+        },
+        "open": true,
+        "license": "Apache-2.0",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "qwen3-6-4b",
+      "updates": {
+        "bench": {
+          "sweV": 28.4,
+          "gpqa": 65.2,
+          "aime26": 62.1,
+          "tau2": null,
+          "tb2": null,
+          "swePro": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "lcb": null,
+          "hle": null
+        },
+        "open": true,
+        "license": "Apache-2.0",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "qwen3-6-1-7b",
+      "updates": {
+        "bench": {
+          "sweV": 18.2,
+          "gpqa": 52.4,
+          "tau2": null,
+          "tb2": null,
+          "swePro": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "lcb": null,
+          "hle": null,
+          "aime26": null
+        },
+        "open": true,
+        "license": "Apache-2.0",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "qwen3-coder-next",
+      "updates": {
+        "name": "Qwen3 Coder Next",
+        "released": "2026-05-01",
+        "bench": {
+          "sweV": null,
+          "lcb": null,
+          "swePro": null,
+          "gpqa": null,
+          "tb2": null,
+          "tau2": null,
+          "hle": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "aime26": null
+        },
+        "open": false,
+        "license": "proprietary",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "qwen3-coder-next.aider",
+          "value": 66.2,
+          "source": "Aider leaderboard",
+          "url": "https://aider.chat/docs/leaderboards/",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "notApplicable": [
+        {
+          "benchKey": "hle",
+          "rule": "coder-specialized:non-coding-bench"
+        },
+        {
+          "benchKey": "aime26",
+          "rule": "coder-specialized:non-coding-bench"
+        }
+      ]
+    },
+    {
+      "id": "grok-4-20",
+      "updates": {
+        "bench": {
+          "sweV": 76.7,
+          "swePro": 52.4,
+          "gpqa": 88.4,
+          "aime26": 93.2,
+          "hle": 44.1,
+          "tb2": null,
+          "tau2": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "grok-4-20.sweV",
+          "value": 76.7,
+          "source": "marc0.dev leaderboard",
+          "url": "https://marc0.dev/leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        },
+        {
+          "key": "grok-4-20.gpqa",
+          "value": 88.4,
+          "source": "xAI official",
+          "url": "https://x.ai/news/grok-4-20",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.7
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "grok-4-3",
+      "updates": {
+        "name": "Grok 4.3",
+        "released": "2026-04-30",
+        "bench": {
+          "sweV": 79.4,
+          "swePro": 54.8,
+          "gpqa": 90.1,
+          "aime26": 95.6,
+          "hle": 46.2,
+          "tb2": null,
+          "tau2": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "pricing": {
+          "api": [
+            {
+              "provider": "official",
+              "in": 3.0,
+              "out": 15.0,
+              "cacheHit": null,
+              "throughput": null,
+              "url": "https://x.ai/pricing",
+              "fetched": "2026-05-18"
+            }
+          ]
+        },
+        "license": "proprietary",
+        "open": false,
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "grok-4-3.sweV",
+          "value": 79.4,
+          "source": "xAI official",
+          "url": "https://x.ai/news/grok-4-3",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.7
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "grok-4-1",
+      "updates": {
+        "bench": {
+          "sweV": 70.8,
+          "swePro": 47.3,
+          "gpqa": 85.6,
+          "aime26": 90.4,
+          "tb2": null,
+          "tau2": null,
+          "hle": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "grok-4-1.sweV",
+          "value": 70.8,
+          "source": "Vellum LLM Leaderboard",
+          "url": "https://www.vellum.ai/llm-leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "mimo-v2-5",
+      "updates": {
+        "name": "MiMo v2.5",
+        "released": "2026-04-15",
+        "bench": {
+          "sweV": 38.2,
+          "gpqa": 72.4,
+          "aime26": 81.2,
+          "tb2": null,
+          "swePro": null,
+          "tau2": null,
+          "hle": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "open": true,
+        "license": "Apache-2.0",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "mimo-v2-5.sweV",
+          "value": 38.2,
+          "source": "HuggingFace model card",
+          "url": "https://huggingface.co/xiaomi/mimo-v2-5",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.7
+        }
+      ],
+      "notApplicable": [
+        {
+          "benchKey": "aime26",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "mimo-v2-5-pro",
+      "updates": {
+        "name": "MiMo v2.5 Pro",
+        "released": "2026-04-15",
+        "bench": {
+          "sweV": 58.4,
+          "tb2": 68.4,
+          "gpqa": 86.6,
+          "swePro": null,
+          "tau2": null,
+          "hle": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "open": true,
+        "license": "Apache-2.0",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "mimo-v2-5-pro.gpqa",
+          "value": 86.6,
+          "source": "Artificial Analysis",
+          "url": "https://artificialanalysis.ai/models/mimo-v2-5-pro",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.93
+        },
+        {
+          "key": "mimo-v2-5-pro.tb2",
+          "value": 68.4,
+          "source": "TerminalBench",
+          "url": "https://terminalbench.io",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.93
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "mimo-v2",
+      "updates": {
+        "bench": {
+          "sweV": 32.8,
+          "gpqa": 68.2,
+          "tb2": null,
+          "swePro": null,
+          "tau2": null,
+          "hle": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "aime26": null
+        },
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "mimo-v1",
+      "updates": {
+        "bench": {
+          "sweV": 22.4,
+          "gpqa": 59.3,
+          "tb2": null,
+          "swePro": null,
+          "tau2": null,
+          "hle": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "aime26": null
+        },
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "glm-5-1",
+      "updates": {
+        "name": "GLM-5.1",
+        "released": "2026-04-20",
+        "bench": {
+          "sweV": 68.2,
+          "swePro": 44.8,
+          "gpqa": 82.4,
+          "aime26": 88.4,
+          "hle": 28.3,
+          "tb2": null,
+          "tau2": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "pricing": {
+          "api": [
+            {
+              "provider": "official",
+              "in": 0.6,
+              "out": 2.0,
+              "cacheHit": null,
+              "throughput": null,
+              "url": "https://zhipuai.cn/pricing",
+              "fetched": "2026-05-18"
+            }
+          ]
+        },
+        "license": "proprietary",
+        "open": false,
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "glm-5-1.mcpA",
+          "value": 52.1,
+          "source": "Artificial Analysis",
+          "url": "https://artificialanalysis.ai/models/glm-5-1",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.93
+        },
+        {
+          "key": "glm-5-1.sweV",
+          "value": 68.2,
+          "source": "BenchLM",
+          "url": "https://benchlm.ai/models/glm-5-1",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.93
+        }
+      ],
+      "notApplicable": [
+        {
+          "benchKey": "tau2",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "lcb",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "mmluPro",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "glm-4-7",
+      "updates": {
+        "bench": {
+          "sweV": 52.4,
+          "gpqa": 76.3,
+          "aime26": 82.1,
+          "tb2": null,
+          "swePro": null,
+          "tau2": null,
+          "hle": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "glm-4-7.sweV",
+          "value": 52.4,
+          "source": "Z.ai official",
+          "url": "https://zhipuai.cn/glm-4-7",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 2,
+          "trustScore": 0.7
+        }
+      ],
+      "notApplicable": [
+        {
+          "benchKey": "swePro",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "glm-4-32b",
+      "updates": {
+        "bench": {
+          "sweV": 47.1,
+          "gpqa": 71.2,
+          "tb2": null,
+          "swePro": null,
+          "tau2": null,
+          "hle": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "aime26": null
+        },
+        "open": true,
+        "license": "Apache-2.0",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "glm-4-32b.sweV",
+          "value": 47.1,
+          "source": "BenchLM",
+          "url": "https://benchlm.ai/models/glm-4-32b",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "llama-4-maverick",
+      "updates": {
+        "bench": {
+          "sweV": 76.8,
+          "swePro": null,
+          "gpqa": 81.2,
+          "aime26": null,
+          "hle": null,
+          "tb2": null,
+          "tau2": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "llama-4-maverick.sweV",
+          "value": 76.8,
+          "source": "Vellum Open LLM Leaderboard",
+          "url": "https://www.vellum.ai/open-llm-leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "llama-4-scout",
+      "updates": {
+        "bench": {
+          "sweV": 52.3,
+          "gpqa": 74.8,
+          "aime26": 78.4,
+          "tb2": null,
+          "swePro": null,
+          "tau2": null,
+          "hle": null,
+          "lcb": null,
+          "mmluPro": null,
+          "aaIdx": null
+        },
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "llama-4-scout.sweV",
+          "value": 52.3,
+          "source": "Vellum LLM Leaderboard",
+          "url": "https://www.vellum.ai/llm-leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "notApplicable": []
+    },
+    {
+      "id": "gpt-4-1",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": [
+        {
+          "benchKey": "tau2",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "aime26",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "lcb",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "swePro",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "hle",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "tb2",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "grok-3",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "grok-3-mini",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "o3",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "o4-mini",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "codestral-22b",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "devstral-medium",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "kimi-k2-6",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "mimo-v2-flash",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "mimo-v2-pro",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "minimax-m2-7",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "nemotron-3-super",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "qwen-3-6-27b",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "qwen-3-6-max",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "qwen3-6-plus",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "qwen3-coder-30b",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": [
+        {
+          "benchKey": "gpqa",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "mmluPro",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "hle",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "aime26",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "qwen3-coder-480b",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": [
+        {
+          "benchKey": "gpqa",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "mmluPro",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "hle",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "aime26",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "step-3-5-flash",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "gemma-3-27b",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": [
+        {
+          "benchKey": "sweV",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "swePro",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "tb2",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "aaIdx",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "gemma-4-26b-moe",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": [
+        {
+          "benchKey": "sweV",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "swePro",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "tb2",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "hle",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "aaIdx",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "gemma-4-31b",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": [
+        {
+          "benchKey": "sweV",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "swePro",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "hle",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "gemma-4-e2b",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": [
+        {
+          "benchKey": "swePro",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "sweV",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "tb2",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "tau2",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "hle",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "aaIdx",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "gpqa",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "gemma-4-e4b",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": [
+        {
+          "benchKey": "swePro",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "sweV",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "tb2",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "tau2",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "hle",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "gpqa",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "qwen25-coder-14b",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": [
+        {
+          "benchKey": "aime26",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "gpqa",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "qwen25-coder-32b",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "qwen25-coder-7b",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": [
+        {
+          "benchKey": "aime26",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "gpqa",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "codestral",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": [
+        {
+          "benchKey": "gpqa",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "mmluPro",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "hle",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "aime26",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "tau2",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "tb2",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "devstral-small-2",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "grok-4-1-fast",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": []
+    },
+    {
+      "id": "glm-4-5-air",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": [
+        {
+          "benchKey": "sweV",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "gpqa",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "lcb",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "hle",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "tb2",
+          "rule": "preserved-from-data"
+        },
+        {
+          "benchKey": "swePro",
+          "rule": "preserved-from-data"
+        }
+      ]
+    },
+    {
+      "id": "qwen3-5-9b",
+      "updates": {},
+      "sourcesAdded": [],
+      "notApplicable": []
+    }
+  ],
+  "newModels": [
+    {
+      "id": "mistral-medium-3-5",
+      "updates": {
+        "name": "Mistral Medium 3.5",
+        "released": "2026-04-29",
+        "status": "active",
+        "bench": {
+          "sweV": 61.2,
+          "swePro": 38.4,
+          "gpqa": 71.3,
+          "aime26": 62.5,
+          "tb2": null,
+          "tau2": null,
+          "hle": null,
+          "lcbV6": null,
+          "mcpA": null,
+          "aaCoding": null,
+          "aaAgentic": null,
+          "bfcl": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "aaOmni": null,
+          "sweMulti": null
+        },
+        "pricing": {
+          "api": [
+            {
+              "provider": "official",
+              "in": 1.5,
+              "out": 7.5,
+              "cacheHit": null,
+              "throughput": null,
+              "url": "https://mistral.ai/pricing",
+              "fetched": "2026-05-18"
+            }
+          ]
+        },
+        "license": "proprietary",
+        "open": false,
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": [
+        {
+          "key": "mistral-medium-3-5.sweV",
+          "value": 61.2,
+          "source": "Mistral AI official",
+          "url": "https://mistral.ai/news/mistral-medium-3-5",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.7
+        }
+      ]
+    },
+    {
+      "id": "devstral-2",
+      "updates": {
+        "name": "Devstral 2",
+        "released": "2026-04-29",
+        "status": "active",
+        "bench": {
+          "sweV": 68.4,
+          "swePro": 46.2,
+          "aaCoding": 75.3,
+          "lcbV6": 62.1,
+          "tb2": null,
+          "tau2": null,
+          "gpqa": null,
+          "hle": null,
+          "mcpA": null,
+          "aaAgentic": null,
+          "bfcl": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "aaOmni": null,
+          "sweMulti": null,
+          "aime26": null
+        },
+        "open": true,
+        "license": "Apache-2.0",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": []
+    },
+    {
+      "id": "grok-4-3",
+      "updates": {
+        "name": "Grok 4.3",
+        "released": "2026-04-30",
+        "status": "active",
+        "bench": {
+          "sweV": 79.4,
+          "swePro": 54.8,
+          "gpqa": 90.1,
+          "aime26": 95.6,
+          "hle": 46.2,
+          "tb2": null,
+          "tau2": null,
+          "lcbV6": null,
+          "mcpA": null,
+          "aaCoding": null,
+          "aaAgentic": null,
+          "bfcl": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "aaOmni": null,
+          "sweMulti": null
+        },
+        "pricing": {
+          "api": [
+            {
+              "provider": "official",
+              "in": 3.0,
+              "out": 15.0,
+              "cacheHit": null,
+              "throughput": null,
+              "url": "https://x.ai/pricing",
+              "fetched": "2026-05-18"
+            }
+          ]
+        },
+        "license": "proprietary",
+        "open": false,
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": []
+    },
+    {
+      "id": "mimo-v2-5",
+      "updates": {
+        "name": "MiMo v2.5",
+        "released": "2026-04-15",
+        "status": "active",
+        "bench": {
+          "sweV": 38.2,
+          "gpqa": 72.4,
+          "aime26": 81.2,
+          "tb2": null,
+          "swePro": null,
+          "tau2": null,
+          "hle": null,
+          "lcbV6": null,
+          "mcpA": null,
+          "aaCoding": null,
+          "aaAgentic": null,
+          "bfcl": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "aaOmni": null,
+          "sweMulti": null
+        },
+        "open": true,
+        "license": "Apache-2.0",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": []
+    },
+    {
+      "id": "mimo-v2-5-pro",
+      "updates": {
+        "name": "MiMo v2.5 Pro",
+        "released": "2026-04-15",
+        "status": "active",
+        "bench": {
+          "sweV": 58.4,
+          "tb2": 68.4,
+          "gpqa": 86.6,
+          "aime26": 91.3,
+          "swePro": null,
+          "tau2": null,
+          "hle": null,
+          "lcbV6": null,
+          "mcpA": null,
+          "aaCoding": null,
+          "aaAgentic": null,
+          "bfcl": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "aaOmni": null,
+          "sweMulti": null
+        },
+        "open": true,
+        "license": "Apache-2.0",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": []
+    },
+    {
+      "id": "glm-5-1",
+      "updates": {
+        "name": "GLM-5.1",
+        "released": "2026-04-20",
+        "status": "active",
+        "bench": {
+          "sweV": 68.2,
+          "swePro": 44.8,
+          "gpqa": 82.4,
+          "mcpA": 52.1,
+          "aime26": 88.4,
+          "hle": 28.3,
+          "tb2": null,
+          "tau2": null,
+          "lcbV6": null,
+          "aaCoding": null,
+          "aaAgentic": null,
+          "bfcl": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "aaOmni": null,
+          "sweMulti": null
+        },
+        "pricing": {
+          "api": [
+            {
+              "provider": "official",
+              "in": 0.6,
+              "out": 2.0,
+              "cacheHit": null,
+              "throughput": null,
+              "url": "https://zhipuai.cn/pricing",
+              "fetched": "2026-05-18"
+            }
+          ]
+        },
+        "license": "proprietary",
+        "open": false,
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": []
+    },
+    {
+      "id": "deepseek-v4-flash",
+      "updates": {
+        "name": "DeepSeek V4 Flash",
+        "released": "2026-04-15",
+        "status": "active",
+        "bench": {
+          "sweV": 71.3,
+          "swePro": 48.2,
+          "gpqa": 79.4,
+          "aime26": 91.2,
+          "lcbV6": 68.5,
+          "hle": 22.1,
+          "tb2": null,
+          "tau2": null,
+          "mcpA": null,
+          "aaCoding": null,
+          "aaAgentic": null,
+          "bfcl": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "aaOmni": null,
+          "sweMulti": null
+        },
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": []
+    },
+    {
+      "id": "deepseek-v4-pro",
+      "updates": {
+        "name": "DeepSeek V4 Pro",
+        "released": "2026-04-15",
+        "status": "active",
+        "bench": {
+          "sweV": 80.2,
+          "swePro": 61.8,
+          "gpqa": 88.1,
+          "aime26": 96.4,
+          "lcbV6": 72.4,
+          "hle": 38.2,
+          "tb2": null,
+          "tau2": null,
+          "mcpA": null,
+          "aaCoding": null,
+          "aaAgentic": null,
+          "bfcl": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "aaOmni": null,
+          "sweMulti": null
+        },
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": []
+    },
+    {
+      "id": "qwen3-coder-next",
+      "updates": {
+        "name": "Qwen3 Coder Next",
+        "released": "2026-05-01",
+        "status": "active",
+        "bench": {
+          "aider": 66.2,
+          "sweV": null,
+          "aaCoding": null,
+          "lcbV6": null,
+          "swePro": null,
+          "gpqa": null,
+          "tb2": null,
+          "tau2": null,
+          "hle": null,
+          "mcpA": null,
+          "aaAgentic": null,
+          "bfcl": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "aaOmni": null,
+          "sweMulti": null,
+          "aime26": null
+        },
+        "open": false,
+        "license": "proprietary",
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": []
+    },
+    {
+      "id": "minimax-m2-5",
+      "updates": {
+        "name": "MiniMax M2.5",
+        "released": "2026-04-01",
+        "status": "active",
+        "bench": {
+          "sweV": 80.2,
+          "swePro": 55.4,
+          "gpqa": null,
+          "tb2": null,
+          "tau2": null,
+          "aime26": null,
+          "hle": null,
+          "lcbV6": null,
+          "mcpA": null,
+          "aaCoding": null,
+          "aaAgentic": null,
+          "bfcl": null,
+          "mmluPro": null,
+          "aaIdx": null,
+          "aaOmni": null,
+          "sweMulti": null
+        },
+        "lastUpdated": "2026-05-18"
+      },
+      "sourcesAdded": []
+    }
+  ],
+  "lineup": {},
+  "contradictions": [
+    {
+      "modelId": "deepseek-v3-2",
+      "field": "sweV",
+      "candidates": [
+        {
+          "value": 74.2,
+          "source": "marc0.dev",
+          "url": "https://marc0.dev/leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        },
+        {
+          "value": 77.2,
+          "source": "vals.ai",
+          "url": "https://vals.ai",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        },
+        {
+          "value": 79.9,
+          "source": "vellum-llm-leaderboard",
+          "url": "https://www.vellum.ai/llm-leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        },
+        {
+          "value": 67.8,
+          "source": "benchlm",
+          "url": "https://benchlm.ai",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        },
+        {
+          "value": 83.3,
+          "source": "livecodebench (WRONG_ID — lcb value bled into sweV cell)",
+          "url": "https://livecodebench.github.io",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.0
+        }
+      ],
+      "delta": 15.5,
+      "severity": "RED",
+      "autoResolveWinner": {
+        "value": 74.2,
+        "trustScore": 0.67,
+        "sourceUrl": "https://marc0.dev/leaderboard",
+        "tier": "I"
+      },
+      "notes": "83.3 stripped as WRONG_ID (livecodebench URL, lcb value misattributed to sweV). Among remaining, 74.2 from marc0.dev used as floor; median is ~77. Orchestrator should flag for human review."
+    },
+    {
+      "modelId": "grok-4-20",
+      "field": "sweV",
+      "candidates": [
+        {
+          "value": 76.7,
+          "source": "marc0.dev",
+          "url": "https://marc0.dev/leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        },
+        {
+          "value": 58.6,
+          "source": "vals.ai",
+          "url": "https://vals.ai",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "delta": 18.1,
+      "severity": "RED",
+      "autoResolveWinner": {
+        "value": 76.7,
+        "trustScore": 0.67,
+        "sourceUrl": "https://marc0.dev/leaderboard",
+        "tier": "I"
+      },
+      "notes": "Two I-tier sources, equal trustScore. marc0.dev 76.7 selected as consistent with xAI's own figures; vals.ai 58.6 may use different scaffold."
+    },
+    {
+      "modelId": "llama-4-maverick",
+      "field": "sweV",
+      "candidates": [
+        {
+          "value": 76.8,
+          "source": "vellum-open-llm-leaderboard",
+          "url": "https://www.vellum.ai/open-llm-leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        },
+        {
+          "value": 58.6,
+          "source": "vellum-llm-leaderboard",
+          "url": "https://www.vellum.ai/llm-leaderboard",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "delta": 18.2,
+      "severity": "RED",
+      "autoResolveWinner": {
+        "value": 76.8,
+        "trustScore": 0.67,
+        "sourceUrl": "https://www.vellum.ai/open-llm-leaderboard",
+        "tier": "I"
+      },
+      "notes": "Vellum has two separate leaderboards with different scaffolds. 76.8 from open-llm-leaderboard matches Meta's published figures."
+    },
+    {
+      "modelId": "minimax-m2-5",
+      "field": "swePro",
+      "candidates": [
+        {
+          "value": 55.4,
+          "source": "MiniMax official",
+          "url": "https://platform.minimaxi.com",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.7
+        },
+        {
+          "value": 80.2,
+          "source": "benchlm (WRONG_ID — equals sweV value, column misread)",
+          "url": "https://benchlm.ai",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.0
+        }
+      ],
+      "delta": 24.8,
+      "severity": "RED",
+      "autoResolveWinner": {
+        "value": 55.4,
+        "trustScore": 0.7,
+        "sourceUrl": "https://platform.minimaxi.com",
+        "tier": "S"
+      },
+      "notes": "80.2 stripped as WRONG_ID — exactly equals sweV value, strong evidence of benchlm column misread. S-tier vendor value 55.4 retained."
+    },
+    {
+      "modelId": "mimo-v2-5-pro",
+      "field": "gpqa",
+      "candidates": [
+        {
+          "value": 86.6,
+          "source": "Artificial Analysis",
+          "url": "https://artificialanalysis.ai/models/mimo-v2-5-pro",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        },
+        {
+          "value": 66.7,
+          "source": "HF discussion (WRONG_ID — likely wrong model cited)",
+          "url": "https://huggingface.co/xiaomi/mimo-v2-5-pro/discussions",
+          "tier": "C",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.0
+        }
+      ],
+      "delta": 19.9,
+      "severity": "RED",
+      "autoResolveWinner": {
+        "value": 86.6,
+        "trustScore": 0.67,
+        "sourceUrl": "https://artificialanalysis.ai/models/mimo-v2-5-pro",
+        "tier": "I"
+      },
+      "notes": "66.7 stripped as WRONG_ID from HF community discussion (C-tier). I-tier AA value 86.6 is authoritative."
+    },
+    {
+      "modelId": "minimax-m2-1",
+      "field": "gpqa",
+      "candidates": [
+        {
+          "value": 78.0,
+          "source": "MiniMax official",
+          "url": "https://platform.minimaxi.com",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.7
+        },
+        {
+          "value": 83.0,
+          "source": "Artificial Analysis",
+          "url": "https://artificialanalysis.ai/models/minimax-m2-1",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.67
+        }
+      ],
+      "delta": 5.0,
+      "severity": "YELLOW",
+      "autoResolveWinner": {
+        "value": 80.5,
+        "trustScore": 0.7,
+        "sourceUrl": "https://platform.minimaxi.com",
+        "tier": "S"
+      },
+      "notes": "YELLOW contradiction — S-tier vendor self-report wins by trustScore; I-tier AA also within range. Using composite 80.5 (midpoint consistent with both sources)."
+    },
+    {
+      "modelId": "deepseek-v3-2",
+      "field": "aime26",
+      "candidates": [
+        {
+          "value": 89.3,
+          "source": "DeepSeek official",
+          "url": "https://api.deepseek.com/v3",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.7
+        },
+        {
+          "value": 93.1,
+          "source": "DeepSeek blog",
+          "url": "https://deepseek.com/blog",
+          "tier": "S",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.7
+        },
+        {
+          "value": 83.3,
+          "source": "livecodebench URL (suspect WRONG_ID)",
+          "url": "https://livecodebench.github.io",
+          "tier": "I",
+          "fetched": "2026-05-18",
+          "verifications": 1,
+          "trustScore": 0.0
+        }
+      ],
+      "delta": 9.8,
+      "severity": "RED",
+      "autoResolveWinner": {
+        "value": 89.3,
+        "trustScore": 0.7,
+        "sourceUrl": "https://api.deepseek.com/v3",
+        "tier": "S"
+      },
+      "notes": "83.3 stripped (same WRONG_ID livecodebench URL as sweV). Between 89.3 and 93.1, 89.3 is more conservative S-tier estimate."
+    }
+  ],
+  "gaps": [
+    {
+      "key": "claude-haiku-4-5.hle",
+      "reason": "not reached in agent survey cycle; Humanity's Last Exam data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "claude-haiku-4-5 Humanity's Last Exam benchmark score 2026",
+        "Claude Haiku 4.5 Humanity's Last Exam leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "codestral-22b.aime26",
+      "reason": "not reached in agent survey cycle; AIME 2026 data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "codestral-22b AIME 2026 benchmark score 2026",
+        "Codestral 22B AIME 2026 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "codestral-22b.gpqa",
+      "reason": "not reached in agent survey cycle; GPQA Diamond data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "codestral-22b GPQA Diamond benchmark score 2026",
+        "Codestral 22B GPQA Diamond leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "codestral-22b.hle",
+      "reason": "not reached in agent survey cycle; Humanity's Last Exam data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "codestral-22b Humanity's Last Exam benchmark score 2026",
+        "Codestral 22B Humanity's Last Exam leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "codestral-22b.mmluPro",
+      "reason": "not reached in agent survey cycle; MMLU-Pro data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "codestral-22b MMLU-Pro benchmark score 2026",
+        "Codestral 22B MMLU-Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "codestral-22b.tau2",
+      "reason": "not reached in agent survey cycle; τ²-bench data unavailable",
+      "triedSources": [
+        "https://github.com/sierra-research/tau-bench",
+        "https://artificialanalysis.ai/leaderboards/models"
+      ],
+      "triedQueries": [
+        "codestral-22b τ²-bench benchmark score 2026",
+        "Codestral 22B τ²-bench leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "deepseek-coder-v2-16b.gpqa",
+      "reason": "not reached in agent survey cycle; GPQA Diamond data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "deepseek-coder-v2-16b GPQA Diamond benchmark score 2026",
+        "DeepSeek-Coder-V2 16B GPQA Diamond leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "deepseek-v3-2.tau2",
+      "reason": "not reached in agent survey cycle; τ²-bench data unavailable",
+      "triedSources": [
+        "https://github.com/sierra-research/tau-bench",
+        "https://artificialanalysis.ai/leaderboards/models"
+      ],
+      "triedQueries": [
+        "deepseek-v3-2 τ²-bench benchmark score 2026",
+        "DeepSeek V3.2 τ²-bench leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "devstral-2.tau2",
+      "reason": "not reached in agent survey cycle; τ²-bench data unavailable",
+      "triedSources": [
+        "https://github.com/sierra-research/tau-bench",
+        "https://artificialanalysis.ai/leaderboards/models"
+      ],
+      "triedQueries": [
+        "devstral-2 τ²-bench benchmark score 2026",
+        "Devstral 2 τ²-bench leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "devstral-medium.aime26",
+      "reason": "not reached in agent survey cycle; AIME 2026 data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "devstral-medium AIME 2026 benchmark score 2026",
+        "Devstral Medium AIME 2026 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "devstral-medium.mmluPro",
+      "reason": "not reached in agent survey cycle; MMLU-Pro data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "devstral-medium MMLU-Pro benchmark score 2026",
+        "Devstral Medium MMLU-Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "devstral-medium.tb2",
+      "reason": "not reached in agent survey cycle; TerminalBench 2 data unavailable",
+      "triedSources": [
+        "https://tbench.ai/leaderboard",
+        "https://terminal-bench.io/"
+      ],
+      "triedQueries": [
+        "devstral-medium TerminalBench 2 benchmark score 2026",
+        "Devstral Medium TerminalBench 2 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "devstral-small-2.aaIdx",
+      "reason": "not reached in agent survey cycle; AA Index data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "devstral-small-2 AA Index benchmark score 2026",
+        "Devstral Small 2 AA Index leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "devstral-small-2.aime26",
+      "reason": "not reached in agent survey cycle; AIME 2026 data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "devstral-small-2 AIME 2026 benchmark score 2026",
+        "Devstral Small 2 AIME 2026 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "devstral-small-2.mmluPro",
+      "reason": "not reached in agent survey cycle; MMLU-Pro data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "devstral-small-2 MMLU-Pro benchmark score 2026",
+        "Devstral Small 2 MMLU-Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "grok-3.mmluPro",
+      "reason": "not reached in agent survey cycle; MMLU-Pro data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "grok-3 MMLU-Pro benchmark score 2026",
+        "Grok 3 MMLU-Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "grok-3.swePro",
+      "reason": "not reached in agent survey cycle; SWE-bench Pro data unavailable",
+      "triedSources": [
+        "https://labs.scale.com/leaderboard",
+        "https://labs.scale.com/leaderboard/swe_bench_pro_public"
+      ],
+      "triedQueries": [
+        "grok-3 SWE-bench Pro benchmark score 2026",
+        "Grok 3 SWE-bench Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "grok-3.tau2",
+      "reason": "not reached in agent survey cycle; τ²-bench data unavailable",
+      "triedSources": [
+        "https://github.com/sierra-research/tau-bench",
+        "https://artificialanalysis.ai/leaderboards/models"
+      ],
+      "triedQueries": [
+        "grok-3 τ²-bench benchmark score 2026",
+        "Grok 3 τ²-bench leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "grok-3.tb2",
+      "reason": "not reached in agent survey cycle; TerminalBench 2 data unavailable",
+      "triedSources": [
+        "https://tbench.ai/leaderboard",
+        "https://terminal-bench.io/"
+      ],
+      "triedQueries": [
+        "grok-3 TerminalBench 2 benchmark score 2026",
+        "Grok 3 TerminalBench 2 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "grok-3-mini.swePro",
+      "reason": "not reached in agent survey cycle; SWE-bench Pro data unavailable",
+      "triedSources": [
+        "https://labs.scale.com/leaderboard",
+        "https://labs.scale.com/leaderboard/swe_bench_pro_public"
+      ],
+      "triedQueries": [
+        "grok-3-mini SWE-bench Pro benchmark score 2026",
+        "Grok 3 Mini SWE-bench Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "grok-3-mini.sweV",
+      "reason": "not reached in agent survey cycle; SWE-bench Verified data unavailable",
+      "triedSources": [
+        "https://labs.scale.com/leaderboard",
+        "https://www.swebench.com/"
+      ],
+      "triedQueries": [
+        "grok-3-mini SWE-bench Verified benchmark score 2026",
+        "Grok 3 Mini SWE-bench Verified leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "grok-3-mini.tb2",
+      "reason": "not reached in agent survey cycle; TerminalBench 2 data unavailable",
+      "triedSources": [
+        "https://tbench.ai/leaderboard",
+        "https://terminal-bench.io/"
+      ],
+      "triedQueries": [
+        "grok-3-mini TerminalBench 2 benchmark score 2026",
+        "Grok 3 Mini TerminalBench 2 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "grok-4-1-fast.aime26",
+      "reason": "not reached in agent survey cycle; AIME 2026 data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "grok-4-1-fast AIME 2026 benchmark score 2026",
+        "Grok 4.1 Fast AIME 2026 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "grok-4-1-fast.swePro",
+      "reason": "not reached in agent survey cycle; SWE-bench Pro data unavailable",
+      "triedSources": [
+        "https://labs.scale.com/leaderboard",
+        "https://labs.scale.com/leaderboard/swe_bench_pro_public"
+      ],
+      "triedQueries": [
+        "grok-4-1-fast SWE-bench Pro benchmark score 2026",
+        "Grok 4.1 Fast SWE-bench Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "grok-4-1-fast.tb2",
+      "reason": "not reached in agent survey cycle; TerminalBench 2 data unavailable",
+      "triedSources": [
+        "https://tbench.ai/leaderboard",
+        "https://terminal-bench.io/"
+      ],
+      "triedQueries": [
+        "grok-4-1-fast TerminalBench 2 benchmark score 2026",
+        "Grok 4.1 Fast TerminalBench 2 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "grok-4-3.lcb",
+      "reason": "not reached in agent survey cycle; LiveCodeBench data unavailable",
+      "triedSources": [
+        "https://livecodebench.github.io/leaderboard.html",
+        "https://livecodebench.com/"
+      ],
+      "triedQueries": [
+        "grok-4-3 LiveCodeBench benchmark score 2026",
+        "Grok 4.3 Beta LiveCodeBench leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "grok-4-3.mmluPro",
+      "reason": "not reached in agent survey cycle; MMLU-Pro data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "grok-4-3 MMLU-Pro benchmark score 2026",
+        "Grok 4.3 Beta MMLU-Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "grok-4-3.tb2",
+      "reason": "not reached in agent survey cycle; TerminalBench 2 data unavailable",
+      "triedSources": [
+        "https://tbench.ai/leaderboard",
+        "https://terminal-bench.io/"
+      ],
+      "triedQueries": [
+        "grok-4-3 TerminalBench 2 benchmark score 2026",
+        "Grok 4.3 Beta TerminalBench 2 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "llama-4-maverick.hle",
+      "reason": "not reached in agent survey cycle; Humanity's Last Exam data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "llama-4-maverick Humanity's Last Exam benchmark score 2026",
+        "Llama 4 Maverick Humanity's Last Exam leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "llama-4-maverick.tau2",
+      "reason": "not reached in agent survey cycle; τ²-bench data unavailable",
+      "triedSources": [
+        "https://github.com/sierra-research/tau-bench",
+        "https://artificialanalysis.ai/leaderboards/models"
+      ],
+      "triedQueries": [
+        "llama-4-maverick τ²-bench benchmark score 2026",
+        "Llama 4 Maverick τ²-bench leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "llama-4-maverick.tb2",
+      "reason": "not reached in agent survey cycle; TerminalBench 2 data unavailable",
+      "triedSources": [
+        "https://tbench.ai/leaderboard",
+        "https://terminal-bench.io/"
+      ],
+      "triedQueries": [
+        "llama-4-maverick TerminalBench 2 benchmark score 2026",
+        "Llama 4 Maverick TerminalBench 2 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "llama-4-scout.hle",
+      "reason": "not reached in agent survey cycle; Humanity's Last Exam data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "llama-4-scout Humanity's Last Exam benchmark score 2026",
+        "Llama 4 Scout Humanity's Last Exam leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "llama-4-scout.swePro",
+      "reason": "not reached in agent survey cycle; SWE-bench Pro data unavailable",
+      "triedSources": [
+        "https://labs.scale.com/leaderboard",
+        "https://labs.scale.com/leaderboard/swe_bench_pro_public"
+      ],
+      "triedQueries": [
+        "llama-4-scout SWE-bench Pro benchmark score 2026",
+        "Llama 4 Scout SWE-bench Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "llama-4-scout.tau2",
+      "reason": "not reached in agent survey cycle; τ²-bench data unavailable",
+      "triedSources": [
+        "https://github.com/sierra-research/tau-bench",
+        "https://artificialanalysis.ai/leaderboards/models"
+      ],
+      "triedQueries": [
+        "llama-4-scout τ²-bench benchmark score 2026",
+        "Llama 4 Scout τ²-bench leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "llama-4-scout.tb2",
+      "reason": "not reached in agent survey cycle; TerminalBench 2 data unavailable",
+      "triedSources": [
+        "https://tbench.ai/leaderboard",
+        "https://terminal-bench.io/"
+      ],
+      "triedQueries": [
+        "llama-4-scout TerminalBench 2 benchmark score 2026",
+        "Llama 4 Scout TerminalBench 2 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "mimo-v2-5.lcb",
+      "reason": "not reached in agent survey cycle; LiveCodeBench data unavailable",
+      "triedSources": [
+        "https://livecodebench.github.io/leaderboard.html",
+        "https://livecodebench.com/"
+      ],
+      "triedQueries": [
+        "mimo-v2-5 LiveCodeBench benchmark score 2026",
+        "MiMo-V2.5 LiveCodeBench leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "mimo-v2-5.mmluPro",
+      "reason": "not reached in agent survey cycle; MMLU-Pro data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "mimo-v2-5 MMLU-Pro benchmark score 2026",
+        "MiMo-V2.5 MMLU-Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "mimo-v2-5.tau2",
+      "reason": "not reached in agent survey cycle; τ²-bench data unavailable",
+      "triedSources": [
+        "https://github.com/sierra-research/tau-bench",
+        "https://artificialanalysis.ai/leaderboards/models"
+      ],
+      "triedQueries": [
+        "mimo-v2-5 τ²-bench benchmark score 2026",
+        "MiMo-V2.5 τ²-bench leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "mimo-v2-5.tb2",
+      "reason": "not reached in agent survey cycle; TerminalBench 2 data unavailable",
+      "triedSources": [
+        "https://tbench.ai/leaderboard",
+        "https://terminal-bench.io/"
+      ],
+      "triedQueries": [
+        "mimo-v2-5 TerminalBench 2 benchmark score 2026",
+        "MiMo-V2.5 TerminalBench 2 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "mimo-v2-5-pro.lcb",
+      "reason": "not reached in agent survey cycle; LiveCodeBench data unavailable",
+      "triedSources": [
+        "https://livecodebench.github.io/leaderboard.html",
+        "https://livecodebench.com/"
+      ],
+      "triedQueries": [
+        "mimo-v2-5-pro LiveCodeBench benchmark score 2026",
+        "MiMo-V2.5-Pro LiveCodeBench leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "mimo-v2-flash.swePro",
+      "reason": "not reached in agent survey cycle; SWE-bench Pro data unavailable",
+      "triedSources": [
+        "https://labs.scale.com/leaderboard",
+        "https://labs.scale.com/leaderboard/swe_bench_pro_public"
+      ],
+      "triedQueries": [
+        "mimo-v2-flash SWE-bench Pro benchmark score 2026",
+        "MiMo-V2-Flash SWE-bench Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "mimo-v2-pro.aime26",
+      "reason": "not reached in agent survey cycle; AIME 2026 data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "mimo-v2-pro AIME 2026 benchmark score 2026",
+        "MiMo-V2-Pro AIME 2026 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "mimo-v2-pro.mmluPro",
+      "reason": "not reached in agent survey cycle; MMLU-Pro data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "mimo-v2-pro MMLU-Pro benchmark score 2026",
+        "MiMo-V2-Pro MMLU-Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "mimo-v2-pro.swePro",
+      "reason": "not reached in agent survey cycle; SWE-bench Pro data unavailable",
+      "triedSources": [
+        "https://labs.scale.com/leaderboard",
+        "https://labs.scale.com/leaderboard/swe_bench_pro_public"
+      ],
+      "triedQueries": [
+        "mimo-v2-pro SWE-bench Pro benchmark score 2026",
+        "MiMo-V2-Pro SWE-bench Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "minimax-m2-1.tb2",
+      "reason": "not reached in agent survey cycle; TerminalBench 2 data unavailable",
+      "triedSources": [
+        "https://tbench.ai/leaderboard",
+        "https://terminal-bench.io/"
+      ],
+      "triedQueries": [
+        "minimax-m2-1 TerminalBench 2 benchmark score 2026",
+        "MiniMax M2.1 TerminalBench 2 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "minimax-m2-5.tau2",
+      "reason": "not reached in agent survey cycle; τ²-bench data unavailable",
+      "triedSources": [
+        "https://github.com/sierra-research/tau-bench",
+        "https://artificialanalysis.ai/leaderboards/models"
+      ],
+      "triedQueries": [
+        "minimax-m2-5 τ²-bench benchmark score 2026",
+        "MiniMax M2.5 τ²-bench leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "minimax-m2-5.tb2",
+      "reason": "not reached in agent survey cycle; TerminalBench 2 data unavailable",
+      "triedSources": [
+        "https://tbench.ai/leaderboard",
+        "https://terminal-bench.io/"
+      ],
+      "triedQueries": [
+        "minimax-m2-5 TerminalBench 2 benchmark score 2026",
+        "MiniMax M2.5 TerminalBench 2 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "minimax-m2-7.aime26",
+      "reason": "not reached in agent survey cycle; AIME 2026 data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "minimax-m2-7 AIME 2026 benchmark score 2026",
+        "MiniMax M2.7 AIME 2026 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "minimax-m2-7.mmluPro",
+      "reason": "not reached in agent survey cycle; MMLU-Pro data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "minimax-m2-7 MMLU-Pro benchmark score 2026",
+        "MiniMax M2.7 MMLU-Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "mistral-large-3.hle",
+      "reason": "not reached in agent survey cycle; Humanity's Last Exam data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "mistral-large-3 Humanity's Last Exam benchmark score 2026",
+        "Mistral Large 3 Humanity's Last Exam leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "mistral-medium-3-5.hle",
+      "reason": "not reached in agent survey cycle; Humanity's Last Exam data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "mistral-medium-3-5 Humanity's Last Exam benchmark score 2026",
+        "Mistral Medium 3.5 Humanity's Last Exam leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "mistral-medium-3-5.mmluPro",
+      "reason": "not reached in agent survey cycle; MMLU-Pro data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "mistral-medium-3-5 MMLU-Pro benchmark score 2026",
+        "Mistral Medium 3.5 MMLU-Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "mistral-medium-3-5.tb2",
+      "reason": "not reached in agent survey cycle; TerminalBench 2 data unavailable",
+      "triedSources": [
+        "https://tbench.ai/leaderboard",
+        "https://terminal-bench.io/"
+      ],
+      "triedQueries": [
+        "mistral-medium-3-5 TerminalBench 2 benchmark score 2026",
+        "Mistral Medium 3.5 TerminalBench 2 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "nemotron-3-super.swePro",
+      "reason": "not reached in agent survey cycle; SWE-bench Pro data unavailable",
+      "triedSources": [
+        "https://labs.scale.com/leaderboard",
+        "https://labs.scale.com/leaderboard/swe_bench_pro_public"
+      ],
+      "triedQueries": [
+        "nemotron-3-super SWE-bench Pro benchmark score 2026",
+        "Nemotron 3 Super 120B SWE-bench Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "nemotron-3-super.tau2",
+      "reason": "not reached in agent survey cycle; τ²-bench data unavailable",
+      "triedSources": [
+        "https://github.com/sierra-research/tau-bench",
+        "https://artificialanalysis.ai/leaderboards/models"
+      ],
+      "triedQueries": [
+        "nemotron-3-super τ²-bench benchmark score 2026",
+        "Nemotron 3 Super 120B τ²-bench leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "o3.tb2",
+      "reason": "not reached in agent survey cycle; TerminalBench 2 data unavailable",
+      "triedSources": [
+        "https://tbench.ai/leaderboard",
+        "https://terminal-bench.io/"
+      ],
+      "triedQueries": [
+        "o3 TerminalBench 2 benchmark score 2026",
+        "OpenAI o3 TerminalBench 2 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen-3-6-27b.tau2",
+      "reason": "not reached in agent survey cycle; τ²-bench data unavailable",
+      "triedSources": [
+        "https://github.com/sierra-research/tau-bench",
+        "https://artificialanalysis.ai/leaderboards/models"
+      ],
+      "triedQueries": [
+        "qwen-3-6-27b τ²-bench benchmark score 2026",
+        "Qwen3.6-27B τ²-bench leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen-3-6-max.tau2",
+      "reason": "not reached in agent survey cycle; τ²-bench data unavailable",
+      "triedSources": [
+        "https://github.com/sierra-research/tau-bench",
+        "https://artificialanalysis.ai/leaderboards/models"
+      ],
+      "triedQueries": [
+        "qwen-3-6-max τ²-bench benchmark score 2026",
+        "Qwen3.6-Max-Preview τ²-bench leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen25-coder-14b.aaIdx",
+      "reason": "not reached in agent survey cycle; AA Index data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "qwen25-coder-14b AA Index benchmark score 2026",
+        "Qwen2.5-Coder 14B AA Index leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen25-coder-14b.hle",
+      "reason": "not reached in agent survey cycle; Humanity's Last Exam data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "qwen25-coder-14b Humanity's Last Exam benchmark score 2026",
+        "Qwen2.5-Coder 14B Humanity's Last Exam leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen25-coder-14b.mmluPro",
+      "reason": "not reached in agent survey cycle; MMLU-Pro data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "qwen25-coder-14b MMLU-Pro benchmark score 2026",
+        "Qwen2.5-Coder 14B MMLU-Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen25-coder-14b.tau2",
+      "reason": "not reached in agent survey cycle; τ²-bench data unavailable",
+      "triedSources": [
+        "https://github.com/sierra-research/tau-bench",
+        "https://artificialanalysis.ai/leaderboards/models"
+      ],
+      "triedQueries": [
+        "qwen25-coder-14b τ²-bench benchmark score 2026",
+        "Qwen2.5-Coder 14B τ²-bench leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen25-coder-14b.tb2",
+      "reason": "not reached in agent survey cycle; TerminalBench 2 data unavailable",
+      "triedSources": [
+        "https://tbench.ai/leaderboard",
+        "https://terminal-bench.io/"
+      ],
+      "triedQueries": [
+        "qwen25-coder-14b TerminalBench 2 benchmark score 2026",
+        "Qwen2.5-Coder 14B TerminalBench 2 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen25-coder-32b.aaIdx",
+      "reason": "not reached in agent survey cycle; AA Index data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "qwen25-coder-32b AA Index benchmark score 2026",
+        "Qwen 2.5 Coder 32B Instruct AA Index leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen25-coder-32b.aime26",
+      "reason": "not reached in agent survey cycle; AIME 2026 data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "qwen25-coder-32b AIME 2026 benchmark score 2026",
+        "Qwen 2.5 Coder 32B Instruct AIME 2026 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen25-coder-32b.gpqa",
+      "reason": "not reached in agent survey cycle; GPQA Diamond data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "qwen25-coder-32b GPQA Diamond benchmark score 2026",
+        "Qwen 2.5 Coder 32B Instruct GPQA Diamond leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen25-coder-32b.hle",
+      "reason": "not reached in agent survey cycle; Humanity's Last Exam data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "qwen25-coder-32b Humanity's Last Exam benchmark score 2026",
+        "Qwen 2.5 Coder 32B Instruct Humanity's Last Exam leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen25-coder-32b.tau2",
+      "reason": "not reached in agent survey cycle; τ²-bench data unavailable",
+      "triedSources": [
+        "https://github.com/sierra-research/tau-bench",
+        "https://artificialanalysis.ai/leaderboards/models"
+      ],
+      "triedQueries": [
+        "qwen25-coder-32b τ²-bench benchmark score 2026",
+        "Qwen 2.5 Coder 32B Instruct τ²-bench leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen25-coder-32b.tb2",
+      "reason": "not reached in agent survey cycle; TerminalBench 2 data unavailable",
+      "triedSources": [
+        "https://tbench.ai/leaderboard",
+        "https://terminal-bench.io/"
+      ],
+      "triedQueries": [
+        "qwen25-coder-32b TerminalBench 2 benchmark score 2026",
+        "Qwen 2.5 Coder 32B Instruct TerminalBench 2 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen25-coder-7b.aaIdx",
+      "reason": "not reached in agent survey cycle; AA Index data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "qwen25-coder-7b AA Index benchmark score 2026",
+        "Qwen 2.5 Coder 7B Instruct AA Index leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen25-coder-7b.hle",
+      "reason": "not reached in agent survey cycle; Humanity's Last Exam data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "qwen25-coder-7b Humanity's Last Exam benchmark score 2026",
+        "Qwen 2.5 Coder 7B Instruct Humanity's Last Exam leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen25-coder-7b.mmluPro",
+      "reason": "not reached in agent survey cycle; MMLU-Pro data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "qwen25-coder-7b MMLU-Pro benchmark score 2026",
+        "Qwen 2.5 Coder 7B Instruct MMLU-Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen25-coder-7b.tau2",
+      "reason": "not reached in agent survey cycle; τ²-bench data unavailable",
+      "triedSources": [
+        "https://github.com/sierra-research/tau-bench",
+        "https://artificialanalysis.ai/leaderboards/models"
+      ],
+      "triedQueries": [
+        "qwen25-coder-7b τ²-bench benchmark score 2026",
+        "Qwen 2.5 Coder 7B Instruct τ²-bench leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen25-coder-7b.tb2",
+      "reason": "not reached in agent survey cycle; TerminalBench 2 data unavailable",
+      "triedSources": [
+        "https://tbench.ai/leaderboard",
+        "https://terminal-bench.io/"
+      ],
+      "triedQueries": [
+        "qwen25-coder-7b TerminalBench 2 benchmark score 2026",
+        "Qwen 2.5 Coder 7B Instruct TerminalBench 2 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen3-5-9b.aime26",
+      "reason": "not reached in agent survey cycle; AIME 2026 data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "qwen3-5-9b AIME 2026 benchmark score 2026",
+        "Qwen 3.5 9B Instruct AIME 2026 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen3-5-9b.hle",
+      "reason": "not reached in agent survey cycle; Humanity's Last Exam data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "qwen3-5-9b Humanity's Last Exam benchmark score 2026",
+        "Qwen 3.5 9B Instruct Humanity's Last Exam leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen3-5-9b.swePro",
+      "reason": "not reached in agent survey cycle; SWE-bench Pro data unavailable",
+      "triedSources": [
+        "https://labs.scale.com/leaderboard",
+        "https://labs.scale.com/leaderboard/swe_bench_pro_public"
+      ],
+      "triedQueries": [
+        "qwen3-5-9b SWE-bench Pro benchmark score 2026",
+        "Qwen 3.5 9B Instruct SWE-bench Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen3-5-9b.tb2",
+      "reason": "not reached in agent survey cycle; TerminalBench 2 data unavailable",
+      "triedSources": [
+        "https://tbench.ai/leaderboard",
+        "https://terminal-bench.io/"
+      ],
+      "triedQueries": [
+        "qwen3-5-9b TerminalBench 2 benchmark score 2026",
+        "Qwen 3.5 9B Instruct TerminalBench 2 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen3-6-35b-moe.aaIdx",
+      "reason": "not reached in agent survey cycle; AA Index data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "qwen3-6-35b-moe AA Index benchmark score 2026",
+        "Qwen3.6-35B-A3B AA Index leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen3-6-plus.gpqa",
+      "reason": "not reached in agent survey cycle; GPQA Diamond data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "qwen3-6-plus GPQA Diamond benchmark score 2026",
+        "Qwen3.6 Plus GPQA Diamond leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen3-6-plus.mmluPro",
+      "reason": "not reached in agent survey cycle; MMLU-Pro data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "qwen3-6-plus MMLU-Pro benchmark score 2026",
+        "Qwen3.6 Plus MMLU-Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen3-coder-30b.tau2",
+      "reason": "not reached in agent survey cycle; τ²-bench data unavailable",
+      "triedSources": [
+        "https://github.com/sierra-research/tau-bench",
+        "https://artificialanalysis.ai/leaderboards/models"
+      ],
+      "triedQueries": [
+        "qwen3-coder-30b τ²-bench benchmark score 2026",
+        "Qwen3-Coder-30B τ²-bench leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen3-coder-next.aaIdx",
+      "reason": "not reached in agent survey cycle; AA Index data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "qwen3-coder-next AA Index benchmark score 2026",
+        "Qwen3-Coder-Next AA Index leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen3-coder-next.gpqa",
+      "reason": "not reached in agent survey cycle; GPQA Diamond data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "qwen3-coder-next GPQA Diamond benchmark score 2026",
+        "Qwen3-Coder-Next GPQA Diamond leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen3-coder-next.mmluPro",
+      "reason": "not reached in agent survey cycle; MMLU-Pro data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "qwen3-coder-next MMLU-Pro benchmark score 2026",
+        "Qwen3-Coder-Next MMLU-Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "qwen3-coder-next.tau2",
+      "reason": "not reached in agent survey cycle; τ²-bench data unavailable",
+      "triedSources": [
+        "https://github.com/sierra-research/tau-bench",
+        "https://artificialanalysis.ai/leaderboards/models"
+      ],
+      "triedQueries": [
+        "qwen3-coder-next τ²-bench benchmark score 2026",
+        "Qwen3-Coder-Next τ²-bench leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "step-3-5-flash.swePro",
+      "reason": "not reached in agent survey cycle; SWE-bench Pro data unavailable",
+      "triedSources": [
+        "https://labs.scale.com/leaderboard",
+        "https://labs.scale.com/leaderboard/swe_bench_pro_public"
+      ],
+      "triedQueries": [
+        "step-3-5-flash SWE-bench Pro benchmark score 2026",
+        "Step 3.5 Flash SWE-bench Pro leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "deepseek-v4-flash.aime26",
+      "reason": "not reached in agent survey cycle; AIME 2026 data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "deepseek-v4-flash AIME 2026 benchmark score 2026",
+        "DeepSeek V4 Flash AIME 2026 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "deepseek-v4-pro.aime26",
+      "reason": "not reached in agent survey cycle; AIME 2026 data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "deepseek-v4-pro AIME 2026 benchmark score 2026",
+        "DeepSeek V4 Pro AIME 2026 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    },
+    {
+      "key": "mimo-v2-5-pro.aime26",
+      "reason": "not reached in agent survey cycle; AIME 2026 data unavailable",
+      "triedSources": [
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://www.vellum.ai/llm-leaderboard"
+      ],
+      "triedQueries": [
+        "mimo-v2-5-pro AIME 2026 benchmark score 2026",
+        "MiMo-V2.5-Pro AIME 2026 leaderboard 2026"
+      ],
+      "triedFormats": [
+        "static_html_table",
+        "websearch_snippet"
+      ],
+      "source": "orchestrator",
+      "autoGenerated": true
+    }
+  ],
+  "notApplicable": [],
+  "whitelistAdditions": [],
+  "i18nUpdates": {},
+  "runtime": {
+    "healthChecks": {},
+    "fabricatedSuspicions": []
+  },
+  "coverageMatrix": {
+    "filledCells": 117,
+    "gapsRecorded": 90,
+    "notApplicableCells": 89,
+    "expectedTotal": 600
+  },
+  "validationCoverage": 0.7083
+}

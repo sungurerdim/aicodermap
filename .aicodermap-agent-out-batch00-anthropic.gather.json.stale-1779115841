@@ -1,0 +1,331 @@
+{
+  "batchId": "batch00-anthropic",
+  "mode": "gather",
+  "observations": [
+    {"modelId": "opus-4-7", "benchKey": "sweV", "value": 87.6, "sourceUrl": "https://www.anthropic.com/news/claude-opus-4-7", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "opus-4-7", "benchKey": "sweV", "value": 87.6, "sourceUrl": "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "opus-4-7", "benchKey": "sweV", "value": 87.6, "sourceUrl": "https://llm-stats.com/models/claude-opus-4-7", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "opus-4-7", "benchKey": "swePro", "value": 64.3, "sourceUrl": "https://www.anthropic.com/news/claude-opus-4-7", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "opus-4-7", "benchKey": "swePro", "value": 64.3, "sourceUrl": "https://benchlm.ai/benchmarks/swePro", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "opus-4-7", "benchKey": "swePro", "value": 64.3, "sourceUrl": "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "opus-4-7", "benchKey": "gpqa", "value": 94.2, "sourceUrl": "https://www.anthropic.com/news/claude-opus-4-7", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "opus-4-7", "benchKey": "gpqa", "value": 94.2, "sourceUrl": "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "opus-4-7", "benchKey": "gpqa", "value": 94.2, "sourceUrl": "https://llm-stats.com/models/claude-opus-4-7", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "opus-4-7", "benchKey": "hle", "value": 46.9, "sourceUrl": "https://www.anthropic.com/news/claude-opus-4-7", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "opus-4-7", "benchKey": "hle", "value": 46.9, "sourceUrl": "https://benchlm.ai/blog/posts/hle-humanitys-last-exam", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "opus-4-7", "benchKey": "hle", "value": 54.7, "sourceUrl": "https://aiwiki.ai/wiki/humanity_s_last_exam", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "opus-4-7", "benchKey": "tb2", "value": 69.4, "sourceUrl": "https://www.anthropic.com/news/claude-opus-4-7", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "opus-4-7", "benchKey": "tb2", "value": 69.4, "sourceUrl": "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "opus-4-7", "benchKey": "mcpA", "value": 77.3, "sourceUrl": "https://www.anthropic.com/news/claude-opus-4-7", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "opus-4-7", "benchKey": "mcpA", "value": 77.3, "sourceUrl": "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "opus-4-7", "benchKey": "aaIdx", "value": 57.0, "sourceUrl": "https://artificialanalysis.ai/models/claude-opus-4-7", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "opus-4-7", "benchKey": "aaIdx", "value": 57.0, "sourceUrl": "https://artificialanalysis.ai/articles/opus-4-7-everything-you-need-to-know", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "opus-4-7", "benchKey": "aaAgentic", "value": 1753.0, "sourceUrl": "https://artificialanalysis.ai/models/claude-opus-4-7", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "opus-4-7", "benchKey": "aaAgentic", "value": 1753.0, "sourceUrl": "https://artificialanalysis.ai/articles/opus-4-7-everything-you-need-to-know", "tier": "I", "fetched": "2026-05-18"},
+
+    {"modelId": "sonnet-4-6", "benchKey": "sweV", "value": 79.6, "sourceUrl": "https://www.anthropic.com/news/claude-sonnet-4-6", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "sonnet-4-6", "benchKey": "sweV", "value": 79.6, "sourceUrl": "https://www.nxcode.io/resources/news/claude-sonnet-4-6-complete-guide-benchmarks-pricing-2026", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "sonnet-4-6", "benchKey": "sweV", "value": 79.6, "sourceUrl": "https://www.datacamp.com/blog/claude-sonnet-4-6", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "sonnet-4-6", "benchKey": "gpqa", "value": 74.1, "sourceUrl": "https://www.anthropic.com/news/claude-sonnet-4-6", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "sonnet-4-6", "benchKey": "gpqa", "value": 74.1, "sourceUrl": "https://www.datacamp.com/blog/claude-sonnet-4-6", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "sonnet-4-6", "benchKey": "gpqa", "value": 74.1, "sourceUrl": "https://www.morphllm.com/claude-benchmarks", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "sonnet-4-6", "benchKey": "tb2", "value": 59.1, "sourceUrl": "https://anthropic.com/claude-sonnet-4-6-system-card", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "sonnet-4-6", "benchKey": "tb2", "value": 59.1, "sourceUrl": "https://dev.to/blamsa0mine/swe-bench-agentic-coding-and-what-actually-changed-from-claude-sonnet-45-to-46-1gig", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "sonnet-4-6", "benchKey": "tau2", "value": 27.9, "sourceUrl": "https://anthropic.com/claude-sonnet-4-6-system-card", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "sonnet-4-6", "benchKey": "tau2", "value": 27.9, "sourceUrl": "https://www.datacamp.com/blog/claude-sonnet-4-6", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "sonnet-4-6", "benchKey": "sweMulti", "value": 75.9, "sourceUrl": "https://anthropic.com/claude-sonnet-4-6-system-card", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "sonnet-4-6", "benchKey": "sweMulti", "value": 75.9, "sourceUrl": "https://www.nxcode.io/resources/news/claude-sonnet-4-6-complete-guide-benchmarks-pricing-2026", "tier": "C", "fetched": "2026-05-18"},
+
+    {"modelId": "claude-haiku-4-5", "benchKey": "sweV", "value": 73.3, "sourceUrl": "https://www.anthropic.com/news/claude-haiku-4-5", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "claude-haiku-4-5", "benchKey": "sweV", "value": 73.3, "sourceUrl": "https://benchlm.ai/models/claude-haiku-4-5", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "claude-haiku-4-5", "benchKey": "sweV", "value": 73.3, "sourceUrl": "https://artificialanalysis.ai/models/claude-4-5-haiku", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "claude-haiku-4-5", "benchKey": "swePro", "value": 39.5, "sourceUrl": "https://www.anthropic.com/news/claude-haiku-4-5", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "claude-haiku-4-5", "benchKey": "swePro", "value": 39.5, "sourceUrl": "https://tech-insider.org/claude-opus-vs-sonnet-vs-haiku-2026/", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "claude-haiku-4-5", "benchKey": "swePro", "value": 39.5, "sourceUrl": "https://humiris.substack.com/p/we-just-benchmarked-claude-haiku", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "claude-haiku-4-5", "benchKey": "tb2", "value": 41.0, "sourceUrl": "https://assets.anthropic.com/m/99128ddd009bdcb/Claude-Haiku-4-5-System-Card.pdf", "tier": "S", "fetched": "2026-05-18"},
+    {"modelId": "claude-haiku-4-5", "benchKey": "tb2", "value": 41.0, "sourceUrl": "https://www.morphllm.com/claude-benchmarks", "tier": "C", "fetched": "2026-05-18"},
+    {"modelId": "claude-haiku-4-5", "benchKey": "aaIdx", "value": 31.0, "sourceUrl": "https://artificialanalysis.ai/models/claude-4-5-haiku", "tier": "I", "fetched": "2026-05-18"},
+    {"modelId": "claude-haiku-4-5", "benchKey": "aaIdx", "value": 31.0, "sourceUrl": "https://benchlm.ai/models/claude-haiku-4-5", "tier": "I", "fetched": "2026-05-18"}
+  ],
+  "modelMeta": [
+    {
+      "modelId": "opus-4-7",
+      "released": "2026-04-16",
+      "context": 1000000,
+      "license": "proprietary",
+      "open": false,
+      "providers": 4
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "released": "2026-02-17",
+      "context": 1000000,
+      "license": "proprietary",
+      "open": false,
+      "providers": 4
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "released": "2025-10-15",
+      "context": 200000,
+      "license": "proprietary",
+      "open": false,
+      "providers": 4
+    }
+  ],
+  "pricingObs": [
+    {
+      "modelId": "opus-4-7",
+      "provider": "official",
+      "in": 5.0,
+      "out": 25.0,
+      "cacheHit": 0.5,
+      "throughput": null,
+      "url": "https://www.anthropic.com/pricing",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "provider": "official",
+      "in": 3.0,
+      "out": 15.0,
+      "cacheHit": 0.3,
+      "throughput": null,
+      "url": "https://www.anthropic.com/pricing",
+      "fetched": "2026-05-18"
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "provider": "official",
+      "in": 1.0,
+      "out": 5.0,
+      "cacheHit": 0.1,
+      "throughput": null,
+      "url": "https://www.anthropic.com/pricing",
+      "fetched": "2026-05-18"
+    }
+  ],
+  "ollamaObs": [],
+  "unslothObs": [],
+  "lineupHints": [
+    {
+      "modelId": "claude-sonnet-4",
+      "event": "deprecated",
+      "evidence": "https://platform.claude.com/docs/en/about-claude/model-deprecations",
+      "details": "claude-sonnet-4 retiring June 15 2026; migrate to sonnet-4-6"
+    },
+    {
+      "modelId": "claude-opus-4",
+      "event": "deprecated",
+      "evidence": "https://platform.claude.com/docs/en/about-claude/model-deprecations",
+      "details": "claude-opus-4 retiring June 15 2026; migrate to opus-4-7"
+    },
+    {
+      "modelId": "opus-4-7",
+      "event": "new",
+      "evidence": "https://www.anthropic.com/news/claude-opus-4-7",
+      "details": "Claude Opus 4.7 released 2026-04-16; direct upgrade from Opus 4.6 at same price"
+    }
+  ],
+  "naCandidates": [
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "ollamaSize",
+      "rationale": "Proprietary closed-weight model; not available on Ollama"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "ollamaSize",
+      "rationale": "Proprietary closed-weight model; not available on Ollama"
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "ollamaSize",
+      "rationale": "Proprietary closed-weight model; not available on Ollama"
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "vramRequirement",
+      "rationale": "Proprietary cloud-only model; VRAM not applicable"
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "vramRequirement",
+      "rationale": "Proprietary cloud-only model; VRAM not applicable"
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "vramRequirement",
+      "rationale": "Proprietary cloud-only model; VRAM not applicable"
+    }
+  ],
+  "rawGaps": [
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "lcbV6",
+      "triedSources": [
+        "https://livecodebench.github.io/leaderboard.html",
+        "https://pricepertoken.com/leaderboards/benchmark/livecodebench",
+        "https://llm-stats.com/benchmarks/swe-bench-verified"
+      ],
+      "triedQueries": [
+        "LiveCodeBench v6 Claude Opus 4.7 Sonnet 4.6 Haiku 4.5 exact score 2026",
+        "LiveCodeBench claude-opus-4-7 percentage score 2026"
+      ]
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "lcbV6",
+      "triedSources": [
+        "https://livecodebench.github.io/leaderboard.html",
+        "https://pricepertoken.com/leaderboards/benchmark/livecodebench"
+      ],
+      "triedQueries": [
+        "LiveCodeBench v6 Claude Opus 4.7 Sonnet 4.6 Haiku 4.5 exact score 2026",
+        "Claude Sonnet 4.6 LiveCodeBench score aider SWE-bench Pro tau-bench exact percentage"
+      ]
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "lcbV6",
+      "triedSources": [
+        "https://livecodebench.github.io/leaderboard.html",
+        "https://artificialanalysis.ai/models/claude-4-5-haiku"
+      ],
+      "triedQueries": [
+        "Claude Haiku 4.5 benchmark scores SWE-bench GPQA LiveCodeBench 2026",
+        "LiveCodeBench v6 Claude Haiku 4.5 exact score 2026"
+      ]
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "tau2",
+      "triedSources": [
+        "https://www.anthropic.com/news/claude-opus-4-7",
+        "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained",
+        "https://llm-stats.com/models/claude-opus-4-7"
+      ],
+      "triedQueries": [
+        "Claude Opus 4.7 LiveCodeBench tau-bench Terminal-bench score 2026",
+        "Opus 4.7 tau-bench exact score percentage 2026"
+      ]
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "tau2",
+      "triedSources": [
+        "https://assets.anthropic.com/m/99128ddd009bdcb/Claude-Haiku-4-5-System-Card.pdf",
+        "https://www.anthropic.com/news/claude-haiku-4-5"
+      ],
+      "triedQueries": [
+        "Claude Haiku 4.5 SWE-bench Pro tau-bench Terminal-bench exact score anthropic system card",
+        "Claude Haiku 4.5 tau-bench score 2026"
+      ]
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "aider",
+      "triedSources": [
+        "https://llm-stats.com/benchmarks/aider-polyglot",
+        "https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained"
+      ],
+      "triedQueries": [
+        "Claude Opus 4.7 aider polyglot benchmark score 2026",
+        "aider leaderboard claude opus 4.7 2026"
+      ]
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "aider",
+      "triedSources": [
+        "https://llm-stats.com/benchmarks/aider-polyglot",
+        "https://www.datacamp.com/blog/claude-sonnet-4-6"
+      ],
+      "triedQueries": [
+        "Claude Sonnet 4.6 LiveCodeBench score aider SWE-bench Pro tau-bench exact percentage",
+        "aider polyglot claude sonnet 4.6 score 2026"
+      ]
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "aider",
+      "triedSources": [
+        "https://llm-stats.com/benchmarks/aider-polyglot",
+        "https://artificialanalysis.ai/models/claude-4-5-haiku"
+      ],
+      "triedQueries": [
+        "Claude Haiku 4.5 GPQA diamond exact score Terminal-bench aider benchmark 2026",
+        "aider polyglot claude haiku 4.5 score 2026"
+      ]
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "gpqa",
+      "triedSources": [
+        "https://artificialanalysis.ai/models/claude-4-5-haiku",
+        "https://benchlm.ai/models/claude-haiku-4-5",
+        "https://www.anthropic.com/news/claude-haiku-4-5"
+      ],
+      "triedQueries": [
+        "Claude Haiku 4.5 GPQA diamond exact score Terminal-bench aider benchmark 2026",
+        "Claude Haiku 4.5 GPQA score percentage 2026"
+      ]
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "swePro",
+      "triedSources": [
+        "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+        "https://benchlm.ai/benchmarks/swePro"
+      ],
+      "triedQueries": [
+        "benchlm.ai claude-opus-4-7 benchmark scores lcb sweV swePro gpqa 2026"
+      ]
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "swePro",
+      "triedSources": [
+        "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+        "https://benchlm.ai/benchmarks/swePro",
+        "https://anthropic.com/claude-sonnet-4-6-system-card"
+      ],
+      "triedQueries": [
+        "Claude Sonnet 4.6 LiveCodeBench score aider SWE-bench Pro tau-bench exact percentage",
+        "claude sonnet 4.6 swePro score SEAL 2026"
+      ]
+    },
+    {
+      "modelId": "sonnet-4-6",
+      "benchKey": "hle",
+      "triedSources": [
+        "https://epoch.ai/benchmarks/hle",
+        "https://benchlm.ai/benchmarks/hle",
+        "https://anthropic.com/claude-sonnet-4-6-system-card"
+      ],
+      "triedQueries": [
+        "Claude Sonnet 4.6 HLE Humanity Last Exam score 2026",
+        "HLE leaderboard sonnet 4.6 score percentage"
+      ]
+    },
+    {
+      "modelId": "claude-haiku-4-5",
+      "benchKey": "hle",
+      "triedSources": [
+        "https://epoch.ai/benchmarks/hle",
+        "https://benchlm.ai/benchmarks/hle",
+        "https://assets.anthropic.com/m/99128ddd009bdcb/Claude-Haiku-4-5-System-Card.pdf"
+      ],
+      "triedQueries": [
+        "Claude Haiku 4.5 HLE Humanity Last Exam score 2026",
+        "HLE benchmark haiku 4.5 percentage score"
+      ]
+    }
+  ],
+  "runtime": {
+    "toolCallCount": 14,
+    "wallclockSec": 120,
+    "snapshotsRead": 0
+  },
+  "partialReason": null
+}
