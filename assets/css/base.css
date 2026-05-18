@@ -27,6 +27,11 @@ html[data-theme="dark"] {
   --warn-soft: rgba(251, 191, 107, 0.55);
   --danger-soft: rgba(244, 123, 139, 0.60);
   --bg-glass: rgba(24, 28, 34, 0.92);
+  --border-dim: rgba(61, 70, 81, 0.45);
+  --muted-dim: rgba(168, 179, 194, 0.60);
+  --ok-tint: rgba(110, 231, 179, 0.18);
+  --danger-tint: rgba(244, 123, 139, 0.18);
+  --warn-tint: rgba(251, 191, 107, 0.18);
 }
 html[data-theme="light"] {
   /* LIGHT palette */
@@ -54,6 +59,11 @@ html[data-theme="light"] {
   --warn-soft: rgba(194, 99, 12, 0.45);
   --danger-soft: rgba(220, 38, 38, 0.45);
   --bg-glass: rgba(247, 249, 252, 0.90);
+  --border-dim: rgba(216, 222, 229, 0.55);
+  --muted-dim: rgba(90, 101, 115, 0.60);
+  --ok-tint: rgba(20, 160, 90, 0.14);
+  --danger-tint: rgba(220, 38, 38, 0.12);
+  --warn-tint: rgba(194, 99, 12, 0.14);
 }
 :root {
   --radius: 10px;

@@ -154,9 +154,9 @@ table.privacy-table td.priv-model {
   font-weight: 600;
   white-space: nowrap;
 }
-.priv-yes     { background: color-mix(in srgb, var(--good) 18%, transparent);     color: var(--good); }
-.priv-no      { background: color-mix(in srgb, var(--danger) 18%, transparent);   color: var(--danger); }
-.priv-partial { background: color-mix(in srgb, var(--warn-2) 18%, transparent);   color: var(--warn-2); }
+.priv-yes     { background: var(--ok-tint);     color: var(--ok); }
+.priv-no      { background: var(--danger-tint); color: var(--danger); }
+.priv-partial { background: var(--warn-tint);   color: var(--warn); }
 .priv-unknown { color: var(--muted); }
 .privacy-note {
   margin-top: 0.75rem;
