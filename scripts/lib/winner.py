@@ -34,9 +34,9 @@ from typing import Any
 
 from .tiers import (
     I_TIER_MIN_VERIFICATIONS,
+    effective_trust_score,
     is_pseudo_source,
     tier_rank,
-    trust_score,
 )
 
 # Global fallback thresholds (overridden per-bench via benchTypes)
@@ -319,6 +319,7 @@ def pick_winner(
     warn_pp: float = DEFAULT_WARN_PP,
     block_pp: float = DEFAULT_BLOCK_PP,
     today: datetime.date | None = None,
+    reliability_ledger: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Select the winning observation and detect contradictions.
 
@@ -387,7 +388,18 @@ def pick_winner(
 
     scored: list[dict[str, Any]] = []
     for o in valid:
-        ts = trust_score(o.get("tier", "C"), verif_count, o.get("fetched") or "")
+        # Phase R3: effective_trust_score applies the Beta-Binomial
+        # reliability multiplier when a ledger is supplied; without it,
+        # the call is mathematically equivalent to trust_score().
+        ts = effective_trust_score(
+            o.get("tier", "C"),
+            verif_count,
+            o.get("fetched") or "",
+            source_url=o.get("sourceUrl") or "",
+            bench_key=bench_key,
+            reliability_ledger=reliability_ledger,
+            is_pseudo=False,
+        )
         scored.append({**o, "trustScore": ts, "value": float(o["value"])})
 
     clusters = _cluster(scored, agreement_pp)

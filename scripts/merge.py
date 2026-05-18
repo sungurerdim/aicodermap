@@ -140,7 +140,9 @@ def merge_pricing(dst_pricing, src_pricing):
         }
 
 
-def apply_quarantine_and_gap_policy(models, sources, cycle_id):
+def apply_quarantine_and_gap_policy(
+    models, sources, cycle_id, *, reliability_ledger=None
+):
     """FAZ 8.A.3d (2026-05-18): merge-time quarantine + gap policy.
 
     Read .aicodermap-verification-map.json (additive fields, safe on
@@ -237,7 +239,11 @@ def apply_quarantine_and_gap_policy(models, sources, cycle_id):
                     if isinstance(e, dict) and e.get("value") is not None
                 ]
                 if pw_obs:
-                    result = pick_winner(pw_obs)
+                    result = pick_winner(
+                        pw_obs,
+                        bench_key=bk,
+                        reliability_ledger=reliability_ledger,
+                    )
                     conf = compute_cell_confidence(result)
                     cell_entry["confidence"] = conf
                     if conf < 0.2:
@@ -924,7 +930,12 @@ def main():
     # FAZ 8.A.3d (2026-05-18): quarantine + gap policy must run BEFORE the
     # final models.json write so the stamps appear in the persisted shape
     # the frontend reads.
-    vmap_updated = apply_quarantine_and_gap_policy(models, sources, cycle_id=TODAY)
+    vmap_updated = apply_quarantine_and_gap_policy(
+        models,
+        sources,
+        cycle_id=TODAY,
+        reliability_ledger=reliability_ledger,
+    )
     vmap_path = Path(PROJECT) / ".aicodermap-verification-map.json"
     vmap_path.write_text(
         json.dumps(vmap_updated, indent=2, ensure_ascii=False) + "\n",

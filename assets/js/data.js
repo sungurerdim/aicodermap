@@ -40,17 +40,78 @@ export async function fetchJson(name) {
 }
 
 export async function loadData() {
-  const [models, sources, gpu, meta] = await Promise.all([
+  const [models, sources, gpu, meta, reliability] = await Promise.all([
     fetchJson('models.json'),
     fetchJson('sources.json'),
     fetchJson('gpu-database.json'),
     // _meta.json is best-effort — older deploys lack it, so a 404 is silent.
     fetchJson('_meta.json').catch(() => null),
+    // Phase R3: per-(source, bench) reliability posterior. Older deploys
+    // lack the file, so a 404 falls back to an empty ledger that yields
+    // neutral 1.0 multipliers everywhere (no behavior change).
+    fetchJson('source-reliability.json').catch(() => null),
   ]);
   State.models = validateModels(models);
   State.sources = (sources && typeof sources === 'object') ? sources : {};
   if (gpu && typeof gpu === 'object') State.gpu = { ...State.gpu, ...gpu };
   if (meta && typeof meta === 'object') State.meta = meta;
+  State.reliability = (reliability && typeof reliability === 'object')
+    ? reliability
+    : { schemaVersion: 'v1', halfLifeCycles: 3, coldStartN: 10, sources: {} };
+}
+
+// Mirror of scripts/lib/reliability.py:source_identity — canonical hostname,
+// lowercased, www-stripped. Returns empty string when the URL is unusable.
+function sourceIdentity(url) {
+  if (!url) return '';
+  try {
+    const u = new URL(String(url).trim());
+    let host = (u.hostname || '').toLowerCase().trim();
+    if (host.startsWith('www.')) host = host.slice(4);
+    return host;
+  } catch {
+    return '';
+  }
+}
+
+// Mirror of scripts/lib/reliability.py:posterior_accuracy.
+// Beta(1+a, 1+d) posterior mean.
+function posteriorMean(agree, disagree) {
+  const a = 1 + Number(agree || 0);
+  const b = 1 + Number(disagree || 0);
+  const denom = a + b;
+  return denom > 0 ? a / denom : 0.5;
+}
+
+// Mirror of scripts/lib/reliability.py:reliability_multiplier with the
+// same hierarchical fallback: per-(source, bench) -> per-source global ->
+// cold-start neutral 1.0. Clamped to [0.3, 1.0]. Returns 1.0 when the
+// ledger is missing or empty.
+export function sourceReliability(url, benchKey) {
+  const ledger = State.reliability;
+  if (!ledger || typeof ledger !== 'object') return 1.0;
+  const sid = sourceIdentity(url);
+  if (!sid) return 1.0;
+  const src = (ledger.sources || {})[sid];
+  if (!src) return 1.0;
+  const coldStart = Number(ledger.coldStartN || 10);
+  if (benchKey) {
+    const bench = (src.byBench || {})[benchKey];
+    if (bench) {
+      const n = Number(bench.agree || 0) + Number(bench.disagree || 0);
+      if (n >= coldStart) {
+        const p = posteriorMean(bench.agree, bench.disagree);
+        return Math.max(0.3, Math.min(1.0, p));
+      }
+    }
+  }
+  const g = src.global || {};
+  const gn = Number(g.agree || 0) + Number(g.disagree || 0);
+  if (gn >= coldStart) {
+    const p = posteriorMean(g.agree, g.disagree);
+    return Math.max(0.3, Math.min(1.0, p));
+  }
+  return 1.0;
 }
 
 export function scoreClass(v) {
@@ -137,7 +198,11 @@ export function cellConfidence(modelId, benchKey) {
     if (!e || PSEUDO.has(e.source)) continue;
     if (e.url) urls.add(String(e.url).toLowerCase());
     const t = Number(e.trustScore);
-    if (Number.isFinite(t) && t > maxTrust) maxTrust = t;
+    // Phase R3: weight per-source trust by its Beta-Binomial reliability
+    // posterior on this bench (cold-start sources stay at 1.0 neutral).
+    const rel = sourceReliability(e.url, benchKey);
+    const tw = Number.isFinite(t) ? t * rel : 0;
+    if (tw > maxTrust) maxTrust = tw;
   }
   const verif = Math.min((urls.size || 1) / 3, 1);
   const trust = maxTrust > 0 ? maxTrust : 0.4;

@@ -66,12 +66,31 @@ def _recency_decay(fetched: str, today: datetime.date) -> float:
 
 
 def _trust_score(
-    tier: str, verifications: int, fetched: str, today: datetime.date
+    tier: str,
+    verifications: int,
+    fetched: str,
+    today: datetime.date,
+    *,
+    source_url: str = "",
+    bench_key: str = "",
+    reliability_ledger: dict | None = None,
 ) -> float:
+    """Phase R2+R3: delegates verif_factor to tiers.verif_factor (log-base-4
+    information-theoretic scaling) and, when reliability_ledger is supplied,
+    applies the per-(source, bench) Beta-Binomial multiplier.
+    """
+    from .tiers import verif_factor as _vf
+
     w = TIER_WEIGHTS.get((tier or "C").upper(), 0.4)
-    v = max(0, min(verifications, 3)) / 3
+    v = _vf(int(verifications) if verifications is not None else 0)
     r = _recency_decay(fetched, today)
-    return round(w * v * r, 3)
+    base = round(w * v * r, 3)
+    if reliability_ledger and source_url:
+        from .reliability import reliability_multiplier  # type: ignore
+
+        mult = reliability_multiplier(reliability_ledger, source_url, bench_key)
+        return round(base * mult, 3)
+    return base
 
 
 def _load_gather_artifacts(root: Path) -> list[tuple[str, dict[str, Any]]]:
@@ -273,6 +292,8 @@ def _pick_winner(
     agreement_pp: float = DEFAULT_AGREEMENT_PP,
     low_conf_urls: set[str] | None = None,
     low_conf_multiplier: float = 1.0,
+    bench_key: str = "",
+    reliability_ledger: dict | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]], float]:
     """Cluster-aware winner selection (FAZ 6.B, 2026-05-10).
 
@@ -307,7 +328,15 @@ def _pick_winner(
     verif_count = len(distinct_urls) or len(observations)
     scored = []
     for o in observations:
-        score = _trust_score(o["tier"], verif_count, o.get("fetched") or "", today)
+        score = _trust_score(
+            o["tier"],
+            verif_count,
+            o.get("fetched") or "",
+            today,
+            source_url=o.get("sourceUrl") or "",
+            bench_key=bench_key,
+            reliability_ledger=reliability_ledger,
+        )
         scored.append({**o, "trustScore": score})
 
     # FAZ 6.C — root-URL trust penalty before clustering. Lets a 0.4-trust
@@ -594,6 +623,7 @@ def synth(
     unhealthy_urls: set[str] | None = None,
     low_conf_urls: set[str] | None = None,
     low_conf_multiplier: float = 1.0,
+    reliability_ledger: dict | None = None,
 ) -> dict[str, Any]:
     """Run the full synthesis pipeline. Returns OUTPUT_SCHEMA artifact dict."""
     # Aggregate all observation cells. FAZ 6.A — drop SPA-shell citations
@@ -621,6 +651,8 @@ def synth(
             agreement_pp=agreement_pp,
             low_conf_urls=low_conf_urls,
             low_conf_multiplier=low_conf_multiplier,
+            bench_key=bk,
+            reliability_ledger=reliability_ledger,
         )
         if not winner:
             continue

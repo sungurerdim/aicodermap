@@ -116,6 +116,10 @@ export const State = {
   dataDeployedAt: null,
   dataEtag: null,
   meta: null,
+  // Phase R3: per-(source, bench) Beta-Binomial accuracy ledger. Loaded by
+  // data.js:loadData; consumed by data.js:sourceReliability / cellConfidence.
+  // Empty scaffold yields neutral 1.0 multipliers (no behavior change).
+  reliability: { schemaVersion: 'v1', halfLifeCycles: 3, coldStartN: 10, sources: {} },
 };
 
 export function readStorage(key, fallback) {

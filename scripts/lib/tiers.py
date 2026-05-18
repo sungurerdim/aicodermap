@@ -164,15 +164,30 @@ def effective_trust_score(
     verifications: int,
     date_str: Any,
     *,
+    source_url: str = "",
+    bench_key: str = "",
+    reliability_ledger: dict | None = None,
     is_pseudo: bool = False,
 ) -> float:
-    """Trust score with pseudo-source dampening.
+    """Trust score with pseudo-source dampening + Beta-Binomial reliability.
 
     Pseudo entries (FAZ 8.A.3b) get a 0.2 multiplier — signal only, never
-    anchor. Used when pseudo entries SURVIVE into clustering (rescue mode)
-    so they don't dominate composite calculations.
+    anchor. They are short-circuited before the reliability lookup so they
+    don't pollute the ledger statistics.
+
+    Phase R3 adds the reliability multiplier: when a ledger is supplied and
+    the source has accumulated enough samples to escape the cold-start
+    threshold, the score is multiplied by the Beta posterior accuracy of
+    that source on this bench (or its global accuracy as fallback). Below
+    the cold-start threshold the multiplier is 1.0, leaving trust_score
+    unchanged — new sources are not penalized.
     """
     base = trust_score(tier, verifications, date_str)
     if is_pseudo:
         return round(base * 0.2, 4)
+    if reliability_ledger and source_url:
+        from .reliability import reliability_multiplier  # type: ignore
+
+        mult = reliability_multiplier(reliability_ledger, source_url, bench_key)
+        return round(base * mult, 4)
     return base

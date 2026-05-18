@@ -18,8 +18,11 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from lib.whitelist import contracts  # type: ignore
 from lib.matrix import active_models  # type: ignore
+from lib import reliability as _reliability  # type: ignore
+from lib.tiers import verif_factor as _verif_factor  # type: ignore
 
 TIER_WEIGHT = {"I": 1.0, "S": 0.7, "C": 0.4, "U": 0.1}
+LEDGER_PATH = ROOT / "data" / "source-reliability.json"
 
 
 def recency_decay(d: str) -> float:
@@ -39,10 +42,31 @@ def recency_decay(d: str) -> float:
     return 0.30
 
 
-def trust_score(tier: str, verifications: int, dtstr: str) -> float:
+def trust_score(
+    tier: str,
+    verifications: int,
+    dtstr: str,
+    *,
+    source_url: str = "",
+    bench_key: str = "",
+    reliability_ledger: dict | None = None,
+) -> float:
+    """Phase R2+R3: log-base-4 verif_factor + optional Beta-Binomial multiplier.
+
+    Stays behaviourally identical to the pre-R2 formula when verifications
+    equals 3 and no ledger is supplied; otherwise applies the canonical
+    `tiers.verif_factor` and (when ledger present) the per-(source, bench)
+    reliability posterior.
+    """
     tw = TIER_WEIGHT.get(tier, 0.1)
-    v = min(max(verifications, 1), 3) / 3.0
-    return round(tw * v * recency_decay(dtstr), 4)
+    v = _verif_factor(int(verifications) if verifications is not None else 0)
+    base = round(tw * v * recency_decay(dtstr), 4)
+    if reliability_ledger and source_url:
+        mult = _reliability.reliability_multiplier(
+            reliability_ledger, source_url, bench_key
+        )
+        return round(base * mult, 4)
+    return base
 
 
 def find_batch_artifacts() -> list[Path]:
@@ -209,11 +233,23 @@ def main() -> int:
     contradictions: list = []
     fills_count = 0
 
+    # Phase R3: load the source-reliability ledger once for the whole run.
+    # When the ledger is empty or the source is below the cold-start threshold,
+    # trust_score behaves exactly as before (multiplier = 1.0).
+    reliability_ledger = _reliability.load_ledger(LEDGER_PATH)
+
     for (mid, bk), entries in cells.items():
         # Build per-observation list with trustScore for sum-based cluster ranking.
         obs_list = []
         for e in entries:
-            ts = trust_score(e["tier"], 1, e["fetched"])
+            ts = trust_score(
+                e["tier"],
+                1,
+                e["fetched"],
+                source_url=e.get("sourceUrl") or "",
+                bench_key=bk,
+                reliability_ledger=reliability_ledger,
+            )
             obs_list.append(
                 {
                     "value": e["value"],
