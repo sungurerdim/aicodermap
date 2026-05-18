@@ -72,13 +72,28 @@
  * see at a glance which signals the preset ignores. Sliders still work
  * (the row stays interactive) but the cell fades into the background. */
 .weight-row.excluded {
-  opacity: 0.42;
+  opacity: 0.32;
   background: transparent;
-  border-color: color-mix(in srgb, var(--border) 55%, transparent);
+  border-color: color-mix(in srgb, var(--border) 45%, transparent);
+  border-style: dashed;
 }
-.weight-row.excluded .label { font-weight: 500; }
+.weight-row.excluded .label {
+  font-weight: 500;
+  font-style: italic;
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent);
+  text-decoration-thickness: 1px;
+}
 .weight-row.excluded:hover,
-.weight-row.excluded:focus-within { opacity: 0.85; }
+.weight-row.excluded:focus-within {
+  opacity: 1;
+  border-style: solid;
+}
+.weight-row.excluded:hover .label,
+.weight-row.excluded:focus-within .label {
+  font-style: normal;
+  text-decoration: none;
+}
 
 /* Filter toolbar — compact horizontal grid that wraps when needed.
  * Each control is a single row (label + input/select). The reset button
@@ -136,14 +151,15 @@
 .gpu-status-line:empty { display: none; }
 #filters-reset.btn-compact { justify-self: end; }
 
-/* Search row — primary filter, gets icon affordance + wider span. The
- * "Ara" / "Search" text label is visually hidden (screen readers still
- * read it); the magnifier icon serves as the visible affordance. */
-.select-row:has(#filter-search) {
+/* Search row — primary filter. The "Ara" / "Search" text label is
+ * visually hidden (screen readers still read it); a magnifier icon
+ * inside the input serves as the visible affordance. Spans 2 grid
+ * columns so users have room to type long model+provider strings. */
+.search-row {
   position: relative;
   grid-column: span 2;
 }
-.select-row:has(#filter-search) > span {
+.search-row > span {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -151,7 +167,7 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
-.select-row:has(#filter-search)::before {
+.search-row::before {
   content: '';
   position: absolute;
   left: 10px;
@@ -160,19 +176,20 @@
   width: 14px;
   height: 14px;
   background-color: var(--muted);
-  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='7'/><path d='m21 21-4.3-4.3'/></svg>");
   -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='7'/><path d='m21 21-4.3-4.3'/></svg>");
-  mask-size: contain;
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='7'/><path d='m21 21-4.3-4.3'/></svg>");
   -webkit-mask-size: contain;
-  mask-repeat: no-repeat;
+  mask-size: contain;
   -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
   pointer-events: none;
   transition: background-color 120ms ease;
 }
-.select-row:has(#filter-search:focus)::before { background-color: var(--accent); }
-#filter-search {
+.search-row:focus-within::before { background-color: var(--accent); }
+.search-row #filter-search {
   padding-left: 30px;
   padding-right: 8px;
+  width: 100%;
 }
 #filter-search::-webkit-search-cancel-button {
   -webkit-appearance: none;
@@ -180,10 +197,10 @@
   width: 14px;
   height: 14px;
   background-color: var(--muted);
-  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round'><line x1='6' y1='6' x2='18' y2='18'/><line x1='6' y1='18' x2='18' y2='6'/></svg>");
   -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round'><line x1='6' y1='6' x2='18' y2='18'/><line x1='6' y1='18' x2='18' y2='6'/></svg>");
-  mask-size: contain;
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round'><line x1='6' y1='6' x2='18' y2='18'/><line x1='6' y1='18' x2='18' y2='6'/></svg>");
   -webkit-mask-size: contain;
+  mask-size: contain;
   cursor: pointer;
 }
 .muted-note {

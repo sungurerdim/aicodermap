@@ -50,13 +50,18 @@ function bootstrapPrefs() {
 
   const storedWeights = readStorage(STORAGE.weights, null);
   const validW = validateWeights(storedWeights);
-  // Default preset is swe-focused for first-time visitors. Stored weights
-  // (whatever preset the user last picked) win when present.
-  const sweFocused = Object.fromEntries(
-    Object.keys(DEFAULT_WEIGHTS).map(k => [k, 0]),
-  );
-  Object.assign(sweFocused, PRESETS['swe-focused'] || {});
-  State.weights = validW || sweFocused;
+  // Default preset is swe-focused for first-time visitors. The literal here
+  // is just a placeholder — `applyDefaultPresetIfFresh` swaps it for the
+  // schema-driven values once loadData() has populated State.schema. Track
+  // whether the user has stored weights so we know whether to overwrite.
+  State.weights = validW || (function buildSweFocused() {
+    const out = Object.fromEntries(
+      Object.keys(DEFAULT_WEIGHTS).map(k => [k, 0]),
+    );
+    Object.assign(out, PRESETS['swe-focused'] || {});
+    return out;
+  }());
+  State._weightsAreDefault = !validW;
 
   const storedFilters = readStorage(STORAGE.filters, null);
   if (storedFilters && typeof storedFilters === 'object') {
@@ -178,6 +183,16 @@ async function bootstrap() {
 
   const ok = await bootstrapData();
   if (!ok) return;
+
+  // After loadData() has populated State.schema, re-apply the swe-focused
+  // default using the schema's authoritative atomicWeights so the dimmed
+  // weights and the dropdown selection stay in sync with the canonical
+  // preset. Skipped when the user has stored weights from a prior session.
+  if (State._weightsAreDefault) {
+    const sp = State.schema && State.schema.presets;
+    const sf = sp && sp['swe-focused'] && sp['swe-focused'].atomicWeights;
+    if (sf) State.weights = Object.fromEntries(Object.keys(State.weights).map(k => [k, sf[k] || 0]));
+  }
 
   renderDeployStamp();
   populateProviderFilter();
