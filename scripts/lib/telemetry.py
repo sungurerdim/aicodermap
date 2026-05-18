@@ -302,6 +302,44 @@ def write_cycle_telemetry(cycle_date: str, telemetry: dict) -> Path:
     return out_path
 
 
+def record_write_skip(batch_id: str, cycle_date: str) -> Path:
+    """FAZ 8.A (2026-05-18): track agents that returned status without Write.
+
+    Appends to `data/_telemetry/<cycle_date>.json` under `writeSkips: [...]`.
+    Each entry is a dict: {batchId, recordedAt}. Idempotent — duplicate
+    (batch_id, cycle_date) tuples are deduplicated in-place.
+
+    The orchestrator's Step 5 write-skip guard calls this BEFORE dispatching
+    a recovery sonnet, so the telemetry reflects EVERY contract violation
+    (including ones successfully recovered). Cycle-over-cycle trend
+    indicates whether the agent's HARD RULE 11 is being internalized.
+    """
+    out_dir = PROJECT / "data" / "_telemetry"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / f"{cycle_date}.json"
+    if out_path.is_file():
+        try:
+            existing = json.loads(out_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            existing = {}
+    else:
+        existing = {}
+    if not isinstance(existing, dict):
+        existing = {}
+    skips = existing.setdefault("writeSkips", [])
+    if not isinstance(skips, list):
+        skips = []
+        existing["writeSkips"] = skips
+    # Idempotent: skip duplicates.
+    if not any(isinstance(e, dict) and e.get("batchId") == batch_id for e in skips):
+        skips.append({"batchId": batch_id, "recordedAt": _utc_iso()})
+    out_path.write_text(
+        json.dumps(existing, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return out_path
+
+
 def metadata_changelog_row(meta: dict) -> str:
     """Compact one-line metadata for the CHANGELOG entry header."""
     fr = meta.get("fillRatio", 0.0) or 0.0

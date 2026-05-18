@@ -295,6 +295,23 @@ reliably; nested 2-level structures often degrade.
     only when each cell has independently-sourced agreement — the
     same trustScore-driven definition of "confirmed" that synth uses.
 
+11. **WRITE BEFORE STATUS** (FAZ 8.A, 2026-05-18). The EMITTED status
+    line in your final message must be PRECEDED by a completed `Write`
+    tool call to `output_path`. Status-only returns are contract
+    violations: cycles 2026-05-13 and 2026-05-18 measured ~25% of haiku
+    gather batches emitting status without ever calling Write, losing
+    all observations to the void.
+    - If context budget runs out before you can compose a full artifact,
+      Write a minimal valid stub FIRST:
+      `{"batchId":"<id>","mode":"gather","observations":[],"modelMeta":[],
+        "pricingObs":[],"ollamaObs":[],"unslothObs":[],"lineupHints":[],
+        "naCandidates":[],"rawGaps":[],"runtime":{"toolCallCount":N,
+        "wallclockSec":S,"snapshotsRead":K},"partialReason":"context_budget"}`
+    - Then status: `EMITTED batch=<id> mode=gather observations=0 partial=context_budget path=<output_path>`
+    - The orchestrator's Step 5 write-skip guard treats a missing file
+      as a recoverable contract violation, but recovery costs an extra
+      sonnet dispatch — avoid by writing the stub yourself.
+
 Wallclock + tool-call ceilings still HARD. Don't exit early.
 
 ### Mode `synth` (sonnet, single dispatch — analyzes ALL gather outputs)
@@ -308,6 +325,16 @@ Reads every gather artifact, applies analytical work:
    data will surface that here).
 3. notApplicable rule citation: take naCandidates and map to
    `_schema.notApplicableRules.rules[]`; drop ones that don't match a rule.
+3.5. **PRE-EMIT KEY VALIDATION** (FAZ 8.A, 2026-05-18). Before Write,
+   iterate every `models[i].updates.bench` dict and drop any key NOT in
+   `idea_context._schema.coreBenchKeys ∪ idea_context._schema.emergingBenchKeys`.
+   Non-canonical keys (e.g., `lcbV6`, `aider`, `aiderPoly`, `aaCoding`
+   if not promoted) bypass schema validation and force merge.py to
+   rollback the entire batch — losing all valid synth output.
+   Status line MUST report dropped keys:
+   `⚠ pre-emit dropped non-canonical keys: [<key1>, <key2>, ...] from <N> models`
+   Empty `bench` dict after pruning → drop the entire `updates.bench`
+   key (don't emit `bench: {}`).
 4. Emit FULL OUTPUT_SCHEMA artifact at synth_output_path.
 
 **Inputs:** `synth_input_paths` (list of gather artifact files), full
@@ -1588,6 +1615,16 @@ Quality rules (agent is responsible for these):
    discovery.
 4. Every `models[].notApplicable[]` entry cites a `rule` from
    `sourcesWhitelist._schema.notApplicableRules.rules[]` (no hardcoded model id).
+5. **WRITE is not optional** (FAZ 8.A, 2026-05-18). Before emitting the
+   EMITTED status line, a `Write` tool call to `output_path` MUST have
+   completed. Returning EMITTED without a preceding Write is a contract
+   violation, regardless of mode (`gather`, `synth`, or `full`). The
+   orchestrator's Step 5 write-skip guard treats a missing artifact as
+   the agent's fault and dispatches a recovery sonnet — but recovery
+   loses ~3 minutes wallclock per batch. Write a minimal valid stub
+   even when context budget is exhausted (see HARD RULE 11 for gather;
+   for synth/full, emit at minimum the required top-level keys with
+   empty arrays and partialReason populated).
 
 The orchestrator (`scripts/merge.py`) HARD-BLOCKs via MX1 gate — satisfied by
 the combined agent output + gap-gen supplement, not the agent alone.

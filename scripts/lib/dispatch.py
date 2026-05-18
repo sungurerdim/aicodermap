@@ -196,15 +196,22 @@ def compute_dispatch_plan(
         )
     sliced = split_oversize_batches(buckets, mpb)
 
+    import re
+
     batches = []
     for i, bucket in enumerate(sliced):
         providers = sorted(
             p for p in {m.get("provider") for m in bucket} if isinstance(p, str)
         )
         # Use first provider name as a hint in the batchId so logs are readable.
-        family_hint = (
-            (providers[0] if providers else "other").lower().replace(" ", "_")[:12]
-        )
+        # FAZ 8.A (2026-05-18): filename-unsafe chars (parens, dots, slashes)
+        # broke artifact file resolution for batches like
+        # `batch10-z.ai_(zhipu_*`. Sanitize to [a-z0-9_-] only.
+        family_hint = re.sub(
+            r"[^a-z0-9_-]",
+            "_",
+            (providers[0] if providers else "other").lower(),
+        )[:12]
         batch_id = f"batch{i:02d}-{family_hint}"
         batches.append(
             {

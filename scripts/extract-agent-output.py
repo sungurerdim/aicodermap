@@ -109,13 +109,25 @@ def main() -> int:
         text = text_from_subagent_jsonl(persisted)
     else:
         text = text_from_persisted_array(persisted)
-    obj_str = find_last_json(text)
+    # FAZ 8.A (2026-05-18): gather artifacts don't carry 'confidence' (synth-only
+    # field). Try batchId marker first (gather), then fall back to confidence
+    # (synth/full). Both markers are top-level keys in their respective schemas.
+    try:
+        obj_str = find_last_json(text, marker='"batchId"')
+    except SystemExit:
+        obj_str = find_last_json(text, marker='"confidence"')
     obj = json.loads(obj_str)
+    # Gather mode acceptance: batchId present is sufficient; confidence is
+    # not required for gather artifacts (mode == "gather").
     out.write_text(json.dumps(obj, indent=2, ensure_ascii=False), encoding="utf-8")
     keys = ",".join(list(obj.keys())[:8])
-    print(
-        f"wrote {out} ({len(obj_str)} chars; keys={keys}; models={len(obj.get('models', []))})"
+    mode = obj.get("mode", "full")
+    extra = (
+        f"observations={len(obj.get('observations', []))}"
+        if mode == "gather"
+        else f"models={len(obj.get('models', []))}"
     )
+    print(f"wrote {out} ({len(obj_str)} chars; mode={mode}; keys={keys}; {extra})")
     return 0
 
 

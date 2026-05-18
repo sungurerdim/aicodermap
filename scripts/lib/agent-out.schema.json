@@ -48,7 +48,10 @@
               ]
             },
             "properties": {
-              "bench": { "type": ["object", "null"] }
+              "bench": {
+                "type": ["object", "null"],
+                "description": "Canonical bench keys: _schema.coreBenchKeys ∪ emergingBenchKeys. Enforced at runtime by scripts/validate-artifact-keys.py — dynamic key universe cannot be embedded in static schema. Non-canonical keys (e.g., lcbV6, aider when deprecated) cause pre-merge REJECT (FAZ 8.A, 2026-05-18)."
+              }
             }
           },
           "sourcesAdded":    { "type": "array" },

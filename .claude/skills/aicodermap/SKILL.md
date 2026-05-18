@@ -379,7 +379,31 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
    ```
 5. Parse return:
    - **PRIMARY (post-2026-05-07):** read `.aicodermap-agent-out-<batchId>.json` (agent wrote it via `Write` tool)
-   - **FALLBACK A:** if file missing/unparseable, run `python scripts/extract-agent-output.py <subagent-jsonl-path> <out-path>` against the agent's transcript at `~/.claude/projects/<projid>/<sessionid>/subagents/agent-<agentId>.jsonl`
+   - **WRITE-SKIP RECOVERY (FAZ 8.A, 2026-05-18):** the orchestrator FIRST
+     checks `Path(out_path).exists()` against the freshly-dispatched agent
+     return. When the agent finished (returned status) but no file appears
+     on disk, that's a write-skip contract violation (cycles 2026-05-13
+     and 2026-05-18 measured this in ~25% of haiku gather batches).
+     Recovery dispatch — small, cheap, max 3 tool calls:
+     ```python
+     if not Path(out_path).exists() and agent_finished:
+         from scripts.lib.telemetry import record_write_skip
+         record_write_skip(batch_id, cycle_date)
+         recovery = Agent({
+             subagent_type: "aicodermap-research-agent",
+             prompt: (
+                 f"Previous run for batch {batch_id} did not Write the "
+                 f"artifact. Write a minimal valid stub NOW to {out_path} "
+                 f"using the structure documented in HARD RULE 11. Return "
+                 f"EMITTED. Do not re-fetch sources."
+             ),
+             output_path: out_path,
+             max_tool_calls: 3,
+         })
+         # If still missing → proceed to FALLBACK A (transcript replay)
+     ```
+   - **FALLBACK A:** if file missing/unparseable AFTER recovery dispatch,
+     run `python scripts/extract-agent-output.py <subagent-jsonl-path> <out-path>` against the agent's transcript at `~/.claude/projects/<projid>/<sessionid>/subagents/agent-<agentId>.jsonl`
    - **FALLBACK B:** if persisted tool-result file exists at `<projid>/<sessionid>/tool-results/toolu_*.json`, run `extract-agent-output.py <persisted-json> <out-path>`
    - validate JSON schema after extraction; on parse failure log to `~/.aicodermap-debug.log` and CONTINUE with whatever fragment is recoverable
 
