@@ -185,6 +185,43 @@ attributed in `data/sources.json` separately.
 
 **Contradiction rule:** between 2+ sources, **>3pp difference → flag**, **>5pp → red flag** (user manual resolution).
 
+**FAZ 8.A.3b contradiction resolution algorithm (2026-05-18).** Five
+pathologies are now handled systematically:
+
+1. **Scaffold disagreement** — same model evaluated under different
+   agentic scaffolds (e.g. agentless vs swe-agent) produces split
+   values. `tag_evaluation_context()` annotates observations whose URL
+   or notes carry scaffold hints (`agentless | swe-agent | aider |
+   openhands | moatless`). `should_quarantine` fires when any cluster
+   member is scaffold-tagged.
+2. **Tool-condition split** — observations carrying `tools=on/off`
+   hints get an `evaluationContext.condition` annotation; merge.py
+   prefers to keep them in distinct cells via the
+   `notApplicableRules`-driven path, not collapse them.
+3. **Category bleed** — a URL feeding multiple bench cells with the
+   same value (e.g. an LCB extractor mis-routing a row into the sweV
+   column) is flagged via `detect_category_bleed`; flagged
+   observations are dropped from clustering.
+4. **Vendor-version drift** — multi-cycle posterior estimate via
+   `bayesian_aggregate()` smooths vendor revisions against historical
+   pool. Cold-start guard (≥3 historical values required) defers
+   activation until ~3 cycles post-deploy.
+5. **Pseudo-source contamination** — observations whose `source ∈
+   {snapshot-extraction, auto-resolution candidate, synth-backfill}`
+   never anchor clustering. `filter_pseudo_sources()` extracts them
+   into the artifact for audit; their weight is dampened (`×0.2`) when
+   rescued as sole evidence.
+
+**Multi-cycle instability mitigation:** `I_TIER_MIN_VERIFICATIONS = 2`
+prevents a single-shot fresh I-tier observation from overriding an
+existing multi-source S-tier consensus on the strength of recency alone.
+
+**Cell confidence + quarantine.** `pick_winner` returns
+`{confidence, quarantine, bayesianPoint}` per cell. Frontend
+`compositeScore` confidence-weights every cell contribution and skips
+quarantined cells entirely. `merge.py` stamps `model.benchQuarantine[bk]`
+when `confidence < 0.2` OR `consecutive_gap_count >= 5`.
+
 ### `data/gpu-database.json` — GPU → VRAM lookup
 
 ```json

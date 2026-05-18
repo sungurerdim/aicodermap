@@ -720,6 +720,24 @@ Tiebreak (when trustScores within 0.05): prefer I-tier, then most recent, then h
 - For multi-source same-value cluster: aggregate verifications, take the max recency.
 - For multi-source disagreement (a contradiction): each candidate gets its own trustScore; winner has max(trustScore).
 
+**FAZ 8.A.3b refinements (2026-05-18):**
+- `I_TIER_MIN_VERIFICATIONS = 2`: a single fresh I-tier observation
+  (verifications < 2) **cannot** override an existing multi-source S-tier
+  consensus. The independent-override rule still fires when ≥2 distinct
+  I-tier sources exist or average I-tier trust ≥ 0.6 — but single-shot
+  outliers are quarantined for the next cycle instead of immediately
+  promoted.
+- **Pseudo-source exclusion**: observations whose `source` ∈
+  `{snapshot-extraction, auto-resolution candidate, synth-backfill}` are
+  filtered out of clustering before pick_winner runs. They survive in
+  the artifact for audit but never anchor consensus. `effective_trust_score(..., is_pseudo=True)`
+  multiplies their weight by 0.2 when used as last-evidence rescue
+  entries (FAZ 3a purge already removed historical pseudo entries).
+- **Cell confidence + quarantine**: `pick_winner` returns
+  `{confidence, quarantine, bayesianPoint}` on every result. Frontend
+  `compositeScore` weights each cell by confidence; quarantined cells
+  are excluded entirely.
+
 ## PRICING_SCHEMA (multi-provider array — replaces flat numbers)
 
 ```json

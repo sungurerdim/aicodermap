@@ -824,7 +824,19 @@ Three shapes, never mixed:
           "tier": "I"|"S"|"C",
           "fetched": ISO_date,
           "verifications": <int>,
-          "trustScore": <number 0..1>
+          "trustScore": <number 0..1>,
+          // FAZ 8.A.3b additive (2026-05-18) — optional fields the agent
+          // SHOULD emit when the evaluation context is non-default. Synth
+          // and merge.py use them to split clusters by context so a
+          // model's `scaffold=agentless` score does not contradict its
+          // `scaffold=swe-agent` score.
+          "evaluationContext": {                 // optional
+            "scaffold":   "agentless|swe-agent|aider|openhands|moatless",
+            "condition":  "tools-on|tools-off",
+            "lcbVersion": "v5|v6"
+          },
+          "confidence": <number 0..1>,           // optional, mirrors pick_winner.confidence
+          "quarantine": <boolean>                // optional, mirrors pick_winner.quarantine
         }
       ]
     }
