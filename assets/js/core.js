@@ -62,36 +62,68 @@ export function normalizeBenchScore(key, value) {
   return value;
 }
 
+// 2026-05-18 retune: weights reflect benchmark reliability + discrimination in
+// May 2026, not 2025 norms. Key shifts from prior generation:
+//   • SWE-bench Verified (sweV) demoted from primary signal — saturated at top
+//     (<1.3pp spread), contamination flagged by OpenAI across all frontier
+//     models. SWE-bench Pro (swePro) is the new gold standard (top ~56%,
+//     standardized SEAL scaffolding, private subset).
+//   • Terminal-Bench 2 (tb2) elevated as the de-facto agentic-coding standard
+//     (top scores 65-82%, real differentiation).
+//   • LiveCodeBench (lcb) — contamination-resistant time-windowed code gen,
+//     held as reliable secondary.
+//   • GPQA / AIME / MMLU-Pro saturated → reasoning preset shifts heavy to
+//     HLE (current frontier ~50% with tools) and ARC-AGI-2 (still discriminates).
+//   • τ²-Bench (tau2) is the top multi-turn agentic reliability signal.
+//   • MCP-Atlas (mcpA) elevated — Scale AI 2026 frontier MCP eval, becoming
+//     a primary agentic discriminator alongside τ²-Bench.
+// Each preset's weights sum to 100; coverage is intentionally widened from the
+// prior coding-centric anchors so each preset reflects its full domain.
 export const DEFAULT_WEIGHTS = {
-  swePro: 16, tb2: 11, lcb: 11, sweV: 9, tbHard: 7, cfElo: 7,
-  nl2Repo: 5, aaCoding: 5, mcpA: 4, aaAgentic: 4, webDevElo: 4,
-  tau2: 3, browseComp: 3, arcAgi2: 3, programBench: 1,
-  gpqa: 2, sweMulti: 2, hle: 1, mmluPro: 1, tau3: 1,
+  swePro: 14, tb2: 11, lcb: 8, hle: 8, tau2: 6, mcpA: 5,
+  sweMulti: 5, arcAgi2: 5, tbHard: 4, cfElo: 4, sweV: 4,
+  aaCoding: 4, aaAgentic: 4, gpqa: 3, aime26: 3, aaIdx: 3,
+  aaOmni: 3, browseComp: 3, bfcl: 3,
 };
 
 export const PRESETS = {
+  // 'balanced' = DEFAULT_WEIGHTS (coding-leaning portfolio across all three
+  // domains: SWE coding + multi-turn agentic + reasoning frontier).
   'balanced': { ...DEFAULT_WEIGHTS },
+  // 'swe-focused' anchors on SWE-bench Pro (the contamination-resistant
+  // gold standard) + Terminal-Bench 2 (top agentic-coding eval). sweV
+  // retained at low weight as legacy reference. Adds webDevElo +
+  // programBench so the preset covers all SWE/coding bench surfaces.
   'swe-focused': {
-    swePro: 23, sweV: 16, sweMulti: 13, lcb: 11, tb2: 9, tbHard: 9,
-    nl2Repo: 9, cfElo: 5, aaCoding: 5,
+    swePro: 28, tb2: 14, lcb: 11, sweMulti: 9, tbHard: 7, sweV: 6,
+    nl2Repo: 6, cfElo: 6, aaCoding: 5, webDevElo: 4, programBench: 4,
   },
+  // 'agentic-focused' weights τ²-Bench (top multi-turn reliability),
+  // Terminal-Bench 2 (terminal/operational), MCP-Atlas (MCP server frontier),
+  // BFCL (function-calling precision), browseComp (browser autonomy).
+  // swePro retained — agents still need to write code to act.
   'agentic-focused': {
-    tb2: 15, mcpA: 13, tbHard: 10, browseComp: 14, aaAgentic: 10,
-    tau2: 8, tau3: 8, swePro: 7, lcb: 7, bfcl: 8,
+    tau2: 18, tb2: 16, mcpA: 13, aaAgentic: 9, bfcl: 8, browseComp: 8,
+    swePro: 7, tbHard: 7, tau3: 6, lcb: 4, nl2Repo: 4,
   },
-  // Reasoning / knowledge breadth — covers the bench keys (aaIdx, aime26,
-  // aaOmni, mmluPro, simpleQa, mrcr, arcAgi2) the coding-centric presets
-  // above leave at zero. Anchors on independent-evaluator composites
-  // (GPQA Diamond + AIME 2026 + HLE + ARC-AGI-2) plus knowledge breadth
-  // (MMLU-Pro + AA-Omniscience + SimpleQA + MRCR long-context).
+  // 'reasoning-focused' anchors on the non-saturated frontier: HLE
+  // (current frontier, top ~50% with tools) + ARC-AGI-2 (still discriminates
+  // 73-83%). GPQA/AIME/MMLU-Pro retained at modest weight (saturated but
+  // still useful as a capability floor). Adds aaOmni (anti-hallucination)
+  // + MRCR (long-context) + SimpleQA (factual recall) for breadth.
   'reasoning-focused': {
-    gpqa: 18, aime26: 15, hle: 15, arcAgi2: 12, mmluPro: 10,
-    aaIdx: 7, aaOmni: 8, simpleQa: 5, mrcr: 5,
-    swePro: 3, lcb: 2,
+    hle: 22, arcAgi2: 17, gpqa: 12, aime26: 10, aaOmni: 9, mmluPro: 7,
+    aaIdx: 6, mrcr: 5, simpleQa: 4, swePro: 4, lcb: 4,
   },
+  // 'benchmark-only' spreads weight across every BENCH_KEY so users who
+  // want to inspect the raw scientific surface can see all dimensions.
+  // Weights still skew toward the most-reliable benches per 2026 consensus.
   'benchmark-only': {
-    swePro: 19, sweV: 12, tb2: 10, lcb: 10, tbHard: 8, sweMulti: 7, cfElo: 7,
-    gpqa: 6, hle: 5, webDevElo: 5, nl2Repo: 5, mmluPro: 3, tau3: 3,
+    swePro: 11, tb2: 9, hle: 8, arcAgi2: 7, tau2: 6, lcb: 6, mcpA: 5,
+    sweMulti: 4, aaIdx: 4, gpqa: 4, aime26: 4, tbHard: 3, cfElo: 4,
+    mmluPro: 3, aaCoding: 3, aaAgentic: 3, webDevElo: 3, nl2Repo: 2,
+    bfcl: 2, browseComp: 2, aaOmni: 2, programBench: 2, mrcr: 1,
+    simpleQa: 1, sweV: 1, tau3: 0,
   },
 };
 
