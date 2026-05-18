@@ -117,51 +117,89 @@ function intraTierMaxDelta(contradiction) {
   return maxDelta;
 }
 
+// Cell-level confidence in [0.05, 1.0]. Combines verification depth
+// (#distinct sources), winning-source trustScore, and contradiction
+// severity penalty. GREEN cells short-circuit to 1.0 so well-covered
+// new models aren't penalized by the absence of cross-source disputes.
+//
+//   verif   = min(N_distinct_sources / 3, 1)
+//   trust   = max(trustScore per source, fallback 0.4)
+//   penalty = 0 (GREEN) | 0.15 (warn) | 0.4 (block)
+//   conf    = max(0.05, verif * trust * (1 - penalty))
+export function cellConfidence(modelId, benchKey) {
+  const entries = State.sources[`${modelId}.${benchKey}`];
+  if (!Array.isArray(entries) || !entries.length) return 1.0;
+  // Distinct primary URLs (drop pseudo-source rescue entries from the count).
+  const PSEUDO = new Set(['snapshot-extraction', 'auto-resolution candidate', 'synth-backfill']);
+  const urls = new Set();
+  let maxTrust = 0;
+  for (const e of entries) {
+    if (!e || PSEUDO.has(e.source)) continue;
+    if (e.url) urls.add(String(e.url).toLowerCase());
+    const t = Number(e.trustScore);
+    if (Number.isFinite(t) && t > maxTrust) maxTrust = t;
+  }
+  const verif = Math.min((urls.size || 1) / 3, 1);
+  const trust = maxTrust > 0 ? maxTrust : 0.4;
+  const c = contradictionFor(modelId, benchKey);
+  let penalty = 0;
+  if (c) {
+    if (c.delta >= CONTRADICTION_BLOCK) penalty = 0.4;
+    else if (c.delta >= CONTRADICTION_WARN) penalty = 0.15;
+  }
+  const conf = verif * trust * (1 - penalty);
+  return Math.max(0.05, Math.min(1.0, conf));
+}
+
+// Returns the set of bench keys flagged as quarantined for this model.
+// merge.py stamps `model.benchQuarantine[bench] = true` whenever the
+// pick_winner.quarantine flag fires (scaffold variants, confidence<0.2,
+// or excessive value dispersion). compositeScore() skips these cells.
+export function quarantinedBenches(model) {
+  const q = model?.benchQuarantine;
+  if (!q || typeof q !== 'object') return new Set();
+  const out = new Set();
+  for (const [k, v] of Object.entries(q)) if (v) out.add(k);
+  return out;
+}
+
 // Weighted composite combining three honesty mechanisms:
 //
-//   raw       = weightedSum / coveredWeight   (avg of available scores, minus
-//                                              a confidence haircut on cells
-//                                              with same-tier disagreement)
+//   raw       = weightedSum / coveredWeight   (confidence-weighted average
+//                                              of available scores)
 //   coverage  = coveredWeight / activeWeight  (fraction of profile covered)
 //   score     = raw × √coverage               (sparse data pulls score down)
 //
 // Coverage penalty: 100% → ×1.00, 50% → ×0.71, 25% → ×0.50. Stops a 1-test
 // cherry-picked high score from outranking a broader, verified model.
 //
-// Confidence haircut: applied only when the *same tier* disagrees by ≥3pp.
-// Cross-tier disputes (e.g. I-tier 80 vs S-tier 85) are already resolved by
-// autoResolveWinner picking the higher-trust source — counting them again
-// here would be double-counting. Same-tier disputes (e.g. I-tier 80 vs
-// I-tier 86) reflect genuine measurement uncertainty: subtract
-// `min((intra − 3) / 2, 5)` from that cell's score. Cap = 5pp/cell so a
-// single extreme outlier cannot dominate the composite.
+// FAZ 8.A.3c (2026-05-18): replaced the prior fixed-cap confidence haircut
+// with per-cell confidence weighting. Each cell's contribution scales by
+// cellConfidence(); low-confidence cells (single-source RED contradictions)
+// still count but with reduced influence. Mitigates the bug where new
+// frontier models with sparse-but-clean GREEN coverage were ranked below
+// older models with contested but verbose provenance.
+//
+// Quarantined cells (model.benchQuarantine) are excluded entirely.
 export function compositeScore(model, weights) {
   let coveredWeight = 0;
   let activeWeight = 0;
   let weightedSum = 0;
-  let confidenceHaircut = 0;
+  const quarantined = quarantinedBenches(model);
   for (const k of BENCH_KEYS) {
     const w = weights[k];
     if (!w) continue;
     activeWeight += w;
+    if (quarantined.has(k)) continue;
     const raw = model.bench?.[k];
     const s = normalizeBenchScore(k, raw);
     if (s == null || !Number.isFinite(s)) continue;
-    coveredWeight += w;
-    weightedSum += w * s;
-
-    const c = contradictionFor(model.id, k);
-    if (c && c.delta >= CONTRADICTION_BLOCK) {
-      const intra = intraTierMaxDelta(c);
-      if (intra >= CONTRADICTION_WARN) {
-        const excess = intra - CONTRADICTION_WARN;
-        const haircut = Math.min(excess / 2, 5);
-        confidenceHaircut += w * haircut;
-      }
-    }
+    const conf = cellConfidence(model.id, k);
+    coveredWeight += w * conf;
+    weightedSum += w * s * conf;
   }
   if (activeWeight === 0 || coveredWeight === 0) return null;
-  const raw = (weightedSum - confidenceHaircut) / coveredWeight;
+  const raw = weightedSum / coveredWeight;
   const coverage = coveredWeight / activeWeight;
   return raw * Math.sqrt(coverage);
 }

@@ -29,21 +29,35 @@ export const BENCH_CATEGORIES = [
   { id: 'general',   keys: ['aaIdx', 'aaOmni'] },
 ];
 
-// cfElo stores raw Codeforces ELO (~1000-3500). compositeScore() needs every
-// bench on a 0-100 scale, so this helper normalizes ELO into a percentile.
-// (elo - 1000) / 25 → 1500=20, 2500=60, 3000=80, 3500=100. Clamped at edges.
-// Every other bench is already 0-100, so it's returned as-is.
+// Per-bench normalization to a [0, 100] composite scale.
+//
+// • cfElo (FAZ 8.A.3c piecewise replaces prior linear): the linear
+//   (elo-1000)/25 mapping under-counted frontier ratings — gpt-5-5's
+//   cfElo 1488 mapped to 19.5/100 even though it is the strongest
+//   competitive-programming score in the dataset. Three-segment
+//   piecewise calibration:
+//     [1200, 1600) -> [0, 40)    (entry tier)
+//     [1600, 2800) -> [40, 85)   (strong-to-frontier sweep)
+//     [2800, 3500) -> [85, 100]  (top of distribution)
+// • webDevElo: LMArena WebDev Arena (~950-1300) — linear mapping retained.
+// • aaOmni: Artificial Analysis Omniscience (lower is better — measures
+//   hallucination rate). Invert so higher composite score = better model.
+// Other benches are already on 0-100; returned as-is.
 export function normalizeBenchScore(key, value) {
   if (value == null || !Number.isFinite(value)) return null;
   if (key === 'cfElo') {
-    const pct = (value - 1000) / 25;
-    return Math.max(0, Math.min(100, pct));
+    if (value < 1200) return 0;
+    if (value < 1600) return ((value - 1200) / 400) * 40;
+    if (value < 2800) return 40 + ((value - 1600) / 1200) * 45;
+    if (value < 3500) return 85 + ((value - 2800) / 700) * 15;
+    return 100;
   }
   if (key === 'webDevElo') {
-    // LMArena WebDev Arena Elo, observed range ~950-1300.
-    // Map (950, 1300) -> (0, 100): pct = (value - 950) / 3.5
     const pct = (value - 950) / 3.5;
     return Math.max(0, Math.min(100, pct));
+  }
+  if (key === 'aaOmni') {
+    return Math.max(0, Math.min(100, 100 - value));
   }
   return value;
 }
@@ -62,8 +76,8 @@ export const PRESETS = {
     nl2Repo: 9, cfElo: 5, aaCoding: 5,
   },
   'agentic-focused': {
-    tb2: 15, mcpA: 13, tbHard: 10, browseComp: 10, aaAgentic: 10,
-    tau2: 8, tau3: 8, swePro: 7, lcb: 7, bfcl: 5,
+    tb2: 15, mcpA: 13, tbHard: 10, browseComp: 14, aaAgentic: 10,
+    tau2: 8, tau3: 8, swePro: 7, lcb: 7, bfcl: 8,
   },
   // Reasoning / knowledge breadth — covers the bench keys (aaIdx, aime26,
   // aaOmni, mmluPro, simpleQa, mrcr, arcAgi2) the coding-centric presets
@@ -76,7 +90,7 @@ export const PRESETS = {
     swePro: 3, lcb: 2,
   },
   'benchmark-only': {
-    swePro: 16, sweV: 12, tb2: 10, lcb: 10, tbHard: 8, sweMulti: 7, cfElo: 7,
+    swePro: 19, sweV: 12, tb2: 10, lcb: 10, tbHard: 8, sweMulti: 7, cfElo: 7,
     gpqa: 6, hle: 5, webDevElo: 5, nl2Repo: 5, mmluPro: 3, tau3: 3,
   },
 };
