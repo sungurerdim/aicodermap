@@ -585,7 +585,8 @@
       "sweFocused": "SWE-odaklı",
       "agenticFocused": "Agentic-odaklı",
       "reasoningFocused": "Akıl yürütme odaklı",
-      "benchmarkOnly": "Sadece Benchmark"
+      "benchmarkOnly": "Sadece Benchmark",
+      "consensus": "Vendor Konsensüsü"
     }
   },
   "reliability": {
@@ -593,5 +594,16 @@
     "exceptional": "olağanüstü kaynak",
     "lowConfidence": "düşük güvenilirlik",
     "coldStart": "yeterli veri yok"
+  },
+  "vendorPanel": {
+    "title": "Vendor görünümü",
+    "consensus": "uzlaşı",
+    "mild": "hafif fark",
+    "controversy": "anlaşmazlık",
+    "agreementTip": "AICM sıra",
+    "consensusRank": "konsensüs sıra",
+    "limitedData": "sınırlı veri",
+    "limitedCoverage": "sınırlı kapsam",
+    "missingTip": "eksik benchler"
   }
 }

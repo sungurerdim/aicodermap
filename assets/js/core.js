@@ -43,8 +43,40 @@ export const BENCH_CATEGORIES = [
 // • aaOmni: Artificial Analysis Omniscience (lower is better — measures
 //   hallucination rate). Invert so higher composite score = better model.
 // Other benches are already on 0-100; returned as-is.
+// F1+F2 (2026-05-18): tries State.schema.normalization[key] first (data-driven);
+// falls back to hardcoded piecewise/linear/invert logic for backward compat
+// (older deploys where sources-whitelist.json was not fetched).
 export function normalizeBenchScore(key, value) {
   if (value == null || !Number.isFinite(value)) return null;
+  const cfg = (State.schema && State.schema.normalization) || null;
+  const entry = cfg && cfg[key];
+  if (entry && entry.type) {
+    if (entry.type === 'piecewise' && Array.isArray(entry.breakpoints) && Array.isArray(entry.outputs)) {
+      const bp = entry.breakpoints, out = entry.outputs;
+      if (bp.length >= 2 && out.length === bp.length && value < bp[0]) return out[0];
+      for (let i = 0; i < bp.length - 1; i++) {
+        if (value < bp[i + 1]) {
+          const span = bp[i + 1] - bp[i];
+          const gain = out[i + 1] - out[i];
+          return out[i] + ((value - bp[i]) / span) * gain;
+        }
+      }
+      return out[out.length - 1];
+    }
+    if (entry.type === 'linear') {
+      const origin = Number(entry.origin) || 0;
+      const divisor = Number(entry.divisor) || 1;
+      const v = (value - origin) / divisor;
+      const lo = Number.isFinite(entry.clampMin) ? entry.clampMin : -Infinity;
+      const hi = Number.isFinite(entry.clampMax) ? entry.clampMax : Infinity;
+      return Math.max(lo, Math.min(hi, v));
+    }
+    if (entry.type === 'invert') {
+      const max = Number.isFinite(entry.max) ? entry.max : 100;
+      return Math.max(0, Math.min(100, max - value));
+    }
+  }
+  // ── fallback (no schema or unknown type) ──
   if (key === 'cfElo') {
     if (value < 1200) return 0;
     if (value < 1600) return ((value - 1200) / 400) * 40;
@@ -127,6 +159,96 @@ export const PRESETS = {
   },
 };
 
+// F1+F2 (2026-05-18): schema-driven preset accessors. Tries
+// State.schema.presets / contracts first; falls back to hardcoded literals.
+// Consumers should prefer these over the raw exports below for new code.
+export function getPresets() {
+  const sp = State.schema && State.schema.presets;
+  if (sp && typeof sp === 'object') {
+    const out = {};
+    for (const [name, def] of Object.entries(sp)) {
+      if (name.startsWith('_') || !def || typeof def !== 'object') continue;
+      // Schema format: { kind, atomicWeights, vendorCompositeView, ... }
+      // Legacy expected format: flat { benchKey: weight } object.
+      // For backward-compat with existing code that reads PRESETS[name][key],
+      // we surface atomicWeights as the flat dict.
+      if (def.kind === 'vendorConsensus') {
+        // Consensus presets carry no atomic weights; downstream code should
+        // branch on def.kind. Surface an empty weights dict + metadata.
+        out[name] = { __kind: 'vendorConsensus', ...(def.atomicWeights || {}) };
+        out[name].__meta = def;
+      } else {
+        out[name] = { ...(def.atomicWeights || {}) };
+        out[name].__meta = def;
+        out[name].__kind = def.kind || 'atomicComposite';
+      }
+    }
+    return Object.keys(out).length ? out : PRESETS;
+  }
+  return PRESETS;
+}
+
+export function getDefaultWeights() {
+  // Default weights = balanced preset's atomic weights when schema present.
+  const sp = State.schema && State.schema.presets;
+  if (sp && sp.balanced && sp.balanced.atomicWeights) {
+    return { ...sp.balanced.atomicWeights };
+  }
+  return { ...DEFAULT_WEIGHTS };
+}
+
+export function getContradictionThresholds() {
+  const ctr = State.schema && State.schema.contracts;
+  return {
+    warn: (ctr && Number.isFinite(ctr.CONTRADICTION_WARN_PP)) ? ctr.CONTRADICTION_WARN_PP : 3.0,
+    block: (ctr && Number.isFinite(ctr.CONTRADICTION_BLOCK_PP)) ? ctr.CONTRADICTION_BLOCK_PP : 5.0,
+  };
+}
+
+// F1+F2: bench classification. Schema-driven atomic vs vendor-composite split.
+// AICoderMap composite uses ONLY atomic; vendor composites surface separately
+// in cross-validation panel (UI consumes via vendorComposites schema block).
+export function getBenchKind(key) {
+  const bk = State.schema && State.schema.benchKind;
+  if (bk && Array.isArray(bk.vendorComposite) && bk.vendorComposite.includes(key)) return 'vendorComposite';
+  if (bk && Array.isArray(bk.atomic) && bk.atomic.includes(key)) return 'atomic';
+  // Fallback: hardcoded list of AA-family composites (matches schema default)
+  if (['aaIdx', 'aaCoding', 'aaAgentic', 'aaOmni'].includes(key)) return 'vendorComposite';
+  return 'atomic';
+}
+
+export function isAtomicBench(key) { return getBenchKind(key) === 'atomic'; }
+export function isVendorComposite(key) { return getBenchKind(key) === 'vendorComposite'; }
+
+export function getVendorCompositeMeta(key) {
+  const vc = State.schema && State.schema.vendorComposites;
+  return (vc && vc[key]) ? vc[key] : null;
+}
+
+export function getCompositePolicy() {
+  const cp = State.schema && State.schema.composite;
+  return {
+    coverageShrinkageExponent: (cp && Number.isFinite(cp.coverageShrinkageExponent)) ? cp.coverageShrinkageExponent : 2,
+    imputationEnabled: !!(cp && cp.imputation && cp.imputation.enabled),
+    minPeerCount: (cp && cp.imputation && Number.isFinite(cp.imputation.minPeerCount)) ? cp.imputation.minPeerCount : 3,
+    maxImputedWeightShare: (cp && cp.imputation && Number.isFinite(cp.imputation.maxImputedWeightShare)) ? cp.imputation.maxImputedWeightShare : 0.30,
+    imputedConfidenceFactor: (cp && cp.imputation && Number.isFinite(cp.imputation.imputedConfidenceFactor)) ? cp.imputation.imputedConfidenceFactor : 0.5,
+    minCoverageDisplay: (cp && Number.isFinite(cp.minCoverageDisplay)) ? cp.minCoverageDisplay : 0.30,
+  };
+}
+
+// Per-preset tiered missing-data policy. Returns sets for fast lookup.
+export function getPresetTiers(presetName) {
+  const sp = State.schema && State.schema.presets;
+  const def = sp && sp[presetName];
+  return {
+    required: new Set(Array.isArray(def?.requiredBenches) ? def.requiredBenches : []),
+    critical: new Set(Array.isArray(def?.criticalBenches) ? def.criticalBenches : []),
+    imputable: new Set(Array.isArray(def?.imputableBenches) ? def.imputableBenches : []),
+    vendorView: Array.isArray(def?.vendorCompositeView) ? def.vendorCompositeView : [],
+  };
+}
+
 export const CONTRADICTION_WARN = 3.0;
 export const CONTRADICTION_BLOCK = 5.0;
 
@@ -152,6 +274,16 @@ export const State = {
   // data.js:loadData; consumed by data.js:sourceReliability / cellConfidence.
   // Empty scaffold yields neutral 1.0 multipliers (no behavior change).
   reliability: { schemaVersion: 'v1', halfLifeCycles: 3, coldStartN: 10, sources: {} },
+  // F1+F2 (2026-05-18): data/sources-whitelist.json _schema block. Loaded by
+  // data.js:loadData. Drives normalize / confidence / presets / benchKind /
+  // vendorComposites / composite policy. Empty object → JS falls back to
+  // hardcoded literals (current behavior).
+  schema: {},
+  // F1+F2: which score function the active preset uses.
+  //   'aicm'           → compositeScore (atomic-only weighted) — default
+  //   'vendorConsensus'→ vendorConsensusScore (mean of normalized vendor composites)
+  scoreFn: 'aicm',
+  activePresetName: 'balanced',
 };
 
 export function readStorage(key, fallback) {

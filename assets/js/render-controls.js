@@ -4,6 +4,7 @@
 
 import {
   State, BENCH_KEYS, DEFAULT_WEIGHTS, PRESETS, STORAGE, writeStorage, readStorage,
+  getPresets,
 } from './core.js';
 import { el, clear } from './dom.js';
 import { t } from './i18n.js';
@@ -74,11 +75,16 @@ export function updateWeightsTotal() {
 }
 
 export function applyPreset(name, onChange) {
-  const preset = PRESETS[name];
+  // F1+F2 (2026-05-18): prefer schema-driven presets via getPresets() if
+  // available; fallback to literal PRESETS. New 'consensus' preset is
+  // vendorConsensus kind — no atomic weights; render uses vendorConsensusScore.
+  const presetSource = getPresets();
+  const preset = (presetSource && presetSource[name]) || PRESETS[name];
   if (!preset) return;
+  const kind = preset.__kind || 'atomicComposite';
+  State.scoreFn = (kind === 'vendorConsensus') ? 'vendorConsensus' : 'aicm';
+  State.activePresetName = name;
   // Zero-base merge: every preset is the full intended distribution.
-  // Spreading DEFAULT_WEIGHTS underneath would leak its values for any
-  // key the preset omits, pushing the runtime sum well above 100.
   State.weights = Object.fromEntries(BENCH_KEYS.map(k => [k, preset[k] || 0]));
   writeStorage(STORAGE.weights, State.weights);
   renderWeightsEditor(onChange);

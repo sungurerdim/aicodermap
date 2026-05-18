@@ -4,6 +4,8 @@
 import {
   State, BENCH_KEYS, CONTRADICTION_WARN, CONTRADICTION_BLOCK,
   validateModels, normalizeBenchScore,
+  getContradictionThresholds, getBenchKind, isAtomicBench, isVendorComposite,
+  getVendorCompositeMeta, getCompositePolicy, getPresetTiers,
 } from './core.js';
 
 // Resolve data URLs against this module's location so loadData() works whether
@@ -40,7 +42,7 @@ export async function fetchJson(name) {
 }
 
 export async function loadData() {
-  const [models, sources, gpu, meta, reliability] = await Promise.all([
+  const [models, sources, gpu, meta, reliability, whitelist] = await Promise.all([
     fetchJson('models.json'),
     fetchJson('sources.json'),
     fetchJson('gpu-database.json'),
@@ -50,6 +52,11 @@ export async function loadData() {
     // lack the file, so a 404 falls back to an empty ledger that yields
     // neutral 1.0 multipliers everywhere (no behavior change).
     fetchJson('source-reliability.json').catch(() => null),
+    // F1+F2 (2026-05-18): sources-whitelist.json _schema drives normalize/
+    // confidence/presets/benchKind/vendorComposites. Best-effort — older
+    // deploys lack the file (or new schema blocks); JS falls back to
+    // hardcoded literals in core.js so no behavior change on miss.
+    fetchJson('sources-whitelist.json').catch(() => null),
   ]);
   State.models = validateModels(models);
   State.sources = (sources && typeof sources === 'object') ? sources : {};
@@ -58,6 +65,11 @@ export async function loadData() {
   State.reliability = (reliability && typeof reliability === 'object')
     ? reliability
     : { schemaVersion: 'v1', halfLifeCycles: 3, coldStartN: 10, sources: {} };
+  // F1+F2: extract _schema; rest of whitelist (vendors/leaderboards/…) is
+  // skill+agent territory and not needed at render time.
+  State.schema = (whitelist && typeof whitelist === 'object' && whitelist._schema)
+    ? whitelist._schema
+    : {};
 }
 
 // Phase R5: mirror of scripts/lib/tiers.py:INTERVAL_DECAY_CURVES. Exposed
@@ -238,11 +250,21 @@ function intraTierMaxDelta(contradiction) {
 //   trust   = max(trustScore per source, fallback 0.4)
 //   penalty = 0 (GREEN) | 0.15 (warn) | 0.4 (block)
 //   conf    = max(0.05, verif * trust * (1 - penalty))
+// F1+F2 (2026-05-18): schema-driven. State.schema.confidence overrides
+// hardcoded constants when present; fallback values match prior behavior.
 export function cellConfidence(modelId, benchKey) {
   const entries = State.sources[`${modelId}.${benchKey}`];
   if (!Array.isArray(entries) || !entries.length) return 1.0;
-  // Distinct primary URLs (drop pseudo-source rescue entries from the count).
-  const PSEUDO = new Set(['snapshot-extraction', 'auto-resolution candidate', 'synth-backfill']);
+  const cfg = (State.schema && State.schema.confidence) || {};
+  const verifDivisor = Number(cfg.verifDivisor) || 3;
+  const warnPen = Number.isFinite(cfg.contradictionWarnPenalty) ? cfg.contradictionWarnPenalty : 0.15;
+  const blockPen = Number.isFinite(cfg.contradictionBlockPenalty) ? cfg.contradictionBlockPenalty : 0.40;
+  const floor = Number.isFinite(cfg.confidenceFloor) ? cfg.confidenceFloor : 0.05;
+  const ceiling = Number.isFinite(cfg.confidenceCeiling) ? cfg.confidenceCeiling : 1.0;
+  const fallbackTrust = Number.isFinite(cfg.fallbackTrust) ? cfg.fallbackTrust : 0.40;
+  const PSEUDO = new Set(Array.isArray(cfg.pseudoSources) && cfg.pseudoSources.length
+    ? cfg.pseudoSources
+    : ['snapshot-extraction', 'auto-resolution candidate', 'synth-backfill']);
   const urls = new Set();
   let maxTrust = 0;
   for (const e of entries) {
@@ -255,16 +277,17 @@ export function cellConfidence(modelId, benchKey) {
     const tw = Number.isFinite(t) ? t * rel : 0;
     if (tw > maxTrust) maxTrust = tw;
   }
-  const verif = Math.min((urls.size || 1) / 3, 1);
-  const trust = maxTrust > 0 ? maxTrust : 0.4;
+  const verif = Math.min((urls.size || 1) / verifDivisor, 1);
+  const trust = maxTrust > 0 ? maxTrust : fallbackTrust;
   const c = contradictionFor(modelId, benchKey);
+  const thr = getContradictionThresholds();
   let penalty = 0;
   if (c) {
-    if (c.delta >= CONTRADICTION_BLOCK) penalty = 0.4;
-    else if (c.delta >= CONTRADICTION_WARN) penalty = 0.15;
+    if (c.delta >= thr.block) penalty = blockPen;
+    else if (c.delta >= thr.warn) penalty = warnPen;
   }
   const conf = verif * trust * (1 - penalty);
-  return Math.max(0.05, Math.min(1.0, conf));
+  return Math.max(floor, Math.min(ceiling, conf));
 }
 
 // Returns the set of bench keys flagged as quarantined for this model.
@@ -297,14 +320,26 @@ export function quarantinedBenches(model) {
 // older models with contested but verbose provenance.
 //
 // Quarantined cells (model.benchQuarantine) are excluded entirely.
+// F1+F2 (2026-05-18): atomic-only aggregation. Vendor composites
+// (aaIdx/aaCoding/aaAgentic/aaOmni) are excluded by getBenchKind — they
+// surface separately via vendorComposites() in the cross-validation panel
+// so we don't double-count benches they already aggregate. Coverage
+// shrinkage exponent is now schema-driven (default 2 = sqrt).
 export function compositeScore(model, weights) {
   let coveredWeight = 0;
   let activeWeight = 0;
   let weightedSum = 0;
   const quarantined = quarantinedBenches(model);
+  const policy = getCompositePolicy();
+  const expo = Number.isFinite(policy.coverageShrinkageExponent) && policy.coverageShrinkageExponent > 0
+    ? policy.coverageShrinkageExponent : 2;
   for (const k of BENCH_KEYS) {
     const w = weights[k];
     if (!w) continue;
+    // Atomic-only — vendor composites contribute to cross-validation panel,
+    // not the AICoderMap composite (their componentBenches are already
+    // counted at the atomic layer; including them = double counting).
+    if (isVendorComposite(k)) continue;
     activeWeight += w;
     if (quarantined.has(k)) continue;
     const raw = model.bench?.[k];
@@ -317,18 +352,20 @@ export function compositeScore(model, weights) {
   if (activeWeight === 0 || coveredWeight === 0) return null;
   const raw = weightedSum / coveredWeight;
   const coverage = coveredWeight / activeWeight;
-  return raw * Math.sqrt(coverage);
+  return raw * Math.pow(coverage, 1 / expo);
 }
 
 // Coverage as a 0..1 fraction of profile weight that the model has scores for.
 // UI uses this for the "Coverage XX%" badge so users can read why a composite
 // is low without reverse-engineering the formula.
+// F1+F2: vendor composites excluded (atomic-only) to match compositeScore().
 export function coverageOf(model, weights) {
   let coveredWeight = 0;
   let activeWeight = 0;
   for (const k of BENCH_KEYS) {
     const w = weights[k];
     if (!w) continue;
+    if (isVendorComposite(k)) continue;
     activeWeight += w;
     const s = model.bench?.[k];
     if (s == null || !Number.isFinite(s)) continue;
@@ -338,6 +375,108 @@ export function coverageOf(model, weights) {
   return coveredWeight / activeWeight;
 }
 
+// ============================================================================
+// F1+F2 (2026-05-18): VENDOR COMPOSITE + CROSS-VALIDATION layer.
+// AICoderMap composite uses only atomic benches. Vendor-aggregated composites
+// (aaIdx, aaCoding, aaAgentic, aaOmni) are shown as independent reference
+// signals in a side panel — not mixed into our weighted average.
+// ============================================================================
+
+// Returns the vendor composite values + normalized scores + metadata for
+// the keys listed in preset.vendorCompositeView (or all 4 AA composites
+// when preset is null). Empty array when no schema present.
+export function vendorComposites(model, presetName) {
+  const tiers = presetName ? getPresetTiers(presetName) : null;
+  const keys = tiers && tiers.vendorView.length ? tiers.vendorView : ['aaIdx', 'aaCoding', 'aaAgentic', 'aaOmni'];
+  const out = [];
+  for (const key of keys) {
+    if (!isVendorComposite(key)) continue;
+    const raw = model.bench?.[key];
+    const normalized = normalizeBenchScore(key, raw);
+    const meta = getVendorCompositeMeta(key);
+    out.push({
+      key,
+      raw,
+      normalized,
+      label: meta?.label || key,
+      labelShort: meta?.labelShort || key,
+      publisher: meta?.publisher || null,
+      publisherUrl: meta?.publisherUrl || null,
+      domain: meta?.domain || null,
+      missing: raw == null || !Number.isFinite(raw),
+    });
+  }
+  return out;
+}
+
+// Vendor consensus score = average of normalized vendor composites for this
+// model. Used as the primary score in 'consensus' preset (Pozisyon B
+// default) and as cross-validation reference for atomic presets.
+export function vendorConsensusScore(model, presetName) {
+  const vc = vendorComposites(model, presetName);
+  const vals = vc.filter(v => v.normalized != null && Number.isFinite(v.normalized))
+                 .map(v => v.normalized);
+  if (!vals.length) return null;
+  return vals.reduce((a, b) => a + b, 0) / vals.length;
+}
+
+// Agreement indicator between AICoderMap composite rank and vendor consensus
+// rank for `model`, computed across `allModels`. Returns:
+//   { aicmRank, consensusRank, gap, flag }
+// flag ∈ {'consensus','mild-disagreement','controversy'} mapped from gap ≤5, ≤15, >15.
+// Returns null if either rank cannot be computed.
+export function crossValidationAgreement(model, allModels, weights, presetName) {
+  if (!Array.isArray(allModels) || !allModels.length) return null;
+  const aicmScores = allModels.map(m => ({ id: m.id, s: compositeScore(m, weights) }));
+  const consScores = allModels.map(m => ({ id: m.id, s: vendorConsensusScore(m, presetName) }));
+  const aicmRanked = aicmScores.filter(x => x.s != null).sort((a, b) => b.s - a.s);
+  const consRanked = consScores.filter(x => x.s != null).sort((a, b) => b.s - a.s);
+  const aicmRank = aicmRanked.findIndex(x => x.id === model.id);
+  const consRank = consRanked.findIndex(x => x.id === model.id);
+  if (aicmRank < 0 || consRank < 0) return null;
+  const gap = Math.abs(aicmRank - consRank);
+  let flag;
+  if (gap <= 5) flag = 'consensus';
+  else if (gap <= 15) flag = 'mild-disagreement';
+  else flag = 'controversy';
+  return { aicmRank: aicmRank + 1, consensusRank: consRank + 1, gap, flag };
+}
+
+// Score resolver — dispatches to the right scoring function based on
+// State.scoreFn (set by applyPreset). UI consumers (render-table /
+// render-card) can call this single helper instead of branching on
+// preset kind. Returns null when score cannot be computed.
+export function effectiveScore(model, weights, presetName) {
+  const fn = State.scoreFn || 'aicm';
+  if (fn === 'vendorConsensus') return vendorConsensusScore(model, presetName || State.activePresetName);
+  return compositeScore(model, weights);
+}
+
+// Tiered missing-data analysis for a model under a preset. Used by UI to
+// show "limited data" badges and route models with ≥2 missing critical
+// benches into the "Limited Coverage" section.
+//   missingRequired: required benches missing → ⚠ rozet
+//   missingCritical: critical benches missing — when ≥2, model is "limited coverage"
+//   imputable:       benches eligible for peer-tier median fill (advisory)
+export function presetTiersFor(model, presetName) {
+  const tiers = getPresetTiers(presetName);
+  const bench = model.bench || {};
+  const has = (k) => {
+    const v = bench[k];
+    return v != null && Number.isFinite(v);
+  };
+  const missingRequired = [...tiers.required].filter(k => !has(k));
+  const missingCritical = [...tiers.critical].filter(k => !has(k));
+  const missingImputable = [...tiers.imputable].filter(k => !has(k));
+  return {
+    missingRequired,
+    missingCritical,
+    missingImputable,
+    isLimitedCoverage: missingCritical.length >= 2,
+    isLimitedData: missingRequired.length > 0,
+  };
+}
+
 // Count of cells in the active preset that actually trigger a confidence
 // haircut — same-tier disputes with ≥3pp intra-tier disagreement on top of
 // the ≥5pp BLOCK threshold. Cells with cross-tier-only disagreement are
@@ -345,15 +484,16 @@ export function coverageOf(model, weights) {
 // based on them would mislead the user about score reductions.
 export function disputedCount(model, weights) {
   let n = 0;
+  const thr = getContradictionThresholds();
   for (const k of BENCH_KEYS) {
     const w = weights[k];
     if (!w) continue;
     const s = model.bench?.[k];
     if (s == null || !Number.isFinite(s)) continue;
     const c = contradictionFor(model.id, k);
-    if (!c || c.delta < CONTRADICTION_BLOCK) continue;
+    if (!c || c.delta < thr.block) continue;
     const intra = intraTierMaxDelta(c);
-    if (intra >= CONTRADICTION_WARN) n++;
+    if (intra >= thr.warn) n++;
   }
   return n;
 }
@@ -390,9 +530,10 @@ export function contradictionFor(modelId, benchKey) {
   const max = Math.max(...values);
   const min = Math.min(...values);
   const delta = max - min;
+  const thr = getContradictionThresholds();
   let severity = null;
-  if (delta >= CONTRADICTION_BLOCK) severity = 'danger';
-  else if (delta >= CONTRADICTION_WARN) severity = 'warn';
+  if (delta >= thr.block) severity = 'danger';
+  else if (delta >= thr.warn) severity = 'warn';
   if (!severity) return null;
   return { delta, severity, sources: list };
 }

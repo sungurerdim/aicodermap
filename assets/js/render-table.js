@@ -5,6 +5,7 @@ import { State, BENCH_KEYS, TIER_ORDER, STORAGE, writeStorage, readStorage } fro
 import {
   compositeScore, coverageOf, fmtScore, scoreClass, contradictionFor,
   pricingView, fmtPriceRange, fmtContext, fmtLastUpdated,
+  effectiveScore,
 } from './data.js';
 import { gpuCompat, getActiveVram, passesFilters } from './gpu.js';
 import { el, clear } from './dom.js';
@@ -222,9 +223,11 @@ function renderTableHeader(thead, cols) {
 }
 
 function rankedModels() {
+  // F1+F2 (2026-05-18): effectiveScore dispatches to compositeScore (atomic)
+  // or vendorConsensusScore based on State.scoreFn (set by applyPreset).
   return State.models
     .filter(passesFilters)
-    .map(m => ({ model: m, score: compositeScore(m, State.weights) }));
+    .map(m => ({ model: m, score: effectiveScore(m, State.weights, State.activePresetName) }));
 }
 
 function sortRanked(ranked, cols) {

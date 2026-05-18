@@ -585,7 +585,8 @@
       "sweFocused": "SWE-focused",
       "agenticFocused": "Agentic-focused",
       "reasoningFocused": "Reasoning-focused",
-      "benchmarkOnly": "Benchmark-only"
+      "benchmarkOnly": "Benchmark-only",
+      "consensus": "Vendor Consensus"
     }
   },
   "reliability": {
@@ -593,5 +594,16 @@
     "exceptional": "exceptional source",
     "lowConfidence": "low confidence",
     "coldStart": "insufficient data"
+  },
+  "vendorPanel": {
+    "title": "Vendor view",
+    "consensus": "consensus",
+    "mild": "mild gap",
+    "controversy": "controversy",
+    "agreementTip": "AICM rank",
+    "consensusRank": "consensus rank",
+    "limitedData": "limited data",
+    "limitedCoverage": "limited coverage",
+    "missingTip": "missing benches"
   }
 }

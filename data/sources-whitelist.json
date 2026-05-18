@@ -800,7 +800,415 @@
       "aaOmni",
       "programBench"
     ],
-    "_deprecatedBenchKeysNote": "FAZ 5.B/C 2026-05-09 split bench universe from 26 → 10 core keys. These 16 legacy keys still hold values in data/models.json (preserved for historical accuracy) but are no longer refreshed by gather agents and not surfaced in priorityCells. Audit accepts them as 'deprecated' rather than 'unknown'. Front-end may render them in a 'historical' section or hide entirely."
+    "_deprecatedBenchKeysNote": "FAZ 5.B/C 2026-05-09 split bench universe from 26 → 10 core keys. These 16 legacy keys still hold values in data/models.json (preserved for historical accuracy) but are no longer refreshed by gather agents and not surfaced in priorityCells. Audit accepts them as 'deprecated' rather than 'unknown'. Front-end may render them in a 'historical' section or hide entirely.",
+    "normalization": {
+      "_purpose": "Per-bench normalize to [0,100] composite scale. Loaded by assets/js/core.js normalizeBenchScore() with backward-compat fallback to hardcoded literals. Adding a new ELO-scale bench = data PR only.",
+      "cfElo": {
+        "type": "piecewise",
+        "breakpoints": [
+          1200,
+          1600,
+          2800,
+          3500
+        ],
+        "outputs": [
+          0,
+          40,
+          85,
+          100
+        ],
+        "_note": "Codeforces ELO. 1200=entry, 1600=strong-pro, 2800=frontier, 3500=top-of-distribution"
+      },
+      "webDevElo": {
+        "type": "linear",
+        "origin": 950,
+        "divisor": 3.5,
+        "clampMin": 0,
+        "clampMax": 100,
+        "_formula": "max(clampMin, min(clampMax, (value - origin) / divisor))",
+        "_note": "LMArena WebDev Arena (~950-1300)"
+      },
+      "aaOmni": {
+        "type": "invert",
+        "max": 100,
+        "_formula": "max(0, min(100, max - value))",
+        "_note": "AA Omniscience: lower is better; inverted so higher composite = better"
+      }
+    },
+    "confidence": {
+      "_purpose": "Parameters for cellConfidence() haircut in assets/js/data.js. Each cell's contribution to composite scales by verif * trust * (1 - penalty).",
+      "verifDivisor": 3,
+      "_verifNote": "verif = min(distinctUrls / verifDivisor, 1). 1 url → 0.33, 3+ → 1.0",
+      "contradictionWarnPenalty": 0.15,
+      "contradictionBlockPenalty": 0.4,
+      "_penaltyNote": "delta < CONTRADICTION_WARN_PP → 0 penalty; delta >= CONTRADICTION_WARN_PP → 0.15; delta >= CONTRADICTION_BLOCK_PP → 0.40",
+      "confidenceFloor": 0.05,
+      "confidenceCeiling": 1.0,
+      "fallbackTrust": 0.4,
+      "_fallbackTrustNote": "Used when max trustScore = 0 (e.g., source has no trustScore field yet)",
+      "pseudoSources": [
+        "snapshot-extraction",
+        "auto-resolution candidate",
+        "synth-backfill"
+      ],
+      "_pseudoSourcesNote": "These source names are non-evidentiary (extraction hints, not real provenance). Excluded from urls.size + trustScore aggregation. Same list also used by scripts/purge-pseudo-sources.py."
+    },
+    "benchKind": {
+      "_purpose": "Classify each bench key. Atomic = single-test methodology, single publisher. VendorComposite = aggregate-of-benches by external publisher (their own weighting). AICoderMap composite uses ONLY atomic; vendor composites surface in cross-validation panel.",
+      "_rule": "If bench X's score is a function of OTHER benches' scores (by an external publisher's weighting), it's vendorComposite. Single-bench aggregates like Elo (head-to-head matches within ONE eval) stay atomic.",
+      "atomic": [
+        "swePro",
+        "sweV",
+        "sweMulti",
+        "nl2Repo",
+        "lcb",
+        "tb2",
+        "tbHard",
+        "cfElo",
+        "webDevElo",
+        "programBench",
+        "tau2",
+        "tau3",
+        "mcpA",
+        "bfcl",
+        "browseComp",
+        "gpqa",
+        "aime26",
+        "hle",
+        "arcAgi2",
+        "mmluPro",
+        "simpleQa",
+        "mrcr"
+      ],
+      "vendorComposite": [
+        "aaIdx",
+        "aaCoding",
+        "aaAgentic",
+        "aaOmni"
+      ]
+    },
+    "vendorComposites": {
+      "_purpose": "Metadata for vendor-aggregated composite benches. Used by UI cross-validation panel + 'AA says X' tooltips. NOT included in AICoderMap composite weighting (would cause double-counting since componentBenches are already weighted atomically).",
+      "aaIdx": {
+        "label": "AA Intelligence Index",
+        "labelShort": "AA Idx",
+        "publisher": "artificialanalysis.ai",
+        "publisherUrl": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+        "domain": "general",
+        "scale": "0-100",
+        "componentBenches": [
+          "gpqa",
+          "aime26",
+          "hle",
+          "mmluPro",
+          "simpleQa",
+          "sciCode",
+          "aiderPoly"
+        ],
+        "_componentNote": "Approximate — AA may add/remove components per index revision; sciCode + aiderPoly not in our coreBenchKeys"
+      },
+      "aaCoding": {
+        "label": "AA Coding Index",
+        "labelShort": "AA Coding",
+        "publisher": "artificialanalysis.ai",
+        "publisherUrl": "https://artificialanalysis.ai/evaluations/coding-index",
+        "domain": "coding",
+        "scale": "0-100",
+        "componentBenches": [
+          "sweV",
+          "sweMulti",
+          "lcb",
+          "sciCode"
+        ]
+      },
+      "aaAgentic": {
+        "label": "AA Agentic Index",
+        "labelShort": "AA Agentic",
+        "publisher": "artificialanalysis.ai",
+        "publisherUrl": "https://artificialanalysis.ai/evaluations/agentic-index",
+        "domain": "agentic",
+        "scale": "0-100",
+        "componentBenches": [
+          "tau2",
+          "tauBench",
+          "browseComp",
+          "tb2"
+        ]
+      },
+      "aaOmni": {
+        "label": "AA Omniscience",
+        "labelShort": "AA Omni",
+        "publisher": "artificialanalysis.ai",
+        "publisherUrl": "https://artificialanalysis.ai/evaluations/omniscience",
+        "domain": "honesty",
+        "scale": "0-100 inverted (lower raw = better, normalized via _schema.normalization.aaOmni)",
+        "componentBenches": [
+          "simpleQa",
+          "mrcr"
+        ]
+      }
+    },
+    "composite": {
+      "_purpose": "Policy parameters for AICoderMap composite score formula.",
+      "coverageShrinkageExponent": 2,
+      "_coverageShrinkageNote": "composite = raw * (coverage ^ (1/exponent)). 2 = sqrt (current behavior). >2 = gentler penalty for low coverage. 1 = linear. 0 = no penalty.",
+      "imputation": {
+        "enabled": false,
+        "mode": "tier-median",
+        "_modeOptions": [
+          "tier-median",
+          "tier-trimmed-mean",
+          "global-median"
+        ],
+        "minPeerCount": 3,
+        "maxImputedWeightShare": 0.3,
+        "imputedConfidenceFactor": 0.5,
+        "annotateInUi": true,
+        "_disabledNote": "Set enabled=true to activate. Until then, missing cells follow coverage-shrinkage policy only."
+      },
+      "minCoverageDisplay": 0.3,
+      "_minCoverageDisplayNote": "Models below this fraction of preset coverage get 'limited data' UI badge."
+    },
+    "presets": {
+      "_purpose": "Data-driven preset definitions. assets/js/core.js PRESETS literal loads from here with backward-compat fallback. 'consensus' preset is new — uses vendor composite median rather than atomic weighting. Per-preset tiered bench classification (required/critical/imputable) drives missing-data UI policy in data.js + render-card.js.",
+      "_presetKindOptions": [
+        "atomicComposite",
+        "vendorConsensus"
+      ],
+      "consensus": {
+        "label": {
+          "tr": "Vendor Konsensüsü",
+          "en": "Vendor Consensus"
+        },
+        "description": "Median rank across vendor composites. Honest default: we don't reweight what AA / LLM-Stats / Vellum already aggregated; we show their consensus + flag disagreements.",
+        "kind": "vendorConsensus",
+        "vendorCompositeView": [
+          "aaIdx",
+          "aaCoding",
+          "aaAgentic"
+        ],
+        "atomicWeights": {}
+      },
+      "balanced": {
+        "label": {
+          "tr": "Dengeli",
+          "en": "Balanced"
+        },
+        "description": "Coding-leaning portfolio across SWE coding + multi-turn agentic + reasoning frontier.",
+        "kind": "atomicComposite",
+        "atomicWeights": {
+          "swePro": 14,
+          "tb2": 11,
+          "lcb": 8,
+          "hle": 8,
+          "tau2": 6,
+          "mcpA": 5,
+          "sweMulti": 5,
+          "arcAgi2": 5,
+          "tbHard": 4,
+          "cfElo": 4,
+          "sweV": 4,
+          "gpqa": 3,
+          "aime26": 3,
+          "browseComp": 3,
+          "bfcl": 3
+        },
+        "_atomicNote": "Sums to 86 (down from 100 in hardcoded PRESETS). The 14 missing points were vendor composites (aaCoding=4, aaAgentic=4, aaIdx=3, aaOmni=3); they now surface in vendorCompositeView panel, not in score.",
+        "vendorCompositeView": [
+          "aaIdx",
+          "aaCoding",
+          "aaAgentic",
+          "aaOmni"
+        ],
+        "requiredBenches": [
+          "swePro",
+          "tb2"
+        ],
+        "criticalBenches": [
+          "swePro",
+          "tb2",
+          "lcb"
+        ],
+        "imputableBenches": [
+          "webDevElo",
+          "programBench",
+          "nl2Repo",
+          "cfElo",
+          "simpleQa",
+          "mrcr"
+        ]
+      },
+      "swe-focused": {
+        "label": {
+          "tr": "SWE Odaklı",
+          "en": "SWE-Focused"
+        },
+        "description": "Anchored on SWE-bench Pro + Terminal-Bench 2 + LiveCodeBench (contamination-resistant + agentic-coding + time-windowed code gen).",
+        "kind": "atomicComposite",
+        "atomicWeights": {
+          "swePro": 28,
+          "tb2": 14,
+          "lcb": 11,
+          "sweMulti": 9,
+          "tbHard": 7,
+          "sweV": 6,
+          "nl2Repo": 6,
+          "cfElo": 6,
+          "webDevElo": 4,
+          "programBench": 4
+        },
+        "_atomicNote": "Sums to 95 (down from 100); 5 pts was aaCoding which moved to vendorCompositeView.",
+        "vendorCompositeView": [
+          "aaCoding",
+          "aaAgentic"
+        ],
+        "requiredBenches": [
+          "swePro",
+          "lcb"
+        ],
+        "criticalBenches": [
+          "swePro",
+          "tb2",
+          "lcb"
+        ],
+        "imputableBenches": [
+          "webDevElo",
+          "programBench",
+          "nl2Repo",
+          "cfElo"
+        ]
+      },
+      "agentic-focused": {
+        "label": {
+          "tr": "Agentic Odaklı",
+          "en": "Agentic-Focused"
+        },
+        "description": "Weights τ²-Bench (multi-turn reliability) + Terminal-Bench 2 + MCP-Atlas + BFCL + browseComp.",
+        "kind": "atomicComposite",
+        "atomicWeights": {
+          "tau2": 18,
+          "tb2": 16,
+          "mcpA": 13,
+          "bfcl": 8,
+          "browseComp": 8,
+          "swePro": 7,
+          "tbHard": 7,
+          "tau3": 6,
+          "lcb": 4,
+          "nl2Repo": 4
+        },
+        "_atomicNote": "Sums to 91 (down from 100); 9 pts was aaAgentic which moved to vendorCompositeView.",
+        "vendorCompositeView": [
+          "aaAgentic",
+          "aaIdx"
+        ],
+        "requiredBenches": [
+          "tau2",
+          "tb2"
+        ],
+        "criticalBenches": [
+          "tau2",
+          "tb2",
+          "mcpA"
+        ],
+        "imputableBenches": [
+          "bfcl",
+          "browseComp",
+          "tau3",
+          "nl2Repo"
+        ]
+      },
+      "reasoning-focused": {
+        "label": {
+          "tr": "Akıl Yürütme Odaklı",
+          "en": "Reasoning-Focused"
+        },
+        "description": "Anchored on HLE (frontier ~50% with tools) + ARC-AGI-2 (still discriminates).",
+        "kind": "atomicComposite",
+        "atomicWeights": {
+          "hle": 22,
+          "arcAgi2": 17,
+          "gpqa": 12,
+          "aime26": 10,
+          "mmluPro": 7,
+          "mrcr": 5,
+          "simpleQa": 4,
+          "swePro": 4,
+          "lcb": 4
+        },
+        "_atomicNote": "Sums to 85 (down from 100); 15 pts were aaOmni=9 + aaIdx=6 which moved to vendorCompositeView.",
+        "vendorCompositeView": [
+          "aaIdx",
+          "aaOmni"
+        ],
+        "requiredBenches": [
+          "hle",
+          "gpqa"
+        ],
+        "criticalBenches": [
+          "hle",
+          "arcAgi2",
+          "gpqa"
+        ],
+        "imputableBenches": [
+          "mmluPro",
+          "simpleQa",
+          "mrcr"
+        ]
+      },
+      "benchmark-only": {
+        "label": {
+          "tr": "Tüm Benchmarklar",
+          "en": "All Benchmarks"
+        },
+        "description": "Spread weight across every atomic bench key for the raw scientific surface.",
+        "kind": "atomicComposite",
+        "atomicWeights": {
+          "swePro": 11,
+          "tb2": 9,
+          "hle": 8,
+          "arcAgi2": 7,
+          "tau2": 6,
+          "lcb": 6,
+          "mcpA": 5,
+          "sweMulti": 4,
+          "gpqa": 4,
+          "aime26": 4,
+          "tbHard": 3,
+          "cfElo": 4,
+          "mmluPro": 3,
+          "webDevElo": 3,
+          "nl2Repo": 2,
+          "bfcl": 2,
+          "browseComp": 2,
+          "programBench": 2,
+          "mrcr": 1,
+          "simpleQa": 1,
+          "sweV": 1,
+          "tau3": 0
+        },
+        "_atomicNote": "Sums to 88 (down from 100); 12 pts were aaCoding=3 + aaAgentic=3 + aaIdx=4 + aaOmni=2 which moved to vendorCompositeView.",
+        "vendorCompositeView": [
+          "aaIdx",
+          "aaCoding",
+          "aaAgentic",
+          "aaOmni"
+        ],
+        "requiredBenches": [],
+        "criticalBenches": [
+          "swePro",
+          "tau2",
+          "hle"
+        ],
+        "imputableBenches": [
+          "webDevElo",
+          "programBench",
+          "nl2Repo",
+          "simpleQa",
+          "mrcr"
+        ]
+      }
+    }
   },
   "vendors": {
     "anthropic": {

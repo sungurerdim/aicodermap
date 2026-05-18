@@ -8,6 +8,8 @@ import {
   pricingView, fmtPriceMoney, fmtPriceRange, fmtPriceCell, fmtContext,
   fmtLastUpdated, formatBenchValue, isCellStale, getCellFreshness,
   sourceReliabilityBadge,
+  effectiveScore, vendorComposites, vendorConsensusScore,
+  crossValidationAgreement, presetTiersFor,
 } from './data.js';
 import { gpuCompat, getActiveVram } from './gpu.js';
 import { el, cameraIconButton, docIconButton } from './dom.js';
@@ -383,9 +385,73 @@ function sourcesFooter(model) {
   return block;
 }
 
+// F1+F2 (2026-05-18): vendor composite + agreement panel. Surfaces the
+// vendor-aggregated composites (aaIdx / aaCoding / aaAgentic / aaOmni) that
+// the AICoderMap composite intentionally excludes (to avoid double-counting
+// of their componentBenches). Shown as a small badge row + an agreement
+// indicator vs AICoderMap composite rank.
+function vendorPanelBlock(model) {
+  const presetName = State.activePresetName || 'balanced';
+  const vc = vendorComposites(model, presetName);
+  if (!vc.length) return null;
+  const block = el('div', { class: 'model-card-row vendor-panel' });
+  const label = el('span', { class: 'row-label' }, t('vendorPanel.title') || 'Vendor view');
+  block.appendChild(label);
+  const list = el('div', { class: 'vendor-badges' });
+  for (const v of vc) {
+    const badge = el('span', {
+      class: `vendor-badge${v.missing ? ' is-missing' : ''}`,
+      'data-tip': v.missing
+        ? `${v.label}: —`
+        : `${v.label}: ${v.raw} (raw) → ${(v.normalized ?? 0).toFixed(0)}/100 (norm)  •  ${v.publisher || ''}`,
+    });
+    badge.appendChild(el('span', { class: 'vendor-badge-label' }, v.labelShort || v.key));
+    badge.appendChild(el('span', { class: 'vendor-badge-value' },
+      v.missing ? '—' : (v.normalized ?? 0).toFixed(0)));
+    list.appendChild(badge);
+  }
+  block.appendChild(list);
+  // Agreement indicator — only meaningful for non-consensus presets that
+  // have a separate AICM composite to compare against.
+  if ((State.scoreFn || 'aicm') !== 'vendorConsensus') {
+    const agreement = crossValidationAgreement(model, State.models, State.weights, presetName);
+    if (agreement && agreement.flag) {
+      const dot = ({ 'consensus': '🟢', 'mild-disagreement': '🟡', 'controversy': '🔴' })[agreement.flag] || '';
+      const lbl = ({
+        'consensus': t('vendorPanel.consensus') || 'consensus',
+        'mild-disagreement': t('vendorPanel.mild') || 'mild gap',
+        'controversy': t('vendorPanel.controversy') || 'controversy',
+      })[agreement.flag];
+      const tip = `${t('vendorPanel.agreementTip') || 'AICM rank'} #${agreement.aicmRank} vs ${t('vendorPanel.consensusRank') || 'consensus rank'} #${agreement.consensusRank} (Δ${agreement.gap})`;
+      const ind = el('span', { class: `vendor-agreement is-${agreement.flag}`, 'data-tip': tip },
+        `${dot} ${lbl}`);
+      block.appendChild(ind);
+    }
+  }
+  return block;
+}
+
+// F1+F2 (2026-05-18): tiered missing-data badge. Surfaces "limited data"
+// (required bench missing) and "limited coverage" (≥2 critical benches
+// missing) under the current preset. Returns null when no tier issues.
+function limitedDataBadge(model) {
+  const presetName = State.activePresetName || 'balanced';
+  const tiers = presetTiersFor(model, presetName);
+  if (!tiers.isLimitedData && !tiers.isLimitedCoverage) return null;
+  const cls = tiers.isLimitedCoverage ? 'limited-coverage' : 'limited-data';
+  const lbl = tiers.isLimitedCoverage
+    ? (t('vendorPanel.limitedCoverage') || 'limited coverage')
+    : (t('vendorPanel.limitedData') || 'limited data');
+  const missing = [...tiers.missingCritical, ...tiers.missingRequired];
+  const tip = `${t('vendorPanel.missingTip') || 'missing benches'}: ${missing.join(', ')}`;
+  return el('span', { class: `bench-tier-badge is-${cls}`, 'data-tip': tip }, `⚠ ${lbl}`);
+}
+
 export function buildModelCard(model, rank) {
   model.__rank = rank;
-  const composite = compositeScore(model, State.weights);
+  // F1+F2 (2026-05-18): effectiveScore dispatches based on State.scoreFn.
+  // 'consensus' preset → vendorConsensusScore; otherwise → compositeScore.
+  const composite = effectiveScore(model, State.weights, State.activePresetName);
   const coverage = coverageOf(model, State.weights);
   const disputed = disputedCount(model, State.weights);
   const status = model.status || 'active';
@@ -408,10 +474,21 @@ export function buildModelCard(model, rank) {
   const main = el('div', { class: 'model-card-main' });
   main.appendChild(cardMeta(model, compat));
 
+  // F1+F2 (2026-05-18): limited-data / limited-coverage tier badge sits
+  // close to the top so users notice it before drilling into bench grid.
+  const limitedBadge = limitedDataBadge(model);
+  if (limitedBadge) main.appendChild(limitedBadge);
+
   const provBlock = pricingProvidersBlock(pricingView(model));
   if (provBlock) main.appendChild(provBlock);
 
   benchGridSection(model).forEach(n => main.appendChild(n));
+
+  // F1+F2: vendor composite + agreement panel — independent reference
+  // signals (NOT included in AICM composite). Surfaces below bench grid
+  // because it's secondary information.
+  const vendorPanel = vendorPanelBlock(model);
+  if (vendorPanel) main.appendChild(vendorPanel);
 
   const unsloth = unslothListBlock(model, compat);
   if (unsloth) main.appendChild(unsloth);

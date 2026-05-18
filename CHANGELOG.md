@@ -1,4 +1,33 @@
 
+## [2026-05-18] — refactor(composite): F1+F2 data-driven schema + atomic-only composite + vendor consensus
+
+### Added
+- `data/sources-whitelist.json _schema` gains 6 new blocks (single source of truth for what was previously hardcoded in `assets/js/core.js`):
+  - **`normalization`** — per-bench `[0, 100]` mapping (cfElo piecewise, webDevElo linear, aaOmni invert). New ELO/inverted bench keys = data PR only, no code change.
+  - **`confidence`** — `cellConfidence()` parameters (`verifDivisor`, contradiction penalties, `confidenceFloor`/`Ceiling`, `fallbackTrust`, `pseudoSources`).
+  - **`benchKind`** — explicit `atomic` (22 keys) vs `vendorComposite` (4 keys: `aaIdx`, `aaCoding`, `aaAgentic`, `aaOmni`) split.
+  - **`vendorComposites`** — metadata for each vendor aggregate (label, publisher, domain, `componentBenches`). Drives the new UI cross-validation panel.
+  - **`composite`** — policy (`coverageShrinkageExponent` configurable; `imputation` block scaffolded but `enabled=false` by default).
+  - **`presets`** — data-driven preset definitions (`atomicWeights` + `vendorCompositeView` + tiered `requiredBenches` / `criticalBenches` / `imputableBenches`). New **`consensus`** preset (kind=`vendorConsensus`) added alongside the 5 existing editorial presets.
+- `assets/js/core.js` accessor helpers: `getPresets()`, `getDefaultWeights()`, `getContradictionThresholds()`, `getBenchKind()`, `isAtomicBench()`, `isVendorComposite()`, `getVendorCompositeMeta()`, `getCompositePolicy()`, `getPresetTiers()`. All prefer schema, fall back to hardcoded literals — no behavior change when whitelist not fetched.
+- `assets/js/data.js` new functions: `effectiveScore()` (score dispatcher), `vendorComposites()`, `vendorConsensusScore()`, `crossValidationAgreement()`, `presetTiersFor()`.
+- UI: vendor composite badge row + agreement indicator (🟢 consensus / 🟡 mild / 🔴 controversy) + tiered "limited data" / "limited coverage" warning rozetler on every model card.
+
+### Changed
+- `compositeScore()` now skips vendor composite benches (atomic-only aggregation) — prevents double-counting their `componentBenches`. Vendor composites surface in the new cross-validation panel instead.
+- `coverageOf()` matches the new atomic-only contract.
+- `normalizeBenchScore()` consults `_schema.normalization[key]` first; hardcoded piecewise/linear/invert logic is now the fallback only.
+- `cellConfidence()` reads thresholds + pseudo-source set from `_schema.confidence` with literal fallback.
+- `contradictionFor()` + `disputedCount()` use `getContradictionThresholds()` (data-driven via `_schema.contracts.CONTRADICTION_WARN_PP/BLOCK_PP`).
+- `data.js:loadData()` now also fetches `sources-whitelist.json` (best-effort; 404 → fallback to all hardcoded values).
+- Preset selector in `index.html` gains the new "Vendor Consensus" option.
+- `applyPreset()` sets `State.scoreFn` based on preset kind so render layer dispatches to the right scoring path.
+
+### Methodology note (top-10 ranking will shift)
+Existing presets previously included vendor composites with non-zero weights (e.g., balanced had `aaCoding=4, aaAgentic=4, aaIdx=3, aaOmni=3` totaling 14 pts). Those weights are now zero in the data-driven schema; the same signal is shown separately in the vendor panel. Net: AICM composite scores drop slightly for models with strong vendor composite values, but ranking is more honest (no signal double-counting). Cross-validation panel surfaces agreement/disagreement with vendor consensus for every model.
+
+[build:after-0673f36]
+
 ## [2026-05-18] — autonomous refresh-all [WARN: very low cumulative provenance coverage 48.3%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 274 new fills; 32 cells auto-gapped by orchestrator; 355 explicit agent gaps preserved]
 
 [fillRatio:0.46 cells:445/960 contradictions:11 fetch:0.0min tools:None batches:None build:a98aee1]
