@@ -357,6 +357,50 @@ def main():
         warnings.append(msg)
     # MX5 is WARN-only.
 
+    # === MX6 — bench-specific strict verification per
+    # _schema.benchVerificationStrict (WARN). For each bench in the map, fail
+    # cells that don't meet the bench's minDistinctIndependentSources threshold
+    # against the listed knownIndependentDomains. ===
+    strict_rules = (whitelist.get("_schema") or {}).get("benchVerificationStrict") or {}
+    strict_violations: list[str] = []
+    for bench_key, rule in strict_rules.items():
+        if bench_key.startswith("_"):
+            continue
+        min_indep = int(rule.get("minDistinctIndependentSources") or 0)
+        known_domains = [d.lower() for d in rule.get("knownIndependentDomains") or []]
+        if not min_indep or not known_domains:
+            continue
+        for m in models:
+            v = (m.get("bench") or {}).get(bench_key)
+            if v is None:
+                continue
+            qbits = m.get("benchQuarantine") or {}
+            if qbits.get(bench_key) is True:
+                continue
+            entries = sources.get(f"{m['id']}.{bench_key}") or []
+            if not isinstance(entries, list):
+                continue
+            indep_domains = set()
+            for e in entries:
+                u = (e.get("url") or "").lower()
+                for d in known_domains:
+                    if d in u:
+                        indep_domains.add(d)
+                        break
+            if len(indep_domains) < min_indep:
+                strict_violations.append(
+                    f"{m['id']}.{bench_key} (independent={len(indep_domains)}/{min_indep})"
+                )
+    if strict_violations:
+        msg = (
+            f"MX6 — {len(strict_violations)} bench cell(s) violate "
+            f"_schema.benchVerificationStrict thresholds: "
+            f"{strict_violations[:5]}"
+            f"{' ...' if len(strict_violations) > 5 else ''}"
+        )
+        warnings.append(msg)
+    # MX6 is WARN-only; agent + manual review handle remediation.
+
     # === Report ===
     print(f"Audit summary  ({len(models)} models, {len(canonical_bench)} bench keys)")
     print(f"  bench keys:        {sorted(canonical_bench)}")

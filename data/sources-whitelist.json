@@ -1349,6 +1349,49 @@
           "mrcr"
         ]
       }
+    },
+    "benchVerificationStrict": {
+      "_purpose": "Per-bench stricter verification thresholds for cells that have historically attracted hallucinated provenance. Audit's MX6 rule and agent's per-cell verification both consult this map.",
+      "tau2": {
+        "minDistinctIndependentSources": 2,
+        "knownIndependentDomains": [
+          "github.com/sierra-research/tau2-bench",
+          "github.com/sierra-research/tau-bench",
+          "artificialanalysis.ai/evaluations/tau2-bench",
+          "taubench.com",
+          "llm-stats.com/benchmarks/tau-bench-retail",
+          "llm-stats.com/benchmarks/tau-bench-airline"
+        ],
+        "selfReportAllowedAs": "secondary-only",
+        "rationale": "tau2 scores require an actual leaderboard entry; vendor self-reports without a public leaderboard backing are quarantine candidates."
+      },
+      "swePro": {
+        "minDistinctIndependentSources": 1,
+        "preferredHarness": "scale.com/leaderboard/swe_bench_pro_public",
+        "alternateHarnesses": [
+          "swebench.com"
+        ],
+        "selfReportAllowedAs": "primary-with-scaffold-note",
+        "scaffoldNoteRequired": true,
+        "rationale": "Scale SEAL is the gold harness. Self-reports (mini-swe-agent / openhands / agentless) are acceptable but the scaffold MUST be in the source.note so cross-harness comparisons stay honest."
+      },
+      "lcb": {
+        "minDistinctIndependentSources": 2,
+        "knownIndependentDomains": [
+          "livecodebench.github.io",
+          "livecodebench.com",
+          "artificialanalysis.ai/evaluations/livecodebench"
+        ],
+        "rationale": "LCB has multiple versions (v5/v6); contradictions across versions are common and require ≥2 sources to disambiguate."
+      },
+      "cfElo": {
+        "minDistinctIndependentSources": 1,
+        "knownIndependentDomains": [
+          "codeforces.com",
+          "artificialanalysis.ai"
+        ],
+        "rationale": "Codeforces Elo is a raw score in the 1500-3500 range; only vendor-or-AA report. Single source acceptable but flagged."
+      }
     }
   },
   "vendors": {
