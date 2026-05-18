@@ -665,6 +665,66 @@ table#comparison-table .coverage-mini.cov-low { color: var(--warn-2, #e07320); b
 }
 .prov-link:hover { opacity: 1; }
 
+/* F6 (2026-05-18): model name → card anchor link + target highlight */
+.model-name-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+.model-name-link:hover { text-decoration: underline; }
+@keyframes card-flash {
+  0%   { box-shadow: 0 0 0 0 rgba(0,180,140,0.0), 0 0 0 0 rgba(0,180,140,0); background: var(--surface); }
+  20%  { box-shadow: 0 0 0 3px rgba(0,180,140,0.45); background: rgba(0,180,140,0.06); }
+  100% { box-shadow: 0 0 0 0 rgba(0,180,140,0); background: var(--surface); }
+}
+.model-card.is-target { animation: card-flash 1.6s ease-out; }
+
+/* F6 (2026-05-18): compact card overrides — denser spacing, smaller bench cells */
+.model-card-main {
+  gap: 6px !important;
+}
+.model-card-row {
+  padding: 4px 0 !important;
+}
+.bench-grid {
+  gap: 2px !important;
+}
+.bench-cell {
+  padding: 2px 6px !important;
+  font-size: 0.88em !important;
+}
+
+/* F6 (2026-05-18): vendor composite group — visually distinct from atomic score */
+.vendor-composite-group {
+  margin-top: var(--space-2);
+  padding: var(--space-2);
+  border-left: 3px solid var(--accent-2, #0a8);
+  background: rgba(0, 180, 180, 0.04);
+  border-radius: 0 6px 6px 0;
+}
+.vendor-group-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: 6px;
+}
+.vendor-group-title {
+  font-weight: 700;
+  font-size: 0.85em;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+}
+.vendor-group-tag {
+  font-size: 0.75em;
+  font-style: italic;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--surface-2, var(--surface));
+  color: var(--muted);
+  cursor: help;
+}
+
 /* F1+F2 (2026-05-18): vendor composite + cross-validation panel */
 .vendor-panel {
   display: flex;

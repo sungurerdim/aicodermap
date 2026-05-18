@@ -162,10 +162,7 @@
   },
   "pricing": {
     "blended": "BLENDED $/1M",
-    "blendedTip": "Blended price per 1M tokens assuming 3:1 input:output ratio. Formula: (in×3 + out) / 4.",
-    "baseline": "Compare prices to",
-    "baselineNone": "None (off)",
-    "baselineTip": "Show each model's blended price as a multiple of the selected baseline"
+    "blendedTip": "Blended price per 1M tokens assuming 3:1 input:output ratio. Formula: (in×3 + out) / 4."
   },
   "privacy": {
     "heading": "Privacy & Compliance",
@@ -563,6 +560,36 @@
       "short": "ProgramBench",
       "name": "ProgramBench",
       "desc": "Cleanroom program reconstruction — 200 tasks, 248K behavioral tests. The model is given documentation + a test harness and must build the entire codebase from scratch in a sandbox. arXiv:2605.03546 (Meta + Stanford + Harvard, 2026-05). No public model has fully resolved any task yet; useful as a frontier breakthrough tracker."
+    },
+    "llmStatsIdx": {
+      "name": "LLM-Stats Composite",
+      "short": "LLM-Stats",
+      "desc": "llm-stats.com TrueSkill-style composite across published benchmarks. Vendor aggregate — independent reference, not part of AICoderMap composite."
+    },
+    "vellumRank": {
+      "name": "Vellum Rank",
+      "short": "Vellum",
+      "desc": "Vellum LLM Leaderboard rank position (1=best). Normalized via inverse-rank. Vendor aggregate."
+    },
+    "benchlmIdx": {
+      "name": "BenchLM Composite",
+      "short": "BenchLM",
+      "desc": "BenchLM.ai composite score across many benchmarks. Vendor aggregate."
+    },
+    "lmArenaElo": {
+      "name": "LMArena Elo",
+      "short": "LMArena",
+      "desc": "LMArena head-to-head Elo rating (general chat). Normalized linear 1000-1500 → 0-100. Vendor aggregate."
+    },
+    "hfOpenAvg": {
+      "name": "HF Open LLM Avg",
+      "short": "HF Open",
+      "desc": "HuggingFace Open LLM Leaderboard average score. Open-weights models only. Vendor aggregate."
+    },
+    "kluRank": {
+      "name": "Klu Rank",
+      "short": "Klu",
+      "desc": "Klu.ai LLM leaderboard rank. Normalized via inverse-rank. Vendor aggregate."
     }
   },
   "benchCategories": {
@@ -604,6 +631,8 @@
     "consensusRank": "consensus rank",
     "limitedData": "limited data",
     "limitedCoverage": "limited coverage",
-    "missingTip": "missing benches"
+    "missingTip": "missing benches",
+    "notInScoreTag": "not in score",
+    "notInScore": "Independent reference — NOT part of AICoderMap composite score"
   }
 }

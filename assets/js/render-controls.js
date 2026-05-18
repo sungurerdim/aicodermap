@@ -157,47 +157,9 @@ export function populateProviderFilter() {
   }
 }
 
-// B3: Pricing baseline dropdown — compares every model's blended price to a
-// selected baseline model. Options: "none" (off) + one option per model sorted
-// cheapest first. Persists to localStorage under STORAGE.pricingBaseline.
-export function renderPricingBaselineDropdown(onChange) {
-  const wrap = document.getElementById('pricing-baseline-wrap');
-  if (!wrap) return;
-  const sel = document.getElementById('pricing-baseline');
-  if (!sel) return;
-
-  while (sel.options.length > 1) sel.remove(1);
-
-  const { pricingView: pv } = /** @type {any} */ (window.__acmData || {});
-  const modelsWithPrice = State.models
-    .filter(m => m.pricing?.api?.length)
-    .sort((a, b) => {
-      const ba = (a.pricing?.range?.in?.[0] ?? Infinity);
-      const bb = (b.pricing?.range?.in?.[0] ?? Infinity);
-      return ba - bb;
-    });
-
-  for (const m of modelsWithPrice) {
-    const opt = document.createElement('option');
-    opt.value = m.id;
-    const inP = m.pricing?.range?.in?.[0];
-    opt.textContent = `${m.name}${inP != null ? ` ($${inP}/1M in)` : ''}`;
-    sel.appendChild(opt);
-  }
-
-  const saved = readStorage(STORAGE.pricingBaseline, 'none');
-  if (saved && [...sel.options].some(o => o.value === saved)) sel.value = saved;
-
-  sel.addEventListener('change', () => {
-    writeStorage(STORAGE.pricingBaseline, sel.value);
-    if (typeof onChange === 'function') onChange();
-  });
-  wrap.hidden = false;
-}
-
-export function getPricingBaseline() {
-  return readStorage(STORAGE.pricingBaseline, 'none');
-}
+// F6 (2026-05-18): "Compare prices to" baseline dropdown removed — feature
+// only affected the table's blended-price column and was not discoverable.
+// Single price baseline (cheapest) is more honest + simpler UX.
 
 export function syncLangToggleUi() {
   document.querySelectorAll('.lang-toggle button[data-lang]').forEach((btn) => {

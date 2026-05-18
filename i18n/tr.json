@@ -162,10 +162,7 @@
   },
   "pricing": {
     "blended": "KARMA $/1M",
-    "blendedTip": "1M token başına karma fiyat (3:1 giriş:çıkış oranı varsayımı). Formül: (giriş×3 + çıkış) / 4.",
-    "baseline": "Fiyatı şununla karşılaştır",
-    "baselineNone": "Yok (kapalı)",
-    "baselineTip": "Her modelin karma fiyatını seçilen referans modele oran olarak göster"
+    "blendedTip": "1M token başına karma fiyat (3:1 giriş:çıkış oranı varsayımı). Formül: (giriş×3 + çıkış) / 4."
   },
   "privacy": {
     "heading": "Gizlilik ve Uyumluluk",
@@ -563,6 +560,36 @@
       "short": "ProgramBench",
       "name": "ProgramBench",
       "desc": "Cleanroom program reconstruction — 200 görev, 248K davranış testi. Modele dökümantasyon + test koşumu verilir, sandbox'ta tüm kod tabanını sıfırdan kurması beklenir. arXiv:2605.03546 (Meta + Stanford + Harvard, 2026-05). Bugün hiçbir kamu model %100 çözmüyor; frontier takip metriği."
+    },
+    "llmStatsIdx": {
+      "name": "LLM-Stats Composite",
+      "short": "LLM-Stats",
+      "desc": "llm-stats.com yayıncısının yayımlanmış benchmarklar üzerinden TrueSkill tarzı composite skoru. Vendor agregatı — bağımsız referans, AICoderMap composite'ine dahil değil."
+    },
+    "vellumRank": {
+      "name": "Vellum Sırası",
+      "short": "Vellum",
+      "desc": "Vellum LLM Leaderboard sıralaması (1=en iyi). Inverse-rank ile normalize edilir. Vendor agregatı."
+    },
+    "benchlmIdx": {
+      "name": "BenchLM Composite",
+      "short": "BenchLM",
+      "desc": "BenchLM.ai çoklu benchmark composite skoru. Vendor agregatı."
+    },
+    "lmArenaElo": {
+      "name": "LMArena Elo",
+      "short": "LMArena",
+      "desc": "LMArena baş-başa karşılaştırma Elo skoru (genel sohbet). 1000-1500 → 0-100 lineer normalize. Vendor agregatı."
+    },
+    "hfOpenAvg": {
+      "name": "HF Open LLM Ort.",
+      "short": "HF Open",
+      "desc": "HuggingFace Open LLM Leaderboard ortalama skoru. Yalnız açık ağırlık modeller. Vendor agregatı."
+    },
+    "kluRank": {
+      "name": "Klu Sırası",
+      "short": "Klu",
+      "desc": "Klu.ai LLM leaderboard sıralaması. Inverse-rank ile normalize edilir. Vendor agregatı."
     }
   },
   "benchCategories": {
@@ -604,6 +631,8 @@
     "consensusRank": "konsensüs sıra",
     "limitedData": "sınırlı veri",
     "limitedCoverage": "sınırlı kapsam",
-    "missingTip": "eksik benchler"
+    "missingTip": "eksik benchler",
+    "notInScoreTag": "skorda değil",
+    "notInScore": "Bağımsız referans — AICoderMap composite skoruna dahil DEĞİL"
   }
 }

@@ -394,9 +394,14 @@ function vendorPanelBlock(model) {
   const presetName = State.activePresetName || 'balanced';
   const vc = vendorComposites(model, presetName);
   if (!vc.length) return null;
-  const block = el('div', { class: 'model-card-row vendor-panel' });
-  const label = el('span', { class: 'row-label' }, t('vendorPanel.title') || 'Vendor view');
-  block.appendChild(label);
+  // F6 (2026-05-18): wrapped in a visually distinct group with header label,
+  // explicit border + background so users see this is NOT part of AICM score.
+  const block = el('section', { class: 'vendor-composite-group', 'data-group': 'vendor' });
+  const header = el('div', { class: 'vendor-group-header' });
+  header.appendChild(el('span', { class: 'vendor-group-title' }, t('vendorPanel.title') || 'Vendor view'));
+  header.appendChild(el('span', { class: 'vendor-group-tag', 'data-tip': t('vendorPanel.notInScore') || 'Independent reference — NOT part of AICoderMap composite score' },
+    t('vendorPanel.notInScoreTag') || 'not in score'));
+  block.appendChild(header);
   const list = el('div', { class: 'vendor-badges' });
   for (const v of vc) {
     const badge = el('span', {
@@ -458,6 +463,7 @@ export function buildModelCard(model, rank) {
   const statusClass = status === 'active' ? '' : ` is-${status}`;
   const card = el('article', {
     class: `model-card${statusClass}`,
+    id: `card-${model.id}`,
     dataset: { modelId: model.id, tier: model.tier, status },
     'data-export-section': `model-${model.id}`,
     'aria-label': model.name,

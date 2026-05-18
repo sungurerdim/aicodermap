@@ -84,7 +84,13 @@
         "id": "general",
         "keys": [
           "aaIdx",
-          "aaOmni"
+          "aaOmni",
+          "llmStatsIdx",
+          "vellumRank",
+          "benchlmIdx",
+          "lmArenaElo",
+          "hfOpenAvg",
+          "kluRank"
         ]
       }
     ],
@@ -798,7 +804,13 @@
       "mrcr",
       "tau3",
       "aaOmni",
-      "programBench"
+      "programBench",
+      "llmStatsIdx",
+      "vellumRank",
+      "benchlmIdx",
+      "lmArenaElo",
+      "hfOpenAvg",
+      "kluRank"
     ],
     "_deprecatedBenchKeysNote": "FAZ 5.B/C 2026-05-09 split bench universe from 26 → 10 core keys. These 16 legacy keys still hold values in data/models.json (preserved for historical accuracy) but are no longer refreshed by gather agents and not surfaced in priorityCells. Audit accepts them as 'deprecated' rather than 'unknown'. Front-end may render them in a 'historical' section or hide entirely.",
     "normalization": {
@@ -833,6 +845,25 @@
         "max": 100,
         "_formula": "max(0, min(100, max - value))",
         "_note": "AA Omniscience: lower is better; inverted so higher composite = better"
+      },
+      "lmArenaElo": {
+        "type": "linear",
+        "origin": 1000,
+        "divisor": 5.0,
+        "clampMin": 0,
+        "clampMax": 100,
+        "_note": "LMArena Elo ~1000-1500 → 0-100"
+      },
+      "vellumRank": {
+        "type": "inverse-rank",
+        "topN": 50,
+        "_formula": "max(0, 100 * (topN - rank + 1) / topN)",
+        "_note": "Rank 1 = 100, rank topN = 2, rank>topN = 0"
+      },
+      "kluRank": {
+        "type": "inverse-rank",
+        "topN": 50,
+        "_formula": "max(0, 100 * (topN - rank + 1) / topN)"
       }
     },
     "confidence": {
@@ -884,7 +915,13 @@
         "aaIdx",
         "aaCoding",
         "aaAgentic",
-        "aaOmni"
+        "aaOmni",
+        "llmStatsIdx",
+        "vellumRank",
+        "benchlmIdx",
+        "lmArenaElo",
+        "hfOpenAvg",
+        "kluRank"
       ]
     },
     "vendorComposites": {
@@ -946,6 +983,86 @@
           "simpleQa",
           "mrcr"
         ]
+      },
+      "llmStatsIdx": {
+        "label": "LLM-Stats Composite",
+        "labelShort": "LLM-Stats",
+        "publisher": "llm-stats.com",
+        "publisherUrl": "https://llm-stats.com",
+        "domain": "general",
+        "scale": "0-100",
+        "componentBenches": [
+          "sweV",
+          "gpqa",
+          "hle",
+          "lcb",
+          "aime26"
+        ],
+        "_note": "TrueSkill-style composite across published benches"
+      },
+      "vellumRank": {
+        "label": "Vellum Rank",
+        "labelShort": "Vellum",
+        "publisher": "vellum.ai",
+        "publisherUrl": "https://www.vellum.ai/llm-leaderboard",
+        "domain": "general",
+        "scale": "rank (1=best); normalized via inverse-rank to 0-100",
+        "scaleKind": "rank",
+        "componentBenches": [
+          "sweV",
+          "gpqa",
+          "aime26",
+          "hle"
+        ]
+      },
+      "benchlmIdx": {
+        "label": "BenchLM Composite",
+        "labelShort": "BenchLM",
+        "publisher": "benchlm.ai",
+        "publisherUrl": "https://benchlm.ai",
+        "domain": "general",
+        "scale": "0-100",
+        "componentBenches": [
+          "swePro",
+          "sweV",
+          "tb2",
+          "lcb",
+          "tau2",
+          "gpqa"
+        ]
+      },
+      "lmArenaElo": {
+        "label": "LMArena Elo",
+        "labelShort": "LMArena",
+        "publisher": "lmarena.ai",
+        "publisherUrl": "https://lmarena.ai",
+        "domain": "general",
+        "scale": "Elo ~1000-1500 → normalized 0-100",
+        "scaleKind": "elo",
+        "componentBenches": []
+      },
+      "hfOpenAvg": {
+        "label": "HF Open LLM Avg",
+        "labelShort": "HF Open",
+        "publisher": "huggingface.co",
+        "publisherUrl": "https://huggingface.co/spaces/HuggingFaceH4/open_llm_leaderboard",
+        "domain": "general",
+        "scale": "0-100",
+        "componentBenches": [
+          "mmluPro",
+          "gpqa",
+          "aime26"
+        ]
+      },
+      "kluRank": {
+        "label": "Klu.ai Rank",
+        "labelShort": "Klu",
+        "publisher": "klu.ai",
+        "publisherUrl": "https://klu.ai/llm-leaderboard",
+        "domain": "general",
+        "scale": "rank (1=best); normalized via inverse-rank to 0-100",
+        "scaleKind": "rank",
+        "componentBenches": []
       }
     },
     "composite": {
@@ -980,12 +1097,19 @@
           "tr": "Vendor Konsensüsü",
           "en": "Vendor Consensus"
         },
-        "description": "Median rank across vendor composites. Honest default: we don't reweight what AA / LLM-Stats / Vellum already aggregated; we show their consensus + flag disagreements.",
+        "description": "Mean rank across all 10 vendor composites (AA family + LLM-Stats + Vellum + BenchLM + LMArena + HuggingFace + Klu). Coverage-penalized: a model with only 1 of 10 vendor composites cannot outrank a model with 5.",
         "kind": "vendorConsensus",
         "vendorCompositeView": [
           "aaIdx",
           "aaCoding",
-          "aaAgentic"
+          "aaAgentic",
+          "aaOmni",
+          "llmStatsIdx",
+          "vellumRank",
+          "benchlmIdx",
+          "lmArenaElo",
+          "hfOpenAvg",
+          "kluRank"
         ],
         "atomicWeights": {}
       },
@@ -997,28 +1121,31 @@
         "description": "Coding-leaning portfolio across SWE coding + multi-turn agentic + reasoning frontier.",
         "kind": "atomicComposite",
         "atomicWeights": {
-          "swePro": 14,
-          "tb2": 11,
-          "lcb": 8,
-          "hle": 8,
-          "tau2": 6,
-          "mcpA": 5,
-          "sweMulti": 5,
-          "arcAgi2": 5,
-          "tbHard": 4,
-          "cfElo": 4,
-          "sweV": 4,
+          "swePro": 17,
+          "tb2": 13,
+          "lcb": 9,
+          "hle": 9,
+          "tau2": 7,
+          "mcpA": 6,
+          "sweMulti": 6,
+          "arcAgi2": 6,
+          "tbHard": 5,
+          "cfElo": 5,
+          "sweV": 5,
           "gpqa": 3,
           "aime26": 3,
           "browseComp": 3,
           "bfcl": 3
         },
-        "_atomicNote": "Sums to 86 (down from 100 in hardcoded PRESETS). The 14 missing points were vendor composites (aaCoding=4, aaAgentic=4, aaIdx=3, aaOmni=3); they now surface in vendorCompositeView panel, not in score.",
+        "_atomicNote": "Rebalanced 2026-05-18 to sum to 100. Atomic-only (vendor composites moved to vendorCompositeView).",
         "vendorCompositeView": [
           "aaIdx",
           "aaCoding",
           "aaAgentic",
-          "aaOmni"
+          "aaOmni",
+          "llmStatsIdx",
+          "benchlmIdx",
+          "lmArenaElo"
         ],
         "requiredBenches": [
           "swePro",
@@ -1046,9 +1173,9 @@
         "description": "Anchored on SWE-bench Pro + Terminal-Bench 2 + LiveCodeBench (contamination-resistant + agentic-coding + time-windowed code gen).",
         "kind": "atomicComposite",
         "atomicWeights": {
-          "swePro": 28,
-          "tb2": 14,
-          "lcb": 11,
+          "swePro": 31,
+          "tb2": 15,
+          "lcb": 12,
           "sweMulti": 9,
           "tbHard": 7,
           "sweV": 6,
@@ -1057,10 +1184,12 @@
           "webDevElo": 4,
           "programBench": 4
         },
-        "_atomicNote": "Sums to 95 (down from 100); 5 pts was aaCoding which moved to vendorCompositeView.",
+        "_atomicNote": "Rebalanced 2026-05-18 to sum to 100. Atomic-only (vendor composites moved to vendorCompositeView).",
         "vendorCompositeView": [
           "aaCoding",
-          "aaAgentic"
+          "aaAgentic",
+          "benchlmIdx",
+          "llmStatsIdx"
         ],
         "requiredBenches": [
           "swePro",
@@ -1086,21 +1215,23 @@
         "description": "Weights τ²-Bench (multi-turn reliability) + Terminal-Bench 2 + MCP-Atlas + BFCL + browseComp.",
         "kind": "atomicComposite",
         "atomicWeights": {
-          "tau2": 18,
-          "tb2": 16,
-          "mcpA": 13,
-          "bfcl": 8,
-          "browseComp": 8,
-          "swePro": 7,
-          "tbHard": 7,
-          "tau3": 6,
+          "tau2": 19,
+          "tb2": 18,
+          "mcpA": 14,
+          "bfcl": 9,
+          "browseComp": 9,
+          "swePro": 8,
+          "tbHard": 8,
+          "tau3": 7,
           "lcb": 4,
           "nl2Repo": 4
         },
-        "_atomicNote": "Sums to 91 (down from 100); 9 pts was aaAgentic which moved to vendorCompositeView.",
+        "_atomicNote": "Rebalanced 2026-05-18 to sum to 100. Atomic-only (vendor composites moved to vendorCompositeView).",
         "vendorCompositeView": [
           "aaAgentic",
-          "aaIdx"
+          "aaIdx",
+          "benchlmIdx",
+          "llmStatsIdx"
         ],
         "requiredBenches": [
           "tau2",
@@ -1126,20 +1257,23 @@
         "description": "Anchored on HLE (frontier ~50% with tools) + ARC-AGI-2 (still discriminates).",
         "kind": "atomicComposite",
         "atomicWeights": {
-          "hle": 22,
-          "arcAgi2": 17,
-          "gpqa": 12,
-          "aime26": 10,
-          "mmluPro": 7,
-          "mrcr": 5,
-          "simpleQa": 4,
-          "swePro": 4,
-          "lcb": 4
+          "hle": 25,
+          "arcAgi2": 20,
+          "gpqa": 14,
+          "aime26": 12,
+          "mmluPro": 8,
+          "mrcr": 6,
+          "simpleQa": 5,
+          "swePro": 5,
+          "lcb": 5
         },
-        "_atomicNote": "Sums to 85 (down from 100); 15 pts were aaOmni=9 + aaIdx=6 which moved to vendorCompositeView.",
+        "_atomicNote": "Rebalanced 2026-05-18 to sum to 100. Atomic-only (vendor composites moved to vendorCompositeView).",
         "vendorCompositeView": [
           "aaIdx",
-          "aaOmni"
+          "aaOmni",
+          "hfOpenAvg",
+          "vellumRank",
+          "kluRank"
         ],
         "requiredBenches": [
           "hle",
@@ -1164,18 +1298,18 @@
         "description": "Spread weight across every atomic bench key for the raw scientific surface.",
         "kind": "atomicComposite",
         "atomicWeights": {
-          "swePro": 11,
-          "tb2": 9,
-          "hle": 8,
-          "arcAgi2": 7,
-          "tau2": 6,
-          "lcb": 6,
-          "mcpA": 5,
-          "sweMulti": 4,
-          "gpqa": 4,
-          "aime26": 4,
+          "swePro": 13,
+          "tb2": 10,
+          "hle": 9,
+          "arcAgi2": 8,
+          "tau2": 7,
+          "lcb": 7,
+          "mcpA": 6,
+          "sweMulti": 5,
+          "gpqa": 5,
+          "aime26": 5,
           "tbHard": 3,
-          "cfElo": 4,
+          "cfElo": 5,
           "mmluPro": 3,
           "webDevElo": 3,
           "nl2Repo": 2,
@@ -1187,12 +1321,18 @@
           "sweV": 1,
           "tau3": 0
         },
-        "_atomicNote": "Sums to 88 (down from 100); 12 pts were aaCoding=3 + aaAgentic=3 + aaIdx=4 + aaOmni=2 which moved to vendorCompositeView.",
+        "_atomicNote": "Rebalanced 2026-05-18 to sum to 100. Atomic-only (vendor composites moved to vendorCompositeView).",
         "vendorCompositeView": [
           "aaIdx",
           "aaCoding",
           "aaAgentic",
-          "aaOmni"
+          "aaOmni",
+          "llmStatsIdx",
+          "vellumRank",
+          "benchlmIdx",
+          "lmArenaElo",
+          "hfOpenAvg",
+          "kluRank"
         ],
         "requiredBenches": [],
         "criticalBenches": [
@@ -1855,7 +1995,8 @@
         "mmluPro",
         "simpleQa",
         "arcAgi2",
-        "browseComp"
+        "browseComp",
+        "vellumRank"
       ]
     },
     {
@@ -1893,7 +2034,8 @@
         "mmluPro",
         "simpleQa",
         "arcAgi2",
-        "browseComp"
+        "browseComp",
+        "llmStatsIdx"
       ],
       "phase": "leaderboard"
     },
@@ -1916,7 +2058,8 @@
       ],
       "format_lastVerified": "2026-04-29",
       "publishes": [
-        "webDevElo"
+        "webDevElo",
+        "lmArenaElo"
       ],
       "phase": "leaderboard"
     },
@@ -2089,7 +2232,8 @@
         "gpqa",
         "sweV",
         "hle",
-        "mmluPro"
+        "mmluPro",
+        "kluRank"
       ],
       "phase": "leaderboard"
     },
@@ -2193,7 +2337,8 @@
         "arcAgi2",
         "browseComp",
         "tau3",
-        "nl2Repo"
+        "nl2Repo",
+        "benchlmIdx"
       ],
       "phase": "leaderboard"
     },
@@ -2445,7 +2590,8 @@
       "tier": "I",
       "format": "static_html_table",
       "publishes": [
-        "programBench"
+        "programBench",
+        "benchlmIdx"
       ],
       "authority": "aggregator tracking ProgramBench publication state across 9+ models",
       "firstSeen": "2026-05-06",
@@ -2554,7 +2700,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": []
     },
     {
       "name": "Together AI",
@@ -2574,7 +2721,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": []
     },
     {
       "name": "Fireworks AI",
@@ -2594,7 +2742,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": []
     },
     {
       "name": "DeepInfra",
@@ -2614,7 +2763,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": []
     },
     {
       "name": "Groq",
@@ -2634,7 +2784,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "publishes": []
     },
     {
       "name": "Groq pricing",
@@ -2653,7 +2804,8 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "phase": "pricing"
+      "phase": "pricing",
+      "publishes": []
     },
     {
       "name": "Cerebras",
@@ -2673,7 +2825,8 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "phase": "pricing"
+      "phase": "pricing",
+      "publishes": []
     },
     {
       "name": "Cerebras inference",
@@ -2692,7 +2845,8 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "phase": "pricing"
+      "phase": "pricing",
+      "publishes": []
     },
     {
       "name": "SambaNova Cloud",
@@ -2712,7 +2866,8 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "phase": "pricing"
+      "phase": "pricing",
+      "publishes": []
     },
     {
       "name": "Replicate",
@@ -2732,7 +2887,8 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "phase": "pricing"
+      "phase": "pricing",
+      "publishes": []
     },
     {
       "name": "Lepton AI",
@@ -2752,7 +2908,8 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "phase": "pricing"
+      "phase": "pricing",
+      "publishes": []
     },
     {
       "name": "Novita AI",
@@ -2772,7 +2929,8 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "phase": "pricing"
+      "phase": "pricing",
+      "publishes": []
     },
     {
       "name": "SiliconFlow",
@@ -2792,7 +2950,8 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "phase": "pricing"
+      "phase": "pricing",
+      "publishes": []
     },
     {
       "name": "Anyscale",
@@ -2812,7 +2971,8 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "phase": "pricing"
+      "phase": "pricing",
+      "publishes": []
     },
     {
       "name": "Cloudflare Workers AI",
@@ -2832,7 +2992,8 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "phase": "pricing"
+      "phase": "pricing",
+      "publishes": []
     },
     {
       "name": "AWS Bedrock",
@@ -2852,7 +3013,8 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "phase": "pricing"
+      "phase": "pricing",
+      "publishes": []
     },
     {
       "name": "Azure AI Foundry",
@@ -2872,7 +3034,8 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "phase": "pricing"
+      "phase": "pricing",
+      "publishes": []
     },
     {
       "name": "HuggingFace Inference Endpoints",
@@ -2892,7 +3055,10 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "phase": "pricing"
+      "phase": "pricing",
+      "publishes": [
+        "hfOpenAvg"
+      ]
     },
     {
       "name": "OpenCode Zen",
@@ -2912,7 +3078,8 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "phase": "pricing"
+      "phase": "pricing",
+      "publishes": []
     },
     {
       "name": "OpenCode Go",
@@ -2931,7 +3098,8 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "phase": "pricing"
+      "phase": "pricing",
+      "publishes": []
     },
     {
       "name": "Lambda Cloud",
@@ -2951,7 +3119,8 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "phase": "pricing"
+      "phase": "pricing",
+      "publishes": []
     },
     {
       "name": "Tensorix",
@@ -2971,7 +3140,8 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "phase": "pricing"
+      "phase": "pricing",
+      "publishes": []
     },
     {
       "name": "benchlm.ai",
@@ -2986,7 +3156,10 @@
         "llama-4-maverick.gpqa",
         "deepseek-v3-2.gpqa"
       ],
-      "phase": "discovery"
+      "phase": "discovery",
+      "publishes": [
+        "benchlmIdx"
+      ]
     }
   ],
   "local": [

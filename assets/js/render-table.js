@@ -24,7 +24,28 @@ function staticColumns() {
       render: (_m, ctx) => String(ctx.index + 1), cls: 'col-rank' },
     { key: 'name', i18n: 'ui.table.name', sortable: true, sticky: true,
       get: (m) => m.name.toLowerCase(),
-      render: (m) => m.name },
+      render: (m) => {
+        // F6 (2026-05-18): name → card anchor link. Clicking jumps to the
+        // model card in #models grid + adds a brief :target highlight.
+        const a = document.createElement('a');
+        a.href = `#card-${m.id}`;
+        a.className = 'model-name-link';
+        a.textContent = m.name;
+        a.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          const target = document.getElementById(`card-${m.id}`);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            target.classList.remove('is-target');
+            // restart animation
+            // eslint-disable-next-line no-void
+            void target.offsetWidth;
+            target.classList.add('is-target');
+            setTimeout(() => target.classList.remove('is-target'), 1800);
+          }
+        });
+        return a;
+      } },
     { key: 'provider', i18n: 'ui.table.provider', sortable: true,
       get: (m) => (m.provider || '').toLowerCase(),
       render: (m) => m.provider || '—' },
@@ -112,25 +133,6 @@ function tailColumns() {
       render: (m) => {
         const b = pricingView(m).blended;
         if (b == null) return '—';
-        const baselineId = readStorage('aicm.pricingBaseline', 'none');
-        if (baselineId && baselineId !== 'none') {
-          const base = State.models.find(bm => bm.id === baselineId);
-          const baseBlended = base ? pricingView(base).blended : null;
-          if (baseBlended && baseBlended > 0) {
-            const ratio = b / baseBlended;
-            const ratioText = ratio.toFixed(2) + '×';
-            const frag = document.createDocumentFragment();
-            const priceSpan = document.createElement('span');
-            priceSpan.textContent = `$${b.toFixed(2)}`;
-            frag.appendChild(priceSpan);
-            const ratioSpan = document.createElement('span');
-            ratioSpan.className = `price-ratio ${ratio < 1 ? 'cheaper' : ratio > 1 ? 'pricier' : 'same'}`;
-            ratioSpan.textContent = ` ${ratioText}`;
-            ratioSpan.title = `vs ${base.name}`;
-            frag.appendChild(ratioSpan);
-            return frag;
-          }
-        }
         return `$${b.toFixed(2)}`;
       } },
     { key: 'vram', i18n: 'ui.table.vram', sortable: true, num: true,
