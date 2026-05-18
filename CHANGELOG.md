@@ -1,4 +1,34 @@
 
+## [2026-05-18] — autonomous refresh-all [WARN: very low cumulative provenance coverage 47.6%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 214 new fills; 377 cells auto-gapped by orchestrator; 6 explicit agent gaps preserved]
+
+[fillRatio:0.47 cells:452/960 contradictions:12 fetch:0.0min tools:None batches:None build:8a1e0a0]
+
+### Updated
+- 34 models: `opus-4-7`, `sonnet-4-6`, `claude-haiku-4-5`, `deepseek-v3-2`, `gemini-3-1-flash`, `gemini-3-1-pro`, `gemma-3-27b`, `gemma-4-26b-moe`, `gemma-4-31b`, `gemma-4-e4b`, `minimax-m2-5`, `mistral-large-3`, `devstral-2`, `codestral-22b`, `devstral-small-2`, `gpt-4-1`, `o3`, `o4-mini`, `qwen-3-6-27b`, `qwen-3-6-max`, `qwen3-6-35b-moe`, `qwen3-6-plus`, `qwen3-coder-30b`, `qwen3-coder-480b`, `qwen3-coder-next`, `qwen25-coder-32b`, `qwen3-5-9b`, `grok-3`, `grok-3-mini`, `grok-4-20`, `grok-4-1-fast`, `glm-4-7`, `glm-4-5-air`, `nemotron-3-super`
+
+### Resolved (auto via trustScore)
+- qwen-3-6-27b.gpqa: winner={'value': 87.8, 'trustScore': 1.0, 'sourceUrl': 'https://llm-stats.com', 'tier': 'I'} (severity=RED, Δ15.4)
+- qwen3-coder-480b.sweV: winner={'value': 66.5, 'trustScore': 0.7, 'sourceUrl': 'https://qwenlm.github.io/blog/qwen3-coder', 'tier': 'S'} (severity=RED, Δ16.5)
+- qwen3-coder-480b.swePro: winner={'value': 38.7, 'trustScore': 1.0, 'sourceUrl': 'https://scale.com/leaderboard', 'tier': 'I'} (severity=RED, Δ27.3)
+- devstral-2.aaIdx: winner={'value': 22.0, 'trustScore': 1.0, 'sourceUrl': 'https://artificialanalysis.ai/models/devstral-2', 'tier': 'I'} (severity=RED, Δ40.1)
+- qwen25-coder-32b.sweV: winner={'value': 38.0, 'trustScore': 1.0, 'sourceUrl': 'https://arxiv.org/abs/2501.12599', 'tier': 'I'} (severity=RED, Δ31.6)
+- minimax-m2-5.tb2: winner={'value': 52.0, 'trustScore': 1.0, 'sourceUrl': 'https://terminal-bench.com', 'tier': 'I'} (severity=RED, Δ5.0)
+- glm-4-7.tau2: winner={'value': 84.7, 'trustScore': 0.7, 'sourceUrl': 'https://zhipuai.cn/news/glm-4-7', 'tier': 'S'} (severity=YELLOW, Δ2.7)
+- nemotron-3-super.gpqa: winner={'value': 82.7, 'trustScore': 1.0, 'sourceUrl': 'https://llm-stats.com', 'tier': 'I'} (severity=YELLOW, Δ3.47)
+- deepseek-v4-flash.gpqa: winner={'value': 89.4, 'trustScore': 1.0, 'sourceUrl': 'https://llm-stats.com', 'tier': 'I'} (severity=GREEN, Δ1.3)
+- grok-3.gpqa: winner={'value': 84.0, 'trustScore': 0.7, 'sourceUrl': 'https://x.ai/news/grok-3', 'tier': 'S'} (severity=GREEN, Δ0.6)
+- mimo-v2-flash.gpqa: winner={'value': 84.3, 'trustScore': 1.0, 'sourceUrl': 'https://llm-stats.com', 'tier': 'I'} (severity=GREEN, Δ0.6)
+- llama-4-maverick.sweV: winner={'value': 76.8, 'trustScore': 1.0, 'sourceUrl': 'https://swebench.com', 'tier': 'I'} (severity=YELLOW, Δ2.6)
+
+### Gaps (380 entries — agent:3 orchestrator:377 — see data/known-gaps.json or next refresh)
+- `grok-3.swePro` *(agent)*: No SWE-bench Pro result found for Grok 3
+- `grok-3.tb2` *(agent)*: No Terminal-Bench 2 result found for Grok 3
+- `deepseek-v3-2.aider` *(agent)*: Aider Polyglot leaderboard frozen 2025-08; no 2026 entries
+- `claude-haiku-4-5.aaAgentic` *(orchestrator)*: not reached in agent survey cycle; AA Agentic data unavailable
+- `claude-haiku-4-5.aaCoding` *(orchestrator)*: not reached in agent survey cycle; AA Coding data unavailable
+- ... and 375 more
+
+
 ## [2026-05-18] — refactor(composite): F1+F2 data-driven schema + atomic-only composite + vendor consensus
 
 ### Added

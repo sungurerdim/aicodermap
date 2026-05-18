@@ -7,17 +7,17 @@
     "ai.google.dev": {
       "byBench": {
         "gpqa": {
-          "agree": 2.0,
+          "agree": 4.0,
           "disagree": 2.0,
-          "rawAgree": 2,
+          "rawAgree": 4,
           "rawDisagree": 2
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 2.0,
+        "agree": 4.0,
         "disagree": 2.0,
-        "rawAgree": 2,
+        "rawAgree": 4,
         "rawDisagree": 2
       },
       "lastSeen": "2026-05-18"
@@ -40,12 +40,36 @@
       },
       "lastSeen": "2026-05-18"
     },
+    "almcorp.com": {
+      "byBench": {
+        "tb2": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
     "anthropic.com": {
       "byBench": {
-        "gpqa": {
-          "agree": 6.0,
+        "aime26": {
+          "agree": 2.0,
           "disagree": 0.0,
-          "rawAgree": 6,
+          "rawAgree": 2,
+          "rawDisagree": 0
+        },
+        "gpqa": {
+          "agree": 11.0,
+          "disagree": 0.0,
+          "rawAgree": 11,
           "rawDisagree": 0
         },
         "hle": {
@@ -54,24 +78,48 @@
           "rawAgree": 8,
           "rawDisagree": 0
         },
-        "swePro": {
-          "agree": 6.0,
+        "mcpA": {
+          "agree": 1.0,
           "disagree": 0.0,
-          "rawAgree": 6,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "swePro": {
+          "agree": 12.0,
+          "disagree": 0.0,
+          "rawAgree": 12,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 5.0,
+          "agree": 8.0,
           "disagree": 0.0,
-          "rawAgree": 5,
+          "rawAgree": 8,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 25.0,
+        "agree": 42.0,
         "disagree": 0.0,
-        "rawAgree": 25,
+        "rawAgree": 42,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "api-docs.deepseek.com": {
+      "byBench": {
+        "gpqa": {
+          "agree": 3.0,
+          "disagree": 0.0,
+          "rawAgree": 3,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 3.0,
+        "disagree": 0.0,
+        "rawAgree": 3,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
@@ -97,9 +145,9 @@
     "artificialanalysis.ai": {
       "byBench": {
         "aaIdx": {
-          "agree": 4.0,
+          "agree": 16.0,
           "disagree": 0.0,
-          "rawAgree": 4,
+          "rawAgree": 16,
           "rawDisagree": 0
         },
         "aaOmni": {
@@ -108,28 +156,34 @@
           "rawAgree": 0,
           "rawDisagree": 2
         },
-        "gpqa": {
-          "agree": 31.0,
+        "cfElo": {
+          "agree": 1.0,
           "disagree": 0.0,
-          "rawAgree": 31,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "gpqa": {
+          "agree": 42.0,
+          "disagree": 0.0,
+          "rawAgree": 42,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 1.0,
+          "agree": 8.0,
           "disagree": 0.0,
-          "rawAgree": 1,
+          "rawAgree": 8,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 5.0,
+          "agree": 13.0,
           "disagree": 0.0,
-          "rawAgree": 5,
+          "rawAgree": 13,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 1.0,
+          "agree": 7.0,
           "disagree": 0.0,
-          "rawAgree": 1,
+          "rawAgree": 7,
           "rawDisagree": 0
         },
         "swePro": {
@@ -139,9 +193,9 @@
           "rawDisagree": 2
         },
         "sweV": {
-          "agree": 12.0,
+          "agree": 19.0,
           "disagree": 0.0,
-          "rawAgree": 12,
+          "rawAgree": 19,
           "rawDisagree": 0
         },
         "tau2": {
@@ -153,22 +207,52 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 56.0,
+        "agree": 108.0,
         "disagree": 4.0,
-        "rawAgree": 56,
+        "rawAgree": 108,
         "rawDisagree": 4
       },
       "lastSeen": "2026-05-18"
     },
     "arxiv.org": {
       "byBench": {
-        "gpqa": {
+        "aime26": {
           "agree": 1.0,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
+        "gpqa": {
+          "agree": 6.0,
+          "disagree": 0.0,
+          "rawAgree": 6,
+          "rawDisagree": 0
+        },
+        "hle": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        },
         "lcb": {
+          "agree": 3.0,
+          "disagree": 0.0,
+          "rawAgree": 3,
+          "rawDisagree": 0
+        },
+        "sweV": {
+          "agree": 3.0,
+          "disagree": 0.0,
+          "rawAgree": 3,
+          "rawDisagree": 0
+        },
+        "tau2": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "tb2": {
           "agree": 1.0,
           "disagree": 0.0,
           "rawAgree": 1,
@@ -177,9 +261,9 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 2.0,
+        "agree": 19.0,
         "disagree": 0.0,
-        "rawAgree": 2,
+        "rawAgree": 19,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
@@ -187,17 +271,17 @@
     "assets.anthropic.com": {
       "byBench": {
         "tb2": {
-          "agree": 5.0,
+          "agree": 8.0,
           "disagree": 0.0,
-          "rawAgree": 5,
+          "rawAgree": 8,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 5.0,
+        "agree": 8.0,
         "disagree": 0.0,
-        "rawAgree": 5,
+        "rawAgree": 8,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
@@ -205,6 +289,24 @@
     "aurigait.com": {
       "byBench": {
         "mmluPro": {
+          "agree": 7.0,
+          "disagree": 0.0,
+          "rawAgree": 7,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 7.0,
+        "disagree": 0.0,
+        "rawAgree": 7,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "automatio.ai": {
+      "byBench": {
+        "tb2": {
           "agree": 1.0,
           "disagree": 0.0,
           "rawAgree": 1,
@@ -222,6 +324,12 @@
     },
     "benchlm.ai": {
       "byBench": {
+        "aaIdx": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
         "aaOmni": {
           "agree": 2.0,
           "disagree": 0.0,
@@ -229,39 +337,39 @@
           "rawDisagree": 0
         },
         "aime26": {
-          "agree": 1.0,
+          "agree": 4.0,
           "disagree": 0.0,
-          "rawAgree": 1,
+          "rawAgree": 4,
           "rawDisagree": 0
         },
         "arcAgi2": {
-          "agree": 1.0,
+          "agree": 4.0,
           "disagree": 0.0,
-          "rawAgree": 1,
+          "rawAgree": 4,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 1.0,
+          "agree": 5.0,
           "disagree": 0.0,
-          "rawAgree": 1,
+          "rawAgree": 5,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 11.0,
+          "agree": 20.0,
           "disagree": 0.0,
-          "rawAgree": 11,
+          "rawAgree": 20,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 2.0,
+          "agree": 5.0,
           "disagree": 0.0,
-          "rawAgree": 2,
+          "rawAgree": 5,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 2.0,
+          "agree": 6.0,
           "disagree": 0.0,
-          "rawAgree": 2,
+          "rawAgree": 6,
           "rawDisagree": 0
         },
         "sweV": {
@@ -270,7 +378,223 @@
           "rawAgree": 6,
           "rawDisagree": 0
         },
+        "tau2": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
+          "rawDisagree": 0
+        },
         "tb2": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 59.0,
+        "disagree": 0.0,
+        "rawAgree": 59,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "blog.google": {
+      "byBench": {
+        "mmluPro": {
+          "agree": 7.0,
+          "disagree": 0.0,
+          "rawAgree": 7,
+          "rawDisagree": 0
+        },
+        "sweV": {
+          "agree": 3.0,
+          "disagree": 0.0,
+          "rawAgree": 3,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 10.0,
+        "disagree": 0.0,
+        "rawAgree": 10,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "blogs.nvidia.com": {
+      "byBench": {
+        "gpqa": {
+          "agree": 0.0,
+          "disagree": 3.0,
+          "rawAgree": 0,
+          "rawDisagree": 3
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 0.0,
+        "disagree": 3.0,
+        "rawAgree": 0,
+        "rawDisagree": 3
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "buildfastwithai.com": {
+      "byBench": {
+        "sweV": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 4.0,
+        "disagree": 0.0,
+        "rawAgree": 4,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "businesswire.com": {
+      "byBench": {
+        "tb2": {
+          "agree": 8.0,
+          "disagree": 0.0,
+          "rawAgree": 8,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 8.0,
+        "disagree": 0.0,
+        "rawAgree": 8,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "codeforces.com": {
+      "byBench": {
+        "cfElo": {
+          "agree": 6.0,
+          "disagree": 0.0,
+          "rawAgree": 6,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 6.0,
+        "disagree": 0.0,
+        "rawAgree": 6,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "community-blog.example": {
+      "byBench": {
+        "gpqa": {
+          "agree": 3.0,
+          "disagree": 0.0,
+          "rawAgree": 3,
+          "rawDisagree": 0
+        },
+        "sweV": {
+          "agree": 0.0,
+          "disagree": 3.0,
+          "rawAgree": 0,
+          "rawDisagree": 3
+        },
+        "tau2": {
+          "agree": 0.0,
+          "disagree": 3.0,
+          "rawAgree": 0,
+          "rawDisagree": 3
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 3.0,
+        "disagree": 6.0,
+        "rawAgree": 3,
+        "rawDisagree": 6
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "datacamp.com": {
+      "byBench": {
+        "sweV": {
+          "agree": 8.0,
+          "disagree": 0.0,
+          "rawAgree": 8,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 8.0,
+        "disagree": 0.0,
+        "rawAgree": 8,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "deepmind.google": {
+      "byBench": {
+        "aime26": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "arcAgi2": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        },
+        "gpqa": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        },
+        "hle": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        },
+        "sweV": {
+          "agree": 18.0,
+          "disagree": 0.0,
+          "rawAgree": 18,
+          "rawDisagree": 0
+        },
+        "tb2": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 35.0,
+        "disagree": 0.0,
+        "rawAgree": 35,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "designforonline.com": {
+      "byBench": {
+        "hle": {
           "agree": 1.0,
           "disagree": 0.0,
           "rawAgree": 1,
@@ -279,15 +603,45 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 27.0,
+        "agree": 1.0,
         "disagree": 0.0,
-        "rawAgree": 27,
+        "rawAgree": 1,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
     },
-    "blog.google": {
+    "dev.to": {
       "byBench": {
+        "tb2": {
+          "agree": 8.0,
+          "disagree": 0.0,
+          "rawAgree": 8,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 8.0,
+        "disagree": 0.0,
+        "rawAgree": 8,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "developer.nvidia.com": {
+      "byBench": {
+        "gpqa": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "hle": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
         "mmluPro": {
           "agree": 1.0,
           "disagree": 0.0,
@@ -297,91 +651,19 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 1.0,
+        "agree": 3.0,
         "disagree": 0.0,
-        "rawAgree": 1,
+        "rawAgree": 3,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
     },
-    "buildfastwithai.com": {
+    "digitalapplied.com": {
       "byBench": {
         "sweV": {
           "agree": 1.0,
           "disagree": 0.0,
           "rawAgree": 1,
-          "rawDisagree": 0
-        }
-      },
-      "firstSeen": "2026-05-18",
-      "global": {
-        "agree": 1.0,
-        "disagree": 0.0,
-        "rawAgree": 1,
-        "rawDisagree": 0
-      },
-      "lastSeen": "2026-05-18"
-    },
-    "businesswire.com": {
-      "byBench": {
-        "tb2": {
-          "agree": 5.0,
-          "disagree": 0.0,
-          "rawAgree": 5,
-          "rawDisagree": 0
-        }
-      },
-      "firstSeen": "2026-05-18",
-      "global": {
-        "agree": 5.0,
-        "disagree": 0.0,
-        "rawAgree": 5,
-        "rawDisagree": 0
-      },
-      "lastSeen": "2026-05-18"
-    },
-    "datacamp.com": {
-      "byBench": {
-        "sweV": {
-          "agree": 5.0,
-          "disagree": 0.0,
-          "rawAgree": 5,
-          "rawDisagree": 0
-        }
-      },
-      "firstSeen": "2026-05-18",
-      "global": {
-        "agree": 5.0,
-        "disagree": 0.0,
-        "rawAgree": 5,
-        "rawDisagree": 0
-      },
-      "lastSeen": "2026-05-18"
-    },
-    "deepmind.google": {
-      "byBench": {
-        "arcAgi2": {
-          "agree": 1.0,
-          "disagree": 0.0,
-          "rawAgree": 1,
-          "rawDisagree": 0
-        },
-        "gpqa": {
-          "agree": 2.0,
-          "disagree": 0.0,
-          "rawAgree": 2,
-          "rawDisagree": 0
-        },
-        "hle": {
-          "agree": 1.0,
-          "disagree": 0.0,
-          "rawAgree": 1,
-          "rawDisagree": 0
-        },
-        "sweV": {
-          "agree": 12.0,
-          "disagree": 0.0,
-          "rawAgree": 12,
           "rawDisagree": 0
         },
         "tb2": {
@@ -393,34 +675,16 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 17.0,
+        "agree": 2.0,
         "disagree": 0.0,
-        "rawAgree": 17,
+        "rawAgree": 2,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
     },
-    "dev.to": {
+    "docs.api.nvidia.com": {
       "byBench": {
         "tb2": {
-          "agree": 5.0,
-          "disagree": 0.0,
-          "rawAgree": 5,
-          "rawDisagree": 0
-        }
-      },
-      "firstSeen": "2026-05-18",
-      "global": {
-        "agree": 5.0,
-        "disagree": 0.0,
-        "rawAgree": 5,
-        "rawDisagree": 0
-      },
-      "lastSeen": "2026-05-18"
-    },
-    "developer.nvidia.com": {
-      "byBench": {
-        "gpqa": {
           "agree": 1.0,
           "disagree": 0.0,
           "rawAgree": 1,
@@ -439,9 +703,9 @@
     "docs.z.ai": {
       "byBench": {
         "aime26": {
-          "agree": 1.0,
+          "agree": 4.0,
           "disagree": 0.0,
-          "rawAgree": 1,
+          "rawAgree": 4,
           "rawDisagree": 0
         },
         "gpqa": {
@@ -451,45 +715,93 @@
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 1.0,
+          "agree": 4.0,
           "disagree": 0.0,
-          "rawAgree": 1,
+          "rawAgree": 4,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 6.0,
+          "agree": 12.0,
           "disagree": 0.0,
-          "rawAgree": 6,
+          "rawAgree": 12,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 14.0,
+        "agree": 26.0,
         "disagree": 0.0,
-        "rawAgree": 14,
+        "rawAgree": 26,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
     },
-    "github.com": {
+    "gemma4all.com": {
       "byBench": {
         "mmluPro": {
           "agree": 1.0,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "github.com": {
+      "byBench": {
+        "gpqa": {
+          "agree": 3.0,
+          "disagree": 0.0,
+          "rawAgree": 3,
+          "rawDisagree": 0
+        },
+        "mmluPro": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
         },
         "sweV": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        },
+        "tau2": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 15.0,
+        "disagree": 0.0,
+        "rawAgree": 15,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "help.apiyi.com": {
+      "byBench": {
+        "gpqa": {
           "agree": 1.0,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
-        "tau2": {
-          "agree": 1.0,
+        "mcpA": {
+          "agree": 2.0,
           "disagree": 0.0,
-          "rawAgree": 1,
+          "rawAgree": 2,
           "rawDisagree": 0
         }
       },
@@ -504,24 +816,42 @@
     },
     "huggingface.co": {
       "byBench": {
+        "aime26": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
         "gpqa": {
-          "agree": 0.0,
+          "agree": 11.0,
           "disagree": 2.0,
-          "rawAgree": 0,
+          "rawAgree": 11,
           "rawDisagree": 2
         },
-        "sweV": {
-          "agree": 2.0,
+        "lcb": {
+          "agree": 1.0,
           "disagree": 0.0,
-          "rawAgree": 2,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "mmluPro": {
+          "agree": 3.0,
+          "disagree": 0.0,
+          "rawAgree": 3,
+          "rawDisagree": 0
+        },
+        "sweV": {
+          "agree": 8.0,
+          "disagree": 0.0,
+          "rawAgree": 8,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 2.0,
+        "agree": 24.0,
         "disagree": 2.0,
-        "rawAgree": 2,
+        "rawAgree": 24,
         "rawDisagree": 2
       },
       "lastSeen": "2026-05-18"
@@ -529,17 +859,17 @@
     "humiris.substack.com": {
       "byBench": {
         "swePro": {
-          "agree": 5.0,
+          "agree": 8.0,
           "disagree": 0.0,
-          "rawAgree": 5,
+          "rawAgree": 8,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 5.0,
+        "agree": 8.0,
         "disagree": 0.0,
-        "rawAgree": 5,
+        "rawAgree": 8,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
@@ -601,84 +931,24 @@
     "livecodebench.github.io": {
       "byBench": {
         "lcb": {
-          "agree": 13.0,
+          "agree": 25.0,
           "disagree": 0.0,
-          "rawAgree": 13,
+          "rawAgree": 25,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 13.0,
+        "agree": 25.0,
         "disagree": 0.0,
-        "rawAgree": 13,
+        "rawAgree": 25,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
     },
-    "llm-stats.com": {
+    "llama.com": {
       "byBench": {
         "aime26": {
-          "agree": 2.0,
-          "disagree": 0.0,
-          "rawAgree": 2,
-          "rawDisagree": 0
-        },
-        "gpqa": {
-          "agree": 9.0,
-          "disagree": 6.0,
-          "rawAgree": 9,
-          "rawDisagree": 6
-        },
-        "hle": {
-          "agree": 1.0,
-          "disagree": 0.0,
-          "rawAgree": 1,
-          "rawDisagree": 0
-        },
-        "lcb": {
-          "agree": 1.0,
-          "disagree": 2.0,
-          "rawAgree": 1,
-          "rawDisagree": 2
-        },
-        "mmluPro": {
-          "agree": 2.0,
-          "disagree": 0.0,
-          "rawAgree": 2,
-          "rawDisagree": 0
-        },
-        "sweV": {
-          "agree": 4.0,
-          "disagree": 0.0,
-          "rawAgree": 4,
-          "rawDisagree": 0
-        },
-        "tau2": {
-          "agree": 2.0,
-          "disagree": 0.0,
-          "rawAgree": 2,
-          "rawDisagree": 0
-        },
-        "tb2": {
-          "agree": 2.0,
-          "disagree": 0.0,
-          "rawAgree": 2,
-          "rawDisagree": 0
-        }
-      },
-      "firstSeen": "2026-05-18",
-      "global": {
-        "agree": 23.0,
-        "disagree": 8.0,
-        "rawAgree": 23,
-        "rawDisagree": 8
-      },
-      "lastSeen": "2026-05-18"
-    },
-    "macaron.im": {
-      "byBench": {
-        "mmluPro": {
           "agree": 1.0,
           "disagree": 0.0,
           "rawAgree": 1,
@@ -694,24 +964,162 @@
       },
       "lastSeen": "2026-05-18"
     },
-    "minimax.io": {
+    "llm-stats.com": {
       "byBench": {
+        "aaIdx": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
         "aime26": {
-          "agree": 1.0,
+          "agree": 11.0,
           "disagree": 0.0,
-          "rawAgree": 1,
+          "rawAgree": 11,
           "rawDisagree": 0
         },
-        "gpqa": {
-          "agree": 1.0,
-          "disagree": 0.0,
-          "rawAgree": 1,
-          "rawDisagree": 0
-        },
-        "hle": {
+        "bfcl": {
           "agree": 2.0,
           "disagree": 0.0,
           "rawAgree": 2,
+          "rawDisagree": 0
+        },
+        "gpqa": {
+          "agree": 33.0,
+          "disagree": 6.0,
+          "rawAgree": 33,
+          "rawDisagree": 6
+        },
+        "hle": {
+          "agree": 7.0,
+          "disagree": 0.0,
+          "rawAgree": 7,
+          "rawDisagree": 0
+        },
+        "lcb": {
+          "agree": 13.0,
+          "disagree": 2.0,
+          "rawAgree": 13,
+          "rawDisagree": 2
+        },
+        "mmluPro": {
+          "agree": 11.0,
+          "disagree": 0.0,
+          "rawAgree": 11,
+          "rawDisagree": 0
+        },
+        "swePro": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "sweV": {
+          "agree": 6.0,
+          "disagree": 0.0,
+          "rawAgree": 6,
+          "rawDisagree": 0
+        },
+        "tau2": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        },
+        "tb2": {
+          "agree": 8.0,
+          "disagree": 0.0,
+          "rawAgree": 8,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 97.0,
+        "disagree": 8.0,
+        "rawAgree": 97,
+        "rawDisagree": 8
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "macaron.im": {
+      "byBench": {
+        "mmluPro": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 4.0,
+        "disagree": 0.0,
+        "rawAgree": 4,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "mcpatlas.com": {
+      "byBench": {
+        "mcpA": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "medium.com": {
+      "byBench": {
+        "hle": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "sweMulti": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 2.0,
+        "disagree": 0.0,
+        "rawAgree": 2,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "minimax.io": {
+      "byBench": {
+        "aime26": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        },
+        "gpqa": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        },
+        "hle": {
+          "agree": 7.0,
+          "disagree": 0.0,
+          "rawAgree": 7,
           "rawDisagree": 0
         },
         "lcb": {
@@ -721,24 +1129,42 @@
           "rawDisagree": 2
         },
         "mmluPro": {
-          "agree": 1.0,
+          "agree": 4.0,
           "disagree": 0.0,
-          "rawAgree": 1,
+          "rawAgree": 4,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 1.0,
+          "agree": 4.0,
           "disagree": 2.0,
-          "rawAgree": 1,
+          "rawAgree": 4,
           "rawDisagree": 2
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 6.0,
+        "agree": 23.0,
         "disagree": 4.0,
-        "rawAgree": 6,
+        "rawAgree": 23,
         "rawDisagree": 4
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "minimaxi.com": {
+      "byBench": {
+        "tb2": {
+          "agree": 0.0,
+          "disagree": 3.0,
+          "rawAgree": 0,
+          "rawDisagree": 3
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 0.0,
+        "disagree": 3.0,
+        "rawAgree": 0,
+        "rawDisagree": 3
       },
       "lastSeen": "2026-05-18"
     },
@@ -762,6 +1188,120 @@
     },
     "morphllm.com": {
       "byBench": {
+        "aime26": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "hle": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        },
+        "lcb": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        },
+        "sweMulti": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "tb2": {
+          "agree": 8.0,
+          "disagree": 0.0,
+          "rawAgree": 8,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 18.0,
+        "disagree": 0.0,
+        "rawAgree": 18,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "officechai.com": {
+      "byBench": {
+        "aaIdx": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "openai.com": {
+      "byBench": {
+        "aime26": {
+          "agree": 12.0,
+          "disagree": 0.0,
+          "rawAgree": 12,
+          "rawDisagree": 0
+        },
+        "gpqa": {
+          "agree": 6.0,
+          "disagree": 0.0,
+          "rawAgree": 6,
+          "rawDisagree": 0
+        },
+        "mmluPro": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "sweV": {
+          "agree": 10.0,
+          "disagree": 0.0,
+          "rawAgree": 10,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 29.0,
+        "disagree": 0.0,
+        "rawAgree": 29,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "openrouter.ai": {
+      "byBench": {
+        "gpqa": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "qwen.ai": {
+      "byBench": {
         "hle": {
           "agree": 1.0,
           "disagree": 0.0,
@@ -769,15 +1309,105 @@
           "rawDisagree": 0
         },
         "lcb": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
+          "rawDisagree": 0
+        },
+        "mmluPro": {
           "agree": 1.0,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
-        "tb2": {
-          "agree": 5.0,
+        "tau2": {
+          "agree": 1.0,
           "disagree": 0.0,
-          "rawAgree": 5,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 5.0,
+        "disagree": 0.0,
+        "rawAgree": 5,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "qwenlm.github.io": {
+      "byBench": {
+        "aime26": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "bfcl": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
+          "rawDisagree": 0
+        },
+        "gpqa": {
+          "agree": 0.0,
+          "disagree": 2.0,
+          "rawAgree": 0,
+          "rawDisagree": 2
+        },
+        "lcb": {
+          "agree": 1.0,
+          "disagree": 8.0,
+          "rawAgree": 1,
+          "rawDisagree": 8
+        },
+        "sweV": {
+          "agree": 3.0,
+          "disagree": 0.0,
+          "rawAgree": 3,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 7.0,
+        "disagree": 10.0,
+        "rawAgree": 7,
+        "rawDisagree": 10
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "research.nvidia.com": {
+      "byBench": {
+        "hle": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "researchgate.net": {
+      "byBench": {
+        "gpqa": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        },
+        "lcb": {
+          "agree": 3.0,
+          "disagree": 0.0,
+          "rawAgree": 3,
           "rawDisagree": 0
         }
       },
@@ -790,105 +1420,9 @@
       },
       "lastSeen": "2026-05-18"
     },
-    "openai.com": {
+    "rootly.com": {
       "byBench": {
-        "aime26": {
-          "agree": 8.0,
-          "disagree": 0.0,
-          "rawAgree": 8,
-          "rawDisagree": 0
-        },
-        "gpqa": {
-          "agree": 6.0,
-          "disagree": 0.0,
-          "rawAgree": 6,
-          "rawDisagree": 0
-        },
-        "sweV": {
-          "agree": 7.0,
-          "disagree": 0.0,
-          "rawAgree": 7,
-          "rawDisagree": 0
-        }
-      },
-      "firstSeen": "2026-05-18",
-      "global": {
-        "agree": 21.0,
-        "disagree": 0.0,
-        "rawAgree": 21,
-        "rawDisagree": 0
-      },
-      "lastSeen": "2026-05-18"
-    },
-    "qwenlm.github.io": {
-      "byBench": {
-        "gpqa": {
-          "agree": 0.0,
-          "disagree": 2.0,
-          "rawAgree": 0,
-          "rawDisagree": 2
-        },
-        "lcb": {
-          "agree": 0.0,
-          "disagree": 8.0,
-          "rawAgree": 0,
-          "rawDisagree": 8
-        }
-      },
-      "firstSeen": "2026-05-18",
-      "global": {
-        "agree": 0.0,
-        "disagree": 10.0,
-        "rawAgree": 0,
-        "rawDisagree": 10
-      },
-      "lastSeen": "2026-05-18"
-    },
-    "researchgate.net": {
-      "byBench": {
-        "gpqa": {
-          "agree": 1.0,
-          "disagree": 0.0,
-          "rawAgree": 1,
-          "rawDisagree": 0
-        },
-        "lcb": {
-          "agree": 1.0,
-          "disagree": 0.0,
-          "rawAgree": 1,
-          "rawDisagree": 0
-        }
-      },
-      "firstSeen": "2026-05-18",
-      "global": {
-        "agree": 2.0,
-        "disagree": 0.0,
-        "rawAgree": 2,
-        "rawDisagree": 0
-      },
-      "lastSeen": "2026-05-18"
-    },
-    "scale.com": {
-      "byBench": {
-        "swePro": {
-          "agree": 5.0,
-          "disagree": 0.0,
-          "rawAgree": 5,
-          "rawDisagree": 0
-        }
-      },
-      "firstSeen": "2026-05-18",
-      "global": {
-        "agree": 5.0,
-        "disagree": 0.0,
-        "rawAgree": 5,
-        "rawDisagree": 0
-      },
-      "lastSeen": "2026-05-18"
-    },
-    "smartchunks.com": {
-      "byBench": {
-        "hle": {
+        "tb2": {
           "agree": 1.0,
           "disagree": 0.0,
           "rawAgree": 1,
@@ -904,48 +1438,48 @@
       },
       "lastSeen": "2026-05-18"
     },
-    "swebench.com": {
-      "byBench": {
-        "sweV": {
-          "agree": 11.0,
-          "disagree": 0.0,
-          "rawAgree": 11,
-          "rawDisagree": 0
-        }
-      },
-      "firstSeen": "2026-05-18",
-      "global": {
-        "agree": 11.0,
-        "disagree": 0.0,
-        "rawAgree": 11,
-        "rawDisagree": 0
-      },
-      "lastSeen": "2026-05-18"
-    },
-    "tech-insider.org": {
+    "scale.com": {
       "byBench": {
         "swePro": {
-          "agree": 5.0,
+          "agree": 16.0,
           "disagree": 0.0,
-          "rawAgree": 5,
+          "rawAgree": 16,
+          "rawDisagree": 0
+        },
+        "sweV": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 5.0,
+        "agree": 20.0,
         "disagree": 0.0,
-        "rawAgree": 5,
+        "rawAgree": 20,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
     },
-    "terminal-bench.com": {
+    "smartchunks.com": {
       "byBench": {
-        "tb2": {
-          "agree": 6.0,
+        "aime26": {
+          "agree": 1.0,
           "disagree": 0.0,
-          "rawAgree": 6,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "hle": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        },
+        "sweV": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
           "rawDisagree": 0
         }
       },
@@ -958,20 +1492,98 @@
       },
       "lastSeen": "2026-05-18"
     },
-    "terminalbench.io": {
+    "swebench.com": {
       "byBench": {
-        "tb2": {
-          "agree": 1.0,
+        "sweV": {
+          "agree": 17.0,
           "disagree": 0.0,
-          "rawAgree": 1,
+          "rawAgree": 17,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 1.0,
+        "agree": 17.0,
         "disagree": 0.0,
-        "rawAgree": 1,
+        "rawAgree": 17,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "tau-bench.github.io": {
+      "byBench": {
+        "tau2": {
+          "agree": 3.0,
+          "disagree": 0.0,
+          "rawAgree": 3,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 3.0,
+        "disagree": 0.0,
+        "rawAgree": 3,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "tech-insider.org": {
+      "byBench": {
+        "gpqa": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "swePro": {
+          "agree": 8.0,
+          "disagree": 0.0,
+          "rawAgree": 8,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 9.0,
+        "disagree": 0.0,
+        "rawAgree": 9,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "terminal-bench.com": {
+      "byBench": {
+        "tb2": {
+          "agree": 15.0,
+          "disagree": 0.0,
+          "rawAgree": 15,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 15.0,
+        "disagree": 0.0,
+        "rawAgree": 15,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "terminalbench.io": {
+      "byBench": {
+        "tb2": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 4.0,
+        "disagree": 0.0,
+        "rawAgree": 4,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
@@ -979,9 +1591,9 @@
     "vals.ai": {
       "byBench": {
         "gpqa": {
-          "agree": 1.0,
+          "agree": 4.0,
           "disagree": 0.0,
-          "rawAgree": 1,
+          "rawAgree": 4,
           "rawDisagree": 0
         },
         "sweV": {
@@ -993,9 +1605,9 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 1.0,
+        "agree": 4.0,
         "disagree": 2.0,
-        "rawAgree": 1,
+        "rawAgree": 4,
         "rawDisagree": 2
       },
       "lastSeen": "2026-05-18"
@@ -1014,24 +1626,30 @@
           "rawAgree": 0,
           "rawDisagree": 6
         },
-        "swePro": {
+        "mcpA": {
           "agree": 1.0,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
+        "swePro": {
+          "agree": 4.0,
+          "disagree": 0.0,
+          "rawAgree": 4,
+          "rawDisagree": 0
+        },
         "sweV": {
-          "agree": 8.0,
+          "agree": 14.0,
           "disagree": 8.0,
-          "rawAgree": 8,
+          "rawAgree": 14,
           "rawDisagree": 8
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 9.0,
+        "agree": 19.0,
         "disagree": 20.0,
-        "rawAgree": 9,
+        "rawAgree": 19,
         "rawDisagree": 20
       },
       "lastSeen": "2026-05-18"
@@ -1039,29 +1657,29 @@
     "x.ai": {
       "byBench": {
         "aime26": {
-          "agree": 1.0,
+          "agree": 4.0,
           "disagree": 0.0,
-          "rawAgree": 1,
+          "rawAgree": 4,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 2.0,
+          "agree": 7.0,
           "disagree": 0.0,
-          "rawAgree": 2,
+          "rawAgree": 7,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 6.0,
+          "agree": 12.0,
           "disagree": 0.0,
-          "rawAgree": 6,
+          "rawAgree": 12,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 9.0,
+        "agree": 23.0,
         "disagree": 0.0,
-        "rawAgree": 9,
+        "rawAgree": 23,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
@@ -1072,6 +1690,48 @@
           "agree": 4.0,
           "disagree": 0.0,
           "rawAgree": 4,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 4.0,
+        "disagree": 0.0,
+        "rawAgree": 4,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "xda-developers.com": {
+      "byBench": {
+        "mmluPro": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-05-18",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-05-18"
+    },
+    "zhipuai.cn": {
+      "byBench": {
+        "sweV": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "tau2": {
+          "agree": 3.0,
+          "disagree": 0.0,
+          "rawAgree": 3,
           "rawDisagree": 0
         }
       },
