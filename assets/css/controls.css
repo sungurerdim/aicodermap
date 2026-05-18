@@ -149,7 +149,13 @@
   text-align: right;
 }
 .gpu-status-line:empty { display: none; }
-#filters-reset.btn-compact { justify-self: end; }
+/* Reset button gets its own full-width row so it doesn't sit stranded
+ * in a single auto-fit cell with empty space around it. Right-aligned
+ * keeps it where users expect a destructive action. */
+#filters-reset.btn-compact {
+  grid-column: 1 / -1;
+  justify-self: end;
+}
 
 /* Search row — primary filter. The "Ara" / "Search" text label is
  * visually hidden (screen readers still read it); a magnifier icon
