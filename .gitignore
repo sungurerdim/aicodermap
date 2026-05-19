@@ -39,6 +39,7 @@ coverage/
 
 # AICoderMap skill artifacts (research-agent intermediate outputs + verification cache)
 .aicodermap-*.json
+.aicodermap-*.json.stale-*
 .aicodermap-images/
 .aicodermap-verification-map.json
 .aicodermap-runtime/
