@@ -75,7 +75,7 @@
     "vramRequirement": null,
     "strengthsKey": "gemini-3-1-flash.strengths",
     "weaknessesKey": "gemini-3-1-flash.weaknesses",
-    "lastUpdated": "2026-05-19",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-11",
@@ -138,6 +138,12 @@
         "winning_cluster_sum_trust": 1.096,
         "winning_cluster_distinct_sources": 1
       }
+    },
+    "privacy": {
+      "soc2": true,
+      "gdpr": true,
+      "trainingDataOptOut": "available",
+      "apiLogging": "opt_out"
     }
   },
   {
@@ -224,7 +230,7 @@
     "vramRequirement": null,
     "strengthsKey": "gemini-3-1-pro.strengths",
     "weaknessesKey": "gemini-3-1-pro.weaknesses",
-    "lastUpdated": "2026-05-19",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-19",
@@ -297,6 +303,12 @@
         "winning_cluster_sum_trust": 5.853,
         "winning_cluster_distinct_sources": 4
       }
+    },
+    "privacy": {
+      "soc2": true,
+      "gdpr": true,
+      "trainingDataOptOut": "available",
+      "apiLogging": "opt_out"
     }
   },
   {
@@ -393,7 +405,7 @@
     "vramRequirement": null,
     "strengthsKey": "gpt-4-1.strengths",
     "weaknessesKey": "gpt-4-1.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "deprecated",
     "deprecatedAt": "2026-02-13",
     "successor": "gpt-5-4",
@@ -418,6 +430,23 @@
       "lcb": "2026-05-11",
       "mmluPro": "2026-05-19",
       "aime26": "2026-05-11"
+    },
+    "privacy": {
+      "soc2": true,
+      "gdpr": true,
+      "trainingDataOptOut": "available",
+      "dataResidency": [
+        "AU",
+        "CA",
+        "EU",
+        "IN",
+        "JP",
+        "KR",
+        "SG",
+        "UK",
+        "US"
+      ],
+      "apiLogging": "opt_out"
     }
   },
   {
@@ -514,7 +543,7 @@
     "vramRequirement": null,
     "strengthsKey": "gpt-5-4.strengths",
     "weaknessesKey": "gpt-5-4.weaknesses",
-    "lastUpdated": "2026-05-18T00:18:54Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-18",
@@ -587,6 +616,23 @@
         "winning_cluster_sum_trust": 2.728,
         "winning_cluster_distinct_sources": 3
       }
+    },
+    "privacy": {
+      "soc2": true,
+      "gdpr": true,
+      "trainingDataOptOut": "available",
+      "dataResidency": [
+        "AU",
+        "CA",
+        "EU",
+        "IN",
+        "JP",
+        "KR",
+        "SG",
+        "UK",
+        "US"
+      ],
+      "apiLogging": "opt_out"
     }
   },
   {
@@ -669,7 +715,7 @@
     "vramRequirement": null,
     "strengthsKey": "grok-3.strengths",
     "weaknessesKey": "grok-3.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "deprecated",
     "benchUpdated": {
       "gpqa": "2026-05-19",
@@ -690,7 +736,13 @@
     "bench.lcb": 79.4,
     "bench.aaIdx": 25,
     "bench.gpqa": 84.6,
-    "bench.hle": 18.8
+    "bench.hle": 18.8,
+    "privacy": {
+      "trainingDataOptOut": "none",
+      "apiLogging": "default_on",
+      "gdpr": true,
+      "soc2": true
+    }
   },
   {
     "id": "grok-3-mini",
@@ -774,7 +826,7 @@
     "vramRequirement": null,
     "strengthsKey": "grok-3-mini.strengths",
     "weaknessesKey": "grok-3-mini.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "deprecated",
     "deprecatedAt": "2026-04-01",
     "successor": "grok-4-20",
@@ -796,6 +848,12 @@
       "tau2": "2026-05-19",
       "sweV": "2026-05-18",
       "aaAgentic": "2026-05-18"
+    },
+    "privacy": {
+      "trainingDataOptOut": "none",
+      "apiLogging": "default_on",
+      "gdpr": true,
+      "soc2": true
     }
   },
   {
@@ -874,7 +932,7 @@
     "vramRequirement": null,
     "strengthsKey": "mistral-large-3.strengths",
     "weaknessesKey": "mistral-large-3.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "active",
     "benchUpdated": {
       "sweV": "2026-05-18",
@@ -923,6 +981,12 @@
         "winning_cluster_sum_trust": 1.521,
         "winning_cluster_distinct_sources": 2
       }
+    },
+    "privacy": {
+      "gdpr": true,
+      "soc2": true,
+      "trainingDataOptOut": "available",
+      "apiLogging": "default_on"
     }
   },
   {
@@ -1011,7 +1075,7 @@
     "vramRequirement": null,
     "strengthsKey": "o3.strengths",
     "weaknessesKey": "o3.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "deprecated",
     "deprecatedAt": "2026-05-01",
     "successor": "gpt-5-5",
@@ -1036,6 +1100,23 @@
       "tau2": "2026-05-18",
       "aaIdx": "2026-05-18",
       "cfElo": "2026-05-18"
+    },
+    "privacy": {
+      "soc2": true,
+      "gdpr": true,
+      "trainingDataOptOut": "available",
+      "dataResidency": [
+        "AU",
+        "CA",
+        "EU",
+        "IN",
+        "JP",
+        "KR",
+        "SG",
+        "UK",
+        "US"
+      ],
+      "apiLogging": "opt_out"
     }
   },
   {
@@ -1124,7 +1205,7 @@
     "vramRequirement": null,
     "strengthsKey": "o4-mini.strengths",
     "weaknessesKey": "o4-mini.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "deprecated",
     "deprecatedAt": "2026-05-01",
     "successor": "gpt-5-5",
@@ -1147,6 +1228,23 @@
       "tb2": "2026-05-18",
       "hle": "2026-05-18",
       "aaIdx": "2026-05-18"
+    },
+    "privacy": {
+      "soc2": true,
+      "gdpr": true,
+      "trainingDataOptOut": "available",
+      "dataResidency": [
+        "AU",
+        "CA",
+        "EU",
+        "IN",
+        "JP",
+        "KR",
+        "SG",
+        "UK",
+        "US"
+      ],
+      "apiLogging": "opt_out"
     }
   },
   {
@@ -1244,7 +1342,7 @@
     "vramRequirement": null,
     "strengthsKey": "opus-4-7.strengths",
     "weaknessesKey": "opus-4-7.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-19",
@@ -1344,6 +1442,15 @@
         "winning_cluster_sum_trust": 2.758,
         "winning_cluster_distinct_sources": 3
       }
+    },
+    "privacy": {
+      "trainingDataOptOut": "available",
+      "dataResidency": [
+        "US"
+      ],
+      "soc2": true,
+      "gdpr": true,
+      "apiLogging": "not_logged"
     }
   },
   {
@@ -1433,7 +1540,7 @@
     "vramRequirement": null,
     "strengthsKey": "sonnet-4-6.strengths",
     "weaknessesKey": "sonnet-4-6.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "active",
     "benchUpdated": {
       "sweV": "2026-05-19",
@@ -1530,6 +1637,15 @@
         "winning_cluster_sum_trust": 1.322,
         "winning_cluster_distinct_sources": 2
       }
+    },
+    "privacy": {
+      "trainingDataOptOut": "available",
+      "dataResidency": [
+        "US"
+      ],
+      "soc2": true,
+      "gdpr": true,
+      "apiLogging": "not_logged"
     }
   },
   {
@@ -1619,7 +1735,7 @@
     "vramRequirement": 14,
     "strengthsKey": "codestral-22b.strengths",
     "weaknessesKey": "codestral-22b.weaknesses",
-    "lastUpdated": "2026-05-18T18:20:43Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "deprecated",
     "ollama": {
       "pullCmd": "ollama pull codestral:22b",
@@ -1675,6 +1791,12 @@
       "tb2": "2026-05-18",
       "gpqa": "2026-05-10",
       "aaIdx": "2026-05-18"
+    },
+    "privacy": {
+      "gdpr": true,
+      "soc2": true,
+      "trainingDataOptOut": "available",
+      "apiLogging": "default_on"
     }
   },
   {
@@ -1764,7 +1886,7 @@
     "vramRequirement": null,
     "strengthsKey": "deepseek-v3-2.strengths",
     "weaknessesKey": "deepseek-v3-2.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "active",
     "benchUpdated": {
       "sweV": "2026-05-19",
@@ -1882,6 +2004,11 @@
         "winning_cluster_sum_trust": 8.211,
         "winning_cluster_distinct_sources": 7
       }
+    },
+    "privacy": {
+      "trainingDataOptOut": "none",
+      "gdpr": false,
+      "soc2": false
     }
   },
   {
@@ -1970,7 +2097,7 @@
     "vramRequirement": null,
     "strengthsKey": "deepseek-v4-flash.strengths",
     "weaknessesKey": "deepseek-v4-flash.weaknesses",
-    "lastUpdated": "2026-05-18T18:20:43Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "ollama": {
       "pullCmd": "ollama pull deepseek-v4-flash:cloud",
       "ollamaUrl": "https://ollama.com/library/deepseek-v4-flash",
@@ -2060,6 +2187,11 @@
         "winning_cluster_sum_trust": 1.457,
         "winning_cluster_distinct_sources": 2
       }
+    },
+    "privacy": {
+      "trainingDataOptOut": "none",
+      "gdpr": false,
+      "soc2": false
     }
   },
   {
@@ -2167,7 +2299,7 @@
     "vramRequirement": null,
     "strengthsKey": "deepseek-v4-pro.strengths",
     "weaknessesKey": "deepseek-v4-pro.weaknesses",
-    "lastUpdated": "2026-05-18T15:37:35Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "active",
     "benchUpdated": {
       "sweV": "2026-05-18",
@@ -2268,6 +2400,11 @@
         "winning_cluster_sum_trust": 4.798,
         "winning_cluster_distinct_sources": 5
       }
+    },
+    "privacy": {
+      "trainingDataOptOut": "none",
+      "gdpr": false,
+      "soc2": false
     }
   },
   {
@@ -2342,7 +2479,7 @@
     "vramRequirement": 75,
     "strengthsKey": "devstral-2.strengths",
     "weaknessesKey": "devstral-2.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "ollama": {
       "pullCmd": "ollama pull devstral:2",
       "tags": [
@@ -2416,6 +2553,11 @@
         "winning_cluster_sum_trust": 0.753,
         "winning_cluster_distinct_sources": 1
       }
+    },
+    "privacy": {
+      "gdpr": true,
+      "soc2": true,
+      "trainingDataOptOut": "available"
     }
   },
   {
@@ -2489,7 +2631,7 @@
     "vramRequirement": null,
     "strengthsKey": "devstral-medium.strengths",
     "weaknessesKey": "devstral-medium.weaknesses",
-    "lastUpdated": "2026-05-18T15:37:35Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "deprecated",
     "benchUpdated": {
       "sweV": "2026-05-18",
@@ -2517,7 +2659,13 @@
     "bench.lcb": 33.7,
     "bench.tau2": 19.9,
     "bench.gpqa": 49.2,
-    "bench.hle": 3.8
+    "bench.hle": 3.8,
+    "privacy": {
+      "gdpr": true,
+      "soc2": true,
+      "trainingDataOptOut": "available",
+      "apiLogging": "default_on"
+    }
   },
   {
     "id": "glm-5-1",
@@ -2599,7 +2747,7 @@
     "vramRequirement": null,
     "strengthsKey": "glm-5-1.strengths",
     "weaknessesKey": "glm-5-1.weaknesses",
-    "lastUpdated": "2026-05-18T00:18:54Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-18",
@@ -2685,6 +2833,13 @@
         "winning_cluster_sum_trust": 3.656,
         "winning_cluster_distinct_sources": 5
       }
+    },
+    "privacy": {
+      "trainingDataOptOut": "unknown",
+      "dataResidency": [
+        "SG"
+      ],
+      "apiLogging": "unknown"
     }
   },
   {
@@ -2815,7 +2970,7 @@
     "vramRequirement": 350,
     "strengthsKey": "kimi-k2-6.strengths",
     "weaknessesKey": "kimi-k2-6.weaknesses",
-    "lastUpdated": "2026-05-18T15:37:35Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-18",
@@ -2935,6 +3090,14 @@
         "winning_cluster_sum_trust": 2.602,
         "winning_cluster_distinct_sources": 4
       }
+    },
+    "privacy": {
+      "trainingDataOptOut": "none",
+      "dataResidency": [
+        "SG"
+      ],
+      "gdpr": false,
+      "apiLogging": "default_on"
     }
   },
   {
@@ -3037,7 +3200,7 @@
     "vramRequirement": 100,
     "strengthsKey": "llama-4-maverick.strengths",
     "weaknessesKey": "llama-4-maverick.weaknesses",
-    "lastUpdated": "2026-05-18T15:37:35Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "ollama": {
       "pullCmd": "ollama run llama4:128x17b",
       "context": 1048576,
@@ -3115,6 +3278,13 @@
         "winning_cluster_sum_trust": 5.111,
         "winning_cluster_distinct_sources": 5
       }
+    },
+    "privacy": {
+      "trainingDataOptOut": "available",
+      "dataResidency": [
+        "US"
+      ],
+      "apiLogging": "not_logged"
     }
   },
   {
@@ -3224,7 +3394,7 @@
     "vramRequirement": 26,
     "strengthsKey": "llama-4-scout.strengths",
     "weaknessesKey": "llama-4-scout.weaknesses",
-    "lastUpdated": "2026-05-18T15:37:35Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "ollama": {
       "pullCmd": "ollama run llama4:16x17b",
       "context": 10000000,
@@ -3301,6 +3471,13 @@
         "winning_cluster_sum_trust": 1.286,
         "winning_cluster_distinct_sources": 2
       }
+    },
+    "privacy": {
+      "trainingDataOptOut": "available",
+      "dataResidency": [
+        "US"
+      ],
+      "apiLogging": "not_logged"
     }
   },
   {
@@ -3659,7 +3836,7 @@
     "vramRequirement": 96,
     "strengthsKey": "mimo-v2-flash.strengths",
     "weaknessesKey": "mimo-v2-flash.weaknesses",
-    "lastUpdated": "2026-05-18T18:20:43Z",
+    "lastUpdated": "2026-05-19",
     "status": "active",
     "benchUpdated": {
       "sweV": "2026-05-18",
@@ -3987,7 +4164,7 @@
     "vramRequirement": null,
     "strengthsKey": "minimax-m2-5.strengths",
     "weaknessesKey": "minimax-m2-5.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-18",
@@ -4088,6 +4265,9 @@
         "winning_cluster_sum_trust": 1.38,
         "winning_cluster_distinct_sources": 1
       }
+    },
+    "privacy": {
+      "trainingDataOptOut": "available"
     }
   },
   {
@@ -4195,7 +4375,7 @@
     "vramRequirement": null,
     "strengthsKey": "minimax-m2-7.strengths",
     "weaknessesKey": "minimax-m2-7.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-19",
@@ -4297,6 +4477,9 @@
         "winning_cluster_sum_trust": 1.52,
         "winning_cluster_distinct_sources": 2
       }
+    },
+    "privacy": {
+      "trainingDataOptOut": "available"
     }
   },
   {
@@ -4393,7 +4576,7 @@
     "vramRequirement": 64,
     "strengthsKey": "nemotron-3-super.strengths",
     "weaknessesKey": "nemotron-3-super.weaknesses",
-    "lastUpdated": "2026-05-18T18:20:43Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "active",
     "ollama": {
       "status": "not-available-on-ollama",
@@ -4480,6 +4663,15 @@
         "winning_cluster_sum_trust": 6.993,
         "winning_cluster_distinct_sources": 6
       }
+    },
+    "privacy": {
+      "trainingDataOptOut": "available",
+      "dataResidency": [
+        "US"
+      ],
+      "soc2": true,
+      "gdpr": true,
+      "apiLogging": "opt_out"
     }
   },
   {
@@ -4575,7 +4767,7 @@
     "vramRequirement": 18,
     "strengthsKey": "qwen-3-6-27b.strengths",
     "weaknessesKey": "qwen-3-6-27b.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19",
     "ollama": {
       "pullCmd": "ollama pull qwen3.6:27b",
       "tags": [
@@ -4744,7 +4936,7 @@
     "vramRequirement": null,
     "strengthsKey": "qwen-3-6-max.strengths",
     "weaknessesKey": "qwen-3-6-max.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19",
     "status": "active",
     "benchUpdated": {
       "sweV": "2026-05-18",
@@ -4935,7 +5127,7 @@
     "vramRequirement": 47,
     "strengthsKey": "qwen3-235b.strengths",
     "weaknessesKey": "qwen3-235b.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19",
     "ollama": {
       "pullCmd": "ollama pull qwen3:235b",
       "ollamaUrl": "https://ollama.com/library/qwen3",
@@ -5134,7 +5326,7 @@
     "vramRequirement": 22,
     "strengthsKey": "qwen3-32b.strengths",
     "weaknessesKey": "qwen3-32b.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19",
     "ollama": {
       "pullCmd": "ollama pull qwen3:32b",
       "tags": [
@@ -5329,7 +5521,7 @@
     "vramRequirement": 22,
     "strengthsKey": "qwen3-6-35b-moe.strengths",
     "weaknessesKey": "qwen3-6-35b-moe.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19",
     "ollama": {
       "pullCmd": "ollama pull qwen3.6:35b-moe",
       "tags": [
@@ -5515,7 +5707,7 @@
     "vramRequirement": null,
     "strengthsKey": "qwen3-6-plus.strengths",
     "weaknessesKey": "qwen3-6-plus.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-18",
@@ -5831,7 +6023,7 @@
     "vramRequirement": null,
     "strengthsKey": "qwen3-coder-480b.strengths",
     "weaknessesKey": "qwen3-coder-480b.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19",
     "status": "active",
     "ollama": {
       "pullCmd": "ollama pull qwen3-coder:480b",
@@ -5982,7 +6174,7 @@
     "vramRequirement": 18,
     "strengthsKey": "qwen3-coder-next.strengths",
     "weaknessesKey": "qwen3-coder-next.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19",
     "ollama": {
       "pullCmd": "ollama pull qwen3-coder-next:latest",
       "tags": [
@@ -6146,7 +6338,7 @@
     "vramRequirement": 120,
     "strengthsKey": "step-3-5-flash.strengths",
     "weaknessesKey": "step-3-5-flash.weaknesses",
-    "lastUpdated": "2026-05-18T15:37:35Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "active",
     "benchUpdated": {
       "sweV": "2026-05-18",
@@ -6217,6 +6409,13 @@
         "winning_cluster_sum_trust": 7.376,
         "winning_cluster_distinct_sources": 6
       }
+    },
+    "privacy": {
+      "trainingDataOptOut": "unknown",
+      "dataResidency": [
+        "SG"
+      ],
+      "apiLogging": "unknown"
     }
   },
   {
@@ -6283,7 +6482,7 @@
     "vramRequirement": 24,
     "strengthsKey": "gemma-3-27b.strengths",
     "weaknessesKey": "gemma-3-27b.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-10",
@@ -6416,7 +6615,7 @@
     "vramRequirement": 16,
     "strengthsKey": "gemma-4-26b-moe.strengths",
     "weaknessesKey": "gemma-4-26b-moe.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19",
     "status": "active",
     "ollama": {
       "pullCmd": "ollama pull gemma4:26b-moe",
@@ -6993,7 +7192,7 @@
     "vramRequirement": 9,
     "strengthsKey": "deepseek-coder-v2-16b.strengths",
     "weaknessesKey": "deepseek-coder-v2-16b.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19",
     "ollama": {
       "pullCmd": "ollama pull deepseek-coder-v2:16b",
       "tags": [
@@ -7129,7 +7328,7 @@
     "vramRequirement": 9,
     "strengthsKey": "deepseek-r1-14b.strengths",
     "weaknessesKey": "deepseek-r1-14b.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19",
     "ollama": {
       "pullCmd": "ollama pull deepseek-r1:14b",
       "tags": [
@@ -7256,7 +7455,7 @@
     "vramRequirement": 11,
     "strengthsKey": "qwen25-coder-14b.strengths",
     "weaknessesKey": "qwen25-coder-14b.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19",
     "ollama": {
       "pullCmd": "ollama pull qwen2.5-coder:14b",
       "tags": [],
@@ -7400,7 +7599,7 @@
     "vramRequirement": 70,
     "strengthsKey": "qwen25-coder-32b.strengths",
     "weaknessesKey": "qwen25-coder-32b.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19",
     "ollama": {
       "pullCmd": "ollama pull qwen2.5-coder:32b",
       "tags": [],
@@ -7543,7 +7742,7 @@
     "vramRequirement": 16,
     "strengthsKey": "qwen25-coder-7b.strengths",
     "weaknessesKey": "qwen25-coder-7b.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19",
     "ollama": {
       "pullCmd": "ollama pull qwen2.5-coder:7b",
       "tags": [],
@@ -7661,7 +7860,7 @@
     "vramRequirement": null,
     "strengthsKey": "codestral.strengths",
     "weaknessesKey": "codestral.weaknesses",
-    "lastUpdated": "2026-05-18T15:37:35Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "active",
     "notApplicableBenchKeys": [
       "programBench",
@@ -7718,6 +7917,12 @@
       "license": null,
       "releasedISO": null,
       "ollamaUrl": "https://ollama.com/library/codestral"
+    },
+    "privacy": {
+      "gdpr": true,
+      "soc2": true,
+      "trainingDataOptOut": "available",
+      "apiLogging": "default_on"
     }
   },
   {
@@ -7793,7 +7998,7 @@
     "vramRequirement": 14,
     "strengthsKey": "devstral-small-2.strengths",
     "weaknessesKey": "devstral-small-2.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "ollama": {
       "pullCmd": "ollama pull devstral-small:2",
       "tags": [
@@ -7833,7 +8038,12 @@
     "bench.lcb": 33.7,
     "bench.tau2": 19.9,
     "bench.gpqa": 49.2,
-    "bench.hle": 3.8
+    "bench.hle": 3.8,
+    "privacy": {
+      "gdpr": true,
+      "soc2": true,
+      "trainingDataOptOut": "available"
+    }
   },
   {
     "id": "claude-haiku-4-5",
@@ -7923,7 +8133,7 @@
     "vramRequirement": null,
     "strengthsKey": "claude-haiku-4-5.strengths",
     "weaknessesKey": "claude-haiku-4-5.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "benchUpdated": {
       "swePro": "2026-05-18",
       "sweV": "2026-05-19",
@@ -8009,6 +8219,15 @@
         "winning_cluster_sum_trust": 1.606,
         "winning_cluster_distinct_sources": 2
       }
+    },
+    "privacy": {
+      "trainingDataOptOut": "available",
+      "dataResidency": [
+        "US"
+      ],
+      "soc2": true,
+      "gdpr": true,
+      "apiLogging": "not_logged"
     }
   },
   {
@@ -8096,7 +8315,7 @@
     "providers": 2,
     "strengthsKey": "gpt-5-5.strengths",
     "weaknessesKey": "gpt-5-5.weaknesses",
-    "lastUpdated": "2026-05-18T15:37:35Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "active",
     "sourcesAdded": [
       {
@@ -8188,6 +8407,23 @@
         "winning_cluster_sum_trust": 3.202,
         "winning_cluster_distinct_sources": 3
       }
+    },
+    "privacy": {
+      "soc2": true,
+      "gdpr": true,
+      "trainingDataOptOut": "available",
+      "dataResidency": [
+        "AU",
+        "CA",
+        "EU",
+        "IN",
+        "JP",
+        "KR",
+        "SG",
+        "UK",
+        "US"
+      ],
+      "apiLogging": "opt_out"
     }
   },
   {
@@ -8268,7 +8504,7 @@
     },
     "strengthsKey": "grok-4-20.strengths",
     "weaknessesKey": "grok-4-20.weaknesses",
-    "lastUpdated": "2026-05-18T18:20:43Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "benchUpdated": {
       "swePro": "2026-05-18",
       "sweV": "2026-05-18",
@@ -8365,6 +8601,12 @@
         "winning_cluster_sum_trust": 6.181,
         "winning_cluster_distinct_sources": 4
       }
+    },
+    "privacy": {
+      "trainingDataOptOut": "none",
+      "apiLogging": "default_on",
+      "gdpr": true,
+      "soc2": true
     }
   },
   {
@@ -8450,7 +8692,7 @@
     "vramRequirement": null,
     "strengthsKey": "grok-4-3.strengths",
     "weaknessesKey": "grok-4-3.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "notApplicableBenchKeys": [
       "programBench",
       "webDevElo"
@@ -8503,6 +8745,12 @@
         "winning_cluster_sum_trust": 3.72,
         "winning_cluster_distinct_sources": 4
       }
+    },
+    "privacy": {
+      "trainingDataOptOut": "none",
+      "apiLogging": "default_on",
+      "gdpr": true,
+      "soc2": true
     }
   },
   {
@@ -8590,7 +8838,7 @@
     "vramRequirement": null,
     "strengthsKey": "grok-4-1-fast.strengths",
     "weaknessesKey": "grok-4-1-fast.weaknesses",
-    "lastUpdated": "2026-05-18T18:20:43Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "notApplicableBenchKeys": [
       "programBench",
       "webDevElo"
@@ -8608,7 +8856,13 @@
       "tb2": "2026-05-18"
     },
     "deprecatedAt": "2026-05-15",
-    "successor": "grok-4-3"
+    "successor": "grok-4-3",
+    "privacy": {
+      "trainingDataOptOut": "none",
+      "apiLogging": "default_on",
+      "gdpr": true,
+      "soc2": true
+    }
   },
   {
     "id": "glm-4-5-air",
@@ -8740,7 +8994,7 @@
     "vramRequirement": 24,
     "strengthsKey": "glm-4-5-air.strengths",
     "weaknessesKey": "glm-4-5-air.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "active",
     "_stubReason": "lineup-discovery placeholder; bench cells pending next /aicodermap refresh cycle",
     "_stubAddedDate": "2026-05-06",
@@ -8762,6 +9016,13 @@
         "winning_cluster_sum_trust": 2.868,
         "winning_cluster_distinct_sources": 3
       }
+    },
+    "privacy": {
+      "trainingDataOptOut": "unknown",
+      "dataResidency": [
+        "SG"
+      ],
+      "apiLogging": "unknown"
     }
   },
   {
@@ -8914,7 +9175,7 @@
     "vramRequirement": 40,
     "strengthsKey": "glm-4-7.strengths",
     "weaknessesKey": "glm-4-7.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "active",
     "_stubReason": "lineup-discovery placeholder; bench cells pending next /aicodermap refresh cycle",
     "_stubAddedDate": "2026-05-06",
@@ -8944,6 +9205,13 @@
         "winning_cluster_sum_trust": 6.797,
         "winning_cluster_distinct_sources": 6
       }
+    },
+    "privacy": {
+      "trainingDataOptOut": "unknown",
+      "dataResidency": [
+        "SG"
+      ],
+      "apiLogging": "unknown"
     }
   },
   {
@@ -9060,7 +9328,7 @@
     "vramRequirement": 80,
     "strengthsKey": "mistral-medium-3-5.strengths",
     "weaknessesKey": "mistral-medium-3-5.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "active",
     "_stubReason": "lineup-discovery placeholder; bench cells pending next /aicodermap refresh cycle",
     "_stubAddedDate": "2026-05-06",
@@ -9074,6 +9342,12 @@
         "winning_cluster_sum_trust": 1.436,
         "winning_cluster_distinct_sources": 1
       }
+    },
+    "privacy": {
+      "gdpr": true,
+      "soc2": true,
+      "trainingDataOptOut": "available",
+      "apiLogging": "default_on"
     }
   },
   {
@@ -9207,7 +9481,7 @@
     "vramRequirement": 20,
     "strengthsKey": "qwen3-5-9b.strengths",
     "weaknessesKey": "qwen3-5-9b.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19",
     "status": "active",
     "_stubReason": "lineup-discovery placeholder; bench cells pending next /aicodermap refresh cycle",
     "_stubAddedDate": "2026-05-06",
@@ -9385,7 +9659,7 @@
     "vramRequirement": null,
     "strengthsKey": "minimax-m2-1.strengths",
     "weaknessesKey": "minimax-m2-1.weaknesses",
-    "lastUpdated": "2026-05-18T22:55:47Z",
+    "lastUpdated": "2026-05-19T00:14:53Z",
     "status": "active",
     "_stubReason": "lineup-discovery placeholder; bench cells pending next /aicodermap refresh cycle",
     "_stubAddedDate": "2026-05-06",
@@ -9447,6 +9721,9 @@
         "winning_cluster_sum_trust": 2.143,
         "winning_cluster_distinct_sources": 2
       }
+    },
+    "privacy": {
+      "trainingDataOptOut": "available"
     }
   }
 ]

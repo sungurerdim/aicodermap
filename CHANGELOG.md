@@ -1,4 +1,17 @@
 
+## [2026-05-19] — autonomous refresh-all [WARN: very low cumulative provenance coverage 45.2%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 0 new fills; 430 cells auto-gapped by orchestrator; 0 explicit agent gaps preserved]
+
+[fillRatio:0.45 cells:461/1020 contradictions:0 fetch:0.0min tools:None batches:None build:07d866a]
+
+### Updated
+- 36 models: `claude-haiku-4-5`, `codestral`, `codestral-22b`, `deepseek-v3-2`, `deepseek-v4-flash`, `deepseek-v4-pro`, `devstral-2`, `devstral-medium`, `devstral-small-2`, `gemini-3-1-flash`, `gemini-3-1-pro`, `glm-4-5-air`, `glm-4-7`, `glm-5-1`, `gpt-4-1`, `gpt-5-4`, `gpt-5-5`, `grok-3`, `grok-3-mini`, `grok-4-1-fast`, `grok-4-20`, `grok-4-3`, `kimi-k2-6`, `llama-4-maverick`, `llama-4-scout`, `minimax-m2-1`, `minimax-m2-5`, `minimax-m2-7`, `mistral-large-3`, `mistral-medium-3-5`, `nemotron-3-super`, `o3`, `o4-mini`, `opus-4-7`, `sonnet-4-6`, `step-3-5-flash`
+
+### Gaps (430 entries — agent:0 orchestrator:430 — see data/known-gaps.json or next refresh)
+- `claude-haiku-4-5.aaAgentic` *(orchestrator)*: not reached in agent survey cycle; AA Agentic data unavailable
+- `claude-haiku-4-5.aaCoding` *(orchestrator)*: not reached in agent survey cycle; AA Coding data unavailable
+- ... and 428 more
+
+
 ## [2026-05-19] — autonomous refresh-all [WARN: very low cumulative provenance coverage 45.3%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 138 new fills; 429 cells auto-gapped by orchestrator; 1 explicit agent gaps preserved]
 
 [fillRatio:0.45 cells:461/1020 contradictions:10 fetch:0.0min tools:None batches:None build:fb2f730]
