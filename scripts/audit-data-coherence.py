@@ -343,6 +343,7 @@ def main():
         "DE",
         "FR",
         "KR",
+        "CN",
         "global",
     }
     logging_values = {

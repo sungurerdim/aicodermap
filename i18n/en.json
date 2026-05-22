@@ -433,7 +433,13 @@
     "grok-4-3": {
       "strengths": "",
       "weaknesses": ""
-    }
+    },
+    "gemini-3-5-flash.strengths": "Fast, low-cost Gemini tier optimized for agentic and coding workloads; 1M-token context.",
+    "gemini-3-5-flash.weaknesses": "Benchmark coverage pending verification; proprietary, cloud-only.",
+    "qwen3-7-max.strengths": "Qwen flagship reasoning-agent model with 1M-token context; strong coding and agentic performance.",
+    "qwen3-7-max.weaknesses": "Closed-weight preview; independent bench coverage pending; priced above mid-tier Qwen.",
+    "qwen3-7-plus.strengths": "Multimodal Qwen3.7 variant with 1M-token context for combined vision and code tasks.",
+    "qwen3-7-plus.weaknesses": "Closed-weight preview; limited independent benchmarks at launch."
   },
   "benchmarks": {
     "swePro": {

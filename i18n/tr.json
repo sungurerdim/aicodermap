@@ -433,7 +433,13 @@
     "grok-4-3": {
       "strengths": "",
       "weaknesses": ""
-    }
+    },
+    "gemini-3-5-flash.strengths": "Agentic ve kodlama iş yükleri için optimize edilmiş hızlı, düşük maliyetli Gemini katmanı; 1M-token bağlam.",
+    "gemini-3-5-flash.weaknesses": "Benchmark kapsamı doğrulanmayı bekliyor; tescilli, yalnızca bulut.",
+    "qwen3-7-max.strengths": "1M-token bağlamlı Qwen amiral gemisi akıl yürütme-agent modeli; güçlü kodlama ve agentic performansı.",
+    "qwen3-7-max.weaknesses": "Kapalı ağırlıklı önizleme; bağımsız bench kapsamı bekliyor; orta seviye Qwen üzerinde fiyat.",
+    "qwen3-7-plus.strengths": "Görüntü ve kod görevlerini birleştiren, 1M-token bağlamlı çok kipli Qwen3.7 varyantı.",
+    "qwen3-7-plus.weaknesses": "Kapalı ağırlıklı önizleme; lansmanda sınırlı bağımsız benchmark."
   },
   "benchmarks": {
     "swePro": {

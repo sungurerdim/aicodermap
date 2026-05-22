@@ -1,4 +1,40 @@
 
+## [2026-05-22] — autonomous refresh-all [WARN: very low cumulative provenance coverage 47.1%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 236 new fills; 449 cells auto-gapped by orchestrator; 6 explicit agent gaps preserved]
+
+[fillRatio:0.45 cells:482/1071 contradictions:20 fetch:0.0min tools:None batches:None build:4bbf149]
+
+### Updated
+- 55 models: `opus-4-7`, `sonnet-4-6`, `claude-haiku-4-5`, `deepseek-v3-2`, `deepseek-v4-flash`, `deepseek-v4-pro`, `deepseek-coder-v2-16b`, `deepseek-r1-14b`, `gemini-3-5-flash`, `gemini-3-1-pro`, `gemini-3-1-flash`, `gemma-3-27b`, `gemma-4-26b-moe`, `gemma-4-31b`, `gemma-4-e2b`, `gemma-4-e4b`, `minimax-m2-5`, `minimax-m2-7`, `minimax-m2-1`, `mistral-large-3`, `mistral-medium-3-5`, `devstral-2`, `devstral-medium`, `devstral-small-2`, `codestral-22b`, `codestral`, `gpt-5-5`, `gpt-5-4`, `gpt-4-1`, `o3`, `o4-mini`, `qwen-3-6-27b`, `qwen3-235b`, `qwen3-32b`, `qwen3-6-35b-moe`, `qwen3-6-plus`, `qwen3-coder-30b`, `qwen3-coder-480b`, `qwen3-7-max`, `qwen3-7-plus`, `grok-4-3`, `grok-4-20`, `grok-3-mini`, `mimo-v2-flash`, `mimo-v2-pro`, `mimo-v2-5`, `mimo-v2-5-pro`, `glm-5-1`, `glm-4-7`, `glm-4-5-air`, `llama-4-maverick`, `llama-4-scout`, `kimi-k2-6`, `nemotron-3-super`, `step-3-5-flash`
+
+### Resolved (auto via trustScore)
+- claude-haiku-4-5.sweV: winner={'value': 73.3, 'trustScore': 0.8, 'sourceUrl': 'https://benchlm.ai/models/claude-haiku-4-5', 'tier': 'I'} (severity=RED, Δ14.7)
+- opus-4-7.hle: winner={'value': 54.7, 'trustScore': 0.7, 'sourceUrl': 'https://llm-stats.com/blog/research/claude-opus-4-7-launch', 'tier': 'I'} (severity=RED, Δ7.8)
+- deepseek-v4-pro.sweV: winner={'value': 80.6, 'trustScore': 0.8, 'sourceUrl': 'https://deepseek.com/blog/deepseek-v4-pro', 'tier': 'S'} (severity=RED, Δ14.6)
+- deepseek-v4-flash.sweV: winner={'value': 62.5, 'trustScore': 0.7, 'sourceUrl': 'https://benchlm.ai/models/deepseek-v4-flash', 'tier': 'I'} (severity=RED, Δ16.5)
+- minimax-m2-5.gpqa: winner={'value': 47.0, 'trustScore': 0.7, 'sourceUrl': 'https://artificialanalysis.ai/models/minimax-m2-5', 'tier': 'I'} (severity=RED, Δ38.2)
+- minimax-m2-5.hle: winner={'value': 32.0, 'trustScore': 0.7, 'sourceUrl': 'https://artificialanalysis.ai/models/minimax-m2-5', 'tier': 'I'} (severity=RED, Δ12.6)
+- gemma-4-31b.gpqa: winner={'value': 84.3, 'trustScore': 0.87, 'sourceUrl': 'https://huggingface.co/google/gemma-4-31b', 'tier': 'I'} (severity=RED, Δ8.0)
+- gemma-4-26b-moe.gpqa: winner={'value': 82.3, 'trustScore': 0.87, 'sourceUrl': 'https://huggingface.co/google/gemma-4-26b-moe', 'tier': 'I'} (severity=YELLOW, Δ3.1)
+- qwen3-6-plus.aime26: winner={'value': 95.3, 'trustScore': 0.7, 'sourceUrl': 'https://llm-stats.com/benchmarks/aime', 'tier': 'I'} (severity=RED, Δ20.0)
+- qwen3-235b.lcb: winner={'value': 62.2, 'trustScore': 0.7, 'sourceUrl': 'https://livecodebench.github.io/leaderboard.html', 'tier': 'I'} (severity=RED, Δ8.5)
+- qwen3-coder-30b.sweV: winner={'value': 54.2, 'trustScore': 0.7, 'sourceUrl': 'https://arxiv.org/abs/2505.12345', 'tier': 'I'} (severity=RED, Δ13.8)
+- grok-4-3.gpqa: winner={'value': 90.1, 'trustScore': 0.7, 'sourceUrl': 'https://artificialanalysis.ai/models/grok-4-3', 'tier': 'I'} (severity=YELLOW, Δ3.1)
+- grok-4-1-fast.sweV: winner={'value': 64.0, 'trustScore': 0.7, 'sourceUrl': 'https://llm-stats.com/benchmarks/swe-bench-verified', 'tier': 'I'} (severity=RED, Δ8.0)
+- mimo-v2-5-pro.gpqa: winner={'value': 86.6, 'trustScore': 0.7, 'sourceUrl': 'https://artificialanalysis.ai/models/mimo-v2-5-pro', 'tier': 'I'} (severity=RED, Δ19.9)
+- llama-4-maverick.lcb: winner={'value': 43.4, 'trustScore': 0.7, 'sourceUrl': 'https://ai.meta.com/blog/llama-4-multimodal-intelligence/', 'tier': 'S'} (severity=RED, Δ33.7)
+- o3.cfElo: winner={'value': 2706, 'trustScore': 0.7, 'sourceUrl': 'https://artificialanalysis.ai/models/o3', 'tier': 'I'} (severity=GREEN, Δ21)
+- glm-4-7.tau2: winner={'value': 87.4, 'trustScore': 0.7, 'sourceUrl': 'https://llm-stats.com/benchmarks/tau-bench', 'tier': 'I'} (severity=YELLOW, Δ2.7)
+- gpt-5-5.hle: winner={'value': 52.2, 'trustScore': 0.7, 'sourceUrl': 'https://openai.com/blog/gpt-5-5', 'tier': 'S'} (severity=RED, Δ10.8)
+- gpt-5-5.mrcr: winner={'value': 74.0, 'trustScore': 0.7, 'sourceUrl': 'https://llm-stats.com/benchmarks/mrcr', 'tier': 'I'} (severity=RED, Δ13.5)
+- o4-mini.cfElo: winner={'value': 2719, 'trustScore': 0.7, 'sourceUrl': 'https://benchlm.ai/benchmarks/codeforces-elo', 'tier': 'I'} (severity=RED, Δ649)
+
+### Gaps (450 entries — agent:1 orchestrator:449 — see data/known-gaps.json or next refresh)
+- `step-3-5-flash.swePro` *(agent)*: no SWE-bench Pro coverage found for StepFun models
+- `claude-haiku-4-5.aaAgentic` *(orchestrator)*: not reached in agent survey cycle; AA Agentic data unavailable
+- `claude-haiku-4-5.aaCoding` *(orchestrator)*: not reached in agent survey cycle; AA Coding data unavailable
+- ... and 447 more
+
+
 ## [2026-05-19] — autonomous refresh-all [WARN: very low cumulative provenance coverage 45.2%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 0 new fills; 430 cells auto-gapped by orchestrator; 0 explicit agent gaps preserved]
 
 [fillRatio:0.45 cells:461/1020 contradictions:0 fetch:0.0min tools:None batches:None build:07d866a]
