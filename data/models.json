@@ -2179,9 +2179,9 @@
       "api": [
         {
           "provider": "official",
-          "in": 0.15,
-          "out": 0.6,
-          "cacheHit": 0.04,
+          "in": 0.14,
+          "out": 0.28,
+          "cacheHit": 0.0028,
           "throughput": null,
           "url": "https://api-docs.deepseek.com/quick_start/pricing",
           "fetched": "2026-05-22"
@@ -2213,8 +2213,8 @@
           0.6
         ],
         "cacheHit": [
-          0.04,
-          0.04
+          0.0028,
+          0.0028
         ]
       },
       "subscription": null
@@ -2252,7 +2252,7 @@
     "vramRequirement": null,
     "strengthsKey": "deepseek-v4-flash.strengths",
     "weaknessesKey": "deepseek-v4-flash.weaknesses",
-    "lastUpdated": "2026-05-22T17:24:04Z",
+    "lastUpdated": "2026-05-22T18:12:06Z",
     "ollama": {
       "pullCmd": "ollama pull deepseek-v4-flash:cloud",
       "ollamaUrl": "https://ollama.com/library/deepseek-v4-flash",
@@ -2389,9 +2389,9 @@
       "api": [
         {
           "provider": "official",
-          "in": 1.74,
-          "out": 3.48,
-          "cacheHit": 0.0145,
+          "in": 0.435,
+          "out": 0.87,
+          "cacheHit": 0.003625,
           "throughput": null,
           "url": "https://api-docs.deepseek.com/quick_start/pricing",
           "fetched": "2026-05-22"
@@ -2409,7 +2409,7 @@
           "provider": "deepinfra",
           "in": 1.74,
           "out": 3.48,
-          "cacheHit": 0.145,
+          "cacheHit": 0.0145,
           "throughput": null,
           "url": "https://deepinfra.com/pricing",
           "fetched": "2026-05-22"
@@ -2443,8 +2443,8 @@
           3.48
         ],
         "cacheHit": [
-          0.0145,
-          0.145
+          0.003625,
+          0.0145
         ]
       },
       "subscription": null
@@ -2481,7 +2481,7 @@
     "vramRequirement": null,
     "strengthsKey": "deepseek-v4-pro.strengths",
     "weaknessesKey": "deepseek-v4-pro.weaknesses",
-    "lastUpdated": "2026-05-22T17:24:04Z",
+    "lastUpdated": "2026-05-22T18:12:06Z",
     "status": "active",
     "benchUpdated": {
       "sweV": "2026-05-22",
