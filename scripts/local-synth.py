@@ -156,6 +156,13 @@ def main() -> int:
                 val = float(val)
             except Exception:
                 continue
+            # Drop out-of-range bench values (mirrors audit-data-coherence.py
+            # _bench_max). A mis-scaled obs — e.g. aaAgentic recorded as a raw
+            # LMArena Elo (1753) instead of the 0-100 index — must never enter
+            # the cluster pool or win a cell. cfElo/webDevElo keep raw-Elo caps.
+            _hi = 3500 if bk == "cfElo" else (2000 if bk == "webDevElo" else 100)
+            if val < 0 or val > _hi:
+                continue
             cells[(mid, bk)].append(
                 {
                     "value": val,
@@ -435,6 +442,34 @@ def main() -> int:
         round(covered / max(total_cells, 1), 4) if total_cells else 0.0
     )
 
+    # Canonicalize raw gather gaps to the schema-valid `key` shape
+    # ("<modelId>.<benchKey>", Branch A of agent-out.schema.json gaps[]).
+    # Gather emits {modelId, benchKey, ...}; merge.py's validator and gap_gen
+    # both key on `key`/`field`, not `benchKey` — so a passthrough produced
+    # schema-invalid gaps AND double-counting in gap_gen. Dedup by cell and
+    # restrict to active × core so the filled+gaps invariant holds.
+    _gap_seen: set[tuple[str, str]] = set()
+    gap_entries: list = []
+    for rg in all_raw_gaps:
+        mid = rg.get("modelId")
+        bk = rg.get("benchKey")
+        if not mid or not bk or mid not in active_ids or bk not in core_keys:
+            continue
+        if (mid, bk) in _gap_seen:
+            continue
+        _gap_seen.add((mid, bk))
+        gap_entries.append(
+            {
+                "key": f"{mid}.{bk}",
+                "reason": rg.get("reason") or "agent surveyed; value unavailable",
+                "triedSources": rg.get("triedSources") or [],
+                "triedQueries": rg.get("triedQueries") or [],
+                "triedFormats": rg.get("triedFormats")
+                or ["static_html_table", "websearch_snippet"],
+                "source": "agent",
+            }
+        )
+
     artifact = {
         "scope": "full",
         "mode": "synth-local",
@@ -449,7 +484,7 @@ def main() -> int:
             "removed": [],
             "hints": all_lineup_hints,
         },
-        "gaps": all_raw_gaps,
+        "gaps": gap_entries,
         "notApplicable": not_applicable,
         "i18nUpdates": {},
         "validationCoverage": validation_coverage,
@@ -475,7 +510,7 @@ def main() -> int:
     print(f"  fills (cellsFilled): {fills_count}")
     print(f"  contradictions: {len(contradictions)}")
     print(f"  naPromoted: {len(not_applicable)}")
-    print(f"  gapsCarried: {len(all_raw_gaps)}")
+    print(f"  gapsCarried: {len(gap_entries)} (deduped from {len(all_raw_gaps)} raw)")
     print(f"  validationCoverage: {validation_coverage * 100:.1f}%")
     return 0
 
