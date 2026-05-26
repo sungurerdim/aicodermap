@@ -26,14 +26,13 @@ def total_universe(
 def na_cells(
     active: Iterable[dict[str, Any]], core_keys: Iterable[str]
 ) -> set[tuple[str, str]]:
-    """`notApplicableBenchKeys` her model entry'sinde tutulur."""
-    out: set[tuple[str, str]] = set()
-    keys = set(core_keys)
-    for m in active:
-        for k in m.get("notApplicableBenchKeys", []) or []:
-            if k in keys:
-                out.add((m["id"], k))
-    return out
+    """RETIRED 2026-05-25: the N/A permanent-skip is gone. Every (model, bench)
+    cell is now FILLED or GAP — an unmeasured cell becomes a gap and is
+    re-researched every cycle (freshness-skip is the only skip). Returns the
+    empty set so every consumer (expected_total / priority_cells /
+    matrix_snapshot / verify_matrix_invariant) treats N/A as permanently empty
+    without signature churn. `notApplicableBenchKeys` is no longer read."""
+    return set()
 
 
 def filled_cells_from_models(
@@ -77,10 +76,9 @@ def gap_cells_from_artifact(
 
 
 def expected_total(active: Iterable[dict[str, Any]], core_keys: Iterable[str]) -> int:
-    """|active_models| × |core_bench_keys| - |na_cells|."""
-    active = list(active)
-    keys = list(core_keys)
-    return len(active) * len(keys) - len(na_cells(active, keys))
+    """|active_models| × |core_bench_keys|. N/A retired (see na_cells), so the
+    target is the full cell universe — every cell is FILLED or GAP."""
+    return len(list(active)) * len(list(core_keys))
 
 
 def priority_cells(

@@ -270,14 +270,13 @@
       assertTrue('every sources.json key references a known model id',
         unknownSrcModels === 0, `unknown=${unknownSrcModels}`);
 
-      // 14c. SSOT — every notApplicableBenchKeys entry is a known BENCH_KEYS.
-      let badNa = [];
-      for (const m of State.models) {
-        const na = Array.isArray(m.notApplicableBenchKeys) ? m.notApplicableBenchKeys : [];
-        for (const k of na) if (!benchSet.has(k)) badNa.push(`${m.id}.${k}`);
-      }
-      assertTrue('notApplicableBenchKeys ⊆ BENCH_KEYS', badNa.length === 0,
-        badNa.length ? badNa.slice(0, 5).join(',') : '');
+      // 14c. N/A retired — no model carries notApplicableBenchKeys/notApplicable.
+      // Every (model, bench) cell is FILLED or GAP; absent cells are gaps.
+      const naModels = State.models.filter(m =>
+        (Array.isArray(m.notApplicableBenchKeys) && m.notApplicableBenchKeys.length) ||
+        (Array.isArray(m.notApplicable) && m.notApplicable.length));
+      assertTrue('N/A retired (no notApplicableBenchKeys)', naModels.length === 0,
+        naModels.length ? naModels.slice(0, 5).map(m => m.id).join(',') : '');
 
       // 14e. SSOT — featuredPresets ⊆ existing GPU entries.
       try {

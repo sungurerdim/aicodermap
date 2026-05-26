@@ -165,7 +165,6 @@ def build_model(s):
         },
         "bench": {k: None for k in ALL_BENCH_KEYS},
         "benchUpdated": {},
-        "notApplicableBenchKeys": [],
         "benchQuarantine": {},
         "providers": None,
         "uptime": None,

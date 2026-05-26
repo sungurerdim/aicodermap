@@ -127,7 +127,6 @@ def main() -> int:
     all_pricing: dict[str, list] = defaultdict(list)
     all_ollama: dict[str, list] = defaultdict(list)
     all_unsloth: dict[str, list] = defaultdict(list)
-    all_na_candidates: list = []
     all_raw_gaps: list = []
     all_lineup_hints: list = []
     runtime_total = {
@@ -204,9 +203,9 @@ def main() -> int:
             if mid in active_ids:
                 all_unsloth[mid].append(uo)
                 runtime_total["unslothObsTotal"] += 1
-        for nc in art.get("naCandidates") or []:
-            all_na_candidates.append(nc)
-            runtime_total["naCandidatesTotal"] += 1
+        # N/A retired: naCandidates are counted for telemetry only, never
+        # promoted — every (model, bench) cell is FILLED or GAP.
+        runtime_total["naCandidatesTotal"] += len(art.get("naCandidates") or [])
         for rg in art.get("rawGaps") or []:
             all_raw_gaps.append(rg)
             runtime_total["rawGapsTotal"] += 1
@@ -424,17 +423,10 @@ def main() -> int:
         or m.get("unslothObservations")
     ]
 
-    # Compute notApplicable promotion: only those with a matching rule
+    # N/A retired 2026-05-25: naCandidates are no longer promoted to
+    # notApplicable. Every (model, bench) cell is FILLED or GAP — an unmeasured
+    # cell stays a gap and is re-researched every cycle (freshness-skip only).
     not_applicable: list = []
-    na_rules = wl.get("_schema", {}).get("notApplicableRules", {})
-    valid_rule_keys = set()
-    if isinstance(na_rules, dict):
-        # Common shapes: {ruleId: {description, ...}} OR {benchKey: [ruleIds]}
-        valid_rule_keys = set(na_rules.keys())
-    for nc in all_na_candidates:
-        rule_id = nc.get("ruleId") or nc.get("rule") or nc.get("reason")
-        if rule_id and (not valid_rule_keys or rule_id in valid_rule_keys):
-            not_applicable.append(nc)
 
     # Coverage computation
     total_cells = len(active) * len(core_keys)

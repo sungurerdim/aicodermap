@@ -575,76 +575,8 @@
       "HEALTH_CHECK_TTL_DAYS": 7
     },
     "notApplicableRules": {
-      "_purpose": "Tier/capability based rules that mark a (model, benchKey) cell as naturally not-applicable so it does not count against the matrix invariant. Agent emits cells under these rules into models[].notApplicable[]; orchestrator reconciles.",
-      "_schema": {
-        "rule": "<rule name>",
-        "appliesTo": "<criteria — matched against model entry>",
-        "excludeBenchKeys": "<list of bench keys naturally undefined>"
-      },
-      "rules": [
-        {
-          "rule": "embedding-only-tier",
-          "appliesTo": {
-            "tier": [
-              "embedding"
-            ]
-          },
-          "excludeBenchKeys": [
-            "swePro",
-            "sweV",
-            "sweMulti",
-            "nl2Repo",
-            "tb2",
-            "tbHard",
-            "lcb",
-            "tau2",
-            "tau3",
-            "mcpA",
-            "bfcl",
-            "browseComp",
-            "aaCoding",
-            "aaAgentic",
-            "cfElo",
-            "webDevElo"
-          ]
-        },
-        {
-          "rule": "spa-blocked-bench-without-alt",
-          "appliesTo": {
-            "_purpose": "When the canonical publisher is SPA-blocked AND no alt publisher exists, the bench is unfillable for any model — agent records cells under notApplicable[] citing this rule.",
-            "leaderboardFormat": [
-              "spa_full"
-            ],
-            "altPublisherCount": 0
-          },
-          "excludeBenchKeys": [],
-          "addedDate": "2026-05-06"
-        },
-        {
-          "rule": "vendor-no-niche-bench-publish",
-          "description": "Vendor does not publish niche bench score (e.g. OpenAI nl2Repo, xAI cfElo). Research will keep attempting; vendor may publish later."
-        },
-        {
-          "rule": "legacy-bench-superseded",
-          "description": "Bench deprecated by vendor in favor of newer eval (e.g. mmluPro → MMLU-Redux). Re-attempted each cycle; replaced if vendor publishes refresh."
-        },
-        {
-          "rule": "closed-weight-no-local-runtime",
-          "description": "Proprietary model has no Ollama/Unsloth equivalent — vramRequirement, ollamaSize, unslothVariants N/A."
-        },
-        {
-          "rule": "compute-only-public-no-elo",
-          "description": "cfElo / chatbotArena require public vote-based ranking; vendor model not surfaced in arena."
-        },
-        {
-          "rule": "vendor-emphasis-mismatch",
-          "description": "Vendor focus on different benchmarks than industry standard (research-grade or non-Western leaderboards)."
-        },
-        {
-          "rule": "edge-model-no-frontier-bench",
-          "description": "Edge/on-device model not benchmarked against frontier evals (e.g. Gemma 4 e2b vs swePro)."
-        }
-      ]
+      "_retired": "N/A retired 2026-05-26 — every (model, bench) cell is FILLED or GAP; the agent emits no notApplicable and gap-gen turns unmeasured cells into gaps (freshness-skip only).",
+      "rules": []
     },
     "benchAliases": {
       "_purpose": "Canonical bench-key ↔ human-name mapping. Agent extraction maps scraped names back to canonical keys via this table — replaces the hardcoded EXTRACTION_DISCIPLINE row 5 table.",
@@ -3958,9 +3890,9 @@
       "consecutiveFailures": 0,
       "rationale": "Model review pages with structured benchmark tables for new proprietary/preview models.",
       "extractedFields": [
-        "qwen-3-6-max.bench.lcbV6",
-        "qwen-3-6-max.bench.gpqa",
-        "qwen-3-6-max.bench.hle"
+        "qwen3-6-max.bench.lcbV6",
+        "qwen3-6-max.bench.gpqa",
+        "qwen3-6-max.bench.hle"
       ]
     },
     {

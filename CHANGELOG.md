@@ -1,4 +1,30 @@
 
+## [2026-05-26] — N/A permanent-skip retired + model-agnostic naming canonicalization
+
+Manual pipeline + data change (no refresh). Two model-agnostic fixes.
+
+### Changed
+- **N/A retired end-to-end.** The `notApplicableBenchKeys` permanent-skip is gone —
+  every (model, bench) cell is now FILLED or GAP. Unmeasured cells become gaps and
+  are re-researched every cycle; the ONLY skip is the freshness tier (confirmed +
+  ≥3 verifs + ≤7d). Cleared the field from all 63 models (589 previously-skipped
+  cells freed for research), emptied `_schema.notApplicableRules`, and removed N/A
+  generation/accounting from matrix.py, gap_gen.py, merge.py, local-synth.py,
+  render-card.js, and the agent + skill contracts. Matrix invariant is now
+  `filled + gaps == totalCells`. (Fixes frontier models like `gpt-5-5` whose
+  fetchable benches — e.g. `lcb` — were wrongly N/A-skipped, masking real coverage.)
+- **Model-agnostic display-name canonicalization.** Version minors now use a dot,
+  not a space: `Qwen3 7 Max` → `Qwen3.7 Max`, `Qwen3 7 Plus` → `Qwen3.7 Plus`.
+  Applied via `lib.util.canonical_display_name` in merge.py (self-corrects every
+  refresh) and enforced by new audit AC12. Param sizes (`Gemma 3 27B`) and dotted
+  versions (`Qwen 3.5 9B`) are intentionally untouched.
+- **ID slug consistency:** `qwen-3-6-27b` → `qwen3-6-27b`, `qwen-3-6-max` →
+  `qwen3-6-max` across models.json, sources.json, sources-whitelist.json, i18n, docs.
+
+### Audit
+- AC9 repurposed → blocks any `notApplicableBenchKeys`/`notApplicable` (N/A retired).
+- AC12 added → model name version-format must be canonical.
+
 ## [2026-05-22] — autonomous refresh-all [WARN: very low cumulative provenance coverage 47.1%] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 236 new fills; 449 cells auto-gapped by orchestrator; 6 explicit agent gaps preserved]
 
 [fillRatio:0.45 cells:482/1071 contradictions:20 fetch:0.0min tools:None batches:None build:4bbf149]

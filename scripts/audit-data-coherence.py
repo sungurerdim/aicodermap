@@ -37,6 +37,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lib.matrix import active_models as _active_models  # noqa: E402
+from lib.util import canonical_display_name as _canonical_name  # noqa: E402
 
 for _stream in (sys.stdout, sys.stderr):
     _reconf = getattr(_stream, "reconfigure", None)
@@ -305,16 +306,40 @@ def main():
     if bad_status:
         failures.append(f"models with non-canonical status: {bad_status}")
 
-    # === AC9 — notApplicableBenchKeys ⊆ coreBenchKeys ===
-    bad_na: list[str] = []
-    for m in models:
-        for k in m.get("notApplicableBenchKeys", []) or []:
-            if k not in canonical_bench:
-                bad_na.append(f"{m['id']}.notApplicableBenchKeys[{k}]")
-    if bad_na:
+    # === AC9 — N/A retired (no notApplicableBenchKeys / notApplicable) ===
+    # The N/A permanent-skip was retired 2026-05-26: every (model, bench) cell
+    # is FILLED or GAP — unmeasured cells become gaps and are re-researched each
+    # cycle (freshness-skip only). A reappearing notApplicableBenchKeys /
+    # notApplicable field means a stale data path or reverted agent contract.
+    has_na = [
+        m["id"]
+        for m in models
+        if m.get("notApplicableBenchKeys") or m.get("notApplicable")
+    ]
+    if has_na:
         failures.append(
-            f"AC9 — notApplicableBenchKeys references {len(bad_na)} non-canonical "
-            f"bench key(s): {bad_na[:5]}{' ...' if len(bad_na) > 5 else ''}"
+            f"AC9 — N/A is retired but {len(has_na)} model(s) still carry "
+            f"notApplicableBenchKeys/notApplicable: {has_na[:5]}"
+            f"{' ...' if len(has_na) > 5 else ''}"
+        )
+
+    # === AC12 — display name version-format canonical (model-agnostic) ===
+    # Every model name must already be in canonical form: a bare minor-version
+    # number uses a dot, not a space ("Qwen3.7 Max", never "Qwen3 7 Max").
+    # Reuses lib.util.canonical_display_name (SSOT with merge.py's auto-fix) so
+    # the gate and the fixer never diverge. Param sizes ("Gemma 3 27B") and
+    # already-dotted versions ("Qwen 3.5 9B") are intentionally left untouched.
+    bad_names: list[str] = []
+    for m in models:
+        nm = m.get("name")
+        if isinstance(nm, str):
+            canon = _canonical_name(nm)
+            if canon != nm:
+                bad_names.append(f"{m['id']}: {nm!r} -> {canon!r}")
+    if bad_names:
+        failures.append(
+            f"AC12 — {len(bad_names)} model name(s) not version-format canonical: "
+            f"{bad_names[:5]}{' ...' if len(bad_names) > 5 else ''}"
         )
 
     # === AC11 — privacy block shape (BLOCK) ===

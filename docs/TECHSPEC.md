@@ -121,7 +121,6 @@ attributed in `data/sources.json` separately.
     "swePro": "2026-04-30",
     "sweV": "2026-04-30"
   },
-  "notApplicableBenchKeys": [],
   "benchQuarantine": {},
   "providers": 4,
   "uptime": 99.8,
@@ -136,10 +135,10 @@ attributed in `data/sources.json` separately.
 
 **Schema notes (post-2026-04-29.d reform):**
 
-- `notApplicableBenchKeys[]` — list of `coreBenchKeys` where this model is
-  structurally not measurable (e.g. an embedded edge model on agentic
-  tool-use benchmarks). MX1 invariant counts these as `notApplicable`,
-  not `gap` — closes silent-omission loophole.
+- N/A retired (2026-05-26): there is no `notApplicableBenchKeys`. Every
+  (model, bench) cell is FILLED or GAP — an unmeasured cell is a gap,
+  re-researched every cycle (freshness-skip is the only skip). The MX1
+  invariant is `filled + gaps == totalCells`.
 - `benchQuarantine{}` — `{ benchKey: true }` map for cells where the only
   available source disagreed with itself across two recent fetches; UI
   warns but does not red-flag (MX5 single-publisher rule).
@@ -149,11 +148,11 @@ attributed in `data/sources.json` separately.
 
 ```json
 {
-  "id": "qwen-3-6-27b",
+  "id": "qwen3-6-27b",
   ...
   "ollamaSize": "18 GB (Q4_K_M, community)",
   "ollama": {
-    "pullCmd": "ollama pull qwen-3-6-27b",
+    "pullCmd": "ollama pull qwen3-6-27b",
     "tags": ["27b", "27b-q4_k_m", "27b-q8_0"],
     "pullCount": 412000,
     "architecture": "qwen3",
@@ -196,8 +195,8 @@ pathologies are now handled systematically:
    member is scaffold-tagged.
 2. **Tool-condition split** — observations carrying `tools=on/off`
    hints get an `evaluationContext.condition` annotation; merge.py
-   prefers to keep them in distinct cells via the
-   `notApplicableRules`-driven path, not collapse them.
+   prefers to keep them in distinct cells via the tool-condition
+   annotation path, not collapse them.
 3. **Category bleed** — a URL feeding multiple bench cells with the
    same value (e.g. an LCB extractor mis-routing a row into the sweV
    column) is flagged via `detect_category_bleed`; flagged

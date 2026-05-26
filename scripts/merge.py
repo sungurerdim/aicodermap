@@ -51,6 +51,7 @@ from lib.matrix import verify_matrix_invariant as _matrix_verify  # noqa: E402
 from lib.whitelist import contracts as _wl_contracts  # noqa: E402
 from lib.whitelist import core_bench_keys as _wl_core_bench_keys  # noqa: E402
 from lib.whitelist import load_whitelist as _wl_load  # noqa: E402
+from lib.util import canonical_display_name as _canonical_name  # noqa: E402
 from lib.telemetry import build_meta as _telemetry_build_meta  # noqa: E402
 from lib.telemetry import (  # noqa: E402
     metadata_changelog_row as _telemetry_changelog_row,
@@ -696,23 +697,10 @@ def main():
             continue
         if apply_model_update(m, upd.get("updates", {})):
             log["updated"].append(mid)
-        # Promote inline notApplicable[] entries (agent emits per-model array)
-        # into models[].notApplicableBenchKeys so the matrix invariant counts
-        # them correctly. Idempotent: dedupe before merge.
-        inline_na = upd.get("notApplicable") or []
-        if inline_na:
-            existing_na = m.setdefault("notApplicableBenchKeys", [])
-            existing_set = set(existing_na)
-            for entry in inline_na:
-                bk = entry.get("benchKey") if isinstance(entry, dict) else None
-                if bk and bk not in existing_set:
-                    existing_na.append(bk)
-                    existing_set.add(bk)
-            # Also clear bench cell if present (cell can't be both filled and na).
-            bench = m.setdefault("bench", {})
-            for bk in existing_set:
-                if bk in bench and bench.get(bk) is not None:
-                    bench[bk] = None
+        # N/A retired 2026-05-25: inline notApplicable[] is no longer promoted
+        # into models[].notApplicableBenchKeys. Every (model, bench) cell is
+        # FILLED or GAP; unmeasured cells stay gaps and are re-researched each
+        # cycle (freshness-skip is the only skip). See tasks.md.
         for s in upd.get("sourcesAdded", []) or []:
             if _is_unhealthy_source(s, unhealthy_urls):
                 log["spa_guard_rejections"] += 1
@@ -998,6 +986,17 @@ def main():
         json.dumps(vmap_updated, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
+
+    # Model-agnostic display-name canonicalization: fix version-dot anomalies
+    # (e.g. slug-derived "Qwen3 7 Max" -> "Qwen3.7 Max") so every refresh
+    # self-corrects without per-model patches. No-op for already-canonical names.
+    for m in models:
+        nm = m.get("name")
+        if isinstance(nm, str):
+            canon = _canonical_name(nm)
+            if canon != nm:
+                m["name"] = canon
+                log.setdefault("name_canonicalized", []).append(f"{nm} -> {canon}")
 
     issues = []
     for m in models:

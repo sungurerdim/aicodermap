@@ -7,7 +7,8 @@ preserves all fills + explicit gaps the agent emitted, and adds auto-gap
 entries for every remaining unfilled (active_model, bench_key) cell.
 
 Result: .aicodermap-agent-out.json that satisfies merge.py MX1 invariant
-(filled + gaps + notApplicable == totalCells) regardless of agent coverage.
+(filled + gaps == totalCells) regardless of agent coverage. N/A retired
+2026-05-25: every unmeasured cell is a gap, re-researched each cycle.
 
 Run from D:/GitHub/aicodermap/ directory.
 """
@@ -75,7 +76,6 @@ if ARTIFACT_PATH.exists():
 # Extract cells already covered by the agent artifact
 agent_filled: set[tuple[str, str]] = set()
 agent_gaps: set[tuple[str, str]] = set()
-agent_na: set[tuple[str, str]] = set()
 
 for entry in existing_artifact.get("models", []):
     mid = entry.get("id") or entry.get("modelId")
@@ -92,10 +92,6 @@ for entry in existing_artifact.get("models", []):
             bk = k.removeprefix("bench.")
             if bk in core_keys and v is not None:
                 agent_filled.add((mid, bk))
-    for na_entry in entry.get("notApplicable", []) or []:
-        bk = na_entry.get("benchKey") if isinstance(na_entry, dict) else None
-        if bk and bk in core_keys:
-            agent_na.add((mid, bk))
 
 for g in existing_artifact.get("gaps", []):
     key = g.get("key")
@@ -110,36 +106,17 @@ for g in existing_artifact.get("gaps", []):
         if mid and bk and mid in active_ids and bk in core_keys:
             agent_gaps.add((mid, bk))
 
-# Also count existing filled cells from data/models.json (merge.py preserves them)
+# Also count existing filled cells from data/models.json (merge.py preserves them).
+# N/A retired 2026-05-25: notApplicable / notApplicableBenchKeys are ignored —
+# previously-N/A cells fall into `missing` below and become gaps.
 existing_filled: set[tuple[str, str]] = set()
-existing_na: set[tuple[str, str]] = set()
-existing_na_entries: dict[str, list[dict]] = {}
 for m in active:
     bench = m.get("bench") or {}
     for k, v in bench.items():
         if k in core_keys and v is not None:
             existing_filled.add((m["id"], k))
-    # data/models.json carries notApplicable both as object list and as bare key list.
-    # gap-gen MUST preserve these — otherwise gap-gen enumerates them as gaps and
-    # merge.py MX1 fails with overlap_gap_na (filled+gaps+na > totalCells).
-    saved: list[dict] = []
-    for na in m.get("notApplicable", []) or []:
-        if isinstance(na, dict):
-            bk = na.get("benchKey") or na.get("key")
-            if bk in core_keys:
-                existing_na.add((m["id"], bk))
-                saved.append(na)
-        elif isinstance(na, str) and na in core_keys:
-            existing_na.add((m["id"], na))
-            saved.append({"benchKey": na, "rule": "preserved-from-data"})
-    for k in m.get("notApplicableBenchKeys", []) or []:
-        if k in core_keys and (m["id"], k) not in existing_na:
-            existing_na.add((m["id"], k))
-            saved.append({"benchKey": k, "rule": "preserved-from-data"})
-    if saved:
-        existing_na_entries[m["id"]] = saved
 
-all_covered = agent_filled | agent_gaps | agent_na | existing_filled | existing_na
+all_covered = agent_filled | agent_gaps | existing_filled
 
 # Build the universe
 total_universe = {(m["id"], k) for m in active for k in core_keys}
@@ -155,7 +132,7 @@ for entry in existing_artifact.get("models", []):
             "id": mid,
             "updates": entry.get("updates", {}),
             "sourcesAdded": entry.get("sourcesAdded", []),
-            "notApplicable": entry.get("notApplicable", []),
+            "notApplicable": [],
         }
 
 # Ensure every active model has an entry
@@ -168,27 +145,10 @@ for m in active:
             "notApplicable": [],
         }
 
-# Re-attach existing notApplicable entries from data/models.json so merge.py sees
-# the same N/A universe the gap-gen excluded above. Dedupe by benchKey.
-for mid, saved in existing_na_entries.items():
-    entry = artifact_models_by_id.setdefault(
-        mid, {"id": mid, "updates": {}, "sourcesAdded": [], "notApplicable": []}
-    )
-    seen = {
-        (n.get("benchKey") or n.get("key"))
-        for n in entry.get("notApplicable", [])
-        if isinstance(n, dict)
-    }
-    for na in saved:
-        bk = na.get("benchKey") or na.get("key")
-        if bk and bk not in seen:
-            entry.setdefault("notApplicable", []).append(na)
-            seen.add(bk)
-
 # Build gaps list (preserve existing explicit gaps + add auto-gaps for missing)
-# Filter out agent gaps for cells already filled OR already N/A — both overlaps
-# break merge.py MX1 invariant (filled+gaps+na exceeds universe).
-already_covered = existing_filled | agent_filled | existing_na | agent_na
+# Filter out agent gaps for cells already filled (overlap would break the
+# filled+gaps invariant).
+already_covered = existing_filled | agent_filled
 
 
 def _gap_cell(g: dict) -> tuple[str, str] | None:
@@ -244,7 +204,6 @@ for mid, bk in sorted(missing):
 
 filled_count = len(existing_filled | agent_filled)
 gap_count = len(existing_gaps)
-na_count = len(agent_na | existing_na)
 total_cells = len(total_universe)
 
 artifact = {
@@ -261,7 +220,7 @@ artifact = {
     "lineup": existing_artifact.get("lineup", {}),
     "contradictions": existing_artifact.get("contradictions", []),
     "gaps": existing_gaps,
-    "notApplicable": existing_artifact.get("notApplicable", []),
+    "notApplicable": [],
     "whitelistAdditions": existing_artifact.get("whitelistAdditions", []),
     "i18nUpdates": existing_artifact.get("i18nUpdates", {}),
     "runtime": existing_artifact.get(
@@ -270,7 +229,7 @@ artifact = {
     "coverageMatrix": {
         "filledCells": len(agent_filled),
         "gapsRecorded": gap_count,
-        "notApplicableCells": na_count,
+        "notApplicableCells": 0,
         "expectedTotal": total_cells,
     },
     "validationCoverage": round(filled_count / max(total_cells, 1), 4),
@@ -291,5 +250,5 @@ print(f"TOTAL_GAPS: {gap_count}")
 total_filled = len(existing_filled | agent_filled)
 print(f"COVERAGE: {artifact['validationCoverage'] * 100:.1f}%")
 print(
-    f"COVERED: {total_filled + gap_count + na_count} / {total_cells}  (filled={total_filled}, gaps={gap_count}, na={na_count})"
+    f"COVERED: {total_filled + gap_count} / {total_cells}  (filled={total_filled}, gaps={gap_count})"
 )

@@ -265,19 +265,6 @@ table#comparison-table .coverage-mini.cov-low { color: var(--warn-2, #e07320); b
   border-radius: 999px;
   vertical-align: 1px;
 }
-.bench-cell.opt-out {
-  opacity: 0.55;
-}
-.bench-cell.opt-out .value {
-  color: var(--muted, #8a8d92);
-  font-size: 0.95em;
-  cursor: help;
-  border-bottom: 1px dotted var(--border, rgba(255, 255, 255, 0.15));
-}
-.bench-cell.opt-out-vendor-opt-out .value { color: var(--warn, #f0b04a); }
-.bench-cell.opt-out-not-applicable .value { color: var(--muted, #8a8d92); }
-.bench-cell.opt-out-out-of-scope .value { color: var(--muted, #6a6e74); }
-
 /* Provenance tier badges on bench cells */
 .bench-cell.tier-c .value {
   color: var(--muted, #8a8d92);

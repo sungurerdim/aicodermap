@@ -43,21 +43,12 @@ export function buildBenchCell(model, key) {
 
   const classes = ['bench-cell'];
   if (score == null) {
-    // Semantic empty-state routing
-    const naKeys = model.notApplicableBenchKeys || [];
-    if (naKeys.includes(key)) {
-      classes.push('opt-out');
-      const rule = (model.bench?.[`_na_rule_${key}`] || '');
-      if (rule === 'vendor-opt-out') classes.push('opt-out-vendor-opt-out');
-      else if (rule === 'out-of-scope') classes.push('opt-out-out-of-scope');
-      else classes.push('opt-out-not-applicable');
-    } else {
-      // Check if this cell is in the current cycle's gap list
-      const inGap = (State.gaps || []).some(g =>
-        (g.key === `${model.id}.${key}`) ||
-        (g.modelId === model.id && g.field === key));
-      classes.push(inGap ? 'gap-pending' : 'empty');
-    }
+    // N/A retired: an empty cell is either a pending gap (in this cycle's gap
+    // list) or simply not-yet-researched — there is no opt-out state.
+    const inGap = (State.gaps || []).some(g =>
+      (g.key === `${model.id}.${key}`) ||
+      (g.modelId === model.id && g.field === key));
+    classes.push(inGap ? 'gap-pending' : 'empty');
   } else {
     // Provenance tier badge
     if (topSource) {

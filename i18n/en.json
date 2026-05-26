@@ -202,7 +202,7 @@
       "strengths": "Office productivity leader (1633 Elo), 98% of Opus 4.7 performance at 20% of the cost, major ARC-AGI-2 leap (58.3%), 1M context, context compaction",
       "weaknesses": "Trails Opus 4.7 on deep scientific reasoning (GPQA: 74.1% vs 94.2%), SWE-bench Pro score not published"
     },
-    "qwen-3-6-27b": {
+    "qwen3-6-27b": {
       "strengths": "27B dense model in same family as 35B MoE variant. 262K context. Good local alternative to 35B A3B. Strong coding and general reasoning.",
       "weaknesses": "Insufficient independent benchmark data. 35B A3B MoE variant generally preferred for same use case. Pricing not disclosed."
     },
@@ -330,7 +330,7 @@
       "strengths": "Distilled from Qwen2.5, strong reasoning with 128K context. MIT license. 9GB size comfortable on 12GB VRAM GPUs. Popular for local mathematical reasoning.",
       "weaknesses": "Distilled model — not at full R1 671B capability. Coding benchmark scores not independently reported. Superseded by DeepSeek V4 family."
     },
-    "qwen-3-6-max": {
+    "qwen3-6-max": {
       "strengths": "AA Intelligence Index 52 strong ranking. #1 on 6 benchmarks: SWE-Pro, Terminal-Bench 2.0, SkillsBench, QwenClawBench, QwenWebBench, SciCode. preserve_thinking for agentic workflows.",
       "weaknesses": "Closed-weight (first time in Qwen history). SWE-Bench Verified independent score not published. Pricing not finalized during preview. Text-only — no image/audio."
     },

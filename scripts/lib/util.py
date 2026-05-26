@@ -10,6 +10,7 @@ Consolidates functions previously duplicated across:
 from __future__ import annotations
 
 import json
+import re
 import time
 from pathlib import Path
 from typing import Any
@@ -93,3 +94,23 @@ def deep_merge(base: dict, override: dict) -> dict:
         else:
             result[k] = v
     return result
+
+
+# A bare minor-version number written with a space after a token that ends in
+# a digit. The trailing negative lookahead `(?![\w.])` deliberately skips
+# numbers followed by a unit letter (param sizes: "27B", "9B") or another dot
+# (already-dotted versions: "3.5"), so only true version-dot anomalies match.
+_VERSION_DOT_PAT = re.compile(r"(\b\w*\d)[ ]+(\d+)(?![\w.])")
+
+
+def canonical_display_name(name: str) -> str:
+    """Standardize a model display name's version separator (model-agnostic).
+
+    "Qwen3 7 Max" -> "Qwen3.7 Max"; leaves "Gemma 3 27B", "Qwen 3.5 9B" and
+    "GPT-5.5" untouched. Verified against the full model set to change only the
+    two genuine version-dot anomalies. Applied in merge.py before each refresh
+    write so future slug-derived names self-correct without per-model patches.
+    """
+    if not name or not isinstance(name, str):
+        return name
+    return _VERSION_DOT_PAT.sub(r"\1.\2", name)

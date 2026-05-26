@@ -364,17 +364,15 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
      core bench keys: <matrixState.coreKeys>
      expected_total cells: <matrixState.expectedTotal>
      currently filled: <matrixState.filledCells> (<fillRatio*100>%)
-     notApplicable: <matrixState.notApplicableCells>
-     missing-or-stale: <expectedTotal - filledCells - notApplicableCells>
+     missing-or-stale: <expectedTotal - filledCells>
 
    PRIORITY QUEUE (top <N>; resolve these FIRST in Phase 2/3 cascade):
      <modelId>.<benchKey>  (bench fill <ratio>, model fill <ratio>)
      ...
 
    EMISSION RULES (HARD, see agent.md SUCCESS_CRITERIA):
-     - every cell ends as: bench[k]=value | gaps[].entry | notApplicable[].entry
+     - every cell ends as: bench[k]=value | gaps[].entry (N/A retired 2026-05-26)
      - gaps[] entries: triedSources[]>=1, triedQueries[]>=2, triedFormats[]>=1
-     - notApplicable[] entries: cite a rule from _schema.notApplicableRules
      - silent omission triggers MX1 rollback in merge.py
    ```
 5. Parse return:

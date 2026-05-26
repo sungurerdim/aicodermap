@@ -77,11 +77,10 @@ idea_context: {
   // C plan reform (added 2026-04-29) — matrix-aware context.
   matrixState: {
     activeModels: <int>, coreKeys: <int>,
-    totalCells: <int>, filledCells: <int>,
-    notApplicableCells: <int>, expectedTotal: <int>,
+    totalCells: <int>, filledCells: <int>, expectedTotal: <int>,
     fillRatio: <float 0..1>,
-    byBench: { <key>: { filled, na, total } },
-    byModel: { <id>:  { filled, na, total } }
+    byBench: { <key>: { filled, total } },
+    byModel: { <id>:  { filled, total } }
   },
   priorityCells: [{ modelId, benchKey, benchFillRatio, modelFillRatio }, ...],
   contracts: { ABSOLUTE_COVERAGE_FLOOR, MIN_SOURCES_PER_FILLED_CELL,
@@ -97,9 +96,9 @@ parallel_models: <int default:5>           # parallelism, NOT a cap
 verification_map_path: ".aicodermap-verification-map.json"  # tarihsel audit + contradiction analiz cache; SKIP kararı vermez
 trust_score_required: <bool default:true>
 termination: "completeness"                # explicit doctrine — see SKILL.md COMPLETENESS_TERMINATION
-expected_total: <int>                      # |active|×|coreKeys| - |notApplicable|; matrix invariant target
+expected_total: <int>                      # |active|×|coreKeys|; matrix invariant target (N/A retired)
 require_priority_first: <bool default:true>  # process priorityCells in Phase 2/3 BEFORE any other empty cell
-require_full_matrix: <bool default:true>     # every cell must end as fill | gap | notApplicable
+require_full_matrix: <bool default:true>     # every cell must end as fill | gap (N/A retired 2026-05-26)
 # UNCAPPED applies to RESEARCH QUALITY (sources, fallbacks, gap fabrication).
 # Per-dispatch resource ceilings remain hard:
 #   • agent_budget_buffer (50 tool-calls) — enforced by self-monitoring
@@ -165,9 +164,6 @@ reliably; nested 2-level structures often degrade.
   ],
   "lineupHints": [
     {"modelId": "<id>", "event": "deprecated"|"renamed"|"new"|"removed", "evidence": "<url>", "details": "<one-line>"}
-  ],
-  "naCandidates": [
-    {"modelId": "<id>", "benchKey": "<key>", "rationale": "<one-line why this bench is N/A for this model>"}
   ],
   "rawGaps": [
     {"modelId": "<id>", "benchKey": "<key>", "triedSources": ["<url>",...], "triedQueries": ["<q>",...]}
@@ -245,8 +241,7 @@ reliably; nested 2-level structures often degrade.
    emit 3 observations (one per source). Synth aggregates verifications.
 
 6. **NO REASONING.** Don't compute trustScore (just record `tier`). Don't
-   pick winners. Don't cite notApplicableRules (just emit `naCandidates`).
-   Don't detect WRONG_ID. Synth handles ALL of these.
+   pick winners. Don't detect WRONG_ID. Synth handles ALL of these.
 
 7. **STATUS LINE format:** `EMITTED batch=<id> mode=gather observations=N
    pricingObs=P ollamaObs=O rawGaps=R path=...`
@@ -263,42 +258,23 @@ reliably; nested 2-level structures often degrade.
    emit a fresh artifact reflecting THIS cycle's fetches. Reading other
    agents' output files is also forbidden.
 
-9. **TIER-BASED N/A SHORT-CIRCUIT** (FAZ 7.G, 2026-05-10). For each
-   model in target_model_ids, check its tier (resolvable via
-   idea_context.matrixState.byModel[<id>].tier OR data/models.json):
-   - `tier ∈ {ollama-local}`: skip benchmark sweep entirely. These
-     are local quantizations whose bench scores are inherited from
-     their parent model and are formally N/A. Emit ONLY pricingObs[]
-     (rare — usually free), ollamaObs[] (the parent reference),
-     unslothObs[] (the quant variants), modelMeta[] (release date,
-     license, vramRequirement, ollamaSize). The agent MUST NOT
-     emit observations[] for these models — orchestrator's gap-gen
-     auto-fills the bench cells with notApplicable[] entries.
-   - `tier ∈ {gemma}`: most small Gemma variants (1B/4B/12B) lack
-     leaderboard coverage for swePro/sweV/aaIdx/tau2/tb2/lcb. Sweep
-     only gpqa, mmluPro, hle (which Gemma's vendor docs publish);
-     emit naCandidates[] for the rest with rationale citing the
-     lineage (Gemma small variants ≠ benchmark targets per vendor
-     report). Saves ~30-50% of the gather wallclock for these
-     batches.
-   - `tier ∈ {coder-specialized}`: skip aime26/hle/mmluPro (math/
-     general-knowledge benchmarks) — these are systematically
-     unreported for coder-specialized models. naCandidates[] with
-     rule citation `coder-specialized:non-coding-bench`.
-   These short-circuits are quality-preserving: the cells they skip
-   are formally N/A per `_schema.notApplicableRules`. Synth maps
-   naCandidates[] to N/A entries; merge.py marks them `notApplicable: true`
-   in data/models.json so the matrix invariant holds without wasting
-   tool calls on guaranteed empty cells.
+9. **RESEARCH EVERY CELL — NO N/A** (2026-05-26: N/A retired). Sweep every
+   (model, benchKey) cell for EVERY model regardless of tier. There is no
+   tier-based short-circuit and no `naCandidates` — an unmeasured cell is a
+   GAP, never "not applicable". Emit `rawGaps[]` (with triedSources +
+   triedQueries) for any cell you cannot fill. Small/local/coder models still
+   have sparse REAL scores: fetch what exists (a 7B coder's swePro/sweV/lcb,
+   a Gemma variant's gpqa/mmluPro/hle, …) and gap the rest. The ONLY cells
+   pre-removed from your slice are recently-confirmed ones (idea_context.
+   skipCells, freshness-tier skip) — that is the sole skip mechanism.
 
 10. **EARLY-EXIT QUALITY GATE** (FAZ 7.H, 2026-05-10). After each
     fetch, check slice coverage:
       - `covered = cells where observations[] for that (modelId, benchKey)
                    has ≥2 entries with distinct sourceUrl AND consensus
                    (max value Δ ≤ contracts.VERIFICATION_AGREEMENT_PP)`
-      - `na_count = cells in naCandidates[] for this slice`
       - `total = |target_model_ids| × |coreBenchKeys|`
-      - When `(covered + na_count) / total ≥ 0.95` AND no remaining
+      - When `covered / total ≥ 0.95` AND no remaining
         priorityCells unvisited, emit + exit. partialReason: null.
         Status: `EMITTED ... earlyExit=true coverage=<N/M>`.
     Saves wallclock for already-well-covered batches (e.g., Anthropic
@@ -565,17 +541,12 @@ fills or all paths are exhausted:
    the next cycle inherits the source without rediscovery. **Newly
    discovered sources are usable immediately, not deferred.**
 
-A cell may remain null only after every step above has been attempted. Before
-emitting any remaining null cell, apply the **notApplicableRules cascade (F4)**:
+A cell may remain null only after every step above has been attempted. **N/A
+retired 2026-05-26:** there is no notApplicableRules cascade — every remaining
+null cell is a GAP, never "not applicable":
 
 ```
 for each (modelId, benchKey) cell still null after steps 1-4:
-  for rule in sourcesWhitelist._schema.notApplicableRules.rules[]:
-    if rule.benchKeys contains benchKey AND rule.modelFilter matches modelId:
-      emit models[].notApplicable[] entry:
-        { benchKey, ruleId: rule.id, reason: rule.reason }
-      skip to next cell
-  # No rule matched — this is a genuine data gap
   emit gaps[] entry:
     { key: benchKey, reason, triedFormats[], triedPatterns[],
       triedSources[], triedQueries[] }
@@ -583,8 +554,8 @@ for each (modelId, benchKey) cell still null after steps 1-4:
 
 **Silent omission of a null cell is a contract violation.** The
 PRE_EMIT_SELF_AUDIT step (below) blocks final emission when this happens.
-Every null cell MUST produce either a `notApplicable[]` entry (rule matched)
-or a `gaps[]` entry (no rule matched, genuine gap).
+Every null cell MUST produce a `gaps[]` entry (with provenance). Do NOT emit
+`notApplicable[]` — it is ignored downstream and blocked by audit AC9.
 
 ## EXTRACTION_DISCIPLINE (named-pattern dispatch, three-pass discipline)
 
@@ -1735,12 +1706,11 @@ The orchestrator triggers `COMPLETENESS_RETRY` (single retry) or surfaces a
 loud CHANGELOG warning on any of:
 
 - `coverageMatrix` missing or `totalCells == 0`.
-- `filledCells + gapsRecorded + notApplicableCells != totalCells`.
-- Model in `idea_context.currentIds` absent from BOTH `models[]` AND `gaps[]`
-  AND `notApplicable[]`.
+- `filledCells + gapsRecorded != totalCells` (N/A retired — every cell is
+  FILLED or GAP).
+- Model in `idea_context.currentIds` absent from BOTH `models[]` AND `gaps[]`.
 - `runtime.modelAudit[id] == "zero-delta-no-gap"` (skill matrix-snapshot
   delta detector — model received no updates and emitted no gaps; suspect
   silent omission).
 - `gaps[]` entry with `triedSources[]` empty (stripped → silent omission).
-- `notApplicable[].rule` not found in `_schema.notApplicableRules.rules[]`
-  (fabricated N/A — caught by audit-data-coherence AC9).
+- Any `notApplicable[]` entry present (N/A retired — blocked by audit AC9).

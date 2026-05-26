@@ -202,7 +202,7 @@
       "strengths": "Ofis verimliliğinde lider (1633 Elo), Opus 4.7 performansının %98'i maliyetin %20'sinde, ARC-AGI-2'de büyük sıçrama (%58.3), 1M token bağlam, context compaction özelliği",
       "weaknesses": "Derin bilimsel akıl yürütmede Opus 4.7'nin gerisinde (GPQA: 74.1% vs 94.2%), SWE-bench Pro skoru eksik"
     },
-    "qwen-3-6-27b": {
+    "qwen3-6-27b": {
       "strengths": "27B yoğun model, 35B MoE varyantı ile aynı ailede. 262K bağlam. Yerel çalıştırma için 35B A3B'ye iyi alternatif. Güçlü kodlama ve genel akıl yürütme.",
       "weaknesses": "Bağımsız benchmark verisi yetersiz. 35B A3B MoE varyantı genellikle aynı kullanım senaryosu için tercih ediliyor. Fiyatlandırma açıklanmadı."
     },
@@ -330,7 +330,7 @@
       "strengths": "Qwen2.5'ten damıtılmış, 128K bağlam penceresi ile güçlü akıl yürütme. MIT lisansı. 9GB dosya boyutu 12GB VRAM GPU'larda rahatça çalışıyor. Yerel matematiksel akıl yürütme için popüler.",
       "weaknesses": "Distilled model — tam R1 671B kapasitesinde değil. Kodlama benchmark skoru bağımsız olarak raporlanmamış. DeepSeek V4 serisinin gölgesinde kaldı."
     },
-    "qwen-3-6-max": {
+    "qwen3-6-max": {
       "strengths": "AA Zeka Endeksi 52 ile yüksek sıralamada. SWE-Pro, Terminal-Bench 2.0, SkillsBench, QwenClawBench, QwenWebBench, SciCode dahil 6 benchmark'ta #1. Ajan iş akışları için preserve_thinking özelliği.",
       "weaknesses": "Kapalı ağırlık (Qwen tarihinde ilk kez). SWE-Bench Verified bağımsız skoru yayınlanmadı. Ön izleme döneminde fiyatlandırma netleşmedi. Görüntü/ses yok — yalnızca metin."
     },
