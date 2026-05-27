@@ -58,6 +58,23 @@ Orchestrator appends count badges to CHANGELOG: `🔎 New vendor candidates: N`,
 | `new-release` | new-model detection (subset of Phase 0) | sonnet | 4 |
 | `search` | quick single lookup | haiku | 1-2 |
 | `deep-fetch` | targeted single (modelId, field) backfill (skill-spawned) | sonnet | — |
+| `anomaly-verify` | resolve `idea_context.anomalies[]` — primary-source check per cell | sonnet | 5 |
+
+**`anomaly-verify` scope (Layer-3 auto-resolution, 2026-05-27):** input is the
+`data/_anomalies.json` queue (source-mismatch / out-of-band / single-source /
+peer-outlier). For EACH cell, apply rule 9 (OUTLIERS→INVESTIGATE): find the
+primary source + exact metric/scale, then emit a verdict. Write
+`.aicodermap-anomaly-verdicts.json`:
+```jsonc
+{ "verdicts": [
+  {"modelId","benchKey","action":"confirm","evidence":"<url>"},                 // real + correctly classified → un-quarantine
+  {"modelId","benchKey","action":"reclassify","toBench":"<key>","evidence":"<url>"}, // metric/scale misfile → move
+  {"modelId","benchKey","action":"clear","reason":"<why>"}                        // wrong/unverifiable/wrong-model
+] }
+```
+A value that is simply WRONG (but correctly classified) → do NOT verdict it here;
+record the corrected value as a normal observation so merge recomputes trustScore.
+scripts/apply-anomaly-verdicts.py applies confirm/reclassify/clear mechanically.
 
 **No `typical duration` column** — the agent runs to completeness, not to a clock. A `full` scope cycle takes as long as walking every advertised source + every per-model URL + every vendor card + every WebSearch fallback for unfilled cells requires. Saturation termination + verification-map confirmed-cell skip make subsequent cycles incremental (most cells already confirmed across 3+ sources skip the sweep entirely).
 

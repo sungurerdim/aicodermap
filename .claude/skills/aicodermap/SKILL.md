@@ -572,6 +572,30 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
    - Persists `.aicodermap-verification-map.json` (gitignored — historical record, regeneratable from sources.json via `bootstrap`)
    - The `confirmed` flag is **audit-only** — used for contradiction analysis and human review. It is NEVER read by the agent or orchestrator to skip a fetch (every cell is re-fetched every cycle).
 
+7.7. ANOMALY_RESOLUTION (auto-dispatch, 2026-05-27 — closes the Layer-3 loop):
+   ```
+   python scripts/detect-anomalies.py        # refresh the queue post-merge
+   ```
+   - If `data/_anomalies.json` has entries in the HIGH-PRIORITY classes
+     (`source-mismatch`, `peer-outlier`, `out-of-band`), the orchestrator
+     dispatches ONE research sub-agent (`scope=anomaly-verify`, `model: "sonnet"`)
+     with `idea_context.anomalies` = the top-N such cells. The agent applies
+     agent.md rule 9 (OUTLIERS→INVESTIGATE) per cell — primary-source +
+     exact-metric check — and writes `.aicodermap-anomaly-verdicts.json` with
+     `confirm | reclassify | clear` verdicts (a simply-wrong VALUE is NOT
+     verdicted; it is re-recorded as a normal observation so merge recomputes
+     trustScore).
+   - Orchestrator applies the mechanical verdicts and re-audits:
+     ```
+     python scripts/apply-anomaly-verdicts.py     # confirm/reclassify/clear
+     python scripts/refresh-finalize.py --skip-gen-unified --skip-gap-gen   # re-merge + SSOT audit
+     ```
+   - `single-source` anomalies are NOT auto-dispatched (too many; they are a
+     coverage signal) — they stay in `idea_context.anomalies` for the next full
+     gather to pick up a 2nd source. Advisory; never blocks. Opt-out
+     `AICODERMAP_NO_ANOMALY_RESOLVE=1`. This is the automated form of the manual
+     cfElo investigation (2026-05-27): an anomaly triggers RESEARCH, not rejection.
+
 8. Render diff summary (markdown table) to user-visible output: models[].updates fields, newModels[], lineup changes (NEW/DEPRECATED/RENAMED/REMOVED), contradictions auto-resolved, coverage% achieved, partialCoverage flag.
 9. AUTO-APPROVE — NO USER PROMPT. The workflow proceeds straight from Step 8 to Step 10. The only halt at this stage is schema-breaking discovery (a brand-new top-level field in a model entry not in the existing whitelist) — and even then, the unrecognized field is logged to gaps[] and merge continues with the recognized fields. RED contradictions are already auto-resolved at Step 7. REMOVED entries are auto-archived per LIFECYCLE_STATES.
 
