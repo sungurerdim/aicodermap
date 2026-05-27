@@ -229,6 +229,36 @@ def main():
             f"{' ...' if len(bad_cells) > 5 else ''}"
         )
 
+    # === 6b. Elo-family metric-misclassification guard (advisory) ===
+    # cfElo must hold a Codeforces competitive-programming rating ONLY. LMArena /
+    # Chatbot Arena chat Elo (~1000-1600) belongs in lmArenaElo; WebDev Arena Elo
+    # in webDevElo. A cfElo cell whose sources are ALL Arena-family domains is
+    # almost certainly a misfiled Arena Elo (the 2026-05-27 cfElo class). Advisory
+    # only — surfaces the cell for re-verification, never blocks: a genuine low
+    # Codeforces rating from a non-arena primary source must stay. Pairs with the
+    # agent.md "BENCH METRIC INTEGRITY" rule that prevents it at gather time.
+    from urllib.parse import urlparse as _urlparse
+
+    _ARENA_DOMAINS = ("lmarena.ai", "arena.ai", "lmsys", "chatbot-arena")
+    elo_suspects = []
+    for m in models:
+        if (m.get("bench") or {}).get("cfElo") is None:
+            continue
+        ents = sources.get(f"{m['id']}.cfElo") or []
+        doms = [
+            _urlparse(e.get("url") or "").netloc.lower().replace("www.", "")
+            for e in ents
+        ]
+        doms = [d for d in doms if d]
+        if doms and all(any(a in d for a in _ARENA_DOMAINS) for d in doms):
+            elo_suspects.append(f"{m['id']}.cfElo={m['bench']['cfElo']}")
+    if elo_suspects:
+        warnings.append(
+            "cfElo cells sourced ONLY from Arena-family domains (likely misfiled "
+            f"LMArena Elo → move to lmArenaElo, re-verify): {elo_suspects[:5]}"
+            f"{' ...' if len(elo_suspects) > 5 else ''}"
+        )
+
     # === 7. data/sources.json keys ===
     src_unknown_models = []
     src_rogue_bench = []

@@ -586,6 +586,39 @@ The single biggest source of data loss in prior runs was a single mega-regex doi
 
 7. Score → trustScore: page is vendor blog → S-tier; leaderboard → I-tier; community → C-tier (formula in SKILL.md). Per-domain `tierOverride` (when set on the whitelist entry) wins over the entry's category-level tier.
 
+8. **BENCH METRIC INTEGRITY — record only what the source names; never coerce by
+   scale/name similarity (HARD).** A value enters cell X ONLY if the source
+   reports benchmark X *by name* (canonical name or a `_schema.benchAliases[X]`
+   alias). Never file a number into a cell because it "looks like" that scale.
+   The whitelist `publishes[]` of a leaderboard is authoritative for what it
+   reports — do NOT attribute a bench a source does not publish.
+   **Confusable families (disambiguate by EXACT name + scale, never merge):**
+   - **Elo family (most dangerous — all ~1000-3500):**
+     · `cfElo` = Codeforces competitive-programming rating ONLY (codeforces.com /
+       CodeElo arXiv:2501.01257; human scale 800-3800; 2026 frontier ~2000-3300).
+     · `lmArenaElo` = LMArena / Chatbot Arena GENERAL chat Elo (lmarena.ai /
+       arena.ai / lmsys; ~1000-1600). A bare "Arena Elo ≈1480" → `lmArenaElo`,
+       NEVER `cfElo`.
+     · `webDevElo` = LMArena WebDev Arena Elo (~950-1300).
+     · GDPval-AA Elo (Artificial Analysis office-work) → belongs to NONE of these;
+       do not file it as cfElo/lmArenaElo.
+   - **SWE family:** `sweV` (SWE-bench Verified) ≠ `swePro` (SWE-bench Pro) ≠
+     `sweMulti` (SWE-bench Multilingual/Multimodal). Keep separate.
+   - **Terminal:** `tb2` (Terminal-Bench 2) ≠ `tbHard` (Terminal-Bench Hard).
+   - **Others:** `tau2`≠`tau3`; `aime26`≠`aime25`; `gpqa` = GPQA **Diamond**;
+     `lcb` ≠ deprecated `lcbV6`.
+   When a model/variant attribution is ambiguous (e.g. a 235B score copied onto a
+   480B-Coder row), record under the EXACT id the source names, never a sibling.
+
+9. **OUTLIERS → INVESTIGATE, never silently reject (HARD).** A genuine
+   breakthrough IS an outlier. If a value is far from peers OR outside a bench's
+   plausible range, do NOT drop it for being "too high/low" and do NOT clamp it.
+   Dig for the primary source (paper / model card / official leaderboard) and the
+   exact metric+scale: (a) corroborated on the same scale → keep it (real); (b)
+   wrong scale/metric → file in the correct cell or gap it with a note; (c)
+   unverifiable → record with a `rawGaps`/note flag so synth + the next cycle
+   re-verify. "Fark çok yüksek" is never, by itself, grounds to discard.
+
 ## IMAGE_OCR_FALLBACK (when bench data lives in PNG charts)
 
 Some vendor announcement pages (notably Anthropic, OpenAI, DeepMind) embed benchmark tables as PNG/JPG images rendered server-side. Page text contains 1-3 summary scores from the lead paragraph, but the embedded charts carry 5-15 additional numbers. Text-only extraction misses these.

@@ -1,4 +1,31 @@
 
+## [2026-05-27] — data integrity: cfElo metric disambiguation + misclassification guards
+
+Triggered by a real bug (deepseek-v4-pro's correct Codeforces rating 3206 was
+quarantined while GPT models showed LMArena chat Elo ~1484 misfiled into the
+Codeforces cell). Targeted research (DeepSeek HF card, Qwen3 report, OpenAI
+o3/o4-mini, Codeforces blog) resolved every flagged cfElo cell.
+
+### Fixed
+- **cfElo metric mis-classification** (`scripts/migrate-cfelo-metric.py`, mechanical
+  + research-sourced). Cleared misfiled values: gpt-5-4 (1484), gpt-5-5 (1488),
+  grok-4-20 (1491) = LMArena chat Elo; grok-4-3 (1500) = GDPval-AA Elo;
+  qwen3-coder-480b (2056) = qwen3-235b's value wrong-attributed. Un-quarantined
+  deepseek-v4-pro cfElo=3206 (confirmed real by primary source; field 2800-3200).
+  Dropped o4-mini's mis-attributed 2070 (a DeepSeek figure), kept 2719 (OpenAI).
+  Kept confirmed-real: qwen3-235b (2056), gemma-3-27b (110, genuinely below-Newbie),
+  o3 (2727), gemini-3-1-pro (3052).
+
+### Added (recurrence prevention)
+- **agent.md BENCH METRIC INTEGRITY rule:** record a value into cell X only when
+  the source names benchmark X; never coerce by scale/name similarity. Disambiguates
+  confusable families — Elo (cfElo=Codeforces vs lmArenaElo=chat vs webDevElo),
+  SWE (sweV/swePro/sweMulti), Terminal (tb2/tbHard), tau2/tau3, etc. Outliers
+  trigger investigation, never silent rejection (a breakthrough IS an outlier).
+- **audit-data-coherence.py Elo-family guard (advisory):** flags any cfElo cell
+  sourced only from Arena-family domains as a likely misfiled LMArena Elo, for
+  re-verification (never blocks — a genuine low Codeforces rating stays).
+
 ## [2026-05-27] — scoring integrity: quarantine-aware composite + CI-overlap rank bands
 
 Fairness/objectivity hardening of the ranking, model-agnostic (every current +
