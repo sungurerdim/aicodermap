@@ -274,20 +274,20 @@ def main():
     for _ad in ("lmarena.ai", "arena.ai", "lmsys.org", "chatbot-arena.com"):
         domain_publishes.setdefault(_ad, set()).update({"lmArenaElo", "webDevElo"})
 
-    # Confusable bench families — members share a name token ("Elo") but live on
-    # DIFFERENT scales, so a cross-member misfile both happens (name confusion) and
-    # corrupts scoring. Flag a filled cell ONLY when a source publishes a SIBLING
-    # in the same family but NOT this bench — the source reports a confusable
-    # metric, so the value likely belongs to the sibling. Scoped to the Elo family
-    # only: there the scales differ (cfElo 800-3800 vs lmArenaElo/webDevElo
-    # ~1000-1600) so the signal is reliable AND the whitelist publishes[] reliably
-    # separates Codeforces from Arena sources. Same-scale families (SWE/tau/
-    # Terminal, all 0-100) are NOT publishes-checked here — incomplete whitelist
-    # publishes[] would false-positive and a same-scale misfile can't corrupt the
-    # composite; those rely on Layer 2 ranges + Layer 3 peer-outlier + agent
-    # discipline instead.
+    # Confusable bench families — members are easy to misfile into one another
+    # (the Elo family especially: same "Elo" name token, different scales). Flag a
+    # filled cell ONLY when a source publishes a SIBLING in the same family but NOT
+    # this bench — the source reports a confusable metric, so the value likely
+    # belongs to the sibling. Now covers ALL families: scripts/derive-publishes.py
+    # completes whitelist publishes[] from observed provenance, so a source that
+    # legitimately reports both members (e.g. AA → sweV AND swePro) is no longer a
+    # false positive. Advisory only.
     confusable_families = [
-        {"cfElo", "lmArenaElo", "webDevElo"},  # Elo family — distinct scales
+        {"cfElo", "lmArenaElo", "webDevElo"},  # Elo (distinct scales)
+        {"sweV", "swePro", "sweMulti"},  # SWE-bench variants
+        {"tb2", "tbHard"},  # Terminal-Bench
+        {"tau2", "tau3"},  # tau-bench
+        {"aaIdx", "aaCoding", "aaAgentic", "aaOmni"},  # AA composites
     ]
 
     def _family(bk):

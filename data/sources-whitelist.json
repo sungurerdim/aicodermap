@@ -1037,10 +1037,28 @@
     },
     "benchRanges": {
       "_purpose": "Per-bench plausibility bands consumed by audit-data-coherence.py. hardMin/hardMax = scale-corruption guard: a value outside is wrong-scale garbage that would distort the 0-100 composite → HARD BLOCK. softMin/softMax = plausibility band: a value inside the hard band but outside the soft band is unusual-but-possible → advisory WARN (re-verify, never reject — a genuine outlier/breakthrough stays). Benches not listed default to a 0-100 percentage (hard 0-100, no soft flag).",
-      "_default": { "hardMin": 0, "hardMax": 100 },
-      "cfElo": { "hardMin": 0, "hardMax": 3800, "softMin": 1000, "softMax": 3500 },
-      "webDevElo": { "hardMin": 0, "hardMax": 2000, "softMin": 900, "softMax": 1700 },
-      "lmArenaElo": { "hardMin": 0, "hardMax": 2500, "softMin": 1000, "softMax": 1850 }
+      "_default": {
+        "hardMin": 0,
+        "hardMax": 100
+      },
+      "cfElo": {
+        "hardMin": 0,
+        "hardMax": 3800,
+        "softMin": 1000,
+        "softMax": 3500
+      },
+      "webDevElo": {
+        "hardMin": 0,
+        "hardMax": 2000,
+        "softMin": 900,
+        "softMax": 1700
+      },
+      "lmArenaElo": {
+        "hardMin": 0,
+        "hardMax": 2500,
+        "softMin": 1000,
+        "softMax": 1850
+      }
     },
     "presets": {
       "_purpose": "Data-driven preset definitions. assets/js/core.js PRESETS literal loads from here with backward-compat fallback. 'consensus' preset is new — uses vendor composite median rather than atomic weighting. Per-preset tiered bench classification (required/critical/imputable) drives missing-data UI policy in data.js + render-card.js.",
@@ -1737,9 +1755,12 @@
       ],
       "format_lastVerified": "2026-04-26",
       "publishes": [
-        "sweV",
+        "gpqa",
+        "hle",
+        "nl2Repo",
+        "sweMulti",
         "swePro",
-        "nl2Repo"
+        "sweV"
       ]
     },
     {
@@ -1762,7 +1783,11 @@
       ],
       "format_lastVerified": "2026-04-26",
       "publishes": [
-        "swePro"
+        "gpqa",
+        "hle",
+        "sweMulti",
+        "swePro",
+        "sweV"
       ]
     },
     {
@@ -1788,8 +1813,9 @@
       ],
       "format_lastVerified": "2026-04-26",
       "publishes": [
-        "sweV",
-        "sweMulti"
+        "sweMulti",
+        "swePro",
+        "sweV"
       ]
     },
     {
@@ -1811,8 +1837,24 @@
       ],
       "format_lastVerified": "2026-04-26",
       "publishes": [
+        "aaIdx",
+        "aime26",
+        "bfcl",
+        "browseComp",
+        "cfElo",
+        "gpqa",
+        "hle",
+        "lcb",
+        "mmluPro",
+        "nl2Repo",
+        "simpleQa",
+        "sweMulti",
+        "swePro",
         "sweV",
-        "sweMulti"
+        "tau2",
+        "tau3",
+        "tb2",
+        "tbHard"
       ],
       "phase": "leaderboard"
     },
@@ -1839,7 +1881,9 @@
       ],
       "format_lastVerified": "2026-04-26",
       "publishes": [
-        "lcb"
+        "aime26",
+        "lcb",
+        "sweV"
       ]
     },
     {
@@ -1931,8 +1975,24 @@
       ],
       "format_lastVerified": "2026-04-26",
       "publishes": [
+        "aaIdx",
+        "aime26",
+        "bfcl",
+        "browseComp",
+        "cfElo",
+        "gpqa",
+        "hle",
+        "lcb",
+        "mmluPro",
+        "nl2Repo",
+        "simpleQa",
+        "sweMulti",
+        "swePro",
+        "sweV",
         "tau2",
-        "tau3"
+        "tau3",
+        "tb2",
+        "tbHard"
       ]
     },
     {
@@ -2003,26 +2063,29 @@
         "default": ""
       },
       "publishes": [
-        "aaIdx",
-        "aaCoding",
         "aaAgentic",
+        "aaCoding",
+        "aaIdx",
         "aaOmni",
-        "gpqa",
-        "sweV",
-        "tb2",
-        "tau2",
-        "hle",
-        "mcpA",
         "aime26",
-        "lcb",
-        "tbHard",
-        "cfElo",
-        "mmluPro",
-        "simpleQa",
-        "mrcr",
         "arcAgi2",
         "browseComp",
-        "tau3"
+        "cfElo",
+        "gpqa",
+        "hle",
+        "lcb",
+        "mcpA",
+        "mmluPro",
+        "mrcr",
+        "simpleQa",
+        "sweMulti",
+        "swePro",
+        "sweV",
+        "tau2",
+        "tau3",
+        "tb2",
+        "tbHard",
+        "webDevElo"
       ]
     },
     {
@@ -2048,15 +2111,22 @@
       ],
       "format_lastVerified": "2026-04-26",
       "publishes": [
-        "sweV",
-        "gpqa",
-        "aime26",
-        "hle",
         "aaIdx",
-        "mmluPro",
-        "simpleQa",
+        "aime26",
         "arcAgi2",
+        "bfcl",
         "browseComp",
+        "gpqa",
+        "hle",
+        "lcb",
+        "mcpA",
+        "mmluPro",
+        "mrcr",
+        "simpleQa",
+        "swePro",
+        "sweV",
+        "tau2",
+        "tb2",
         "vellumRank"
       ]
     },
@@ -2086,17 +2156,26 @@
         "claude-{id}"
       ],
       "publishes": [
-        "sweV",
+        "aaIdx",
+        "aime26",
+        "arcAgi2",
+        "bfcl",
+        "browseComp",
+        "cfElo",
         "gpqa",
         "hle",
         "lcb",
-        "aime26",
-        "cfElo",
+        "llmStatsIdx",
+        "mcpA",
         "mmluPro",
+        "mrcr",
+        "nl2Repo",
         "simpleQa",
-        "arcAgi2",
-        "browseComp",
-        "llmStatsIdx"
+        "sweMulti",
+        "swePro",
+        "sweV",
+        "tau2",
+        "tb2"
       ],
       "phase": "leaderboard"
     },
@@ -2119,8 +2198,9 @@
       ],
       "format_lastVerified": "2026-04-29",
       "publishes": [
-        "webDevElo",
-        "lmArenaElo"
+        "lcb",
+        "lmArenaElo",
+        "webDevElo"
       ],
       "phase": "leaderboard"
     },
@@ -2196,6 +2276,7 @@
       ],
       "format_lastVerified": "2026-04-26",
       "publishes": [
+        "bfcl",
         "lcb"
       ],
       "phase": "leaderboard"
@@ -2218,7 +2299,19 @@
       ],
       "format_lastVerified": "2026-05-06",
       "publishes": [
-        "lcb"
+        "aime26",
+        "browseComp",
+        "gpqa",
+        "hle",
+        "lcb",
+        "mcpA",
+        "mmluPro",
+        "sweMulti",
+        "swePro",
+        "sweV",
+        "tau2",
+        "tau3",
+        "tb2"
       ],
       "phase": "leaderboard"
     },
@@ -2264,10 +2357,19 @@
       ],
       "format_lastVerified": "2026-05-06",
       "publishes": [
+        "aime26",
+        "browseComp",
         "gpqa",
         "hle",
-        "aime26",
-        "mmluPro"
+        "lcb",
+        "mcpA",
+        "mmluPro",
+        "sweMulti",
+        "swePro",
+        "sweV",
+        "tau2",
+        "tau3",
+        "tb2"
       ],
       "phase": "leaderboard"
     },
@@ -2291,10 +2393,12 @@
       "format_lastVerified": "2026-04-26",
       "publishes": [
         "gpqa",
-        "sweV",
         "hle",
+        "kluRank",
+        "lcb",
         "mmluPro",
-        "kluRank"
+        "sweV",
+        "tb2"
       ],
       "phase": "leaderboard"
     },
@@ -2317,9 +2421,13 @@
       ],
       "format_lastVerified": "2026-04-26",
       "publishes": [
-        "sweV",
+        "aime26",
+        "gpqa",
+        "hle",
         "lcb",
-        "gpqa"
+        "mrcr",
+        "nl2Repo",
+        "sweV"
       ],
       "phase": "leaderboard"
     },
@@ -2469,7 +2577,13 @@
       ],
       "format_lastVerified": "2026-04-26",
       "publishes": [
+        "aime26",
+        "browseComp",
+        "gpqa",
+        "lcb",
+        "mmluPro",
         "sweV",
+        "tau3",
         "tb2"
       ],
       "phase": "leaderboard"
@@ -2519,7 +2633,23 @@
         "claude-{id}"
       ],
       "publishes": [
-        "lcb"
+        "aaIdx",
+        "aime26",
+        "arcAgi2",
+        "bfcl",
+        "browseComp",
+        "gpqa",
+        "hle",
+        "lcb",
+        "mcpA",
+        "mmluPro",
+        "mrcr",
+        "nl2Repo",
+        "sweMulti",
+        "swePro",
+        "sweV",
+        "tau2",
+        "tb2"
       ]
     },
     {
@@ -2546,8 +2676,23 @@
         "claude-{id}"
       ],
       "publishes": [
+        "aaIdx",
+        "aime26",
+        "arcAgi2",
+        "bfcl",
+        "browseComp",
+        "gpqa",
+        "hle",
+        "lcb",
+        "mcpA",
+        "mmluPro",
+        "mrcr",
+        "nl2Repo",
+        "sweMulti",
+        "swePro",
         "sweV",
-        "sweMulti"
+        "tau2",
+        "tb2"
       ]
     },
     {
@@ -2601,10 +2746,14 @@
       "tier": "I",
       "format": "static_html_table",
       "publishes": [
-        "sweV",
-        "tb2",
+        "aime26",
+        "browseComp",
         "gpqa",
-        "hle"
+        "hle",
+        "mmluPro",
+        "sweV",
+        "tau2",
+        "tb2"
       ],
       "lastVerifiedDate": "2026-04-27",
       "consecutiveFailures": 0,
@@ -2617,8 +2766,9 @@
       "tier": "I",
       "format": "static_html_table",
       "publishes": [
-        "sweV",
+        "mrcr",
         "swePro",
+        "sweV",
         "tb2"
       ],
       "lastVerifiedDate": "2026-04-27",
@@ -2651,8 +2801,28 @@
       "tier": "I",
       "format": "static_html_table",
       "publishes": [
+        "aaCoding",
+        "aaIdx",
+        "aaOmni",
+        "aime26",
+        "arcAgi2",
+        "benchlmIdx",
+        "bfcl",
+        "browseComp",
+        "cfElo",
+        "gpqa",
+        "hle",
+        "lcb",
+        "mcpA",
+        "mmluPro",
+        "nl2Repo",
         "programBench",
-        "benchlmIdx"
+        "simpleQa",
+        "sweMulti",
+        "swePro",
+        "sweV",
+        "tau2",
+        "tb2"
       ],
       "authority": "aggregator tracking ProgramBench publication state across 9+ models",
       "firstSeen": "2026-05-06",
@@ -2669,7 +2839,18 @@
       "tier": "I",
       "format": "static_html_table",
       "publishes": [
-        "aaIdx"
+        "aaIdx",
+        "aime26",
+        "arcAgi2",
+        "gpqa",
+        "hle",
+        "lcb",
+        "mcpA",
+        "sweMulti",
+        "swePro",
+        "sweV",
+        "tau2",
+        "webDevElo"
       ],
       "authority": "multi-provider adoption + price signal aggregator",
       "firstSeen": "2026-05-06",
@@ -2691,6 +2872,19 @@
       "tier": "I",
       "format": "spa_full",
       "publishes": [
+        "aime26",
+        "browseComp",
+        "gpqa",
+        "hle",
+        "lcb",
+        "mcpA",
+        "mmluPro",
+        "sweMulti",
+        "swePro",
+        "sweV",
+        "tau2",
+        "tau3",
+        "tb2",
         "webDevElo"
       ],
       "authority": "human-preference Elo (now LMArena); HF mirror serves the JSON datapack",
@@ -2715,7 +2909,19 @@
       "tier": "I",
       "format": "static_html_table",
       "publishes": [
-        "lcb"
+        "aime26",
+        "browseComp",
+        "gpqa",
+        "hle",
+        "lcb",
+        "mcpA",
+        "mmluPro",
+        "sweMulti",
+        "swePro",
+        "sweV",
+        "tau2",
+        "tau3",
+        "tb2"
       ],
       "lastVerifiedDate": "2026-05-10",
       "_runtime": {
@@ -2731,7 +2937,20 @@
       "tier": "I",
       "format": "static_html_table",
       "publishes": [
-        "bfcl"
+        "aime26",
+        "bfcl",
+        "browseComp",
+        "gpqa",
+        "hle",
+        "lcb",
+        "mcpA",
+        "mmluPro",
+        "sweMulti",
+        "swePro",
+        "sweV",
+        "tau2",
+        "tau3",
+        "tb2"
       ],
       "lastVerifiedDate": "2026-05-10",
       "_runtime": {
@@ -3118,7 +3337,20 @@
       "format_lastVerified": "2026-04-26",
       "phase": "pricing",
       "publishes": [
-        "hfOpenAvg"
+        "aime26",
+        "browseComp",
+        "gpqa",
+        "hfOpenAvg",
+        "hle",
+        "lcb",
+        "mcpA",
+        "mmluPro",
+        "sweMulti",
+        "swePro",
+        "sweV",
+        "tau2",
+        "tau3",
+        "tb2"
       ]
     },
     {
@@ -3219,7 +3451,27 @@
       ],
       "phase": "discovery",
       "publishes": [
-        "benchlmIdx"
+        "aaCoding",
+        "aaIdx",
+        "aaOmni",
+        "aime26",
+        "arcAgi2",
+        "benchlmIdx",
+        "bfcl",
+        "browseComp",
+        "cfElo",
+        "gpqa",
+        "hle",
+        "lcb",
+        "mcpA",
+        "mmluPro",
+        "nl2Repo",
+        "simpleQa",
+        "sweMulti",
+        "swePro",
+        "sweV",
+        "tau2",
+        "tb2"
       ]
     }
   ],
@@ -3240,22 +3492,20 @@
         "{family}"
       ],
       "publishes": [
+        "aaAgentic",
+        "aaCoding",
+        "aaIdx",
+        "aaOmni",
+        "aime26",
+        "bfcl",
+        "gpqa",
+        "hle",
+        "mcpA",
+        "sweMulti",
         "swePro",
         "sweV",
-        "sweMulti",
-        "lcbV6",
-        "tb2",
         "tau2",
-        "mcpA",
-        "bfcl",
-        "aider",
-        "gpqa",
-        "aime26",
-        "hle",
-        "aaCoding",
-        "aaAgentic",
-        "aaIdx",
-        "aaOmni"
+        "tb2"
       ],
       "fallbacks": [
         {

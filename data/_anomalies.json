@@ -2,11 +2,10 @@
   "_purpose": "Cells needing deep verification next refresh (confirm / reclassify / flag). Advisory; never auto-applied. See agent.md OUTLIERS->INVESTIGATE + audit-data-coherence.py.",
   "generated": "2026-05-27",
   "counts": {
-    "total": 172,
+    "total": 170,
     "single-source": 129,
     "peer-outlier": 53,
-    "out-of-band": 1,
-    "source-mismatch": 2
+    "out-of-band": 1
   },
   "anomalies": [
     {
@@ -1361,18 +1360,6 @@
       ]
     },
     {
-      "modelId": "gemma-4-26b-moe",
-      "benchKey": "webDevElo",
-      "value": 1441,
-      "reasons": [
-        "source artificialanalysis.ai publishes ['cfElo'], not webDevElo"
-      ],
-      "sources": [
-        "artificialanalysis.ai",
-        "gemma4-ai.com"
-      ]
-    },
-    {
       "modelId": "gemma-4-31b",
       "benchKey": "aaIdx",
       "value": 39.0,
@@ -1403,18 +1390,6 @@
       ],
       "sources": [
         "gemma4.wiki"
-      ]
-    },
-    {
-      "modelId": "gemma-4-31b",
-      "benchKey": "webDevElo",
-      "value": 1452,
-      "reasons": [
-        "source artificialanalysis.ai publishes ['cfElo'], not webDevElo"
-      ],
-      "sources": [
-        "artificialanalysis.ai",
-        "gemma4-ai.com"
       ]
     },
     {
