@@ -2,35 +2,21 @@
   "_purpose": "Cells needing deep verification next refresh (confirm / reclassify / flag). Advisory; never auto-applied. See agent.md OUTLIERS->INVESTIGATE + audit-data-coherence.py.",
   "generated": "2026-05-27",
   "counts": {
-    "total": 170,
-    "single-source": 129,
-    "peer-outlier": 53,
+    "total": 163,
+    "single-source": 120,
+    "peer-outlier": 48,
     "out-of-band": 1
   },
   "anomalies": [
     {
-      "modelId": "gpt-5-4",
-      "benchKey": "aaIdx",
-      "value": 26.0,
+      "modelId": "mistral-large-3",
+      "benchKey": "aime26",
+      "value": 72.1,
       "reasons": [
         "single-source (<2 distinct urls)",
-        "peer-outlier (v=26.0 vs tier median 51, MAD 6)"
+        "peer-outlier (v=72.1 vs tier median 92, MAD 3.8)"
       ],
-      "sources": [
-        "artificialanalysis.ai"
-      ]
-    },
-    {
-      "modelId": "grok-3-mini",
-      "benchKey": "tb2",
-      "value": 17.4,
-      "reasons": [
-        "single-source (<2 distinct urls)",
-        "peer-outlier (v=17.4 vs tier median 67.9, MAD 8.8)"
-      ],
-      "sources": [
-        "artificialanalysis.ai"
-      ]
+      "sources": []
     },
     {
       "modelId": "codestral-22b",
@@ -45,51 +31,15 @@
       ]
     },
     {
-      "modelId": "deepseek-v4-pro",
-      "benchKey": "aime26",
-      "value": 61.2,
+      "modelId": "llama-4-scout",
+      "benchKey": "aaIdx",
+      "value": 14.0,
       "reasons": [
         "single-source (<2 distinct urls)",
-        "peer-outlier (v=61.2 vs tier median 90.5, MAD 5.1)"
+        "peer-outlier (v=14.0 vs tier median 47, MAD 8)"
       ],
       "sources": [
-        "lmcouncil.ai"
-      ]
-    },
-    {
-      "modelId": "devstral-medium",
-      "benchKey": "aaAgentic",
-      "value": 14.5,
-      "reasons": [
-        "single-source (<2 distinct urls)",
-        "peer-outlier (v=14.5 vs tier median 56, MAD 1)"
-      ],
-      "sources": [
-        "designforonline.com"
-      ]
-    },
-    {
-      "modelId": "devstral-medium",
-      "benchKey": "aime26",
-      "value": 6.7,
-      "reasons": [
-        "single-source (<2 distinct urls)",
-        "peer-outlier (v=6.7 vs tier median 91.95, MAD 3.275)"
-      ],
-      "sources": [
-        "designforonline.com"
-      ]
-    },
-    {
-      "modelId": "devstral-medium",
-      "benchKey": "tbHard",
-      "value": 9.1,
-      "reasons": [
-        "single-source (<2 distinct urls)",
-        "peer-outlier (v=9.1 vs tier median 29.75, MAD 4.5)"
-      ],
-      "sources": [
-        "designforonline.com"
+        "artificialanalysis.ai"
       ]
     },
     {
@@ -98,19 +48,7 @@
       "value": 68.7,
       "reasons": [
         "single-source (<2 distinct urls)",
-        "peer-outlier (v=68.7 vs tier median 56, MAD 1)"
-      ],
-      "sources": [
-        "artificialanalysis.ai"
-      ]
-    },
-    {
-      "modelId": "qwen3-235b",
-      "benchKey": "aaIdx",
-      "value": 88.2,
-      "reasons": [
-        "single-source (<2 distinct urls)",
-        "peer-outlier (v=88.2 vs tier median 48, MAD 9.5)"
+        "peer-outlier (v=68.7 vs tier median 56.5, MAD 0.75)"
       ],
       "sources": [
         "artificialanalysis.ai"
@@ -139,28 +77,6 @@
       "sources": [
         "x.ai"
       ]
-    },
-    {
-      "modelId": "grok-4-1-fast",
-      "benchKey": "tb2",
-      "value": 14.4,
-      "reasons": [
-        "single-source (<2 distinct urls)",
-        "peer-outlier (v=14.4 vs tier median 67.9, MAD 8.8)"
-      ],
-      "sources": [
-        "designforonline.com"
-      ]
-    },
-    {
-      "modelId": "mistral-medium-3-5",
-      "benchKey": "aime26",
-      "value": 62.5,
-      "reasons": [
-        "single-source (<2 distinct urls)",
-        "peer-outlier (v=62.5 vs tier median 90.5, MAD 5.1)"
-      ],
-      "sources": []
     },
     {
       "modelId": "gemini-3-1-flash",
@@ -268,6 +184,18 @@
         "llm-stats.com",
         "marc0.dev",
         "openai.com"
+      ]
+    },
+    {
+      "modelId": "grok-3",
+      "benchKey": "aaIdx",
+      "value": 25,
+      "reasons": [
+        "peer-outlier (v=25 vs tier median 51, MAD 6)"
+      ],
+      "sources": [
+        "artificialanalysis.ai",
+        "sltcreative.com"
       ]
     },
     {
@@ -401,15 +329,6 @@
       ]
     },
     {
-      "modelId": "mistral-large-3",
-      "benchKey": "aime26",
-      "value": 72.1,
-      "reasons": [
-        "single-source (<2 distinct urls)"
-      ],
-      "sources": []
-    },
-    {
       "modelId": "o4-mini",
       "benchKey": "aaIdx",
       "value": 73.6,
@@ -493,7 +412,7 @@
       "benchKey": "aime26",
       "value": 63.3,
       "reasons": [
-        "peer-outlier (v=63.3 vs tier median 90.5, MAD 5.1)"
+        "peer-outlier (v=63.3 vs tier median 92, MAD 3.8)"
       ],
       "sources": [
         "lmcouncil.ai",
@@ -852,21 +771,10 @@
     },
     {
       "modelId": "llama-4-scout",
-      "benchKey": "aaIdx",
-      "value": 14.0,
-      "reasons": [
-        "single-source (<2 distinct urls)"
-      ],
-      "sources": [
-        "artificialanalysis.ai"
-      ]
-    },
-    {
-      "modelId": "llama-4-scout",
       "benchKey": "aime26",
       "value": 78.4,
       "reasons": [
-        "peer-outlier (v=78.4 vs tier median 91.95, MAD 3.275)"
+        "peer-outlier (v=78.4 vs tier median 92.3, MAD 3)"
       ],
       "sources": [
         "llama.com",
@@ -1237,7 +1145,7 @@
       "benchKey": "aime26",
       "value": 75.3,
       "reasons": [
-        "peer-outlier (v=75.3 vs tier median 91.95, MAD 3.275)"
+        "peer-outlier (v=75.3 vs tier median 92.3, MAD 3)"
       ],
       "sources": [
         "artificialanalysis.ai",
@@ -1732,6 +1640,19 @@
         "designforonline.com",
         "llm-stats.com",
         "x.ai"
+      ]
+    },
+    {
+      "modelId": "grok-4-1-fast",
+      "benchKey": "aaIdx",
+      "value": 24.0,
+      "reasons": [
+        "peer-outlier (v=24.0 vs tier median 51, MAD 6)"
+      ],
+      "sources": [
+        "artificialanalysis.ai",
+        "designforonline.com",
+        "llm-stats.com"
       ]
     },
     {

@@ -72,14 +72,19 @@ def main() -> int:
                 applied["skipped"] += 1
                 continue
             val = bench.get(bk)
-            if val is not None:
+            # SAFETY: only move into an EMPTY destination — never overwrite an
+            # already-populated (correctly-sourced) cell. If the destination is
+            # filled, the misfiled value is simply dropped (the correct value stays).
+            if val is not None and bench.get(to) is None:
                 bench[to] = val
+                ent = sources.pop(f"{mid}.{bk}", None)
+                if ent is not None:
+                    sources.setdefault(f"{mid}.{to}", [])
+                    sources[f"{mid}.{to}"].extend(ent)
+            else:
+                sources.pop(f"{mid}.{bk}", None)
             bench.pop(bk, None)
             bq.pop(bk, None)
-            ent = sources.pop(f"{mid}.{bk}", None)
-            if ent is not None:
-                sources.setdefault(f"{mid}.{to}", [])
-                sources[f"{mid}.{to}"].extend(ent)
             applied["reclassify"] += 1
 
         if "benchQuarantine" in m:
