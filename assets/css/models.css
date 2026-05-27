@@ -200,8 +200,10 @@ table#comparison-table .composite-unc {
   cursor: help;
 }
 table#comparison-table .composite-unc.single-src { color: var(--warn-2, #e07320); font-style: italic; }
-table#comparison-table .rank-band { cursor: help; }
-table#comparison-table .rank-band.tied { color: var(--muted); font-weight: 600; cursor: help; }
+table#comparison-table .rank-num { cursor: help; }
+/* Significance break: a thin divider where the composite gap to the group below
+   is statistically real (uncertainty bands no longer overlap). */
+table#comparison-table tbody tr.cluster-break td { border-top: 2px solid var(--accent-soft); }
 
 .model-meta {
   display: grid;

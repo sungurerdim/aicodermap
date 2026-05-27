@@ -791,29 +791,24 @@ export function rankBands(models, weights, presetName) {
     .map(m => ({ id: m.id, ...compositeUncertainty(m, weights, State.models, presetName) }))
     .filter(r => r.score != null)
     .sort((a, b) => b.score - a.score);
-  // Monotonic dense tiers from the LMArena CI-overlap idea, adapted for a
-  // score-sorted table: walking top→down, a model joins the current tier when
-  // its uncertainty band still overlaps the tier LEADER's band (upper >=
-  // leaderLower); otherwise it opens the next (lower) tier. Models within one
-  // tier are statistically indistinguishable from the tier leader → shown as a
-  // shared rank with ≈, never as false-precision strict ordering. `sep` records
-  // the rigorous pairwise count (1 + #models whose lower bound exceeds this
-  // model's upper bound) for tooltip/debug, without driving the displayed rank.
-  let rank = 0;
+  // Granular ordinal rank (1..N) keeps the table discriminating + familiar; the
+  // ±σ band on each score carries the honesty (overlapping bands = close). A
+  // `cluster` id increments only at a SIGNIFICANCE BREAK — where a model's
+  // uncertainty band no longer overlaps the current cluster leader's band
+  // (upper < leaderLower) — so the UI can draw a divider between statistically
+  // distinct groups WITHOUT collapsing ranks into opaque tiers.
+  let cluster = 0;
   let leaderLower = Infinity;
-  for (const r of rows) {
+  rows.forEach((r, i) => {
+    r.rank = i + 1;
     if (r.upper >= leaderLower) {
-      r.rank = rank;                 // same tier as current leader
+      r.cluster = cluster;
     } else {
-      rank += 1;                     // new, strictly-lower tier (first row: 0→1)
-      r.rank = rank;
-      leaderLower = r.lower;         // this model leads the new tier
+      cluster += 1;
+      r.cluster = cluster;
+      leaderLower = r.lower;
     }
-    r.sep = 1 + rows.filter(o => o !== r && o.lower > r.upper).length;
-  }
-  const rankCounts = {};
-  for (const r of rows) rankCounts[r.rank] = (rankCounts[r.rank] || 0) + 1;
-  for (const r of rows) r.tied = rankCounts[r.rank] > 1;
+  });
   return rows;
 }
 

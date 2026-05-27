@@ -22,16 +22,14 @@ function staticColumns() {
     { key: 'rank', i18n: 'ui.table.rank', sortable: false, num: true,
       get: (_m, ctx) => ctx.band ? ctx.band.rank : ctx.index + 1,
       render: (_m, ctx) => {
-        // CI-overlap band tier: models within evidential noise share a rank,
-        // marked ≈. Stable across sort column (always the composite tier).
-        if (ctx.band) {
-          const span = document.createElement('span');
-          span.className = ctx.band.tied ? 'rank-band tied' : 'rank-band';
-          span.textContent = ctx.band.tied ? `${ctx.band.rank}≈` : String(ctx.band.rank);
-          span.title = t(ctx.band.tied ? 'ui.rankTieTip' : 'ui.rankTip');
-          return span;
-        }
-        return String(ctx.index + 1);
+        // Granular ordinal composite rank (stable across sort column). The ±σ on
+        // the score + significance-break dividers carry the uncertainty story;
+        // the rank number stays discriminating and familiar.
+        const span = document.createElement('span');
+        span.className = 'rank-num';
+        span.textContent = String(ctx.band ? ctx.band.rank : ctx.index + 1);
+        span.title = t('ui.rankTip');
+        return span;
       }, cls: 'col-rank' },
     { key: 'name', i18n: 'ui.table.name', sortable: true, sticky: true,
       get: (m) => m.name.toLowerCase(),
@@ -279,9 +277,17 @@ function sortRanked(ranked, cols) {
 
 function renderTableBody(tbody, ranked, cols) {
   clear(tbody);
+  // Significance-break dividers only make sense in composite-descending order
+  // (the band clusters are computed in that order). Other sorts keep the stable
+  // composite rank number but draw no dividers.
+  const showBreaks = State.sort.col === 'composite' && State.sort.dir === 'desc';
   ranked.forEach((entry, index) => {
     const tr = document.createElement('tr');
     tr.dataset.modelId = entry.model.id;
+    if (showBreaks && index > 0 && entry.band && ranked[index - 1].band
+        && entry.band.cluster !== ranked[index - 1].band.cluster) {
+      tr.classList.add('cluster-break');
+    }
     const ctx = { index, score: entry.score, band: entry.band };
     for (const col of cols) {
       const td = document.createElement('td');

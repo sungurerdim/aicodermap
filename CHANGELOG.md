@@ -18,15 +18,18 @@ future model).
 - **CI-overlap rank bands (AA / LMArena-inspired).** The composite now carries an
   EPISTEMIC uncertainty (±σ) propagated from per-cell evidence quality
   (cellConfidence + contradiction spread + coverage + imputation share).
-  `rankBands()` groups models whose uncertainty bands overlap the tier leader
-  into a shared rank (marked ≈), so within-noise differences are no longer shown
-  as false-precision ordering. Table rank column + score ±σ + card uncertainty
-  range now reflect this. Labelled "uncertainty range" (not a 95% CI); a numeric
-  band needs ≥2 distinct sources (else single-source flag). Constants are
-  schema-driven (`_schema.composite.uncertainty`). Atomic-only (no double-count
-  of vendor composites); does not touch weights or the coverage exponent.
-  Verified: opus-4-7 and the other top frontier models share rank-1 bands where
-  they are statistically indistinguishable.
+  `rankBands()` keeps a granular ordinal rank (1..N by score) — discriminating
+  and familiar — while a `cluster` id increments only at a SIGNIFICANCE BREAK
+  (where a model's band no longer overlaps the cluster leader's). The table
+  shows the ordinal rank + score ±σ + a thin divider at each break (composite
+  sort), so users see both who is ahead AND where the gaps are statistically
+  real, without opaque tier numbers. Card shows the uncertainty range too.
+  Labelled "uncertainty range" (not a 95% CI); single-source cells flagged.
+  Constants are schema-driven (`_schema.composite.uncertainty`). Atomic-only (no
+  double-count of vendor composites); does not touch weights or the coverage
+  exponent. Verified on real data: top-5 frontier models form one cluster (truly
+  close), with clear breaks below — e.g. balanced yields 6 clusters across 53
+  ranked models.
 
 ## [2026-05-27] — autonomous refresh-all [WARN: cumulative provenance coverage 50.7% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 352 new fills; 19 cells auto-gapped by orchestrator; 710 explicit agent gaps preserved]
 

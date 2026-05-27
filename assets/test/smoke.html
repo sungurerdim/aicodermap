@@ -153,8 +153,9 @@
       { id: 'hi', name: 'HI', tier: 'frontier', bench: { swePro: 90, sweV: 90 } },
       { id: 'lo', name: 'LO', tier: 'frontier', bench: { swePro: 20, sweV: 20 } },
     ], w, 'balanced');
-    assertEq('rankBands: top model is rank 1', rb[0].rank, 1);
-    assertTrue('rankBands: clearly-separated lower model gets a worse rank', rb[1].rank > rb[0].rank);
+    assertEq('rankBands: top model is ordinal rank 1', rb[0].rank, 1);
+    assertEq('rankBands: second model is ordinal rank 2', rb[1].rank, 2);
+    assertTrue('rankBands: clearly-separated models land in different clusters', rb[1].cluster > rb[0].cluster);
 
     // 7. data: scoreClass thresholds
     assertEq('scoreClass(85) → high', scoreClass(85), 'score-high');
