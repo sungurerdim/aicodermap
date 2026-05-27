@@ -1,4 +1,29 @@
 
+## [2026-05-27] — data-integrity hardening: 3 systematic layers
+
+Defense-in-depth so benchmark values land in the right cell with the right
+metric, and anomalies are investigated rather than silently accepted or rejected.
+Honest scope: this is layered prevention + flag-and-verify, not a 100% guarantee.
+
+### Added
+- **Layer 1 — source-authorization audit (`audit-data-coherence.py`):** builds
+  domain→published-benches from the whitelist `publishes[]` + known Arena Elo
+  publishers; flags a filled cell when a source publishes a confusable SIBLING
+  metric but not this bench (scoped to the Elo family, where scales differ and
+  the signal is reliable). Advisory WARN.
+- **Layer 2 — per-bench plausibility bands (`_schema.benchRanges` + audit):**
+  data-driven hard bounds (scale-corruption guard → HARD BLOCK) + soft bounds
+  (unusual-but-possible → advisory WARN, re-verify, never reject). Replaces the
+  hardcoded `_bench_max`. e.g. gemma-3-27b cfElo=110 now flags for verification
+  (stays — it is a genuine below-Newbie rating).
+- **Layer 3 — anomaly verification queue (`scripts/detect-anomalies.py` →
+  `data/_anomalies.json`):** detects source-mismatch / out-of-band / single-source
+  / peer-outlier (robust MAD vs same-tier peers) cells; the orchestrator (SKILL
+  PRELIM-F) slices the queue into each gather batch's `idea_context.anomalies`,
+  and the agent (agent.md rule 9) resolves them FIRST — confirm / reclassify /
+  flag, never auto-dismiss. Wired through `write-batch-ctx.py`. (172 cells flagged
+  on current data, e.g. gpt-5-4.aaIdx=26 vs tier-median 51.)
+
 ## [2026-05-27] — data integrity: cfElo metric disambiguation + misclassification guards
 
 Triggered by a real bug (deepseek-v4-pro's correct Codeforces rating 3206 was

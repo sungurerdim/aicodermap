@@ -195,29 +195,41 @@ def main():
                     )
 
     # === 6. data/models.json bench cells ===
-    # Most bench cells are percentages (0-100). cfElo stores raw Codeforces
-    # ELO (range 0-3500); webDevElo stores raw LMArena WebDev Arena Elo
-    # (allowed up to 2000 — top models in 2026 exceed the old 1500 cap).
-    # See whitelist _benchKeyNotes.
-    def _bench_max(key):
-        if key == "cfElo":
-            return 3500
-        if key == "webDevElo":
-            return 2000
-        return 100
+    # Plausibility bands are data-driven from _schema.benchRanges (SSOT). hard
+    # bounds = scale-corruption guard (wrong-scale value that would distort the
+    # 0-100 composite) → HARD BLOCK. soft bounds = plausibility band: in-hard but
+    # out-of-soft = unusual-but-possible → advisory WARN (re-verify, never reject —
+    # a genuine outlier/breakthrough stays). Unlisted benches default to a 0-100
+    # percentage. Most cells are percentages; cfElo/webDevElo/lmArenaElo are raw
+    # Elo (see benchRanges + _benchKeyNotes).
+    _ranges = schema_block.get("benchRanges") or {}
+    _range_default = _ranges.get("_default") or {"hardMin": 0, "hardMax": 100}
+
+    def _band(key):
+        r = _ranges.get(key) or _range_default
+        return (
+            r.get("hardMin", 0),
+            r.get("hardMax", 100),
+            r.get("softMin"),
+            r.get("softMax"),
+        )
 
     data_bench_cells = set()
     bad_cells = []
+    soft_suspects = []
     for m in models:
         for k, v in (m.get("bench") or {}).items():
             data_bench_cells.add(k)
-            if v is not None:
-                if not isinstance(v, (int, float)):
-                    bad_cells.append(f"{m['id']}.{k}={v!r} (non-numeric)")
-                else:
-                    hi = _bench_max(k)
-                    if v < 0 or v > hi:
-                        bad_cells.append(f"{m['id']}.{k}={v} (out of [0,{hi}])")
+            if v is None:
+                continue
+            if not isinstance(v, (int, float)):
+                bad_cells.append(f"{m['id']}.{k}={v!r} (non-numeric)")
+                continue
+            lo, hi, slo, shi = _band(k)
+            if v < lo or v > hi:
+                bad_cells.append(f"{m['id']}.{k}={v} (out of [{lo},{hi}])")
+            elif (slo is not None and v < slo) or (shi is not None and v > shi):
+                soft_suspects.append(f"{m['id']}.{k}={v} (soft [{slo},{shi}])")
     rogue = data_bench_cells - canonical_bench
     if rogue:
         failures.append(
@@ -228,35 +240,83 @@ def main():
             f"data/models.json has {len(bad_cells)} bench cell(s) with bad values: {bad_cells[:5]}"
             f"{' ...' if len(bad_cells) > 5 else ''}"
         )
+    if soft_suspects:
+        warnings.append(
+            f"{len(soft_suspects)} bench cell(s) outside the plausibility band "
+            f"(unusual value — re-verify, not rejected): {soft_suspects[:5]}"
+            f"{' ...' if len(soft_suspects) > 5 else ''}"
+        )
 
-    # === 6b. Elo-family metric-misclassification guard (advisory) ===
-    # cfElo must hold a Codeforces competitive-programming rating ONLY. LMArena /
-    # Chatbot Arena chat Elo (~1000-1600) belongs in lmArenaElo; WebDev Arena Elo
-    # in webDevElo. A cfElo cell whose sources are ALL Arena-family domains is
-    # almost certainly a misfiled Arena Elo (the 2026-05-27 cfElo class). Advisory
-    # only — surfaces the cell for re-verification, never blocks: a genuine low
-    # Codeforces rating from a non-arena primary source must stay. Pairs with the
-    # agent.md "BENCH METRIC INTEGRITY" rule that prevents it at gather time.
+    # === 6b. Source-authorization guard (advisory) — general metric-
+    # misclassification detection. Build domain → published-benches from the
+    # whitelist (entries with a NON-EMPTY publishes[]) + the known Arena-family
+    # Elo publishers. A FILLED bench cell is flagged when one of its sources is a
+    # KNOWN, scoped publisher whose publishes[] does NOT include this bench (e.g.
+    # an LMArena Elo filed into cfElo, or any leaderboard contributing a bench it
+    # doesn't actually report). Vendor / arxiv / uncategorized sources never
+    # trigger (they can report anything about a model) → low false-positive.
+    # Advisory: surfaces the cell for re-verification, never blocks. Pairs with
+    # the agent.md "BENCH METRIC INTEGRITY" rule (gather-time prevention).
     from urllib.parse import urlparse as _urlparse
 
-    _ARENA_DOMAINS = ("lmarena.ai", "arena.ai", "lmsys", "chatbot-arena")
-    elo_suspects = []
+    def _dom(u):
+        return _urlparse(u or "").netloc.lower().replace("www.", "")
+
+    domain_publishes: dict[str, set] = {}
+    for _cat in ("leaderboards", "aggregators", "local", "community", "registries"):
+        for e in whitelist.get(_cat) or []:
+            pub = e.get("publishes") or []
+            d = _dom(e.get("url"))
+            if pub and d:
+                domain_publishes.setdefault(d, set()).update(pub)
+    # Known Arena-family Elo publishers (chat/webdev Elo, never Codeforces cfElo)
+    # — ensure coverage even if a whitelist entry's scope is incomplete.
+    for _ad in ("lmarena.ai", "arena.ai", "lmsys.org", "chatbot-arena.com"):
+        domain_publishes.setdefault(_ad, set()).update({"lmArenaElo", "webDevElo"})
+
+    # Confusable bench families — members share a name token ("Elo") but live on
+    # DIFFERENT scales, so a cross-member misfile both happens (name confusion) and
+    # corrupts scoring. Flag a filled cell ONLY when a source publishes a SIBLING
+    # in the same family but NOT this bench — the source reports a confusable
+    # metric, so the value likely belongs to the sibling. Scoped to the Elo family
+    # only: there the scales differ (cfElo 800-3800 vs lmArenaElo/webDevElo
+    # ~1000-1600) so the signal is reliable AND the whitelist publishes[] reliably
+    # separates Codeforces from Arena sources. Same-scale families (SWE/tau/
+    # Terminal, all 0-100) are NOT publishes-checked here — incomplete whitelist
+    # publishes[] would false-positive and a same-scale misfile can't corrupt the
+    # composite; those rely on Layer 2 ranges + Layer 3 peer-outlier + agent
+    # discipline instead.
+    confusable_families = [
+        {"cfElo", "lmArenaElo", "webDevElo"},  # Elo family — distinct scales
+    ]
+
+    def _family(bk):
+        for fam in confusable_families:
+            if bk in fam:
+                return fam
+        return set()
+
+    src_mismatch = []
     for m in models:
-        if (m.get("bench") or {}).get("cfElo") is None:
-            continue
-        ents = sources.get(f"{m['id']}.cfElo") or []
-        doms = [
-            _urlparse(e.get("url") or "").netloc.lower().replace("www.", "")
-            for e in ents
-        ]
-        doms = [d for d in doms if d]
-        if doms and all(any(a in d for a in _ARENA_DOMAINS) for d in doms):
-            elo_suspects.append(f"{m['id']}.cfElo={m['bench']['cfElo']}")
-    if elo_suspects:
+        for bk, bv in (m.get("bench") or {}).items():
+            if bv is None or bk not in canonical_bench:
+                continue
+            fam = _family(bk)
+            if not fam:
+                continue
+            for e in sources.get(f"{m['id']}.{bk}") or []:
+                pub = domain_publishes.get(_dom(e.get("url")))
+                if pub and (pub & fam) and bk not in pub:
+                    sib = sorted(pub & fam)
+                    src_mismatch.append(
+                        f"{m['id']}.{bk}<-{_dom(e.get('url'))}(has {sib})"
+                    )
+                    break
+    if src_mismatch:
         warnings.append(
-            "cfElo cells sourced ONLY from Arena-family domains (likely misfiled "
-            f"LMArena Elo → move to lmArenaElo, re-verify): {elo_suspects[:5]}"
-            f"{' ...' if len(elo_suspects) > 5 else ''}"
+            f"{len(src_mismatch)} bench cell(s) sourced from a publisher of a "
+            f"confusable SIBLING metric but not this bench (likely misfiled, "
+            f"re-verify): {src_mismatch[:5]}{' ...' if len(src_mismatch) > 5 else ''}"
         )
 
     # === 7. data/sources.json keys ===

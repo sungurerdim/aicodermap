@@ -45,6 +45,11 @@ def main() -> int:
         REPO / "data" / ".leaderboard-snapshots" / "_index.json", {}
     )
     snapshots = snap_index.get("byUrl") or {}
+    # Layer-3 anomaly verification queue (PRELIM-F). Sliced per batch below so
+    # each agent resolves its flagged cells FIRST (agent.md OUTLIERS->INVESTIGATE).
+    anomalies = (_read_json(REPO / "data" / "_anomalies.json", {}) or {}).get(
+        "anomalies"
+    ) or []
 
     ctr = contracts(wl)
     keys = core_bench_keys(wl)
@@ -97,6 +102,8 @@ def main() -> int:
             current_ids=current_ids,
             bench_keys=keys,
         )
+        _bm = set(batch["modelIds"])
+        ctx["anomalies"] = [a for a in anomalies if a.get("modelId") in _bm]
         out_path = REPO / f".aicodermap-ctx-{batch['batchId']}.json"
         out_path.write_text(json.dumps(ctx, ensure_ascii=False), encoding="utf-8")
         size_kb = out_path.stat().st_size / 1024

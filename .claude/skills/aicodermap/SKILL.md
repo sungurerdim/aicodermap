@@ -74,6 +74,28 @@ PRELIM-D. SNAPSHOT_ROW_EXTRACTION (FAZ 7.F, 2026-05-10):
    - **Quality gate:** rows are NOT auto-promoted to observations[]. The agent must verify before emitting. `_rows.json` is a STARTING POINT, not a source of record.
    - Non-fatal. Opt-out via `AICODERMAP_NO_ROW_EXTRACT=1`.
 
+PRELIM-F. ANOMALY_VERIFICATION_QUEUE (2026-05-27):
+   ```
+   python scripts/detect-anomalies.py
+   ```
+   - Runs the Layer-3 detector over CURRENT data/{models,sources}.json +
+     `_schema.benchRanges`/`publishes[]`, writing `data/_anomalies.json` — a queue
+     of cells needing DEEP VERIFICATION (not silent acceptance or rejection; a
+     genuine breakthrough IS an outlier). Classes: `source-mismatch` (Elo-family
+     metric misfiled), `out-of-band` (outside soft plausibility band),
+     `single-source` (<2 distinct URLs on a core bench), `peer-outlier` (far from
+     same-tier peers via robust MAD).
+   - Orchestrator injects the top entries into every gather batch's
+     `idea_context.anomalies = [{modelId, benchKey, value, reasons[]}, ...]`
+     (sliced to the batch's modelIds). The agent resolves these FIRST per
+     agent.md "OUTLIERS -> INVESTIGATE": find the primary source + exact
+     metric/scale, then CONFIRM (keep), RECLASSIFY (correct cell/scale), or FLAG
+     (rawGaps note) — never auto-dismiss for being "too high/low".
+   - Advisory: never mutates data. Non-fatal. Opt-out via `AICODERMAP_NO_ANOMALY=1`.
+   - This is the systematic backbone of "investigate outliers, don't reject them".
+     (Full auto-dispatch of a research sub-agent the instant an anomaly surfaces
+     mid-merge is future work; v1 = detect + queue + next-cycle research priority.)
+
 PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-only fast path:
    - Computes `priorityCells = priority_cells(active, coreBenchKeys, limit=200, vmap, ttl=FRESHNESS_TTL_DAYS)`. If `priorityCells == []` AND every active model's `lastUpdated` is within `contracts.STALE_DAYS - 7` (default 7 days), the orchestrator switches the cycle to **lineup-sync only**: dispatches a single sonnet lineup agent (Step 0 only) and skips Stage A + Stage B + merge entirely. Output is whatever vendor-lineup deltas surface; data/{models,sources}.json values are unchanged.
    - Why: when the matrix is fully covered AND fresh, there is nothing for gather agents to research that the verification map doesn't already mark `confirmed=true ≤7d`. The cycle's only value is detecting NEW/DEPRECATED/RENAMED models from vendor lineup pages.

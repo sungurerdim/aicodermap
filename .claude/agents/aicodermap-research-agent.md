@@ -618,6 +618,10 @@ The single biggest source of data loss in prior runs was a single mega-regex doi
    wrong scale/metric → file in the correct cell or gap it with a note; (c)
    unverifiable → record with a `rawGaps`/note flag so synth + the next cycle
    re-verify. "Fark çok yüksek" is never, by itself, grounds to discard.
+   The orchestrator pre-flags such cells in `idea_context.anomalies[]` (the
+   PRELIM-F detector: source-mismatch / out-of-band / single-source /
+   peer-outlier) — resolve every anomaly intersecting your slice FIRST, with a
+   primary-source check, before sweeping the rest.
 
 ## IMAGE_OCR_FALLBACK (when bench data lives in PNG charts)
 

@@ -1035,6 +1035,13 @@
         "_minSourcesForCINote": "Models with fewer distinct sources on the majority of covered cells show a single-source flag instead of a numeric band (pitfall: no fabricated CI from one source)."
       }
     },
+    "benchRanges": {
+      "_purpose": "Per-bench plausibility bands consumed by audit-data-coherence.py. hardMin/hardMax = scale-corruption guard: a value outside is wrong-scale garbage that would distort the 0-100 composite → HARD BLOCK. softMin/softMax = plausibility band: a value inside the hard band but outside the soft band is unusual-but-possible → advisory WARN (re-verify, never reject — a genuine outlier/breakthrough stays). Benches not listed default to a 0-100 percentage (hard 0-100, no soft flag).",
+      "_default": { "hardMin": 0, "hardMax": 100 },
+      "cfElo": { "hardMin": 0, "hardMax": 3800, "softMin": 1000, "softMax": 3500 },
+      "webDevElo": { "hardMin": 0, "hardMax": 2000, "softMin": 900, "softMax": 1700 },
+      "lmArenaElo": { "hardMin": 0, "hardMax": 2500, "softMin": 1000, "softMax": 1850 }
+    },
     "presets": {
       "_purpose": "Data-driven preset definitions. assets/js/core.js PRESETS literal loads from here with backward-compat fallback. 'consensus' preset is new — uses vendor composite median rather than atomic weighting. Per-preset tiered bench classification (required/critical/imputable) drives missing-data UI policy in data.js + render-card.js.",
       "_presetKindOptions": [
