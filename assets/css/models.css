@@ -138,6 +138,13 @@
   color: var(--muted);
   cursor: help;
 }
+.composite-score .composite-unc {
+  font-size: 0.72em;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: help;
+}
+.composite-score .composite-unc.single-src { color: var(--warn-2, #e07320); font-style: italic; }
 .composite-score .coverage.cov-full { color: var(--ok); border-color: var(--accent-soft); }
 .composite-score .coverage.cov-partial { color: var(--warn); border-color: var(--warn-soft); }
 .composite-score .coverage.cov-low { color: var(--warn-2, #e07320); border-color: var(--warn-2-soft, #e0732040); }
@@ -183,6 +190,18 @@ table#comparison-table .coverage-mini {
 table#comparison-table .coverage-mini.cov-full { color: var(--ok); border-color: var(--accent-soft); }
 table#comparison-table .coverage-mini.cov-partial { color: var(--warn); border-color: var(--warn-soft); }
 table#comparison-table .coverage-mini.cov-low { color: var(--warn-2, #e07320); border-color: var(--warn-2-soft, #e0732040); }
+
+/* CI-overlap rank bands (2026-05-27): composite uncertainty + tier display. */
+table#comparison-table .composite-unc {
+  margin-left: 4px;
+  font-size: 0.68em;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: help;
+}
+table#comparison-table .composite-unc.single-src { color: var(--warn-2, #e07320); font-style: italic; }
+table#comparison-table .rank-band { cursor: help; }
+table#comparison-table .rank-band.tied { color: var(--muted); font-weight: 600; cursor: help; }
 
 .model-meta {
   display: grid;

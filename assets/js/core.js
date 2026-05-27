@@ -241,6 +241,18 @@ export function getCompositePolicy() {
     maxImputedWeightShare: (cp && cp.imputation && Number.isFinite(cp.imputation.maxImputedWeightShare)) ? cp.imputation.maxImputedWeightShare : 0.30,
     imputedConfidenceFactor: (cp && cp.imputation && Number.isFinite(cp.imputation.imputedConfidenceFactor)) ? cp.imputation.imputedConfidenceFactor : 0.5,
     minCoverageDisplay: (cp && Number.isFinite(cp.minCoverageDisplay)) ? cp.minCoverageDisplay : 0.30,
+    uncertainty: (() => {
+      const u = (cp && cp.uncertainty) || {};
+      return {
+        enabled: u.enabled !== false,
+        sigmaMax: Number.isFinite(u.sigmaMax) ? u.sigmaMax : 14,
+        contraDivisor: (Number.isFinite(u.contraDivisor) && u.contraDivisor > 0) ? u.contraDivisor : 2,
+        imputeSigma: Number.isFinite(u.imputeSigma) ? u.imputeSigma : 12,
+        sparsityAlpha: Number.isFinite(u.sparsityAlpha) ? u.sparsityAlpha : 0.25,
+        bandMult: (Number.isFinite(u.bandMult) && u.bandMult > 0) ? u.bandMult : 1,
+        minSourcesForCI: Number.isFinite(u.minSourcesForCI) ? u.minSourcesForCI : 2,
+      };
+    })(),
   };
 }
 

@@ -9,7 +9,7 @@ import {
   fmtLastUpdated, formatBenchValue, isCellStale, getCellFreshness,
   sourceReliabilityBadge,
   effectiveScore, vendorComposites, vendorConsensusScore,
-  crossValidationAgreement, presetTiersFor,
+  crossValidationAgreement, presetTiersFor, compositeUncertainty,
 } from './data.js';
 import { gpuCompat, getActiveVram } from './gpu.js';
 import { el, cameraIconButton, docIconButton } from './dom.js';
@@ -136,7 +136,7 @@ function cardHead(model) {
   return head;
 }
 
-function compositeBlock(composite, coverage, disputed) {
+function compositeBlock(composite, coverage, disputed, unc) {
   const pct = coverage != null ? Math.round(coverage * 100) : null;
   const isLowCov = pct != null && pct < 40;
   const valueText = fmtScore(composite, 1);
@@ -148,6 +148,14 @@ function compositeBlock(composite, coverage, disputed) {
     el('span', { class: 'label' }, t('ui.table.composite')),
     valueEl,
   );
+  // Uncertainty range (±σ) — honest precision. Labelled, not a 95% CI;
+  // flagged when backed mostly by a single source.
+  if (unc && Number.isFinite(unc.sigma) && composite != null) {
+    score.appendChild(el('span', {
+      class: unc.hasCI ? 'composite-unc' : 'composite-unc single-src',
+      title: t(unc.hasCI ? 'ui.uncertaintyTip' : 'ui.uncertaintySingleTip'),
+    }, `±${unc.sigma.toFixed(1)}`));
+  }
   if (pct != null) {
     const covClass = `coverage cov-${pct >= 75 ? 'full' : pct >= 40 ? 'partial' : 'low'}`;
     score.appendChild(el('span', { class: covClass, title: t('ui.coverageTip') },
@@ -450,6 +458,11 @@ export function buildModelCard(model, rank) {
   const composite = effectiveScore(model, State.weights, State.activePresetName);
   const coverage = coverageOf(model, State.weights);
   const disputed = disputedCount(model, State.weights);
+  // CI-overlap uncertainty (2026-05-27) — AICM atomic path only; vendor
+  // consensus scores on a different basis so a band would mislead.
+  const unc = (State.scoreFn || 'aicm') !== 'vendorConsensus'
+    ? compositeUncertainty(model, State.weights, State.models, State.activePresetName)
+    : null;
   const status = model.status || 'active';
   const statusClass = status === 'active' ? '' : ` is-${status}`;
   const card = el('article', {
@@ -466,7 +479,7 @@ export function buildModelCard(model, rank) {
   // start so its small height never pushes main content down; main flows
   // freely from the top of the card alongside the score column.
   card.appendChild(cardHead(model));
-  card.appendChild(compositeBlock(composite, coverage, disputed));
+  card.appendChild(compositeBlock(composite, coverage, disputed, unc));
 
   const main = el('div', { class: 'model-card-main' });
   main.appendChild(cardMeta(model, compat));

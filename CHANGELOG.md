@@ -1,4 +1,33 @@
 
+## [2026-05-27] — scoring integrity: quarantine-aware composite + CI-overlap rank bands
+
+Fairness/objectivity hardening of the ranking, model-agnostic (every current +
+future model).
+
+### Fixed
+- **Imputed composite now respects benchQuarantine.** `compositeScoreImputed`
+  (the active scoring path) used quarantined cells at full weight, while
+  `compositeScore` excluded them — so a model whose high scores were all
+  quarantined (single-source / dispersed hype-blog values) could outrank clean
+  independent-leaderboard data (qwen3-7-max #3 over opus-4-7 #4 in swe-focused).
+  Quarantined cells are now treated as missing → peer-tier imputation (reduced
+  weight, capped) or excluded. `impute` also skips the model's own quarantined
+  value and excludes peers' quarantined values from the median pool.
+
+### Added
+- **CI-overlap rank bands (AA / LMArena-inspired).** The composite now carries an
+  EPISTEMIC uncertainty (±σ) propagated from per-cell evidence quality
+  (cellConfidence + contradiction spread + coverage + imputation share).
+  `rankBands()` groups models whose uncertainty bands overlap the tier leader
+  into a shared rank (marked ≈), so within-noise differences are no longer shown
+  as false-precision ordering. Table rank column + score ±σ + card uncertainty
+  range now reflect this. Labelled "uncertainty range" (not a 95% CI); a numeric
+  band needs ≥2 distinct sources (else single-source flag). Constants are
+  schema-driven (`_schema.composite.uncertainty`). Atomic-only (no double-count
+  of vendor composites); does not touch weights or the coverage exponent.
+  Verified: opus-4-7 and the other top frontier models share rank-1 bands where
+  they are statistically indistinguishable.
+
 ## [2026-05-27] — autonomous refresh-all [WARN: cumulative provenance coverage 50.7% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 352 new fills; 19 cells auto-gapped by orchestrator; 710 explicit agent gaps preserved]
 
 [fillRatio:0.51 cells:543/1071 contradictions:204 fetch:0.0min tools:None batches:None build:9f80e29]

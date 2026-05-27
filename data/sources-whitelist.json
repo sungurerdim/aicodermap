@@ -1017,7 +1017,23 @@
         "_disabledNote": "Enabled 2026-05-18. effectiveScore() dispatches to compositeScoreImputed which fills missing imputable benches with peer-tier median (≥3 peers, normalized via _schema.normalization). Imputed cells weighted at imputedConfidenceFactor (0.5); total imputed share capped at maxImputedWeightShare (0.30)."
       },
       "minCoverageDisplay": 0.3,
-      "_minCoverageDisplayNote": "Models below this fraction of preset coverage get 'limited data' UI badge."
+      "_minCoverageDisplayNote": "Models below this fraction of preset coverage get 'limited data' UI badge.",
+      "uncertainty": {
+        "_purpose": "LMArena-inspired CI-overlap rank bands. Composite carries an EPISTEMIC uncertainty (sigma) propagated from per-cell evidence quality (cellConfidence + contradiction spread + imputation). rankBands() assigns rank = 1 + #models whose lower bound exceeds this model's upper bound, so models within noise share a band. NOT a frequentist 95% CI — labelled 'uncertainty range'; a numeric band is shown only when >= minSourcesForCI distinct sources back the model (else range-only).",
+        "enabled": true,
+        "sigmaMax": 10,
+        "_sigmaMaxNote": "Max per-cell SD (0-100 scale) at cellConfidence=0; sigma_conf = sigmaMax * (1 - cellConfidence). 10 keeps well-sourced cells (conf~0.5) near +/-5 and high-conf cells tight, rather than over-stating uncertainty from the trustScore posterior plateau.",
+        "contraDivisor": 2,
+        "_contraDivisorNote": "sigma_contra = contradictionDelta / contraDivisor (pp spread treated as ~2 SD range).",
+        "imputeSigma": 11,
+        "_imputeSigmaNote": "Floor SD applied to imputed (peer-median) cells — they are estimates, never observations.",
+        "sparsityAlpha": 0.18,
+        "_sparsityAlphaNote": "Extra band width from missing coverage: sigma_sparsity = score * sparsityAlpha * (1 - coverage).",
+        "bandMult": 1,
+        "_bandMultNote": "Band half-width = bandMult * sigma_composite. 1 = +/- 1 sigma. Higher = wider (more conservative) bands.",
+        "minSourcesForCI": 2,
+        "_minSourcesForCINote": "Models with fewer distinct sources on the majority of covered cells show a single-source flag instead of a numeric band (pitfall: no fabricated CI from one source)."
+      }
     },
     "presets": {
       "_purpose": "Data-driven preset definitions. assets/js/core.js PRESETS literal loads from here with backward-compat fallback. 'consensus' preset is new — uses vendor composite median rather than atomic weighting. Per-preset tiered bench classification (required/critical/imputable) drives missing-data UI policy in data.js + render-card.js.",

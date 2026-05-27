@@ -5,7 +5,7 @@ import { State, BENCH_KEYS, TIER_ORDER, STORAGE, writeStorage, readStorage } fro
 import {
   compositeScore, coverageOf, fmtScore, scoreClass, contradictionFor,
   pricingView, fmtPriceRange, fmtContext, fmtLastUpdated,
-  effectiveScore,
+  effectiveScore, rankBands,
 } from './data.js';
 import { gpuCompat, getActiveVram, passesFilters } from './gpu.js';
 import { el, clear } from './dom.js';
@@ -20,8 +20,19 @@ function tierLabel(tier) {
 function staticColumns() {
   return [
     { key: 'rank', i18n: 'ui.table.rank', sortable: false, num: true,
-      get: (_m, ctx) => ctx.index + 1,
-      render: (_m, ctx) => String(ctx.index + 1), cls: 'col-rank' },
+      get: (_m, ctx) => ctx.band ? ctx.band.rank : ctx.index + 1,
+      render: (_m, ctx) => {
+        // CI-overlap band tier: models within evidential noise share a rank,
+        // marked ≈. Stable across sort column (always the composite tier).
+        if (ctx.band) {
+          const span = document.createElement('span');
+          span.className = ctx.band.tied ? 'rank-band tied' : 'rank-band';
+          span.textContent = ctx.band.tied ? `${ctx.band.rank}≈` : String(ctx.band.rank);
+          span.title = t(ctx.band.tied ? 'ui.rankTieTip' : 'ui.rankTip');
+          return span;
+        }
+        return String(ctx.index + 1);
+      }, cls: 'col-rank' },
     { key: 'name', i18n: 'ui.table.name', sortable: true, sticky: true,
       get: (m) => m.name.toLowerCase(),
       render: (m) => {
@@ -65,6 +76,15 @@ function staticColumns() {
         span.className = scoreClass(ctx.score);
         span.textContent = fmtScore(ctx.score);
         wrap.appendChild(span);
+        // Uncertainty range (±σ) — honest precision. Labelled "uncertainty
+        // range", not a 95% CI; flagged when backed by a single source.
+        if (ctx.band && Number.isFinite(ctx.band.sigma) && ctx.score != null) {
+          const u = document.createElement('span');
+          u.className = ctx.band.hasCI ? 'composite-unc' : 'composite-unc single-src';
+          u.textContent = `±${Math.round(ctx.band.sigma)}`;
+          u.title = t(ctx.band.hasCI ? 'ui.uncertaintyTip' : 'ui.uncertaintySingleTip');
+          wrap.appendChild(u);
+        }
         const cov = coverageOf(m, State.weights);
         if (cov != null) {
           const pct = Math.round(cov * 100);
@@ -227,9 +247,21 @@ function renderTableHeader(thead, cols) {
 function rankedModels() {
   // F1+F2 (2026-05-18): effectiveScore dispatches to compositeScore (atomic)
   // or vendorConsensusScore based on State.scoreFn (set by applyPreset).
-  return State.models
-    .filter(passesFilters)
-    .map(m => ({ model: m, score: effectiveScore(m, State.weights, State.activePresetName) }));
+  const filtered = State.models.filter(passesFilters);
+  // CI-overlap rank bands (2026-05-27) — only on the AICM atomic path; the
+  // vendorConsensus path scores differently so bands would mismatch. bandById
+  // gives each row its composite tier + uncertainty (sigma) regardless of which
+  // column the table is sorted by.
+  let bandById = null;
+  if ((State.scoreFn || 'aicm') !== 'vendorConsensus') {
+    const bands = rankBands(filtered, State.weights, State.activePresetName);
+    bandById = new Map(bands.map(b => [b.id, b]));
+  }
+  return filtered.map(m => ({
+    model: m,
+    score: effectiveScore(m, State.weights, State.activePresetName),
+    band: bandById ? (bandById.get(m.id) || null) : null,
+  }));
 }
 
 function sortRanked(ranked, cols) {
@@ -250,7 +282,7 @@ function renderTableBody(tbody, ranked, cols) {
   ranked.forEach((entry, index) => {
     const tr = document.createElement('tr');
     tr.dataset.modelId = entry.model.id;
-    const ctx = { index, score: entry.score };
+    const ctx = { index, score: entry.score, band: entry.band };
     for (const col of cols) {
       const td = document.createElement('td');
       if (col.num) td.classList.add('num');

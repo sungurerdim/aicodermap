@@ -700,6 +700,123 @@ export function compositeScoreImputed(model, weights, allModels, presetName) {
   return { score: (weightedSum / coveredWeight) * Math.pow(coverage, 1 / expo), imputedKeys };
 }
 
+// CI-overlap rank-band engine (AA/LMArena-inspired, 2026-05-27). Propagates an
+// EPISTEMIC uncertainty (sigma) for the composite from per-cell evidence quality
+// (cellConfidence + contradiction spread + imputation) through the SAME
+// weighted-mean × coverage^(1/expo) formula compositeScoreImputed uses, so the
+// returned `score` matches effectiveScore exactly. Confidence widens the band
+// but does not move the point score (parity with compositeScoreImputed, which
+// weights observed cells at full w). NOT a frequentist 95% CI — band labelled
+// "uncertainty range"; hasCI flags whether enough distinct sources back it.
+// Constants: _schema.composite.uncertainty (getCompositePolicy().uncertainty).
+export function compositeUncertainty(model, weights, allModels, presetName) {
+  const policy = getCompositePolicy();
+  const u = policy.uncertainty;
+  const tiers = getPresetTiers(presetName || State.activePresetName || 'balanced');
+  const expo = policy.coverageShrinkageExponent > 0 ? policy.coverageShrinkageExponent : 2;
+  const confFactor = policy.imputedConfidenceFactor || 0.5;
+  const maxImputed = policy.maxImputedWeightShare || 0.30;
+  const quarantined = quarantinedBenches(model);
+  let coveredWeight = 0, activeWeight = 0, weightedSum = 0, imputedWeight = 0;
+  let varAccum = 0, coveredCells = 0, sourcedCells = 0;
+  for (const k of BENCH_KEYS) {
+    const w = weights[k];
+    if (!w) continue;
+    if (isVendorComposite(k)) continue;       // atomic-only (no double-count)
+    activeWeight += w;
+    const haveRaw = quarantined.has(k) ? null : model.bench?.[k];
+    let s = null, isImputed = false;
+    if (haveRaw != null && Number.isFinite(haveRaw)) {
+      s = normalizeBenchScore(k, haveRaw);
+    } else if (tiers.imputable.has(k)) {
+      const imp = impute(model, k, allModels);
+      if (imp != null) { s = imp; isImputed = true; }
+    }
+    if (s == null || !Number.isFinite(s)) continue;
+    let cw, sigmaCell;
+    if (isImputed) {
+      if ((imputedWeight + w) / activeWeight > maxImputed) continue;
+      cw = w * confFactor;            // parity with compositeScoreImputed
+      imputedWeight += w;
+      sigmaCell = u.imputeSigma;      // estimate, never an observation
+    } else {
+      cw = w;                         // parity with compositeScoreImputed
+      const conf = cellConfidence(model.id, k);
+      const sConf = u.sigmaMax * (1 - conf);
+      const c = contradictionFor(model.id, k);
+      const sContra = (c && Number.isFinite(c.delta)) ? (c.delta / u.contraDivisor) : 0;
+      sigmaCell = Math.sqrt(sConf * sConf + sContra * sContra);
+      const entries = State.sources[`${model.id}.${k}`];
+      if (Array.isArray(entries)) {
+        const urls = new Set(entries.filter(e => e && e.url).map(e => String(e.url).toLowerCase()));
+        if (urls.size >= u.minSourcesForCI) sourcedCells++;
+      }
+    }
+    coveredWeight += cw;
+    weightedSum += cw * s;
+    varAccum += (cw * cw) * (sigmaCell * sigmaCell);
+    coveredCells++;
+  }
+  if (activeWeight === 0 || coveredWeight === 0) {
+    return { score: null, sigma: null, lower: null, upper: null, hasCI: false, coverage: 0, imputedShare: 0 };
+  }
+  const raw = weightedSum / coveredWeight;
+  const coverage = coveredWeight / activeWeight;
+  const covFactor = Math.pow(coverage, 1 / expo);
+  const score = raw * covFactor;
+  const sigmaMean = covFactor * (Math.sqrt(varAccum) / coveredWeight);  // SD of weighted mean, coverage-scaled
+  const sigmaSparsity = score * u.sparsityAlpha * (1 - coverage);       // missing-profile epistemic width
+  const sigma = Math.sqrt(sigmaMean * sigmaMean + sigmaSparsity * sigmaSparsity);
+  const half = u.bandMult * sigma;
+  return {
+    score,
+    sigma,
+    lower: Math.max(0, score - half),
+    upper: Math.min(100, score + half),
+    hasCI: coveredCells > 0 && sourcedCells >= Math.ceil(coveredCells / 2),
+    coverage,
+    imputedShare: imputedWeight / activeWeight,
+  };
+}
+
+// Assign CI-overlap rank bands across `models` for the active preset.
+// rank(M) = 1 + |{ N : N.lower > M.upper }| (LMArena rule): models whose
+// uncertainty bands overlap share a rank, so within-noise differences are not
+// shown as strict ordering. Returns entries sorted by point score desc with
+// { id, score, sigma, lower, upper, hasCI, coverage, imputedShare, rank,
+//   tied } where `tied` = another model shares this rank.
+export function rankBands(models, weights, presetName) {
+  const rows = (models || [])
+    .filter(m => (m.status || 'active') !== 'archived')
+    .map(m => ({ id: m.id, ...compositeUncertainty(m, weights, State.models, presetName) }))
+    .filter(r => r.score != null)
+    .sort((a, b) => b.score - a.score);
+  // Monotonic dense tiers from the LMArena CI-overlap idea, adapted for a
+  // score-sorted table: walking top→down, a model joins the current tier when
+  // its uncertainty band still overlaps the tier LEADER's band (upper >=
+  // leaderLower); otherwise it opens the next (lower) tier. Models within one
+  // tier are statistically indistinguishable from the tier leader → shown as a
+  // shared rank with ≈, never as false-precision strict ordering. `sep` records
+  // the rigorous pairwise count (1 + #models whose lower bound exceeds this
+  // model's upper bound) for tooltip/debug, without driving the displayed rank.
+  let rank = 0;
+  let leaderLower = Infinity;
+  for (const r of rows) {
+    if (r.upper >= leaderLower) {
+      r.rank = rank;                 // same tier as current leader
+    } else {
+      rank += 1;                     // new, strictly-lower tier (first row: 0→1)
+      r.rank = rank;
+      leaderLower = r.lower;         // this model leads the new tier
+    }
+    r.sep = 1 + rows.filter(o => o !== r && o.lower > r.upper).length;
+  }
+  const rankCounts = {};
+  for (const r of rows) rankCounts[r.rank] = (rankCounts[r.rank] || 0) + 1;
+  for (const r of rows) r.tied = rankCounts[r.rank] > 1;
+  return rows;
+}
+
 export function isLocalRunnable(m) {
   if (m.tier === 'ollama-local' || m.tier === 'gemma') return true;
   if (Number.isFinite(m.vramRequirement)) return true;

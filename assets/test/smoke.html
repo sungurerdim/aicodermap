@@ -30,7 +30,7 @@
     } from '../js/core.js';
     import {
       compositeScore, coverageOf, disputedCount, contradictionFor, pricingView, fmtPriceRange, fmtContext,
-      isLocalRunnable, scoreClass, fmtScore, loadData,
+      isLocalRunnable, scoreClass, fmtScore, loadData, compositeUncertainty, rankBands,
     } from '../js/data.js';
     import { gpuCompat } from '../js/gpu.js';
     import { modelSourcesSummary, buildSourcesMarkdown } from '../js/sources.js';
@@ -134,6 +134,27 @@
     const csCross = compositeScore(mCross, w);
     assertTrue('cross-tier-only dispute applies NO haircut', Math.abs(csCross - ((22*80 + 10*60) / 32)) < 0.01);
     assertEq('disputedCount excludes cross-tier-only', disputedCount(mCross, w), 0);
+
+    // 6h. compositeUncertainty: sparse coverage widens the uncertainty band
+    const mFull = { id: 'uf', name: 'UF', tier: 'frontier', bench: { swePro: 70, sweV: 70 } };
+    const mSparse = { id: 'us', name: 'US', tier: 'frontier', bench: { swePro: 70 } };
+    const uFull = compositeUncertainty(mFull, w, [mFull], 'balanced');
+    const uSparse = compositeUncertainty(mSparse, w, [mSparse], 'balanced');
+    assertTrue('compositeUncertainty: sparse coverage widens the band', uSparse.sigma > uFull.sigma);
+    assertTrue('compositeUncertainty: score parity with compositeScore basis', uFull.score != null);
+
+    // 6i. compositeUncertainty excludes quarantined cells (matches composite path)
+    const mQ = { id: 'uq', name: 'UQ', tier: 'frontier', bench: { swePro: 95, sweV: 60 }, benchQuarantine: { swePro: true } };
+    const uQ = compositeUncertainty(mQ, w, [mQ], 'balanced');
+    assertTrue('compositeUncertainty drops quarantined high cell (score reflects sweV only)', uQ.score < 70);
+
+    // 6j. rankBands: clearly-separated models get distinct monotonic tiers
+    const rb = rankBands([
+      { id: 'hi', name: 'HI', tier: 'frontier', bench: { swePro: 90, sweV: 90 } },
+      { id: 'lo', name: 'LO', tier: 'frontier', bench: { swePro: 20, sweV: 20 } },
+    ], w, 'balanced');
+    assertEq('rankBands: top model is rank 1', rb[0].rank, 1);
+    assertTrue('rankBands: clearly-separated lower model gets a worse rank', rb[1].rank > rb[0].rank);
 
     // 7. data: scoreClass thresholds
     assertEq('scoreClass(85) → high', scoreClass(85), 'score-high');
