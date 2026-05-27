@@ -630,11 +630,14 @@ export function fmtContext(n) {
 // that have a real value. Requires ≥3 peers; otherwise returns null (no guess).
 // Imputed values are never written to storage — only used in compositeScoreImputed().
 export function impute(model, key, allModels) {
-  if (model.bench?.[key] != null) return model.bench[key];
+  // A quarantined own-value is untrusted (single-source / dispersed / low
+  // confidence) — fall through to peer estimation instead of returning it.
+  if (model.bench?.[key] != null && !quarantinedBenches(model).has(key)) return model.bench[key];
   const peers = (allModels || []).filter(
     m => m.id !== model.id
       && m.tier === model.tier
-      && m.bench?.[key] != null,
+      && m.bench?.[key] != null
+      && !quarantinedBenches(m).has(key),   // peers' quarantined values don't anchor the median
   );
   if (peers.length < 3) return null;
   const vals = peers.map(p => normalizeBenchScore(key, p.bench[key])).filter(v => v != null);
@@ -653,6 +656,7 @@ export function compositeScoreImputed(model, weights, allModels, presetName) {
   const expo = policy.coverageShrinkageExponent > 0 ? policy.coverageShrinkageExponent : 2;
   const confFactor = policy.imputedConfidenceFactor || 0.5;
   const maxImputed = policy.maxImputedWeightShare || 0.30;
+  const quarantined = quarantinedBenches(model);
   let coveredWeight = 0;
   let activeWeight = 0;
   let weightedSum = 0;
@@ -663,7 +667,14 @@ export function compositeScoreImputed(model, weights, allModels, presetName) {
     if (!w) continue;
     if (isVendorComposite(k)) continue;       // atomic-only
     activeWeight += w;
-    const haveRaw = model.bench?.[k];
+    // Quarantined cells (merge.py flagged: single-source / dispersed / low
+    // confidence) are untrusted — treat as missing so they get peer-tier
+    // imputation (reduced weight, capped) instead of distorting the composite
+    // at full weight. Mirrors compositeScore()'s quarantine exclusion and
+    // applies uniformly to every model (current + future). Without this, a
+    // model whose only high scores are quarantined hype-blog values (e.g.
+    // qwen3-7-max lcb=90.5) outranks clean independent-leaderboard data.
+    const haveRaw = quarantined.has(k) ? null : model.bench?.[k];
     let s = null, isImputed = false;
     if (haveRaw != null && Number.isFinite(haveRaw)) {
       s = normalizeBenchScore(k, haveRaw);
