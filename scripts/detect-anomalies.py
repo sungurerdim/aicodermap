@@ -15,6 +15,12 @@ Anomaly classes:
                     (_schema.benchRanges).
   single-source   — core-bench cell backed by < MIN_SOURCES distinct source URLs.
   peer-outlier    — value far from same-tier peers on the bench (> K_MAD * MAD).
+  fresh-divergence — stored value disagrees with THIS cycle's fresh gather
+                    observation by > CONTRADICTION_WARN_PP (from
+                    data/_synth-traceability.json divergences[], when present).
+                    Surfaces cases where a conservative historical-consensus
+                    winner overrode a correct fresh correction (cycle 2026-05-28:
+                    o3.arcAgi2 stored 87.5 [mislabeled ARC-AGI-1] vs fresh 2.9).
 
 Stdlib-only. Idempotent. Run post-merge (or as a refresh PRELIM); the orchestrator
 reads the queue into idea_context.anomalies for the next gather.
@@ -120,6 +126,34 @@ def main() -> int:
                     }
                 )
 
+    # fresh-divergence — ingest the synth traceability gate's advisory list
+    # (grounded values that disagree with this cycle's fresh observations).
+    # Closes the Defect-B loop: a stale-consensus winner that overrode a correct
+    # fresh correction surfaces here for next-cycle research. Non-fatal if absent.
+    trace_path = ROOT / "data" / "_synth-traceability.json"
+    if trace_path.is_file():
+        try:
+            trace = json.loads(trace_path.read_text(encoding="utf-8"))
+            for d in trace.get("divergences") or []:
+                cell = d.get("cell") or ""
+                if "." not in cell:
+                    continue
+                mid, k = cell.split(".", 1)
+                anomalies.append(
+                    {
+                        "modelId": mid,
+                        "benchKey": k,
+                        "value": d.get("value"),
+                        "reasons": [
+                            f"fresh-divergence (stored {d.get('value')} vs this-cycle "
+                            f"obs {d.get('freshConsensus')}, Δ{d.get('deltaPp')}pp)"
+                        ],
+                        "sources": [],
+                    }
+                )
+        except (OSError, json.JSONDecodeError):
+            pass
+
     by_class: dict[str, int] = {}
     for a in anomalies:
         for r in a["reasons"]:
@@ -130,6 +164,8 @@ def main() -> int:
                 if "soft band" in r
                 else "single-source"
                 if "single-source" in r
+                else "fresh-divergence"
+                if "fresh-divergence" in r
                 else "peer-outlier"
             )
             by_class[tag] = by_class.get(tag, 0) + 1

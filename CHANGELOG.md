@@ -1,4 +1,42 @@
 
+## [2026-05-28] — synth-layer integrity: fabrication gate + fresh-divergence surfacing
+
+A `refresh-all` cycle exposed two synthesis-layer defects (the gather stage was
+sound — 530 source-traced observations). This entry ships the TOOLING fix that
+prevents recurrence; the cycle's contested benchmark values were NOT committed.
+
+### Fixed
+- **Stage-B synth fabrication.** The FAZ 4.C sonnet synth invented ~25–68 bench
+  values absent from every gather observation, attributed to real URLs and
+  contradicting the gathered evidence (e.g. `opus-4-7.hle=11.6` when the
+  observation was 54.7; `devstral-2.sweV=66.4` against 3 sources at 72.2;
+  `grok-4-20.sweV=90.1` with no observation). Such an artifact would corrupt the
+  live decision data.
+
+### Added
+- **Synth traceability gate (`scripts/validate-synth-traceability.py`).** Every
+  non-null `updates.bench[k]` is checked against its cell's EVIDENCE ENVELOPE
+  (this cycle's fresh gather observations ∪ historical `sources.json` values).
+  A value outside `[min,max]` of its candidates — or with zero evidence — is a
+  FABRICATION. Scale-agnostic (uses the cell's own candidate range, so
+  cfElo/webDevElo/0-100 all validate). `--auto-fallback` regenerates the
+  artifact via the deterministic `local-synth.py` (which can only pick
+  trust-winners from real observations, never hallucinate) and re-validates.
+  Verified: flags 68 fabricated values on the bad artifact, 0 on local-synth
+  output, recovers cleanly on fallback.
+- **Orchestration wiring (SKILL.md + agent.md).** New Stage-B gate step between
+  synth dispatch and `gen_unified_artifact`, plus a `4s` row in
+  SILENT_FAIL_PREVENTION. agent.md synth mode gains HARD RULE 0 — GROUNDING /
+  NO FABRICATION: every emitted value must be a verbatim gather-observed
+  trust-winner; no observation → gap, never a value.
+- **`fresh-divergence` anomaly class (`scripts/detect-anomalies.py`).** Ingests
+  the gate's advisory `divergences[]` (grounded values that disagree with THIS
+  cycle's fresh observations by > CONTRADICTION_WARN_PP) into
+  `data/_anomalies.json`, so a conservative historical-consensus winner that
+  overrode a correct fresh correction surfaces for the Step 7.7 anomaly→research
+  loop (e.g. `o3.arcAgi2` stored 87.5 [mislabeled ARC-AGI-1] vs fresh 2.9).
+  Local-synth's conservative resolution policy is unchanged — flag, don't reject.
+
 ## [2026-05-27] — data-integrity hardening: 3 systematic layers
 
 Defense-in-depth so benchmark values land in the right cell with the right

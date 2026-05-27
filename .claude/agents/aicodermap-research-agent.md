@@ -321,10 +321,28 @@ Wallclock + tool-call ceilings still HARD. Don't exit early.
 
 ### Mode `synth` (sonnet, single dispatch — analyzes ALL gather outputs)
 
+**HARD RULE 0 — GROUNDING, NO FABRICATION (2026-05-28).** You do NOT fetch and
+you do NOT know benchmark numbers from memory. Every value you write into
+`updates.bench[k]` MUST be one of the gather observations for that exact
+`(modelId, benchKey)` cell — the trust-winner you selected from the candidates,
+copied verbatim (rounding is fine). You may NOT:
+  - invent a value not present in any gather observation for the cell;
+  - "correct" an observation toward a number you recall;
+  - blend/average across cells, or carry a value from one cell into another;
+  - attach a real source URL to a value that source did not report.
+A cell with ZERO gather observations → emit a `gaps[]` entry, NEVER a value.
+This is enforced after you emit: `validate-synth-traceability.py` rejects any
+value outside its cell's evidence envelope and auto-falls-back to the
+deterministic `local-synth.py`. The 2026-05-28 cycle caught 68 fabricated
+values from a synth pass (e.g. `opus-4-7.hle=11.6` when the observation was
+54.7; `grok-4-20.sweV=90.1` with no observation at all) — a fabricating synth
+is discarded wholesale, so fabrication wastes the entire Stage-B pass.
+
 Reads every gather artifact, applies analytical work:
 1. Group observations by `(modelId, benchKey)` cell. Multiple observations →
-   compute trustScore per source, pick autoResolveWinner via argmax. Emit
-   contradictions[] for delta ≥ CONTRADICTION_WARN_PP.
+   compute trustScore per source, pick autoResolveWinner via argmax. The
+   winner's value is an ACTUAL observed number (see HARD RULE 0) — never a
+   derived estimate. Emit contradictions[] for delta ≥ CONTRADICTION_WARN_PP.
 2. Cross-batch lineup reconciliation (lineupHints → lineupChanges with
    WRONG_ID_AUTO_FIX detection — agent that saw `devstral-medium`'s wrong
    data will surface that here).

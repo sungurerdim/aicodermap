@@ -375,6 +375,27 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
      output_path: ".aicodermap-agent-out-synth.json"
    })
 
+   // ─── Stage B GATE: synth bench-value traceability (2026-05-28) ──────────
+   // The Stage-B sonnet synth can FABRICATE bench values — numbers present in
+   // NO gather observation, attributed to real URLs, contradicting the
+   // gathered evidence (cycle 2026-05-28 measured 68 ungrounded values in one
+   // synth artifact: opus-4-7.hle=11.6 vs observed 54.7; grok-4-20.sweV=90.1
+   // with no observation). Pushing these would corrupt the live decision data.
+   // This gate classifies every non-null updates.bench[k] against the cell's
+   // EVIDENCE ENVELOPE (fresh gather observations ∪ historical sources.json):
+   // a value outside [min,max] of its candidates (or with zero evidence) is a
+   // FABRICATION. On fabrication it auto-falls-back to the DETERMINISTIC
+   // local-synth.py (which cannot hallucinate — it only picks trust-winners
+   // from real observations) and re-validates. This step CANNOT be skipped on
+   // refresh-all; it is the sole guard between a hallucinating synth and merge.
+   //   python scripts/validate-synth-traceability.py --auto-fallback
+   // Exit 0 = clean or recovered (artifact safe for gen_unified). Exit 2 =
+   // fabrication AND fallback also dirty → log loud CHANGELOG warn; merge.py's
+   // own MX/anomaly audits remain the backstop. The advisory divergences[] in
+   // data/_synth-traceability.json (grounded values that disagree with THIS
+   // cycle's fresh observations by > CONTRADICTION_WARN_PP) feed the Step 7.7
+   // anomaly→research loop — surfaced, never silently resolved.
+
    // gen_unified_artifact.py prefers synth output when present, falls back
    // to gather union otherwise.
    artifact = merge_batch_artifacts(per_batch_artifacts)
@@ -711,6 +732,7 @@ Termination — all four MUST hold before agent emits final JSON:
 | 4 Agent survey | `.aicodermap-agent-out-<batchId>.json` exists and parses; `models[]+newModels[]` ≥ FAMILY_BASELINE_MIN OR explicit gaps[] | (1) agent-written file primary; (2) FALLBACK A: `extract-agent-output.py` against subagent jsonl; (3) FALLBACK B: persisted tool-result extraction; (4) on all-3 failure: log to `~/.aicodermap-debug.log` + CONTINUE merge with available data. Family-count shortfall logged to gaps[], never halts. |
 | 4w Wallclock cap | Every batch returns within BATCH_WALLCLOCK_SEC (600s) | FAZ 1.3 (2026-05-07): orchestrator wraps each Agent call with `subprocess.run(timeout=BATCH_WALLCLOCK_SEC)`. On timeout: SIGKILL the agent, attempt Read of partial-written `.aicodermap-agent-out-<batchId>.json`. If file exists with valid JSON head → use it, set `partialReason:{code:'timeout', wallclockSec:BATCH_WALLCLOCK_SEC}`. If file missing/corrupt → emit empty stub `{batchId, models:[], gaps:[], partialReason:{code:'timeout-no-write'}}` and CONTINUE to next wave. Never block on a single batch's timeout. |
 | 4d Wave dispatch completeness | All `plan["waves"]` indices present in `wave_state.completed` | FAZ 1.1 (2026-05-07): hard guard at end of Step 4 wave loop. If incomplete → `halt_workflow()` BEFORE Step 5. gap-gen would mask missing waves as auto-gaps; that pattern slipped the 2026-05-06 partial commit through. SOLE non-push halt path. |
+| 4s Synth traceability gate | Every non-null `updates.bench[k]` in `.aicodermap-agent-out-synth.json` lies within its cell's evidence envelope (fresh gather obs ∪ historical sources.json) | 2026-05-28: `validate-synth-traceability.py --auto-fallback` runs after Stage B, before gen_unified. On FABRICATION (value outside envelope / zero evidence — the Stage-B sonnet synth hallucinated 68 such values in the 2026-05-28 cycle) → auto-regenerate the artifact via deterministic `local-synth.py` (cannot hallucinate) + re-validate. If fallback also dirty → loud CHANGELOG warn + CONTINUE (merge.py MX/anomaly audits backstop). `divergences[]` (grounded but disagree with fresh obs > CONTRADICTION_WARN_PP) are advisory → feed Step 7.7 anomaly→research loop, never block. |
 | 6 Coverage log | `validationCoverage` is a number 0..1 in artifact | Below COVERAGE_TARGET (0.85): set artifact.partialCoverage=true, append "⚠ cumulative provenance coverage" line to CHANGELOG, CONTINUE. Below COVERAGE_HARD_BLOCK (0.50): louder warning, still CONTINUE. No deep-fetch loop (retired 2026-04-28) — agent already walks every cell every cycle. |
 | 7 Contradiction auto-resolve | Every contradiction has autoResolveWinner | TrustScore ties within 0.05 with no I-tier present: prefer most-recent value, then most-verified, then alphabetical-by-source as deterministic tiebreaker — never user prompt |
 | 10 Atomic write | `data/{models,sources}.json` parse-valid + self-check passes | On parse failure: restore from `.bak` + log root cause + retry the merge once with relaxed self-check. On second failure: write the artifact's known-good fields only, mark unhealable fields in gaps[]. CONTINUE — never leave repo in restored-only state |
