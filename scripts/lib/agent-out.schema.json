@@ -37,24 +37,33 @@
           "modelId":         { "type": "string" },
           "updates": {
             "type": "object",
-            "not": {
-              "anyOf": [
-                { "required": ["bench.swePro"] },
-                { "required": ["bench.sweV"] },
-                { "required": ["bench.lcb"] },
-                { "required": ["bench.tb2"] },
-                { "required": ["bench.tau2"] },
-                { "required": ["bench.gpqa"] }
-              ]
-            },
             "properties": {
               "bench": {
                 "type": ["object", "null"],
-                "description": "Canonical bench keys: _schema.coreBenchKeys ∪ emergingBenchKeys. Enforced at runtime by scripts/validate-artifact-keys.py — dynamic key universe cannot be embedded in static schema. Non-canonical keys (e.g., lcbV6, aider when deprecated) cause pre-merge REJECT (FAZ 8.A, 2026-05-18)."
+                "description": "Canonical bench keys: _schema.coreBenchKeys ∪ emergingBenchKeys. Enforced at runtime by scripts/validate-artifact-keys.py — dynamic key universe cannot be embedded in static schema. Non-canonical keys (e.g., lcbV6, aider when deprecated) cause pre-merge REJECT (FAZ 8.A, 2026-05-18). Flat `bench.X` keys at updates root rejected by validate-agent-out.py."
               }
             }
           },
-          "sourcesAdded":    { "type": "array" },
+          "sourcesAdded": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["key"],
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9_-]+\\.[a-zA-Z0-9]+$"
+                },
+                "value": {},
+                "source": { "type": "string" },
+                "url": { "type": "string" },
+                "tier": { "type": "string", "enum": ["I", "S", "C"] },
+                "trustScore": { "type": "number", "minimum": 0, "maximum": 1 },
+                "fetched": { "type": "string" },
+                "verifications": { "type": "integer", "minimum": 1 }
+              }
+            }
+          },
           "notApplicable":   { "type": "array" }
         }
       }

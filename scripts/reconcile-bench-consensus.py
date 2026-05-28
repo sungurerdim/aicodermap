@@ -178,10 +178,6 @@ def main() -> int:
     models = json.loads(MODELS_PATH.read_text(encoding="utf-8"))
     models_by_id = {m["id"]: m for m in models}
 
-    # Aggregate observations from BOTH `<mid>.<key>` and legacy
-    # `<mid>.bench.<key>` flat keys before clustering. Pre-FAZ 6.B,
-    # processing each as a separate cell let two independent winners
-    # ping-pong across sweeps.
     cell_sources: dict[tuple[str, str], list[dict[str, Any]]] = {}
     for flatkey, entries in sources.items():
         if not isinstance(entries, list) or not entries:
@@ -189,8 +185,6 @@ def main() -> int:
         if "." not in flatkey:
             continue
         mid, fkey = flatkey.split(".", 1)
-        if fkey.startswith("bench."):
-            fkey = fkey[len("bench.") :]
         if not mid or not fkey:
             continue
         cell_sources.setdefault((mid, fkey), []).extend(entries)

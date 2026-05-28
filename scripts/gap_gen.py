@@ -83,15 +83,11 @@ for entry in existing_artifact.get("models", []):
         continue
     for k, v in (entry.get("updates", {}) or {}).items():
         if k == "bench" and isinstance(v, dict):
-            # nested format: {"bench": {"sweV": 65.4, ...}}
             for bk, bv in v.items():
                 if bk in core_keys and bv is not None:
                     agent_filled.add((mid, bk))
-        else:
-            # flat format: {"bench.sweV": 65.4} or {"sweV": 65.4}
-            bk = k.removeprefix("bench.")
-            if bk in core_keys and v is not None:
-                agent_filled.add((mid, bk))
+        elif k in core_keys and v is not None:
+            agent_filled.add((mid, k))
 
 for g in existing_artifact.get("gaps", []):
     key = g.get("key")

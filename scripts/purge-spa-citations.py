@@ -68,7 +68,7 @@ def main() -> int:
         print("⚠ no unhealthy URLs in whitelist _runtime — nothing to purge")
         return 0
 
-    print(f"=== PURGING SPA-SHELL CITATIONS ===")
+    print("=== PURGING SPA-SHELL CITATIONS ===")
     print(f"unhealthy URL set: {sorted(unhealthy_urls)}")
 
     sources = json.loads(SOURCES_PATH.read_text(encoding="utf-8"))
@@ -101,9 +101,6 @@ def main() -> int:
         if "." not in flatkey:
             continue
         mid, fkey = flatkey.split(".", 1)
-        # bench cells live under model.bench.<key>
-        if fkey.startswith("bench."):
-            fkey = fkey[len("bench.") :]
         m = models_by_id.get(mid)
         if not m:
             continue
@@ -161,7 +158,7 @@ def main() -> int:
     )
     print(f"\n✓ wrote {SOURCES_PATH.relative_to(ROOT)}")
     print(f"✓ wrote {MODELS_PATH.relative_to(ROOT)}")
-    print(f"  backups rotated to .bak / .bak2")
+    print("  backups rotated to .bak / .bak2")
     return 0
 
 

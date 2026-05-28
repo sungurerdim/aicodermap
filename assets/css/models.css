@@ -205,6 +205,14 @@ table#comparison-table .rank-num { cursor: help; }
    is statistically real (uncertainty bands no longer overlap). */
 table#comparison-table tbody tr.cluster-break td { border-top: 2px solid var(--accent-soft); }
 
+/* Bench columns are ordered by preset weight (desc); excluded benches are
+   grouped at the right. This divider marks the boundary between the in-preset
+   and not-in-preset column groups. */
+table#comparison-table th.bench-group-divider,
+table#comparison-table td.bench-group-divider {
+  border-left: 2px solid var(--border-strong, var(--accent-soft));
+}
+
 .model-meta {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -214,6 +222,8 @@ table#comparison-table tbody tr.cluster-break td { border-top: 2px solid var(--a
 .meta-cell { display: flex; flex-direction: column; gap: 1px; }
 .meta-cell .label { color: var(--muted); font-size: 0.68rem; font-weight: 600; line-height: 1.2; }
 .meta-cell .value { color: var(--text); font-family: var(--font-mono); line-height: 1.25; }
+.last-updated .last-updated-date { color: var(--text); font-weight: 700; }
+.last-updated .last-updated-ago { color: var(--muted); font-weight: 400; opacity: 0.85; }
 
 .bench-grid {
   display: grid;
@@ -341,17 +351,23 @@ table#comparison-table tbody tr.cluster-break td { border-top: 2px solid var(--a
   border-color: var(--warn-2-soft, #e0732040);
 }
 
-/* Category header rows in bench grid */
-.bench-cat-header {
+/* Preset-weighted group headers in bench grid: "in active preset" (weight
+ * desc) then "not in preset". Labels are written pre-cased in i18n (no CSS
+ * text-transform — avoids the Turkish dotless-I uppercase trap). */
+.bench-group-header {
   grid-column: 1 / -1;
   font-size: 0.7rem;
   font-weight: 600;
-  text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--muted, #8a8d92);
   padding: 6px 4px 2px;
   border-bottom: 1px solid var(--border, rgba(255,255,255,0.08));
   margin-top: 4px;
+}
+.bench-group-header.is-excluded {
+  color: var(--muted, #8a8d92);
+  opacity: 0.7;
+  border-bottom-style: dashed;
 }
 
 .compat-badge {

@@ -19,7 +19,9 @@
       "reset": "Varsayılana Dön",
       "editor": "Ağırlık Editörü",
       "weightLabel": "Ağırlık",
-      "excluded": "Aktif preset bu testi hesaba katmıyor"
+      "excluded": "Aktif preset bu testi hesaba katmıyor",
+      "inPresetGroup": "AKTİF PRESETTE",
+      "notInPresetGroup": "PRESET DIŞI"
     },
     "filter": {
       "gpu": "GPU'ma sığanları göster",
@@ -95,6 +97,13 @@
     "freshness": {
       "refresh": "Yenile",
       "stale": "Yeni bir build yayında (commit {liveSha} · görüntülenen {servedShort} · {ageMin} dk önce). Kısa sürede yansıyacak; sayfayı yenileyin."
+    },
+    "timeAgo": {
+      "justNow": "az önce",
+      "suffix": "önce",
+      "d": " gün",
+      "h": " saat",
+      "m": " dk"
     },
     "tier": {
       "frontier": "FRONTIER",
@@ -530,11 +539,6 @@
       "short": "MMLU-PRO",
       "desc": "57 disiplinde akıl yürütme; sert dikkat dağıtıcılı sorular."
     },
-    "simpleQa": {
-      "name": "SimpleQA-Verified",
-      "short": "SIMPLE-QA",
-      "desc": "Faktüellik / kısa soruda halüsinasyon direnci."
-    },
     "mrcr": {
       "name": "MRCR 1M",
       "short": "MRCR",
@@ -564,16 +568,6 @@
       "name": "NL2Repo",
       "short": "NL2REPO",
       "desc": "Doğal dil tarifinden tam repo üretimi; çok-dosyalı yapı + bağımlılık çözümleme."
-    },
-    "tau3": {
-      "name": "τ³-bench",
-      "short": "τ³",
-      "desc": "τ²-bench halefi: uzun-ufuklu çok-turlu araç çağrısı + plan yürütme."
-    },
-    "programBench": {
-      "short": "ProgramBench",
-      "name": "ProgramBench",
-      "desc": "Cleanroom program reconstruction — 200 görev, 248K davranış testi. Modele dökümantasyon + test koşumu verilir, sandbox'ta tüm kod tabanını sıfırdan kurması beklenir. arXiv:2605.03546 (Meta + Stanford + Harvard, 2026-05). Bugün hiçbir kamu model %100 çözmüyor; frontier takip metriği."
     },
     "llmStatsIdx": {
       "name": "LLM-Stats Composite",

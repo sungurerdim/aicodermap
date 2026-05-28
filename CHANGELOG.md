@@ -1,4 +1,35 @@
 
+## [2026-05-28] — refresh-all finalization (post-cycle integrity pass, no new fetch)
+
+[fillRatio:0.5602 cells:600/1071 build:9b10bea — SSOT audit PASS (WARN-only)]
+
+Consolidates the same-day remediation work layered on top of the morning
+refresh-all commit (9b10bea). No new web fetches — this commit ships the
+already-gathered, deduplicated, audit-passing working-tree state.
+
+### Changed
+- Core bench coverage 561 -> 600 filled cells (fillRatio 0.52 -> 0.5602).
+- `data/sources.json` pseudo-source / SPA-citation purge (snapshot-extraction,
+  auto-resolution-candidate, synth-backfill entries removed; pre-purge backups
+  retained locally). ~3.8k provenance lines dropped, consensus de-noised.
+- Bench universe trimmed: dead keys `programBench`, `tau3`, `simpleQa` removed
+  from `BENCH_CATEGORIES`; `DEFAULT_WEIGHTS` / `PRESETS` rebalanced toward
+  high-coverage (>=70%) benches to avoid coverage-penalty distortion.
+- Frontend render layer (`core.js`, `data.js`, `render-card.js`,
+  `render-table.js`, `models.css`) synced to the rebalanced bench schema so
+  `audit-data-coherence.py` invariants hold on the deployed tree
+  (BENCH_KEYS <-> coreBenchKeys, weights subset of BENCH_KEYS).
+- `verification-map` rebuilt; `_anomalies` + `_synth-traceability` regenerated.
+- Pipeline tooling: stale one-shot migration scripts removed
+  (`migrate-*`, `strip-bench-key`); `merge.py` synth traceability gate +
+  `validate-agent-out` / `agent-out.schema.json` refinements.
+
+### Audit (WARN-only, no hard block)
+- 1 plausibility-band outlier (`gemma-3-27b.cfElo=110.0`) — flagged for re-verify.
+- 2 sibling-metric misfile suspects (`opus-4-7.cfElo`, `deepseek-v4-pro.cfElo`).
+- MX5: 127 single-source cells (quarantine candidates) — next cycle adds 2nd source.
+- MX6: 82 cells below `benchVerificationStrict` independent-source thresholds.
+
 ## [2026-05-28] — autonomous refresh-all [WARN: cumulative provenance coverage 52.4% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 351 new fills; 42 cells auto-gapped by orchestrator; 680 explicit agent gaps preserved]
 
 [fillRatio:0.52 cells:561/1071 contradictions:208 fetch:0.0min tools:None batches:None build:9d1e71e]

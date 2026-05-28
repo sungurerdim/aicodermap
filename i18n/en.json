@@ -19,7 +19,9 @@
       "reset": "Reset to default",
       "editor": "Weights Editor",
       "weightLabel": "Weight",
-      "excluded": "Excluded by active preset"
+      "excluded": "Excluded by active preset",
+      "inPresetGroup": "IN ACTIVE PRESET",
+      "notInPresetGroup": "NOT IN PRESET"
     },
     "filter": {
       "gpu": "Show models that fit my GPU",
@@ -95,6 +97,13 @@
     "freshness": {
       "refresh": "Refresh",
       "stale": "Newer build is live (commit {liveSha} · serving {servedShort} · {ageMin} min ago). Will reflect on refresh."
+    },
+    "timeAgo": {
+      "justNow": "just now",
+      "suffix": "ago",
+      "d": "d",
+      "h": "h",
+      "m": "m"
     },
     "tier": {
       "frontier": "FRONTIER",
@@ -530,11 +539,6 @@
       "short": "MMLU-PRO",
       "desc": "Multi-discipline reasoning across 57 subjects with hard distractors."
     },
-    "simpleQa": {
-      "name": "SimpleQA-Verified",
-      "short": "SIMPLE-QA",
-      "desc": "Factuality / hallucination resistance on short factoid questions."
-    },
     "mrcr": {
       "name": "MRCR 1M",
       "short": "MRCR",
@@ -564,16 +568,6 @@
       "name": "NL2Repo",
       "short": "NL2REPO",
       "desc": "Natural-language → full repository generation; multi-file structure + dependency resolution."
-    },
-    "tau3": {
-      "name": "τ³-bench",
-      "short": "τ³",
-      "desc": "Successor to τ²-bench: longer-horizon multi-turn tool-calling + plan execution."
-    },
-    "programBench": {
-      "short": "ProgramBench",
-      "name": "ProgramBench",
-      "desc": "Cleanroom program reconstruction — 200 tasks, 248K behavioral tests. The model is given documentation + a test harness and must build the entire codebase from scratch in a sandbox. arXiv:2605.03546 (Meta + Stanford + Harvard, 2026-05). No public model has fully resolved any task yet; useful as a frontier breakthrough tracker."
     },
     "llmStatsIdx": {
       "name": "LLM-Stats Composite",

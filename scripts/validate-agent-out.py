@@ -61,17 +61,30 @@ def main() -> int:
 
     # F3: reject flat bench keys (e.g. updates["bench.swePro"] instead of updates.bench.swePro)
     flat_key_errors: list[str] = []
+    bench_prefix_src_errors: list[str] = []
     for model_entry in artifact.get("models") or []:
+        mid = model_entry.get("id") or "?"
         updates = model_entry.get("updates") or {}
         flat_bench = [k for k in updates if k.startswith("bench.")]
         if flat_bench:
-            mid = model_entry.get("id") or "?"
             flat_key_errors.append(
                 f"model {mid}: flat bench keys in updates (must use nested bench object): "
                 + ", ".join(flat_bench[:5])
             )
+        for s in model_entry.get("sourcesAdded") or []:
+            if not isinstance(s, dict):
+                continue
+            key = s.get("key", "")
+            if ".bench." in key or key.startswith("bench."):
+                bench_prefix_src_errors.append(
+                    f"model {mid}: sourcesAdded key '{key}' uses legacy bench.X prefix"
+                )
     if flat_key_errors:
         errors = (errors or []) + [f"FLAT_BENCH_KEY: {e}" for e in flat_key_errors]
+    if bench_prefix_src_errors:
+        errors = (errors or []) + [
+            f"LEGACY_BENCH_PREFIX: {e}" for e in bench_prefix_src_errors
+        ]
 
     if errors:
         print(f"✗ Agent output INVALID — {len(errors)} error(s):", file=sys.stderr)

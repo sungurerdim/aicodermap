@@ -375,6 +375,24 @@ export function coverageOf(model, weights) {
   return coveredWeight / activeWeight;
 }
 
+// Bench-key display ordering shared by the comparison table (columns) and the
+// model card (grid). Splits BENCH_KEYS into the benches the active preset
+// scores (weight > 0) and those it excludes (weight 0). The in-preset group is
+// sorted by weight descending so the heaviest benchmark sits first (leftmost);
+// ties keep BENCH_KEYS order (stable sort). The excluded group keeps BENCH_KEYS
+// order. Recomputed on every render, so switching preset re-orders both surfaces.
+export function orderedBenchKeys(weights) {
+  const w = weights || State.weights || {};
+  const included = [];
+  const excluded = [];
+  for (const k of BENCH_KEYS) {
+    if ((Number(w[k]) || 0) > 0) included.push(k);
+    else excluded.push(k);
+  }
+  included.sort((a, b) => (Number(w[b]) || 0) - (Number(w[a]) || 0));
+  return { included, excluded };
+}
+
 // ============================================================================
 // F1+F2 (2026-05-18): VENDOR COMPOSITE + CROSS-VALIDATION layer.
 // AICoderMap composite uses only atomic benches. Vendor-aggregated composites
@@ -541,7 +559,29 @@ export function fmtScore(v, digits = 1) {
 export function fmtLastUpdated(s) {
   if (!s || typeof s !== 'string') return '';
   const t = s.indexOf('T');
-  return t < 0 ? '' : `${s.slice(0, t)} ${s.slice(t + 1, t + 6)}`;
+  return t < 0 ? s : `${s.slice(0, t)} ${s.slice(t + 1, t + 6)}`;
+}
+
+// ISO datetime (or YYYY-MM-DD) → "2 gün 4 saat 13 dk önce" / "2d 4h 13m ago".
+// Returns '' for invalid input. Uses i18n keys: ui.timeAgo.{justNow,suffix,d,h,m}
+export function fmtTimeAgo(s, tFn) {
+  if (!s || typeof s !== 'string') return '';
+  const iso = s.includes('T') ? s : `${s}T00:00:00Z`;
+  const then = new Date(iso);
+  if (Number.isNaN(then.getTime())) return '';
+  const diffMs = Date.now() - then.getTime();
+  if (diffMs < 0) return '';
+  const totalMin = Math.floor(diffMs / 60000);
+  if (totalMin < 1) return tFn('ui.timeAgo.justNow');
+  const days = Math.floor(totalMin / 1440);
+  const hours = Math.floor((totalMin % 1440) / 60);
+  const mins = totalMin % 60;
+  const parts = [];
+  if (days) parts.push(`${days}${tFn('ui.timeAgo.d')}`);
+  if (hours) parts.push(`${hours}${tFn('ui.timeAgo.h')}`);
+  if (mins && days === 0) parts.push(`${mins}${tFn('ui.timeAgo.m')}`);
+  if (!parts.length) parts.push(`${totalMin}${tFn('ui.timeAgo.m')}`);
+  return `${parts.join(' ')} ${tFn('ui.timeAgo.suffix')}`;
 }
 
 // HTTP-date string ("Tue, 28 Apr 2026 14:07:20 GMT") → "2026-04-28 14:07 UTC".

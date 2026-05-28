@@ -55,15 +55,13 @@
           "tbHard",
           "cfElo",
           "webDevElo",
-          "aaCoding",
-          "programBench"
+          "aaCoding"
         ]
       },
       {
         "id": "agentic",
         "keys": [
           "tau2",
-          "tau3",
           "mcpA",
           "bfcl",
           "browseComp",
@@ -78,7 +76,6 @@
           "hle",
           "arcAgi2",
           "mmluPro",
-          "simpleQa",
           "mrcr"
         ]
       },
@@ -734,10 +731,7 @@
       "browseComp",
       "sweMulti",
       "bfcl",
-      "simpleQa",
-      "tau3",
       "aaOmni",
-      "programBench",
       "llmStatsIdx",
       "vellumRank",
       "benchlmIdx",
@@ -1095,32 +1089,26 @@
         "description": "Coding-leaning portfolio across SWE coding + multi-turn agentic + reasoning frontier.",
         "kind": "atomicComposite",
         "atomicWeights": {
-          "swePro": 17,
-          "tb2": 13,
-          "lcb": 9,
-          "hle": 9,
-          "tau2": 7,
-          "mcpA": 6,
-          "sweMulti": 6,
-          "arcAgi2": 6,
-          "tbHard": 5,
-          "cfElo": 3,
+          "swePro": 18,
+          "tb2": 12,
+          "lcb": 10,
+          "hle": 10,
           "sweV": 5,
-          "gpqa": 3,
+          "tau2": 8,
+          "mcpA": 4,
+          "sweMulti": 5,
+          "arcAgi2": 4,
+          "tbHard": 3,
+          "cfElo": 3,
+          "gpqa": 4,
           "aime26": 3,
-          "browseComp": 2,
-          "bfcl": 2,
-          "mrcr": 4
+          "browseComp": 2
         },
         "_atomicNote": "Rebalanced 2026-05-18 to sum to 100. Atomic-only (vendor composites moved to vendorCompositeView).",
         "vendorCompositeView": [
-          "aaIdx",
           "aaCoding",
           "aaAgentic",
-          "aaOmni",
-          "llmStatsIdx",
-          "benchlmIdx",
-          "lmArenaElo"
+          "aaIdx"
         ],
         "requiredBenches": [
           "swePro",
@@ -1148,24 +1136,16 @@
         "description": "Anchored on SWE-bench Pro + Terminal-Bench 2 + LiveCodeBench (contamination-resistant + agentic-coding + time-windowed code gen).",
         "kind": "atomicComposite",
         "atomicWeights": {
-          "swePro": 31,
-          "tb2": 15,
-          "lcb": 12,
-          "sweMulti": 9,
-          "tbHard": 7,
-          "sweV": 6,
-          "nl2Repo": 6,
-          "cfElo": 6,
-          "programBench": 4,
-          "mrcr": 4
+          "swePro": 32,
+          "tb2": 17,
+          "lcb": 13,
+          "sweMulti": 14,
+          "sweV": 9,
+          "cfElo": 9,
+          "mcpA": 6
         },
         "_atomicNote": "Rebalanced 2026-05-18 to sum to 100. Atomic-only (vendor composites moved to vendorCompositeView).",
-        "vendorCompositeView": [
-          "aaCoding",
-          "aaAgentic",
-          "benchlmIdx",
-          "llmStatsIdx"
-        ],
+        "vendorCompositeView": [],
         "requiredBenches": [
           "swePro",
           "lcb"
@@ -1190,23 +1170,18 @@
         "description": "Weights τ²-Bench (multi-turn reliability) + Terminal-Bench 2 + MCP-Atlas + BFCL + browseComp.",
         "kind": "atomicComposite",
         "atomicWeights": {
-          "tau2": 19,
+          "tau2": 21,
           "tb2": 18,
-          "mcpA": 14,
-          "bfcl": 9,
+          "mcpA": 17,
           "browseComp": 9,
-          "swePro": 8,
+          "bfcl": 4,
+          "swePro": 10,
           "tbHard": 8,
-          "tau3": 7,
-          "lcb": 4,
-          "nl2Repo": 4
+          "lcb": 4
         },
         "_atomicNote": "Rebalanced 2026-05-18 to sum to 100. Atomic-only (vendor composites moved to vendorCompositeView).",
         "vendorCompositeView": [
-          "aaAgentic",
-          "aaIdx",
-          "benchlmIdx",
-          "llmStatsIdx"
+          "aaAgentic"
         ],
         "requiredBenches": [
           "tau2",
@@ -1232,23 +1207,19 @@
         "description": "Anchored on HLE (frontier ~50% with tools) + ARC-AGI-2 (still discriminates).",
         "kind": "atomicComposite",
         "atomicWeights": {
-          "hle": 25,
-          "arcAgi2": 20,
-          "gpqa": 14,
-          "aime26": 12,
-          "mmluPro": 8,
-          "mrcr": 6,
-          "simpleQa": 5,
-          "swePro": 5,
-          "lcb": 5
+          "hle": 27,
+          "arcAgi2": 9,
+          "gpqa": 16,
+          "aime26": 13,
+          "mmluPro": 10,
+          "mrcr": 7,
+          "swePro": 4,
+          "lcb": 4
         },
         "_atomicNote": "Rebalanced 2026-05-18 to sum to 100. Atomic-only (vendor composites moved to vendorCompositeView).",
         "vendorCompositeView": [
-          "aaIdx",
           "aaOmni",
-          "hfOpenAvg",
-          "vellumRank",
-          "kluRank"
+          "aaIdx"
         ],
         "requiredBenches": [
           "hle",
@@ -1273,41 +1244,28 @@
         "description": "Spread weight across every atomic bench key for the raw scientific surface.",
         "kind": "atomicComposite",
         "atomicWeights": {
-          "swePro": 13,
+          "swePro": 12,
           "tb2": 10,
           "hle": 9,
-          "arcAgi2": 8,
-          "tau2": 7,
-          "lcb": 7,
-          "mcpA": 6,
-          "sweMulti": 5,
-          "gpqa": 5,
+          "lcb": 8,
+          "tau2": 8,
+          "sweV": 6,
+          "mmluPro": 6,
+          "gpqa": 6,
           "aime26": 5,
+          "sweMulti": 4,
+          "arcAgi2": 4,
+          "mcpA": 4,
+          "cfElo": 4,
           "tbHard": 3,
-          "cfElo": 5,
-          "mmluPro": 3,
-          "webDevElo": 3,
-          "nl2Repo": 2,
-          "bfcl": 2,
           "browseComp": 2,
-          "programBench": 2,
-          "mrcr": 2,
-          "simpleQa": 1,
-          "sweV": 0,
-          "tau3": 0
+          "mrcr": 1
         },
         "_atomicNote": "Rebalanced 2026-05-18 to sum to 100. Atomic-only (vendor composites moved to vendorCompositeView).",
         "vendorCompositeView": [
           "aaIdx",
           "aaCoding",
-          "aaAgentic",
-          "aaOmni",
-          "llmStatsIdx",
-          "vellumRank",
-          "benchlmIdx",
-          "lmArenaElo",
-          "hfOpenAvg",
-          "kluRank"
+          "aaAgentic"
         ],
         "requiredBenches": [],
         "criticalBenches": [
@@ -1847,12 +1805,10 @@
         "lcb",
         "mmluPro",
         "nl2Repo",
-        "simpleQa",
         "sweMulti",
         "swePro",
         "sweV",
         "tau2",
-        "tau3",
         "tb2",
         "tbHard"
       ],
@@ -1985,12 +1941,10 @@
         "lcb",
         "mmluPro",
         "nl2Repo",
-        "simpleQa",
         "sweMulti",
         "swePro",
         "sweV",
         "tau2",
-        "tau3",
         "tb2",
         "tbHard"
       ]
@@ -2077,12 +2031,10 @@
         "mcpA",
         "mmluPro",
         "mrcr",
-        "simpleQa",
         "sweMulti",
         "swePro",
         "sweV",
         "tau2",
-        "tau3",
         "tb2",
         "tbHard",
         "webDevElo"
@@ -2122,7 +2074,6 @@
         "mcpA",
         "mmluPro",
         "mrcr",
-        "simpleQa",
         "swePro",
         "sweV",
         "tau2",
@@ -2170,7 +2121,6 @@
         "mmluPro",
         "mrcr",
         "nl2Repo",
-        "simpleQa",
         "sweMulti",
         "swePro",
         "sweV",
@@ -2310,7 +2260,6 @@
         "swePro",
         "sweV",
         "tau2",
-        "tau3",
         "tb2"
       ],
       "phase": "leaderboard"
@@ -2368,7 +2317,6 @@
         "swePro",
         "sweV",
         "tau2",
-        "tau3",
         "tb2"
       ],
       "phase": "leaderboard"
@@ -2501,11 +2449,9 @@
         "tbHard",
         "cfElo",
         "mmluPro",
-        "simpleQa",
         "mrcr",
         "arcAgi2",
         "browseComp",
-        "tau3",
         "nl2Repo",
         "benchlmIdx"
       ],
@@ -2583,7 +2529,6 @@
         "lcb",
         "mmluPro",
         "sweV",
-        "tau3",
         "tb2"
       ],
       "phase": "leaderboard"
@@ -2777,24 +2722,6 @@
       "phase": "leaderboard"
     },
     {
-      "name": "ProgramBench (official)",
-      "url": "https://programbench.com/",
-      "domain": "programbench.com",
-      "tier": "I",
-      "format": "static_html_table",
-      "publishes": [
-        "programBench"
-      ],
-      "authority": "cleanroom program reconstruction; 200 tasks, 248K behavioral tests",
-      "paperUrl": "https://arxiv.org/abs/2605.03546",
-      "firstSeen": "2026-05-06",
-      "lastVerifiedDate": "2026-05-06",
-      "format_lastVerified": "2026-05-06",
-      "phase": "active",
-      "consecutiveFailures": 0,
-      "extractor": "static_html_table"
-    },
-    {
       "name": "BenchLM — ProgramBench tracker",
       "url": "https://benchlm.ai/benchmarks/programBench",
       "domain": "benchlm.ai",
@@ -2816,8 +2743,6 @@
         "mcpA",
         "mmluPro",
         "nl2Repo",
-        "programBench",
-        "simpleQa",
         "sweMulti",
         "swePro",
         "sweV",
@@ -2883,7 +2808,6 @@
         "swePro",
         "sweV",
         "tau2",
-        "tau3",
         "tb2",
         "webDevElo"
       ],
@@ -2920,7 +2844,6 @@
         "swePro",
         "sweV",
         "tau2",
-        "tau3",
         "tb2"
       ],
       "lastVerifiedDate": "2026-05-10",
@@ -2949,7 +2872,6 @@
         "swePro",
         "sweV",
         "tau2",
-        "tau3",
         "tb2"
       ],
       "lastVerifiedDate": "2026-05-10",

@@ -67,9 +67,6 @@ def main() -> int:
                     if suffix in REMAP:
                         s["key"] = f"{prefix}.{REMAP[suffix]}"
                         remapped += 1
-                    elif prefix == "bench" and suffix not in canon:
-                        dropped += 1
-                        continue
                 new_srcs.append(s)
             m["sourcesAdded"] = new_srcs
 

@@ -598,6 +598,11 @@ def validate_gaps(out):
 
 
 def append_source(sources, key, entry):
+    if ".bench." in key or key.startswith("bench."):
+        raise ValueError(
+            f"append_source: legacy bench.X key rejected: {key!r}. "
+            "Use canonical 'model_id.bench_key' (single dot)."
+        )
     if key not in sources:
         sources[key] = []
     arr = sources[key]

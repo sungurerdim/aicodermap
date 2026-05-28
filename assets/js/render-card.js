@@ -2,12 +2,12 @@
 // its own builder function so individual concerns stay <50 lines and brace
 // nesting stays ≤3.
 
-import { State, BENCH_KEYS, BENCH_CATEGORIES } from './core.js';
+import { State } from './core.js';
 import {
   compositeScore, coverageOf, disputedCount, fmtScore, contradictionFor,
   pricingView, fmtPriceMoney, fmtPriceRange, fmtPriceCell, fmtContext,
-  fmtLastUpdated, formatBenchValue, isCellStale, getCellFreshness,
-  sourceReliabilityBadge,
+  fmtLastUpdated, fmtTimeAgo, formatBenchValue, isCellStale, getCellFreshness,
+  sourceReliabilityBadge, orderedBenchKeys,
   effectiveScore, vendorComposites, vendorConsensusScore,
   crossValidationAgreement, presetTiersFor, compositeUncertainty,
 } from './data.js';
@@ -19,6 +19,21 @@ import { modelSourcesSummary, exportSourcesMarkdown } from './sources.js';
 
 function tierLabel(tier) {
   return t(`ui.tier.${tier}`) || tier;
+}
+
+function lastUpdatedNode(iso) {
+  const wrap = el('span', { class: 'last-updated' });
+  const dateStr = fmtLastUpdated(iso);
+  if (!dateStr) {
+    wrap.textContent = '—';
+    return wrap;
+  }
+  wrap.appendChild(el('strong', { class: 'last-updated-date' }, dateStr));
+  const ago = fmtTimeAgo(iso, t);
+  if (ago) {
+    wrap.appendChild(el('span', { class: 'last-updated-ago' }, ` · ${ago}`));
+  }
+  return wrap;
 }
 
 function metaCell(label, value) {
@@ -190,7 +205,7 @@ function cardMeta(model, compat) {
         : (s.notes || s.tier)).join(' · ')
     : '—';
   meta.appendChild(metaCell(t('ui.table.pricingSub'), subText));
-  meta.appendChild(metaCell(t('ui.table.lastUpdated'), fmtLastUpdated(model.lastUpdated) || '—'));
+  meta.appendChild(metaCell(t('ui.table.lastUpdated'), lastUpdatedNode(model.lastUpdated)));
 
   if (model.providers != null) {
     const uptimeNote = model.uptime != null ? ` (uptime ${fmtScore(model.uptime, 1)}%)` : '';
@@ -239,20 +254,19 @@ function buildPricingProviderRow(e) {
 function benchGridSection(model) {
   const head = el('div', { class: 'meta-cell' }, el('span', { class: 'label' }, t('ui.table.bench')));
   const grid = el('div', { class: 'bench-grid' });
-  const categorised = new Set();
-  for (const cat of BENCH_CATEGORIES) {
-    const catLabel = t(`benchCategories.${cat.id}.label`) || cat.id;
-    grid.appendChild(el('div', { class: 'bench-cat-header' }, catLabel));
-    for (const k of cat.keys) {
-      if (BENCH_KEYS.includes(k)) {
-        grid.appendChild(buildBenchCell(model, k));
-        categorised.add(k);
-      }
-    }
+  // Preset-weighted grouping: in-preset benches first (weight desc), then the
+  // excluded ones under a separate header. Each group is preceded by a header
+  // spanning the full grid row.
+  const { included, excluded } = orderedBenchKeys(State.weights);
+  if (included.length) {
+    grid.appendChild(el('div', { class: 'bench-group-header' },
+      t('ui.weights.inPresetGroup') || 'In active preset'));
+    for (const k of included) grid.appendChild(buildBenchCell(model, k));
   }
-  // Uncategorised keys fallback (should not occur if BENCH_CATEGORIES is complete)
-  for (const k of BENCH_KEYS) {
-    if (!categorised.has(k)) grid.appendChild(buildBenchCell(model, k));
+  if (excluded.length) {
+    grid.appendChild(el('div', { class: 'bench-group-header is-excluded' },
+      t('ui.weights.notInPresetGroup') || 'Not in preset'));
+    for (const k of excluded) grid.appendChild(buildBenchCell(model, k));
   }
   return [head, grid];
 }

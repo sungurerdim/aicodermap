@@ -4,8 +4,7 @@
 Closes the loop: an anomaly-verify research agent (agent.md scope=anomaly-verify)
 investigates the cells in data/_anomalies.json and writes verdicts to
 `.aicodermap-anomaly-verdicts.json`; this script applies the SAFE, MECHANICAL
-ones to data/{models,sources}.json. It is the generic, verdict-driven form of
-the one-off migrate-cfelo-metric.py.
+ones to data/{models,sources}.json.
 
 Verdict shape (one per resolved cell):
   {"modelId","benchKey","action": <confirm|reclassify|clear>, ...}

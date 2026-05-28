@@ -210,7 +210,6 @@ def bootstrap_from_sources():
     cells = {}
     bench_keys = _load_bench_key_universe()
     for key, entries in sources.items():
-        # key: "<modelId>.<benchKey>" or "<modelId>.bench.<benchKey>" or other (pricing.api etc.)
         if not isinstance(entries, list):
             continue
         parts = key.split(".")

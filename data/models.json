@@ -43,17 +43,17 @@
       }
     },
     "bench": {
-      "swePro": null,
+      "swePro": 34.63,
       "sweV": 78.0,
-      "tb2": null,
+      "tb2": 65.2,
       "tau2": 71.5,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": 89.8,
+      "gpqa": 90.4,
       "sweMulti": null,
-      "hle": 34.7,
-      "aaIdx": 46.0,
+      "hle": 35.0,
+      "aaIdx": 71.0,
       "bfcl": null,
       "aime26": 97.0,
       "aaOmni": null,
@@ -62,10 +62,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 89.0,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": 86.9,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 3,
@@ -223,16 +221,16 @@
     },
     "bench": {
       "swePro": 54.2,
-      "sweV": 79.6,
+      "sweV": 80.6,
       "tb2": 68.5,
       "tau2": 76.5,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": 69.2,
-      "gpqa": 94.1,
+      "gpqa": 94.3,
       "sweMulti": null,
       "hle": 44.4,
-      "aaIdx": 57.02,
+      "aaIdx": 57.2,
       "bfcl": null,
       "aime26": 98.1,
       "aaOmni": 33,
@@ -241,10 +239,8 @@
       "cfElo": 3052,
       "browseComp": 85.9,
       "mmluPro": 90.99,
-      "simpleQa": null,
       "mrcr": 84.9,
       "arcAgi2": 77.1,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 3,
@@ -274,7 +270,6 @@
       "cfElo": "2026-05-10",
       "mrcr": "2026-05-28"
     },
-    "benchQuarantine": {},
     "bench.swePro": 54.2,
     "bench.sweV": 80.6,
     "bench.tb2": 68.5,
@@ -407,29 +402,27 @@
       }
     },
     "bench": {
-      "swePro": null,
-      "sweV": 54.7,
+      "swePro": 60.8,
+      "sweV": 54.6,
       "tb2": null,
       "tau2": null,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": 66.43,
+      "gpqa": 66.3,
       "sweMulti": null,
       "hle": null,
-      "aaIdx": 26.0,
+      "aaIdx": 71.2,
       "bfcl": null,
-      "aime26": null,
+      "aime26": 43.7,
       "aaOmni": null,
       "lcb": 68.2,
       "tbHard": null,
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 80.6,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 3,
@@ -443,7 +436,6 @@
     "status": "deprecated",
     "deprecatedAt": "2026-05-01",
     "successor": "gpt-5-4",
-    "benchQuarantine": {},
     "bench.sweV": 54.6,
     "bench.gpqa": 66.3,
     "benchUpdated": {
@@ -471,6 +463,10 @@
         "US"
       ],
       "apiLogging": "opt_out"
+    },
+    "benchQuarantine": {
+      "aime26": true,
+      "mmluPro": true
     }
   },
   {
@@ -535,27 +531,25 @@
       }
     },
     "bench": {
-      "swePro": 59.1,
-      "sweV": 78.83,
+      "swePro": 57.7,
+      "sweV": 81.5,
       "tb2": 75.1,
-      "tau2": null,
+      "tau2": 92.8,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": 68.1,
-      "gpqa": 92.0,
+      "gpqa": 92.8,
       "sweMulti": null,
       "hle": 39.8,
       "bfcl": null,
-      "aime26": null,
+      "aime26": 98.7,
       "aaOmni": 43,
       "lcb": 85.3,
       "tbHard": null,
       "browseComp": 89.3,
-      "mmluPro": null,
-      "simpleQa": null,
+      "mmluPro": 78.0,
       "mrcr": 36.6,
       "arcAgi2": 73.3,
-      "programBench": null,
       "nl2Repo": 41.3,
       "aaIdx": 57.0
     },
@@ -588,7 +582,8 @@
       "lcb": "2026-05-28"
     },
     "benchQuarantine": {
-      "aaIdx": true
+      "aaIdx": true,
+      "sweV": true
     },
     "bench.swePro": 57.7,
     "bench.sweV": 81.5,
@@ -722,7 +717,7 @@
     },
     "bench": {
       "swePro": null,
-      "sweV": 63.8,
+      "sweV": 55.3,
       "tb2": null,
       "tau2": null,
       "aaCoding": null,
@@ -740,10 +735,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 79.9,
-      "simpleQa": null,
       "mrcr": 91.5,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 3,
@@ -767,7 +760,6 @@
     },
     "deprecatedAt": "2026-05-15",
     "successor": "grok-4-3",
-    "benchQuarantine": {},
     "bench.lcb": 79.4,
     "bench.aaIdx": 25,
     "bench.gpqa": 84.6,
@@ -777,6 +769,9 @@
       "apiLogging": "default_on",
       "gdpr": true,
       "soc2": true
+    },
+    "benchQuarantine": {
+      "mrcr": true
     }
   },
   {
@@ -838,19 +833,17 @@
       "gpqa": 79.1,
       "sweMulti": null,
       "hle": 11.1,
-      "aaIdx": 32.02,
+      "aaIdx": 32.0,
       "bfcl": null,
       "aime26": 95.8,
       "aaOmni": null,
-      "lcb": 80.4,
+      "lcb": 70.0,
       "tbHard": null,
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 82.8,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 2,
@@ -864,7 +857,6 @@
     "status": "deprecated",
     "deprecatedAt": "2026-05-15",
     "successor": "grok-4-3",
-    "benchQuarantine": {},
     "bench.lcb": 80.4,
     "bench.aaIdx": 32,
     "bench.gpqa": 79.1,
@@ -886,6 +878,9 @@
       "apiLogging": "default_on",
       "gdpr": true,
       "soc2": true
+    },
+    "benchQuarantine": {
+      "sweV": true
     }
   },
   {
@@ -933,7 +928,7 @@
     },
     "bench": {
       "swePro": 48.2,
-      "sweV": 48.5,
+      "sweV": 55.34,
       "tb2": 42.8,
       "tau2": 70.2,
       "aaCoding": null,
@@ -942,7 +937,7 @@
       "gpqa": 43.9,
       "sweMulti": null,
       "hle": null,
-      "aaIdx": 71.5,
+      "aaIdx": 23.0,
       "bfcl": null,
       "aime26": 72.1,
       "aaOmni": null,
@@ -951,10 +946,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 73.11,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 3,
@@ -979,7 +972,7 @@
     },
     "benchQuarantine": {
       "swePro": true,
-      "mmluPro": true
+      "sweV": true
     },
     "bench.sweV": 55.34,
     "bench.lcb": 82.8,
@@ -1100,7 +1093,7 @@
       }
     },
     "bench": {
-      "swePro": 71.7,
+      "swePro": 78.5,
       "sweV": 71.7,
       "tb2": null,
       "tau2": 83.5,
@@ -1110,7 +1103,7 @@
       "gpqa": 87.7,
       "sweMulti": null,
       "hle": 20.3,
-      "aaIdx": 51.0,
+      "aaIdx": 79.4,
       "bfcl": null,
       "aime26": 88.9,
       "aaOmni": null,
@@ -1118,11 +1111,9 @@
       "tbHard": null,
       "cfElo": 2727.0,
       "browseComp": null,
-      "mmluPro": 87.0,
-      "simpleQa": null,
+      "mmluPro": 88.2,
       "mrcr": null,
       "arcAgi2": 87.5,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 2,
@@ -1136,7 +1127,6 @@
     "status": "deprecated",
     "deprecatedAt": "2026-05-01",
     "successor": "gpt-5-5",
-    "benchQuarantine": {},
     "bench.sweV": 71.7,
     "bench.lcb": 75.8,
     "bench.gpqa": 87.7,
@@ -1170,6 +1160,9 @@
         "US"
       ],
       "apiLogging": "opt_out"
+    },
+    "benchQuarantine": {
+      "swePro": true
     }
   },
   {
@@ -1226,16 +1219,16 @@
       }
     },
     "bench": {
-      "swePro": 55.2,
-      "sweV": 68.19,
-      "tb2": 45.0,
+      "swePro": 65.3,
+      "sweV": 68.1,
+      "tb2": 72.4,
       "tau2": 71.8,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
       "gpqa": 81.4,
       "sweMulti": null,
-      "hle": 36.8,
+      "hle": 71.8,
       "aaIdx": 73.6,
       "bfcl": null,
       "aime26": 92.7,
@@ -1244,11 +1237,9 @@
       "tbHard": null,
       "cfElo": 2719,
       "browseComp": null,
-      "mmluPro": 80.0,
-      "simpleQa": null,
+      "mmluPro": 78.1,
       "mrcr": null,
       "arcAgi2": 2.3,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 3,
@@ -1262,7 +1253,6 @@
     "status": "deprecated",
     "deprecatedAt": "2026-05-01",
     "successor": "gpt-5-5",
-    "benchQuarantine": {},
     "bench.sweV": 68.1,
     "bench.lcb": 80.2,
     "bench.gpqa": 81.4,
@@ -1296,6 +1286,11 @@
         "US"
       ],
       "apiLogging": "opt_out"
+    },
+    "benchQuarantine": {
+      "swePro": true,
+      "tb2": true,
+      "arcAgi2": true
     }
   },
   {
@@ -1363,12 +1358,12 @@
     },
     "bench": {
       "swePro": 64.3,
-      "sweV": 87.6,
-      "tb2": 69.11,
+      "sweV": 86.4,
+      "tb2": 69.4,
       "aaCoding": 53.0,
       "aaAgentic": null,
-      "mcpA": 77.3,
-      "gpqa": 94.2,
+      "mcpA": 78.2,
+      "gpqa": 95.4,
       "sweMulti": 79.3,
       "hle": 46.9,
       "aaIdx": 57.0,
@@ -1377,13 +1372,11 @@
       "aaOmni": 26,
       "lcb": 72.2,
       "tbHard": null,
-      "cfElo": null,
+      "cfElo": 1498.0,
       "browseComp": 79.3,
       "mmluPro": 89.87,
-      "simpleQa": null,
       "mrcr": 32.2,
       "arcAgi2": 75.8,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 12,
@@ -1415,8 +1408,7 @@
       "aime26": "2026-05-22"
     },
     "benchQuarantine": {
-      "cfElo": true,
-      "tau2": true
+      "cfElo": true
     },
     "bench.swePro": 64.3,
     "bench.sweV": 87.6,
@@ -1567,7 +1559,7 @@
       "sweV": 79.6,
       "swePro": 40.2,
       "tb2": 59.1,
-      "tau2": 91.7,
+      "tau2": 87.5,
       "aaCoding": 44.0,
       "aaAgentic": 52.0,
       "mcpA": 61.3,
@@ -1583,10 +1575,8 @@
       "cfElo": null,
       "browseComp": 74.0,
       "mmluPro": 79.2,
-      "simpleQa": null,
       "mrcr": 76.0,
       "arcAgi2": 58.3,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 12,
@@ -1621,7 +1611,8 @@
     "benchQuarantine": {
       "aaOmni": true,
       "aaCoding": true,
-      "aaAgentic": true
+      "aaAgentic": true,
+      "aime26": true
     },
     "bench.sweV": 79.6,
     "bench.tb2": 59.1,
@@ -1788,10 +1779,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 24.0,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 4,
@@ -1856,7 +1845,6 @@
     },
     "deprecatedAt": "2026-05-01",
     "successor": "codestral",
-    "benchQuarantine": {},
     "bench.swePro": 2,
     "bench.lcb": 37.9,
     "benchUpdated": {
@@ -1873,6 +1861,11 @@
       "soc2": true,
       "trainingDataOptOut": "available",
       "apiLogging": "default_on"
+    },
+    "benchQuarantine": {
+      "gpqa": true,
+      "tb2": true,
+      "mmluPro": true
     }
   },
   {
@@ -1940,7 +1933,7 @@
       "subscription": null
     },
     "bench": {
-      "sweV": 67.85,
+      "sweV": 67.8,
       "swePro": 15.56,
       "tb2": 46.4,
       "tau2": 71.3,
@@ -1949,8 +1942,8 @@
       "mcpA": null,
       "gpqa": 82.4,
       "sweMulti": 57.9,
-      "hle": 24.76,
-      "aaIdx": 32.0,
+      "hle": 25.1,
+      "aaIdx": 16.0,
       "bfcl": null,
       "aime26": 89.3,
       "aaOmni": null,
@@ -1959,10 +1952,8 @@
       "cfElo": 2121.0,
       "browseComp": 40.1,
       "mmluPro": 85.0,
-      "simpleQa": 97.1,
       "mrcr": 83.5,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 9,
@@ -1994,7 +1985,6 @@
       "lcb": "2026-05-28",
       "mmluPro": "2026-05-28",
       "browseComp": "2026-05-08",
-      "simpleQa": "2026-05-08",
       "cfElo": "2026-05-28",
       "tb2": "2026-05-28",
       "sweMulti": "2026-05-18",
@@ -2006,9 +1996,9 @@
     "benchQuarantine": {
       "cfElo": true,
       "browseComp": true,
-      "simpleQa": true,
       "mrcr": true,
-      "aaAgentic": true
+      "aaAgentic": true,
+      "sweV": true
     },
     "bench.swePro": 15.56,
     "bench.sweV": 70,
@@ -2198,22 +2188,20 @@
       "aaCoding": 72.0,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": 88.36,
+      "gpqa": 88.5,
       "sweMulti": null,
       "hle": 22.1,
       "aaIdx": 47.0,
       "bfcl": null,
       "aime26": 91.6,
       "aaOmni": null,
-      "lcb": 91.43,
+      "lcb": 91.6,
       "tbHard": null,
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 86.4,
-      "simpleQa": 34.1,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 5,
@@ -2243,17 +2231,15 @@
       "lcb": "2026-05-28",
       "tb2": "2026-05-28",
       "mmluPro": "2026-05-27",
-      "simpleQa": "2026-05-09",
       "tau2": "2026-05-11",
       "aime26": "2026-05-27",
       "aaCoding": "2026-05-28"
     },
     "benchQuarantine": {
       "tau2": true,
-      "hle": true,
-      "simpleQa": true,
       "aime26": true,
-      "aaCoding": true
+      "aaCoding": true,
+      "gpqa": true
     },
     "bench.swePro": 52.3,
     "bench.sweV": 79,
@@ -2438,10 +2424,8 @@
       "cfElo": 3206,
       "browseComp": 83.4,
       "mmluPro": 88.2,
-      "simpleQa": 57.9,
       "mrcr": 83.5,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 5,
@@ -2464,7 +2448,6 @@
       "aaIdx": "2026-05-28",
       "lcb": "2026-05-28",
       "mmluPro": "2026-05-28",
-      "simpleQa": "2026-05-09",
       "cfElo": "2026-05-28",
       "mrcr": "2026-05-28",
       "browseComp": "2026-05-09",
@@ -2474,13 +2457,12 @@
       "aaAgentic": "2026-05-28"
     },
     "benchQuarantine": {
-      "tau2": true,
       "sweMulti": true,
       "browseComp": true,
-      "simpleQa": true,
       "mrcr": true,
       "aaCoding": true,
-      "aaAgentic": true
+      "aaAgentic": true,
+      "mcpA": true
     },
     "bench.swePro": 55.4,
     "bench.sweV": 80.6,
@@ -2622,12 +2604,12 @@
     },
     "bench": {
       "sweV": 72.2,
-      "swePro": 46.2,
+      "swePro": 41.5,
       "tb2": 18.9,
       "tau2": 24.9,
       "aaCoding": null,
       "aaAgentic": null,
-      "mcpA": null,
+      "mcpA": 73.6,
       "gpqa": 59.4,
       "sweMulti": null,
       "hle": 3.6,
@@ -2635,15 +2617,13 @@
       "bfcl": null,
       "aime26": 36.7,
       "aaOmni": null,
-      "lcb": 44.8,
+      "lcb": 93.5,
       "tbHard": 18.9,
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 76.2,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 1,
@@ -2689,10 +2669,13 @@
       "aime26": "2026-05-28"
     },
     "benchQuarantine": {
-      "swePro": true,
       "tb2": true,
       "mcpA": true,
-      "mmluPro": true
+      "lcb": true,
+      "hle": true,
+      "tbHard": true,
+      "tau2": true,
+      "aime26": true
     },
     "bench.sweV": 72.2,
     "bench.tb2": 18.9,
@@ -2769,9 +2752,9 @@
       "subscription": null
     },
     "bench": {
-      "sweV": 61.6,
+      "sweV": 68.0,
       "swePro": 37.2,
-      "tb2": null,
+      "tb2": 9.1,
       "tau2": 19.9,
       "aaCoding": 15.9,
       "mcpA": null,
@@ -2785,10 +2768,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 70.8,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 2,
@@ -2817,7 +2798,6 @@
     },
     "deprecatedAt": "2026-05-01",
     "successor": "mistral-medium-3-5",
-    "benchQuarantine": {},
     "bench.sweV": 68,
     "bench.tb2": 9.1,
     "bench.lcb": 33.7,
@@ -2829,6 +2809,11 @@
       "soc2": true,
       "trainingDataOptOut": "available",
       "apiLogging": "default_on"
+    },
+    "benchQuarantine": {
+      "sweV": true,
+      "tb2": true,
+      "aaCoding": true
     }
   },
   {
@@ -2892,17 +2877,15 @@
       "bfcl": null,
       "aime26": 95.3,
       "aaOmni": 51,
-      "lcb": null,
+      "lcb": 72.9,
       "tbHard": null,
       "cfElo": null,
       "browseComp": 68,
       "mmluPro": 82.0,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
       "nl2Repo": 42.7,
-      "webDevElo": 1534,
-      "programBench": null
+      "webDevElo": 1534
     },
     "providers": 3,
     "uptime": null,
@@ -2933,7 +2916,7 @@
     "benchQuarantine": {
       "aaOmni": true,
       "browseComp": true,
-      "mmluPro": true
+      "lcb": true
     },
     "bench.swePro": 58.4,
     "bench.sweV": 77.8,
@@ -3113,7 +3096,7 @@
       "aaAgentic": null,
       "mcpA": 66.6,
       "gpqa": 90.5,
-      "sweMulti": 47.3,
+      "sweMulti": 76.7,
       "aaIdx": 54.0,
       "bfcl": null,
       "aime26": 96.4,
@@ -3123,11 +3106,9 @@
       "cfElo": null,
       "browseComp": 83.2,
       "mmluPro": 84.6,
-      "simpleQa": 43,
       "mrcr": 55.0,
       "arcAgi2": null,
       "webDevElo": 1529,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 11,
@@ -3169,11 +3150,9 @@
       "browseComp": "2026-05-09",
       "mcpA": "2026-05-09",
       "mmluPro": "2026-05-28",
-      "simpleQa": "2026-05-09",
       "mrcr": "2026-05-09",
       "webDevElo": "2026-05-09"
     },
-    "benchQuarantine": {},
     "bench.swePro": 58.6,
     "bench.sweV": 80.2,
     "bench.sweMulti": 76.7,
@@ -3289,7 +3268,12 @@
       "arcAgi2",
       "programBench",
       "nl2Repo"
-    ]
+    ],
+    "benchQuarantine": {
+      "browseComp": true,
+      "mcpA": true,
+      "mrcr": true
+    }
   },
   {
     "id": "llama-4-maverick",
@@ -3372,10 +3356,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 80.5,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": 0.0,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 7,
@@ -3410,7 +3392,7 @@
       "arcAgi2": "2026-05-28"
     },
     "benchQuarantine": {
-      "arcAgi2": true
+      "sweV": true
     },
     "bench.swePro": 5.24,
     "bench.sweV": 76.8,
@@ -3560,7 +3542,7 @@
     },
     "bench": {
       "swePro": null,
-      "sweV": 58.0,
+      "sweV": 58.6,
       "tb2": null,
       "tau2": null,
       "aaCoding": null,
@@ -3578,10 +3560,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 74.3,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 6,
@@ -3618,9 +3598,6 @@
       "mmluPro": "2026-05-28",
       "bfcl": "2026-05-18",
       "aime26": "2026-05-18"
-    },
-    "benchQuarantine": {
-      "aime26": true
     },
     "bench.sweV": 68,
     "bench.lcb": 32.8,
@@ -3701,7 +3678,10 @@
       "arcAgi2",
       "programBench",
       "nl2Repo"
-    ]
+    ],
+    "benchQuarantine": {
+      "sweV": true
+    }
   },
   {
     "id": "mimo-v2-5",
@@ -3749,7 +3729,7 @@
       "swePro": 56.1,
       "sweV": 78.9,
       "tb2": 65.8,
-      "tau2": 82.7,
+      "tau2": 94.2,
       "aaCoding": 42.1,
       "aaAgentic": null,
       "mcpA": null,
@@ -3765,10 +3745,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": null,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 2,
@@ -3794,9 +3772,7 @@
       "aaCoding": "2026-05-28"
     },
     "benchQuarantine": {
-      "gpqa": true,
       "sweMulti": true,
-      "hle": true,
       "aaIdx": true,
       "tbHard": true,
       "tau2": true,
@@ -3909,26 +3885,24 @@
       "tb2": 68.4,
       "sweV": 78.9,
       "tau2": 72.9,
-      "aaCoding": null,
+      "aaCoding": 45.5,
       "aaAgentic": 68.7,
       "mcpA": null,
       "gpqa": 86.6,
       "sweMulti": null,
-      "hle": 33.9,
+      "hle": 33.8,
       "aaIdx": 54,
       "bfcl": null,
       "aime26": null,
       "aaOmni": null,
-      "lcb": 76.4,
+      "lcb": 76.2,
       "tbHard": 43.2,
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 68.5,
-      "simpleQa": null,
       "mrcr": 55.5,
       "arcAgi2": null,
       "webDevElo": 1479,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 2,
@@ -4074,7 +4048,7 @@
     "bench": {
       "sweV": 73.4,
       "swePro": null,
-      "tb2": 38.5,
+      "tb2": 30.5,
       "tau2": 79.5,
       "aaCoding": null,
       "aaAgentic": null,
@@ -4091,11 +4065,9 @@
       "cfElo": null,
       "browseComp": 45.4,
       "mmluPro": 84.9,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
       "webDevElo": 1337,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 2,
@@ -4139,8 +4111,9 @@
       "aaIdx": "2026-05-28"
     },
     "benchQuarantine": {
-      "aaIdx": true,
-      "webDevElo": true
+      "webDevElo": true,
+      "browseComp": true,
+      "tbHard": true
     },
     "bench.sweV": 73.4,
     "bench.sweMulti": 71.7,
@@ -4276,7 +4249,7 @@
       }
     },
     "bench": {
-      "sweV": 77.97,
+      "sweV": 78.0,
       "swePro": null,
       "tb2": 86.7,
       "tau2": 95.0,
@@ -4295,10 +4268,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": null,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 2,
@@ -4319,10 +4290,6 @@
       "sweV": "2026-05-28",
       "tb2": "2026-05-14",
       "lcb": "2026-05-22"
-    },
-    "benchQuarantine": {
-      "lcb": true,
-      "tbHard": true
     },
     "bench.sweV": 78,
     "bench.tb2": 86.7,
@@ -4434,7 +4401,7 @@
     "bench": {
       "sweV": 80.2,
       "aaIdx": 42.0,
-      "swePro": 55.4,
+      "swePro": 56.2,
       "tb2": 52.0,
       "tau2": null,
       "aaCoding": null,
@@ -4451,10 +4418,8 @@
       "cfElo": null,
       "browseComp": 76.3,
       "mmluPro": 74.0,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 3,
@@ -4508,7 +4473,6 @@
       "aaAgentic": "2026-05-27"
     },
     "benchQuarantine": {
-      "mmluPro": true,
       "aaAgentic": true
     },
     "bench.swePro": 36.81,
@@ -4672,12 +4636,12 @@
       "sweV": 78.0,
       "tb2": 57.0,
       "aaIdx": 50.0,
-      "swePro": 56.22,
+      "swePro": 56.2,
       "tau2": 84.8,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": 86.94,
+      "gpqa": 87.4,
       "sweMulti": 76.5,
       "hle": 28.1,
       "bfcl": null,
@@ -4688,10 +4652,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 82.0,
-      "simpleQa": null,
       "mrcr": 68.7,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": 39.8
     },
     "providers": 2,
@@ -4933,21 +4895,19 @@
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": 79.26,
+      "gpqa": 79.23,
       "hle": 18.26,
       "aaIdx": 36,
       "bfcl": null,
       "aime26": 89.8,
       "aaOmni": null,
-      "lcb": 81.19,
+      "lcb": 81.2,
       "tbHard": 29,
       "cfElo": null,
       "browseComp": null,
-      "mmluPro": 83.33,
-      "simpleQa": null,
+      "mmluPro": 83.7,
       "mrcr": 91.75,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 4,
@@ -4983,9 +4943,6 @@
       "mrcr": "2026-05-09",
       "mmluPro": "2026-05-28",
       "tbHard": "2026-05-22"
-    },
-    "benchQuarantine": {
-      "aaIdx": true
     },
     "bench.sweV": 60.47,
     "bench.sweMulti": 45.78,
@@ -5124,7 +5081,7 @@
       "swePro": 53.5,
       "sweV": 77.2,
       "tb2": 59.3,
-      "tau2": null,
+      "tau2": 76.8,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
@@ -5140,11 +5097,9 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 86.2,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "nl2Repo": 36.2,
-      "programBench": null
+      "nl2Repo": 36.2
     },
     "providers": 3,
     "uptime": null,
@@ -5314,7 +5269,7 @@
     "bench": {
       "aaIdx": 52,
       "swePro": 57.3,
-      "sweV": 70.9,
+      "sweV": 70.8,
       "tb2": 65.4,
       "tau2": 80.1,
       "aaCoding": null,
@@ -5331,11 +5286,9 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 79.0,
-      "simpleQa": 52.0,
       "mrcr": null,
       "arcAgi2": null,
-      "nl2Repo": 42.9,
-      "programBench": null
+      "nl2Repo": 42.9
     },
     "providers": 2,
     "uptime": null,
@@ -5349,7 +5302,6 @@
     "benchUpdated": {
       "sweV": "2026-05-28",
       "tb2": "2026-05-28",
-      "simpleQa": "2026-05-09",
       "nl2Repo": "2026-05-09",
       "gpqa": "2026-05-28",
       "aime26": "2026-05-28",
@@ -5362,10 +5314,7 @@
       "tbHard": "2026-05-28"
     },
     "benchQuarantine": {
-      "aaIdx": true,
-      "swePro": true,
       "nl2Repo": true,
-      "lcb": true,
       "tbHard": true,
       "tau2": true
     },
@@ -5523,15 +5472,13 @@
       "bfcl": 70.8,
       "aime26": 92.3,
       "aaOmni": null,
-      "lcb": 74.49,
+      "lcb": 74.8,
       "tbHard": null,
       "cfElo": 2056.0,
       "browseComp": null,
       "mmluPro": 84.4,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null,
       "aaIdx": 30.0
     },
@@ -5570,11 +5517,10 @@
       "aaIdx": "2026-05-28"
     },
     "benchQuarantine": {
-      "tau2": true,
-      "hle": true,
-      "cfElo": true,
       "tb2": true,
-      "aaIdx": true
+      "aaIdx": true,
+      "lcb": true,
+      "sweV": true
     },
     "bench.swePro": 21.41,
     "bench.lcb": 74.8,
@@ -5735,17 +5681,15 @@
       "hle": 8.3,
       "aaIdx": 76.4,
       "bfcl": 75.7,
-      "aime26": 81.18,
+      "aime26": 81.5,
       "aaOmni": null,
-      "lcb": 54.52,
+      "lcb": 54.6,
       "tbHard": null,
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 79.8,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 5,
@@ -5799,10 +5743,7 @@
       "aaIdx": "2026-05-28"
     },
     "benchQuarantine": {
-      "swePro": true,
-      "tb2": true,
-      "aaIdx": true,
-      "tau2": true
+      "swePro": true
     },
     "bench.swePro": 3.4,
     "bench.tb2": 3,
@@ -5942,7 +5883,7 @@
       "tau2": 73.4,
       "aaCoding": null,
       "aaAgentic": null,
-      "mcpA": 37.0,
+      "mcpA": 62.8,
       "gpqa": 82.3,
       "sweMulti": 67.2,
       "hle": 79.1,
@@ -5955,12 +5896,9 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 85.2,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "tau3": 67.2,
-      "nl2Repo": 29.4,
-      "programBench": null
+      "nl2Repo": 29.4
     },
     "providers": 2,
     "uptime": null,
@@ -6002,7 +5940,6 @@
     "benchUpdated": {
       "swePro": "2026-05-28",
       "mmluPro": "2026-05-28",
-      "tau3": "2026-05-08",
       "nl2Repo": "2026-05-09",
       "sweV": "2026-05-28",
       "lcb": "2026-05-22",
@@ -6015,9 +5952,8 @@
       "hle": "2026-05-18"
     },
     "benchQuarantine": {
-      "hle": true,
-      "tau3": true,
-      "nl2Repo": true
+      "nl2Repo": true,
+      "tau2": true
     },
     "bench.swePro": 49.5,
     "bench.sweV": 73.4,
@@ -6151,10 +6087,10 @@
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": 84.6,
+      "gpqa": 89.6,
       "sweMulti": null,
       "hle": 78.8,
-      "aaIdx": 50.0,
+      "aaIdx": 74.8,
       "bfcl": null,
       "aime26": 75.3,
       "aaOmni": null,
@@ -6163,10 +6099,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 88.5,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 2,
@@ -6191,11 +6125,7 @@
       "gpqa": "2026-05-22"
     },
     "benchQuarantine": {
-      "tau2": true,
-      "gpqa": true,
-      "hle": true,
-      "aime26": true,
-      "mmluPro": true
+      "gpqa": true
     },
     "bench.swePro": 56.6,
     "bench.sweV": 78.8,
@@ -6311,27 +6241,25 @@
     "bench": {
       "aaIdx": 20,
       "swePro": 65.3,
-      "sweV": 51.38,
+      "sweV": 51.6,
       "tb2": 36.2,
-      "tau2": null,
+      "tau2": 74.2,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": null,
+      "gpqa": 43.9,
       "sweMulti": null,
-      "hle": null,
+      "hle": 76.9,
       "bfcl": null,
-      "aime26": null,
+      "aime26": 69.8,
       "aaOmni": null,
-      "lcb": 65.4,
+      "lcb": 56.3,
       "tbHard": null,
       "cfElo": null,
       "browseComp": null,
-      "mmluPro": null,
-      "simpleQa": null,
+      "mmluPro": 88.5,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 4,
@@ -6366,12 +6294,12 @@
       "hle": "2026-05-10"
     },
     "benchQuarantine": {
-      "swePro": true,
       "tau2": true,
       "hle": true,
       "aime26": true,
-      "lcb": true,
-      "mmluPro": true
+      "mmluPro": true,
+      "sweV": true,
+      "tb2": true
     },
     "bench.sweV": 69.6,
     "bench.tb2": 36.2,
@@ -6471,25 +6399,23 @@
       "swePro": 38.7,
       "sweV": 69.6,
       "tb2": 23.9,
-      "tau2": null,
+      "tau2": 77.5,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": null,
+      "gpqa": 84.2,
       "sweMulti": null,
-      "hle": null,
+      "hle": 85.2,
       "aaIdx": 25,
       "bfcl": 68.7,
-      "aime26": null,
+      "aime26": 82.1,
       "aaOmni": null,
       "lcb": 68.0,
       "tbHard": null,
       "browseComp": null,
-      "mmluPro": null,
-      "simpleQa": null,
+      "mmluPro": 93.4,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 10,
@@ -6542,13 +6468,10 @@
       "hle": "2026-05-10"
     },
     "benchQuarantine": {
-      "swePro": true,
       "tb2": true,
       "gpqa": true,
       "hle": true,
-      "bfcl": true,
       "aime26": true,
-      "lcb": true,
       "mmluPro": true
     },
     "bench.swePro": 38.7,
@@ -6637,7 +6560,7 @@
       }
     },
     "bench": {
-      "sweV": 70.6,
+      "sweV": 71.1,
       "swePro": 44.3,
       "tb2": 36.2,
       "tau2": null,
@@ -6656,10 +6579,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": null,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 3,
@@ -6704,7 +6625,8 @@
       "aime26": "2026-05-19"
     },
     "benchQuarantine": {
-      "tb2": true
+      "tb2": true,
+      "gpqa": true
     },
     "bench.swePro": 44.3,
     "bench.sweV": 70.6,
@@ -6833,10 +6755,8 @@
       "cfElo": null,
       "browseComp": 69.0,
       "mmluPro": 84.4,
-      "simpleQa": 31.6,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 3,
@@ -6864,13 +6784,10 @@
       "tau2": "2026-05-28",
       "aaIdx": "2026-05-28",
       "browseComp": "2026-05-10",
-      "simpleQa": "2026-05-09",
       "aime26": "2026-05-27",
       "tbHard": "2026-05-28"
     },
     "benchQuarantine": {
-      "aime26": true,
-      "simpleQa": true,
       "tbHard": true
     },
     "bench.sweV": 74.4,
@@ -6986,16 +6903,16 @@
     },
     "bench": {
       "aaIdx": 10.0,
-      "swePro": null,
-      "sweV": null,
-      "tb2": null,
+      "swePro": 11.38,
+      "sweV": 13.7,
+      "tb2": 3.8,
       "tau2": 6.6,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": 42.46,
+      "gpqa": 42.4,
       "sweMulti": null,
-      "hle": 10.5,
+      "hle": 4.7,
       "bfcl": null,
       "aime26": 20.8,
       "aaOmni": null,
@@ -7004,10 +6921,8 @@
       "cfElo": 110.0,
       "browseComp": null,
       "mmluPro": 67.5,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 8,
@@ -7035,7 +6950,8 @@
     "benchQuarantine": {
       "tb2": true,
       "hle": true,
-      "cfElo": true
+      "cfElo": true,
+      "gpqa": true
     },
     "bench.swePro": 11.38,
     "bench.lcb": 29.1,
@@ -7133,7 +7049,7 @@
       }
     },
     "bench": {
-      "sweV": null,
+      "sweV": 64.0,
       "swePro": null,
       "tb2": null,
       "tau2": 86.4,
@@ -7142,8 +7058,8 @@
       "mcpA": null,
       "gpqa": 82.3,
       "sweMulti": null,
-      "hle": null,
-      "aaIdx": 15.0,
+      "hle": 22.0,
+      "aaIdx": 31.0,
       "bfcl": null,
       "aime26": 88.3,
       "aaOmni": null,
@@ -7152,11 +7068,9 @@
       "cfElo": 2150.0,
       "browseComp": null,
       "mmluPro": 82.6,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
       "webDevElo": 1441,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 4,
@@ -7208,7 +7122,8 @@
       "tau2": true,
       "hle": true,
       "aaAgentic": true,
-      "cfElo": true
+      "cfElo": true,
+      "sweV": true
     },
     "bench.sweV": 64,
     "bench.lcb": 77.1,
@@ -7321,12 +7236,12 @@
       "gpqa": 84.3,
       "tau2": 86.4,
       "swePro": null,
-      "tb2": null,
+      "tb2": 42.9,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
       "sweMulti": null,
-      "hle": null,
+      "hle": 23.0,
       "aaIdx": 39.0,
       "bfcl": null,
       "aime26": 89.2,
@@ -7336,11 +7251,9 @@
       "cfElo": 2150,
       "browseComp": null,
       "mmluPro": 85.2,
-      "simpleQa": null,
       "mrcr": 66.4,
       "arcAgi2": null,
       "webDevElo": 1452,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 5,
@@ -7391,7 +7304,8 @@
       "tb2": "2026-05-14"
     },
     "benchQuarantine": {
-      "tb2": true
+      "tb2": true,
+      "mrcr": true
     },
     "bench.sweV": 64,
     "bench.lcb": 80,
@@ -7482,10 +7396,10 @@
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": null,
+      "gpqa": 43.4,
       "sweMulti": null,
       "hle": null,
-      "aaIdx": null,
+      "aaIdx": 15.0,
       "bfcl": null,
       "aime26": 37.5,
       "aaOmni": null,
@@ -7494,10 +7408,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 60.0,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 3,
@@ -7534,7 +7446,6 @@
       "mmluPro": "2026-05-27",
       "gpqa": "2026-05-22"
     },
-    "benchQuarantine": {},
     "bench.lcb": 44,
     "bench.aaIdx": 15,
     "bench.aime26": 42.5,
@@ -7616,10 +7527,10 @@
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": null,
+      "gpqa": 58.6,
       "sweMulti": null,
       "hle": null,
-      "aaIdx": 19.0,
+      "aaIdx": 15.0,
       "bfcl": null,
       "aime26": 42.5,
       "aaOmni": null,
@@ -7628,10 +7539,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 69.4,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 3,
@@ -7668,7 +7577,6 @@
       "aaIdx": "2026-05-28",
       "mmluPro": "2026-05-27"
     },
-    "benchQuarantine": {},
     "bench.lcb": 52,
     "bench.aaIdx": 15,
     "bench.aime26": 42.5,
@@ -7747,14 +7655,14 @@
       }
     },
     "bench": {
-      "swePro": null,
+      "swePro": 10.34,
       "sweV": 43.0,
       "tb2": null,
       "tau2": null,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
-      "gpqa": 68.4,
+      "gpqa": 74.5,
       "sweMulti": null,
       "hle": null,
       "aaIdx": null,
@@ -7766,10 +7674,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": null,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 2,
@@ -7895,7 +7801,7 @@
     },
     "bench": {
       "swePro": null,
-      "sweV": null,
+      "sweV": 43.2,
       "tb2": null,
       "tau2": null,
       "aaCoding": null,
@@ -7903,20 +7809,18 @@
       "mcpA": null,
       "gpqa": 59.1,
       "sweMulti": null,
-      "hle": null,
+      "hle": 71.5,
       "aaIdx": null,
       "bfcl": null,
-      "aime26": 70.08,
+      "aime26": 71.2,
       "aaOmni": null,
       "lcb": 53.1,
       "tbHard": null,
       "cfElo": 1481.0,
       "browseComp": null,
       "mmluPro": 93.9,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 2,
@@ -7966,10 +7870,8 @@
       "cfElo": "2026-05-28"
     },
     "benchQuarantine": {
-      "sweV": true,
-      "lcb": true,
-      "mmluPro": true,
-      "cfElo": true
+      "cfElo": true,
+      "hle": true
     },
     "bench.lcb": 53.1,
     "bench.gpqa": 59.1,
@@ -8058,10 +7960,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": null,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 4,
@@ -8211,15 +8111,13 @@
       "bfcl": null,
       "aime26": null,
       "aaOmni": null,
-      "lcb": 48.9,
+      "lcb": 48.2,
       "tbHard": null,
       "cfElo": null,
       "browseComp": null,
-      "mmluPro": null,
-      "simpleQa": null,
+      "mmluPro": 78.2,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 8,
@@ -8257,7 +8155,8 @@
     },
     "benchQuarantine": {
       "swePro": true,
-      "aaCoding": true
+      "aaCoding": true,
+      "lcb": true
     },
     "bench.sweV": 69.6,
     "benchReconciled": {
@@ -8376,10 +8275,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": null,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 8,
@@ -8496,7 +8393,7 @@
     },
     "bench": {
       "swePro": 2.0,
-      "sweV": 57.4,
+      "sweV": 76.2,
       "tb2": null,
       "tau2": null,
       "aaCoding": null,
@@ -8514,10 +8411,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 24.0,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 2,
@@ -8532,7 +8427,6 @@
     "benchQuarantine": {
       "gpqa": true,
       "aaIdx": true,
-      "lcb": true,
       "mmluPro": true
     },
     "bench.swePro": 1.51,
@@ -8660,10 +8554,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": null,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 2,
@@ -8710,7 +8602,6 @@
       "swePro": "2026-05-10",
       "aaIdx": "2026-05-28"
     },
-    "benchQuarantine": {},
     "bench.sweV": 68,
     "bench.tb2": 9.1,
     "bench.lcb": 33.7,
@@ -8721,6 +8612,14 @@
       "gdpr": true,
       "soc2": true,
       "trainingDataOptOut": "available"
+    },
+    "benchQuarantine": {
+      "gpqa": true,
+      "hle": true,
+      "swePro": true,
+      "tau2": true,
+      "tb2": true,
+      "aaIdx": true
     }
   },
   {
@@ -8779,7 +8678,7 @@
       }
     },
     "bench": {
-      "swePro": 39.5,
+      "swePro": 39.45,
       "sweV": 73.3,
       "tb2": 41.2,
       "tau2": 83.1,
@@ -8798,10 +8697,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 76.0,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 11,
@@ -8829,8 +8726,6 @@
     },
     "benchQuarantine": {
       "sweMulti": true,
-      "aime26": true,
-      "mmluPro": true,
       "aaCoding": true,
       "tbHard": true
     },
@@ -8993,11 +8888,9 @@
       "tbHard": 60.6,
       "browseComp": 84.4,
       "mmluPro": 92.3,
-      "simpleQa": null,
       "mrcr": 74.0,
       "arcAgi2": 85,
       "aaOmni": 57.0,
-      "programBench": null,
       "lcb": 88.6,
       "aime26": 87.9,
       "nl2Repo": null,
@@ -9051,7 +8944,8 @@
       "tbHard": "2026-05-27"
     },
     "benchQuarantine": {
-      "tbHard": true
+      "tbHard": true,
+      "sweV": true
     },
     "bench.swePro": 58.6,
     "bench.sweV": 88.7,
@@ -9214,9 +9108,9 @@
       ]
     },
     "bench": {
-      "gpqa": 87.99,
-      "hle": 24.26,
-      "sweV": 77.22,
+      "gpqa": 88.0,
+      "hle": 24.0,
+      "sweV": 78.0,
       "swePro": 51.8,
       "tb2": 47.1,
       "tau2": 93.0,
@@ -9227,14 +9121,12 @@
       "aime26": 95.0,
       "aaOmni": null,
       "aaIdx": 49.0,
-      "lcb": 79.32,
+      "lcb": 79.4,
       "tbHard": null,
       "browseComp": 43.0,
       "mmluPro": 86.6,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": 15.9,
-      "programBench": null,
       "nl2Repo": null
     },
     "strengthsKey": "grok-4-20.strengths",
@@ -9258,10 +9150,11 @@
       "aime26": "2026-05-28"
     },
     "benchQuarantine": {
-      "aaIdx": true,
       "browseComp": true,
-      "aaAgentic": true,
-      "aaCoding": true
+      "aaCoding": true,
+      "gpqa": true,
+      "hle": true,
+      "sweV": true
     },
     "bench.swePro": 51.8,
     "bench.sweV": 58.6,
@@ -9405,7 +9298,7 @@
       ]
     },
     "bench": {
-      "swePro": 60.5,
+      "swePro": 54.8,
       "sweV": 79.6,
       "tb2": 68.5,
       "tau2": 98.0,
@@ -9423,10 +9316,8 @@
       "tbHard": null,
       "browseComp": null,
       "mmluPro": 68.5,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 1,
@@ -9441,7 +9332,6 @@
       "swePro": true,
       "aime26": true,
       "tb2": true,
-      "aaCoding": true,
       "aaAgentic": true,
       "lcb": true,
       "mmluPro": true
@@ -9569,15 +9459,15 @@
     },
     "bench": {
       "swePro": null,
-      "sweV": 56.0,
-      "tau2": 63.7,
+      "sweV": 76.9,
+      "tau2": 72.8,
       "aaCoding": null,
       "aaAgentic": null,
       "mcpA": null,
       "gpqa": 85.3,
       "sweMulti": null,
-      "hle": 5.0,
-      "aaIdx": 38.0,
+      "hle": 17.6,
+      "aaIdx": 38.6,
       "bfcl": null,
       "aime26": 92.0,
       "aaOmni": null,
@@ -9586,13 +9476,10 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 85.4,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
       "nl2Repo": null,
-      "tau3": null,
-      "webDevElo": null,
-      "programBench": null
+      "webDevElo": null
     },
     "providers": 1,
     "uptime": null,
@@ -9602,7 +9489,6 @@
     "strengthsKey": "grok-4-1-fast.strengths",
     "weaknessesKey": "grok-4-1-fast.weaknesses",
     "lastUpdated": "2026-05-28T03:35:10Z",
-    "benchQuarantine": {},
     "benchUpdated": {
       "lcb": "2026-05-27",
       "gpqa": "2026-05-27",
@@ -9622,6 +9508,10 @@
       "apiLogging": "default_on",
       "gdpr": true,
       "soc2": true
+    },
+    "benchQuarantine": {
+      "tbHard": true,
+      "aime26": true
     }
   },
   {
@@ -9678,15 +9568,14 @@
     },
     "bench": {
       "aaIdx": 23,
-      "swePro": null,
+      "swePro": 48.1,
       "sweV": 57.6,
       "sweMulti": null,
       "nl2Repo": 36.8,
       "lcb": 72.9,
-      "tb2": null,
+      "tb2": 37.5,
       "tbHard": 20.5,
-      "tau2": 78.1,
-      "tau3": null,
+      "tau2": 79.1,
       "mcpA": null,
       "bfcl": 76.7,
       "aaCoding": null,
@@ -9699,10 +9588,8 @@
       "hle": 14.4,
       "aaOmni": 38,
       "mmluPro": 81.4,
-      "simpleQa": null,
       "mrcr": null,
-      "arcAgi2": null,
-      "programBench": null
+      "arcAgi2": null
     },
     "benchUpdated": {
       "bfcl": "2026-05-22",
@@ -9725,12 +9612,11 @@
     "benchQuarantine": {
       "swePro": true,
       "nl2Repo": true,
-      "lcb": true,
       "aaOmni": true,
       "tb2": true,
       "browseComp": true,
-      "gpqa": true,
-      "tbHard": true
+      "tbHard": true,
+      "aaIdx": true
     },
     "providers": 4,
     "uptime": null,
@@ -9866,16 +9752,15 @@
       }
     },
     "bench": {
-      "aaIdx": 21.0,
-      "swePro": null,
-      "sweV": 73.74,
+      "aaIdx": 42.0,
+      "swePro": 52.3,
+      "sweV": 73.1,
       "sweMulti": 66.7,
       "nl2Repo": 39.4,
       "lcb": 84.9,
       "tb2": 41.0,
       "tbHard": 31.8,
       "tau2": 87.4,
-      "tau3": null,
       "mcpA": null,
       "bfcl": null,
       "aaCoding": null,
@@ -9883,15 +9768,13 @@
       "browseComp": 67.0,
       "cfElo": null,
       "webDevElo": null,
-      "gpqa": 85.72,
+      "gpqa": 85.7,
       "aime26": 95.7,
       "hle": 42.8,
       "aaOmni": 42,
       "mmluPro": 84.3,
-      "simpleQa": null,
       "mrcr": null,
-      "arcAgi2": null,
-      "programBench": null
+      "arcAgi2": null
     },
     "benchUpdated": {
       "sweV": "2026-05-28",
@@ -9917,7 +9800,6 @@
       "nl2Repo": true,
       "browseComp": true,
       "aaOmni": true,
-      "mmluPro": true,
       "tbHard": true
     },
     "providers": 5,
@@ -10075,7 +9957,6 @@
       "tb2": null,
       "tbHard": null,
       "tau2": 91.4,
-      "tau3": 91.4,
       "mcpA": null,
       "bfcl": null,
       "aaCoding": null,
@@ -10087,25 +9968,17 @@
       "hle": null,
       "aaOmni": null,
       "mmluPro": null,
-      "simpleQa": null,
       "mrcr": null,
-      "arcAgi2": null,
-      "programBench": null
+      "arcAgi2": null
     },
     "benchUpdated": {
       "sweV": "2026-05-28",
-      "tau3": "2026-05-10",
       "aaIdx": "2026-05-28",
       "lcb": "2026-05-22",
       "tau2": "2026-05-28",
       "swePro": "2026-05-18",
       "gpqa": "2026-05-22",
       "aime26": "2026-05-18"
-    },
-    "benchQuarantine": {
-      "aaIdx": true,
-      "lcb": true,
-      "tau2": true
     },
     "providers": 1,
     "uptime": null,
@@ -10243,7 +10116,7 @@
       }
     },
     "bench": {
-      "aaIdx": 32.4,
+      "aaIdx": 32.0,
       "swePro": null,
       "sweV": 42.3,
       "sweMulti": null,
@@ -10251,8 +10124,7 @@
       "lcb": 65.6,
       "tb2": null,
       "tbHard": null,
-      "tau2": 79.1,
-      "tau3": null,
+      "tau2": 86.7,
       "mcpA": null,
       "bfcl": null,
       "aaCoding": null,
@@ -10265,10 +10137,8 @@
       "hle": null,
       "aaOmni": null,
       "mmluPro": 82.5,
-      "simpleQa": null,
       "mrcr": null,
-      "arcAgi2": null,
-      "programBench": null
+      "arcAgi2": null
     },
     "benchUpdated": {
       "gpqa": "2026-05-28",
@@ -10428,7 +10298,7 @@
       }
     },
     "bench": {
-      "aaIdx": 39.0,
+      "aaIdx": 38.0,
       "swePro": 36.81,
       "sweV": 74.0,
       "sweMulti": 48.6,
@@ -10437,7 +10307,6 @@
       "tb2": 47.9,
       "tbHard": null,
       "tau2": 87.0,
-      "tau3": null,
       "mcpA": null,
       "bfcl": 37.4,
       "aaCoding": null,
@@ -10450,10 +10319,8 @@
       "hle": 17.8,
       "aaOmni": null,
       "mmluPro": 88.0,
-      "simpleQa": null,
       "mrcr": null,
-      "arcAgi2": null,
-      "programBench": null
+      "arcAgi2": null
     },
     "benchUpdated": {
       "sweMulti": "2026-05-19",
@@ -10471,10 +10338,9 @@
       "aaAgentic": "2026-05-27"
     },
     "benchQuarantine": {
-      "swePro": true,
-      "aime26": true,
       "tb2": true,
-      "aaAgentic": true
+      "aaAgentic": true,
+      "bfcl": true
     },
     "providers": 2,
     "uptime": null,
@@ -10680,10 +10546,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": null,
-      "simpleQa": null,
       "mrcr": 77.3,
       "arcAgi2": 72.1,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": 2,
@@ -10706,8 +10570,6 @@
       "mrcr": "2026-05-28"
     },
     "benchQuarantine": {
-      "sweV": true,
-      "aaIdx": true,
       "arcAgi2": true,
       "mrcr": true
     },
@@ -10810,7 +10672,7 @@
       "gpqa": 92.4,
       "sweMulti": null,
       "hle": 41.4,
-      "aaIdx": 56.6,
+      "aaIdx": 57.0,
       "bfcl": null,
       "aime26": 90.5,
       "aaOmni": null,
@@ -10819,10 +10681,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": 90.5,
-      "simpleQa": null,
       "mrcr": 90.4,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": null,
@@ -10849,10 +10709,7 @@
       "mmluPro": "2026-05-27"
     },
     "benchQuarantine": {
-      "sweV": true,
       "mcpA": true,
-      "gpqa": true,
-      "aaIdx": true,
       "aime26": true,
       "tbHard": true,
       "mrcr": true,
@@ -10927,10 +10784,8 @@
       "cfElo": null,
       "browseComp": null,
       "mmluPro": null,
-      "simpleQa": null,
       "mrcr": null,
       "arcAgi2": null,
-      "programBench": null,
       "nl2Repo": null
     },
     "providers": null,

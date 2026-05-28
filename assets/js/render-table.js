@@ -1,11 +1,11 @@
 // Comparison table + model list render. Columns are split into helper builders;
 // renderAll wires both surfaces together.
 
-import { State, BENCH_KEYS, TIER_ORDER, STORAGE, writeStorage, readStorage } from './core.js';
+import { State, TIER_ORDER, STORAGE, writeStorage, readStorage } from './core.js';
 import {
   compositeScore, coverageOf, fmtScore, scoreClass, contradictionFor,
-  pricingView, fmtPriceRange, fmtContext, fmtLastUpdated,
-  effectiveScore, rankBands,
+  pricingView, fmtPriceRange, fmtContext, fmtLastUpdated, fmtTimeAgo,
+  effectiveScore, rankBands, orderedBenchKeys,
 } from './data.js';
 import { gpuCompat, getActiveVram, passesFilters } from './gpu.js';
 import { el, clear } from './dom.js';
@@ -99,7 +99,12 @@ function staticColumns() {
 }
 
 function benchColumns() {
-  return BENCH_KEYS.map(k => ({
+  // Preset-weighted order: in-preset benches first (weight desc), then the
+  // excluded ones grouped at the right. firstExcluded marks the boundary so
+  // the header/body can draw a divider between the two groups.
+  const { included, excluded } = orderedBenchKeys(State.weights);
+  const firstExcluded = excluded.length ? excluded[0] : null;
+  return [...included, ...excluded].map(k => ({
     key: `bench.${k}`,
     benchKey: k,
     i18n: `benchmarks.${k}.short`,
@@ -107,6 +112,7 @@ function benchColumns() {
     sortable: true,
     num: true,
     cls: 'bench-cell-td',
+    groupDivider: k === firstExcluded,
     get: (m) => m.bench?.[k],
     render: (m) => renderBenchValue(m, k),
   }));
@@ -167,7 +173,15 @@ function tailColumns() {
       } },
     { key: 'lastUpdated', i18n: 'ui.table.lastUpdated', sortable: true,
       get: (m) => m.lastUpdated || '',
-      render: (m) => fmtLastUpdated(m.lastUpdated) || '—' },
+      render: (m) => {
+        const dateStr = fmtLastUpdated(m.lastUpdated);
+        if (!dateStr) return '—';
+        const wrap = el('span', { class: 'last-updated' });
+        wrap.appendChild(el('strong', { class: 'last-updated-date' }, dateStr));
+        const ago = fmtTimeAgo(m.lastUpdated, t);
+        if (ago) wrap.appendChild(el('span', { class: 'last-updated-ago' }, ` · ${ago}`));
+        return wrap;
+      } },
   ];
 }
 
@@ -205,6 +219,7 @@ function renderTableHeader(thead, cols) {
     th.dataset.col = col.key;
     if (col.num) th.classList.add('num');
     if (col.sticky) th.classList.add('col-name');
+    if (col.groupDivider) th.classList.add('bench-group-divider');
     if (col.sortable) {
       th.dataset.sortable = 'true';
       th.addEventListener('click', () => onSortClick(col.key));
@@ -294,6 +309,7 @@ function renderTableBody(tbody, ranked, cols) {
       if (col.num) td.classList.add('num');
       if (col.sticky) td.classList.add('col-name');
       if (col.cls) td.classList.add(col.cls);
+      if (col.groupDivider) td.classList.add('bench-group-divider');
       // Bench column body cells dim out when the preset excludes the bench
       // (weight === 0). Keeps them visible (data is real) but visually
       // de-emphasises so the user sees what's actually counted.

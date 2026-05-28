@@ -72,14 +72,6 @@ def main() -> int:
     wl = _load(WHITELIST_PATH)
     canonical_bench = set((wl.get("_schema") or {}).get("coreBenchKeys") or [])
     deprecated_bench = set((wl.get("_schema") or {}).get("deprecatedBenchKeys") or [])
-    canonical_na_rules = {
-        r.get("rule")
-        for r in (
-            ((wl.get("_schema") or {}).get("notApplicableRules") or {}).get("rules")
-            or []
-        )
-        if r.get("rule")
-    }
 
     models = _load(MODELS_PATH)
     if not isinstance(models, list):
@@ -147,9 +139,9 @@ def main() -> int:
             if not isinstance(mid, str) or mid not in model_ids:
                 meta_unknown_model.append((Path(gp).name, mid))
 
-    _check(f"observations parsed", True, f"{obs_total} total")
+    _check("observations parsed", True, f"{obs_total} total")
     _check(
-        f"observation modelId resolves to known model",
+        "observation modelId resolves to known model",
         not obs_with_unknown_model,
         f"{len(obs_with_unknown_model)} unknown"
         if obs_with_unknown_model
@@ -159,32 +151,32 @@ def main() -> int:
         for s, m, b in obs_with_unknown_model[:3]:
             print(f"      • {s}: modelId={m} bench={b}")
     _check(
-        f"observation benchKey is canonical or deprecated",
+        "observation benchKey is canonical or deprecated",
         not obs_with_unknown_bench,
         f"{len(obs_with_unknown_bench)} non-canonical"
         if obs_with_unknown_bench
         else "all canonical",
     )
-    _check(f"observation tier in {{I,S,C,U}}", not obs_invalid_tier)
+    _check("observation tier in {I,S,C,U}", not obs_invalid_tier)
     _check(
-        f"observation has sourceUrl",
+        "observation has sourceUrl",
         not obs_missing_source_url,
         f"{len(obs_missing_source_url)} missing"
         if obs_missing_source_url
         else "all present",
     )
     _check(
-        f"observation value is numeric",
+        "observation value is numeric",
         not obs_non_numeric,
         f"{len(obs_non_numeric)} non-numeric" if obs_non_numeric else "all numeric",
     )
     _check(
-        f"pricingObs modelId valid",
+        "pricingObs modelId valid",
         not pricing_unknown_model,
         f"{pricing_total} total, {len(pricing_unknown_model)} unknown",
     )
     _check(
-        f"modelMeta modelId valid",
+        "modelMeta modelId valid",
         not meta_unknown_model,
         f"{meta_total} total, {len(meta_unknown_model)} unknown",
     )
@@ -216,22 +208,22 @@ def main() -> int:
             if st is not None and st not in VALID_STATUS:
                 synth_status_invalid.append((m.get("id"), st))
         _check(
-            f"synth models[] all resolve to known IDs",
+            "synth models[] all resolve to known IDs",
             not synth_with_unknown,
             f"{len(synth_with_unknown)} unknown",
         )
         _check(
-            f"synth bench fields are flat scalars",
+            "synth bench fields are flat scalars",
             not synth_bench_wrapped,
             f"{len(synth_bench_wrapped)} wrapped",
         )
         _check(
-            f"synth bench keys all canonical",
+            "synth bench keys all canonical",
             not synth_bench_unknown,
             f"{len(synth_bench_unknown)} non-canonical",
         )
         _check(
-            f"synth status field valid",
+            "synth status field valid",
             not synth_status_invalid,
             f"{len(synth_status_invalid)} invalid",
         )
@@ -245,7 +237,7 @@ def main() -> int:
                 if "." in k and not k.startswith(f"{mid}."):
                     cross.append((mid, k))
         _check(
-            f"sourcesAdded keys match parent modelId",
+            "sourcesAdded keys match parent modelId",
             not cross,
             f"{len(cross)} mismatched",
         )
@@ -311,7 +303,7 @@ def main() -> int:
             lifecycle_invalid.append((mid, "archived-without-archivedAt"))
 
     _check(
-        f"bench cells are flat scalars",
+        "bench cells are flat scalars",
         not bench_wrapped,
         f"{len(bench_wrapped)} violations",
     )
@@ -319,7 +311,7 @@ def main() -> int:
         for mid, k in bench_wrapped[:3]:
             print(f"      • {mid}.{k}")
     _check(
-        f"bench keys all canonical",
+        "bench keys all canonical",
         not bench_unknown,
         f"{len(bench_unknown)} non-canonical",
     )
@@ -327,7 +319,7 @@ def main() -> int:
         for mid, k in bench_unknown[:3]:
             print(f"      • {mid}.{k}")
     _check(
-        f"bench cell ≠ N/A overlap",
+        "bench cell ≠ N/A overlap",
         not bench_na_overlap,
         f"{len(bench_na_overlap)} cells in both bench{{}} and notApplicableBenchKeys",
     )
@@ -335,27 +327,27 @@ def main() -> int:
         for mid, k in bench_na_overlap[:5]:
             print(f"      • {mid}.{k}")
     _check(
-        f"pricing.api is array",
+        "pricing.api is array",
         not pricing_invalid,
         f"{len(pricing_invalid)} non-array",
     )
     _check(
-        f"pricing.subscription is array",
+        "pricing.subscription is array",
         not pricing_subscription_invalid,
         f"{len(pricing_subscription_invalid)} non-array",
     )
     _check(
-        f"pricing.range present when api[] populated",
+        "pricing.range present when api[] populated",
         not pricing_range_missing,
         f"{len(pricing_range_missing)} missing",
     )
     _check(
-        f"status field in valid set",
+        "status field in valid set",
         not status_invalid,
         f"{len(status_invalid)} invalid",
     )
     _check(
-        f"lifecycle dates set when status changes",
+        "lifecycle dates set when status changes",
         not lifecycle_invalid,
         f"{len(lifecycle_invalid)} missing",
     )
@@ -381,8 +373,6 @@ def main() -> int:
         if not isinstance(entries, list) or "." not in k:
             continue
         mid, fkey = k.split(".", 1)
-        if fkey.startswith("bench."):
-            fkey = fkey[len("bench.") :]
         cell_seen[(mid, fkey)] += sum(
             1 for e in entries if isinstance(e, dict) and e.get("value") is not None
         )
@@ -395,7 +385,7 @@ def main() -> int:
                 bench_cells_no_provenance.append((m["id"], k, v))
 
     _check(
-        f"sources keys parse to known modelId",
+        "sources keys parse to known modelId",
         not src_unknown_model,
         f"{len(src_unknown_model)} orphan keys",
     )
@@ -403,12 +393,12 @@ def main() -> int:
         for k, mid in src_unknown_model[:3]:
             print(f"      • {k} (modelId={mid})")
     _check(
-        f"sources keys have <modelId>.<field> shape",
+        "sources keys have <modelId>.<field> shape",
         not src_invalid_key_format,
         f"{len(src_invalid_key_format)} malformed",
     )
     _check(
-        f"every filled bench cell has provenance",
+        "every filled bench cell has provenance",
         not bench_cells_no_provenance,
         f"{len(bench_cells_no_provenance)} bench cells without source",
     )
@@ -427,19 +417,19 @@ def main() -> int:
     missing_in_i18n = model_ids - set(tr_models) - set(en_models)
     extra_in_i18n = (set(tr_models) | set(en_models)) - model_ids
     _check(
-        f"TR ↔ EN model key parity",
+        "TR ↔ EN model key parity",
         not tr_only and not en_only,
         f"TR-only={len(tr_only)} EN-only={len(en_only)}",
     )
     _check(
-        f"every active model has i18n entries",
+        "every active model has i18n entries",
         not missing_in_i18n,
         f"{len(missing_in_i18n)} missing",
     )
     if missing_in_i18n:
         for mid in sorted(missing_in_i18n)[:5]:
             print(f"      • {mid}")
-    _check(f"no orphan i18n entries", not extra_in_i18n, f"{len(extra_in_i18n)} extra")
+    _check("no orphan i18n entries", not extra_in_i18n, f"{len(extra_in_i18n)} extra")
     if extra_in_i18n:
         for mid in sorted(extra_in_i18n)[:5]:
             print(f"      • {mid}")
@@ -459,12 +449,12 @@ def main() -> int:
             if not blk.get("strengths") or not blk.get("weaknesses"):
                 sw_missing_en.append(mid)
     _check(
-        f"TR strengths+weaknesses present",
+        "TR strengths+weaknesses present",
         not sw_missing_tr,
         f"{len(sw_missing_tr)} missing",
     )
     _check(
-        f"EN strengths+weaknesses present",
+        "EN strengths+weaknesses present",
         not sw_missing_en,
         f"{len(sw_missing_en)} missing",
     )
@@ -501,10 +491,10 @@ def main() -> int:
     # ----- SUMMARY ----------------------------------------------------------
     _section("SUMMARY")
     if issues:
-        print(f"  Auditor errors during run:")
+        print("  Auditor errors during run:")
         for i in issues:
             print(f"      • {i}")
-    print(f"  Run audit-data-coherence.py for SSOT-drift checks.")
+    print("  Run audit-data-coherence.py for SSOT-drift checks.")
     return 0
 
 
