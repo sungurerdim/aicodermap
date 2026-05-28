@@ -1,0 +1,150 @@
+{
+  "cycleEndedAt": "2026-05-28T04:03:30Z",
+  "cycleStartedAt": "2026-05-28T04:03:30Z",
+  "perBatch": [
+    {
+      "agentGaps": 28,
+      "batchId": "batch00-anthropic",
+      "fills": 51,
+      "gaps": 28,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 28,
+      "wallclockSec": 420.0
+    },
+    {
+      "agentGaps": 47,
+      "batchId": "batch01-deepseek",
+      "fills": 53,
+      "gaps": 47,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 22,
+      "wallclockSec": 180.0
+    },
+    {
+      "agentGaps": 93,
+      "batchId": "batch02-google_deepm",
+      "fills": 72,
+      "gaps": 93,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 22,
+      "wallclockSec": 280.0
+    },
+    {
+      "agentGaps": 20,
+      "batchId": "batch03-minimax",
+      "fills": 44,
+      "gaps": 20,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 14,
+      "wallclockSec": 185.0
+    },
+    {
+      "agentGaps": 86,
+      "batchId": "batch04-mistral_ai",
+      "fills": 36,
+      "gaps": 86,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "Several bench cells (sweV for mistral-large-3, most cells for devstral-medium/codestral/codestral-22b) not publicly reported by vendor or independent evaluators as of 2026-05-28. tau2 value for mistral-medium-3-5 flagged as tau3-telecom-variant (Mistral-specific benchmark, not canonical tau2). GPQA for devstral-2 sourced from AA via third-party review. aime26 for devstral-2 is AIME 2025 figure (2026 not published).",
+      "toolCallCount": 22,
+      "wallclockSec": 420.0
+    },
+    {
+      "agentGaps": 51,
+      "batchId": "batch05-openai",
+      "fills": 58,
+      "gaps": 51,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 30,
+      "wallclockSec": 420.0
+    },
+    {
+      "agentGaps": 96,
+      "batchId": "batch06-alibaba_qwen",
+      "fills": 68,
+      "gaps": 96,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 22,
+      "wallclockSec": 480.0
+    },
+    {
+      "agentGaps": 102,
+      "batchId": "batch07-alibaba_qwen",
+      "fills": 32,
+      "gaps": 102,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 22,
+      "wallclockSec": 210.0
+    },
+    {
+      "agentGaps": 53,
+      "batchId": "batch08-xai",
+      "fills": 41,
+      "gaps": 53,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "Several grok-4-3 and grok-4-1-fast bench cells not available from public sources; AA pages SPA-rendered. Grok 4.20 tau2/tb2/tbHard not publicly surfaced. Gaps recorded with tried sources and queries.",
+      "toolCallCount": 26,
+      "wallclockSec": 280.0
+    },
+    {
+      "agentGaps": 47,
+      "batchId": "batch09-xiaomi",
+      "fills": 35,
+      "gaps": 47,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 18,
+      "wallclockSec": 210.0
+    },
+    {
+      "agentGaps": 25,
+      "batchId": "batch10-z_ai__zhipu_",
+      "fills": 50,
+      "gaps": 25,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 23,
+      "wallclockSec": 320.0
+    },
+    {
+      "agentGaps": 34,
+      "batchId": "batch11-meta",
+      "fills": 62,
+      "gaps": 34,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 22,
+      "wallclockSec": 420.0
+    }
+  ],
+  "totalBatches": 12,
+  "totals": {
+    "agentGaps": 682,
+    "fills": 602,
+    "gaps": 682,
+    "na": 0,
+    "orchestratorGaps": 0,
+    "toolCallSum": 271,
+    "wallclockSecMax": 480.0,
+    "wallclockSecP95": 480.0
+  },
+  "zeroFillBatches": []
+}
