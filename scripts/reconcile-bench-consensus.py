@@ -44,6 +44,12 @@ from lib.synth import (  # noqa: E402  - runtime path
     _load_unhealthy_urls,
 )
 
+# 5.1 — reconcile must apply the SAME consensus guarantees lib.winner.pick_winner
+# gives the merge path: drop pseudo-sources before clustering, and let a
+# qualifying I-tier cluster override the raw sum_trust ordering. Without these,
+# reconcile could overwrite a value the canonical engine would have kept.
+from lib.winner import _i_tier_cluster, filter_pseudo_sources  # noqa: E402
+
 SOURCES_PATH = ROOT / "data" / "sources.json"
 MODELS_PATH = ROOT / "data" / "models.json"
 WHITELIST_PATH = ROOT / "data" / "sources-whitelist.json"
@@ -54,11 +60,16 @@ WHITELIST_PATH = ROOT / "data" / "sources-whitelist.json"
 DEFAULT_AGREEMENT_PP = 1.5
 
 
-def _load_contracts() -> dict[str, Any]:
+def _load_whitelist() -> dict[str, Any]:
+    """6.6: parse the whitelist ONCE; contracts + low-conf + unhealthy loaders
+    all consume this parsed dict instead of re-reading the 135 KB file 3×."""
     try:
-        wl = json.loads(WHITELIST_PATH.read_text(encoding="utf-8"))
+        return json.loads(WHITELIST_PATH.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return {}
+
+
+def _contracts_of(wl: dict[str, Any]) -> dict[str, Any]:
     return ((wl.get("_schema") or {}).get("contracts")) or {}
 
 
@@ -102,7 +113,8 @@ def _rotate_bak(p: Path) -> None:
 
 
 def main() -> int:
-    contracts = _load_contracts()
+    whitelist = _load_whitelist()  # 6.6: single parse, reused by all 3 loaders
+    contracts = _contracts_of(whitelist)
     agreement_pp = float(
         contracts.get("VERIFICATION_AGREEMENT_PP", DEFAULT_AGREEMENT_PP)
     )
@@ -131,7 +143,7 @@ def main() -> int:
 
     # FAZ 6.C: load low-confidence URL set + multiplier so the cluster math
     # downweights root-listing URLs the same way the forward synth path does.
-    low_conf_urls, low_conf_mult = _load_low_confidence_urls(ROOT)
+    low_conf_urls, low_conf_mult = _load_low_confidence_urls(ROOT, whitelist)
     if low_conf_urls:
         print(
             f"low-confidence URLs = {len(low_conf_urls)} × {low_conf_mult} multiplier"
@@ -139,7 +151,7 @@ def main() -> int:
     # FAZ 6.F: stale-clear policy. When stored value's only evidence is from
     # unhealthy/low-confidence URLs AND new consensus is below the override
     # gate, clear stored value to null rather than keep a discredited number.
-    unhealthy_urls = _load_unhealthy_urls(ROOT)
+    unhealthy_urls = _load_unhealthy_urls(ROOT, whitelist)
     print(f"unhealthy URLs (FAZ 6.A) = {len(unhealthy_urls)}")
 
     def _evidence_is_discredited(entries: list[dict[str, Any]]) -> bool:
@@ -211,10 +223,20 @@ def main() -> int:
         if low_conf_urls:
             _apply_low_confidence_penalty(obs, low_conf_urls, low_conf_mult)
 
+        # 5.1 — drop pseudo-sources (snapshot-extraction / synth-backfill / auto-
+        # resolution candidates lacking a verifiable URL) so they cannot anchor
+        # consensus, exactly as pick_winner does. Fall back to the full set only
+        # when nothing primary remains.
+        primary, _pseudo = filter_pseudo_sources(obs)
+        obs = primary or obs
+
         clusters = _cluster_observations(obs, agreement_pp)
         if not clusters:
             continue
-        winning_cluster = clusters[0]
+        # 5.1 — I-tier override: a qualifying I-tier cluster wins regardless of the
+        # sum_trust sort (matches pick_winner rule 1), so reconcile never lets a
+        # high-trust S-tier cluster overwrite an independent-leaderboard consensus.
+        winning_cluster = _i_tier_cluster(clusters) or clusters[0]
         # Override gate — protect stored values from weak consensus.
         d = winning_cluster["distinct_sources"]
         s = winning_cluster["sum_trust"]

@@ -10,8 +10,29 @@ not nested `models[].observations[]`. See agent.md GATHER_MODE for spec.
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Any
+
+
+def _artifact_started_unix(artifact: dict[str, Any]) -> float | None:
+    """Return the agent's self-reported start as epoch seconds, or None.
+
+    Gather artifacts carry it at `runtime.startedAt`; full/synth at
+    `runMetadata.startedAt`. Both are ISO-8601. Content-based (unlike mtime,
+    which a touch/partial-write can refresh without the agent re-running)."""
+    for container in ("runtime", "runMetadata"):
+        block = artifact.get(container)
+        if isinstance(block, dict):
+            raw = block.get("startedAt")
+            if isinstance(raw, str) and raw:
+                txt = raw.strip().replace("Z", "+00:00")
+                try:
+                    return datetime.fromisoformat(txt).timestamp()
+                except ValueError:
+                    continue
+    return None
+
 
 # Permitted top-level keys in a gather artifact. Anything else = full/synth schema bleed.
 GATHER_TOP_KEYS = {
@@ -277,6 +298,30 @@ def validate_gather_file(
                 f"(grace={STALE_GRACE_SEC}s). Prior-cycle output reused; "
                 f"orchestrator must overwrite via fresh dispatch."
             )
+        # Content-based stale guard (3.2): the agent's self-reported startedAt is
+        # authoritative — a touched/partial-written file can refresh mtime without
+        # the agent having re-run this cycle. Mandatory once cycle_started is known.
+        started = _artifact_started_unix(artifact)
+        stats = verdict.setdefault("stats", {})
+        if started is None:
+            stats["missingStartedAt"] = True
+            verdict["valid"] = False
+            verdict.setdefault("errors", []).append(
+                "MISSING runtime.startedAt — mandatory under cycle stale check; "
+                "cannot prove the artifact was produced this cycle. Treated as "
+                "stale → orchestrator must re-dispatch."
+            )
+        else:
+            started_age = cycle_started_unix - started
+            if started_age > STALE_GRACE_SEC:
+                stats["stale"] = True
+                stats["startedAtAgeSec"] = round(started_age, 1)
+                verdict["valid"] = False
+                verdict.setdefault("errors", []).append(
+                    f"STALE artifact — runtime.startedAt predates cycle start by "
+                    f"{started_age:.0f}s (grace={STALE_GRACE_SEC}s). Agent did not "
+                    f"re-run this cycle; orchestrator must overwrite via fresh dispatch."
+                )
     return verdict
 
 

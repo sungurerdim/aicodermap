@@ -451,7 +451,17 @@
     "qwen3-7-max.strengths": "Qwen flagship reasoning-agent model with 1M-token context; strong coding and agentic performance.",
     "qwen3-7-max.weaknesses": "Closed-weight preview; independent bench coverage pending; priced above mid-tier Qwen.",
     "qwen3-7-plus.strengths": "Multimodal Qwen3.7 variant with 1M-token context for combined vision and code tasks.",
-    "qwen3-7-plus.weaknesses": "Closed-weight preview; limited independent benchmarks at launch."
+    "qwen3-7-plus.weaknesses": "Closed-weight preview; limited independent benchmarks at launch.",
+    "claude-opus-4-8.strengths": "Anthropic frontier flagship; strongest Claude on SWE-bench and agentic coding at release.",
+    "claude-opus-4-8.weaknesses": "Premium API pricing; closed weights; full benchmark coverage pending this cycle's survey.",
+    "gpt-5-4-mini.strengths": "Cost-efficient GPT-5.4 tier with 400K context; balances latency and capability for coding agents.",
+    "gpt-5-4-mini.weaknesses": "Smaller than full GPT-5.4 on hard reasoning; closed weights; bench coverage pending survey.",
+    "gpt-5-4-nano.strengths": "Smallest GPT-5.4 variant; cheapest OpenAI option for high-throughput, low-latency coding calls.",
+    "gpt-5-4-nano.weaknesses": "Lowest capacity in the GPT-5.4 family on multi-file tasks; closed weights; bench coverage pending.",
+    "mistral-small-4.strengths": "Apache-2.0 small Mistral with 256K context; self-hostable on a single mid-range GPU.",
+    "mistral-small-4.weaknesses": "Below frontier on agentic benchmarks; full bench coverage pending this cycle's survey.",
+    "nemotron-3-nano-omni.strengths": "Open-weight multimodal NVIDIA Nemotron nano; compact footprint for agentic, multimodal tasks.",
+    "nemotron-3-nano-omni.weaknesses": "Nano scale limits hard-coding capability; bench coverage pending this cycle's survey."
   },
   "benchmarks": {
     "swePro": {

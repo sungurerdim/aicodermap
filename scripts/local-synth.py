@@ -16,10 +16,10 @@ from collections import defaultdict
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from lib.whitelist import contracts  # type: ignore
-from lib.matrix import active_models  # type: ignore
-from lib import reliability as _reliability  # type: ignore
-from lib.tiers import verif_factor as _verif_factor  # type: ignore
+from lib.whitelist import contracts  # type: ignore  # noqa: E402
+from lib.matrix import active_models  # type: ignore  # noqa: E402
+from lib import reliability as _reliability  # type: ignore  # noqa: E402
+from lib.tiers import verif_factor as _verif_factor  # type: ignore  # noqa: E402
 
 TIER_WEIGHT = {"I": 1.0, "S": 0.7, "C": 0.4, "U": 0.1}
 LEDGER_PATH = ROOT / "data" / "source-reliability.json"
@@ -139,12 +139,17 @@ def main() -> int:
         "rawGapsTotal": 0,
     }
 
+    # 6.1 — parse each batch artifact ONCE; the observations pass and the
+    # pricing pass below both iterate this cached list instead of re-reading
+    # every .gather.json from disk a second time.
+    parsed_artifacts: list[tuple[Path, dict]] = []
     for p in artifacts:
         try:
-            art = json.load(open(p, encoding="utf-8"))
+            parsed_artifacts.append((p, json.load(open(p, encoding="utf-8"))))
         except Exception as e:
             print(f"  ! skip {p.name}: {e}")
-            continue
+
+    for p, art in parsed_artifacts:
         runtime_total["batchesMerged"] += 1
         for obs in art.get("observations") or []:
             mid = obs.get("modelId")
@@ -190,11 +195,7 @@ def main() -> int:
                 historical_injected += 1
     runtime_total["historicalObsInjected"] = historical_injected
 
-    for p in artifacts:
-        try:
-            art = json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
+    for p, art in parsed_artifacts:
         for po in art.get("pricingObs") or []:
             mid = po.get("modelId")
             if mid in active_ids:

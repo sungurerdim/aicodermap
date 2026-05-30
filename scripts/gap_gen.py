@@ -180,11 +180,18 @@ for mid, bk in sorted(missing):
     lb2 = bench_to_lb2.get(bk, "")
     label = _bench_label(bk)
     name = model_names.get(mid, mid)
+    # 5.5 — never emit empty-string triedSources. A bench with no leaderboard
+    # mapping would otherwise yield ["", ""], which passes the len>=1 count gate
+    # but carries no provenance. Drop blanks; fall back to an explicit
+    # no-mapping token so the gap is honestly attributable.
+    tried_sources = [u for u in (lb1, lb2) if u] or [
+        f"orchestrator:no-leaderboard-mapping:{bk}"
+    ]
     existing_gaps.append(
         {
             "key": f"{mid}.{bk}",
             "reason": f"not reached in agent survey cycle; {label} data unavailable",
-            "triedSources": [lb1, lb2],
+            "triedSources": tried_sources,
             "triedQueries": [
                 f"{mid} {label} benchmark score 2026",
                 f"{name} {label} leaderboard 2026",

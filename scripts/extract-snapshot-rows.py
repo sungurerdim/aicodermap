@@ -39,18 +39,31 @@ from typing import Any
 from urllib.parse import urlparse
 
 PROJECT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT / "scripts"))
+from lib.util import parse_locale_decimal  # noqa: E402
+
 SNAP_DIR = PROJECT / "data" / ".leaderboard-snapshots"
 ROWS_OUT = SNAP_DIR / "_rows.json"
 INDEX_PATH = SNAP_DIR / "_index.json"
 
-ROW_VALUE_RE = re.compile(r"(\d{1,3}(?:\.\d+)?)\s*%?")
+# Locale-tolerant capture (4.2): the value token may carry comma decimals
+# ("87,6") or grouped thousands ("1,234" / "1 234" / "1.234,56"). The OLD
+# pattern stopped at the comma, silently capturing "87,6" as "87". parse_locale_decimal
+# (SSOT _localeDecimalRule) normalizes the captured token. Leading group bounded
+# to 4 digits (Elo hardMax); thousands group is a fixed \d{3} → ReDoS-safe.
+_SEP = r"[.,    ]"
+ROW_VALUE_RE = re.compile(rf"(\d{{1,4}}(?:{_SEP}\d{{3}})*(?:[.,]\d+)?)\s*%?")
 # FAZ 7.F.b: stricter row-value regex — require percent sign OR a value
 # explicitly in the typical bench range. Cycle 2026-05-10 measured the
 # permissive variant extracting version numbers (e.g. `3-1` → 1.0) as
 # bench scores. The agent now opts in via --strict only when values are
 # meant to flow into observations[]; otherwise rows are emitted as
 # low-confidence hints (confidence: "regex-hint") for agent verification.
-STRICT_VALUE_RE = re.compile(r"(\d{2,3}(?:\.\d+)?)\s*%")
+STRICT_VALUE_RE = re.compile(r"(\d{2,3}(?:[.,]\d+)?)\s*%")
+# 4.5 — markdown separator-row filter (the documented markdown_table_row
+# post-process: reject `|---|:--:|` rows so a stray '--' run is never read as a
+# score). Implemented in code, not just specified.
+SEPARATOR_ROW_RE = re.compile(r"^\s*\|?[\s\-:|]{3,}\|?\s*$")
 TAG_RE = re.compile(r"<[^>]+>")
 WS_RE = re.compile(r"\s+")
 MIN_PLAUSIBLE_VALUE = 5.0
@@ -133,15 +146,26 @@ def extract_rows_from_html(
             if idx < 0:
                 continue
             window = text[idx : idx + 250]
+            # 4.5 — skip if the alias sits on a markdown separator row.
+            first_line = window.splitlines()[0] if window else ""
+            if SEPARATOR_ROW_RE.match(first_line):
+                continue
             m = value_re.search(window[len(alias) :])
             if not m:
                 continue
-            try:
-                val = float(m.group(1))
-            except ValueError:
+            val = parse_locale_decimal(m.group(1))
+            if val is None:
                 continue
             if val < MIN_PLAUSIBLE_VALUE or val > MAX_PLAUSIBLE_VALUE:
                 continue
+            # 6.5 — a row is NON-AMBIGUOUS when the page advertises exactly one
+            # bench key AND the value was captured in strict mode (explicit %
+            # anchor, not a loose digit). Such rows are reliable enough to mark
+            # `confirmed` so the agent's re-verify pass can skip them; multi-bench
+            # pages or loose matches stay `regex-hint` (must be re-verified).
+            conf = (
+                "confirmed" if (strict and len(page_bench_keys) == 1) else "regex-hint"
+            )
             for bk in page_bench_keys:
                 rows.append(
                     {
@@ -150,7 +174,7 @@ def extract_rows_from_html(
                         "value": val,
                         "sourceUrl": url,
                         "tier": tier,
-                        "confidence": "regex-hint",
+                        "confidence": conf,
                         "snippet": window[:120],
                     }
                 )

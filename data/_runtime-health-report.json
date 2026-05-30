@@ -1,0 +1,176 @@
+{
+  "probedAt": "2026-05-30T19:06:12Z",
+  "total": 138,
+  "counts": {
+    "format-drift": 14,
+    "redirect": 7,
+    "spa": 15,
+    "bot-block": 2,
+    "dead": 10
+  },
+  "formatDrift": [
+    {
+      "url": "https://lmarena.ai/leaderboard/webdev",
+      "declared": "static_html_table",
+      "observed": "dead"
+    },
+    {
+      "url": "https://klu.ai/llm-leaderboard",
+      "declared": "static_html_table",
+      "observed": "bot_blocked"
+    },
+    {
+      "url": "https://benchlm.ai/benchmarks/programBench",
+      "declared": "static_html_table",
+      "observed": "spa_full"
+    },
+    {
+      "url": "https://openrouter.ai",
+      "declared": "static_html_table",
+      "observed": "spa_full"
+    },
+    {
+      "url": "https://deepinfra.com/models",
+      "declared": "static_html_table",
+      "observed": "spa_full"
+    },
+    {
+      "url": "https://cloud.sambanova.ai/models",
+      "declared": "static_html_table",
+      "observed": "dead"
+    },
+    {
+      "url": "https://www.lepton.ai/pricing",
+      "declared": "static_html_table",
+      "observed": "dead"
+    },
+    {
+      "url": "https://www.anyscale.com/endpoints",
+      "declared": "static_html_table",
+      "observed": "spa_full"
+    },
+    {
+      "url": "https://ai.azure.com/explore/models",
+      "declared": "static_html_table",
+      "observed": "spa_full"
+    },
+    {
+      "url": "https://benchlm.ai/models/gemini-3-1-pro",
+      "declared": "static_html_article",
+      "observed": "spa_full"
+    },
+    {
+      "url": "https://www.datacamp.com/blog",
+      "declared": "static_html_table",
+      "observed": "spa_full"
+    },
+    {
+      "url": "https://tokenmix.ai/blog/",
+      "declared": "static_html_article",
+      "observed": "spa_full"
+    },
+    {
+      "url": "https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-for-service-organizations",
+      "declared": "static_html_article",
+      "observed": "spa_full"
+    },
+    {
+      "url": "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html",
+      "declared": "static_html_article",
+      "observed": "bot_blocked"
+    }
+  ],
+  "redirects": [
+    {
+      "url": "https://paperswithcode.com/area/code-generation",
+      "to": "https://huggingface.co/papers/trending"
+    },
+    {
+      "url": "https://cerebras.ai/inference",
+      "to": "https://www.cerebras.ai/inference"
+    },
+    {
+      "url": "https://designarena.ai/leaderboard",
+      "to": "https://www.designarena.ai/leaderboard"
+    },
+    {
+      "url": "https://compliance.microsoft.com/compliancemanager",
+      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3Dpx2hgqi9lukGvAWbjWD7e5FmZ62zr6bgI58hMrPRJv97Vl9vm_60eOttHvbEo61kuaZ1D0JWfnhq6ntF7KkgGnbpMsf-ae-nFphpmmVdSQDdtFik-DSBuC-aNPqOk_5-KoWL4xbXRhU0S2xT3ph_oPscG4WT3P84C-cDB6OYD7M&response_mode=form_post&nonce=639157647636868295.Mjc4ZGFmYWQtMmM1Ny00YjI0LTk4MDAtZWQ5NzA3MjBmYWQ4YjcyYmIwMWUtYmZmOS00YTRjLTlkODEtYzBjZDYzMDc4MTI3&client-request-id=9ec7cb63-cf4e-405d-81ef-d9c377c4072a&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.3.0.0"
+    },
+    {
+      "url": "https://edpb.europa.eu/our-work-tools/consistency-findings/register-for-decisions_en",
+      "to": "https://www.edpb.europa.eu/our-work-tools/consistency-findings/register-for-decisions_en"
+    },
+    {
+      "url": "https://platform.openai.com/docs/models",
+      "to": "https://developers.openai.com/api/docs/models"
+    },
+    {
+      "url": "https://www.all-hands.dev",
+      "to": "https://www.openhands.dev/"
+    }
+  ],
+  "spa": [
+    "https://livebench.ai/",
+    "https://benchlm.ai/benchmarks/programBench",
+    "https://openrouter.ai/rankings",
+    "https://openrouter.ai",
+    "https://deepinfra.com/models",
+    "https://www.anyscale.com/endpoints",
+    "https://ai.azure.com/explore/models",
+    "https://benchlm.ai/models/gemini-3-1-pro",
+    "https://www.datacamp.com/blog",
+    "https://tokenmix.ai/blog/",
+    "https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-for-service-organizations",
+    "https://trust.openai.com/",
+    "https://trust.anthropic.com/",
+    "https://mimo.xiaomi.com",
+    "https://www.stepfun.com"
+  ],
+  "botBlocked": [
+    "https://klu.ai/llm-leaderboard",
+    "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
+  ],
+  "dead": [
+    {
+      "url": "https://lmarena.ai/leaderboard/webdev",
+      "error": "HTTP 404 Not Found"
+    },
+    {
+      "url": "https://klu.ai/llm-leaderboard",
+      "error": "HTTP 403 Forbidden"
+    },
+    {
+      "url": "https://agentbench.ai",
+      "error": "URLError: <urlopen error timed out>"
+    },
+    {
+      "url": "https://cloud.sambanova.ai/models",
+      "error": "HTTP 404 Not Found"
+    },
+    {
+      "url": "https://www.lepton.ai/pricing",
+      "error": "HTTP 404 Not Found"
+    },
+    {
+      "url": "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html",
+      "error": "HTTP 403 Forbidden"
+    },
+    {
+      "url": "https://www.deepseek.com/news",
+      "error": "HTTP 404 Not Found"
+    },
+    {
+      "url": "https://z.ai/news",
+      "error": "HTTP 404 Not Found"
+    },
+    {
+      "url": "https://xiaomimimo.github.io",
+      "error": "HTTP 404 Not Found"
+    },
+    {
+      "url": "https://platform.minimaxi.com/document",
+      "error": "HTTP 404 Not Found"
+    }
+  ]
+}

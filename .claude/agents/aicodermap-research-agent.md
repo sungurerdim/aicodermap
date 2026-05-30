@@ -17,17 +17,49 @@ Walks `sourcesWhitelist.vendors.*.urls.lineup` URLs in parallel.
 
 **Protocol:**
 1. Fetch every vendor lineup URL (parallel single-message dispatch).
+   - **Redirect follow:** on a 30x response (incl. cross-host, e.g. docs.claude.com
+     → platform.claude.com), follow the `Location` up to **2 hops**; record the
+     final resolved URL in `runtime.fetchErrors[]?` only if the chain still fails.
+     A 30x that resolves to a 200 within 2 hops is a SUCCESS, not a failure.
+   - **SPA_NO_DATA detect:** a 200 whose body has no extractable model rows/cards
+     (client-rendered shell — `<div id="root">`/`__NEXT_DATA__`-only, body text
+     < ~200 chars of model-relevant content) is treated as a fetch FAILURE
+     (`observedFormat:'spa_full'`), NOT a success — it MUST trigger the per-vendor
+     fallback below, never a silent empty `active[]`.
+   - **Per-vendor WebSearch fallback:** any vendor whose lineup fetch fails (4xx/5xx/
+     timeout/redirect-dead-end/SPA_NO_DATA) falls back to the WebSearch new-release
+     net (step 3b) scoped to that vendor to recover its `active[]`; if even that
+     yields nothing, emit `gaps[]` `lineup:<vendor>: empty` (never omit the vendor).
 2. Extract: active model list, deprecation table, renamed/successor announcements.
 3. Cross-reference with `idea_context.currentIds` (current `data/models.json`).
+3b. **WebSearch new-release net (always run — does NOT depend on lineup fetch success).**
+   For EVERY vendor, expand `sourcesWhitelist._schema.newReleaseProbe.queryTemplates`
+   per-vendor: `{vendorName}` ← `vendors.<id>.name`, `{familyHint}` ← derived from
+   that vendor's most-recent id in `currentIds` per `newReleaseProbe.familyHintSource`
+   (strip trailing version token; never invent a next-version number), `{year}` ←
+   current + prior calendar year. Run the expanded WebSearch queries in parallel.
+   For every surfaced model name whose canonical id is NOT in `currentIds`, append to
+   `lineupChanges.new[] = {suggestedId, vendor, evidenceUrl, observedVersion,
+   source:'newReleaseProbe', evidenceConfidence}`. A surfaced id already in
+   `currentIds` is a no-op. Single-snippet-only hits with no corroboration →
+   `gaps[]` `newrelease:<vendor>: unconfirmed` instead of `lineupChanges.new`.
+   This net is what catches a new model when the vendor's lineup page is
+   404/SPA/redirect-broken — a broken lineup fetch (step 1 failure) MUST NOT
+   suppress this probe.
 4. Emit lineup diff in `lineupChanges`:
-   - `NEW`: in vendor lineup, not in data → mark for Phase 2 survey.
+   - `NEW`: in vendor lineup OR surfaced by the new-release net, not in data → mark for Phase 2 survey.
    - `DEPRECATED`: in data, vendor marks deprecated → `lineupChanges.deprecated[]`.
    - `RENAMED`: vendor canonical id differs → `lineupChanges.renamed[{from, to, evidenceUrl}]`.
    - `REMOVED`: in data, absent from vendor page → `lineupChanges.removed[]`.
-5. **Mandatory emission contract:** `lineup` MUST be non-empty (every HTTP 200
-   vendor contributes at least one entry). 4xx/5xx/timeout vendors emit a
-   `gaps[]` entry `lineup:<vendor>: unreachable: <reason>` AND a
-   `runtime.fetchErrors[]` entry. Silent omission = contract violation.
+5. **Mandatory emission contract (per-vendor, not global):** EVERY vendor in
+   `sourcesWhitelist.vendors` MUST appear as a key in `lineup`. Each vendor key
+   carries either a non-empty `active[]` (from lineup fetch OR the step-1
+   WebSearch fallback) OR a `gaps[]` entry `lineup:<vendor>: empty`. A
+   globally-non-empty `lineup` that silently omits a broken vendor is a
+   contract violation — the test is per-vendor coverage, not the global count.
+   4xx/5xx/timeout/SPA_NO_DATA vendors that also fail the WebSearch fallback emit
+   `gaps[]` `lineup:<vendor>: unreachable: <reason>` AND a `runtime.fetchErrors[]`
+   entry. Silent omission of any vendor = contract violation.
 6. `runtime.healthChecks` MUST cover ≥3 leaderboard domains with
    `{status, observedFormat}`; failures emit `gaps[]` entries.
 
@@ -75,6 +107,44 @@ primary source + exact metric/scale, then emit a verdict. Write
 A value that is simply WRONG (but correctly classified) → do NOT verdict it here;
 record the corrected value as a normal observation so merge recomputes trustScore.
 scripts/apply-anomaly-verdicts.py applies confirm/reclassify/clear mechanically.
+
+## SCOPE_NEW_RELEASE
+
+**`new-release` scope** is a focused subset of Phase 0 whose sole job is catching
+models that exist now but are absent from `idea_context.currentIds`. It is what the
+orchestrator dispatches for a targeted "did anyone ship something?" probe and what
+the PRELIM-E fast path leans on.
+
+Phase 0 steps that run (in order):
+1. **Step 1** lineup fetch (with redirect-follow + SPA_NO_DATA detect) for every vendor.
+2. **Step 3b** WebSearch new-release net — per-vendor expansion of
+   `sourcesWhitelist._schema.newReleaseProbe.queryTemplates` ({vendorName} +
+   derived {familyHint} + {year}). This is the primary detector; it runs even when
+   step 1 fails for a vendor.
+3. **Phase 0 sub-probes** (unknown-vendor / unknown-leaderboard) — emit candidates only.
+
+Steps that DO NOT run: Phase 1 SOURCE_FIRST_SWEEP, Phase 2 per-model fill, Stage A/B
+cell research. No bench/pricing values are gathered.
+
+Output shape:
+```jsonc
+{
+  "lineupChanges": {
+    "new":       [{ "suggestedId","vendor","evidenceUrl","observedVersion","source","evidenceConfidence" }],
+    "deprecated":[ ... ], "renamed":[ ... ], "removed":[ ... ]
+  },
+  "newModels": [ /* minimal stub {id, vendor, evidenceUrl} per lineupChanges.new entry — NO bench/pricing */ ],
+  "gaps": [ "newrelease:<vendor>: unconfirmed", "lineup:<vendor>: empty|unreachable" ],
+  "runtime": { "fetchErrors":[...], "healthChecks":{...} }
+}
+```
+
+Merge effect: the orchestrator treats `lineupChanges.new[]` / `newModels[]` as
+**detection signals only** — it appends each as a NEW model stub flagged for a
+follow-up `specific`/`full` survey (Step 4) and appends a CHANGELOG `🆕` line. A
+`new-release` run NEVER writes bench/pricing into `data/models.json` directly (no
+values were gathered); it only widens the active set so the next fill cycle covers
+the new id. Ids already in `currentIds` are no-ops.
 
 **No `typical duration` column** — the agent runs to completeness, not to a clock. A `full` scope cycle takes as long as walking every advertised source + every per-model URL + every vendor card + every WebSearch fallback for unfilled cells requires. Saturation termination + verification-map confirmed-cell skip make subsequent cycles incremental (most cells already confirmed across 3+ sources skip the sweep entirely).
 
@@ -186,6 +256,10 @@ reliably; nested 2-level structures often degrade.
     {"modelId": "<id>", "benchKey": "<key>", "triedSources": ["<url>",...], "triedQueries": ["<q>",...]}
   ],
   "runtime": {
+    "startedAt": ISO_datetime,   // MANDATORY — wallclock instant this gather began.
+                                 // Orchestrator's stale check rejects artifacts
+                                 // whose startedAt predates cycleStartedUnix (a
+                                 // prior-cycle file reused without re-running).
     "toolCallCount": <int>,
     "wallclockSec": <int>,
     "snapshotsRead": <int>
@@ -228,7 +302,7 @@ reliably; nested 2-level structures often degrade.
   "rawGaps": [
     {"modelId": "claude-haiku-4-5", "benchKey": "aaAgentic", "triedSources": ["https://artificialanalysis.ai/models/claude-4-5-haiku"], "triedQueries": ["claude haiku 4.5 aa agentic 2026"]}
   ],
-  "runtime": {"toolCallCount": 22, "wallclockSec": 150, "snapshotsRead": 8},
+  "runtime": {"startedAt": "2026-05-29T08:00:00Z", "toolCallCount": 22, "wallclockSec": 150, "snapshotsRead": 8},
   "partialReason": null
 }
 ```
@@ -310,8 +384,9 @@ reliably; nested 2-level structures often degrade.
       Write a minimal valid stub FIRST:
       `{"batchId":"<id>","mode":"gather","observations":[],"modelMeta":[],
         "pricingObs":[],"ollamaObs":[],"unslothObs":[],"lineupHints":[],
-        "naCandidates":[],"rawGaps":[],"runtime":{"toolCallCount":N,
-        "wallclockSec":S,"snapshotsRead":K},"partialReason":"context_budget"}`
+        "naCandidates":[],"rawGaps":[],"runtime":{"startedAt":"<ISO>",
+        "toolCallCount":N,"wallclockSec":S,"snapshotsRead":K},
+        "partialReason":"context_budget"}`
     - Then status: `EMITTED batch=<id> mode=gather observations=0 partial=context_budget path=<output_path>`
     - The orchestrator's Step 5 write-skip guard treats a missing file
       as a recoverable contract violation, but recovery costs an extra
@@ -637,8 +712,14 @@ The single biggest source of data loss in prior runs was a single mega-regex doi
      · `webDevElo` = LMArena WebDev Arena Elo (~950-1300).
      · GDPval-AA Elo (Artificial Analysis office-work) → belongs to NONE of these;
        do not file it as cfElo/lmArenaElo.
-   - **SWE family:** `sweV` (SWE-bench Verified) ≠ `swePro` (SWE-bench Pro) ≠
-     `sweMulti` (SWE-bench Multilingual/Multimodal). Keep separate.
+   - **SWE family (variant qualifier MANDATORY):** `sweV` (SWE-bench Verified) ≠
+     `swePro` (SWE-bench Pro) ≠ `sweMulti` (SWE-bench Multilingual/Multimodal).
+     A bare "SWE-bench: 70" with NO variant word (Verified / Pro / Multilingual)
+     is AMBIGUOUS — you may NOT default it to `sweV`. Record it under your
+     best-evidence variant but tag the observation `_variantAmbiguous: true`; the
+     merge applies a −0.5 trustScore penalty and surfaces it as an anomaly for
+     re-verification. If you cannot even guess the variant, emit a `gaps[]` entry
+     `swe-variant-ambiguous:<modelId>` instead of filling a cell.
    - **Terminal:** `tb2` (Terminal-Bench 2) ≠ `tbHard` (Terminal-Bench Hard).
    - **Others:** `tau2`≠`tau3`; `aime26`≠`aime25`; `gpqa` = GPQA **Diamond**;
      `lcb` ≠ deprecated `lcbV6`.

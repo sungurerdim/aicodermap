@@ -103,6 +103,54 @@ def deep_merge(base: dict, override: dict) -> dict:
 _VERSION_DOT_PAT = re.compile(r"(\b\w*\d)[ ]+(\d+)(?![\w.])")
 
 
+# Whitespace that doubles as a thousands separator (BIPM): space, tab, NBSP,
+# thin-space, narrow-no-break, figure-space.
+_THOUSANDS_WS = "\t     "
+_WS_RE = re.compile(f"[{re.escape(_THOUSANDS_WS)}]")
+_COMMA_THOUSANDS_RE = re.compile(r"^\d{1,3}(,\d{3})+$")
+
+
+def parse_locale_decimal(raw: str | float | int | None) -> float | None:
+    """Parse a captured numeric string under `_localeDecimalRule` (SSOT in
+    sources-whitelist.json `_schema.regexLibrary`). Returns a float or None.
+
+    Handles 87.6, 87,6, 1,234.56, 1.234,56, 1 234,56 (BIPM thin-space + EU
+    decimal). Rule: strip whitespace thousands separators; if both '.' and ','
+    are present the RIGHTMOST is the decimal separator and the other is
+    thousands (stripped); if only ',' is present it is thousands when it matches
+    the d{1,3}(,d{3})+ grouping, else decimal. Apply ONLY to an already-captured
+    numeric token — never inside the extraction regex.
+    """
+    if raw is None:
+        return None
+    if isinstance(raw, (int, float)):
+        return float(raw)
+    if not isinstance(raw, str):
+        return None
+    s = _WS_RE.sub("", raw.strip())
+    if not s:
+        return None
+    # Keep a leading sign + percent stripped.
+    s = s.rstrip("%")
+    has_dot, has_comma = "." in s, "," in s
+    if has_dot and has_comma:
+        # Rightmost separator is the decimal point; the other is thousands.
+        dec = "." if s.rfind(".") > s.rfind(",") else ","
+        other = "," if dec == "." else "."
+        s = s.replace(other, "")
+        s = s.replace(dec, ".")
+    elif has_comma:
+        if _COMMA_THOUSANDS_RE.match(s):
+            s = s.replace(",", "")  # thousands grouping
+        else:
+            s = s.replace(",", ".")  # decimal comma
+    # '.'-only or digits-only fall through unchanged (treated as decimal).
+    try:
+        return float(s)
+    except ValueError:
+        return None
+
+
 def canonical_display_name(name: str) -> str:
     """Standardize a model display name's version separator (model-agnostic).
 

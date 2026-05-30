@@ -29,6 +29,7 @@ Used as a CI-style gate by:
   - skill workflow before git commit (loud warning if dirty)
 """
 
+import functools
 import json
 import os
 import re
@@ -259,7 +260,9 @@ def main():
     # the agent.md "BENCH METRIC INTEGRITY" rule (gather-time prevention).
     from urllib.parse import urlparse as _urlparse
 
+    @functools.lru_cache(maxsize=8192)
     def _dom(u):
+        # 6.2 — memoized: source URLs recur across many cells; cache the parse.
         return _urlparse(u or "").netloc.lower().replace("www.", "")
 
     domain_publishes: dict[str, set] = {}
@@ -296,7 +299,16 @@ def main():
                 return fam
         return set()
 
-    src_mismatch = []
+    # 4.3 — the Elo family (distinct scales 0-3500 vs ~1000-1700) and the
+    # SWE-bench variant family (different difficulty) are the two confusables
+    # whose misfile most corrupts the composite. A cell in these families whose
+    # value is supported ONLY by sibling-publishers (NO source publishes the
+    # actual bench) is a genuine misfile → HARD FAILURE (merge-blocking). The
+    # other families, or a hard-family cell that ALSO has a valid publisher,
+    # stay advisory WARN.
+    hard_confusable = {"cfElo", "lmArenaElo", "webDevElo", "sweV", "swePro", "sweMulti"}
+    src_mismatch = []  # soft / advisory
+    src_misfile_hard = []  # merge-blocking
     for m in models:
         for bk, bv in (m.get("bench") or {}).items():
             if bv is None or bk not in canonical_bench:
@@ -304,14 +316,31 @@ def main():
             fam = _family(bk)
             if not fam:
                 continue
+            has_valid_publisher = False
+            sibling_hit = None
             for e in sources.get(f"{m['id']}.{bk}") or []:
                 pub = domain_publishes.get(_dom(e.get("url")))
-                if pub and (pub & fam) and bk not in pub:
-                    sib = sorted(pub & fam)
-                    src_mismatch.append(
-                        f"{m['id']}.{bk}<-{_dom(e.get('url'))}(has {sib})"
+                if not pub:
+                    continue
+                if bk in pub:
+                    has_valid_publisher = True
+                elif (pub & fam) and sibling_hit is None:
+                    sibling_hit = (
+                        f"{m['id']}.{bk}<-{_dom(e.get('url'))}(has {sorted(pub & fam)})"
                     )
-                    break
+            if sibling_hit is None:
+                continue
+            if bk in hard_confusable and not has_valid_publisher:
+                src_misfile_hard.append(sibling_hit)
+            else:
+                src_mismatch.append(sibling_hit)
+    if src_misfile_hard:
+        failures.append(
+            f"{len(src_misfile_hard)} Elo/SWE-variant bench cell(s) supported ONLY "
+            f"by a sibling-metric publisher (no source publishes the actual bench) "
+            f"— genuine misfile, MERGE-BLOCKING: {src_misfile_hard[:8]}"
+            f"{' ...' if len(src_misfile_hard) > 8 else ''}"
+        )
     if src_mismatch:
         warnings.append(
             f"{len(src_mismatch)} bench cell(s) sourced from a publisher of a "
@@ -529,8 +558,23 @@ def main():
         )
         failures.append(msg)
 
-    # === MX5 — quarantine flag for cells with <2 distinct source URLs (WARN) ===
+    # === MX5 — weak provenance: cells with <2 distinct source URLs ===
+    # 5.3: a single-source CORE-bench value flows into the composite at full
+    # weight. MX5 stays WARN for non-core (and core, by default), but ESCALATES
+    # to a merge-blocking FAILURE for core cells when
+    # benchVerificationStrict._coreSingleSourceHardBlock is true. The flag is
+    # held false while the snapshot still carries grandfathered single-source
+    # core cells (the next full refresh-all adds 2nd sources); the mechanism is
+    # always present + unit-testable.
+    _schema_blk = whitelist.get("_schema") or {}
+    core_keys = set(_schema_blk.get("coreBenchKeys") or [])
+    hard_block_core = bool(
+        (_schema_blk.get("benchVerificationStrict") or {}).get(
+            "_coreSingleSourceHardBlock"
+        )
+    )
     weak_provenance: list[str] = []
+    weak_core: list[str] = []
     for m in models:
         for k, v in (m.get("bench") or {}).items():
             if v is None:
@@ -542,14 +586,21 @@ def main():
             distinct_urls = {e.get("url") for e in entries if e.get("url")}
             if len(distinct_urls) < 2:
                 weak_provenance.append(key)
+                if k in core_keys:
+                    weak_core.append(key)
     if weak_provenance:
         msg = (
             f"MX5 — {len(weak_provenance)} filled bench cell(s) have <2 distinct "
-            f"source URLs (quarantine candidates): {weak_provenance[:5]}"
-            f"{' ...' if len(weak_provenance) > 5 else ''}"
+            f"source URLs ({len(weak_core)} core) (quarantine candidates): "
+            f"{weak_provenance[:5]}{' ...' if len(weak_provenance) > 5 else ''}"
         )
         warnings.append(msg)
-    # MX5 is WARN-only.
+    if hard_block_core and weak_core:
+        failures.append(
+            f"MX5-CORE — {len(weak_core)} CORE-bench cell(s) single-sourced (<2 "
+            f"distinct URLs) flow into the composite at full weight, MERGE-BLOCKING: "
+            f"{weak_core[:8]}{' ...' if len(weak_core) > 8 else ''}"
+        )
 
     # === MX6 — bench-specific strict verification per
     # _schema.benchVerificationStrict (WARN). For each bench in the map, fail

@@ -28,6 +28,7 @@ reads the queue into idea_context.anomalies for the next gather.
 
 from __future__ import annotations
 
+import functools
 import json
 import statistics
 from pathlib import Path
@@ -40,7 +41,10 @@ MIN_PEERS = 4  # need this many same-tier peers to call a peer-outlier
 ELO_FAMILY = {"cfElo", "lmArenaElo", "webDevElo"}
 
 
+@functools.lru_cache(maxsize=8192)
 def _dom(u) -> str:
+    # 6.2 — memoized: the same source URLs recur across hundreds of cells, so
+    # cache url→domain instead of re-parsing per entry.
     return urlparse(u or "").netloc.lower().replace("www.", "")
 
 
@@ -64,18 +68,24 @@ def main() -> int:
     for ad in ("lmarena.ai", "arena.ai", "lmsys.org", "chatbot-arena.com"):
         dom_pub.setdefault(ad, set()).update({"lmArenaElo", "webDevElo"})
 
-    # same-tier peer value pools per bench (for robust outlier detection)
-    pools: dict[tuple, list[float]] = {}
+    # same-tier peer value pools per bench (for robust outlier detection).
+    # 5.4: store (modelId, value) so the pool is filtered by IDENTITY, not value
+    # — excluding the current model by `x != v` also dropped genuine same-valued
+    # peers, collapsing a copy-paste cluster to mad=0 (never flagged).
+    pools: dict[tuple, list[tuple]] = {}
     for m in models:
         tier = m.get("tier")
         for k, v in (m.get("bench") or {}).items():
             if isinstance(v, (int, float)):
-                pools.setdefault((tier, k), []).append(float(v))
+                pools.setdefault((tier, k), []).append((m.get("id"), float(v)))
 
     def srcs(mid: str, k: str) -> list[dict]:
         return sources.get(f"{mid}.{k}") or []
 
     anomalies = []
+    anomaly_by_cell: dict[
+        tuple, dict
+    ] = {}  # (mid,bk) -> entry, to merge fresh-divergence
     for m in models:
         mid, tier = m.get("id"), m.get("tier")
         for k, v in (m.get("bench") or {}).items():
@@ -105,8 +115,16 @@ def main() -> int:
             if k in core and len([u for u in urls if u]) < MIN_SOURCES:
                 reasons.append(f"single-source (<{MIN_SOURCES} distinct urls)")
 
+            # variant-ambiguous (4.4) — a source entry the agent tagged because
+            # the scraped "SWE-bench" carried no Verified/Pro/Multilingual qualifier.
+            if any(e.get("_variantAmbiguous") for e in entries):
+                reasons.append(
+                    "variant-ambiguous (SWE-bench with no Verified/Pro/Multilingual qualifier)"
+                )
+
             # peer-outlier (robust, same tier)
-            pool = [x for x in pools.get((tier, k), []) if x != v] + [v]
+            peers = [val for (mid2, val) in pools.get((tier, k), []) if mid2 != mid]
+            pool = peers + [v]
             if len(pool) >= MIN_PEERS:
                 med = statistics.median(pool)
                 mad = statistics.median([abs(x - med) for x in pool]) or 0.0
@@ -116,15 +134,15 @@ def main() -> int:
                     )
 
             if reasons:
-                anomalies.append(
-                    {
-                        "modelId": mid,
-                        "benchKey": k,
-                        "value": v,
-                        "reasons": reasons,
-                        "sources": sorted(u for u in urls if u)[:5],
-                    }
-                )
+                entry = {
+                    "modelId": mid,
+                    "benchKey": k,
+                    "value": v,
+                    "reasons": reasons,
+                    "sources": sorted(u for u in urls if u)[:5],
+                }
+                anomalies.append(entry)
+                anomaly_by_cell[(mid, k)] = entry
 
     # fresh-divergence — ingest the synth traceability gate's advisory list
     # (grounded values that disagree with this cycle's fresh observations).
@@ -139,18 +157,26 @@ def main() -> int:
                 if "." not in cell:
                     continue
                 mid, k = cell.split(".", 1)
-                anomalies.append(
-                    {
+                reason = (
+                    f"fresh-divergence (stored {d.get('value')} vs this-cycle "
+                    f"obs {d.get('freshConsensus')}, Δ{d.get('deltaPp')}pp)"
+                )
+                # 5.5 — merge into the cell's existing anomaly instead of emitting a
+                # second entry for the same (modelId, benchKey) (was double-emit).
+                existing = anomaly_by_cell.get((mid, k))
+                if existing is not None:
+                    if reason not in existing["reasons"]:
+                        existing["reasons"].append(reason)
+                else:
+                    entry = {
                         "modelId": mid,
                         "benchKey": k,
                         "value": d.get("value"),
-                        "reasons": [
-                            f"fresh-divergence (stored {d.get('value')} vs this-cycle "
-                            f"obs {d.get('freshConsensus')}, Δ{d.get('deltaPp')}pp)"
-                        ],
+                        "reasons": [reason],
                         "sources": [],
                     }
-                )
+                    anomalies.append(entry)
+                    anomaly_by_cell[(mid, k)] = entry
         except (OSError, json.JSONDecodeError):
             pass
 
@@ -166,6 +192,8 @@ def main() -> int:
                 if "single-source" in r
                 else "fresh-divergence"
                 if "fresh-divergence" in r
+                else "variant-ambiguous"
+                if "variant-ambiguous" in r
                 else "peer-outlier"
             )
             by_class[tag] = by_class.get(tag, 0) + 1

@@ -8,6 +8,9 @@ Single source of truth for bench keys:
 Usage:
   python scripts/gen-bench-keys.py          # overwrite BENCH_KEYS if out of sync
   python scripts/gen-bench-keys.py --check  # exit 1 if core.js is out of sync (for pre-commit/CI)
+  python scripts/gen-bench-keys.py --check-regex-drift  # 4.1: exit 1 if the
+        # bench_score_labeled regex references a bench name no longer grounded in
+        # _schema.benchAliases (a rename/removal the regex didn't follow).
 
 The script is idempotent: re-running when already in sync writes nothing.
 Stdlib-only.
@@ -92,7 +95,127 @@ def _replace_bench_keys_block(text: str, new_block: str) -> str:
     return re.sub(pattern, new_block, text, flags=re.DOTALL)
 
 
+def _extract_bench_group(regex: str) -> str | None:
+    """Return the inner content of the `(?<bench>...)` named group via balanced
+    unescaped-paren counting."""
+    anchor = "(?<bench>"
+    start = regex.find(anchor)
+    if start < 0:
+        return None
+    i = start + len(anchor)
+    depth = 1
+    while i < len(regex) and depth > 0:
+        c = regex[i]
+        if c == "(" and regex[i - 1] != "\\":
+            depth += 1
+        elif c == ")" and regex[i - 1] != "\\":
+            depth -= 1
+        i += 1
+    return regex[start + len(anchor) : i - 1]
+
+
+def _split_top_alternation(s: str) -> list[str]:
+    """Split on top-level `|`, ignoring `|` inside (?:...) groups and [...] classes."""
+    out: list[str] = []
+    depth = 0
+    cur = ""
+    i = 0
+    while i < len(s):
+        c = s[i]
+        if c == "[":
+            j = s.find("]", i)
+            if j < 0:
+                j = len(s) - 1
+            cur += s[i : j + 1]
+            i = j + 1
+            continue
+        if c == "(":
+            depth += 1
+        elif c == ")":
+            depth -= 1
+        if c == "|" and depth == 0:
+            out.append(cur)
+            cur = ""
+            i += 1
+            continue
+        cur += c
+        i += 1
+    if cur:
+        out.append(cur)
+    return out
+
+
+def _flatten_alt(a: str) -> str:
+    """Reduce one regex alternative to a representative literal name."""
+    a = re.sub(r"\(\?:([^)|]*)(?:\|[^)]*)?\)\??", r"\1", a)  # (?:Pro|Verified) -> Pro
+    a = re.sub(r"\[[^\]]*\]\??", "", a)  # char classes (separators) -> ''
+    a = re.sub(r"\\s[*+?]?", "", a)  # \s, \s*, \s+ -> ''
+    a = re.sub(r"\\d\{[^}]*\}", "", a)  # \d{2,4} -> ''
+    a = a.replace("v?", "").replace("?", "")
+    a = re.sub(r"[\\(){}:*+]", "", a)
+    return a
+
+
+def _norm(s: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", s.lower())
+
+
+def check_regex_drift() -> int:
+    """4.1 — fail (exit 1) when a bench name hardcoded in bench_score_labeled is
+    no longer grounded in _schema.benchAliases (the SSOT alias map)."""
+    wl = json.loads(WHITELIST.read_text(encoding="utf-8"))
+    schema = wl.get("_schema", {})
+    pat = ((schema.get("regexLibrary") or {}).get("patterns") or {}).get(
+        "bench_score_labeled"
+    )
+    aliases = {
+        k: v
+        for k, v in (schema.get("benchAliases") or {}).items()
+        if not k.startswith("_")
+    }
+    if not pat or not aliases:
+        print(
+            "DRIFT-CHECK: bench_score_labeled or benchAliases missing", file=sys.stderr
+        )
+        return 1
+    grp = _extract_bench_group(pat.get("regex", ""))
+    if not grp:
+        print("DRIFT-CHECK: could not extract (?<bench>) group", file=sys.stderr)
+        return 1
+
+    grounded_names = {_norm(x) for k, v in aliases.items() for x in ([k] + list(v))}
+    grounded_names.discard("")
+    stale: list[str] = []
+    for alt in _split_top_alternation(grp):
+        sample = _norm(_flatten_alt(alt))
+        if not sample:
+            continue
+        if not any(sample == g or sample in g or g in sample for g in grounded_names):
+            stale.append(alt.strip())
+
+    if stale:
+        print(
+            "DRIFT: bench_score_labeled references name(s) not grounded in "
+            "_schema.benchAliases (rename/removal the regex did not follow):",
+            file=sys.stderr,
+        )
+        for s in stale:
+            print(f"  - {s}", file=sys.stderr)
+        print(
+            "Fix: update the regex alternation OR restore the alias in benchAliases.",
+            file=sys.stderr,
+        )
+        return 1
+    print(
+        f"OK: bench_score_labeled alternation grounded in benchAliases "
+        f"({len(_split_top_alternation(grp))} alternatives checked)"
+    )
+    return 0
+
+
 def main() -> int:
+    if "--check-regex-drift" in sys.argv:
+        return check_regex_drift()
     check_only = "--check" in sys.argv
 
     keys = load_keys_from_whitelist()

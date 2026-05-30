@@ -44,6 +44,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from lib.tiers import is_pseudo_source  # type: ignore  # noqa: E402
 from lib.whitelist import contracts  # type: ignore  # noqa: E402
 
 SYNTH_PATH = ROOT / ".aicodermap-agent-out-synth.json"
@@ -78,19 +79,45 @@ def _gather_observations() -> dict[tuple[str, str], list[float]]:
     return obs
 
 
+def _prior_fabricated_cells() -> set[str]:
+    """Cells the PRIOR cycle's report flagged as fabricated. Reading the report
+    BEFORE this run overwrites it gives last cycle's verdict — a value that was
+    fabricated once must not anchor this cycle's envelope (5.2 contamination)."""
+    flagged: set[str] = set()
+    if not REPORT_PATH.is_file():
+        return flagged
+    try:
+        rep = json.loads(REPORT_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return flagged
+    for key in ("fabricated", "fabricatedBeforeFallback"):
+        for f in rep.get(key) or []:
+            cell = f.get("cell") if isinstance(f, dict) else None
+            if cell:
+                flagged.add(cell)
+    return flagged
+
+
 def _historical_values() -> dict[tuple[str, str], list[float]]:
-    """Every prior provenance value, keyed by cell. Pseudo-sources included on
-    purpose: the envelope only needs to know what evidence has ever existed, so
-    counting them keeps the fabrication test conservative (fewer false alarms)."""
+    """Prior provenance values per cell, with the contamination sources EXCLUDED
+    (5.2): pseudo-source entries (snapshot-extraction / synth-backfill / auto-
+    resolution candidate) and any cell the prior cycle flagged as fabricated do
+    NOT widen the envelope — otherwise a once-fabricated value re-validates itself
+    forever (historical contamination bypass). This makes the gate stricter."""
     hist: dict[tuple[str, str], list[float]] = defaultdict(list)
     if not SOURCES_PATH.is_file():
         return hist
+    fabricated = _prior_fabricated_cells()
     data = json.load(open(SOURCES_PATH, encoding="utf-8"))
     for full_key, entries in data.items():
         if "." not in full_key or not isinstance(entries, list):
             continue
+        if full_key in fabricated:
+            continue  # cell was fabricated last cycle — its history is suspect
         mid, bk = full_key.split(".", 1)
         for e in entries:
+            if not isinstance(e, dict) or is_pseudo_source(e):
+                continue  # pseudo-source: never anchors the envelope
             v = _to_float(e.get("value"))
             if v is not None:
                 hist[(mid, bk)].append(v)

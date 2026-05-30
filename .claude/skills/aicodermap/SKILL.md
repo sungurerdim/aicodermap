@@ -37,6 +37,11 @@ Orchestrate AI coding LLM tracker updates: discover **official vendor lineup** �
 ## WORKFLOW
 ```
 PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
+   - **PRIMARY (2.6):** the deterministic `scripts/source-health-probe.py` in PRELIM-B
+     now performs this check across ALL categories in one urllib pass and refreshes
+     `_runtime.healthChecks`. The agent-based sample below is the FALLBACK used only
+     when that script cannot run. Format-drift auto-demote logic still applies to
+     whichever source produced the observedFormat.
    - Skill instructs agent to run quick HEAD/GET probes on a 3-URL sample of leaderboards[]
    - Agent reports for each probe: `runtime.healthChecks[<domain>]: { status: 'ok'|'unhealthy:<reason>', observedFormat: <format-key> }`
    - **Format consistency check:** if `entry.format` says `static_html_table` but `observedFormat` says `spa_full` (or vice versa), increment `entry.consecutiveFailures`. After 3 consecutive cycles of the same drift, auto-demote `entry.format` to the observed value (e.g., `static_*` → `spa_full`). This is self-healing format classification — the agent does not need a manual whitelist edit when a vendor migrates a leaderboard from server-rendered to SPA.
@@ -44,10 +49,25 @@ PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):
    - Persistent-unhealthy domains (≥3 cycles consecutive) get `_runtime.unhealthy: true` — agent skips them in this cycle's Phase 1 until next health-check passes
    - This step prevents wasted fetch budget on guaranteed-SPA/403 URLs AND keeps the whitelist's format classification accurate without human intervention
 
-PRELIM-B. LEADERBOARD_PREFETCH (FAZ 2.1, 2026-05-07 — orchestrator-side single-pass):
+PRELIM-B. SOURCE_HEALTH_PROBE + LEADERBOARD_PREFETCH (orchestrator-side single-pass):
    ```
+   python scripts/source-health-probe.py        # 2.6: probe ALL categories, refresh healthChecks
    python scripts/prefetch-leaderboards.py --max 12
    ```
+   - **2.6 SOURCE_HEALTH_PROBE (deterministic, supersedes the agent 3-URL sample):**
+     `source-health-probe.py` fetches EVERY whitelist category in ONE stdlib-urllib
+     pass — vendors (lineup + news), leaderboards, aggregators, local, registries,
+     complianceAggregators, community — classifies each URL's OBSERVED format, and
+     refreshes `_runtime.healthChecks[<domain>]` + `_runtime.lastFullCycle`. It
+     reports the four reachability problems in one place
+     (`data/_runtime-health-report.json`): `format-drift` (declared static but now
+     SPA/bot/dead), `redirect` (cross-host 30x → `redirectedTo`), `spa`, `bot-block`.
+     SSL-trust failures from the local cert bundle are tagged `ssl-env` and do NOT
+     count as a reachability failure (environment artifact, not a dead source).
+     Because it runs FIRST, the prefetch below already sees the refreshed
+     healthChecks and skips drifted/dead URLs. The agent-side probe in PRELIM
+     remains a fallback only if this script can't run (network/tooling outage).
+     Non-fatal: a probe failure logs + CONTINUEs.
    - **What:** stdlib `urllib` HTTP-GET pass over every healthy whitelist leaderboard/aggregator/community/registries URL whose format is NOT in the FAZ 1.4 banned-list. Writes snapshots to `data/.leaderboard-snapshots/<host>__<sha8>.{html,json}` and a manifest to `data/.leaderboard-snapshots/_index.json`.
    - **Why:** the prior cycle had 18 sub-agents each running their own Phase 1 sweep, fetching ~37 leaderboards × 18 batches = ~666 duplicated WebFetches per refresh-all. This pass collapses that into ONE prefetch (~15s wallclock for 73 URLs). Each batch agent then `Read`s the snapshot from disk instead of WebFetching — saves 1 tool-call + 5–30s per leaderboard per agent.
    - **TTL:** snapshots stay fresh for 24h. Re-runs within TTL no-op (`fresh: N to-fetch: 0`). Use `--force` to ignore TTL (rare; only when whitelist URLs change).
@@ -62,6 +82,16 @@ PRELIM-C. STALE_ARTIFACT_PRUNE (FAZ 7.A, 2026-05-10):
    - Renames prior-cycle artifacts to `<name>.stale-<epoch>` so dispatched agents cannot reuse them. Patterns: `.aicodermap-agent-out-batch*.gather.json`, `.aicodermap-agent-out-batch*-gather.json`, `.aicodermap-agent-out-synth.json`, `.aicodermap-agent-out.json`.
    - Defends against the cycle 2026-05-10 failure mode: gather/synth agents observed prior-cycle artifacts, deemed them complete, emitted EMITTED status without fresh fetches.
    - Orchestrator records `cycle_started_unix = time.time()` AFTER prune; this flows into `idea_context.cycleStartedUnix` and into gather validator's `--cycle-started-unix`.
+   - **6.4 — verificationMap file-age guard.** Before computing `priorityCells`/
+     `skipCells`, stat `.aicodermap-verification-map.json`. If its mtime predates
+     `cycle_started_unix - STALE_DAYS×86400` (i.e. the audit log is older than one
+     full refresh interval), its `confirmed` flags are no longer trustworthy — a
+     long-stale map would otherwise let PRELIM-E's fast-path skip a real refresh on
+     outdated "confirmed ≤7d" evidence. In that case DEGRADE every cell to Tier-1:
+     pass `skip_confirmed_within_days=0` to `priority_cells(...)` so NO cell is
+     skipped as confirmed, and force the full Stage A/B path (bypass the
+     LINEUP_ONLY_MINI_CYCLE_GATE) this cycle. Log `⚠ verification-map stale
+     (age >STALE_DAYS) — all cells re-verified T1`. Missing file → same treatment.
    - Non-fatal. Opt-out via `AICODERMAP_NO_PRUNE=1`.
 
 PRELIM-D. SNAPSHOT_ROW_EXTRACTION (FAZ 7.F, 2026-05-10):
@@ -71,6 +101,7 @@ PRELIM-D. SNAPSHOT_ROW_EXTRACTION (FAZ 7.F, 2026-05-10):
    - Walks every `data/.leaderboard-snapshots/*.html|json`, applies the schema's regex/JSON extractors with strict bench-value heuristics (% sign required, value ∈ [5..100]), emits `data/.leaderboard-snapshots/_rows.json` with shape `{ byModel: { <id>: [{benchKey, value, sourceUrl, tier, confidence: "regex-hint", snippet}] } }`.
    - Why: each gather agent previously re-read the same raw HTML snapshot when looking for its target models. Cycle 2026-05-10 measured ~16 agents × ~75 snapshots = ~1200 redundant Read+parse operations. Pre-extraction does the parse ONCE; agents read the slim `_rows.json` (10-30 KB total).
    - **Hint quality:** `confidence: "regex-hint"` — the agent verifies any used row by Reading its sourceUrl snapshot OR by an independent fetch. Multi-bench tables can produce duplicate values across keys (e.g., a single 80.2 attributed to both swePro+sweV); the agent's row-validator (FORMAT_DISPATCH) drops these unless an independent source confirms the bench-key assignment.
+   - **6.5 — `confidence: "confirmed"` fast-path:** a row from a page advertising EXACTLY ONE bench key, captured in strict mode (explicit `%` anchor), is emitted as `confirmed` (non-ambiguous: no cross-key duplication is possible). The agent MAY promote a `confirmed` row directly to `observations[]` and SKIP the re-verify fetch — it still counts as one I-tier source toward the ≥2 distinct-source requirement. `regex-hint` rows still require verification.
    - **Quality gate:** rows are NOT auto-promoted to observations[]. The agent must verify before emitting. `_rows.json` is a STARTING POINT, not a source of record.
    - Non-fatal. Opt-out via `AICODERMAP_NO_ROW_EXTRACT=1`.
 
@@ -97,7 +128,8 @@ PRELIM-F. ANOMALY_VERIFICATION_QUEUE (2026-05-27):
      mid-merge is future work; v1 = detect + queue + next-cycle research priority.)
 
 PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-only fast path:
-   - Computes `priorityCells = priority_cells(active, coreBenchKeys, limit=200, vmap, ttl=FRESHNESS_TTL_DAYS)`. If `priorityCells == []` AND every active model's `lastUpdated` is within `contracts.STALE_DAYS - 7` (default 7 days), the orchestrator switches the cycle to **lineup-sync only**: dispatches a single sonnet lineup agent (Step 0 only) and skips Stage A + Stage B + merge entirely. Output is whatever vendor-lineup deltas surface; data/{models,sources}.json values are unchanged.
+   - Computes `priorityCells = priority_cells(active, coreBenchKeys, limit=200, vmap, ttl=FRESHNESS_TTL_DAYS)`. If `priorityCells == []` AND every active model's `lastUpdated` is within `contracts.STALE_DAYS - 7` (default 7 days), the orchestrator switches the cycle to **lineup-sync only**: dispatches a single sonnet lineup agent (`scope=lineup-sync`, Step 0 only) and skips Stage A + Stage B + merge entirely. Output is whatever vendor-lineup deltas surface; data/{models,sources}.json values are unchanged.
+   - **Full Phase 0 still runs in this fast path** — `lineup-sync` is the COMPLETE Phase 0, not a bare lineup-URL fetch: the agent still runs the WebSearch new-release net (agent.md step 3b, per-vendor templated probes) and the Phase 0 sub-probes (unknown-vendor / unknown-leaderboard discovery). Only Stage A/B (per-cell bench/pricing fill) and merge are skipped. This is what guarantees a brand-new model (e.g. an Opus-family bump) is still caught on a fully-fresh-matrix cycle even though no cell needs re-research.
    - Why: when the matrix is fully covered AND fresh, there is nothing for gather agents to research that the verification map doesn't already mark `confirmed=true ≤7d`. The cycle's only value is detecting NEW/DEPRECATED/RENAMED models from vendor lineup pages.
    - **Quality preserved:** the gate is hit only when EVERY active model was fully refreshed within the freshness TTL window. If even one cell is starved, full Stage A/B runs. The freshness check uses the verification map's `confirmed` flag (≥3 distinct sources within VERIFICATION_AGREEMENT_PP); not just the date.
    - Opt-out: `AICODERMAP_FULL_REFRESH=1` env var forces the full Stage A/B regardless. `--force` flag on `/aicodermap refresh-all --force` does the same.
@@ -304,6 +336,11 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
        })
        for batch_spec in [b for b in plan.batches if b.waveIndex == wave_index]
      ])
+     // Stamp each artifact with the REAL file it was written to, so Stage B reads
+     // exactly these (and any retry replacement below) — never a reconstructed path.
+     for art, bspec in zip(wave_results,
+                           [b for b in plan.batches if b.waveIndex == wave_index]):
+       art._source_path = f".aicodermap-agent-out-{bspec.batchId}.gather.json"
      per_batch_artifacts.extend(wave_results)
      wave_state["completed"].append(wave_index)
      wave_state["pending"].remove(wave_index)
@@ -329,14 +366,21 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
            prompt: structured(... same params as original ...,
                               retry_of: r.batchId,
                               wallclock_deadline_unix: now() + BATCH_WALLCLOCK_SEC),
-           output_path: f".aicodermap-agent-out-{r.batchId}-retry.json"
+           // Retry writes a GATHER artifact (same .gather.json convention) so
+           // Stage B's synth_input_paths can consume it directly. CRITICAL fix
+           // 2026-05-29: previously '-retry.json' (non-gather) + path rebuilt
+           // from plan.batches → synth read the STALE 0-fill gather, never the
+           // retry's fills.
+           output_path: f".aicodermap-agent-out-{r.batchId}-retry.gather.json"
          })
          for r in zero_fill
        ])
        for orig, ret in zip(zero_fill, retry_results):
          ret._retry_attempted = true
+         ret._source_path = f".aicodermap-agent-out-{orig.batchId}-retry.gather.json"
          if ret.runtime.fills > 0:
-           // Replace zero-fill result with retry's productive output
+           // Replace zero-fill result with retry's productive output (carries its
+           // own _source_path, so Stage B reads the retry file, not the original).
            replace_in_list(per_batch_artifacts, orig, ret)
            log(f"  ✓ {orig.batchId} retry recovered {ret.runtime.fills} fills")
          else:
@@ -359,8 +403,45 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
    //
    // Synth does NOT fetch — it consumes pre-fetched observations. This
    // keeps the expensive sonnet pass focused on reasoning, not extraction.
-   gather_paths = [f".aicodermap-agent-out-{b.batchId}.gather.json"
-                   for b in plan.batches]
+   // Build from the REAL per_batch_artifacts paths (post-retry-replacement), NOT
+   // a reconstruction from plan.batches — that ignored retry swaps and fed synth
+   // stale 0-fill gathers (CRITICAL, fixed 2026-05-29).
+   gather_paths = [a._source_path for a in per_batch_artifacts if a._source_path]
+   // 3.6 — ZERO-OBS / WEAK-BATCH FILTER + per-batch coverage. Validate each
+   // gather before it enters synth: validate_gather flags `zero valid
+   // observations` (valid=False) and computes per-batch cardinality
+   // (`perModelObs`, `avgObs`, `isWeakBatch`, MIN_AVG_OBS_PER_MODEL floor).
+   // A zero-obs gather contributes NOTHING to synth but burns its context
+   // budget, so drop it from synth input (its cells already persist as
+   // gaps[]/priorityCells for the next cycle). coverageMatrix stays OUT of the
+   // gather schema (flat-schema discipline — it's a FULL_SCHEMA_BLEED_KEY); the
+   // per-batch coverage signal is derived here from perModelObs instead.
+   kept_paths, dropped = [], []
+   for a in per_batch_artifacts:
+     if not a._source_path:
+       continue
+     v = validate_gather_file(a._source_path, batch_model_ids_of(a),
+                              cycle_started_unix=idea_context.cycleStartedUnix)
+     if v["stats"].get("observations", 0) == 0:
+       dropped.append(a._source_path)        // zero-obs (already retried via FAZ 2.4)
+     else:
+       kept_paths.append(a._source_path)
+       if v["stats"].get("isWeakBatch"):
+         log("⚠ weak batch into synth: " + a._source_path +
+             " avgObs=" + str(v["stats"].get("avgObs")) +
+             " weakModels=" + str(len(v["stats"].get("weakModels", []))))
+   if dropped:
+     log("ℹ dropped " + str(len(dropped)) + " zero-obs gather(s) from synth input: " + str(dropped))
+   gather_paths = kept_paths
+   // 6.3 — SLIM the synth idea_context. Synth REASONS over the gather artifacts
+   // (synth_input_paths); it does NOT re-fetch, so it needs neither the full
+   // leaderboardSnapshots map (URL→path, only useful to a fetching gather agent)
+   // nor the full verificationMap (per-cell audit history). Dropping both saves
+   // ~25-40 KB of synth context every cycle. Keep only the reasoning essentials.
+   synth_ctx = { ...idea_context,
+     leaderboardSnapshots: undefined,        // synth reads gather files, not snapshots
+     verificationMap: { cells: {} },         // synth doesn't re-audit per-cell history
+   }
    synth_result = Agent({
      subagent_type: "aicodermap-research-agent",
      model: "sonnet",  // FAZ 4.C: synth uses sonnet for reasoning quality
@@ -368,7 +449,7 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
        scope, query,
        mode: "synth",
        synth_input_paths: gather_paths,
-       idea_context: idea_context,  // full context for cross-batch reasoning
+       idea_context: synth_ctx,  // slimmed — full snapshots/verificationMap dropped (6.3)
        wallclock_deadline_unix: now() + BATCH_WALLCLOCK_SEC,
        agent_budget_buffer: 80,  // synth has higher budget — many gather files to read
      ),
@@ -443,6 +524,24 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
          })
          # If still missing → proceed to FALLBACK A (transcript replay)
      ```
+   - **STALE-VIOLATION RECOVERY (3.2, 2026-05-29):** a file that EXISTS but whose
+     content predates this cycle is just as corrupting as a missing one — the
+     agent reused a prior-cycle artifact without re-running. After reading
+     `out_path`, validate it against the cycle anchor:
+     ```python
+     from scripts.lib.gather_validator import validate_gather_file
+     v = validate_gather_file(out_path, batch_model_ids,
+                              cycle_started_unix=idea_context.cycleStartedUnix)
+     if v["stats"].get("stale") or v["stats"].get("missingStartedAt"):
+         # runtime.startedAt < cycleStartedUnix - grace, OR startedAt absent →
+         # treat EXACTLY like a write-skip: re-dispatch (same recovery as above),
+         # never feed the stale content into synth.
+         record_write_skip(batch_id, cycle_date)   # same telemetry channel
+         <re-dispatch the batch fresh, then re-validate once>
+     ```
+     This is the content-based twin of the mtime stale guard in PRELIM (prune +
+     `--cycle-started-unix`): mtime can be refreshed by a touch/partial write, but
+     `runtime.startedAt` is the agent's own claim of when it began.
    - **FALLBACK A:** if file missing/unparseable AFTER recovery dispatch,
      run `python scripts/extract-agent-output.py <subagent-jsonl-path> <out-path>` against the agent's transcript at `~/.claude/projects/<projid>/<sessionid>/subagents/agent-<agentId>.jsonl`
    - **FALLBACK B:** if persisted tool-result file exists at `<projid>/<sessionid>/tool-results/toolu_*.json`, run `extract-agent-output.py <persisted-json> <out-path>`
@@ -458,17 +557,43 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
     completeness_ratio = cells_attempted / batch_expected if cells_attempted else null
 
     if completeness_ratio != null and completeness_ratio < 0.30:
-        if wallclock < 480s and completeness_ratio > 0:
-            // Agent stopped too early — SendMessage to SAME agent to continue
+        if wallclock < 480s and completeness_ratio > 0 and not artifact._partial_continued:
+            // Agent stopped too early but has wallclock left — SendMessage to
+            // SAME agent (cheapest: keeps its warmed context) to continue.
+            artifact._partial_continued = true
             SendMessage(agent_id, "Continue from where you stopped. You attempted " +
               cells_attempted + "/" + batch_expected + " cells (" + round(completeness_ratio*100) +
               "%). Process the remaining cells before emitting final JSON.")
-            // Wait for second return; if still < 0.30 → log CHANGELOG warn, CONTINUE (no halt)
-        else:
-            // Wallclock exceeded or zero cells attempted → log warn, CONTINUE
-            log("⚠ sub-agent batch " + bucket + " completeness " + completeness_ratio + " < 0.30 threshold")
+            // Wait for second return, then re-evaluate completeness_ratio below.
+        if completeness_ratio < 0.30 and not artifact._partial_retry_attempted:
+            // STILL < 30% (SendMessage didn't help, OR wallclock exceeded, OR
+            // zero cells attempted). Do NOT silently accept — dispatch ONE
+            // FRESH-CONTEXT sonnet retry, identical policy to the FAZ 2.4 0-fill
+            // retry (a fresh context often clears the wedged-state that made the
+            // first agent stall). Reuse the same batch params + gather output_path
+            // so the retry REPLACES this artifact in per_batch_artifacts.
+            artifact._partial_retry_attempted = true
+            log("⚠ batch " + bucket + " completeness " + completeness_ratio +
+                " < 0.30 — dispatching fresh-context sonnet retry")
+            retry = Agent({
+                subagent_type: "aicodermap-research-agent", model: "sonnet",
+                prompt: structured(... same params as original batch ...,
+                                   retry_of: batch_id, reason: "partial<0.30",
+                                   wallclock_deadline_unix: now() + BATCH_WALLCLOCK_SEC),
+                output_path: f".aicodermap-agent-out-{batch_id}-partialretry.gather.json"
+            })
+            retry._source_path = f".aicodermap-agent-out-{batch_id}-partialretry.gather.json"
+            retry._partial_retry_attempted = true
+            if (retry.runtime.cellsAttempted or 0) / batch_expected >= completeness_ratio:
+                replace_in_list(per_batch_artifacts, artifact, retry)   // keep the better return
+                log("  ✓ " + batch_id + " partial-retry improved coverage")
+            else:
+                changelog_warns.append("⚠ " + batch_id + ": partial<0.30 ×2 — next cycle picks up via gaps[]/priorityCells")
+        // After at most one SendMessage + one fresh retry, accept whatever we have
+        // and CONTINUE — never halt; unfilled cells persist as gaps[]/priorityCells.
     ```
-    This ensures agents cannot cheaply exit after surveying only 8/882 cells.
+    This ensures agents cannot cheaply exit after surveying only 8/882 cells —
+    a <30% return is escalated (continue → fresh sonnet retry), never silently merged.
 
 5a. MATRIX_SNAPSHOT (P7 reform):
     Before consuming the artifact, snapshot the pre-merge state of
@@ -565,6 +690,7 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
    - Extracted values get S-tier provenance pointing to the page URL. Merged into pending updates before Step 10.
    - Image OCR is opt-out per vendor: omit `imageOCRPatterns` (or set to `[]`) in the vendor's whitelist entry — no flag needed.
    - **Adding a new image-embedded vendor** = appending `imageOCRPatterns: ["<regex>"]` to that vendor's whitelist entry; no SKILL.md or agent.md change required.
+   - **DECISION (2.7, 2026-05-29) — image-OCR stays a need-gated dispatch, NOT a blanket PRELIM step.** Per agent.md IMAGE_OCR_FALLBACK's empirical finding (2026-04-26): the coreBenchKeys universe (SWE-bench Verified, GPQA, HLE, Terminal-Bench, LCB, tau-bench, MCP-Atlas) lives in vendor-page TEXT lead summaries or on independent leaderboards — NOT in the announcement PNG charts, which carry mostly AUXILIARY benches. So `image_embedded`'s `static_html_article → websearch_snippet` fallback is sufficient for our scored benches, and OCR is reserved for the residual case (this step, gated on `model_null_bench_count ≥ 3`). Promoting OCR to an unconditional PRELIM pass would burn vision-Read budget on auxiliary-bench charts we do not score. Re-evaluate only if a future vendor ships core benches image-only.
 
 7.5. DYNAMIC_WHITELIST_DISCOVERY (self-healing whitelist mutation, post-fact persistence):
    - Reform 2026-04-28 rev3: the agent already FETCHED any non-whitelisted HTTPS source that surfaced during Phase 3 step 4 (in-cycle promotion — see agent.md TRUSTED_SOURCE_WHITELIST rule 6). Values from those fetches are already in `artifact.models[*].sourcesAdded[]` with tier=C and were merged into data/models.json + data/sources.json by step 10. This step's job is no longer to gate when the source is USED — it is to harden the source into the whitelist file so subsequent cycles can fetch it without rediscovery.
@@ -606,9 +732,28 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
      `confirm | reclassify | clear` verdicts (a simply-wrong VALUE is NOT
      verdicted; it is re-recorded as a normal observation so merge recomputes
      trustScore).
-   - Orchestrator applies the mechanical verdicts and re-audits:
+   - Orchestrator GATES, applies the mechanical verdicts, then re-audits with
+     rollback (3.5 traceability gate, 2026-05-29):
      ```
-     python scripts/apply-anomaly-verdicts.py     # confirm/reclassify/clear
+     # GATE FIRST — reject any reclassify/confirm whose value is wrong-scale for
+     # its target bench (band) or contradicts every shred of evidence for that
+     # cell (envelope). --filter drops the bad verdicts so apply only runs safe
+     # ones; the dropped ones are quarantined in data/_anomaly-verdict-traceability.json.
+     python scripts/validate-anomaly-verdicts.py --filter
+     # Snapshot for rollback (apply writes its own .bak, but capture pre-apply too)
+     cp data/models.json data/models.json.preanomaly ; cp data/sources.json data/sources.json.preanomaly
+     python scripts/apply-anomaly-verdicts.py     # confirm/reclassify/clear (filtered)
+     # POST-APPLY AUDIT — if the coherence audit now FAILS (a verdict the gate's
+     # band/envelope check could not foresee still broke an AC/MX invariant),
+     # ROLL BACK to the pre-apply snapshot and log loudly; never ship a verdict
+     # that breaks coherence.
+     if ! python scripts/audit-data-coherence.py ; then
+         mv data/models.json.preanomaly data/models.json
+         mv data/sources.json.preanomaly data/sources.json
+         echo "⚠ anomaly verdicts rolled back — post-apply audit failed" >> CHANGELOG.md
+     else
+         rm -f data/models.json.preanomaly data/sources.json.preanomaly
+     fi
      python scripts/refresh-finalize.py --skip-gen-unified --skip-gap-gen   # re-merge + SSOT audit
      ```
    - `single-source` anomalies are NOT auto-dispatched (too many; they are a
@@ -629,6 +774,12 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
     - data/sources.json keys reference only known model IDs and canonical bench keys
     - tier values ∈ {frontier, open-flagship, coder-specialized, gemma, ollama-local}
     - status values ∈ {active, deprecated, archived}
+    - **benchAliases ⇄ extraction-regex (4.1):** also run
+      `python scripts/gen-bench-keys.py --check-regex-drift` in this step — it
+      exits 1 when `_schema.regexLibrary.patterns.bench_score_labeled` references
+      a bench name no longer grounded in `_schema.benchAliases` (a rename/removal
+      the regex didn't follow, e.g. the retired `Aider` token caught 2026-05-29).
+      Treat a non-zero exit as a coherence HARD BLOCK like the rows above.
     **HARD BLOCK** — drift is a single explicit exception to the UNCAPPED "never block"
     doctrine. On audit failure, merge.py rolls data/{models,sources}.json back to their
     .bak snapshots and exits non-zero. No CHANGELOG entry is written, the artifact is
@@ -718,21 +869,26 @@ Termination — all four MUST hold before agent emits final JSON:
 1. Every `leaderboards[]` entry visited (200+extract OR unreachable+fallback
    exhausted OR `_runtime.unhealthy` auto-skip).
 2. Every vendor with perModelUrl/modelCardUrl/postUrl attempted per model.
-3. Every priorityCells[] entry attempted (FAZ 2.3 authoritative work list).
+3. Every cell in `target_model_ids × coreBenchKeys` attempted — the WHOLE slice,
+   not just priorityCells. Under FAZ 4.A priorityCells is ORDERING-only (resolve
+   first), NOT the scope; `require_full_matrix:true` makes the full slice the
+   termination target. (Superseded the FAZ 2.3 "authoritative work list" reading,
+   which let agents stop after ~11 priority cells/batch — see PRELIM ctx note.)
 4. Every still-empty cell carries a gaps[] entry; advisory GAP_VALIDITY_GATE
-   surfaces low-effort suspicions but never strips entries.
+   surfaces low-effort suspicions but REPAIRS rather than strips entries (3.3).
 
 ## SILENT_FAIL_PREVENTION (loud failures + auto-recovery, halts only at git push conflict)
 
 | Step | Success criterion | On failure (auto-recovery, never user prompt unless noted) |
 |------|-------------------|------------------------------------------------------------|
-| 0 Lineup discovery | `lineup` populated AND ≥10 vendor pages successfully parsed (or all reachable vendors attempted) | If `lineup` empty/missing AND not first run → dispatch ONE retry agent restricted to Step 0. On second-cycle empty: log `gaps[]` entry `lineup:incomplete` and CONTINUE. Unreachable vendors → log `lineup:<vendor>: unreachable`, never block on stale lineup. |
+| 0 Lineup discovery | **Per-vendor:** EVERY `sourcesWhitelist.vendors` id appears as a key in `lineup` AND has a non-empty `active[]` OR a loud `gaps[]` `lineup:<vendor>: empty`. (Global "≥10 parsed" is NOT sufficient — a globally-non-empty lineup that silently drops a broken vendor is a failure.) | Compute the set of vendors with empty/missing `active[]` (NOT global-empty). For EACH such vendor → dispatch ONE retry agent restricted to Step 0 scoped to that vendor (forces the agent.md step-1 per-vendor WebSearch fallback). Still empty after retry → log `gaps[]` `lineup:<vendor>: empty` and CONTINUE. Unreachable vendors → also `lineup:<vendor>: unreachable`. Never block on stale lineup; never drop a vendor silently. |
 | 0b Source health check | `runtime.healthChecks` covers ≥3 leaderboard domains with status entries | If <3 domains → dispatch retry agent restricted to PRELIM SOURCE_HEALTH_CHECK. On second-cycle <3: log `gaps[]` entry `health-check:incomplete` and CONTINUE. |
 | 0c Leaderboard prefetch | `data/.leaderboard-snapshots/_index.json` exists AND `_meta.totalSucceeded ≥ 0.5×totalAttempted` | FAZ 2.1 (2026-05-07): non-fatal. Each agent independently falls back to WebFetch for any URL absent from `idea_context.leaderboardSnapshots`. Prefetch is a wallclock optimization, not a correctness gate. If `prefetch-leaderboards.py` exits non-zero → log warning + CONTINUE without `leaderboardSnapshots` map. |
 | 4 Agent survey | `.aicodermap-agent-out-<batchId>.json` exists and parses; `models[]+newModels[]` ≥ FAMILY_BASELINE_MIN OR explicit gaps[] | (1) agent-written file primary; (2) FALLBACK A: `extract-agent-output.py` against subagent jsonl; (3) FALLBACK B: persisted tool-result extraction; (4) on all-3 failure: log to `~/.aicodermap-debug.log` + CONTINUE merge with available data. Family-count shortfall logged to gaps[], never halts. |
 | 4w Wallclock cap | Every batch returns within BATCH_WALLCLOCK_SEC (600s) | FAZ 1.3 (2026-05-07): orchestrator wraps each Agent call with `subprocess.run(timeout=BATCH_WALLCLOCK_SEC)`. On timeout: SIGKILL the agent, attempt Read of partial-written `.aicodermap-agent-out-<batchId>.json`. If file exists with valid JSON head → use it, set `partialReason:{code:'timeout', wallclockSec:BATCH_WALLCLOCK_SEC}`. If file missing/corrupt → emit empty stub `{batchId, models:[], gaps:[], partialReason:{code:'timeout-no-write'}}` and CONTINUE to next wave. Never block on a single batch's timeout. |
 | 4d Wave dispatch completeness | All `plan["waves"]` indices present in `wave_state.completed` | FAZ 1.1 (2026-05-07): hard guard at end of Step 4 wave loop. If incomplete → `halt_workflow()` BEFORE Step 5. gap-gen would mask missing waves as auto-gaps; that pattern slipped the 2026-05-06 partial commit through. SOLE non-push halt path. |
 | 4s Synth traceability gate | Every non-null `updates.bench[k]` in `.aicodermap-agent-out-synth.json` lies within its cell's evidence envelope (fresh gather obs ∪ historical sources.json) | 2026-05-28: `validate-synth-traceability.py --auto-fallback` runs after Stage B, before gen_unified. On FABRICATION (value outside envelope / zero evidence — the Stage-B sonnet synth hallucinated 68 such values in the 2026-05-28 cycle) → auto-regenerate the artifact via deterministic `local-synth.py` (cannot hallucinate) + re-validate. If fallback also dirty → loud CHANGELOG warn + CONTINUE (merge.py MX/anomaly audits backstop). `divergences[]` (grounded but disagree with fresh obs > CONTRADICTION_WARN_PP) are advisory → feed Step 7.7 anomaly→research loop, never block. |
+| 7.7a Anomaly verdict gate | Every `reclassify`/`confirm` verdict in `.aicodermap-anomaly-verdicts.json` is traceable: moved value within the TARGET bench's hard band (scale guard) AND its evidence envelope (fresh ∪ historical) | 2026-05-29: `validate-anomaly-verdicts.py --filter` runs BEFORE `apply-anomaly-verdicts.py`. A reclassify into a wrong-scale bench (e.g. cfElo 3052 → sweV's 0-100) or a confirm contradicting all evidence is dropped (quarantined in `data/_anomaly-verdict-traceability.json`); apply runs only the safe verdicts. Post-apply `audit-data-coherence.py` failure → ROLL BACK to the pre-apply snapshot + loud CHANGELOG warn. Never ship a verdict that breaks coherence. |
 | 6 Coverage log | `validationCoverage` is a number 0..1 in artifact | Below COVERAGE_TARGET (0.85): set artifact.partialCoverage=true, append "⚠ cumulative provenance coverage" line to CHANGELOG, CONTINUE. Below COVERAGE_HARD_BLOCK (0.50): louder warning, still CONTINUE. No deep-fetch loop (retired 2026-04-28) — agent already walks every cell every cycle. |
 | 7 Contradiction auto-resolve | Every contradiction has autoResolveWinner | TrustScore ties within 0.05 with no I-tier present: prefer most-recent value, then most-verified, then alphabetical-by-source as deterministic tiebreaker — never user prompt |
 | 10 Atomic write | `data/{models,sources}.json` parse-valid + self-check passes | On parse failure: restore from `.bak` + log root cause + retry the merge once with relaxed self-check. On second failure: write the artifact's known-good fields only, mark unhealable fields in gaps[]. CONTINUE — never leave repo in restored-only state |
@@ -790,6 +946,11 @@ Exceptional single-source override — Phase R4
   override_mode = "exceptional-source-override"
 
 Tiebreak (when trustScores within 0.05): prefer I-tier, then most recent, then highest verifications.
+
+Variant-ambiguity penalty (4.4): an observation tagged `_variantAmbiguous` (a bare
+"SWE-bench" with no Verified/Pro/Multilingual qualifier) → trustScore = max(0,
+trustScore − 0.5). merge.py enforces this at ingestion and records the cell in
+`runtime.variantAmbiguous[]`; detect-anomalies.py surfaces it as an anomaly.
 ```
 
 **Application:**

@@ -107,26 +107,31 @@ def _load_gather_artifacts(root: Path) -> list[tuple[str, dict[str, Any]]]:
     return out
 
 
-def _load_unhealthy_urls(root: Path) -> set[str]:
+def _load_unhealthy_urls(root: Path, wl: dict[str, Any] | None = None) -> set[str]:
     """FAZ 6.A (2026-05-10): observations citing URLs marked unhealthy in
     data/sources-whitelist.json._runtime.unhealthy MUST be dropped before
     trustScore math runs. The cycle 2026-05-09 fabricated 26 tb2 values
     from https://tbench.ai/leaderboard (a SPA shell with empty snapshot)
     and the I-tier override promoted them over multi-source consensus.
+
+    6.6: pass an already-parsed `wl` to avoid a redundant whitelist read.
     """
-    wl_path = root / "data" / "sources-whitelist.json"
-    try:
-        wl = json.loads(wl_path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return set()
-    runtime = wl.get("_runtime") or {}
+    if wl is None:
+        wl_path = root / "data" / "sources-whitelist.json"
+        try:
+            wl = json.loads(wl_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return set()
+    runtime = (wl or {}).get("_runtime") or {}
     unhealthy = runtime.get("unhealthy") or {}
     return {
         (u or "").strip().rstrip("/").lower() for u, flag in unhealthy.items() if flag
     }
 
 
-def _load_low_confidence_urls(root: Path) -> tuple[set[str], float]:
+def _load_low_confidence_urls(
+    root: Path, wl: dict[str, Any] | None = None
+) -> tuple[set[str], float]:
     """FAZ 6.C (2026-05-10): root-listing URLs (whole-leaderboard pages) are
     prone to cross-row misattribution. Specific bench-path URLs are reliable;
     bare root URLs that list every (model, bench) combination are not.
@@ -134,13 +139,15 @@ def _load_low_confidence_urls(root: Path) -> tuple[set[str], float]:
     root-cited entry can't out-weigh multi-source bench-path consensus.
 
     Returns: (url_set, multiplier). When url_set is empty, no penalty applies.
+    6.6: pass an already-parsed `wl` to avoid a redundant whitelist read.
     """
-    wl_path = root / "data" / "sources-whitelist.json"
-    try:
-        wl = json.loads(wl_path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return set(), 1.0
-    runtime = wl.get("_runtime") or {}
+    if wl is None:
+        wl_path = root / "data" / "sources-whitelist.json"
+        try:
+            wl = json.loads(wl_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return set(), 1.0
+    runtime = (wl or {}).get("_runtime") or {}
     block = runtime.get("lowConfidenceUrls") or {}
     multiplier = float(block.get("trustPenaltyMultiplier") or 0.5)
     urls = block.get("urls") or {}

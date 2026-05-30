@@ -224,7 +224,12 @@ def apply_quarantine_and_gap_policy(
                 cell_entry["gapHistory"] = []
                 cell_entry["gapSince"] = None
 
-            # Confidence from current-cycle observations in sources.json.
+            # Confidence from the CUMULATIVE provenance pool — every entry in
+            # sources.json for this cell, historical ∪ this-cycle (5.5: the pool
+            # must include historical observations, not just the fresh ones, so
+            # a long-confirmed cell keeps its high confidence even on a cycle that
+            # re-cites only one source). sources.json is append/dedupe, so this
+            # get() already spans all cycles.
             obs = sources.get(cell_key) or []
             if isinstance(obs, list) and obs:
                 pw_obs = [
@@ -525,53 +530,82 @@ def _extract_bench_key(g):
     return g.get("field") or ""
 
 
+# Stub tokens for repaired gap provenance (3.3 reform). Distinct, greppable
+# strings so a human auditor can find every machine-repaired gap.
+GAP_REPAIR_STUB_SOURCE = "repaired:no-triedSources-emitted-by-agent"
+GAP_REPAIR_STUB_QUERY = "repaired:no-triedQuery-emitted-by-agent"
+GAP_REPAIR_STUB_FORMAT = "repaired:no-triedFormat-emitted-by-agent"
+
+
 def validate_gaps(out):
-    """GAP_VALIDITY_GATE — strip + audit (P5 reform).
+    """GAP_VALIDITY_GATE — repair + audit (3.3 reform, 2026-05-29).
 
-    Hard rule (MX3): every `gaps[]` entry MUST carry triedSources[] >= 1.
-    Empty triedSources is a contract violation; the entry is stripped and
-    recorded in `runtime.strippedGaps[]`. The corresponding cell then
-    surfaces as a silent omission via MX1 (matrix invariant), rolling the
-    merge back. MX1 has no warn-only override.
+    Hard rule (MX3): every `gaps[]` entry MUST carry triedSources[] >= 1
+    (and ideally triedQueries[] >= 2, triedFormats[] >= 1).
 
-    Soft rule (audit suspicion): triedQueries[] < 2 OR triedFormats[] < 1
-    flags `runtime.fabricatedSuspicions[]` for human review but the entry
-    stays in gaps[].
+    A malformed gap (missing provenance arrays) is now **REPAIRED in place** —
+    its missing arrays stubbed so the cell stays a valid GAP — rather than
+    STRIPPED. Stripping turned the cell into a silent omission, which MX1
+    (matrix invariant, no warn-only override) then used to roll the ENTIRE
+    merge back: one lazy/broken gap entry nuked a whole cycle's productive
+    work. Repair preserves the cycle; every repaired entry is loudly recorded
+    in `runtime.repairedGaps[]` AND flagged in `runtime.fabricatedSuspicions[]`
+    for human review (the stub tokens are greppable).
+
+    Soft rule (audit suspicion): triedQueries[] < 2 OR triedFormats[] < 1 OR
+    triedSources[] below the advertised floor flags `fabricatedSuspicions[]`
+    but the entry stays in gaps[].
 
     Returns the suspicion list (audit) for the orchestrator's diff summary.
     """
     bench_advertised = _build_bench_advertised_count()
     raw = out.get("gaps", []) or []
     kept = []
-    stripped = []
+    repaired = []
     suspicions = []
     for g in raw:
-        ts = g.get("triedSources") or []
-        tq = g.get("triedQueries") or []
-        tf = g.get("triedFormats") or []
-        ts_n, tq_n, tf_n = len(ts), len(tq), len(tf)
+        ts = list(g.get("triedSources") or [])
+        tq = list(g.get("triedQueries") or [])
+        tf = list(g.get("triedFormats") or [])
 
         bench_key = _extract_bench_key(g)
 
-        # MX3 — empty triedSources strips the gap.
-        if ts_n < 1:
-            stripped.append(
+        # MX3 REPAIR — stub missing provenance arrays instead of stripping the
+        # gap (which would cascade to an MX1 full-merge rollback).
+        repaired_fields = []
+        if len(ts) < 1:
+            ts = [GAP_REPAIR_STUB_SOURCE]
+            repaired_fields.append("triedSources")
+        if len(tq) < 2:
+            while len(tq) < 2:
+                tq.append(GAP_REPAIR_STUB_QUERY)
+            repaired_fields.append("triedQueries")
+        if len(tf) < 1:
+            tf = [GAP_REPAIR_STUB_FORMAT]
+            repaired_fields.append("triedFormats")
+
+        if repaired_fields:
+            g["triedSources"] = ts
+            g["triedQueries"] = tq
+            g["triedFormats"] = tf
+            g["_repaired"] = repaired_fields
+            repaired.append(
                 {
                     "modelId": g.get("modelId"),
                     "field": g.get("field"),
                     "bench_key": bench_key,
                     "reason": g.get("reason"),
-                    "stripReason": "triedSources empty",
+                    "repairedFields": repaired_fields,
                 }
             )
-            continue
 
+        ts_n, tq_n, tf_n = len(ts), len(tq), len(tf)
         kept.append(g)
 
-        # Soft suspicion: low query/format effort.
+        # Soft suspicion: low query/format effort, OR any machine repair.
         n_advertised = bench_advertised.get(bench_key, 0)
         suggested_floor = min(max(n_advertised, 3), 5)
-        if tq_n < 2 or tf_n < 1 or ts_n < suggested_floor:
+        if repaired_fields or tq_n < 2 or tf_n < 1 or ts_n < suggested_floor:
             suspicions.append(
                 {
                     "modelId": g.get("modelId"),
@@ -585,13 +619,14 @@ def validate_gaps(out):
                     },
                     "n_advertised": n_advertised,
                     "suggested_floor": suggested_floor,
+                    "repairedFields": repaired_fields,
                 }
             )
 
     out["gaps"] = kept
     runtime = out.setdefault("runtime", {})
-    if stripped:
-        runtime.setdefault("strippedGaps", []).extend(stripped)
+    if repaired:
+        runtime.setdefault("repairedGaps", []).extend(repaired)
     if suspicions:
         runtime.setdefault("fabricatedSuspicions", []).extend(suspicions)
     return suspicions
@@ -716,19 +751,29 @@ def main():
             warn = format_consistency_warn(s, wl_idx)
             if warn:
                 log["format_warnings"].append(f"{mid}: {warn}")
-            if append_source(
-                sources,
-                s["key"],
-                {
-                    "value": s.get("value"),
-                    "source": s.get("source"),
-                    "url": s.get("url"),
-                    "date": s.get("fetched") or TODAY,
-                    "tier": s.get("tier"),
-                    "verifications": s.get("verifications", 1),
-                    "trustScore": s.get("trustScore"),
-                },
-            ):
+            # 4.4 — SWE-variant ambiguity penalty. An observation the agent tagged
+            # `_variantAmbiguous` (a bare "SWE-bench" with no Verified/Pro/Multi
+            # qualifier) gets −0.5 trustScore (clamped ≥0) so a properly-qualified
+            # value out-ranks it, and the cell is recorded anomaly-visible.
+            _ts = s.get("trustScore")
+            _ambiguous = bool(s.get("_variantAmbiguous"))
+            if _ambiguous and isinstance(_ts, (int, float)):
+                _ts = max(0.0, float(_ts) - 0.5)
+            _entry = {
+                "value": s.get("value"),
+                "source": s.get("source"),
+                "url": s.get("url"),
+                "date": s.get("fetched") or TODAY,
+                "tier": s.get("tier"),
+                "verifications": s.get("verifications", 1),
+                "trustScore": _ts,
+            }
+            if _ambiguous:
+                _entry["_variantAmbiguous"] = True
+                out.setdefault("runtime", {}).setdefault("variantAmbiguous", []).append(
+                    s["key"]
+                )
+            if append_source(sources, s["key"], _entry):
                 log["sources_appended"] += 1
 
     for nm in out.get("newModels", []) or []:

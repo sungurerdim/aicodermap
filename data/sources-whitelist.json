@@ -95,6 +95,24 @@
     ],
     "_benchKeyNotes": "cfElo stores RAW Codeforces ELO (range 0-3500); webDevElo stores RAW LMArena WebDev Arena Elo (range 950-1300 typical, allowed up to 1500); every other bench key stores 0-100 percentage. compositeScore() in assets/js/data.js normalizes cfElo and webDevElo via core.js normalizeBenchScore() (linear map to 0-100) before weighting. audit-data-coherence.py allows cfElo cells in [0, 3500] and webDevElo cells in [0, 1500].",
     "benchKeysUsage": "Universe of bench keys = coreBenchKeys ∪ leaderboards[].publishes[]. New leaderboards extending publishes[] auto-extend the universe. Frontend BENCH_KEYS in assets/js/core.js mirrors coreBenchKeys; if you add a new core key here, add it to assets/js/core.js too. NOTE 2026-04-29: dropped `aider` (Aider Polyglot leaderboard frozen 2025-08; no Opus 4.7 / Gemini 3.1 Pro / GPT-5.5 entries). Renamed `lcbV6` → `lcb` (rolling LiveCodeBench leaderboard supersedes pinned v6). Added: `tbHard`, `cfElo`, `mmluPro`, `simpleQa`, `mrcr`, `arcAgi2`, `browseComp` — all with strong 2026 vendor adoption.",
+    "newReleaseProbe": {
+      "purpose": "WebSearch-based new-release net for Phase 0. Catches a vendor's new model even when its lineup docs page is broken (404/SPA/redirect). Model-agnostic: the agent expands each template per vendor at runtime, NEVER hardcodes a model name.",
+      "appliesToScopes": [
+        "full",
+        "lineup-sync",
+        "new-release"
+      ],
+      "familyHintSource": "Derive {familyHint} from the vendor's existing model family in idea_context.currentIds — strip the trailing version token from the most-recent id for that vendor (e.g. currentIds 'claude-opus-4-7' → familyHint 'Claude Opus 4'; 'gpt-5-4' → 'GPT-5'; 'qwen3-6' → 'Qwen3'). If the vendor has no currentIds entry, use {vendorName} alone. Do NOT invent a specific next-version number.",
+      "yearWindow": "Use the agent's current calendar year and the prior year as {year} (two probes per template when crossing a year boundary).",
+      "queryTemplates": [
+        "{vendorName} {familyHint} new model release {year}",
+        "{vendorName} latest model announcement {year}",
+        "{familyHint} successor release notes {year}"
+      ],
+      "emit": "For every model name surfaced by these searches whose canonical id is NOT in idea_context.currentIds, append to lineupChanges.new[] = { suggestedId, vendor, evidenceUrl, observedVersion, source:'newReleaseProbe' }. A surfaced id already in currentIds is ignored (no-op). Unverifiable single-snippet hits emit gaps[] 'newrelease:<vendor>: unconfirmed' instead of lineupChanges.new.",
+      "dedupeAgainst": "idea_context.currentIds",
+      "minEvidence": "≥1 independent (non-vendor) snippet OR the vendor news/blog post confirming the release; vendor-page-only with no corroboration → still emit but tag evidenceConfidence:'single'."
+    },
     "formatTaxonomy": {
       "static_html_table": {
         "description": "HTML page with <table> rows + scores",
@@ -270,6 +288,19 @@
         "defaultFallbacks": [
           {
             "format": "websearch_snippet"
+          },
+          {
+            "format": "aggregator_mirror",
+            "mirrorDomains": [
+              "pricepertoken.com",
+              "llm-stats.com",
+              "vals.ai",
+              "benchlm.ai"
+            ]
+          },
+          {
+            "format": "hf_model_card",
+            "note": "Vendor model card on huggingface.co carries announced benches."
           }
         ]
       },
@@ -296,6 +327,33 @@
           "bench_score_labeled"
         ],
         "defaultFallbacks": []
+      },
+      "aggregator_mirror": {
+        "description": "Independent aggregator mirror of a SPA leaderboard's scores (pricepertoken/llm-stats/vals.ai/benchlm). Real cascade step for spa_full + bot_blocked sources before websearch_snippet.",
+        "primaryTool": "WebFetch",
+        "extractor": "regex_extract",
+        "extractorPatterns": [
+          "bench_score_table_row",
+          "bench_score_labeled"
+        ],
+        "defaultFallbacks": [
+          {
+            "format": "websearch_snippet"
+          }
+        ]
+      },
+      "hf_model_card": {
+        "description": "huggingface.co/<org>/<model> model card — vendor-published benches in the card README. Fallback for bot_blocked vendors.",
+        "primaryTool": "WebFetch",
+        "extractor": "regex_extract",
+        "extractorPatterns": [
+          "bench_score_labeled"
+        ],
+        "defaultFallbacks": [
+          {
+            "format": "websearch_snippet"
+          }
+        ]
       }
     },
     "extractors": {
@@ -384,7 +442,7 @@
       },
       "patterns": {
         "bench_score_labeled": {
-          "regex": "(?<bench>SWE[\\s\\-]?bench[\\s\\-]?(?:Pro|Verified|Multilingual)|Terminal[\\s\\-]?Bench(?:\\s*v?\\d{1,2})?|LiveCodeBench(?:\\s*v?\\d{1,2})?|Aider(?:\\s+Polyglot)?|tau[\\s\\-]?bench(?:\\s*v?\\d{1,2})?|MCP[\\s\\-]?Atlas|GPQA(?:\\s+Diamond)?|HLE|AIME(?:\\s*\\d{2,4})?|BFCL|aaIdx|aaCoding|aaAgentic|aaOmni|sweMulti)\\s*(?:\\([^)]{0,40}\\))?\\s*[:=\\u2013\\u2014\\u2015\\-]\\s*(?<value>\\d{1,3}(?:[.,]\\d{1,3})?)\\s*(?<unit>%|pts|pt|points?)?",
+          "regex": "(?<bench>SWE[\\s\\-]?bench[\\s\\-]?(?:Pro|Verified|Multilingual)|Terminal[\\s\\-]?Bench(?:\\s*v?\\d{1,2})?|LiveCodeBench(?:\\s*v?\\d{1,2})?|tau[\\s\\-]?bench\\s*v?\\d{1,2}|MCP[\\s\\-]?Atlas|GPQA(?:\\s+Diamond)?|HLE|AIME\\s*\\d{2,4}|BFCL|aaIdx|aaCoding|aaAgentic|aaOmni|sweMulti)\\s*(?:\\([^)]{0,40}\\))?\\s*[:=\\u2013\\u2014\\u2015\\-]\\s*(?<value>\\d{1,3}(?:[.,]\\d{1,3})?)\\s*(?<unit>%|pts|pt|points?)?",
           "flags": "i",
           "description": "Bench name + score in same span. Bounded paren content (max 40c), Unicode dashes, decimal locale-tolerant, optional unit, version suffix v1..v99. Most-common pattern.",
           "captures": [
@@ -435,7 +493,7 @@
         "bench_score_normalized_0_1": {
           "regex": "\\b0\\.(?<frac>\\d{2,4})\\b",
           "flags": "",
-          "description": "'0.876' → multiply ×100. Only when bench typically reports 0-100 per benchSchema hint; guard against confidence-interval false positives.",
+          "description": "'0.876' → multiply ×100. Only when bench typically reports 0-100 per benchSchema hint; guard against confidence-interval false positives. ELO GUARD (4.5): NEVER apply to a raw-Elo bench (cfElo / webDevElo / lmArenaElo) — those report 0-3500 / ~900-1700, never 0-1 normalized, so a '0.xx' near an Elo cell is a CI/footnote, not the score.",
           "captures": [
             "frac"
           ],
@@ -684,8 +742,7 @@
       ],
       "aime26": [
         "AIME 2026",
-        "AIME26",
-        "AIME"
+        "AIME26"
       ],
       "hle": [
         "HLE",
@@ -697,6 +754,37 @@
         "ProgramBench",
         "program_bench",
         "programBench"
+      ],
+      "llmStatsIdx": [
+        "LLM-Stats Index",
+        "LLM Stats Index",
+        "llm-stats.com Index"
+      ],
+      "vellumRank": [
+        "Vellum LLM Leaderboard",
+        "Vellum Rank",
+        "Vellum Ranking"
+      ],
+      "benchlmIdx": [
+        "BenchLM Index",
+        "BenchLM Score",
+        "BenchLM Rank"
+      ],
+      "lmArenaElo": [
+        "LMArena Elo",
+        "Chatbot Arena Elo",
+        "LM Arena Elo",
+        "Arena Elo"
+      ],
+      "hfOpenAvg": [
+        "Open LLM Leaderboard Average",
+        "HF Open LLM Average",
+        "Open LLM Avg"
+      ],
+      "kluRank": [
+        "Klu.ai Leaderboard",
+        "Klu Rank",
+        "Klu Ranking"
       ]
     },
     "deprecatedBenchKeys": [
@@ -739,6 +827,7 @@
       "hfOpenAvg",
       "kluRank"
     ],
+    "_recognizedNotTrackedNote": "4.5/2026-05-29 — `tau3` (tau-bench v3) is in benchAliases + the confusable Elo/tau family for MISFILE DETECTION ONLY (so a tau3 value is never silently filed as tau2). It is deliberately NEITHER core NOR emerging: promoting it to a tracked, scored bench requires a frontend PR (assets/js/core.js BENCH_KEYS + i18n tr/en labels), which is out of scope for the data pipeline. Until tau-bench v3 has real cross-model adoption, a genuine tau3 observation is recognized-but-not-stored; the agent emits a discoveries.benchmarks[] candidate instead.",
     "_deprecatedBenchKeysNote": "FAZ 5.B/C 2026-05-09 split bench universe from 26 → 10 core keys. These 16 legacy keys still hold values in data/models.json (preserved for historical accuracy) but are no longer refreshed by gather agents and not surfaced in priorityCells. Audit accepts them as 'deprecated' rather than 'unknown'. Front-end may render them in a 'historical' section or hide entirely.",
     "normalization": {
       "_purpose": "Per-bench normalize to [0,100] composite scale. Loaded by assets/js/core.js normalizeBenchScore() with backward-compat fallback to hardcoded literals. Adding a new ELO-scale bench = data PR only.",
@@ -1298,7 +1387,7 @@
         "rationale": "tau2 scores require an actual leaderboard entry; vendor self-reports without a public leaderboard backing are quarantine candidates."
       },
       "swePro": {
-        "minDistinctIndependentSources": 1,
+        "minDistinctIndependentSources": 2,
         "preferredHarness": "scale.com/leaderboard/swe_bench_pro_public",
         "alternateHarnesses": [
           "swebench.com"
@@ -1317,13 +1406,15 @@
         "rationale": "LCB has multiple versions (v5/v6); contradictions across versions are common and require ≥2 sources to disambiguate."
       },
       "cfElo": {
-        "minDistinctIndependentSources": 1,
+        "minDistinctIndependentSources": 2,
         "knownIndependentDomains": [
           "codeforces.com",
           "artificialanalysis.ai"
         ],
-        "rationale": "Codeforces Elo is a raw score in the 1500-3500 range; only vendor-or-AA report. Single source acceptable but flagged."
-      }
+        "rationale": "Codeforces Elo is a raw score in the 1500-3500 range and feeds the composite at full weight via normalization; a single source is too easy to misfile (see 4.3 opus-4-7.cfElo). Require 2 distinct independent sources (5.3)."
+      },
+      "_coreSingleSourceHardBlock": false,
+      "_coreSingleSourceHardBlockNote": "5.3 — when true, MX5 escalates from WARN to merge-blocking FAILURE for any core-bench cell with <2 distinct source URLs (single-source core values flow into the composite at full weight). Kept false while the current snapshot still carries ~93 grandfathered single-source core cells; the next full refresh-all closes that gap (each gather adds a 2nd source), after which flip this to true to enforce. The audit MECHANISM is always present and unit-testable regardless of the flag."
     },
     "privacyFieldNormalize": {
       "trainingDataOptOut": {
@@ -1392,7 +1483,7 @@
       "name": "Anthropic",
       "tier": "S",
       "urls": {
-        "lineup": "https://docs.claude.com/en/docs/about-claude/models",
+        "lineup": "https://platform.claude.com/docs/en/about-claude/models",
         "news": "https://www.anthropic.com/news",
         "docs": "https://docs.claude.com",
         "pricing": "https://platform.claude.com/docs/en/about-claude/pricing",
@@ -1568,7 +1659,7 @@
       "name": "Moonshot AI (Kimi)",
       "tier": "S",
       "urls": {
-        "lineup": "https://platform.moonshot.cn/docs",
+        "lineup": "https://platform.kimi.com/docs",
         "news": "https://www.kimi.com/blog"
       },
       "extracts": "Kimi K-series catalog",
@@ -1680,6 +1771,7 @@
       "name": "All Hands AI (Devstral co-developer)",
       "tier": "S",
       "urls": {
+        "lineup": "https://www.openhands.dev",
         "news": "https://www.all-hands.dev",
         "blog": "https://openhands.dev/blog",
         "indexPage": "https://index.openhands.dev/home",
@@ -1832,6 +1924,16 @@
           "format": "meta_tag_extract"
         },
         {
+          "format": "aggregator_mirror",
+          "mirrorDomains": [
+            "pricepertoken.com",
+            "llm-stats.com",
+            "vals.ai",
+            "benchlm.ai"
+          ],
+          "note": "Resolve each publishes[] bench on a mirror domain (model+bench path) before websearch_snippet. Real cascade, not advisory."
+        },
+        {
           "format": "websearch_snippet"
         }
       ],
@@ -1866,26 +1968,29 @@
     },
     {
       "name": "Terminal-Bench",
-      "url": "https://tbench.ai/leaderboard",
+      "url": "https://www.tbench.ai/leaderboard/terminal-bench/2.0",
       "tier": "I",
       "authority": "TB2 agentic execution",
       "phase": "leaderboard",
-      "format": "spa_full",
-      "skipWebFetch": true,
-      "lastVerifiedDate": "2026-05-10",
-      "consecutiveFailures": 3,
-      "extractor": "websearch_snippet",
+      "format": "static_html_table",
+      "skipWebFetch": false,
+      "lastVerifiedDate": "2026-05-29",
+      "consecutiveFailures": 0,
+      "extractor": "html_table",
       "fallbacks": [
+        {
+          "format": "static_html_article"
+        },
         {
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-05-10",
+      "format_lastVerified": "2026-05-29",
       "publishes": [
         "tb2",
         "tbHard"
       ],
-      "_demote_note": "FAZ 6.A 2026-05-10 — bare /leaderboard root is JS-rendered SPA shell; snapshot returns 57KB with zero model rows. WebFetch yields no extractable data. Use sub-path https://www.tbench.ai/leaderboard/terminal-bench/2.0 instead (full URL, server-rendered table)."
+      "_demote_note": "RE-PROMOTED 2026-05-29: bare /leaderboard root was a JS SPA shell (57KB, 0 rows); the full sub-path /leaderboard/terminal-bench/2.0 is server-rendered (144 entries, model names + scores static). Verified live 2026-05-29."
     },
     {
       "name": "Terminal-Bench (alt)",
@@ -2165,10 +2270,25 @@
       "extractor": "websearch_snippet",
       "fallbacks": [
         {
+          "format": "github_raw_json",
+          "urlPattern": "https://datasets-server.huggingface.co/rows?dataset=livebench",
+          "note": "HF Datasets server rows API (structured JSON mirror)."
+        },
+        {
           "format": "github_raw_json"
         },
         {
           "format": "meta_tag_extract"
+        },
+        {
+          "format": "aggregator_mirror",
+          "mirrorDomains": [
+            "pricepertoken.com",
+            "llm-stats.com",
+            "vals.ai",
+            "benchlm.ai"
+          ],
+          "note": "Resolve each publishes[] bench on a mirror domain (model+bench path) before websearch_snippet. Real cascade, not advisory."
         },
         {
           "format": "websearch_snippet"
@@ -2196,6 +2316,16 @@
         },
         {
           "format": "meta_tag_extract"
+        },
+        {
+          "format": "aggregator_mirror",
+          "mirrorDomains": [
+            "pricepertoken.com",
+            "llm-stats.com",
+            "vals.ai",
+            "benchlm.ai"
+          ],
+          "note": "Resolve each publishes[] bench on a mirror domain (model+bench path) before websearch_snippet. Real cascade, not advisory."
         },
         {
           "format": "websearch_snippet"
@@ -2495,6 +2625,16 @@
           "format": "meta_tag_extract"
         },
         {
+          "format": "aggregator_mirror",
+          "mirrorDomains": [
+            "pricepertoken.com",
+            "llm-stats.com",
+            "vals.ai",
+            "benchlm.ai"
+          ],
+          "note": "Resolve each publishes[] bench on a mirror domain (model+bench path) before websearch_snippet. Real cascade, not advisory."
+        },
+        {
           "format": "websearch_snippet"
         }
       ],
@@ -2660,6 +2800,16 @@
       "rationale": "Independent research org running their own evaluations on 50+ benchmarks (Epoch Capabilities Index combining 42). SWE-bench Verified internal runs (484 samples), cross-references external leaderboards. Updated daily.",
       "fallbacks": [
         {
+          "format": "aggregator_mirror",
+          "mirrorDomains": [
+            "pricepertoken.com",
+            "llm-stats.com",
+            "vals.ai",
+            "benchlm.ai"
+          ],
+          "note": "Resolve each publishes[] bench on a mirror domain (model+bench path) before websearch_snippet. Real cascade, not advisory."
+        },
+        {
           "format": "websearch_snippet",
           "query": "site:epoch.ai/benchmarks \"<modelName>\""
         },
@@ -2762,7 +2912,7 @@
       "url": "https://openrouter.ai/rankings",
       "domain": "openrouter.ai",
       "tier": "I",
-      "format": "static_html_table",
+      "format": "spa_full",
       "publishes": [
         "aaIdx",
         "aime26",
@@ -2780,15 +2930,26 @@
       "authority": "multi-provider adoption + price signal aggregator",
       "firstSeen": "2026-05-06",
       "lastVerifiedDate": "2026-05-06",
-      "format_lastVerified": "2026-05-06",
+      "format_lastVerified": "2026-05-29",
       "phase": "leaderboard",
       "consecutiveFailures": 0,
       "extractor": "static_html_table",
       "fallbacks": [
         {
+          "format": "aggregator_mirror",
+          "mirrorDomains": [
+            "pricepertoken.com",
+            "llm-stats.com",
+            "vals.ai",
+            "benchlm.ai"
+          ],
+          "note": "Resolve each publishes[] bench on a mirror domain (model+bench path) before websearch_snippet. Real cascade, not advisory."
+        },
+        {
           "format": "websearch_snippet"
         }
-      ]
+      ],
+      "_demote_note": "FORMAT DRIFT 2026-05-29: openrouter.ai/rankings is now a client-rendered SPA (no model rows in raw HTML — 'No models found' placeholder). Verified live 2026-05-29."
     },
     {
       "name": "LMSYS Chatbot Arena (HF mirror)",
@@ -2820,7 +2981,22 @@
       "extractor": "spa_full",
       "fallbacks": [
         {
+          "format": "github_raw_json",
+          "urlPattern": "https://datasets-server.huggingface.co/rows?dataset=lmsys/chatbot_arena_conversations",
+          "note": "HF Datasets server rows API (structured JSON mirror)."
+        },
+        {
           "format": "github_raw_json"
+        },
+        {
+          "format": "aggregator_mirror",
+          "mirrorDomains": [
+            "pricepertoken.com",
+            "llm-stats.com",
+            "vals.ai",
+            "benchlm.ai"
+          ],
+          "note": "Resolve each publishes[] bench on a mirror domain (model+bench path) before websearch_snippet. Real cascade, not advisory."
         },
         {
           "format": "websearch_snippet"
@@ -3836,19 +4012,18 @@
       "url": "https://www.reddit.com/r/LocalLLaMA/",
       "tier": "C",
       "note": "community VRAM reports only",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
-      "consecutiveFailures": 0,
-      "extractor": "html_table",
+      "format": "bot_blocked",
+      "lastVerifiedDate": "2026-05-29",
+      "consecutiveFailures": 3,
+      "extractor": "websearch_snippet",
       "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
         {
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "skipWebFetch": true,
+      "_demote_note": "2026-05-29: 8.4KB bot-wall (login/robot check) was mis-read as healthy static_html_table. Reddit blocks automated fetch; community VRAM signal recoverable only via websearch_snippet."
     },
     {
       "name": "Design Arena",
@@ -4107,36 +4282,58 @@
   "_runtime": {
     "healthChecks": {
       "artificialanalysis.ai/leaderboards": {
-        "status": "spa_partial",
-        "note": "Intelligence Index static; Coding/Agentic/Omni dynamic; use /articles/* for I-tier extraction"
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
       },
       "gorilla.cs.berkeley.edu/leaderboard.html": {
-        "status": "spa_no_data",
-        "note": "Full SPA; no static fallback found"
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "repromotable"
+        ]
       },
       "livecodebench.github.io/leaderboard.html": {
-        "status": "spa_no_data",
-        "note": "Full SPA"
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "repromotable"
+        ]
       },
       "swebench.com": {
-        "status": "spa_partial",
-        "note": "Truncation; per-leaderboard subpages probably static",
-        "consecutiveFailures": 1,
-        "lastStatus": "SPA_NO_DATA",
-        "lastObservedFormat": "spa_full",
-        "lastProbedAt": "2026-04-27"
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
       },
       "matharena.ai": {
-        "status": "spa_no_data",
-        "note": "Full SPA"
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "repromotable"
+        ]
       },
       "livebench.ai": {
-        "status": "spa_no_data",
-        "note": "Full SPA; HF Datasets API alt path"
+        "status": "spa_full",
+        "observedFormat": "spa_full",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "spa"
+        ]
       },
       "vellum.ai/llm-leaderboard": {
-        "status": "partial_static",
-        "note": "SPA with partial static rows; Vellum blog articles fully static and high-quality"
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
       },
       "vellum.ai/blog": {
         "status": "static",
@@ -4155,31 +4352,40 @@
         "note": "Slug guesses fail; use WebSearch"
       },
       "x.ai/news": {
-        "status": "403_blocked",
-        "note": "Bot detection"
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
       },
       "anthropic.com/news": {
-        "status": "image_embedded",
-        "note": "Bench tables as PNG; auxiliary text scores only; image-OCR pipeline required for full extraction"
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
       },
       "llm-stats.com/benchmarks": {
-        "status": "static",
-        "note": "Closes SPA gap on livecodebench.github.io and swebench.com; verified 2026-04-26"
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
       },
       "atlascloud.ai/blog": {
-        "status": "static",
-        "note": "Multi-model Chinese frontier comparison; verified 2026-04-26"
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
       },
       "akitaonrails.com/en": {
-        "status": "static",
-        "note": "Independent benchmark roundup; verified 2026-04-26"
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
       },
       "llm-stats.com": {
-        "consecutiveFailures": 0,
-        "lastStatus": "ok",
-        "lastObservedFormat": "static_html_article",
-        "lastProbedAt": "2026-04-27",
-        "unhealthy": false
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
       },
       "artificialanalysis.ai": {
         "consecutiveFailures": 0,
@@ -4189,17 +4395,20 @@
         "unhealthy": false
       },
       "benchlm.ai": {
-        "consecutiveFailures": 0,
-        "lastStatus": "ok",
-        "lastObservedFormat": "spa_partial",
-        "lastProbedAt": "2026-04-27",
-        "unhealthy": false
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
       },
       "openrouter.ai": {
-        "consecutiveFailures": 1,
-        "lastStatus": "SPA_NO_DATA",
-        "lastObservedFormat": "spa_full",
-        "lastProbedAt": "2026-04-27"
+        "status": "spa_full",
+        "observedFormat": "spa_full",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "format-drift",
+          "spa"
+        ]
       },
       "livecodebench.github.io": {
         "consecutiveFailures": 3,
@@ -4216,11 +4425,10 @@
         "lastProbedAt": "2026-04-27"
       },
       "arxiv.org": {
-        "consecutiveFailures": 0,
-        "unhealthy": false,
-        "lastStatus": "ok",
-        "lastObservedFormat": "static_html_article",
-        "lastProbedAt": "2026-04-27"
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
       },
       "labs.scale.com": {
         "consecutiveFailures": 0,
@@ -4243,25 +4451,827 @@
         "lastProbedAt": "2026-04-27"
       },
       "huggingface.co": {
-        "consecutiveFailures": 0,
-        "unhealthy": false,
-        "lastStatus": "ok",
-        "lastObservedFormat": "static_html_article",
-        "lastProbedAt": "2026-04-27"
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
       },
       "tbench.ai": {
-        "status": "unhealthy:spa_full",
+        "status": "static_html_table",
+        "lastObservedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-29",
+        "note": "sub-path /leaderboard/terminal-bench/2.0 server-rendered"
+      },
+      "labs.scale.com/leaderboard": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "github.com/SWE-bench": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "livecodebench.com": {
+        "status": "ssl-env-unverified",
+        "observedFormat": "ssl-env-unverified",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "ssl-env"
+        ]
+      },
+      "tbench.ai/leaderboard": {
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "terminal-bench.io": {
+        "status": "ssl-env-unverified",
+        "observedFormat": "ssl-env-unverified",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "ssl-env"
+        ]
+      },
+      "github.com/sierra-research": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "mcp-atlas.dev": {
+        "status": "ssl-env-unverified",
+        "observedFormat": "ssl-env-unverified",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "ssl-env"
+        ]
+      },
+      "lmarena.ai/leaderboard": {
+        "status": "dead",
+        "observedFormat": "dead",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 2,
+        "problems": [
+          "format-drift",
+          "http-404"
+        ]
+      },
+      "bigcode-bench.github.io": {
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "huggingface.co/spaces": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "evalplus.github.io/leaderboard.html": {
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "klu.ai/llm-leaderboard": {
+        "status": "bot_blocked",
+        "observedFormat": "bot_blocked",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 2,
+        "problems": [
+          "bot-block",
+          "format-drift"
+        ]
+      },
+      "paperswithcode.com/area": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "redirect"
+        ],
+        "redirectedTo": "https://huggingface.co/papers/trending"
+      },
+      "agentbench.ai": {
+        "status": "unreachable",
+        "observedFormat": "unreachable",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 2,
+        "problems": [
+          "unreachable"
+        ]
+      },
+      "vals.ai/benchmarks": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "lmmarketcap.com": {
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "epoch.ai/benchmarks": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "lmcouncil.ai/benchmarks": {
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "marc0.dev/en": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "benchlm.ai/benchmarks": {
+        "status": "spa_full",
         "observedFormat": "spa_full",
-        "lastChecked": "2026-05-10",
-        "consecutiveFailures": 3,
-        "note": "bare /leaderboard root is SPA — snapshot empty. Use full /terminal-bench/2.0 sub-path."
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "format-drift",
+          "spa"
+        ]
+      },
+      "openrouter.ai/rankings": {
+        "status": "spa_full",
+        "observedFormat": "spa_full",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "spa"
+        ]
+      },
+      "together.ai/models": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "fireworks.ai/models": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "deepinfra.com/models": {
+        "status": "spa_full",
+        "observedFormat": "spa_full",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "format-drift",
+          "spa"
+        ]
+      },
+      "console.groq.com/docs": {
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "groq.com/pricing": {
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "inference-docs.cerebras.ai": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "cerebras.ai/inference": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "redirect"
+        ],
+        "redirectedTo": "https://www.cerebras.ai/inference"
+      },
+      "cloud.sambanova.ai/models": {
+        "status": "dead",
+        "observedFormat": "dead",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 2,
+        "problems": [
+          "format-drift",
+          "http-404"
+        ]
+      },
+      "replicate.com": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "lepton.ai/pricing": {
+        "status": "dead",
+        "observedFormat": "dead",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 2,
+        "problems": [
+          "format-drift",
+          "http-404"
+        ]
+      },
+      "novita.ai/model-api": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "siliconflow.cn/models": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "anyscale.com/endpoints": {
+        "status": "spa_full",
+        "observedFormat": "spa_full",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "format-drift",
+          "spa"
+        ]
+      },
+      "developers.cloudflare.com/workers-ai": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "aws.amazon.com/bedrock": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "ai.azure.com/explore": {
+        "status": "spa_full",
+        "observedFormat": "spa_full",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "format-drift",
+          "spa"
+        ]
+      },
+      "opencode.ai/docs": {
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "lambda.ai/inference": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "tensorix.ai": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "benchlm.ai/models": {
+        "status": "spa_full",
+        "observedFormat": "spa_full",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "format-drift",
+          "spa"
+        ]
+      },
+      "ollama.com/library": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "huggingface.co/unsloth": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "huggingface.co/bartowski": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "huggingface.co/mradermacher": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "huggingface.co/lmstudio-community": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "lmstudio.ai/models": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "github.com/ggerganov": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "huggingface.co/mlx-community": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "docs.vllm.ai/en": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "github.com/sgl-project": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "github.com/AlexsJones": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "huggingface.co/models": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "apidog.com/blog": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "the-decoder.com": {
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "datacamp.com/blog": {
+        "status": "spa_full",
+        "observedFormat": "spa_full",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "format-drift",
+          "spa"
+        ]
+      },
+      "buildfastwithai.com": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "simonwillison.net": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "latent.space": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "swyx.io": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "github.com/Hannibal046": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "github.com/horseee": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "reddit.com/r": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "designarena.ai/leaderboard": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "redirect"
+        ],
+        "redirectedTo": "https://www.designarena.ai/leaderboard"
+      },
+      "lushbinary.com/blog": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "whatllm.org/blog": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "almcorp.com/blog": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "tokenmix.ai/blog": {
+        "status": "spa_full",
+        "observedFormat": "spa_full",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "format-drift",
+          "spa"
+        ]
+      },
+      "vals.ai": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "buildfastwithai.com/blogs": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "iternal.ai/llm-selection-guide": {
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "mindwiredai.com/2026": {
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "gemma4.wiki/benchmark": {
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "designforonline.com/ai-models": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "automatio.ai/models": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "datalearner.com/en": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "aws.amazon.com/compliance": {
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "cloud.google.com/security": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "learn.microsoft.com/en-us": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "compliance.microsoft.com/compliancemanager": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "redirect"
+        ],
+        "redirectedTo": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3Dpx2hgqi9lukGvAWbjWD7e5FmZ62zr6bgI58hMrPRJv97Vl9vm_60eOttHvbEo61kuaZ1D0JWfnhq6ntF7KkgGnbpMsf-ae-nFphpmmVdSQDdtFik-DSBuC-aNPqOk_5-KoWL4xbXRhU0S2xT3ph_oPscG4WT3P84C-cDB6OYD7M&response_mode=form_post&nonce=639157647636868295.Mjc4ZGFmYWQtMmM1Ny00YjI0LTk4MDAtZWQ5NzA3MjBmYWQ4YjcyYmIwMWUtYmZmOS00YTRjLTlkODEtYzBjZDYzMDc4MTI3&client-request-id=9ec7cb63-cf4e-405d-81ef-d9c377c4072a&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.3.0.0"
+      },
+      "aicpa-cima.com/topic": {
+        "status": "spa_full",
+        "observedFormat": "spa_full",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "format-drift",
+          "spa"
+        ]
+      },
+      "iso.org/standard": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "gdpr-info.eu": {
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "edpb.europa.eu/our-work-tools": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "redirect"
+        ],
+        "redirectedTo": "https://www.edpb.europa.eu/our-work-tools/consistency-findings/register-for-decisions_en"
+      },
+      "hhs.gov/hipaa": {
+        "status": "bot_blocked",
+        "observedFormat": "bot_blocked",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 2,
+        "problems": [
+          "bot-block",
+          "format-drift"
+        ]
+      },
+      "trust.openai.com": {
+        "status": "spa_full",
+        "observedFormat": "spa_full",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "spa"
+        ]
+      },
+      "trust.anthropic.com": {
+        "status": "spa_full",
+        "observedFormat": "spa_full",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "spa"
+        ]
+      },
+      "platform.claude.com/docs": {
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "platform.openai.com/docs": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "redirect"
+        ],
+        "redirectedTo": "https://developers.openai.com/api/docs/models"
+      },
+      "openai.com/blog": {
+        "status": "ssl-env-unverified",
+        "observedFormat": "ssl-env-unverified",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "ssl-env"
+        ]
+      },
+      "ai.google.dev/gemini-api": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "deepmind.google/discover": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "docs.mistral.ai/getting-started": {
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "mistral.ai/news": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "api-docs.deepseek.com/quick_start": {
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "deepseek.com/news": {
+        "status": "dead",
+        "observedFormat": "dead",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 2,
+        "problems": [
+          "http-404"
+        ]
+      },
+      "docs.x.ai/docs": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "qwenlm.github.io/blog": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "platform.kimi.com/docs": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "kimi.com/blog": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "docs.z.ai/api-reference": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "z.ai/news": {
+        "status": "dead",
+        "observedFormat": "dead",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 2,
+        "problems": [
+          "http-404"
+        ]
+      },
+      "xiaomimimo.github.io": {
+        "status": "dead",
+        "observedFormat": "dead",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 2,
+        "problems": [
+          "http-404"
+        ]
+      },
+      "mimo.xiaomi.com": {
+        "status": "spa_full",
+        "observedFormat": "spa_full",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "spa"
+        ]
+      },
+      "platform.minimaxi.com/document": {
+        "status": "dead",
+        "observedFormat": "dead",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 2,
+        "problems": [
+          "http-404"
+        ]
+      },
+      "minimaxi.com/news": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "build.nvidia.com": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "blogs.nvidia.com": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "huggingface.co/meta-llama": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "ai.meta.com/blog": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "huggingface.co/google": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "stepfun.com": {
+        "status": "spa_full",
+        "observedFormat": "spa_full",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "spa"
+        ]
+      },
+      "openhands.dev": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0
+      },
+      "all-hands.dev": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-05-30",
+        "consecutiveFailures": 0,
+        "problems": [
+          "redirect"
+        ],
+        "redirectedTo": "https://www.openhands.dev/"
       }
     },
-    "lastFullCycle": "2026-04-27",
+    "lastFullCycle": "2026-05-30",
     "schemaVersion": 2,
-    "unhealthy": {
-      "https://tbench.ai/leaderboard": true
-    },
+    "unhealthy": {},
     "lowConfidenceUrls": {
       "_purpose": "Root-listing URLs (whole-leaderboard pages) prone to cross-row misattribution. Agent fetch returns rendered HTML with all models × all benchmarks, but extracting a specific (modelId, benchKey) cell from such a listing is error-prone. trustScore is multiplied by trustPenaltyMultiplier (default 0.5) when a citation's URL matches one of these patterns. Specific bench-path URLs (e.g. https://llm-stats.com/benchmarks/livecodebench) are NOT penalized — they unambiguously identify the bench.",
       "_purposeAddedAt": "2026-05-10",
