@@ -156,6 +156,29 @@ def main():
                 f"PRESET '{pname}' has keys NOT in canonical: {sorted(extra)}"
             )
 
+    # === 3b. PRESET weights sum to 100 (schema = runtime SSOT via getPresets) ===
+    # Every atomicComposite preset's atomicWeights MUST sum to exactly 100, else
+    # the composite score is silently mis-normalized per preset. vendorConsensus
+    # presets carry no atomic weights (sum 0) and are exempt. Keys must also be
+    # canonical. (Schema diverged from core.js on 2026-05-28 — balanced/agentic/
+    # reasoning/benchmark summed 90-92 after AA benches were dropped.)
+    for pname, pdef in (schema_block.get("presets") or {}).items():
+        if pname.startswith("_") or not isinstance(pdef, dict):
+            continue
+        if pdef.get("kind") == "vendorConsensus":
+            continue
+        aw = pdef.get("atomicWeights") or {}
+        bad_keys = set(aw) - canonical_bench
+        if bad_keys:
+            failures.append(
+                f"schema preset '{pname}' atomicWeights has non-canonical keys: {sorted(bad_keys)}"
+            )
+        total = round(sum(v for v in aw.values() if isinstance(v, (int, float))), 4)
+        if total != 100:
+            failures.append(
+                f"schema preset '{pname}' atomicWeights sum={total}, must be 100"
+            )
+
     # === 4-5. i18n benchmarks keys ===
     en_bench = set((en.get("benchmarks") or {}).keys())
     tr_bench = set((tr.get("benchmarks") or {}).keys())
