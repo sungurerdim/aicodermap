@@ -54,6 +54,10 @@ AA_FIELD_MAP: dict[str, tuple[str, float]] = {
     "tau2": ("tau2", 100.0),
     "terminalbenchHard": ("tbHard", 100.0),
 }
+# AA's OWN definitional composites — AA authoritative, fed to synth. The rest of
+# AA_FIELD_MAP are external benchmarks AA only *measures* (kept in _aa-rows.json
+# for impossible-value detection, NOT injected as synth sources). See gather-write.
+AA_COMPOSITE_KEYS = {"aaIdx", "aaCoding", "aaAgentic"}
 
 
 def _norm(s: str) -> str:
@@ -206,9 +210,18 @@ def main() -> int:
         ),
         encoding="utf-8",
     )
-    # Gather artifact for the synth/merge pipeline. startedAt is a REAL epoch
-    # (this is deterministic tooling with clock access) so the gather validator's
-    # stale check never false-trips on it (unlike LLM agents, which placeholder it).
+    # Gather artifact for the synth/merge pipeline carries ONLY the AA-COMPOSITE
+    # benches (aaIdx/aaCoding/aaAgentic) — AA's definitional indices, where AA is
+    # authoritative. The AA-MEASURED externals (gpqa/hle/tau2/tbHard) are
+    # DELIBERATELY excluded from synth: verification 2026-05-31 showed AA measures
+    # them under a standardized (often no-tools) protocol that legitimately
+    # disagrees with widely-reported vendor (tooled) numbers — e.g. sonnet-4-6.hle
+    # is 51 across 8 sources incl. Anthropic, but AA's standardized score is 13.
+    # Injecting AA's externals as I-tier sources would manufacture spurious
+    # contradictions against well-corroborated data. They stay in _aa-rows.json
+    # only, used by apply-aa-authoritative.py / audit-agent-misfiles.py to flag
+    # physically-IMPOSSIBLE stored values (outside AA's observed envelope).
+    composite_obs = [o for o in observations if o["benchKey"] in AA_COMPOSITE_KEYS]
     import time as _time
 
     GATHER_PATH.write_text(
@@ -216,11 +229,11 @@ def main() -> int:
             {
                 "batchId": "batch90-aa-rsc",
                 "mode": "gather",
-                "observations": observations,
+                "observations": composite_obs,
                 "runtime": {
                     "startedAt": int(_time.time()),
                     "source": "aa-rsc-deterministic",
-                    "fills": len(observations),
+                    "fills": len(composite_obs),
                 },
             },
             ensure_ascii=False,

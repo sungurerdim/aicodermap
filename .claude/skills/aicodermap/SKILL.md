@@ -105,6 +105,30 @@ PRELIM-D. SNAPSHOT_ROW_EXTRACTION (FAZ 7.F, 2026-05-10):
    - **Quality gate:** rows are NOT auto-promoted to observations[]. The agent must verify before emitting. `_rows.json` is a STARTING POINT, not a source of record.
    - Non-fatal. Opt-out via `AICODERMAP_NO_ROW_EXTRACT=1`.
 
+PRELIM-G. AA_STRUCTURED_EXTRACT (2026-05-31) — deterministic Artificial Analysis pull:
+   ```
+   python scripts/extract-aa-rsc.py
+   ```
+   - Artificial Analysis is the single richest source for the indices that are
+     otherwise systematically empty (aaCoding, aaAgentic) plus a strong I-tier
+     cross-check for gpqa/hle/tau2/tbHard. It is `spa_partial`, so live WebFetch
+     returns the page shell without the numbers — the 2026-05-30 cycle left 108
+     aaCoding/aaAgentic gaps that had ALL reached AA. This script decodes AA's
+     Next.js RSC streaming chunks (`self.__next_f`) to read the embedded
+     per-model dataset directly, maps 7 high-confidence fields with correct
+     scale, resolves AA slug/name → our id by exact-normalized match (ZERO
+     fuzzy matching → no cross-model misattribution), and writes:
+       * `data/.leaderboard-snapshots/_aa-rows.json` (agents may Read it)
+       * `.aicodermap-agent-out-batch90-aa-rsc.gather.json` — a gather-schema
+         artifact (real epoch startedAt) auto-discovered by local-synth +
+         gen_unified's `batch*` glob, so AA flows through synth/merge exactly
+         like an agent's gather output, deterministic + I-tier.
+   - Why FIRST (before gather): agents read `_aa-rows.json` as confirmed I-tier
+     rows; synth consumes the gather artifact. Cuts wasted AA WebFetch budget.
+   - Non-fatal. Opt-out via `AICODERMAP_NO_AA=1`. If AA changes its RSC format
+     the script emits `parsed 0` + exits 1 (logged, CONTINUE — agents fall back
+     to live WebFetch as before).
+
 PRELIM-F. ANOMALY_VERIFICATION_QUEUE (2026-05-27):
    ```
    python scripts/detect-anomalies.py
@@ -718,6 +742,31 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
      ```
    - Persists `.aicodermap-verification-map.json` (gitignored — historical record, regeneratable from sources.json via `bootstrap`)
    - The `confirmed` flag is **audit-only** — used for contradiction analysis and human review. It is NEVER read by the agent or orchestrator to skip a fetch (every cell is re-fetched every cycle).
+
+7.6b. AA_AUTHORITATIVE_CORRECTION (2026-05-31, post-merge deterministic corrector):
+   ```
+   python scripts/apply-aa-authoritative.py --apply   # fix AA-composite misfiles + fill empties
+   python scripts/audit-agent-misfiles.py             # advisory sweep report
+   python scripts/audit-data-coherence.py             # re-verify SSOT after correction
+   ```
+   - `aaIdx`/`aaCoding`/`aaAgentic` are Artificial Analysis's OWN definitional
+     composite indices — no one else computes them, so a stored value that
+     disagrees with AA's current value (from PRELIM-G's `_aa-rows.json`) by >2pp
+     is a misfile (an agent misread AA, or filed a different metric). Confirmed
+     empirically 2026-05-31: AA's aaIdx ceiling is ~61 yet agents had stored
+     71-79 (physically impossible). The corrector deterministically adopts AA's
+     value (override misfile OR fill empty) and replaces provenance with the AA
+     I-tier entry. It ALSO corrects AA-MEASURED externals (gpqa/hle/tau2/tbHard)
+     ONLY when the stored value is outside AA's observed envelope for that bench
+     (physically impossible, e.g. hle=79 when AA's ceiling is 45.7) — plausible
+     source variance is left untouched.
+   - Runs AFTER merge so it corrects the final written data (like
+     apply-anomaly-verdicts). Rotates .bak. If `audit-data-coherence.py` then
+     fails, roll back to .bak and log loud (same pattern as 7.7a). Non-fatal.
+     Opt-out `AICODERMAP_NO_AA_AUTHORITATIVE=1`.
+   - `audit-agent-misfiles.py` is advisory only — writes `data/_misfile-audit.json`
+     with the AA-MEASURED moderate disagreements (plausible, not auto-corrected)
+     for the next cycle's anomaly→research loop to verify against primary sources.
 
 7.7. ANOMALY_RESOLUTION (auto-dispatch, 2026-05-27 — closes the Layer-3 loop):
    ```
