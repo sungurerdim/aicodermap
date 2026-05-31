@@ -296,16 +296,17 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
    - `data/sources-whitelist.json` is SSOT for "what URLs the agent is allowed to fetch" AND for the bench-key universe (`_schema.coreBenchKeys`). Frontend `BENCH_KEYS` (assets/js/core.js), i18n `benchmarks.*`, and the data-file `bench` cells all mirror this canonical set. `scripts/audit-data-coherence.py` enforces the mirroring by failing loudly on any drift.
    - No skip registry: every (modelId, benchKey) pair is re-attempted every cycle so vendor opt-outs that close are surfaced immediately
    - The agent file (.claude/agents/aicodermap-research-agent.md) only carries PROCEDURE (how) — every list of URLs, vendors, or model IDs lives in data files
-// FAZ 4.C (2026-05-09, revised 2026-05-17): SONNET GATHER + SONNET SYNTH.
-   // Two-stage pipeline: gather (N batches × sonnet) + synth (1 × sonnet).
+// FAZ 4.C (2026-05-09) → A3 (2026-05-31): SONNET GATHER + DETERMINISTIC SYNTH.
+   // Two-stage pipeline: gather (N batches × sonnet) + synth (1 × local-synth.py).
    //   Stage A (gather): N batches × SONNET agent (mode="gather").
    //     Full research quality from the first pass; emits raw observations
    //     + naCandidates + lineupHints. NO contradiction analysis, NO trustScore
    //     math, NO autoResolveWinner — that stays in Stage B.
-   //   Stage B (synth):   1 batch  × SONNET agent (mode="synth"). Reads ALL
-   //     gather artifacts, applies analytical work: trustScore + contradictions
-   //     + autoResolveWinner + WRONG_ID detection + N/A rule citation.
-   //     Emits full OUTPUT_SCHEMA artifact.
+   //   Stage B (synth):   `python scripts/local-synth.py` (DETERMINISTIC, A3).
+   //     Reads ALL gather artifacts, applies trustScore + contradictions +
+   //     autoResolveWinner over real observations. Emits full OUTPUT_SCHEMA
+   //     artifact. The prior sonnet synth agent is RETIRED — it fabricated bench
+   //     values every cycle and always fell back to local-synth anyway.
    //
    // Rationale for dropping haiku gather (FAZ 4.C.2 retired):
    //   Empirical result — 14/18 haiku batches came back weak (avg_obs < 3),
@@ -457,49 +458,44 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
    if dropped:
      log("ℹ dropped " + str(len(dropped)) + " zero-obs gather(s) from synth input: " + str(dropped))
    gather_paths = kept_paths
-   // 6.3 — SLIM the synth idea_context. Synth REASONS over the gather artifacts
-   // (synth_input_paths); it does NOT re-fetch, so it needs neither the full
-   // leaderboardSnapshots map (URL→path, only useful to a fetching gather agent)
-   // nor the full verificationMap (per-cell audit history). Dropping both saves
-   // ~25-40 KB of synth context every cycle. Keep only the reasoning essentials.
-   synth_ctx = { ...idea_context,
-     leaderboardSnapshots: undefined,        // synth reads gather files, not snapshots
-     verificationMap: { cells: {} },         // synth doesn't re-audit per-cell history
-   }
-   synth_result = Agent({
-     subagent_type: "aicodermap-research-agent",
-     model: "sonnet",  // FAZ 4.C: synth uses sonnet for reasoning quality
-     prompt: structured(
-       scope, query,
-       mode: "synth",
-       synth_input_paths: gather_paths,
-       idea_context: synth_ctx,  // slimmed — full snapshots/verificationMap dropped (6.3)
-       wallclock_deadline_unix: now() + BATCH_WALLCLOCK_SEC,
-       agent_budget_buffer: 80,  // synth has higher budget — many gather files to read
-     ),
-     output_path: ".aicodermap-agent-out-synth.json"
-   })
+   // ─── Stage B: LOCAL-SYNTH PRIMARY (deterministic — 2026-05-31, A3) ─────────
+   // The sonnet synth agent is RETIRED as the primary path. Empirical result
+   // across 2026-05-28 → 2026-05-30: the sonnet synth FABRICATED bench values
+   // every cycle (68 ungrounded values on 2026-05-28; 1 + under-production of
+   // 32 fills on 2026-05-30) and ALWAYS fell back to local-synth via the
+   // traceability gate. So the sonnet dispatch was pure cost + latency + risk
+   // with no surviving output. local-synth.py is now the PRIMARY synth: it is
+   // deterministic, CANNOT hallucinate (only picks trust-winners from real
+   // gather observations), and out-produced the sonnet synth (716 vs 32 fills
+   // on the same inputs). It reads every `.aicodermap-agent-out-batch*.gather.json`
+   // (incl. the deterministic batch90-aa-rsc) and writes the unified artifact.
+   //   python scripts/local-synth.py     // → .aicodermap-agent-out-synth.json
+   // The expensive analytical edge cases the sonnet synth was meant to own
+   // (WRONG_ID, cross-model misattribution) are covered deterministically by
+   // gen_unified + merge audits (AC12 id-canon, MX-rules) + the AA cross-check
+   // (apply-aa-authoritative / audit-agent-misfiles). If a future need for
+   // LLM-grade narrative synthesis arises, dispatch a NARROW sonnet pass that
+   // only ANNOTATES contradictions[] — it must never emit bench fills.
+   run("python scripts/local-synth.py")
+   synth_result = read(".aicodermap-agent-out-synth.json")
 
    // ─── Stage B GATE: synth bench-value traceability (2026-05-28) ──────────
-   // The Stage-B sonnet synth can FABRICATE bench values — numbers present in
-   // NO gather observation, attributed to real URLs, contradicting the
-   // gathered evidence (cycle 2026-05-28 measured 68 ungrounded values in one
-   // synth artifact: opus-4-7.hle=11.6 vs observed 54.7; grok-4-20.sweV=90.1
-   // with no observation). Pushing these would corrupt the live decision data.
-   // This gate classifies every non-null updates.bench[k] against the cell's
-   // EVIDENCE ENVELOPE (fresh gather observations ∪ historical sources.json):
-   // a value outside [min,max] of its candidates (or with zero evidence) is a
-   // FABRICATION. On fabrication it auto-falls-back to the DETERMINISTIC
-   // local-synth.py (which cannot hallucinate — it only picks trust-winners
-   // from real observations) and re-validates. This step CANNOT be skipped on
-   // refresh-all; it is the sole guard between a hallucinating synth and merge.
+   // Now that local-synth is PRIMARY (A3), this gate is a CONFIRMATION rather
+   // than a fallback trigger: local-synth cannot fabricate (it only emits
+   // trust-winners from real gather observations), so the gate should pass
+   // clean every cycle. It is RETAINED as a cheap invariant check — it still
+   // classifies every non-null updates.bench[k] against the cell's EVIDENCE
+   // ENVELOPE (fresh gather observations ∪ historical sources.json); a value
+   // outside [min,max] would indicate a local-synth bug, and --auto-fallback
+   // simply re-runs local-synth (idempotent). It also still emits the advisory
+   // divergences[] (grounded values that disagree with THIS cycle's fresh
+   // observations by > CONTRADICTION_WARN_PP) into data/_synth-traceability.json
+   // for the Step 7.7 anomaly→research loop. (Historical note: when a sonnet
+   // synth was primary it fabricated 68 values on 2026-05-28 + under-produced on
+   // 2026-05-30, which is exactly why A3 retired it.)
    //   python scripts/validate-synth-traceability.py --auto-fallback
-   // Exit 0 = clean or recovered (artifact safe for gen_unified). Exit 2 =
-   // fabrication AND fallback also dirty → log loud CHANGELOG warn; merge.py's
-   // own MX/anomaly audits remain the backstop. The advisory divergences[] in
-   // data/_synth-traceability.json (grounded values that disagree with THIS
-   // cycle's fresh observations by > CONTRADICTION_WARN_PP) feed the Step 7.7
-   // anomaly→research loop — surfaced, never silently resolved.
+   // Exit 0 = clean (expected). Exit 2 = local-synth bug → loud CHANGELOG warn;
+   // merge.py's own MX/anomaly audits remain the backstop.
 
    // gen_unified_artifact.py prefers synth output when present, falls back
    // to gather union otherwise.

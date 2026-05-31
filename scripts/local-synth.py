@@ -73,6 +73,54 @@ def find_batch_artifacts() -> list[Path]:
     return sorted(ROOT.glob(".aicodermap-agent-out-batch*.gather.json"))
 
 
+_ELO_SIBLINGS = {"cfElo", "webDevElo", "lmArenaElo"}
+
+
+def build_host_publishes(wl: dict) -> dict:
+    """host -> set(benchKeys it publishes), from every whitelist category. Used by
+    the Elo-trap filter to spot a cfElo value scraped off a webDevElo-only page."""
+    from urllib.parse import urlparse
+
+    out: dict[str, set] = {}
+    for cat in (wl.get(k) for k in wl if isinstance(wl.get(k), list)):
+        for e in cat or []:
+            if not isinstance(e, dict):
+                continue
+            url = e.get("url") or ""
+            pub = e.get("publishes") or []
+            if not url or not pub:
+                continue
+            host = (urlparse(url).hostname or "").lower().lstrip("www.")
+            if host:
+                out.setdefault(host, set()).update(pub)
+    return out
+
+
+def is_elo_sibling_misfile(
+    bk: str, val: float, source_url: str, host_pub: dict
+) -> bool:
+    """C1 (2026-05-31): drop an Elo observation that is almost certainly a
+    sibling-metric misfile — the source host publishes a DIFFERENT Elo
+    (cfElo/webDevElo/lmArenaElo) but not this one, AND the value itself sits in
+    the arena range (1000-1600) rather than the Codeforces range (>1600). This
+    keeps genuine cross-sourced values (e.g. cfElo=3206 read off a page that also
+    lists webDevElo) while stopping a webDevElo=1300 filed as cfElo from entering
+    the cluster pool (the class that recurrently hard-blocks merge)."""
+    if bk not in _ELO_SIBLINGS:
+        return False
+    from urllib.parse import urlparse
+
+    host = (urlparse(source_url).hostname or "").lower().lstrip("www.")
+    pub = host_pub.get(host)
+    if not pub or bk in pub or not (pub & _ELO_SIBLINGS):
+        return False  # host can't be judged / legitimately publishes bk / no sibling
+    # Host publishes a sibling Elo but NOT bk. Only drop if the value also looks
+    # like the sibling metric (arena-range), confirming the misfile.
+    if bk == "cfElo" and val >= 1600:
+        return False  # genuine Codeforces-range rating, not a webDevElo misfile
+    return True
+
+
 def main() -> int:
     os.chdir(ROOT)
     with open("data/models.json", encoding="utf-8") as f:
@@ -83,6 +131,8 @@ def main() -> int:
     core_keys = wl["_schema"]["coreBenchKeys"]
     ctr = contracts(wl)
     agreement_pp = float(ctr.get("VERIFICATION_AGREEMENT_PP", 1.5))
+    host_pub = build_host_publishes(wl)  # C1 Elo-trap filter input
+    elo_dropped = 0
 
     active = active_models(models)
     active_ids = {m["id"] for m in active}
@@ -167,6 +217,12 @@ def main() -> int:
             # the cluster pool or win a cell. cfElo/webDevElo keep raw-Elo caps.
             _hi = 3500 if bk == "cfElo" else (2000 if bk == "webDevElo" else 100)
             if val < 0 or val > _hi:
+                continue
+            # C1 (2026-05-31): drop Elo values that are sibling-metric misfiles
+            # (e.g. a webDevElo scraped off its page and filed as cfElo) before
+            # they can win a cell + recurrently hard-block merge.
+            if is_elo_sibling_misfile(bk, val, obs.get("sourceUrl") or "", host_pub):
+                elo_dropped += 1
                 continue
             cells[(mid, bk)].append(
                 {
@@ -513,6 +569,8 @@ def main() -> int:
     print(f"  naPromoted: {len(not_applicable)}")
     print(f"  gapsCarried: {len(gap_entries)} (deduped from {len(all_raw_gaps)} raw)")
     print(f"  validationCoverage: {validation_coverage * 100:.1f}%")
+    if elo_dropped:
+        print(f"  eloSiblingMisfilesDropped (C1): {elo_dropped}")
     return 0
 
 
