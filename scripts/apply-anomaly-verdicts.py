@@ -28,9 +28,13 @@ from __future__ import annotations
 
 import json
 import shutil
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "scripts"))
+from lib.util import normalize_anomaly_verdict  # noqa: E402
+
 MODELS = ROOT / "data" / "models.json"
 SOURCES = ROOT / "data" / "sources.json"
 VERDICTS = ROOT / ".aicodermap-anomaly-verdicts.json"
@@ -43,6 +47,7 @@ def main() -> int:
     verdicts = (json.loads(VERDICTS.read_text(encoding="utf-8")) or {}).get(
         "verdicts"
     ) or []
+    verdicts = [normalize_anomaly_verdict(v) for v in verdicts]
     models = json.loads(MODELS.read_text(encoding="utf-8"))
     sources = json.loads(SOURCES.read_text(encoding="utf-8"))
     by_id = {m.get("id"): m for m in models}

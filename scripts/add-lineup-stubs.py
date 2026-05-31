@@ -8,37 +8,26 @@ i18n strengths/weaknesses populated for both TR and EN to keep parity audits gre
 
 import json
 from datetime import date
+from pathlib import Path
 
-PROJECT_ROOT = __file__.rsplit("/", 2)[0] if "/" in __file__ else ".."
+_REPO = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = str(_REPO)
 TODAY = date.today().isoformat()
 
-ALL_BENCH_KEYS = [
-    "aaIdx",
-    "swePro",
-    "sweV",
-    "sweMulti",
-    "nl2Repo",
-    "lcb",
-    "tb2",
-    "tbHard",
-    "tau2",
-    "tau3",
-    "mcpA",
-    "bfcl",
-    "aaCoding",
-    "aaAgentic",
-    "browseComp",
-    "cfElo",
-    "webDevElo",
-    "gpqa",
-    "aime26",
-    "hle",
-    "aaOmni",
-    "mmluPro",
-    "simpleQa",
-    "mrcr",
-    "arcAgi2",
-]
+
+def _canonical_bench_keys() -> list[str]:
+    """Derive the canonical bench-cell key set from the whitelist SSOT
+    (`_schema.coreBenchKeys`), NEVER a hardcoded list. A stub that carried a
+    key absent from the whitelist (the retired simpleQa/tau3, 2026-05-30) is a
+    SSOT-coherence drift that hard-blocks merge — deriving here makes a stub
+    self-correct whenever the canonical set changes."""
+    wl = json.loads(
+        (_REPO / "data" / "sources-whitelist.json").read_text(encoding="utf-8")
+    )
+    return list(wl.get("_schema", {}).get("coreBenchKeys") or [])
+
+
+ALL_BENCH_KEYS = _canonical_bench_keys()
 
 STUBS = [
     {

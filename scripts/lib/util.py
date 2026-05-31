@@ -162,3 +162,28 @@ def canonical_display_name(name: str) -> str:
     if not name or not isinstance(name, str):
         return name
     return _VERSION_DOT_PAT.sub(r"\1.\2", name)
+
+
+def normalize_anomaly_verdict(v: dict) -> dict:
+    """Coerce an anomaly-verify verdict to the canonical schema the
+    validate/apply scripts consume, tolerating the natural shape an LLM agent
+    emits. Maps: `verdict`->`action`; list `evidence`->'; '-joined string;
+    `correctedBenchKey`->`toBench`; `correctedValue`->`toValue`; `note`->`reason`
+    (kept only if `reason` absent). Idempotent — re-normalizing is a no-op."""
+    if not isinstance(v, dict):
+        return v
+    out = dict(v)
+    if not out.get("action") and out.get("verdict"):
+        out["action"] = out["verdict"]
+    ev = out.get("evidence")
+    if isinstance(ev, list):
+        out["evidence"] = "; ".join(str(u) for u in ev if u)
+    elif ev is None:
+        out["evidence"] = ""
+    if not out.get("toBench") and out.get("correctedBenchKey"):
+        out["toBench"] = out["correctedBenchKey"]
+    if out.get("toValue") is None and out.get("correctedValue") is not None:
+        out["toValue"] = out["correctedValue"]
+    if not (out.get("reason") or "").strip() and (out.get("note") or "").strip():
+        out["reason"] = out["note"]
+    return out

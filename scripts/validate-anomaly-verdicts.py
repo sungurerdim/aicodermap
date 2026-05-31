@@ -41,6 +41,8 @@ from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "scripts"))
+from lib.util import normalize_anomaly_verdict  # noqa: E402
 
 VERDICTS_PATH = ROOT / ".aicodermap-anomaly-verdicts.json"
 MODELS_PATH = ROOT / "data" / "models.json"
@@ -251,6 +253,7 @@ def main() -> int:
     verdicts = (json.loads(VERDICTS_PATH.read_text(encoding="utf-8")) or {}).get(
         "verdicts"
     ) or []
+    verdicts = [normalize_anomaly_verdict(v) for v in verdicts]
     if not verdicts:
         print("verdicts file empty; nothing to validate")
         return 0

@@ -1113,15 +1113,13 @@ OBJECT FIELDS:    ollama (full pullCmd/tags/pullCount/architecture/parameters/li
                   privacy (per-field dict merge: {trainingDataOptOut, dataResidency[], soc2, gdpr, apiLogging}. synth's _build_privacy_block clusters by (modelId, field) and picks highest-tier observation (I > S > C) with most-recent fetched as tiebreak. I-tier audit registry overrides S-tier vendor self-report; sources in data/sources-whitelist.json `complianceAggregators[]` + vendor-discovered `urls.privacy`/`urls.trust`. Canonical values enforced by audit-data-coherence.py AC11 — drift → merge rollback.)
 
 BENCH KEYS (dynamic universe = whitelist `_schema.coreBenchKeys` ∪ `_schema.emergingBenchKeys`):
-                  core (16): swePro, sweV, lcb, tb2, tbHard, cfElo, nl2Repo,
-                             aaCoding, aaAgentic, aaIdx, tau2, gpqa, mmluPro,
-                             hle, aime26, arcAgi2
-                  emerging (10): sweMulti, mcpA, bfcl, browseComp, webDevElo,
-                                 aaOmni, mrcr, simpleQa, tau3, programBench
-                  deprecated (3): lcbV6, aider, aiderPoly  (silently dropped by synth filter)
-                  (authoritative: data/sources-whitelist.json _schema.coreBenchKeys
-                   + _schema.emergingBenchKeys; extends automatically when a leaderboard's
-                   publishes[] adds a key)
+                  DO NOT hardcode the list here — it drifts (the retired
+                  simpleQa/tau3/programBench snapshot hard-blocked merge on
+                  2026-05-30). SOLE SSOT = data/sources-whitelist.json
+                  `_schema.coreBenchKeys` (currently 17, includes mrcr) ∪
+                  `_schema.emergingBenchKeys` (currently 12). Stub builders +
+                  audit + agent all derive from there; the set extends
+                  automatically when a leaderboard's publishes[] adds a key.
                   → trustScore-driven contradiction resolution per bench key
 ```
 

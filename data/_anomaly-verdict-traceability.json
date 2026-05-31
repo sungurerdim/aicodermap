@@ -1,31 +1,11 @@
 {
-  "checked": 17,
+  "checked": 2,
   "rejected": [],
   "warnings": [
     {
-      "cell": "gpt-4-1.aime26",
-      "action": "clear",
-      "reason": "missing-reason"
-    },
-    {
-      "cell": "mistral-large-3.aime26",
-      "action": "clear",
-      "reason": "missing-reason"
-    },
-    {
-      "cell": "devstral-2.tau2",
-      "action": "clear",
-      "reason": "missing-reason"
-    },
-    {
-      "cell": "devstral-2.aime26",
-      "action": "clear",
-      "reason": "missing-reason"
-    },
-    {
       "cell": "grok-4-3.lcb",
-      "action": "clear",
-      "reason": "missing-reason"
+      "action": "reclassify",
+      "reason": "source-cell-empty-noop"
     }
   ],
   "ok": true,

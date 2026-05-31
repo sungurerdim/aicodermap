@@ -19,12 +19,17 @@ def _artifact_started_unix(artifact: dict[str, Any]) -> float | None:
     """Return the agent's self-reported start as epoch seconds, or None.
 
     Gather artifacts carry it at `runtime.startedAt`; full/synth at
-    `runMetadata.startedAt`. Both are ISO-8601. Content-based (unlike mtime,
-    which a touch/partial-write can refresh without the agent re-running)."""
+    `runMetadata.startedAt`. Accepts ISO-8601 strings OR an integer/float epoch
+    (deterministic tooling, e.g. extract-aa-rsc.py, stamps a real epoch since it
+    has clock access; LLM agents have none and can only placeholder a string)."""
     for container in ("runtime", "runMetadata"):
         block = artifact.get(container)
         if isinstance(block, dict):
             raw = block.get("startedAt")
+            if isinstance(raw, bool):
+                continue
+            if isinstance(raw, (int, float)):
+                return float(raw)
             if isinstance(raw, str) and raw:
                 txt = raw.strip().replace("Z", "+00:00")
                 try:
@@ -298,30 +303,54 @@ def validate_gather_file(
                 f"(grace={STALE_GRACE_SEC}s). Prior-cycle output reused; "
                 f"orchestrator must overwrite via fresh dispatch."
             )
-        # Content-based stale guard (3.2): the agent's self-reported startedAt is
-        # authoritative — a touched/partial-written file can refresh mtime without
-        # the agent having re-run this cycle. Mandatory once cycle_started is known.
+        # Content-based stale guard (3.2, revised 2026-05-31): startedAt is a
+        # SECONDARY signal. mtime (above) is authoritative for "written this
+        # cycle" because PRELIM-C prune renames every prior-cycle artifact to
+        # `.stale-*`, so any file still matching the gather glob was produced
+        # this cycle. LLM agents have no clock and routinely placeholder
+        # startedAt (e.g. midnight) → the old hard-fail here produced false
+        # STALE positives on genuinely-fresh gathers (whole 2026-05-30 cycle).
+        # New rule: when mtime is FRESH, a missing/old startedAt is a WARNING,
+        # not stale. startedAt only escalates to STALE when mtime is ALSO stale
+        # (defense-in-depth against a touched-but-not-rerun file).
+        mtime_fresh = age_sec <= STALE_GRACE_SEC
         started = _artifact_started_unix(artifact)
         stats = verdict.setdefault("stats", {})
         if started is None:
-            stats["missingStartedAt"] = True
-            verdict["valid"] = False
-            verdict.setdefault("errors", []).append(
-                "MISSING runtime.startedAt — mandatory under cycle stale check; "
-                "cannot prove the artifact was produced this cycle. Treated as "
-                "stale → orchestrator must re-dispatch."
-            )
+            if mtime_fresh:
+                stats["startedAtWarn"] = "missing (mtime fresh → trusted)"
+                verdict.setdefault("warnings", []).append(
+                    "runtime.startedAt missing/unparseable; mtime proves the file "
+                    "was written this cycle, so trusted (advisory)."
+                )
+            else:
+                stats["missingStartedAt"] = True
+                verdict["valid"] = False
+                verdict.setdefault("errors", []).append(
+                    "MISSING runtime.startedAt AND mtime predates cycle start — "
+                    "cannot prove fresh; treated as stale → re-dispatch."
+                )
         else:
             started_age = cycle_started_unix - started
             if started_age > STALE_GRACE_SEC:
-                stats["stale"] = True
-                stats["startedAtAgeSec"] = round(started_age, 1)
-                verdict["valid"] = False
-                verdict.setdefault("errors", []).append(
-                    f"STALE artifact — runtime.startedAt predates cycle start by "
-                    f"{started_age:.0f}s (grace={STALE_GRACE_SEC}s). Agent did not "
-                    f"re-run this cycle; orchestrator must overwrite via fresh dispatch."
-                )
+                if mtime_fresh:
+                    stats["startedAtWarn"] = (
+                        f"old by {started_age:.0f}s (mtime fresh → trusted)"
+                    )
+                    verdict.setdefault("warnings", []).append(
+                        f"runtime.startedAt predates cycle start by {started_age:.0f}s "
+                        f"but mtime is fresh (likely an agent clock-less placeholder); "
+                        f"trusted via mtime (advisory)."
+                    )
+                else:
+                    stats["stale"] = True
+                    stats["startedAtAgeSec"] = round(started_age, 1)
+                    verdict["valid"] = False
+                    verdict.setdefault("errors", []).append(
+                        f"STALE artifact — runtime.startedAt AND mtime both predate "
+                        f"cycle start (startedAt by {started_age:.0f}s); agent did not "
+                        f"re-run this cycle; orchestrator must overwrite via fresh dispatch."
+                    )
     return verdict
 
 
