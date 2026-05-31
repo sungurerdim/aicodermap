@@ -45,7 +45,14 @@ AGENT_BUDGET_BUFFER = 50
 CELLS_PER_TOOL_CALL = 3
 MAX_BATCH_CELLS = AGENT_BUDGET_BUFFER * CELLS_PER_TOOL_CALL  # 150
 MAX_PARALLEL = 10  # bumped 5→10 (FAZ 1.2, 2026-05-07): halve wave count
-ABSOLUTE_MAX_BATCH_MODELS = 8
+# B2 (2026-05-31): 8→6. The 2026-05-30 cycle left ~191 cells never reached, the
+# worst in the 8-model batches (8×17=136 cells vs a 50-tool-call budget — the
+# CELLS_PER_TOOL_CALL=3 throughput assumption proved optimistic). 6 models ×17 =
+# 102 cells fits the budget far better, so each slice fully sweeps. The cost of
+# the extra batches is offset because the AA RSC extractor (PRELIM-G) now fills
+# aaIdx/aaCoding/aaAgentic deterministically — ~81 of those 191 never-reached
+# cells were exactly AA Coding/Agentic, so each gather agent has less to research.
+ABSOLUTE_MAX_BATCH_MODELS = 6
 
 
 def models_per_batch(core_keys_count: int) -> int:
