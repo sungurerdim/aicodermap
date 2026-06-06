@@ -47,10 +47,11 @@ from lib.matrix import filled_cells_from_models as _matrix_filled  # noqa: E402
 from lib.matrix import gap_cells_from_artifact as _matrix_gaps  # noqa: E402
 from lib.matrix import total_universe as _matrix_universe  # noqa: E402
 from lib.matrix import verify_matrix_invariant as _matrix_verify  # noqa: E402
-from lib.whitelist import ALL_WHITELIST_CATEGORIES  # noqa: E402
+from lib.whitelist import _load_unhealthy_urls as _wl_load_unhealthy  # noqa: E402
 from lib.whitelist import all_bench_keys as _wl_all_bench_keys  # noqa: E402
 from lib.whitelist import contracts as _wl_contracts  # noqa: E402
 from lib.whitelist import core_bench_keys as _wl_core_bench_keys  # noqa: E402
+from lib.whitelist import hostname_index as _wl_hostname_index  # noqa: E402
 from lib.whitelist import load_whitelist as _wl_load  # noqa: E402
 from lib.constants import VERIFICATION_AGREEMENT_PP as _AGREEMENT_PP  # noqa: E402
 from lib.tiers import TIER_RANK as _TIER_RANK  # noqa: E402
@@ -412,47 +413,6 @@ def find(models, mid):
     return None
 
 
-def build_whitelist_index():
-    """Hostname → (format, tier) lookup for format-consistency log. Non-fatal
-    on missing/malformed whitelist."""
-    try:
-        with open(WHITELIST, encoding="utf-8") as fp:
-            wl = json.load(fp)
-    except (FileNotFoundError, json.JSONDecodeError) as exc:
-        logging.warning("build_whitelist_index: loaded empty (%s)", exc)
-        return {}
-    idx = {}
-    for cat in ALL_WHITELIST_CATEGORIES:
-        for e in wl.get(cat, []) or []:
-            url = e.get("url")
-            if not url:
-                continue
-            host = _extract_domain(url)
-            if host and host not in idx:
-                idx[host] = (e.get("format"), e.get("tier"))
-    return idx
-
-
-def load_unhealthy_urls():
-    """FAZ 6.A (2026-05-10): URL set that the SPA-shell guard rejects.
-    Sourced from data/sources-whitelist.json `_runtime.unhealthy`. Any
-    sourcesAdded entry or contradiction candidate citing one of these URLs
-    is dropped before bench values mutate. The cycle 2026-05-09 fabricated
-    26 tb2 values from https://tbench.ai/leaderboard (an empty SPA shell);
-    this guard prevents the same class of regression at the merge layer.
-    """
-    try:
-        with open(WHITELIST, encoding="utf-8") as fp:
-            wl = json.load(fp)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return set()
-    runtime = wl.get("_runtime") or {}
-    unhealthy = runtime.get("unhealthy") or {}
-    return {
-        (u or "").strip().rstrip("/").lower() for u, flag in unhealthy.items() if flag
-    }
-
-
 def _is_unhealthy_source(entry, unhealthy_urls):
     """True when `entry.url` matches the SPA-shell unhealthy set (after norm)."""
     if not unhealthy_urls:
@@ -728,8 +688,8 @@ def main():
     with open(sources_path, encoding="utf-8") as fp:
         sources = json.load(fp)
 
-    wl_idx = build_whitelist_index()
-    unhealthy_urls = load_unhealthy_urls()
+    wl_idx = _wl_hostname_index(_wl_load())
+    unhealthy_urls = _wl_load_unhealthy(Path(PROJECT))
 
     log = {
         "updated": [],
