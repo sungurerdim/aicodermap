@@ -1,27 +1,12 @@
 {
   "_summary": {
-    "compositeMisfiles": 2,
-    "measuredCandidates": 35,
-    "bandViolations": 19,
-    "crossBenchDups": 4,
+    "compositeMisfiles": 0,
+    "measuredCandidates": 38,
+    "bandViolations": 24,
+    "crossBenchDups": 5,
     "aaRowsLoaded": 384
   },
-  "compositeMisfiles": [
-    {
-      "modelId": "glm-4-7",
-      "benchKey": "aaAgentic",
-      "current": 21.01,
-      "aa": 55.01,
-      "delta": 34.0
-    },
-    {
-      "modelId": "glm-4-7",
-      "benchKey": "aaCoding",
-      "current": 23.82,
-      "aa": 36.26,
-      "delta": 12.44
-    }
-  ],
+  "compositeMisfiles": [],
   "measuredCandidates": [
     {
       "modelId": "mistral-large-3",
@@ -40,9 +25,9 @@
     {
       "modelId": "glm-4-5-air",
       "benchKey": "tau2",
-      "current": 78.1,
+      "current": 78.18,
       "aa": 46.49,
-      "delta": 31.61
+      "delta": 31.69
     },
     {
       "modelId": "minimax-m2-7",
@@ -50,6 +35,13 @@
       "current": 57.0,
       "aa": 84.8,
       "delta": 27.8
+    },
+    {
+      "modelId": "step-3-7-flash",
+      "benchKey": "hle",
+      "current": 47.2,
+      "aa": 19.93,
+      "delta": 27.27
     },
     {
       "modelId": "gemma-4-31b",
@@ -150,13 +142,6 @@
       "delta": 17.35
     },
     {
-      "modelId": "gpt-5-4-nano",
-      "benchKey": "tau2",
-      "current": 92.5,
-      "aa": 76.02,
-      "delta": 16.48
-    },
-    {
       "modelId": "o4-mini",
       "benchKey": "tau2",
       "current": 71.8,
@@ -192,6 +177,13 @@
       "delta": 14.35
     },
     {
+      "modelId": "step-3-5-flash",
+      "benchKey": "gpqa",
+      "current": 69.0,
+      "aa": 83.13,
+      "delta": 14.13
+    },
+    {
       "modelId": "mimo-v2-flash",
       "benchKey": "hle",
       "current": 22.1,
@@ -206,18 +198,18 @@
       "delta": 13.7
     },
     {
+      "modelId": "mistral-medium-3-5",
+      "benchKey": "tbHard",
+      "current": 20.45,
+      "aa": 33.33,
+      "delta": 12.88
+    },
+    {
       "modelId": "sonnet-4-6",
       "benchKey": "tau2",
       "current": 91.7,
       "aa": 79.53,
       "delta": 12.17
-    },
-    {
-      "modelId": "gpt-5-4-nano",
-      "benchKey": "hle",
-      "current": 37.7,
-      "aa": 26.46,
-      "delta": 11.24
     },
     {
       "modelId": "deepseek-v4-flash",
@@ -227,11 +219,25 @@
       "delta": 10.53
     },
     {
+      "modelId": "step-3-7-flash",
+      "benchKey": "tau2",
+      "current": 88.2,
+      "aa": 98.54,
+      "delta": 10.34
+    },
+    {
       "modelId": "gpt-5-4-mini",
       "benchKey": "tau2",
       "current": 93.4,
       "aa": 83.33,
       "delta": 10.07
+    },
+    {
+      "modelId": "deepseek-v4-flash",
+      "benchKey": "gpqa",
+      "current": 79.4,
+      "aa": 89.39,
+      "delta": 9.99
     },
     {
       "modelId": "deepseek-v4-flash",
@@ -280,6 +286,15 @@
       ]
     },
     {
+      "modelId": "gemini-3-1-pro",
+      "benchKey": "lmArenaElo",
+      "value": 1493.0,
+      "band": [
+        0.0,
+        100.0
+      ]
+    },
+    {
       "modelId": "o3",
       "benchKey": "cfElo",
       "value": 2727.0,
@@ -300,7 +315,7 @@
     {
       "modelId": "deepseek-v3-2",
       "benchKey": "cfElo",
-      "value": 2121.0,
+      "value": 2046.0,
       "band": [
         0.0,
         100.0
@@ -415,6 +430,15 @@
       ]
     },
     {
+      "modelId": "gemma-4-26b-moe",
+      "benchKey": "lmArenaElo",
+      "value": 1441.0,
+      "band": [
+        0.0,
+        100.0
+      ]
+    },
+    {
       "modelId": "gemma-4-31b",
       "benchKey": "cfElo",
       "value": 2150,
@@ -433,6 +457,33 @@
       ]
     },
     {
+      "modelId": "gemma-4-31b",
+      "benchKey": "lmArenaElo",
+      "value": 1452.0,
+      "band": [
+        0.0,
+        100.0
+      ]
+    },
+    {
+      "modelId": "gemma-4-e2b",
+      "benchKey": "cfElo",
+      "value": 633.0,
+      "band": [
+        0.0,
+        100.0
+      ]
+    },
+    {
+      "modelId": "gemma-4-e4b",
+      "benchKey": "cfElo",
+      "value": 940.0,
+      "band": [
+        0.0,
+        100.0
+      ]
+    },
+    {
       "modelId": "deepseek-r1-14b",
       "benchKey": "cfElo",
       "value": 1481.0,
@@ -444,6 +495,15 @@
   ],
   "crossBenchDups": [
     {
+      "modelId": "opus-4-7",
+      "value": 87.6,
+      "benchKeys": [
+        "aime26",
+        "lcb",
+        "sweV"
+      ]
+    },
+    {
       "modelId": "minimax-m2-7",
       "value": 57.0,
       "benchKeys": [
@@ -453,7 +513,7 @@
     },
     {
       "modelId": "nemotron-3-super",
-      "value": 29,
+      "value": 29.0,
       "benchKeys": [
         "tb2",
         "tbHard"

@@ -1,6 +1,30 @@
 {
-  "checked": 12,
+  "checked": 17,
   "rejected": [
+    {
+      "cell": "deepseek-v4-pro.cfElo",
+      "action": "confirm",
+      "value": 3206.0,
+      "reason": "outside-band[cfElo:0-100]"
+    },
+    {
+      "cell": "gemma-4-31b.cfElo",
+      "action": "confirm",
+      "value": 2150.0,
+      "reason": "outside-band[cfElo:0-100]"
+    },
+    {
+      "cell": "deepseek-r1-14b.cfElo",
+      "action": "confirm",
+      "value": 1481.0,
+      "reason": "outside-band[cfElo:0-100]"
+    },
+    {
+      "cell": "gemma-3-27b.cfElo",
+      "action": "confirm",
+      "value": 110.0,
+      "reason": "outside-band[cfElo:0-100]"
+    },
     {
       "cell": "deepseek-v4-flash.cfElo",
       "action": "confirm",

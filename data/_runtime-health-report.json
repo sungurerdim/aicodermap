@@ -1,12 +1,12 @@
 {
-  "probedAt": "2026-06-06T08:58:22Z",
+  "probedAt": "2026-06-06T13:08:46Z",
   "total": 138,
   "counts": {
     "format-drift": 14,
     "redirect": 8,
     "spa": 15,
     "bot-block": 2,
-    "dead": 12
+    "dead": 11
   },
   "formatDrift": [
     {
@@ -99,7 +99,7 @@
     },
     {
       "url": "https://compliance.microsoft.com/compliancemanager",
-      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3De5p-lAjxKggODPdczH9pKvxx1GSHoWTOB3AsKJKfRxSMMabj_XLOcn25h9Xrja5I9IN1b99g7FHCw-SVxuSCSe7uOiJ9UhrCUekilwY3QMBqVbMLoEZ2rusgFTe5VMX-AVhAteTFrTvPAHyYVUqJ25pWBxqojp2TaAKl3EuZ0Ro&response_mode=form_post&nonce=639163330882280007.ZWU0NTBjYzEtOWM5Ni00Y2Y3LWJlOGItMzEyYjM3NWY1NDE3MzQ4YWMyNTYtZjVkNS00OWYxLWI4OTktZjI4YmE4MzczNjRj&client-request-id=f6b11e9e-923a-4a6c-a46e-fc2b8801e5cd&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
+      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DWHPifq5sEApAUuanIwOf0Vemp47tHmFYXxNXezCNizU4JEcAg5ypvxLuc2FOaeIxPpr0orVWPLReyRSyvZG7ZXPAATxrMNx2hV0aqAB50NFoLPnWU6RBd_BeOLMY9rHJjyD1bZYC_ph98eyeIu9bQokXF7Eu2XElF8VZ4mWy8UM&response_mode=form_post&nonce=639163481128331118.MjQ0MjM2MjYtZmFjZi00NmZkLThjNjctZDVkZWY1ODIwMzhmNWFkYmU2MGUtNGFhYi00MzNiLTlkMDEtYzhiZGE1OTVkMzZi&client-request-id=c3d9e78b-d315-471e-9667-4ebfb29157fd&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
     },
     {
       "url": "https://edpb.europa.eu/our-work-tools/consistency-findings/register-for-decisions_en",
@@ -138,10 +138,6 @@
   "dead": [
     {
       "url": "https://terminal-bench.io/",
-      "error": "URLError: <urlopen error [Errno 11001] getaddrinfo failed>"
-    },
-    {
-      "url": "https://mcp-atlas.dev",
       "error": "URLError: <urlopen error [Errno 11001] getaddrinfo failed>"
     },
     {
