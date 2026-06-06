@@ -282,10 +282,21 @@ def should_quarantine(
 ) -> bool:
     """Quarantine = "this value is UNTRUSTED, exclude it from the composite."
     Triggers, in order:
-    - distinct primary values > 5  → extreme dispersion (no agreed value)
+    - distinct value CLUSTERS > 5  → extreme dispersion (no agreed value)
     - any scaffold-variant obs     → different eval contexts must not share a cell
     - confidence < 0.2             → low-confidence floor, EXCEPT a clean I-tier
       winner (see below)
+
+    DISPERSION COUNTS CLUSTERS, NOT RAW VALUES (2026-06-06): the trigger groups
+    observations within agreement_pp first, so a strong consensus reported with
+    trivial rounding spread (sweV 87.5 / 87.51 / 87.6 / 86.4 = ONE ~87.5 cluster)
+    counts once. Counting raw rounded values conflated that with genuine
+    dispersion and quarantined clean multi-source cells — opus-4-7.sweV had 6
+    raw values but only 3 clusters (≈87.5 consensus from 20+ I-tier sources, plus
+    an AA no-tools 72.5 and an lmcouncil 82.0, both legitimate harness variance,
+    not misfiles — see the AA tooled-vs-no-tools note). A fabrication that
+    disagrees still forms its own cluster, and a truly dispersed cell (>5
+    non-agreeing clusters) still quarantines, so fabrication defense is intact.
 
     I-TIER EXEMPTION (2026-06-06): a single observation from a canonical
     independent leaderboard (tier I) that is NOT contradicted (severity ≠ RED)
@@ -301,10 +312,8 @@ def should_quarantine(
     low-tier (C/S-only) or RED-contradicted single-source cells — the cases it
     was actually meant to catch (hype-blog inflation, conflicting numbers)."""
     scored = result.get("scored") or []
-    distinct_values = {
-        round(float(s["value"]), 2) for s in scored if s.get("value") is not None
-    }
-    if len(distinct_values) > 5:
+    clusters = result.get("all_clusters") or []
+    if len(clusters) > 5:
         return True
     pool = list(primary_obs or scored)
     for o in pool:
