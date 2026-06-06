@@ -68,6 +68,29 @@ STUB_META = {
         en_s="198B MoE (11B active) + 1.8B vision encoder, Apache 2.0, 256K context. For coding agents and search workflows. Cheap $0.20/$1.15. OpenRouter + NVIDIA NIM.",
         en_w="Released May 29 2026; bench cells not yet filled (next cycle). Independent verification limited.",
     ),
+    "minimax-m3": dict(
+        provider="MiniMax",
+        tier="open-flagship",
+        open=False,
+        license="proprietary",
+        context=1000000,
+        released="2026-06-01",
+        api=[
+            {
+                "provider": "official",
+                "in": 0.30,
+                "out": 1.20,
+                "cacheHit": None,
+                "throughput": None,
+                "url": "https://www.minimax.io/blog/minimax-m3",
+                "fetched": "2026-06-06",
+            }
+        ],
+        tr_s="1M bağlam, çok-kipli (metin/görüntü/video girişi), MSA seyrek dikkat. SWE-Pro ~%59.0, SWE-Verified ~%80.5 (lineup kaynağı). $0.30/$1.20 ucuz fiyat. 1 Haziran 2026 çıkışlı.",
+        tr_w="Önceki tam taramada gather lineup-hint ile yakalandı ama dedicated lineup fetch'i kaçırdı (artık harvest-new-models.py çözüyor). Bench hücreleri sonraki döngüde çok-kaynaklı provenance ile dolacak.",
+        en_s="1M context, multimodal (text/image/video input), MSA sparse attention. SWE-Pro ~59.0%, SWE-Verified ~80.5% (lineup source). Cheap $0.30/$1.20. Released June 1 2026.",
+        en_w="Caught via gather lineup-hint in the prior full sweep but missed by the dedicated lineup fetch (now resolved by harvest-new-models.py). Bench cells fill with multi-source provenance next cycle.",
+    ),
     "glm-5": dict(
         provider="Z.ai (Zhipu AI)",
         tier="open-flagship",

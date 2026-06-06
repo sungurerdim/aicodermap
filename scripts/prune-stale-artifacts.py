@@ -45,6 +45,13 @@ PATTERNS = [
     ".aicodermap-agent-out-batch*-gather.json",  # pre-F1.2 compat only
     ".aicodermap-agent-out-synth.json",
     ".aicodermap-agent-out.json",
+    # Per-batch idea_context files. The dispatch plan can split providers into a
+    # DIFFERENT set of batchIds cycle-to-cycle (e.g. mistral 1×6 → 2×{6,2}); a
+    # prior-cycle ctx whose batchId no longer exists in the fresh plan is never
+    # overwritten and pollutes the fresh ctx glob with stale/duplicate model
+    # assignments (observed 2026-06-06: 9 orphan ctx files collided with 16
+    # fresh, duplicating deprecated-model slices). Prune them with the rest.
+    ".aicodermap-ctx-batch*.json",
 ]
 
 ARCHIVE_DIR_NAME = ".aicodermap-stale-archive"

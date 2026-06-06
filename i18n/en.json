@@ -477,6 +477,10 @@
   "glm-5": {
    "strengths": "744B MoE (40B active), 200K context, MIT license. Z.ai frontier model; SWE-Verified ~77.8%, GPQA ~86%, AIME26 ~92.7% (lineup source). Successor glm-5-1 tracked separately.",
    "weaknesses": "Missed in a prior refresh (released Feb 11 2026); bench cells will be filled with multi-source provenance next full sweep."
+  },
+  "minimax-m3": {
+   "strengths": "1M context, multimodal (text/image/video input), MSA sparse attention. SWE-Pro ~59.0%, SWE-Verified ~80.5% (lineup source). Cheap $0.30/$1.20. Released June 1 2026.",
+   "weaknesses": "Caught via gather lineup-hint in the prior full sweep but missed by the dedicated lineup fetch (now resolved by harvest-new-models.py). Bench cells fill with multi-source provenance next cycle."
   }
  },
  "benchmarks": {

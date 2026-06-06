@@ -77,16 +77,21 @@ def _highest_confidence(values: list[str | None]) -> str:
 
 
 def _load_canonical_keys() -> set[str]:
-    """Load coreBenchKeys ∪ deprecatedBenchKeys for filtering."""
+    """Bench-value passthrough universe = all_bench_keys (core ∪ emerging,
+    == frontend BENCH_KEYS) ∪ deprecatedBenchKeys (kept for backward-compat
+    passthrough). Using core-only here previously DROPPED every emerging fill
+    (mcpA/sweMulti/browseComp/bfcl) the synth produced, so PRESETS that weight
+    them never saw the value. SoC: coverage formulas use core_bench_keys; value
+    passthrough uses all_bench_keys (single SSOT accessor, no inline set)."""
     sys.path.insert(0, str(ROOT / "scripts"))
     from lib.whitelist import (  # noqa: E402  — runtime path injection
-        core_bench_keys,
+        all_bench_keys,
         deprecated_bench_keys,
         load_whitelist,
     )
 
     wl = load_whitelist()
-    return set(core_bench_keys(wl)) | set(deprecated_bench_keys(wl))
+    return set(all_bench_keys(wl)) | set(deprecated_bench_keys(wl))
 
 
 def merge_artifacts(

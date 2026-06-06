@@ -16,7 +16,7 @@ from collections import defaultdict
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from lib.whitelist import contracts  # type: ignore  # noqa: E402
+from lib.whitelist import all_bench_keys, contracts  # type: ignore  # noqa: E402
 from lib.matrix import active_models  # type: ignore  # noqa: E402
 from lib import reliability as _reliability  # type: ignore  # noqa: E402
 from lib.tiers import verif_factor as _verif_factor  # type: ignore  # noqa: E402
@@ -128,7 +128,17 @@ def main() -> int:
     models = md if isinstance(md, list) else md.get("models", [])
     with open("data/sources-whitelist.json", encoding="utf-8") as f:
         wl = json.load(f)
+    # SoC: two distinct bench-key concerns, each with ONE SSOT accessor.
+    #   • core_keys (coreBenchKeys, 17) → COVERAGE/matrix denominator only.
+    #   • value_keys (all_bench_keys = core ∪ emerging, 29) → which observed
+    #     values may be INGESTED/scored. Mirrors frontend BENCH_KEYS exactly.
+    # Filtering ingestion to core_keys alone silently DROPPED every fresh
+    # emerging observation (2026-06-06: 45 obs / 33 cells — e.g. opus-4-8
+    # mcpA=82.2 + sweMulti=84.4 lost, sinking it in swe-focused despite top
+    # swePro/sweV). Emerging cells are optional (never gap-demanded), but their
+    # observed values MUST flow through so PRESETS that weight them see them.
     core_keys = wl["_schema"]["coreBenchKeys"]
+    value_keys = set(all_bench_keys(wl))
     ctr = contracts(wl)
     agreement_pp = float(ctr.get("VERIFICATION_AGREEMENT_PP", 1.5))
     host_pub = build_host_publishes(wl)  # C1 Elo-trap filter input
@@ -152,7 +162,7 @@ def main() -> int:
             if "." not in full_key:
                 continue
             mid, bk = full_key.split(".", 1)
-            if bk not in core_keys:
+            if bk not in value_keys:
                 continue
             for e in entries:
                 v = e.get("value")
@@ -205,7 +215,7 @@ def main() -> int:
             mid = obs.get("modelId")
             bk = obs.get("benchKey")
             val = obs.get("value")
-            if mid not in active_ids or bk not in core_keys or val is None:
+            if mid not in active_ids or bk not in value_keys or val is None:
                 continue
             try:
                 val = float(val)

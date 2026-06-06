@@ -19,6 +19,7 @@ Performs schema-complete merge per SKILL.md MERGE_RULES:
 import json
 import logging
 import os
+import re
 import shutil
 import sys
 from datetime import date, datetime, timezone
@@ -252,9 +253,27 @@ def apply_quarantine_and_gap_policy(
                     )
                     conf = compute_cell_confidence(result)
                     cell_entry["confidence"] = conf
-                    if conf < 0.2:
+                    # SSOT/DRY (2026-06-06): use pick_winner's quarantine verdict
+                    # (lib.winner.should_quarantine) instead of re-deriving the
+                    # `conf < 0.2` rule inline. The previous inline copy bypassed
+                    # should_quarantine's I-tier exemption, so clean canonical-
+                    # leaderboard cells (AA aaCoding, Scale SEAL swePro) stayed
+                    # quarantined here even though winner.py cleared them. One
+                    # quarantine decision, one source of truth.
+                    if result.get("quarantine"):
                         m.setdefault("benchQuarantine", {})[bk] = True
                         quarantined_count += 1
+                    else:
+                        # Quarantine is a CURRENT-state verdict, not a permanent
+                        # mark (2026-06-06). Authoritatively CLEAR a stale flag
+                        # when the cell is now trusted — a 2nd source arrived, a
+                        # contradiction resolved, or the I-tier exemption applies.
+                        # Without this, the old "never clear" policy let flags
+                        # accumulate forever (319 stuck cells), so improving the
+                        # evidence never lifted a model's score.
+                        bq = m.get("benchQuarantine")
+                        if isinstance(bq, dict):
+                            bq.pop(bk, None)
                     # Winner-authoritative reconciliation (fix: synth-emitted
                     # single-observation values can disagree with the
                     # multi-source consensus across data/sources.json).
@@ -505,10 +524,13 @@ def _build_bench_advertised_count():
 
 
 def _load_bench_key_universe():
-    """Bench-key universe = whitelist._schema.coreBenchKeys ∪ every
-    leaderboard's publishes[] entry. Loaded fresh from whitelist on each
-    merge run so a leaderboard adding a new bench key in publishes[] flows
-    through automatically."""
+    """Bench-value universe = coreBenchKeys ∪ emergingBenchKeys (== frontend
+    BENCH_KEYS / all_bench_keys SSOT) ∪ every leaderboard's publishes[] entry.
+    Emerging keys are explicit members so an emerging cell with no dedicated
+    leaderboard publisher (e.g. a vendor-only mcpA/sweMulti) still passes through
+    instead of being filtered out. Loaded fresh on each merge so a leaderboard
+    adding a new publishes[] key also flows through automatically. SoC: coverage/
+    matrix uses coreBenchKeys (_wl_core_bench_keys); value passthrough uses this."""
     try:
         with open(WHITELIST, encoding="utf-8") as fp:
             wl = json.load(fp)
@@ -517,6 +539,8 @@ def _load_bench_key_universe():
     universe = set()
     schema = wl.get("_schema") or {}
     for k in schema.get("coreBenchKeys", []) or []:
+        universe.add(k)
+    for k in schema.get("emergingBenchKeys", []) or []:
         universe.add(k)
     for lb in wl.get("leaderboards", []) or []:
         for k in lb.get("publishes", []) or []:
@@ -1379,8 +1403,18 @@ def main():
     if os.path.exists(cl_path):
         with open(cl_path, encoding="utf-8") as fp:
             existing = fp.read()
+        # CONSOLIDATE same-day re-runs (FIX 2026-06-06). A full cycle calls merge
+        # MORE THAN ONCE (anomaly verdicts + stub additions each re-finalize), and
+        # each run regenerates the WHOLE entry from the current data — so a naive
+        # prepend stacked 3 identical-date blocks in one cycle. Strip any existing
+        # leading `## [TODAY]` block(s) before prepending the freshest one: the
+        # last merge of a cycle is authoritative. SoC: only same-day blocks are
+        # touched; prior dates are immutable history.
+        existing = re.sub(
+            r"(?ms)^## \[" + re.escape(TODAY) + r"\].*?(?=^## \[|\Z)", "", existing
+        )
         with open(cl_path, "w", encoding="utf-8") as fp:
-            fp.write(cl_blob + "\n" + existing)
+            fp.write(cl_blob + "\n" + existing.lstrip("\n"))
     else:
         with open(cl_path, "w", encoding="utf-8") as fp:
             fp.write("# Changelog\n\n" + cl_blob)

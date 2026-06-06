@@ -79,7 +79,7 @@ PRELIM-C. STALE_ARTIFACT_PRUNE (FAZ 7.A, 2026-05-10):
    ```
    python scripts/prune-stale-artifacts.py
    ```
-   - Renames prior-cycle artifacts to `<name>.stale-<epoch>` so dispatched agents cannot reuse them. Patterns: `.aicodermap-agent-out-batch*.gather.json`, `.aicodermap-agent-out-batch*-gather.json`, `.aicodermap-agent-out-synth.json`, `.aicodermap-agent-out.json`.
+   - Renames prior-cycle artifacts to `<name>.stale-<epoch>` so dispatched agents cannot reuse them. Patterns: `.aicodermap-agent-out-batch*.gather.json`, `.aicodermap-agent-out-batch*-gather.json`, `.aicodermap-agent-out-synth.json`, `.aicodermap-agent-out.json`, `.aicodermap-ctx-batch*.json` (added 2026-06-06 — the dispatch plan can split providers into DIFFERENT batchIds cycle-to-cycle, so a prior-cycle ctx whose batchId is gone from the fresh plan is never overwritten and pollutes the fresh ctx glob with stale/duplicate model slices).
    - Defends against the cycle 2026-05-10 failure mode: gather/synth agents observed prior-cycle artifacts, deemed them complete, emitted EMITTED status without fresh fetches.
    - Orchestrator records `cycle_started_unix = time.time()` AFTER prune; this flows into `idea_context.cycleStartedUnix` and into gather validator's `--cycle-started-unix`.
    - **6.4 — verificationMap file-age guard.** Before computing `priorityCells`/
@@ -167,6 +167,16 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
      * RENAMED (vendor changed canonical id) → auto-rename per WRONG_ID_AUTO_FIX rule
      * REMOVED (no longer on vendor page after grace period) → archive to data/archive/<id>.json
    - This step CANNOT be skipped on refresh-all; it's the source of truth for "what models exist".
+   - **Gather-hint harvest (MANDATORY, added 2026-06-06) — second new-model detection channel:**
+     after Stage A gather returns, run `python scripts/harvest-new-models.py`. It unions
+     every gather artifact's `lineupHints[event='new']` into `.aicodermap-lineup.json`'s
+     `newModels[]`, deduped against `currentIds`. ROOT CAUSE this closes: the dedicated
+     lineup agent depends on a vendor's lineup page being reachable; when it is SPA/403/dead
+     and the WebSearch fallback misses the release, a genuinely-new model is dropped even
+     though a gather agent researching that vendor's slice SAW it (e.g. `minimax-m3`,
+     released 2026-06-01, was flagged by batch04-minimax's gather but absent from the lineup
+     file). Harvesting makes detection robust to any single source failing. The harvested
+     entries flow into the same stub-add + CHANGELOG path as lineup-agent newModels.
    - **Mandatory retry (added 2026-04-28):** if Step 4 returns with `lineup` empty/missing/`{}` AND this is not the first-ever run, the orchestrator dispatches ONE retry agent (sonnet) restricted to Step 0 (fetch vendor lineup pages only, no bench/pricing). On second-cycle empty, log `gaps[]` entry `lineup:incomplete` with reason and continue. Same retry policy applies when `runtime.healthChecks` covers fewer than 3 leaderboard domains.
 
 1. Read data/{models,sources,sources-whitelist}.json + lineup result from Step 0

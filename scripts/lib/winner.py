@@ -281,15 +281,26 @@ def should_quarantine(
     result: dict[str, Any],
     primary_obs: list[dict[str, Any]] | None = None,
 ) -> bool:
-    """FAZ 8.A.3b quarantine triggers:
-    - confidence < 0.2
-    - distinct primary values > 5 (extreme dispersion)
-    - any observation flagged as scaffold-variant (different evaluation
-      contexts shouldn't share a single composite cell)
-    """
-    conf = float(result.get("confidence") or 0.0)
-    if conf < 0.2:
-        return True
+    """Quarantine = "this value is UNTRUSTED, exclude it from the composite."
+    Triggers, in order:
+    - distinct primary values > 5  → extreme dispersion (no agreed value)
+    - any scaffold-variant obs     → different eval contexts must not share a cell
+    - confidence < 0.2             → low-confidence floor, EXCEPT a clean I-tier
+      winner (see below)
+
+    I-TIER EXEMPTION (2026-06-06): a single observation from a canonical
+    independent leaderboard (tier I) that is NOT contradicted (severity ≠ RED)
+    and NOT dispersed is the project's MOST-trusted evidence — Artificial
+    Analysis for aaCoding/aaAgentic, Scale SEAL for swePro, etc. Quarantining it
+    merely for confidence < 0.2 double-penalizes verification scarcity that
+    trustScore ALREADY discounts (v=1 → 0.5) on top of the composite's
+    coverage^(1/expo) shrinkage, and it self-contradicts apply-aa-authoritative
+    (AA's own definitional indices were being excluded). Empirically this floor
+    quarantined 153 such clean I-tier cells (48% of all quarantines, 2026-06-06),
+    systematically sinking brand-new frontier models whose best benchmarks come
+    from 1-2 independent leaderboards. The confidence floor is RETAINED for
+    low-tier (C/S-only) or RED-contradicted single-source cells — the cases it
+    was actually meant to catch (hype-blog inflation, conflicting numbers)."""
     scored = result.get("scored") or []
     distinct_values = {
         round(float(s["value"]), 2) for s in scored if s.get("value") is not None
@@ -303,6 +314,14 @@ def should_quarantine(
         ctx = o.get("evaluationContext") or {}
         if isinstance(ctx, dict) and ctx.get("scaffold"):
             return True
+    conf = float(result.get("confidence") or 0.0)
+    if conf < 0.2:
+        winner_tier = str((result.get("winner_obs") or {}).get("tier") or "").upper()
+        severity = result.get("severity", "GREEN")
+        # Clean canonical-leaderboard evidence is trusted, not quarantined.
+        if winner_tier == "I" and severity != "RED":
+            return False
+        return True
     return False
 
 

@@ -477,6 +477,10 @@
   "glm-5": {
    "strengths": "744B MoE (40B aktif), 200K bağlam, MIT lisans. Z.ai'nin frontier modeli; SWE-Verified ~%77.8, GPQA ~%86, AIME26 ~%92.7 (lineup kaynağı). Halefi glm-5-1 ayrıca takip ediliyor.",
    "weaknesses": "Önceki döngüde atlanmıştı (11 Şubat 2026 çıkışlı); bench hücreleri sonraki tam taramada çok-kaynaklı provenance ile doldurulacak."
+  },
+  "minimax-m3": {
+   "strengths": "1M bağlam, çok-kipli (metin/görüntü/video girişi), MSA seyrek dikkat. SWE-Pro ~%59.0, SWE-Verified ~%80.5 (lineup kaynağı). $0.30/$1.20 ucuz fiyat. 1 Haziran 2026 çıkışlı.",
+   "weaknesses": "Önceki tam taramada gather lineup-hint ile yakalandı ama dedicated lineup fetch'i kaçırdı (artık harvest-new-models.py çözüyor). Bench hücreleri sonraki döngüde çok-kaynaklı provenance ile dolacak."
   }
  },
  "benchmarks": {
