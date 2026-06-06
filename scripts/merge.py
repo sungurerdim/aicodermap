@@ -104,6 +104,74 @@ def restore_from_bak(paths):
     return rolled
 
 
+def run_post_write_audits(models_path, sources_path, project):
+    """Run the post-write HARD-BLOCK audits against the just-written data files:
+    SSOT coherence (audit-data-coherence.py) then bench-source mapping
+    (audit-bench-source-mapping.py). On the FIRST failure, roll the data files
+    back to their .bak snapshots, print the loud abort block to stderr, and
+    return False. No sys.exit inside — the caller owns the fail-fast exit so the
+    skill orchestrator sees a non-zero return. Returns True when both pass."""
+    import subprocess
+
+    sep = "=" * 72
+
+    # 1. SSOT coherence audit.
+    proc = subprocess.run(
+        [sys.executable, f"{project}/scripts/audit-data-coherence.py"],
+        capture_output=True,
+        text=True,
+        check=False,
+        env={**os.environ, "PYTHONIOENCODING": "utf-8"},
+    )
+    if proc.returncode != 0:
+        rolled = restore_from_bak([models_path, sources_path])
+        print("\n" + sep, file=sys.stderr)
+        print("✗ MERGE ABORTED — SSOT coherence drift in artifact", file=sys.stderr)
+        print(sep, file=sys.stderr)
+        for line in (proc.stderr or "").strip().splitlines():
+            print(f"  {line}", file=sys.stderr)
+        print("", file=sys.stderr)
+        if rolled:
+            print(
+                f"  Rolled back {len(rolled)} file(s) from .bak so the working tree "
+                f"matches the pre-merge state:",
+                file=sys.stderr,
+            )
+            for p in rolled:
+                print(f"    - {os.path.relpath(p, project)}", file=sys.stderr)
+        print("", file=sys.stderr)
+        print(
+            "  Fix the drift in .aicodermap-agent-out.json (the agent's artifact) "
+            "or the underlying SSOT files, then re-run merge. Commit is blocked "
+            "until audit passes.",
+            file=sys.stderr,
+        )
+        print(sep, file=sys.stderr)
+        return False
+
+    # 2. Bench-source mapping audit — HARD BLOCK on AC6/AC7 drift.
+    bench_proc = subprocess.run(
+        [sys.executable, f"{project}/scripts/audit-bench-source-mapping.py"],
+        capture_output=True,
+        text=True,
+        check=False,
+        env={**os.environ, "PYTHONIOENCODING": "utf-8"},
+    )
+    if bench_proc.returncode != 0:
+        rolled = restore_from_bak([models_path, sources_path])
+        print("\n" + sep, file=sys.stderr)
+        print("✗ MERGE ABORTED — bench-source mapping drift (AC6/AC7)", file=sys.stderr)
+        print(sep, file=sys.stderr)
+        for line in (bench_proc.stderr or "").strip().splitlines():
+            print(f"  {line}", file=sys.stderr)
+        if rolled:
+            print(f"\n  Rolled back {len(rolled)} file(s) from .bak.", file=sys.stderr)
+        print(sep, file=sys.stderr)
+        return False
+
+    return True
+
+
 def deep_merge(dst, src):
     """Recursively merge src into dst. Arrays are replaced unless handled specially."""
     for k, v in src.items():
@@ -1162,65 +1230,11 @@ def main():
                 print("=" * 72, file=sys.stderr)
                 sys.exit(1)
 
-    # SSOT coherence audit — HARD BLOCK gate. Runs against the just-written
-    # data files. On drift: roll the data files back to their .bak snapshots,
-    # print a loud failure with the audit's stderr, and exit non-zero so the
-    # skill orchestrator (and any caller) sees the merge did not complete.
-    # No CHANGELOG entry, no commit-eligible state — drift never reaches main.
-    import subprocess
-
-    proc = subprocess.run(
-        [sys.executable, f"{PROJECT}/scripts/audit-data-coherence.py"],
-        capture_output=True,
-        text=True,
-        check=False,
-        env={**os.environ, "PYTHONIOENCODING": "utf-8"},
-    )
-    coherence_ok = proc.returncode == 0
-    if not coherence_ok:
-        rolled = restore_from_bak([models_path, sources_path])
-        print("\n" + "=" * 72, file=sys.stderr)
-        print("✗ MERGE ABORTED — SSOT coherence drift in artifact", file=sys.stderr)
-        print("=" * 72, file=sys.stderr)
-        for line in (proc.stderr or "").strip().splitlines():
-            print(f"  {line}", file=sys.stderr)
-        print("", file=sys.stderr)
-        if rolled:
-            print(
-                f"  Rolled back {len(rolled)} file(s) from .bak so the working tree "
-                f"matches the pre-merge state:",
-                file=sys.stderr,
-            )
-            for p in rolled:
-                print(f"    - {os.path.relpath(p, PROJECT)}", file=sys.stderr)
-        print("", file=sys.stderr)
-        print(
-            "  Fix the drift in .aicodermap-agent-out.json (the agent's artifact) "
-            "or the underlying SSOT files, then re-run merge. Commit is blocked "
-            "until audit passes.",
-            file=sys.stderr,
-        )
-        print("=" * 72, file=sys.stderr)
-        sys.exit(1)
-
-    # Bench-source mapping audit — HARD BLOCK on AC6/AC7 drift.
-    bench_proc = subprocess.run(
-        [sys.executable, f"{PROJECT}/scripts/audit-bench-source-mapping.py"],
-        capture_output=True,
-        text=True,
-        check=False,
-        env={**os.environ, "PYTHONIOENCODING": "utf-8"},
-    )
-    if bench_proc.returncode != 0:
-        rolled = restore_from_bak([models_path, sources_path])
-        print("\n" + "=" * 72, file=sys.stderr)
-        print("✗ MERGE ABORTED — bench-source mapping drift (AC6/AC7)", file=sys.stderr)
-        print("=" * 72, file=sys.stderr)
-        for line in (bench_proc.stderr or "").strip().splitlines():
-            print(f"  {line}", file=sys.stderr)
-        if rolled:
-            print(f"\n  Rolled back {len(rolled)} file(s) from .bak.", file=sys.stderr)
-        print("=" * 72, file=sys.stderr)
+    # Post-write HARD-BLOCK audits (SSOT coherence + bench-source mapping).
+    # The helper runs both against the just-written data files, rolls back to
+    # .bak + prints the loud abort block on drift, and returns False. No
+    # CHANGELOG entry, no commit-eligible state — drift never reaches main.
+    if not run_post_write_audits(models_path, sources_path, PROJECT):
         sys.exit(1)
 
     # FAZ C audit — research-pipeline telemetry from runMetadata.
