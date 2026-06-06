@@ -159,7 +159,7 @@ def merge_artifacts(
             if mid not in models_by_id:
                 models_by_id[mid] = m
             else:
-                # Merge updates + sourcesAdded + notApplicable for same id
+                # Merge updates + sourcesAdded for same id
                 # (rare; only happens if two batches accidentally share a model).
                 existing = models_by_id[mid]
                 existing_updates = existing.setdefault("updates", {})
@@ -174,9 +174,6 @@ def merge_artifacts(
                         existing_updates[k] = v
                 existing.setdefault("sourcesAdded", []).extend(
                     m.get("sourcesAdded") or []
-                )
-                existing.setdefault("notApplicable", []).extend(
-                    m.get("notApplicable") or []
                 )
 
         for nm in data.get("newModels") or []:

@@ -63,8 +63,7 @@
                 "verifications": { "type": "integer", "minimum": 1 }
               }
             }
-          },
-          "notApplicable":   { "type": "array" }
+          }
         }
       }
     },
@@ -106,7 +105,6 @@
     "newModels":        { "type": "array" },
     "lineup":           { "type": "object" },
     "contradictions":   { "type": "array" },
-    "notApplicable":    { "type": "array" },
     "whitelistAdditions": { "type": "array" },
     "i18nUpdates":      { "type": "object" },
     "runtime":          { "type": "object" },

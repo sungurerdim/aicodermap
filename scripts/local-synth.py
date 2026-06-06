@@ -497,10 +497,9 @@ def main() -> int:
         or m.get("unslothObservations")
     ]
 
-    # N/A retired 2026-05-25: naCandidates are no longer promoted to
-    # notApplicable. Every (model, bench) cell is FILLED or GAP — an unmeasured
-    # cell stays a gap and is re-researched every cycle (freshness-skip only).
-    not_applicable: list = []
+    # N/A retired 2026-05-25: naCandidates are never promoted. Every
+    # (model, bench) cell is FILLED or GAP — an unmeasured cell stays a gap
+    # and is re-researched every cycle (freshness-skip only).
 
     # Coverage computation
     total_cells = len(active) * len(core_keys)
@@ -552,14 +551,12 @@ def main() -> int:
             "hints": all_lineup_hints,
         },
         "gaps": gap_entries,
-        "notApplicable": not_applicable,
         "i18nUpdates": {},
         "validationCoverage": validation_coverage,
         "runtime": {
             **runtime_total,
             "cellsFilled": fills_count,
             "contradictionsDetected": len(contradictions),
-            "naPromoted": len(not_applicable),
             "modelsTouched": len(final_models),
             "totalCellsExpected": total_cells,
             "synthMethod": "local-deterministic",
@@ -576,7 +573,6 @@ def main() -> int:
     print(f"  modelsTouched: {len(final_models)}")
     print(f"  fills (cellsFilled): {fills_count}")
     print(f"  contradictions: {len(contradictions)}")
-    print(f"  naPromoted: {len(not_applicable)}")
     print(f"  gapsCarried: {len(gap_entries)} (deduped from {len(all_raw_gaps)} raw)")
     print(f"  validationCoverage: {validation_coverage * 100:.1f}%")
     if elo_dropped:

@@ -129,7 +129,6 @@ for entry in existing_artifact.get("models", []):
             "id": mid,
             "updates": entry.get("updates", {}),
             "sourcesAdded": entry.get("sourcesAdded", []),
-            "notApplicable": [],
         }
 
 # Ensure every active model has an entry
@@ -139,7 +138,6 @@ for m in active:
             "id": m["id"],
             "updates": {},
             "sourcesAdded": [],
-            "notApplicable": [],
         }
 
 # Build gaps list (preserve existing explicit gaps + add auto-gaps for missing)
@@ -224,7 +222,6 @@ artifact = {
     "lineup": existing_artifact.get("lineup", {}),
     "contradictions": existing_artifact.get("contradictions", []),
     "gaps": existing_gaps,
-    "notApplicable": [],
     "whitelistAdditions": existing_artifact.get("whitelistAdditions", []),
     "i18nUpdates": existing_artifact.get("i18nUpdates", {}),
     "runtime": existing_artifact.get(
