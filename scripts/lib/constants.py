@@ -34,7 +34,12 @@ COMPLETENESS_RETRY_LIMIT = 1  # Single retry per refresh.
 BATCH_WALLCLOCK_SEC = 600  # FAZ 1.3: per-batch wallclock cap (10 min).
 BATCH_WALLCLOCK_SOFT_STOP_SEC = 30  # FAZ 1.3: agent self-stops at deadline-30s.
 AGENT_BUDGET_BUFFER = 50  # FAZ 1: tool-call ceiling per agent.
-MAX_PARALLEL = 10  # FAZ 1.2: parallel sub-agents per wave.
+MAX_PARALLEL = 16  # 2026-06-06: 10→16. With FFD batch-packing a 76-model cycle
+# is ~13 batches, so 16 fits the whole plan in ONE wave — the orchestrator
+# dispatches every batch in a single message and the harness schedules them
+# continuously (a finishing agent frees a slot immediately), eliminating the
+# wave-barrier idle time where fast agents waited ~290s for the slowest in their
+# wave. 16 also matches the workflow concurrency ceiling (min(16, cores-2)).
 
 # ── Freshness contract (FAZ 2.2) ───────────────────────────────────────────
 FRESHNESS_TTL_DAYS = 7  # T2 cells skip if confirmed AND age ≤ this.

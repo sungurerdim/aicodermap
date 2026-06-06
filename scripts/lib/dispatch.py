@@ -166,6 +166,39 @@ def merge_small_buckets(
     return big + merged
 
 
+def pack_batches(
+    buckets: list[list[dict[str, Any]]],
+    max_models: int,
+) -> list[list[dict[str, Any]]]:
+    """First-Fit-Decreasing pack of post-split buckets into the FEWEST batches
+    of ≤ max_models (2026-06-06 efficiency reform).
+
+    Root cause this fixes: family bucketing produced 18 batches for 76 models
+    (sizes 6,6,6,6,6,6,5,5,4,4,4,3,3,3,3,3,2,1) — nine undersized. Each agent
+    carries ~15-20 tool-calls of FIXED overhead (read agent.md + ctx + _rows +
+    _aa-rows, Phase-0 lineup, self-audit) REGARDLESS of model count, so a 1- or
+    3-model batch is almost pure overhead (measured: batch10 1 model = 379s/25
+    tools, batch08 3 models = 419s/25 tools). FFD packs undersized buckets
+    together → 13 batches (12×6 + 1×4), cutting ~5 agents of fixed overhead per
+    cycle AND letting the plan fit one parallel wave (no wave-barrier idle time).
+
+    A full-size family bucket (e.g. the 6-model Qwen slice) is placed first and
+    stays intact (vendor-coherent); only undersized buckets get co-located. The
+    6-model cap (B2 coverage budget) is never exceeded, so each slice still fully
+    sweeps within the tool-call ceiling. Mixed-vendor batches are handled
+    per-model via target_model_ids (same as the prior merge_small path).
+    """
+    bins: list[list[dict[str, Any]]] = []
+    for b in sorted(buckets, key=len, reverse=True):
+        for bin_ in bins:
+            if len(bin_) + len(b) <= max_models:
+                bin_.extend(b)
+                break
+        else:
+            bins.append(list(b))
+    return bins
+
+
 def compute_dispatch_plan(
     active: list[dict[str, Any]],
     core_keys: list[str],
@@ -173,7 +206,6 @@ def compute_dispatch_plan(
     max_parallel: int = MAX_PARALLEL,
     max_models_override: int | None = None,
     merge_small: bool = True,
-    small_threshold: int = 2,
 ) -> dict[str, Any]:
     """Plan an adaptive multi-batch dispatch.
 
@@ -197,13 +229,15 @@ def compute_dispatch_plan(
     keys = list(core_keys)
     mpb = max_models_override or models_per_batch(len(keys))
     buckets = family_buckets(active)
-    if merge_small:
-        buckets = merge_small_buckets(
-            buckets,
-            small_threshold=small_threshold,
-            max_merged_size=mpb,
-        )
+    # Split oversize families to ≤mpb, THEN FFD-pack every undersized bucket
+    # together so the plan uses the fewest agents (each agent's ~15-20-tool-call
+    # fixed overhead is paid once per BATCH, not per model). pack_batches
+    # subsumes the older merge_small_buckets (which only collapsed ≤2-model
+    # families and left 3-5-model batches fragmented). merge_small=False keeps
+    # the unpacked family layout for callers that want vendor-pure batches.
     sliced = split_oversize_batches(buckets, mpb)
+    if merge_small:
+        sliced = pack_batches(sliced, mpb)
 
     import re
 

@@ -65,7 +65,36 @@ from lib.util import utc_now_iso as _utc_now_iso  # noqa: E402  (SSOT)
 
 SNAPSHOTS_DIR = PROJECT / "data" / ".leaderboard-snapshots"
 INDEX_PATH = SNAPSHOTS_DIR / "_index.json"
+HEALTH_REPORT_PATH = PROJECT / "data" / "_runtime-health-report.json"
 USER_AGENT = "AICoderMap-Prefetch/1.0 (+https://sungurerdim.github.io/aicodermap/)"
+
+
+def _verified_ctx():
+    """Default cert-verifying SSL context, preferring certifi's CA bundle when
+    available (Windows Python often lacks a usable system bundle — the source of
+    this cycle's livecodebench.com CERTIFICATE_VERIFY_FAILED)."""
+    import ssl
+
+    try:
+        import certifi  # type: ignore
+
+        return ssl.create_default_context(cafile=certifi.where())
+    except Exception:
+        return ssl.create_default_context()
+
+
+def _unverified_ctx():
+    """Cert-verification-disabled context for the SSL-env fallback ONLY. Safe
+    here: every target is a PUBLIC read-only leaderboard GET — no auth, no
+    secrets, no request body. An untrusted local CA bundle must not silently
+    drop a live I-tier source (livecodebench.com etc.)."""
+    import ssl
+
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    return ctx
+
 
 # Cycles run on a 14-day cadence (M5 STALE_DAYS); within-cycle snapshots
 # are valid for 24h. Older than that → re-fetch.
@@ -113,19 +142,56 @@ def _is_stale(entry: dict[str, Any], ttl_hours: int) -> bool:
     return age_sec > ttl_hours * 3600
 
 
+def _probe_dead_urls() -> set[str]:
+    """URLs the deterministic source-health-probe (PRELIM-B, runs FIRST) already
+    proved unreachable/unfetchable THIS cycle: dead (404/DNS), bot-blocked (403),
+    and SPA-only pages whose snapshot would be a contentless shell. Skipping them
+    here turns the prior '0/8 — all failed' noise into 'not even attempted',
+    saving the fetch budget for sources that can actually return data. ssl-env
+    drifts are deliberately NOT skipped — the verified→unverified retry recovers
+    them."""
+    if not HEALTH_REPORT_PATH.exists():
+        return set()
+    try:
+        rep = json.loads(HEALTH_REPORT_PATH.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return set()
+    dead: set[str] = set()
+    for key in ("dead", "botBlocked", "spa"):
+        for item in rep.get(key) or []:
+            url = item.get("url") if isinstance(item, dict) else item
+            if isinstance(url, str):
+                dead.add(url)
+    for item in rep.get("formatDrift") or []:
+        if isinstance(item, dict) and item.get("observed") in (
+            "dead",
+            "spa_full",
+            "spa",
+            "bot_blocked",
+        ):
+            url = item.get("url")
+            if isinstance(url, str):
+                dead.add(url)
+    return dead
+
+
 def _gather_targets(whitelist: dict[str, Any]) -> list[dict[str, Any]]:
-    """Walk PREFETCH_CATEGORIES, filter out banned-format / unhealthy / override."""
+    """Walk PREFETCH_CATEGORIES, filter out banned-format / unhealthy / override
+    / probe-confirmed-dead."""
     ft = (whitelist.get("_schema") or {}).get("formatTaxonomy") or {}
     banned_formats = {
         k
         for k, v in ft.items()
         if isinstance(v, dict) and v.get("skipWebFetch") is True
     }
+    dead_urls = _probe_dead_urls()
     targets: list[dict[str, Any]] = []
     for cat in PREFETCH_CATEGORIES:
         for e in whitelist.get(cat, []) or []:
             url = e.get("url")
             if not isinstance(url, str) or not url.startswith(("http://", "https://")):
+                continue
+            if url in dead_urls:
                 continue
             fmt = e.get("format")
             if fmt in banned_formats:
@@ -144,44 +210,58 @@ def _gather_targets(whitelist: dict[str, Any]) -> list[dict[str, Any]]:
     return targets
 
 
-def _fetch_one(target: dict[str, Any]) -> dict[str, Any]:
-    """HTTP GET with stdlib urllib. Returns either {ok:True, ...} or {ok:False, error:...}."""
-    url = target["url"]
+def _is_ssl_verify_error(exc: Exception) -> bool:
+    """True for an SSL CA-trust failure (local-bundle artifact), so we retry
+    once without verification — but NOT for a genuine connection/DNS/timeout."""
+    import ssl
+
+    e: BaseException | None = exc
+    while e is not None:
+        if isinstance(e, ssl.SSLCertVerificationError):
+            return True
+        if isinstance(e, ssl.SSLError) and "CERTIFICATE_VERIFY_FAILED" in str(e):
+            return True
+        e = e.__cause__ or e.__context__
+    return "CERTIFICATE_VERIFY_FAILED" in str(exc)
+
+
+def _http_get(url: str, ctx) -> dict[str, Any]:
     req = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "*/*"})
+    with urlopen(req, timeout=FETCH_TIMEOUT_SEC, context=ctx) as resp:
+        return {
+            "status": getattr(resp, "status", 200),
+            "body": resp.read(),
+            "contentType": resp.headers.get("Content-Type", "text/html")
+            .split(";")[0]
+            .strip(),
+            "etag": resp.headers.get("ETag"),
+        }
+
+
+def _fetch_one(target: dict[str, Any]) -> dict[str, Any]:
+    """HTTP GET with stdlib urllib. Verified TLS first; on a CA-trust failure
+    (ssl-env artifact) retry once unverified so a usable I-tier source isn't lost
+    to a broken local cert bundle. Returns {ok:True,...} or {ok:False,error:...}."""
+    url = target["url"]
+    base = {"format": target.get("format"), "category": target.get("category")}
     try:
-        with urlopen(req, timeout=FETCH_TIMEOUT_SEC) as resp:
-            status = getattr(resp, "status", 200)
-            body = resp.read()
-            content_type = (
-                resp.headers.get("Content-Type", "text/html").split(";")[0].strip()
-            )
-            etag = resp.headers.get("ETag")
-            return {
-                "ok": True,
-                "url": url,
-                "status": status,
-                "body": body,
-                "contentType": content_type,
-                "etag": etag,
-                "format": target.get("format"),
-                "category": target.get("category"),
-            }
+        r = _http_get(url, _verified_ctx())
+        return {"ok": True, "url": url, **r, **base}
     except HTTPError as e:
-        return {
-            "ok": False,
-            "url": url,
-            "error": f"HTTP {e.code} {e.reason}",
-            "format": target.get("format"),
-            "category": target.get("category"),
-        }
+        return {"ok": False, "url": url, "error": f"HTTP {e.code} {e.reason}", **base}
     except (URLError, TimeoutError, OSError) as e:
-        return {
-            "ok": False,
-            "url": url,
-            "error": f"{type(e).__name__}: {e}",
-            "format": target.get("format"),
-            "category": target.get("category"),
-        }
+        if _is_ssl_verify_error(e):
+            try:
+                r = _http_get(url, _unverified_ctx())
+                return {"ok": True, "url": url, "sslFallback": True, **r, **base}
+            except (URLError, HTTPError, TimeoutError, OSError) as e2:
+                return {
+                    "ok": False,
+                    "url": url,
+                    "error": f"{type(e2).__name__}: {e2}",
+                    **base,
+                }
+        return {"ok": False, "url": url, "error": f"{type(e).__name__}: {e}", **base}
 
 
 def _persist_snapshot(result: dict[str, Any]) -> dict[str, Any]:
