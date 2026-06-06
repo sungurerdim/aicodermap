@@ -811,7 +811,7 @@ def main():
     # a high-tier outlier override multi-source consensus. Re-cluster the
     # candidates here and prefer the cluster with max sum(trustScore).
     sys.path.insert(0, f"{PROJECT}/scripts")
-    from lib.synth import _cluster_observations  # noqa: E402
+    from lib.cluster import _cluster_observations  # noqa: E402
 
     AGREEMENT_PP = _AGREEMENT_PP  # SSOT: lib.constants
     MIN_DISTINCT_SAFE = 3

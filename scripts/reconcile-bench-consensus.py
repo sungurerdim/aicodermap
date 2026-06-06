@@ -18,8 +18,8 @@ cell present in data/sources.json, recomputes the winning value, and
 updates data/models.json. Outliers stay in sources.json (preserved for
 audit) but lose the contradictionRole=winner flag.
 
-The same rule lives in scripts/lib/synth.py `_pick_winner` for the
-forward path (next refresh cycle); this script handles the historical
+The same clustering primitives (lib.cluster) back lib.winner.pick_winner on
+the forward path (next refresh cycle); this script handles the historical
 data backlog only.
 """
 
@@ -37,9 +37,11 @@ if hasattr(sys.stdout, "reconfigure"):
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from lib.synth import (  # noqa: E402  - runtime path
+from lib.cluster import (  # noqa: E402  - runtime path
     _apply_low_confidence_penalty,
     _cluster_observations,
+)
+from lib.whitelist import (  # noqa: E402  - runtime path
     _load_low_confidence_urls,
     _load_unhealthy_urls,
 )

@@ -26,8 +26,8 @@ This script:
   5. Prints a per-cell delta report
 
 This is a defensive one-shot. Going forward, agents must be prevented from
-re-citing SPA-shell URLs — see scripts/lib/synth.py FAZ 6.A guard for the
-runtime defense.
+re-citing SPA-shell URLs — see lib.whitelist._load_unhealthy_urls + the
+merge.py FAZ 6.A guard for the runtime defense.
 """
 
 from __future__ import annotations

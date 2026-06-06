@@ -5,7 +5,6 @@ duplicated across:
   - scripts/local-synth.py      (cluster ranking by distinct_sources + sum_trust)
   - scripts/merge.py            (_consensus_winner, FAZ 6.B re-clustering)
   - scripts/reconcile-bench-consensus.py
-  - scripts/lib/synth.py        (_pick_winner — cluster-aware)
 
 All callers import pick_winner() from here.
 

@@ -3,7 +3,6 @@
 Previously duplicated across:
   - scripts/local-synth.py   TIER_WEIGHT = {I:1.0, S:0.7, C:0.4, U:0.1}
   - scripts/gather-union.py  TIER_WEIGHT: dict[str, float]
-  - scripts/lib/synth.py     TIER_WEIGHTS = {I:1.0, S:0.7, C:0.4, U:0.1}
 
 All callers import from here. No magic numbers in individual scripts.
 """
