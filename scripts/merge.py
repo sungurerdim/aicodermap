@@ -24,7 +24,6 @@ import shutil
 import sys
 from datetime import date, datetime, timezone
 from pathlib import Path
-from urllib.parse import urlparse
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
@@ -57,6 +56,7 @@ from lib.constants import VERIFICATION_AGREEMENT_PP as _AGREEMENT_PP  # noqa: E4
 from lib.tiers import TIER_RANK as _TIER_RANK  # noqa: E402
 from lib.tiers import TIER_WEIGHT as _TIER_WEIGHT  # noqa: E402
 from lib.util import canonical_display_name as _canonical_name  # noqa: E402
+from lib.util import extract_domain as _extract_domain  # noqa: E402
 from lib.telemetry import build_meta as _telemetry_build_meta  # noqa: E402
 from lib.telemetry import (  # noqa: E402
     metadata_changelog_row as _telemetry_changelog_row,
@@ -427,11 +427,7 @@ def build_whitelist_index():
             url = e.get("url")
             if not url:
                 continue
-            try:
-                host = urlparse(url).hostname or ""
-            except Exception:
-                continue
-            host = host.lower().lstrip("www.")
+            host = _extract_domain(url)
             if host and host not in idx:
                 idx[host] = (e.get("format"), e.get("tier"))
     return idx
@@ -475,10 +471,7 @@ def format_consistency_warn(source_entry, wl_idx):
     url = source_entry.get("url") or ""
     if not url:
         return None
-    try:
-        host = (urlparse(url).hostname or "").lower().lstrip("www.")
-    except Exception:
-        return None
+    host = _extract_domain(url)
     info = wl_idx.get(host)
     if not info:
         return None

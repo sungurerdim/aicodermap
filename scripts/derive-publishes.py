@@ -25,17 +25,20 @@ from __future__ import annotations
 
 import json
 import shutil
+import sys
 from pathlib import Path
-from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "scripts"))
+from lib.util import extract_domain  # noqa: E402
+
 WL = ROOT / "data" / "sources-whitelist.json"
 SOURCES = ROOT / "data" / "sources.json"
 CATS = ("leaderboards", "aggregators", "local", "community", "registries")
 
 
 def _dom(u) -> str:
-    return urlparse(u or "").netloc.lower().replace("www.", "")
+    return extract_domain(u or "")
 
 
 def main() -> int:

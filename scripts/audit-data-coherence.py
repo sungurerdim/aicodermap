@@ -39,6 +39,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lib.matrix import active_models as _active_models  # noqa: E402
 from lib.util import canonical_display_name as _canonical_name  # noqa: E402
+from lib.util import extract_domain  # noqa: E402
 
 for _stream in (sys.stdout, sys.stderr):
     _reconf = getattr(_stream, "reconfigure", None)
@@ -281,12 +282,10 @@ def main():
     # trigger (they can report anything about a model) → low false-positive.
     # Advisory: surfaces the cell for re-verification, never blocks. Pairs with
     # the agent.md "BENCH METRIC INTEGRITY" rule (gather-time prevention).
-    from urllib.parse import urlparse as _urlparse
-
     @functools.lru_cache(maxsize=8192)
     def _dom(u):
         # 6.2 — memoized: source URLs recur across many cells; cache the parse.
-        return _urlparse(u or "").netloc.lower().replace("www.", "")
+        return extract_domain(u or "")
 
     domain_publishes: dict[str, set] = {}
     for _cat in ("leaderboards", "aggregators", "local", "community", "registries"):

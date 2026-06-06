@@ -47,12 +47,16 @@ def normalize_url(url: str) -> str:
 
 
 def extract_domain(url: str) -> str:
-    """Return hostname without www. prefix."""
+    """Return hostname without the `www.` prefix.
+
+    Uses removeprefix (exact-prefix strip), NOT lstrip — lstrip("www.") strips
+    the CHARACTER SET {w,.,o}, so it mangled openrouter.ai->penrouter.ai,
+    openai.com->penai.com, ollama.com->llama.com. removeprefix is Py3.9+."""
     if not url:
         return ""
     try:
-        host = urlparse(url.strip()).hostname or ""
-        return host.lower().lstrip("www.")
+        host = (urlparse(url.strip()).hostname or "").lower()
+        return host.removeprefix("www.")
     except Exception:
         return ""
 

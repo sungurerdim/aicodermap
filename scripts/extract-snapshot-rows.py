@@ -36,11 +36,10 @@ import sys
 import time
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlparse
 
 PROJECT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT / "scripts"))
-from lib.util import parse_locale_decimal  # noqa: E402
+from lib.util import extract_domain, parse_locale_decimal  # noqa: E402
 
 SNAP_DIR = PROJECT / "data" / ".leaderboard-snapshots"
 ROWS_OUT = SNAP_DIR / "_rows.json"
@@ -253,7 +252,7 @@ def extract_rows_from_json(
 
 def lookup_url_tier(whitelist: dict[str, Any], url: str) -> str:
     """Look up the tier for a URL in whitelist categories. Default 'C'."""
-    host = (urlparse(url).hostname or "").lower().lstrip("www.")
+    host = extract_domain(url)
     for cat in ("leaderboards", "aggregators", "community", "local", "registries"):
         for e in whitelist.get(cat, []) or []:
             eu = e.get("url") or ""

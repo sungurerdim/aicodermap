@@ -33,11 +33,11 @@ import json
 import statistics
 import sys
 from pathlib import Path
-from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 from lib.constants import ELO_BENCH_KEYS, MIN_SOURCES_PER_FILLED_CELL  # noqa: E402
+from lib.util import extract_domain  # noqa: E402
 
 MIN_SOURCES = MIN_SOURCES_PER_FILLED_CELL  # SSOT: lib.constants
 K_MAD = 4.0  # robust-outlier threshold (modified z ~ 0.6745*|x-med|/MAD)
@@ -49,7 +49,7 @@ ELO_FAMILY = ELO_BENCH_KEYS  # SSOT: lib.constants
 def _dom(u) -> str:
     # 6.2 — memoized: the same source URLs recur across hundreds of cells, so
     # cache url→domain instead of re-parsing per entry.
-    return urlparse(u or "").netloc.lower().replace("www.", "")
+    return extract_domain(u or "")
 
 
 def main() -> int:

@@ -22,6 +22,7 @@ from lib import reliability as _reliability  # type: ignore  # noqa: E402
 from lib.tiers import TIER_WEIGHT  # type: ignore  # noqa: E402  (SSOT)
 from lib.tiers import verif_factor as _verif_factor  # type: ignore  # noqa: E402
 from lib.constants import ELO_BENCH_KEYS  # type: ignore  # noqa: E402  (SSOT)
+from lib.util import extract_domain  # type: ignore  # noqa: E402  (SSOT)
 
 LEDGER_PATH = ROOT / "data" / "source-reliability.json"
 
@@ -80,8 +81,6 @@ _ELO_SIBLINGS = ELO_BENCH_KEYS  # SSOT: lib.constants.ELO_BENCH_KEYS
 def build_host_publishes(wl: dict) -> dict:
     """host -> set(benchKeys it publishes), from every whitelist category. Used by
     the Elo-trap filter to spot a cfElo value scraped off a webDevElo-only page."""
-    from urllib.parse import urlparse
-
     out: dict[str, set] = {}
     for cat in (wl.get(k) for k in wl if isinstance(wl.get(k), list)):
         for e in cat or []:
@@ -91,7 +90,7 @@ def build_host_publishes(wl: dict) -> dict:
             pub = e.get("publishes") or []
             if not url or not pub:
                 continue
-            host = (urlparse(url).hostname or "").lower().lstrip("www.")
+            host = extract_domain(url)
             if host:
                 out.setdefault(host, set()).update(pub)
     return out
@@ -109,9 +108,7 @@ def is_elo_sibling_misfile(
     the cluster pool (the class that recurrently hard-blocks merge)."""
     if bk not in _ELO_SIBLINGS:
         return False
-    from urllib.parse import urlparse
-
-    host = (urlparse(source_url).hostname or "").lower().lstrip("www.")
+    host = extract_domain(source_url)
     pub = host_pub.get(host)
     if not pub or bk in pub or not (pub & _ELO_SIBLINGS):
         return False  # host can't be judged / legitimately publishes bk / no sibling

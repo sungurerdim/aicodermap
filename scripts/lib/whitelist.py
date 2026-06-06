@@ -14,7 +14,8 @@ import json
 import os
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlparse
+
+from .util import extract_domain
 
 PROJECT = Path(__file__).resolve().parents[2]
 WHITELIST_PATH = PROJECT / "data" / "sources-whitelist.json"
@@ -174,10 +175,7 @@ def hostname_index(
             url = e.get("url")
             if not url:
                 continue
-            try:
-                host = (urlparse(url).hostname or "").lower().lstrip("www.")
-            except Exception:
-                continue
+            host = extract_domain(url)
             if host and host not in idx:
                 idx[host] = (e.get("format"), e.get("tier"))
     return idx
