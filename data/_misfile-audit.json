@@ -1,175 +1,13 @@
 {
   "_summary": {
-    "compositeMisfiles": 20,
-    "measuredCandidates": 41,
+    "compositeMisfiles": 0,
+    "measuredCandidates": 36,
     "bandViolations": 0,
-    "crossBenchDups": 14,
-    "aaRowsLoaded": 349
+    "crossBenchDups": 4,
+    "aaRowsLoaded": 356
   },
-  "compositeMisfiles": [
-    {
-      "modelId": "mistral-large-3",
-      "benchKey": "aaIdx",
-      "current": 71.5,
-      "aa": 22.8,
-      "delta": 48.7
-    },
-    {
-      "modelId": "gpt-4-1",
-      "benchKey": "aaIdx",
-      "current": 71.2,
-      "aa": 26.28,
-      "delta": 44.92
-    },
-    {
-      "modelId": "o3",
-      "benchKey": "aaIdx",
-      "current": 79.4,
-      "aa": 38.37,
-      "delta": 41.03
-    },
-    {
-      "modelId": "o4-mini",
-      "benchKey": "aaIdx",
-      "current": 73.6,
-      "aa": 33.06,
-      "delta": 40.54
-    },
-    {
-      "modelId": "devstral-2",
-      "benchKey": "aaIdx",
-      "current": 62.1,
-      "aa": 22.04,
-      "delta": 40.06
-    },
-    {
-      "modelId": "devstral-medium",
-      "benchKey": "aaIdx",
-      "current": 54.6,
-      "aa": 18.66,
-      "delta": 35.94
-    },
-    {
-      "modelId": "deepseek-v4-flash",
-      "benchKey": "aaCoding",
-      "current": 72.0,
-      "aa": 38.71,
-      "delta": 33.29
-    },
-    {
-      "modelId": "deepseek-v4-pro",
-      "benchKey": "aaCoding",
-      "current": 80.0,
-      "aa": 47.47,
-      "delta": 32.53
-    },
-    {
-      "modelId": "qwen3-6-27b",
-      "benchKey": "aaIdx",
-      "current": 72.5,
-      "aa": 45.82,
-      "delta": 26.68
-    },
-    {
-      "modelId": "glm-4-7",
-      "benchKey": "aaIdx",
-      "current": 21.0,
-      "aa": 42.11,
-      "delta": 21.11
-    },
-    {
-      "modelId": "grok-4-20",
-      "benchKey": "aaCoding",
-      "current": 22.0,
-      "aa": 40.45,
-      "delta": 18.45
-    },
-    {
-      "modelId": "qwen3-5-9b",
-      "benchKey": "aaAgentic",
-      "current": 55.5,
-      "aa": 37.42,
-      "delta": 18.08
-    },
-    {
-      "modelId": "grok-4-20",
-      "benchKey": "aaAgentic",
-      "current": 38.3,
-      "aa": 53.86,
-      "delta": 15.56
-    },
-    {
-      "modelId": "grok-4-1-fast",
-      "benchKey": "aaIdx",
-      "current": 38.2,
-      "aa": 23.56,
-      "delta": 14.64
-    },
-    {
-      "modelId": "deepseek-v3-2",
-      "benchKey": "aaAgentic",
-      "current": 51.4,
-      "aa": 39.82,
-      "delta": 11.58
-    },
-    {
-      "modelId": "mimo-v2-flash",
-      "benchKey": "aaIdx",
-      "current": 41.0,
-      "aa": 30.35,
-      "delta": 10.65
-    },
-    {
-      "modelId": "sonnet-4-6",
-      "benchKey": "aaAgentic",
-      "current": 52.0,
-      "aa": 61.62,
-      "delta": 9.62
-    },
-    {
-      "modelId": "minimax-m2-1",
-      "benchKey": "aaAgentic",
-      "current": 57.0,
-      "aa": 47.4,
-      "delta": 9.6
-    },
-    {
-      "modelId": "sonnet-4-6",
-      "benchKey": "aaIdx",
-      "current": 52.0,
-      "aa": 44.38,
-      "delta": 7.62
-    },
-    {
-      "modelId": "grok-4-1-fast",
-      "benchKey": "aaAgentic",
-      "current": 39.1,
-      "aa": 32.95,
-      "delta": 6.15
-    }
-  ],
+  "compositeMisfiles": [],
   "measuredCandidates": [
-    {
-      "modelId": "qwen3-6-35b-moe",
-      "benchKey": "hle",
-      "current": 79.1,
-      "aa": 20.16,
-      "delta": 58.94
-    },
-    {
-      "modelId": "o4-mini",
-      "benchKey": "hle",
-      "current": 71.8,
-      "aa": 17.51,
-      "delta": 54.29
-    },
-    {
-      "modelId": "qwen3-6-plus",
-      "benchKey": "hle",
-      "current": 78.8,
-      "aa": 25.72,
-      "delta": 53.08
-    },
     {
       "modelId": "mistral-large-3",
       "benchKey": "tau2",
@@ -236,9 +74,9 @@
     {
       "modelId": "grok-4-1-fast",
       "benchKey": "gpqa",
-      "current": 85.4,
+      "current": 85.32,
       "aa": 63.74,
-      "delta": 21.66
+      "delta": 21.58
     },
     {
       "modelId": "gemma-4-e4b",
@@ -271,9 +109,9 @@
     {
       "modelId": "mimo-v2-flash",
       "benchKey": "gpqa",
-      "current": 83.81,
+      "current": 83.86,
       "aa": 65.56,
-      "delta": 18.25
+      "delta": 18.3
     },
     {
       "modelId": "kimi-k2-6",
@@ -318,13 +156,6 @@
       "delta": 16.24
     },
     {
-      "modelId": "qwen3-6-max",
-      "benchKey": "tau2",
-      "current": 80.1,
-      "aa": 95.91,
-      "delta": 15.81
-    },
-    {
       "modelId": "mimo-v2-5",
       "benchKey": "tbHard",
       "current": 26.5,
@@ -348,9 +179,9 @@
     {
       "modelId": "deepseek-v3-2",
       "benchKey": "hle",
-      "current": 24.91,
+      "current": 24.86,
       "aa": 10.52,
-      "delta": 14.39
+      "delta": 14.34
     },
     {
       "modelId": "mimo-v2-flash",
@@ -365,13 +196,6 @@
       "current": 18.8,
       "aa": 5.1,
       "delta": 13.7
-    },
-    {
-      "modelId": "grok-4-1-fast",
-      "benchKey": "hle",
-      "current": 17.6,
-      "aa": 4.96,
-      "delta": 12.64
     },
     {
       "modelId": "sonnet-4-6",
@@ -409,11 +233,11 @@
       "delta": 9.97
     },
     {
-      "modelId": "grok-4-1-fast",
+      "modelId": "qwen3-6-35b-moe",
       "benchKey": "tbHard",
-      "current": 24.2,
-      "aa": 14.39,
-      "delta": 9.81
+      "current": 43.94,
+      "aa": 34.85,
+      "delta": 9.09
     },
     {
       "modelId": "grok-4-1-fast",
@@ -440,62 +264,6 @@
   "bandViolations": [],
   "crossBenchDups": [
     {
-      "modelId": "o4-mini",
-      "value": 71.8,
-      "benchKeys": [
-        "hle",
-        "tau2"
-      ]
-    },
-    {
-      "modelId": "opus-4-7",
-      "value": 87.6,
-      "benchKeys": [
-        "lcb",
-        "mmluPro"
-      ]
-    },
-    {
-      "modelId": "sonnet-4-6",
-      "value": 52.0,
-      "benchKeys": [
-        "aaAgentic",
-        "aaIdx"
-      ]
-    },
-    {
-      "modelId": "deepseek-v4-pro",
-      "value": 67.9,
-      "benchKeys": [
-        "aaAgentic",
-        "tb2"
-      ]
-    },
-    {
-      "modelId": "devstral-2",
-      "value": 18.9,
-      "benchKeys": [
-        "tb2",
-        "tbHard"
-      ]
-    },
-    {
-      "modelId": "kimi-k2-6",
-      "value": 54.0,
-      "benchKeys": [
-        "aaIdx",
-        "hle"
-      ]
-    },
-    {
-      "modelId": "mimo-v2-pro",
-      "value": 87.0,
-      "benchKeys": [
-        "gpqa",
-        "lcb"
-      ]
-    },
-    {
       "modelId": "nemotron-3-super",
       "value": 29,
       "benchKeys": [
@@ -512,14 +280,6 @@
       ]
     },
     {
-      "modelId": "qwen3-6-plus",
-      "value": 78.8,
-      "benchKeys": [
-        "hle",
-        "sweV"
-      ]
-    },
-    {
       "modelId": "grok-4-3",
       "value": 53.0,
       "benchKeys": [
@@ -533,22 +293,6 @@
       "benchKeys": [
         "mmluPro",
         "tb2"
-      ]
-    },
-    {
-      "modelId": "grok-4-1-fast",
-      "value": 85.4,
-      "benchKeys": [
-        "gpqa",
-        "mmluPro"
-      ]
-    },
-    {
-      "modelId": "qwen3-7-max",
-      "value": 90.5,
-      "benchKeys": [
-        "aime26",
-        "lcb"
       ]
     }
   ]

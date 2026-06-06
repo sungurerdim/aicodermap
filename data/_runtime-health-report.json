@@ -1,12 +1,12 @@
 {
-  "probedAt": "2026-05-30T19:06:12Z",
+  "probedAt": "2026-06-06T04:59:32Z",
   "total": 138,
   "counts": {
     "format-drift": 14,
-    "redirect": 7,
+    "redirect": 8,
     "spa": 15,
     "bot-block": 2,
-    "dead": 10
+    "dead": 11
   },
   "formatDrift": [
     {
@@ -90,12 +90,16 @@
       "to": "https://www.cerebras.ai/inference"
     },
     {
+      "url": "https://www.swyx.io/",
+      "to": "https://swyx.io/"
+    },
+    {
       "url": "https://designarena.ai/leaderboard",
       "to": "https://www.designarena.ai/leaderboard"
     },
     {
       "url": "https://compliance.microsoft.com/compliancemanager",
-      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3Dpx2hgqi9lukGvAWbjWD7e5FmZ62zr6bgI58hMrPRJv97Vl9vm_60eOttHvbEo61kuaZ1D0JWfnhq6ntF7KkgGnbpMsf-ae-nFphpmmVdSQDdtFik-DSBuC-aNPqOk_5-KoWL4xbXRhU0S2xT3ph_oPscG4WT3P84C-cDB6OYD7M&response_mode=form_post&nonce=639157647636868295.Mjc4ZGFmYWQtMmM1Ny00YjI0LTk4MDAtZWQ5NzA3MjBmYWQ4YjcyYmIwMWUtYmZmOS00YTRjLTlkODEtYzBjZDYzMDc4MTI3&client-request-id=9ec7cb63-cf4e-405d-81ef-d9c377c4072a&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.3.0.0"
+      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DycQLhg6SGLU7TcpevSRxiVBbiq-dTz2rfcYwJDcorjEEIITUlxEFZs2zOiVw5gY25gsV0_ZAP2HMgaMK1GPiQfQVKf2iVJzMKidpSrohHH1S6Bp8LrYY4fmcZTzsmEegrRCo_MzpNwF-1NfJQN5mzYal6mOtSi7_9oUrksJ5T5c&response_mode=form_post&nonce=639163187590048102.ZjUzMGJiYzYtYWIzMS00YzQ3LTk5NGYtMzAzNTg3ZjIwMDQ5NTIzMjE0NTEtYmVlYS00ZWQwLWFjMDMtNjVkNDlmMzcxNTU2&client-request-id=2890f015-90c0-4189-8217-ca9f67963e8e&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
     },
     {
       "url": "https://edpb.europa.eu/our-work-tools/consistency-findings/register-for-decisions_en",
@@ -132,6 +136,10 @@
     "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
   ],
   "dead": [
+    {
+      "url": "https://terminal-bench.io/",
+      "error": "URLError: <urlopen error [Errno 11001] getaddrinfo failed>"
+    },
     {
       "url": "https://lmarena.ai/leaderboard/webdev",
       "error": "HTTP 404 Not Found"

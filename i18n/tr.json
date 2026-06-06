@@ -1,661 +1,677 @@
 {
-  "ui": {
-    "appTitle": "AICoderMap",
-    "appTagline": "Hangi modeli ne için kullanacağına saniyeler içinde karar ver. Senin önceliklerine göre sıralı, kaynak çelişkileri görünür, GPU'na sığacak seçenekler hangi quant ile çalışır anında belli.",
-    "loading": "Yükleniyor...",
-    "noData": "Veri yok",
-    "section": {
-      "weights": "Ağırlık Editörü",
-      "filters": "Filtreler",
-      "table": "Karşılaştırma Tablosu",
-      "models": "Model Kartları",
-      "export": "Dışa Aktar",
-      "privacy": "Gizlilik"
-    },
-    "weights": {
-      "total": "Toplam",
-      "totalWarn": "Toplam 100 olmalı",
-      "preset": "Hazır Profil",
-      "reset": "Varsayılana Dön",
-      "editor": "Ağırlık Editörü",
-      "weightLabel": "Ağırlık",
-      "excluded": "Aktif preset bu testi hesaba katmıyor",
-      "inPresetGroup": "AKTİF PRESETTE",
-      "notInPresetGroup": "PRESET DIŞI"
-    },
-    "filter": {
-      "gpu": "GPU'ma sığanları göster",
-      "gpuLabel": "GPU",
-      "vramLabel": "VRAM (GB)",
-      "gpuAuto": "Otomatik tespit",
-      "gpuAutoUnavailable": "Otomatik tespit kullanılamıyor — GPU seçin veya Manuel VRAM girin",
-      "gpuApproximate": "yaklaşık",
-      "gpuPrivacyStripped": "GPU algılandı — tarayıcı cihaz bilgisini gizliyor, lütfen GPU'yu elle seçin",
-      "reset": "Filtreleri sıfırla",
-      "gpuManual": "Manuel seç",
-      "gpuOverride": "Manuel VRAM",
-      "tier": "Tier",
-      "openOnly": "Sadece açık model",
-      "all": "Tümü",
-      "deployment": "Görüntü",
-      "deploymentAll": "Tüm modeller",
-      "cloudOnly": "Yalnızca bulut/abonelik",
-      "localFit": "GPU'ma sığan yerel modeller",
-      "search": "Ara",
-      "searchPlaceholder": "model adı, sağlayıcı...",
-      "provider": "Üretici",
-      "providerAll": "Tüm üreticiler",
-      "gpuPopular": "Popüler donanım"
-    },
-    "lang": {
-      "toggle": "EN"
-    },
-    "theme": {
-      "light": "Aydınlık tema",
-      "dark": "Karanlık tema",
-      "auto": "Sistem teması"
-    },
-    "export": {
-      "section": "Bölümü PNG olarak kaydet",
-      "weights": "Ağırlıkları PNG olarak kaydet",
-      "model": "Model detaylarını PNG olarak kaydet",
-      "table": "Karşılaştırma tablosunu PNG olarak kaydet",
-      "full": "Tam sayfa PNG",
-      "fullTooltip": "Tüm sayfayı PNG olarak kaydet",
-      "sources": "Kaynakları Markdown olarak indir"
-    },
-    "table": {
-      "rank": "#",
-      "name": "MODEL",
-      "provider": "SAĞLAYICI",
-      "released": "ÇIKIŞ",
-      "tier": "TIER",
-      "license": "LİSANS",
-      "context": "BAĞLAM",
-      "pricingApi": "API ($/1M TOK)",
-      "pricingSub": "ABONELİK",
-      "priceIn": "API IN $",
-      "priceOut": "API OUT $",
-      "composite": "COMPOSITE",
-      "bench": "BENCHMARK SKORLARI",
-      "gpu": "GPU UYUM",
-      "vram": "VRAM",
-      "lastUpdated": "GÜNCELLEME",
-      "strengths": "GÜÇLÜ YANLAR",
-      "weaknesses": "ZAYIF YANLAR",
-      "cacheHit": "Önbellek",
-      "providers": "Sağlayıcılar",
-      "ollamaSize": "Ollama boyutu"
-    },
-    "footer": {
-      "about": "Hakkında",
-      "repo": "GitHub Repo",
-      "license": "MIT Lisans",
-      "privacy": "Cookie yok, kayıt yok, ücretsiz. Yalnızca anonim trafik ölçümü için GitHub Insights kullanılır.",
-      "deployed": "Yayın"
-    },
-    "freshness": {
-      "refresh": "Yenile",
-      "stale": "Yeni bir build yayında (commit {liveSha} · görüntülenen {servedShort} · {ageMin} dk önce). Kısa sürede yansıyacak; sayfayı yenileyin."
-    },
-    "timeAgo": {
-      "justNow": "az önce",
-      "suffix": "önce",
-      "d": " gün",
-      "h": " saat",
-      "m": " dk"
-    },
-    "tier": {
-      "frontier": "FRONTIER",
-      "open-flagship": "AÇIK FLAGSHIP",
-      "coder-specialized": "KOD UZMANLAŞMIŞ",
-      "gemma": "GEMMA",
-      "ollama-local": "OLLAMA YEREL"
-    },
-    "compat": {
-      "fits": "Uyumlu",
-      "offload": "Offload",
-      "tooLarge": "Yetersiz VRAM",
-      "cloud": "Bulut model"
-    },
-    "contradiction": {
-      "title": "Çelişki tespit edildi",
-      "delta": "Fark",
-      "values": "Değerler",
-      "tier": {
-        "S": "Self-reported",
-        "I": "Independent",
-        "C": "Community"
-      }
-    },
-    "errors": {
-      "fetchFailed": "Veri yüklenemedi, sayfayı yenileyin.",
-      "weightsInvalid": "Ağırlıklar toplamı 100 olmalı.",
-      "schemaInvalid": "Veri şeması beklenen formatta değil. Varsayılana dönüldü.",
-      "i18nFallback": "Dil dosyası yüklenemedi, Türkçe varsayılan kullanılıyor.",
-      "exportFailed": "PNG dışa aktarma başarısız. Sayfayı yenileyin.",
-      "webgpuUnsupported": "Tarayıcınız WebGPU desteklemiyor. Manuel GPU seçin."
-    },
-    "ollama": {
-      "title": "Yerel (Ollama)",
-      "copy": "Komutu kopyala",
-      "viewOn": "Ollama'da görüntüle"
-    },
-    "openShort": "AÇIK",
-    "closedShort": "KAPALI",
-    "openWeights": "Açık ağırlıklar",
-    "closedWeights": "Kapalı ağırlıklar",
-    "optOut": {
-      "vendor-opt-out": "Üretici göndermedi",
-      "not-applicable": "Bu test için uygun değil",
-      "out-of-scope": "Kapsam dışı varyant"
-    },
-    "coverage": "Kapsam",
-    "coverageTip": "Aktif profil ağırlığının ne kadarı mevcut benchmark skorlarıyla destekleniyor. Composite, √kapsam ile çarpılarak az test alıp yüksek skor çıkan modelleri ezmeyen ama avantajını da silen bir ceza uygular.",
-    "uncertaintyTip": "Bileşik skorun belirsizlik aralığı (±1σ); her hücrenin kaynak uyumu, çelişki yayılımı, kapsam ve imputasyonundan türetilir. Frekansçı %95 güven aralığı değildir — kanıt kalitesini yansıtır. Geniş bant = zayıf kanıt.",
-    "uncertaintySingleTip": "Belirsizlik aralığı (±1σ). Buradaki hücrelerin çoğu tek kaynağa dayanıyor; bandı güven aralığı değil kaba bir tahmin olarak görün — bağımsız kaynak arttıkça daralır.",
-    "rankTip": "Skora göre bileşik sıra (sıralama sütunundan bağımsız sabit). Her skorun yanındaki ±aralık belirsizliği gösterir — aralıkları çakışan modeller istatistiksel olarak yakındır. Ayraç çizgisi anlamlı kopuşu işaret eder: alttaki gruba gerçek bir fark.",
-    "disputed": "tartışmalı",
-    "disputedTip": "Aktif preset'te aynı-tier kaynaklar arasında uyumsuzluk taşıyan hücre sayısı (≥5pp BLOCK eşiğinin üstünde, tek bir tier içinde ≥3pp). Composite bu hücreler için güven kesintisi içerir — hücre başına maks 5pp, böylece tek bir outlier composite'i ezemez. Cross-tier uyumsuzluklar (örn. I-tier ↔ S-tier) sayılmaz, çünkü autoResolveWinner zaten yüksek-tier kaynağı seçti.",
-    "sources": "Kaynaklar",
-    "sourcesUnique": "benzersiz",
-    "sourcesDatapoints": "veri noktası",
-    "lowConfidence": "düşük güven",
-    "lowConfidenceTip": "Composite, aktif profil ağırlığının %40'ından azından hesaplandı. Skor güvenilirliği sınırlı.",
-    "a11y": {
-      "skipToContent": "İçeriğe atla"
-    },
-    "share": {
-      "tooltip": "Mevcut ağırlıklarını ve filtrelerini içeren paylaşılabilir link oluştur",
-      "button": "Paylaşım linkini kopyala",
-      "copied": "Link kopyalandı",
-      "failed": "Link kopyalanamadı"
-    },
-    "pricing": {
-      "byProvider": "Sağlayıcıya göre fiyatlandırma"
-    },
-    "deprecated": "KULLANIMDAN KALDIRILDI",
-    "archived": "ARŞİVLENDİ"
+ "ui": {
+  "appTitle": "AICoderMap",
+  "appTagline": "Hangi modeli ne için kullanacağına saniyeler içinde karar ver. Senin önceliklerine göre sıralı, kaynak çelişkileri görünür, GPU'na sığacak seçenekler hangi quant ile çalışır anında belli.",
+  "loading": "Yükleniyor...",
+  "noData": "Veri yok",
+  "section": {
+   "weights": "Ağırlık Editörü",
+   "filters": "Filtreler",
+   "table": "Karşılaştırma Tablosu",
+   "models": "Model Kartları",
+   "export": "Dışa Aktar",
+   "privacy": "Gizlilik"
   },
-  "pricing": {
-    "blended": "KARMA $/1M",
-    "blendedTip": "1M token başına karma fiyat (3:1 giriş:çıkış oranı varsayımı). Formül: (giriş×3 + çıkış) / 4."
+  "weights": {
+   "total": "Toplam",
+   "totalWarn": "Toplam 100 olmalı",
+   "preset": "Hazır Profil",
+   "reset": "Varsayılana Dön",
+   "editor": "Ağırlık Editörü",
+   "weightLabel": "Ağırlık",
+   "excluded": "Aktif preset bu testi hesaba katmıyor",
+   "inPresetGroup": "AKTİF PRESETTE",
+   "notInPresetGroup": "PRESET DIŞI"
   },
-  "privacy": {
-    "heading": "Gizlilik ve Uyumluluk",
-    "subheading": "Eğitim verisi opt-out politikaları, veri barındırma ve sertifikasyon durumu. Uyumluluk ekibinizle doğrulayın.",
-    "col": {
-      "model": "Model",
-      "trainingOptOut": "Eğitim opt-out",
-      "dataResidency": "Veri konumu",
-      "soc2": "SOC 2",
-      "gdpr": "GDPR",
-      "apiLogging": "API loglama"
-    },
-    "val": {
-      "available": "Mevcut",
-      "none": "Yok",
-      "unknown": "—",
-      "yes": "Evet",
-      "no": "Hayır",
-      "defaultOn": "Varsayılan açık",
-      "defaultOff": "Varsayılan kapalı",
-      "optOut": "Opt-out mevcut",
-      "notLogged": "Loglanmıyor"
-    },
-    "note": "Kaynak: tedarikçi belgesi ve hizmet şartları. Son doğrulama: 2026-04-30."
+  "filter": {
+   "gpu": "GPU'ma sığanları göster",
+   "gpuLabel": "GPU",
+   "vramLabel": "VRAM (GB)",
+   "gpuAuto": "Otomatik tespit",
+   "gpuAutoUnavailable": "Otomatik tespit kullanılamıyor — GPU seçin veya Manuel VRAM girin",
+   "gpuApproximate": "yaklaşık",
+   "gpuPrivacyStripped": "GPU algılandı — tarayıcı cihaz bilgisini gizliyor, lütfen GPU'yu elle seçin",
+   "reset": "Filtreleri sıfırla",
+   "gpuManual": "Manuel seç",
+   "gpuOverride": "Manuel VRAM",
+   "tier": "Tier",
+   "openOnly": "Sadece açık model",
+   "all": "Tümü",
+   "deployment": "Görüntü",
+   "deploymentAll": "Tüm modeller",
+   "cloudOnly": "Yalnızca bulut/abonelik",
+   "localFit": "GPU'ma sığan yerel modeller",
+   "search": "Ara",
+   "searchPlaceholder": "model adı, sağlayıcı...",
+   "provider": "Üretici",
+   "providerAll": "Tüm üreticiler",
+   "gpuPopular": "Popüler donanım"
   },
-  "models": {
-    "opus-4-7": {
-      "strengths": "SWE-bench Pro liderliği (%64.3), MCP-Atlas araç kullanımında zirve (%77.3), 1M token bağlam penceresi, en yüksek görsel çözünürlük (3.75MP), CursorBench üzerinde %70 skor",
-      "weaknesses": "GPT-5.4'e kıyasla yüksek fiyat ($5/$25), aaIdx skoru (57) GPT-5.5 ile eşit düzeyde ama çok daha pahalı"
-    },
-    "sonnet-4-6": {
-      "strengths": "Ofis verimliliğinde lider (1633 Elo), Opus 4.7 performansının %98'i maliyetin %20'sinde, ARC-AGI-2'de büyük sıçrama (%58.3), 1M token bağlam, context compaction özelliği",
-      "weaknesses": "Derin bilimsel akıl yürütmede Opus 4.7'nin gerisinde (GPQA: 74.1% vs 94.2%), SWE-bench Pro skoru eksik"
-    },
-    "qwen3-6-27b": {
-      "strengths": "27B yoğun model, 35B MoE varyantı ile aynı ailede. 262K bağlam. Yerel çalıştırma için 35B A3B'ye iyi alternatif. Güçlü kodlama ve genel akıl yürütme.",
-      "weaknesses": "Bağımsız benchmark verisi yetersiz. 35B A3B MoE varyantı genellikle aynı kullanım senaryosu için tercih ediliyor. Fiyatlandırma açıklanmadı."
-    },
-    "kimi-k2-6": {
-      "strengths": "SWE-Pro 58.6 ile açık ağırlık modeller arasında en yüksek skor. HLE-Full with Tools 54.0 GPT-5.4 ve Claude'u geçiyor. 300 eş zamanlı alt-ajan, 4000 adımlı koordineli ajan sürüsü. LiveCodeBench v6 %89.6 lider.",
-      "weaknesses": "Modified MIT lisansı bazı ticari kısıtlamalar getiriyor. Matematik ve GPQA akıl yürütmede frontier gerisinde. Benchmark harness seçimi skoru birkaç puan etkileyebilir."
-    },
-    "deepseek-v4-flash": {
-      "strengths": "284B toplam / 13B aktif MoE, MIT lisansı. $0.14 girişle piyasanın en ucuz frontier-sınıfı modeli. SWE-Verified %79.0 Pro'ya yalnızca 1.6 puan geride. 1M token bağlam 10% daha az KV önbellek.",
-      "weaknesses": "Çoğu geliştirici iş yükü için Pro ile fark ihmal edilebilir ama kuantum atlama gereken görevlerde arka planda kalıyor. Yerel çalıştırma hâlâ güçlü donanım gerektiriyor. Yalnızca metin."
-    },
-    "deepseek-v3-2": {
-      "strengths": "671B toplam MoE, son derece rekabetçi fiyat ($0.28 giriş). SWE-Verified tutarlı 72-74% aralığı birden fazla çerçeve ile doğrulandı. Açık ağırlık, DeepSeek Sparse Attention ile uzun bağlam optimize edilmiş.",
-      "weaknesses": "V4-Pro Nisan 2026'da onu yerinden etti. Bağlam penceresi yalnızca 128K — V4'ün 1M'ine kıyasla yetersiz. DeepSeek Speciale varyantı ile standart model arasında skor tutarsızlığı var."
-    },
-    "qwen3-coder-30b": {
-      "strengths": "30B toplam / 3.3B aktif MoE, $0.07/M girişle son derece uygun fiyatlı. 262K bağlam penceresi, 107 token/sn. Ollama/LMStudio/llama.cpp desteğiyle kolay yerel kurulum.",
-      "weaknesses": "AA Zeka Endeksi 20 ile mevcut rekabetçi alanda ortalamanın altında. SWE-Bench puanı bağımsız olarak doğrulanmamış. Qwen3.6-35B-A3B gibi daha yeni modeller açısından artık birincil seçenek değil."
-    },
-    "devstral-2": {
-      "strengths": "SOTA açık ağırlık kodlama ajanı, SWE-Verified %72.2. 256K bağlam, Ollama'da mevcut. Eşlik eden Devstral Small 2 (24B) tek GPU'da çalışıyor. Mistral Vibe CLI ile entegrasyon.",
-      "weaknesses": "123B yoğun model, minimum 4x H100-sınıfı GPU gerektiriyor. SWE-bench Verified puanı resmi leaderboard'da henüz doğrulanmadı. Gelir > $20M şirketler için ticari lisans gerekiyor."
-    },
-    "glm-5-1": {
-      "strengths": "SWE-Pro 58.4 ile GPT-5.4 ve Claude Opus 4.6'yı geçiyor. NL2Repo %42.7 tam repo oluşturmada lider. 8 saate kadar özerk görev çalışması. Huawei Ascend 910B ile %100 yerli chip'te eğitim. MIT lisansı açık ağırlık.",
-      "weaknesses": "GPQA Diamond %86.2 frontier'ın gerisinde (Claude %94.3). SWE-Bench Verified bağımsız AA skoru mevcut değil. 744B toplam / 40B aktif — yerel çalıştırma pratikte imkânsız."
-    },
-    "llama-4-scout": {
-      "strengths": "10M token bağlam (Nis 2026 itibarıyla en büyük açık ağırlıklı); MoE 17B/109B; lcbV6=32.8; açık ağırlıklar; GPQA %57.2",
-      "weaknesses": "NVIDIA RULER'a göre gerçek bağlam 5-6.5M token; SWE-bench skoru yok; aaIdx=14 düşük; tüm benchmark'larda Maverick'in altında"
-    },
-    "llama-4-maverick": {
-      "strengths": "MoE mimarisi (17B aktif / 400B toplam); 1M token bağlam; lcbV6=43.4 ile GPT-4o'yu (%32.3) geçiyor; GPQA %69.8; açık ağırlıklar",
-      "weaknesses": "Tier-I kaynaklarda SWE-bench Verified skoru bulunamadı; deneysel-vs-herkese-açık sürüm tartışması; aaIdx=18 frontier medyanının altında"
-    },
-    "qwen3-coder-next": {
-      "strengths": "80B toplam / 3B aktif hibrit dikkat+MoE mimarisi. Tek RTX 5090 ile yerel çalışıyor. 256K bağlam, 370+ dil. SWE-Verified %58.7 — 10-20x daha fazla aktif parametreli modelleri geride bırakıyor.",
-      "weaknesses": "API fiyatlandırması henüz netleşmedi. SWE-Pro bağımsız ölçümü yok. Qwen3-Coder-480B'nin gölgesinde kalıyor. FIM/otomatik tamamlama için optimize edilmemiş."
-    },
-    "minimax-m2-7": {
-      "strengths": "Frontier kalitesi açık ağırlıklı modeller arasında en düşük fiyat noktasında ($0.30 giriş). SWE-Bench ve Terminal-Bench'te güçlü ajansal kodlama. Piyasa medyanının yarısı fiyatla en yüksek zeka endeks skorlarından biri.",
-      "weaknesses": "45.7 token/s çıkış hızıyla sınıfının altında kalıyor. Giriş TTFT yüksek (2.18s). MiniMax platform dışında sağlayıcı çeşitliliği sınırlı."
-    },
-    "minimax-m2-5": {
-      "strengths": "SWE-Bench Verified'da %80.2 ile kapalı kaynak frontier modellerini eşliyor. 105 token/sn çıkış hızı sınıfında ortalamanın iki katı. 230B toplam / 10B aktif MoE mimarisi verimli çalışıyor.",
-      "weaknesses": "AA Zeka Endeksi 42 ile M2.7'nin gerisinde kalıyor. SWE-Pro ve Terminal-Bench bağımsız doğrulaması eksik. Ekim 2025'te çıkan orijinal M2'nin yerini aldı, artık ikincil bir seçenek."
-    },
-    "mimo-v2-flash": {
-      "strengths": "MIT lisansıyla açık kaynak, 309B toplam / 15B aktif MoE. 1M token bağlam penceresi. SWE-Bench Verified %73.4 ile Claude Sonnet 4.5'i geçiyor. AIME 2025'te %94.1 matematik performansı.",
-      "weaknesses": "Fiyatlandırma API'si henüz net değil. SWE-Pro bağımsız ölçümü yok. V2-Pro ve V2.5 serileri çıkınca hızla gölgede kaldı."
-    },
-    "mimo-v2-pro": {
-      "strengths": "1T toplam / 42B aktif MoE, %78 SWE-Bench Verified ile Claude Sonnet 4.6'yı aşıyor. 1M token bağlam, ajansal iş akışları için idealdir. Frontier kalitesinin çok altında fiyat. 'Hunter Alpha' gizli lansmanıyla viral oldu.",
-      "weaknesses": "Açık ağırlık yayınlanmadı (sadece API). 256K üzeri bağlam için fiyat 2 katına çıkıyor. SWE-Pro bağımsız ölçümü eksik. V2.5-Pro Nisan 2026'da yerini almaya başladı."
-    },
-    "mimo-v2-5-pro": {
-      "strengths": "Frontier modelleri aynı yetenekle %40-60 daha az token harcayarak eşliyor. SWE-Pro 57.2, ClawEval 63.8, τ³-Bench 72.9. Görüntü/ses/video+metin çok modlu tek model. 672 araç çağrısıyla 4.3 saatte mükemmel derleyici görevi.",
-      "weaknesses": "Ağırlıklar henüz açık kaynak değil ('yakında' söz verildi). Önce kamu beta, tam API ölçeklendirilmesi devam ediyor. SWE-Pro skoru self-reported."
-    },
-    "mimo-v2-5": {
-      "strengths": "100-150 token/sn ile hızlı günlük kullanım modeli. Muse Spark'a kıyasla %50 daha az token kullanımı. Tüm modaliteleri destekliyor ($0.40 giriş uygun fiyatlı). V2-Pro ve V2-Omni'yi tek modelde birleştiriyor.",
-      "weaknesses": "Tam parametre sayısı ayrıca açıklanmadı (Pro ile paylaşılıyor olabilir). Benchmark skoru henüz bağımsız doğrulanmadı. Ağırlıklar henüz açık kaynak değil."
-    },
-    "step-3-5-flash": {
-      "strengths": "196B toplam / 11B aktif MoE açık kaynak. 100-350 token/sn üretim hızı. SWE-Verified %74.4, τ²-Bench 88.2 ile güçlü ajansal kodlama. $0.10/$0.30 piyasanın en ucuz seçeneklerinden.",
-      "weaknesses": "Benchmarkların tamamı self-reported (StepFun). vLLM/llama.cpp ile yerel çalışırken VRAM gereksinimi yüksek. Bağımsız platform doğrulaması sınırlı."
-    },
-    "deepseek-v4-pro": {
-      "strengths": "1.6T toplam / 49B aktif MoE, açık ağırlık MIT. SWE-Verified %80.6 (Claude Opus 4.6'ya 0.2 puan fark), LiveCodeBench %93.5. V3.2'ye kıyasla %73 daha az FLoP, 1M token bağlam, frontier kalitesinin çok altında fiyat.",
-      "weaknesses": "Yerel çalıştırmak için minimum 8x H100 80GB GPU gerekiyor. Preview aşamasında bant genişliği kısıtlı. HLE %37.7 ile frontier modellerinin gerisinde. Yalnızca metin destekli, görüntü/ses yok."
-    },
-    "qwen3-coder-480b": {
-      "strengths": "Açık ağırlıklar arasında ajansal kodlamada SOTA. Aider Polyglot %61.8 Claude Sonnet 4 ile eşit. 7.5T token (%70 kod) eğitim verisi, 358 programlama dili. QwenCode CLI açık kaynak sunuldu.",
-      "weaknesses": "480B toplam parametre yerel çalıştırmayı pratikte imkânsız kılıyor (birden fazla H100 düğümü gerekli). 256K bağlam penceresi 1M sunan rakiplere kıyasla kısıtlı. Düşünme modu desteklenmiyor."
-    },
-    "devstral-medium": {
-      "strengths": "24B parametre, Apache 2.0 lisansı, 32GB RAM dizüstü bilgisayarda çalışıyor. SWE-Verified %68 güçlü yerel kodlama. Çok modlu (görüntü girişi destekli). $0.10/$0.30 uygun fiyatlı.",
-      "weaknesses": "Devstral 2 123B'ye kıyasla 4.2 puan geride. Görüntü çıkışı yok. Yerel performans tam hassasiyet için 32GB+ RAM gerektiriyor."
-    },
-    "codestral-22b": {
-      "strengths": "HumanEval %86.6, MBPP %91.2. 256K bağlam penceresi repo-ölçeği kod tamamlama için ideal. 22B parametreyle RTX 4090'da tam hassasiyet çalışıyor. FIM (fill-in-the-middle) desteği IDE entegrasyonu için mükemmel.",
-      "weaknesses": "Ticari olmayan lisans girişim benimsemesini kısıtlıyor. SWE-Bench Verified bağımsız skoru yok. Devstral ve Qwen3-Coder gibi yeni ajansal modellerin gölgesinde kaldı."
-    },
-    "nemotron-3-super": {
-      "strengths": "Hibrit Mamba-Transformer mimarisi (LatentMoE) 5x daha yüksek throughput. NVFP4 ile 64GB VRAM'da çalışıyor (tek H100 SXM). SWE-Verified %60.5 açık ağırlık rekoru (çıkış tarihinde). 1M token bağlamda %91.75 RULER. Cloudflare Workers AI'da ücretsiz.",
-      "weaknesses": "SWE-Verified %60.5 Nisan 2026 itibarıyla DeepSeek V4-Pro (%80.6) ve Kimi K2.6 (%80.2) tarafından geride bırakıldı. İngilizce dışı kodlamada %45.8 ile önemli düşüş. BF16 tam ağırlıklar için 3-4x H100 gerekiyor."
-    },
-    "gemma-4-e2b": {
-      "strengths": "2.3B etkin parametre (5.1B toplam, PLE); yerel çok modlu (metin/görsel/ses); çevrimdışı; mobilde 48 tok/s; Apache 2.0",
-      "weaknesses": "Kenar cihaz modeli — SWE-bench/ajansal'da test edilmedi; lcbV6=44.0 tek C-tier kaynak; aaIdx=15 düşük; vLLM FlashAttention fallback yavaşlığı"
-    },
-    "gemma-4-e4b": {
-      "strengths": "4.5B etkin; sesli ASR ile yerel çok modlu; M serisi Mac'te 40+ tok/s; T4 GPU'da; Apache 2.0; lcbV6=52.0 boyut sınıfı için güçlü",
-      "weaknesses": "Kenar cihaz modeli — SWE-bench'te test edilmedi; lcbV6=52.0 tek C-tier kaynak; E2B ile aynı aaIdx=15; vLLM'de RTX 4090'da ~9 tok/s"
-    },
-    "gemma-4-26b-moe": {
-      "strengths": "26B toplam / 3.8B aktif MoE, RTX 4090'da 24GB ile çalışıyor (Q4). Arena AI'da küresel #6. AIME 2026 %88.3 verimlilik için etkileyici. 31B yoğun modelin %97'si kalitesini 1/8 hesaplama ile sunuyor.",
-      "weaknesses": "SWE-Verified %64 GLM-5.1 (%78) ve Claude'un (%87.6) gerisinde. Hâlâ 26GB yüklemesi gerektiriyor (sadece 3.8B aktif olmasına rağmen). Kodlama ajanı senaryolarında 31B Yoğun'a tercih edilmiyor."
-    },
-    "gemma-4-31b": {
-      "strengths": "Apache 2.0 ile en iyi ABD açık modeli. Arena AI #3 (Elo 1452). AIME 2026 %89.2 güçlü matematik. τ²-Bench 86.4 etkileyici ajan performansı. 256K bağlam. Tam çok modlu.",
-      "weaknesses": "SWE-Verified %64 GLM-5.1 ve Kimi K2.6 gibi Çin modellerin gerisinde. Tam hassasiyet için 80GB H100 gerekiyor. Fiyatlandırma henüz açıklanmadı (Google AI Studio ücretsiz önizleme)."
-    },
-    "gemma-3-27b": {
-      "strengths": "27B yoğun model, tek GPU'da tam hassasiyet çalışıyor. DeepInfra'da $0.10/1M giriş ile son derece ucuz. 140+ dil, görüntü+metin çok modlu. İnce ayar için iyi temel.",
-      "weaknesses": "LiveCodeBench v6 %29.1 ile mevcut kodlama standartlarında çok düşük. Gemma 4 Nisan 2026'da dramatik biçimde onu geride bıraktı (Codeforces ELO: 110 vs 2150). Ajansal araç kullanımı %6.6 kabul edilemez düşük."
-    },
-    "qwen25-coder-32b": {
-      "strengths": "14.7M Ollama indirmesiyle yerel kodlama için #1 tercih. HumanEval %92.7, Aider %73.7. FIM (fill-in-the-middle) ile en iyi otomatik tamamlama modeli. RTX 4090'da Q4_K_M ile 22GB VRAM'da çalışıyor.",
-      "weaknesses": "32K bağlam penceresi modern standartlarda sınırlı (not: Unsloth 128K versiyonu mevcut). Qwen3.6 ailesi ile karşılaştırıldığında ajansal kodlamada zayıf. Yalnızca metin, çok modlu değil."
-    },
-    "qwen25-coder-14b": {
-      "strengths": "9GB dosya boyutu — 12GB VRAM GPU'larda (RTX 3060/4060) güçlü kodlama. FIM desteği ile IDE otomatik tamamlama için idealdir. Apache 2.0 lisansı ile ticari kullanım özgür.",
-      "weaknesses": "32K bağlam penceresi kısıtlı. 32B varyantına kıyasla benchmark performansı düşer. Ajansal kodlama için 32B veya üzeri tercih edilmeli."
-    },
-    "qwen25-coder-7b": {
-      "strengths": "4.7GB boyut, 8GB VRAM GPU (RX 580, GTX 1070) dahil çalışıyor. FIM desteği ile hafif IDE entegrasyonu. Apache 2.0. Giriş seviyesi yerel kodlama için en iyi seçenek.",
-      "weaknesses": "32K bağlam penceresi ve 7B parametre ciddi ajansal görevi kaldırmaz. Daha güçlü donanımda 14B veya 32B tercih edin. Benchmark rakamları 32B'nin önemli ölçüde altında."
-    },
-    "deepseek-coder-v2-16b": {
-      "strengths": "16B MoE varyantı 8.9GB ile 12GB VRAM'da çalışıyor. 160K bağlam penceresi yerel modeller arasında oldukça geniş. GPT4-Turbo ile karşılaştırılabilir performans (çıkış dönemi). 2.4M Ollama indirmesi.",
-      "weaknesses": "2024'ten itibaren güncel yeni modeller tarafından önemli ölçüde geride bırakıldı. 236B varyantı pratikte çalıştırılamaz (133GB). Lisans DeepSeek'e özgü Apache/MIT değil."
-    },
-    "deepseek-r1-14b": {
-      "strengths": "Qwen2.5'ten damıtılmış, 128K bağlam penceresi ile güçlü akıl yürütme. MIT lisansı. 9GB dosya boyutu 12GB VRAM GPU'larda rahatça çalışıyor. Yerel matematiksel akıl yürütme için popüler.",
-      "weaknesses": "Distilled model — tam R1 671B kapasitesinde değil. Kodlama benchmark skoru bağımsız olarak raporlanmamış. DeepSeek V4 serisinin gölgesinde kaldı."
-    },
-    "qwen3-6-max": {
-      "strengths": "AA Zeka Endeksi 52 ile yüksek sıralamada. SWE-Pro, Terminal-Bench 2.0, SkillsBench, QwenClawBench, QwenWebBench, SciCode dahil 6 benchmark'ta #1. Ajan iş akışları için preserve_thinking özelliği.",
-      "weaknesses": "Kapalı ağırlık (Qwen tarihinde ilk kez). SWE-Bench Verified bağımsız skoru yayınlanmadı. Ön izleme döneminde fiyatlandırma netleşmedi. Görüntü/ses yok — yalnızca metin."
-    },
-    "gpt-5-4": {
-      "strengths": "GPT-5.4 serisinin temel modeli, geniş bağlam (1M token), maliyet açısından uygun giriş fiyatlandırması, ChatGPT Plus üzerinden erişim",
-      "weaknesses": "GPT-5.4 ve o3 gibi daha yeni OpenAI modelleri tarafından yerinden edildi, bağımsız benchmark verileri kısıtlı"
-    },
-    "qwen3-6-35b-moe": {
-      "strengths": "35B toplam / 3B aktif MoE, Apache 2.0. SWE-Verified %73.4 açık ağırlıklar arasında olağanüstü. 24GB Apple Silicon Mac'te Unsloth 4-bit ile çalışıyor. GPQA Diamond 86.0 güçlü çoklu disiplin performansı.",
-      "weaknesses": "API fiyatlandırması henüz açıklanmadı. SWE-Pro bağımsız ölçümü yok. F16 tam model ~72GB gerektiriyor (tüketici donanımının üzerinde)."
-    },
-    "o4-mini": {
-      "strengths": "o3'e kıyasla 10 kat daha ucuz, güçlü muhakeme; SWE-bench Verified %58.6 (Vellum bağımsız) / %68.1 (OpenAI scaffold); GPQA Diamond %81.4; LiveCodeBench %80.2; Codeforces ELO 2719",
-      "weaknesses": "SWE-bench skoru scaffold'a göre değişiyor (OpenAI %68.1, Vellum %58.6 — RED, muhafazakar %58.6 seçildi); Artificial Analysis'te aaIdx girişi yok; kapalı ağırlıklı, yerel dağıtılamaz"
-    },
-    "grok-3-mini": {
-      "strengths": "aaIdx=32 (fiyat dilimi medyanının çok üzerinde); GPQA Diamond %79.1; LiveCodeBench %69.6 (muhafazakar); 183 tok/s; 1M token başına $0.30/$0.50 — güçlü maliyet verimliliği",
-      "weaknesses": "Hiçbir Tier-I kaynakta SWE-bench Verified skoru yok; lcbV6 tek kaynak xAI (RED — aynı kaynakta 69.6/80.4 çelişkisi); xAI SWE-bench/SEAL'a katılmıyor"
-    },
-    "gemini-3-1-flash": {
-      "strengths": "1M token bağlam, $0.15-$0.30/M giriş — Pro'dan 4x ucuz. GPQA %86.9 güçlü bilim akıl yürütmesi. Yüksek hacimli üretim için en hızlı Google modeli; AI Studio'da ücretsiz katman.",
-      "weaknesses": "Bağımsız SWE-bench Verified veya LiveCodeBench skoru bulunamadı. Tescilli, kapalı ağırlıklı. Çoğu akıl yürütme benchmark'ında Pro'nun ~5pp gerisinde."
-    },
-    "gemini-3-1-pro": {
-      "strengths": "1M bağlam, SWE-V %80.6 DeepSeek V4-Pro ile eşit, GPQA %94.3 dünya standardı, LCB %88.49, SWE-Pro %46.1, MCP-Atlas %73.9. $2/$12 — frontier'da en iyi Google değeri.",
-      "weaknesses": "HLE %44.4 Claude Opus 4.7 (%46.9) ve MiMo-V2.5-Pro (%48.0) gerisinde. Bağımsız aaAgentic, tb2, tau2 skoru yok. Tescilli kapalı ağırlıklı, yerel dağıtım yok."
-    },
-    "gpt-4-1": {
-      "strengths": "SWE-V %54.6 kendi sınıfı için güçlü, 1M bağlam, $2/$8 /1M $0.50 cache ile. Çok modlu (video+metin). GPT-4o'ya kıyasla %83 maliyet düşüşü. ChatGPT Plus'tan erişilebilir.",
-      "weaknesses": "Bağımsız GPQA, LCB veya SWE-Pro skoru bulunamadı. Akıl yürütme görevlerinde o3 ve o4-mini tarafından geride bırakıldı. Tescilli, kapalı ağırlıklı. Video-MME %72 SOTA değil."
-    },
-    "grok-3": {
-      "strengths": "GPQA %84.6 güçlü bilim, LCB %79.4 kodlama, 1M token bağlam (öncekinin 8x'i), AIME 2025 %93.3. Chatbot Arena Elo lansmanında ~1402. $3/$15 /1M.",
-      "weaknesses": "Hiçbir Tier-I kaynakta SWE-bench Verified veya SWE-Pro skoru yok. Benchmark tartışması: çok denemeli ortalamalar rakip tek-deneme skorlarını şişiriyor. xAI SEAL'a katılmıyor."
-    },
-    "mistral-large-3": {
-      "strengths": "675B toplam / 41B aktif MoE, LCB %82.8 güçlü kodlama, HumanEval %92.0, AIME 2025 %88.0, MATH-500 %93.6. Self-hostable açık ağırlıklı. $0.50/$1.50 uygun fiyat.",
-      "weaknesses": "GPQA %43.9 denk açık ağırlıklı modellerden önemli ölçüde geride (DeepSeek %77+, Kimi %80+). Bağımsız SWE-bench Verified skoru yok. Frontier ajansal ve bilim akıl yürütmesinde geride."
-    },
-    "o3": {
-      "strengths": "SWE-V %71.7, GPQA %87.7, AIME %96.7, Codeforces Elo 2727, ARC-AGI %87.5. Mart 2026'da %80 fiyat düşüşüyle $2/$8 /1M. OpenAI'dan sınıfının en iyi akıl yürütme modeli.",
-      "weaknesses": "Düşünme token'ları çıkış olarak faturalanır (gizli maliyet: 500 görünür token 2000+ faturalı tüketebilir). ARC-AGI-2 yalnızca %2.9. SWE-Pro Tier-I skoru yok. Kapalı ağırlıklı, yerel dağıtım yok."
-    },
-    "qwen3-235b": {
-      "strengths": "235B toplam / 22B aktif MoE, Apache 2.0. LCB %74.8, GPQA %81.1, AIME 2025 %92.3, AIME 2024 %85.7. Gemini 2.5 Pro ile rekabet ediyor. $0.20/$1.00 /1M — GPT-5'ten %70 ucuz.",
-      "weaknesses": "LCB %74.8 yeni frontier modellerin gerisinde (Gemini 3.1 Pro %88.5, DeepSeek V4-Pro %93.5). Bağımsız SWE-bench Verified skoru yok. Yerel dağıtım için birden fazla H100 düğümü gerekli."
-    },
-    "qwen3-32b": {
-      "strengths": "32B yoğun, Apache 2.0. $0.15/$0.75 /1M — en ucuz frontier kalitesinde yoğun model. 119 dil, güçlü çok dilli kodlama. Q4 kuantizasyonla tek A100 veya üst düzey tüketici GPU'ya sığıyor.",
-      "weaknesses": "SWE-bench Pro yalnızca %3.4 (GPT-4o %4.9'un bile gerisinde). Bağımsız Tier-I GPQA veya LCB skoru bulunamadı. 235B MoE kardeşinden küçük — karmaşık akıl yürütmede daha düşük tavan."
-    },
-    "qwen3-6-plus": {
-      "strengths": "Yeniden inşa edilmiş akıl yürütme katmanı sürekli açık düşünce zinciri kullanır. Qwen 3.5 Plus'a kıyasla 515 daha az akıl yürütme token'ı ile daha uzun çıktı üretiyor. Geliştirilmiş tutarlılık ve üretim güvenilirliği.",
-      "weaknesses": "Bağımsız GPQA, SWE-bench veya LiveCodeBench skoru bulunamadı. Çok modlu ses/video görevlerinde 3.5 Plus'ın gerisinde. Büyük sağlayıcı API'lerinde fiyat resmi olarak açıklanmadı."
-    },
-    "devstral-small-2": {
-      "strengths": "24B parametre, SWE-V %68.0 — boyut sınıfının en güçlü açık ağırlıklı modeli. 256K bağlam, Apache 2.0, çok modlu görüntü girişi. RTX 4090 (24GB) veya 32GB Mac'te çalışıyor. 75 tok/s, TTFT 1.18s. $0.10/$0.30.",
-      "weaknesses": "Devstral 2'den (123B) 4.2pp geride. Bağımsız SWE-Pro veya LCB skoru yok. Büyük Devstral 2'ye kıyasla sınırlı sağlayıcı çeşitliliği. Görüntü çıkışı desteklenmiyor."
-    },
-    "gpt-5-5": {
-      "strengths": "Terminal-Bench 2.0'da %82.7 lider; GPQA %93.6; 1M token bağlam; natif çok modallu (omni); MCP-Atlas %75.3; SWE-bench Pro %58.6.",
-      "weaknesses": "SWE-bench Pro'da Opus 4.7'nin 5.7 puan gerisinde; HLE %41.4 (Opus 4.7 = %46.9); $5/$30 yüksek API fiyatı; kapalı ağırlıklar."
-    },
-    "glm-4-5-air": {
-      "strengths": "12B aktif parametreli MoE; self-host icin maliyet-yetenek dengesi iyi; MIT lisansli.",
-      "weaknesses": "Bench kapsami bekliyor; yayin aninda agentic kolonlar buyuk olcude test edilmemis."
-    },
-    "glm-4-7": {
-      "strengths": "GLM serisinde acik-agirlikli kodlama lideri; MIT altinda frontier-sinifi SWE davranisi hedefler.",
-      "weaknesses": "Kullanilabilir quantlarda 40GB+ VRAM ister; tuketici GPU icin gercekci degil."
-    },
-    "mistral-medium-3-5": {
-      "strengths": "Avrupa dilleri destegi guclu, fiyati ongorulebilir orta-seviye Mistral modeli.",
-      "weaknesses": "Modified-MIT lisansi ticari yeniden dagitimi kisitlar; yalnizca cloud."
-    },
-    "qwen3-5-9b": {
-      "strengths": "6-8GB tuketici GPU icin uygun kompakt 9B Qwen; Apache 2.0 kisitsiz.",
-      "weaknesses": "Coklu-dosya refaktorde 27B/35B kardeslerinden daha dusuk kapasite; agentic bosluklar bekleniyor."
-    },
-    "minimax-m2-1": {
-      "strengths": "Token basina 1$ altinda 1M-token baglam penceresi; uzun-dokuman ve coklu-dosya gorevleri icin faydali.",
-      "weaknesses": "Tam hassasiyette yerel calistirma pratik degil; cloud-oncelikli dagitim."
-    },
-    "claude-haiku-4-5": {
-      "strengths": "",
-      "weaknesses": ""
-    },
-    "codestral": {
-      "strengths": "",
-      "weaknesses": ""
-    },
-    "grok-4-1-fast": {
-      "strengths": "",
-      "weaknesses": ""
-    },
-    "grok-4-20": {
-      "strengths": "",
-      "weaknesses": ""
-    },
-    "grok-4-3": {
-      "strengths": "",
-      "weaknesses": ""
-    },
-    "gemini-3-5-flash.strengths": "Agentic ve kodlama iş yükleri için optimize edilmiş hızlı, düşük maliyetli Gemini katmanı; 1M-token bağlam.",
-    "gemini-3-5-flash.weaknesses": "Benchmark kapsamı doğrulanmayı bekliyor; tescilli, yalnızca bulut.",
-    "qwen3-7-max.strengths": "1M-token bağlamlı Qwen amiral gemisi akıl yürütme-agent modeli; güçlü kodlama ve agentic performansı.",
-    "qwen3-7-max.weaknesses": "Kapalı ağırlıklı önizleme; bağımsız bench kapsamı bekliyor; orta seviye Qwen üzerinde fiyat.",
-    "qwen3-7-plus.strengths": "Görüntü ve kod görevlerini birleştiren, 1M-token bağlamlı çok kipli Qwen3.7 varyantı.",
-    "qwen3-7-plus.weaknesses": "Kapalı ağırlıklı önizleme; lansmanda sınırlı bağımsız benchmark.",
-    "claude-opus-4-8.strengths": "Anthropic'in amiral gemisi sınır modeli; sürüm anında SWE-bench ve agentic kodlamada en güçlü Claude.",
-    "claude-opus-4-8.weaknesses": "Premium API fiyatı; kapalı ağırlıklar; tam benchmark kapsamı bu döngünün taramasını bekliyor.",
-    "gpt-5-4-mini.strengths": "400K bağlamlı, maliyet-verimli GPT-5.4 katmanı; kodlama ajanları için gecikme ve yetenek dengesi.",
-    "gpt-5-4-mini.weaknesses": "Zorlu muhakemede tam GPT-5.4'ten zayıf; kapalı ağırlıklar; bench kapsamı taramayı bekliyor.",
-    "gpt-5-4-nano.strengths": "En küçük GPT-5.4 varyantı; yüksek verimli, düşük gecikmeli kodlama çağrıları için en ucuz OpenAI seçeneği.",
-    "gpt-5-4-nano.weaknesses": "Çoklu-dosya görevlerde GPT-5.4 ailesinin en düşük kapasitesi; kapalı ağırlıklar; bench kapsamı bekliyor.",
-    "mistral-small-4.strengths": "256K bağlamlı, Apache-2.0 küçük Mistral; tek orta-seviye GPU'da self-host edilebilir.",
-    "mistral-small-4.weaknesses": "Agentic benchmarklarda sınır seviyesinin altında; tam bench kapsamı bu döngünün taramasını bekliyor.",
-    "nemotron-3-nano-omni.strengths": "Açık-ağırlıklı multimodal NVIDIA Nemotron nano; agentic ve multimodal görevler için kompakt.",
-    "nemotron-3-nano-omni.weaknesses": "Nano ölçeği zorlu kodlama yeteneğini sınırlar; bench kapsamı bu döngünün taramasını bekliyor."
+  "lang": {
+   "toggle": "EN"
   },
-  "benchmarks": {
-    "swePro": {
-      "name": "SWE-bench Pro",
-      "short": "SWE-PRO",
-      "desc": "Contamination-resistant gold standard; 1865 task, 41 repo, çoklu dil."
-    },
-    "sweV": {
-      "name": "SWE-bench Verified",
-      "short": "SWE-V",
-      "desc": "İnsan doğrulamalı 500 task. Pro ile çelişki sık görülür."
-    },
-    "sweMulti": {
-      "name": "SWE-bench Multilingual",
-      "short": "SWE-M",
-      "desc": "9 programlama dilinde yazılım hata düzeltme."
-    },
-    "tb2": {
-      "name": "TerminalBench 2",
-      "short": "TB2",
-      "desc": "Terminal CLI agentic execution; tool kullanım kalitesi."
-    },
-    "tbHard": {
-      "name": "Terminal-Bench Hard",
-      "short": "TB-HARD",
-      "desc": "Terminal-Bench'in en zor 44 task subseti; AA Index v4 bileşeni."
-    },
-    "lcb": {
-      "name": "LiveCodeBench",
-      "short": "LCB",
-      "desc": "Sürekli güncellenen contamination-free yarışmacı kodlama leaderboard'ı (May 2023→bugün)."
-    },
-    "tau2": {
-      "name": "τ²-bench",
-      "short": "τ²",
-      "desc": "Multi-turn tool calling + plan execution (telekom track)."
-    },
-    "mcpA": {
-      "name": "MCP-Atlas",
-      "short": "MCP-A",
-      "desc": "Model Context Protocol tool zinciri kalitesi."
-    },
-    "bfcl": {
-      "name": "BFCL v3/v4",
-      "short": "BFCL",
-      "desc": "Berkeley Function-Calling Leaderboard — fonksiyon/araç seçim doğruluğu."
-    },
-    "browseComp": {
-      "name": "BrowseComp",
-      "short": "BROWSE",
-      "desc": "Web araştırma agent benchmark'ı; çok-adımlı tarama + sentez."
-    },
-    "aaCoding": {
-      "name": "AA Coding",
-      "short": "AA-CODE",
-      "desc": "Artificial Analysis composite coding skoru."
-    },
-    "aaAgentic": {
-      "name": "AA Agentic",
-      "short": "AA-AGT",
-      "desc": "Artificial Analysis agentic kullanım skoru."
-    },
-    "aaIdx": {
-      "name": "AA Index",
-      "short": "AA-IDX",
-      "desc": "Artificial Analysis genel composite (referans, ağırlıkta kullanılmaz)."
-    },
-    "aaOmni": {
-      "name": "AA-Omniscience",
-      "short": "AA-OMNI",
-      "desc": "Artificial Analysis omniscience / hizasızlık skoru (düşük daha iyi)."
-    },
-    "cfElo": {
-      "name": "Codeforces ELO",
-      "short": "CF-ELO",
-      "desc": "Codeforces yarışmacı kodlama ELO puanı; 1000-3500 ham skala."
-    },
-    "webDevElo": {
-      "name": "LMArena WebDev Elo",
-      "short": "WD-ELO",
-      "desc": "LMArena WebDev Arena: ön-yüz kod çıktıları üzerinde insanların kör tercih oylamasıyla hesaplanan Elo; tipik ham aralık 950-1300."
-    },
-    "mmluPro": {
-      "name": "MMLU-Pro",
-      "short": "MMLU-PRO",
-      "desc": "57 disiplinde akıl yürütme; sert dikkat dağıtıcılı sorular."
-    },
-    "mrcr": {
-      "name": "MRCR 1M",
-      "short": "MRCR",
-      "desc": "1M token uzun bağlamda retrieval; çoklu iğne (needle) testi."
-    },
-    "arcAgi2": {
-      "name": "ARC-AGI-2",
-      "short": "ARC-2",
-      "desc": "Soyut akıl yürütme; insan altı tek frontier benchmark."
-    },
-    "gpqa": {
-      "name": "GPQA Diamond",
-      "short": "GPQA",
-      "desc": "Lisansüstü seviye genel akıl yürütme (188 zor soru)."
-    },
-    "aime26": {
-      "name": "AIME 2026",
-      "short": "AIME26",
-      "desc": "AIME 2026 — ileri düzey matematik akıl yürütme."
-    },
-    "hle": {
-      "name": "Humanity's Last Exam",
-      "short": "HLE",
-      "desc": "Kapsamlı ileri düzey çoklu disiplin testi."
-    },
-    "nl2Repo": {
-      "name": "NL2Repo",
-      "short": "NL2REPO",
-      "desc": "Doğal dil tarifinden tam repo üretimi; çok-dosyalı yapı + bağımlılık çözümleme."
-    },
-    "llmStatsIdx": {
-      "name": "LLM-Stats Composite",
-      "short": "LLM-Stats",
-      "desc": "llm-stats.com yayıncısının yayımlanmış benchmarklar üzerinden TrueSkill tarzı composite skoru. Vendor agregatı — bağımsız referans, AICoderMap composite'ine dahil değil."
-    },
-    "vellumRank": {
-      "name": "Vellum Sırası",
-      "short": "Vellum",
-      "desc": "Vellum LLM Leaderboard sıralaması (1=en iyi). Inverse-rank ile normalize edilir. Vendor agregatı."
-    },
-    "benchlmIdx": {
-      "name": "BenchLM Composite",
-      "short": "BenchLM",
-      "desc": "BenchLM.ai çoklu benchmark composite skoru. Vendor agregatı."
-    },
-    "lmArenaElo": {
-      "name": "LMArena Elo",
-      "short": "LMArena",
-      "desc": "LMArena baş-başa karşılaştırma Elo skoru (genel sohbet). 1000-1500 → 0-100 lineer normalize. Vendor agregatı."
-    },
-    "hfOpenAvg": {
-      "name": "HF Open LLM Ort.",
-      "short": "HF Open",
-      "desc": "HuggingFace Open LLM Leaderboard ortalama skoru. Yalnız açık ağırlık modeller. Vendor agregatı."
-    },
-    "kluRank": {
-      "name": "Klu Sırası",
-      "short": "Klu",
-      "desc": "Klu.ai LLM leaderboard sıralaması. Inverse-rank ile normalize edilir. Vendor agregatı."
-    }
+  "theme": {
+   "light": "Aydınlık tema",
+   "dark": "Karanlık tema",
+   "auto": "Sistem teması"
   },
-  "benchCategories": {
-    "coding": {
-      "label": "Kodlama"
-    },
-    "agentic": {
-      "label": "Ajansal"
-    },
-    "reasoning": {
-      "label": "Akıl Yürütme"
-    },
-    "general": {
-      "label": "Genel"
-    }
+  "export": {
+   "section": "Bölümü PNG olarak kaydet",
+   "weights": "Ağırlıkları PNG olarak kaydet",
+   "model": "Model detaylarını PNG olarak kaydet",
+   "table": "Karşılaştırma tablosunu PNG olarak kaydet",
+   "full": "Tam sayfa PNG",
+   "fullTooltip": "Tüm sayfayı PNG olarak kaydet",
+   "sources": "Kaynakları Markdown olarak indir"
   },
-  "verdicts": {
-    "preset": {
-      "balanced": "Dengeli",
-      "sweFocused": "SWE-odaklı",
-      "agenticFocused": "Agentic-odaklı",
-      "reasoningFocused": "Akıl yürütme odaklı",
-      "benchmarkOnly": "Sadece Benchmark",
-      "consensus": "Vendor Konsensüsü"
-    }
+  "table": {
+   "rank": "#",
+   "name": "MODEL",
+   "provider": "SAĞLAYICI",
+   "released": "ÇIKIŞ",
+   "tier": "TIER",
+   "license": "LİSANS",
+   "context": "BAĞLAM",
+   "pricingApi": "API ($/1M TOK)",
+   "pricingSub": "ABONELİK",
+   "priceIn": "API IN $",
+   "priceOut": "API OUT $",
+   "composite": "COMPOSITE",
+   "bench": "BENCHMARK SKORLARI",
+   "gpu": "GPU UYUM",
+   "vram": "VRAM",
+   "lastUpdated": "GÜNCELLEME",
+   "strengths": "GÜÇLÜ YANLAR",
+   "weaknesses": "ZAYIF YANLAR",
+   "cacheHit": "Önbellek",
+   "providers": "Sağlayıcılar",
+   "ollamaSize": "Ollama boyutu"
   },
-  "reliability": {
-    "label": "Güvenilirlik",
-    "exceptional": "olağanüstü kaynak",
-    "lowConfidence": "düşük güvenilirlik",
-    "coldStart": "yeterli veri yok"
+  "footer": {
+   "about": "Hakkında",
+   "repo": "GitHub Repo",
+   "license": "MIT Lisans",
+   "privacy": "Cookie yok, kayıt yok, ücretsiz. Yalnızca anonim trafik ölçümü için GitHub Insights kullanılır.",
+   "deployed": "Yayın"
   },
-  "vendorPanel": {
-    "title": "Vendor görünümü",
-    "consensus": "uzlaşı",
-    "mild": "hafif fark",
-    "controversy": "anlaşmazlık",
-    "agreementTip": "AICM sıra",
-    "consensusRank": "konsensüs sıra",
-    "limitedData": "sınırlı veri",
-    "limitedCoverage": "sınırlı kapsam",
-    "missingTip": "eksik benchler",
-    "notInScoreTag": "skorda değil",
-    "notInScore": "Bağımsız referans — AICoderMap composite skoruna dahil DEĞİL"
+  "freshness": {
+   "refresh": "Yenile",
+   "stale": "Yeni bir build yayında (commit {liveSha} · görüntülenen {servedShort} · {ageMin} dk önce). Kısa sürede yansıyacak; sayfayı yenileyin."
+  },
+  "timeAgo": {
+   "justNow": "az önce",
+   "suffix": "önce",
+   "d": " gün",
+   "h": " saat",
+   "m": " dk"
+  },
+  "tier": {
+   "frontier": "FRONTIER",
+   "open-flagship": "AÇIK FLAGSHIP",
+   "coder-specialized": "KOD UZMANLAŞMIŞ",
+   "gemma": "GEMMA",
+   "ollama-local": "OLLAMA YEREL"
   },
   "compat": {
-    "errors": {
-      "webgpuUnsupported": "WebGPU bu tarayıcıda desteklenmiyor"
-    }
+   "fits": "Uyumlu",
+   "offload": "Offload",
+   "tooLarge": "Yetersiz VRAM",
+   "cloud": "Bulut model"
+  },
+  "contradiction": {
+   "title": "Çelişki tespit edildi",
+   "delta": "Fark",
+   "values": "Değerler",
+   "tier": {
+    "S": "Self-reported",
+    "I": "Independent",
+    "C": "Community"
+   }
+  },
+  "errors": {
+   "fetchFailed": "Veri yüklenemedi, sayfayı yenileyin.",
+   "weightsInvalid": "Ağırlıklar toplamı 100 olmalı.",
+   "schemaInvalid": "Veri şeması beklenen formatta değil. Varsayılana dönüldü.",
+   "i18nFallback": "Dil dosyası yüklenemedi, Türkçe varsayılan kullanılıyor.",
+   "exportFailed": "PNG dışa aktarma başarısız. Sayfayı yenileyin.",
+   "webgpuUnsupported": "Tarayıcınız WebGPU desteklemiyor. Manuel GPU seçin."
+  },
+  "ollama": {
+   "title": "Yerel (Ollama)",
+   "copy": "Komutu kopyala",
+   "viewOn": "Ollama'da görüntüle"
+  },
+  "openShort": "AÇIK",
+  "closedShort": "KAPALI",
+  "openWeights": "Açık ağırlıklar",
+  "closedWeights": "Kapalı ağırlıklar",
+  "optOut": {
+   "vendor-opt-out": "Üretici göndermedi",
+   "not-applicable": "Bu test için uygun değil",
+   "out-of-scope": "Kapsam dışı varyant"
+  },
+  "coverage": "Kapsam",
+  "coverageTip": "Aktif profil ağırlığının ne kadarı mevcut benchmark skorlarıyla destekleniyor. Composite, √kapsam ile çarpılarak az test alıp yüksek skor çıkan modelleri ezmeyen ama avantajını da silen bir ceza uygular.",
+  "uncertaintyTip": "Bileşik skorun belirsizlik aralığı (±1σ); her hücrenin kaynak uyumu, çelişki yayılımı, kapsam ve imputasyonundan türetilir. Frekansçı %95 güven aralığı değildir — kanıt kalitesini yansıtır. Geniş bant = zayıf kanıt.",
+  "uncertaintySingleTip": "Belirsizlik aralığı (±1σ). Buradaki hücrelerin çoğu tek kaynağa dayanıyor; bandı güven aralığı değil kaba bir tahmin olarak görün — bağımsız kaynak arttıkça daralır.",
+  "rankTip": "Skora göre bileşik sıra (sıralama sütunundan bağımsız sabit). Her skorun yanındaki ±aralık belirsizliği gösterir — aralıkları çakışan modeller istatistiksel olarak yakındır. Ayraç çizgisi anlamlı kopuşu işaret eder: alttaki gruba gerçek bir fark.",
+  "disputed": "tartışmalı",
+  "disputedTip": "Aktif preset'te aynı-tier kaynaklar arasında uyumsuzluk taşıyan hücre sayısı (≥5pp BLOCK eşiğinin üstünde, tek bir tier içinde ≥3pp). Composite bu hücreler için güven kesintisi içerir — hücre başına maks 5pp, böylece tek bir outlier composite'i ezemez. Cross-tier uyumsuzluklar (örn. I-tier ↔ S-tier) sayılmaz, çünkü autoResolveWinner zaten yüksek-tier kaynağı seçti.",
+  "sources": "Kaynaklar",
+  "sourcesUnique": "benzersiz",
+  "sourcesDatapoints": "veri noktası",
+  "lowConfidence": "düşük güven",
+  "lowConfidenceTip": "Composite, aktif profil ağırlığının %40'ından azından hesaplandı. Skor güvenilirliği sınırlı.",
+  "a11y": {
+   "skipToContent": "İçeriğe atla"
+  },
+  "share": {
+   "tooltip": "Mevcut ağırlıklarını ve filtrelerini içeren paylaşılabilir link oluştur",
+   "button": "Paylaşım linkini kopyala",
+   "copied": "Link kopyalandı",
+   "failed": "Link kopyalanamadı"
+  },
+  "pricing": {
+   "byProvider": "Sağlayıcıya göre fiyatlandırma"
+  },
+  "deprecated": "KULLANIMDAN KALDIRILDI",
+  "archived": "ARŞİVLENDİ"
+ },
+ "pricing": {
+  "blended": "KARMA $/1M",
+  "blendedTip": "1M token başına karma fiyat (3:1 giriş:çıkış oranı varsayımı). Formül: (giriş×3 + çıkış) / 4."
+ },
+ "privacy": {
+  "heading": "Gizlilik ve Uyumluluk",
+  "subheading": "Eğitim verisi opt-out politikaları, veri barındırma ve sertifikasyon durumu. Uyumluluk ekibinizle doğrulayın.",
+  "col": {
+   "model": "Model",
+   "trainingOptOut": "Eğitim opt-out",
+   "dataResidency": "Veri konumu",
+   "soc2": "SOC 2",
+   "gdpr": "GDPR",
+   "apiLogging": "API loglama"
+  },
+  "val": {
+   "available": "Mevcut",
+   "none": "Yok",
+   "unknown": "—",
+   "yes": "Evet",
+   "no": "Hayır",
+   "defaultOn": "Varsayılan açık",
+   "defaultOff": "Varsayılan kapalı",
+   "optOut": "Opt-out mevcut",
+   "notLogged": "Loglanmıyor"
+  },
+  "note": "Kaynak: tedarikçi belgesi ve hizmet şartları. Son doğrulama: 2026-04-30."
+ },
+ "models": {
+  "opus-4-7": {
+   "strengths": "SWE-bench Pro liderliği (%64.3), MCP-Atlas araç kullanımında zirve (%77.3), 1M token bağlam penceresi, en yüksek görsel çözünürlük (3.75MP), CursorBench üzerinde %70 skor",
+   "weaknesses": "GPT-5.4'e kıyasla yüksek fiyat ($5/$25), aaIdx skoru (57) GPT-5.5 ile eşit düzeyde ama çok daha pahalı"
+  },
+  "sonnet-4-6": {
+   "strengths": "Ofis verimliliğinde lider (1633 Elo), Opus 4.7 performansının %98'i maliyetin %20'sinde, ARC-AGI-2'de büyük sıçrama (%58.3), 1M token bağlam, context compaction özelliği",
+   "weaknesses": "Derin bilimsel akıl yürütmede Opus 4.7'nin gerisinde (GPQA: 74.1% vs 94.2%), SWE-bench Pro skoru eksik"
+  },
+  "qwen3-6-27b": {
+   "strengths": "27B yoğun model, 35B MoE varyantı ile aynı ailede. 262K bağlam. Yerel çalıştırma için 35B A3B'ye iyi alternatif. Güçlü kodlama ve genel akıl yürütme.",
+   "weaknesses": "Bağımsız benchmark verisi yetersiz. 35B A3B MoE varyantı genellikle aynı kullanım senaryosu için tercih ediliyor. Fiyatlandırma açıklanmadı."
+  },
+  "kimi-k2-6": {
+   "strengths": "SWE-Pro 58.6 ile açık ağırlık modeller arasında en yüksek skor. HLE-Full with Tools 54.0 GPT-5.4 ve Claude'u geçiyor. 300 eş zamanlı alt-ajan, 4000 adımlı koordineli ajan sürüsü. LiveCodeBench v6 %89.6 lider.",
+   "weaknesses": "Modified MIT lisansı bazı ticari kısıtlamalar getiriyor. Matematik ve GPQA akıl yürütmede frontier gerisinde. Benchmark harness seçimi skoru birkaç puan etkileyebilir."
+  },
+  "deepseek-v4-flash": {
+   "strengths": "284B toplam / 13B aktif MoE, MIT lisansı. $0.14 girişle piyasanın en ucuz frontier-sınıfı modeli. SWE-Verified %79.0 Pro'ya yalnızca 1.6 puan geride. 1M token bağlam 10% daha az KV önbellek.",
+   "weaknesses": "Çoğu geliştirici iş yükü için Pro ile fark ihmal edilebilir ama kuantum atlama gereken görevlerde arka planda kalıyor. Yerel çalıştırma hâlâ güçlü donanım gerektiriyor. Yalnızca metin."
+  },
+  "deepseek-v3-2": {
+   "strengths": "671B toplam MoE, son derece rekabetçi fiyat ($0.28 giriş). SWE-Verified tutarlı 72-74% aralığı birden fazla çerçeve ile doğrulandı. Açık ağırlık, DeepSeek Sparse Attention ile uzun bağlam optimize edilmiş.",
+   "weaknesses": "V4-Pro Nisan 2026'da onu yerinden etti. Bağlam penceresi yalnızca 128K — V4'ün 1M'ine kıyasla yetersiz. DeepSeek Speciale varyantı ile standart model arasında skor tutarsızlığı var."
+  },
+  "qwen3-coder-30b": {
+   "strengths": "30B toplam / 3.3B aktif MoE, $0.07/M girişle son derece uygun fiyatlı. 262K bağlam penceresi, 107 token/sn. Ollama/LMStudio/llama.cpp desteğiyle kolay yerel kurulum.",
+   "weaknesses": "AA Zeka Endeksi 20 ile mevcut rekabetçi alanda ortalamanın altında. SWE-Bench puanı bağımsız olarak doğrulanmamış. Qwen3.6-35B-A3B gibi daha yeni modeller açısından artık birincil seçenek değil."
+  },
+  "devstral-2": {
+   "strengths": "SOTA açık ağırlık kodlama ajanı, SWE-Verified %72.2. 256K bağlam, Ollama'da mevcut. Eşlik eden Devstral Small 2 (24B) tek GPU'da çalışıyor. Mistral Vibe CLI ile entegrasyon.",
+   "weaknesses": "123B yoğun model, minimum 4x H100-sınıfı GPU gerektiriyor. SWE-bench Verified puanı resmi leaderboard'da henüz doğrulanmadı. Gelir > $20M şirketler için ticari lisans gerekiyor."
+  },
+  "glm-5-1": {
+   "strengths": "SWE-Pro 58.4 ile GPT-5.4 ve Claude Opus 4.6'yı geçiyor. NL2Repo %42.7 tam repo oluşturmada lider. 8 saate kadar özerk görev çalışması. Huawei Ascend 910B ile %100 yerli chip'te eğitim. MIT lisansı açık ağırlık.",
+   "weaknesses": "GPQA Diamond %86.2 frontier'ın gerisinde (Claude %94.3). SWE-Bench Verified bağımsız AA skoru mevcut değil. 744B toplam / 40B aktif — yerel çalıştırma pratikte imkânsız."
+  },
+  "llama-4-scout": {
+   "strengths": "10M token bağlam (Nis 2026 itibarıyla en büyük açık ağırlıklı); MoE 17B/109B; lcbV6=32.8; açık ağırlıklar; GPQA %57.2",
+   "weaknesses": "NVIDIA RULER'a göre gerçek bağlam 5-6.5M token; SWE-bench skoru yok; aaIdx=14 düşük; tüm benchmark'larda Maverick'in altında"
+  },
+  "llama-4-maverick": {
+   "strengths": "MoE mimarisi (17B aktif / 400B toplam); 1M token bağlam; lcbV6=43.4 ile GPT-4o'yu (%32.3) geçiyor; GPQA %69.8; açık ağırlıklar",
+   "weaknesses": "Tier-I kaynaklarda SWE-bench Verified skoru bulunamadı; deneysel-vs-herkese-açık sürüm tartışması; aaIdx=18 frontier medyanının altında"
+  },
+  "qwen3-coder-next": {
+   "strengths": "80B toplam / 3B aktif hibrit dikkat+MoE mimarisi. Tek RTX 5090 ile yerel çalışıyor. 256K bağlam, 370+ dil. SWE-Verified %58.7 — 10-20x daha fazla aktif parametreli modelleri geride bırakıyor.",
+   "weaknesses": "API fiyatlandırması henüz netleşmedi. SWE-Pro bağımsız ölçümü yok. Qwen3-Coder-480B'nin gölgesinde kalıyor. FIM/otomatik tamamlama için optimize edilmemiş."
+  },
+  "minimax-m2-7": {
+   "strengths": "Frontier kalitesi açık ağırlıklı modeller arasında en düşük fiyat noktasında ($0.30 giriş). SWE-Bench ve Terminal-Bench'te güçlü ajansal kodlama. Piyasa medyanının yarısı fiyatla en yüksek zeka endeks skorlarından biri.",
+   "weaknesses": "45.7 token/s çıkış hızıyla sınıfının altında kalıyor. Giriş TTFT yüksek (2.18s). MiniMax platform dışında sağlayıcı çeşitliliği sınırlı."
+  },
+  "minimax-m2-5": {
+   "strengths": "SWE-Bench Verified'da %80.2 ile kapalı kaynak frontier modellerini eşliyor. 105 token/sn çıkış hızı sınıfında ortalamanın iki katı. 230B toplam / 10B aktif MoE mimarisi verimli çalışıyor.",
+   "weaknesses": "AA Zeka Endeksi 42 ile M2.7'nin gerisinde kalıyor. SWE-Pro ve Terminal-Bench bağımsız doğrulaması eksik. Ekim 2025'te çıkan orijinal M2'nin yerini aldı, artık ikincil bir seçenek."
+  },
+  "mimo-v2-flash": {
+   "strengths": "MIT lisansıyla açık kaynak, 309B toplam / 15B aktif MoE. 1M token bağlam penceresi. SWE-Bench Verified %73.4 ile Claude Sonnet 4.5'i geçiyor. AIME 2025'te %94.1 matematik performansı.",
+   "weaknesses": "Fiyatlandırma API'si henüz net değil. SWE-Pro bağımsız ölçümü yok. V2-Pro ve V2.5 serileri çıkınca hızla gölgede kaldı."
+  },
+  "mimo-v2-pro": {
+   "strengths": "1T toplam / 42B aktif MoE, %78 SWE-Bench Verified ile Claude Sonnet 4.6'yı aşıyor. 1M token bağlam, ajansal iş akışları için idealdir. Frontier kalitesinin çok altında fiyat. 'Hunter Alpha' gizli lansmanıyla viral oldu.",
+   "weaknesses": "Açık ağırlık yayınlanmadı (sadece API). 256K üzeri bağlam için fiyat 2 katına çıkıyor. SWE-Pro bağımsız ölçümü eksik. V2.5-Pro Nisan 2026'da yerini almaya başladı."
+  },
+  "mimo-v2-5-pro": {
+   "strengths": "Frontier modelleri aynı yetenekle %40-60 daha az token harcayarak eşliyor. SWE-Pro 57.2, ClawEval 63.8, τ³-Bench 72.9. Görüntü/ses/video+metin çok modlu tek model. 672 araç çağrısıyla 4.3 saatte mükemmel derleyici görevi.",
+   "weaknesses": "Ağırlıklar henüz açık kaynak değil ('yakında' söz verildi). Önce kamu beta, tam API ölçeklendirilmesi devam ediyor. SWE-Pro skoru self-reported."
+  },
+  "mimo-v2-5": {
+   "strengths": "100-150 token/sn ile hızlı günlük kullanım modeli. Muse Spark'a kıyasla %50 daha az token kullanımı. Tüm modaliteleri destekliyor ($0.40 giriş uygun fiyatlı). V2-Pro ve V2-Omni'yi tek modelde birleştiriyor.",
+   "weaknesses": "Tam parametre sayısı ayrıca açıklanmadı (Pro ile paylaşılıyor olabilir). Benchmark skoru henüz bağımsız doğrulanmadı. Ağırlıklar henüz açık kaynak değil."
+  },
+  "step-3-5-flash": {
+   "strengths": "196B toplam / 11B aktif MoE açık kaynak. 100-350 token/sn üretim hızı. SWE-Verified %74.4, τ²-Bench 88.2 ile güçlü ajansal kodlama. $0.10/$0.30 piyasanın en ucuz seçeneklerinden.",
+   "weaknesses": "Benchmarkların tamamı self-reported (StepFun). vLLM/llama.cpp ile yerel çalışırken VRAM gereksinimi yüksek. Bağımsız platform doğrulaması sınırlı."
+  },
+  "deepseek-v4-pro": {
+   "strengths": "1.6T toplam / 49B aktif MoE, açık ağırlık MIT. SWE-Verified %80.6 (Claude Opus 4.6'ya 0.2 puan fark), LiveCodeBench %93.5. V3.2'ye kıyasla %73 daha az FLoP, 1M token bağlam, frontier kalitesinin çok altında fiyat.",
+   "weaknesses": "Yerel çalıştırmak için minimum 8x H100 80GB GPU gerekiyor. Preview aşamasında bant genişliği kısıtlı. HLE %37.7 ile frontier modellerinin gerisinde. Yalnızca metin destekli, görüntü/ses yok."
+  },
+  "qwen3-coder-480b": {
+   "strengths": "Açık ağırlıklar arasında ajansal kodlamada SOTA. Aider Polyglot %61.8 Claude Sonnet 4 ile eşit. 7.5T token (%70 kod) eğitim verisi, 358 programlama dili. QwenCode CLI açık kaynak sunuldu.",
+   "weaknesses": "480B toplam parametre yerel çalıştırmayı pratikte imkânsız kılıyor (birden fazla H100 düğümü gerekli). 256K bağlam penceresi 1M sunan rakiplere kıyasla kısıtlı. Düşünme modu desteklenmiyor."
+  },
+  "devstral-medium": {
+   "strengths": "24B parametre, Apache 2.0 lisansı, 32GB RAM dizüstü bilgisayarda çalışıyor. SWE-Verified %68 güçlü yerel kodlama. Çok modlu (görüntü girişi destekli). $0.10/$0.30 uygun fiyatlı.",
+   "weaknesses": "Devstral 2 123B'ye kıyasla 4.2 puan geride. Görüntü çıkışı yok. Yerel performans tam hassasiyet için 32GB+ RAM gerektiriyor."
+  },
+  "codestral-22b": {
+   "strengths": "HumanEval %86.6, MBPP %91.2. 256K bağlam penceresi repo-ölçeği kod tamamlama için ideal. 22B parametreyle RTX 4090'da tam hassasiyet çalışıyor. FIM (fill-in-the-middle) desteği IDE entegrasyonu için mükemmel.",
+   "weaknesses": "Ticari olmayan lisans girişim benimsemesini kısıtlıyor. SWE-Bench Verified bağımsız skoru yok. Devstral ve Qwen3-Coder gibi yeni ajansal modellerin gölgesinde kaldı."
+  },
+  "nemotron-3-super": {
+   "strengths": "Hibrit Mamba-Transformer mimarisi (LatentMoE) 5x daha yüksek throughput. NVFP4 ile 64GB VRAM'da çalışıyor (tek H100 SXM). SWE-Verified %60.5 açık ağırlık rekoru (çıkış tarihinde). 1M token bağlamda %91.75 RULER. Cloudflare Workers AI'da ücretsiz.",
+   "weaknesses": "SWE-Verified %60.5 Nisan 2026 itibarıyla DeepSeek V4-Pro (%80.6) ve Kimi K2.6 (%80.2) tarafından geride bırakıldı. İngilizce dışı kodlamada %45.8 ile önemli düşüş. BF16 tam ağırlıklar için 3-4x H100 gerekiyor."
+  },
+  "gemma-4-e2b": {
+   "strengths": "2.3B etkin parametre (5.1B toplam, PLE); yerel çok modlu (metin/görsel/ses); çevrimdışı; mobilde 48 tok/s; Apache 2.0",
+   "weaknesses": "Kenar cihaz modeli — SWE-bench/ajansal'da test edilmedi; lcbV6=44.0 tek C-tier kaynak; aaIdx=15 düşük; vLLM FlashAttention fallback yavaşlığı"
+  },
+  "gemma-4-e4b": {
+   "strengths": "4.5B etkin; sesli ASR ile yerel çok modlu; M serisi Mac'te 40+ tok/s; T4 GPU'da; Apache 2.0; lcbV6=52.0 boyut sınıfı için güçlü",
+   "weaknesses": "Kenar cihaz modeli — SWE-bench'te test edilmedi; lcbV6=52.0 tek C-tier kaynak; E2B ile aynı aaIdx=15; vLLM'de RTX 4090'da ~9 tok/s"
+  },
+  "gemma-4-26b-moe": {
+   "strengths": "26B toplam / 3.8B aktif MoE, RTX 4090'da 24GB ile çalışıyor (Q4). Arena AI'da küresel #6. AIME 2026 %88.3 verimlilik için etkileyici. 31B yoğun modelin %97'si kalitesini 1/8 hesaplama ile sunuyor.",
+   "weaknesses": "SWE-Verified %64 GLM-5.1 (%78) ve Claude'un (%87.6) gerisinde. Hâlâ 26GB yüklemesi gerektiriyor (sadece 3.8B aktif olmasına rağmen). Kodlama ajanı senaryolarında 31B Yoğun'a tercih edilmiyor."
+  },
+  "gemma-4-31b": {
+   "strengths": "Apache 2.0 ile en iyi ABD açık modeli. Arena AI #3 (Elo 1452). AIME 2026 %89.2 güçlü matematik. τ²-Bench 86.4 etkileyici ajan performansı. 256K bağlam. Tam çok modlu.",
+   "weaknesses": "SWE-Verified %64 GLM-5.1 ve Kimi K2.6 gibi Çin modellerin gerisinde. Tam hassasiyet için 80GB H100 gerekiyor. Fiyatlandırma henüz açıklanmadı (Google AI Studio ücretsiz önizleme)."
+  },
+  "gemma-3-27b": {
+   "strengths": "27B yoğun model, tek GPU'da tam hassasiyet çalışıyor. DeepInfra'da $0.10/1M giriş ile son derece ucuz. 140+ dil, görüntü+metin çok modlu. İnce ayar için iyi temel.",
+   "weaknesses": "LiveCodeBench v6 %29.1 ile mevcut kodlama standartlarında çok düşük. Gemma 4 Nisan 2026'da dramatik biçimde onu geride bıraktı (Codeforces ELO: 110 vs 2150). Ajansal araç kullanımı %6.6 kabul edilemez düşük."
+  },
+  "qwen25-coder-32b": {
+   "strengths": "14.7M Ollama indirmesiyle yerel kodlama için #1 tercih. HumanEval %92.7, Aider %73.7. FIM (fill-in-the-middle) ile en iyi otomatik tamamlama modeli. RTX 4090'da Q4_K_M ile 22GB VRAM'da çalışıyor.",
+   "weaknesses": "32K bağlam penceresi modern standartlarda sınırlı (not: Unsloth 128K versiyonu mevcut). Qwen3.6 ailesi ile karşılaştırıldığında ajansal kodlamada zayıf. Yalnızca metin, çok modlu değil."
+  },
+  "qwen25-coder-14b": {
+   "strengths": "9GB dosya boyutu — 12GB VRAM GPU'larda (RTX 3060/4060) güçlü kodlama. FIM desteği ile IDE otomatik tamamlama için idealdir. Apache 2.0 lisansı ile ticari kullanım özgür.",
+   "weaknesses": "32K bağlam penceresi kısıtlı. 32B varyantına kıyasla benchmark performansı düşer. Ajansal kodlama için 32B veya üzeri tercih edilmeli."
+  },
+  "qwen25-coder-7b": {
+   "strengths": "4.7GB boyut, 8GB VRAM GPU (RX 580, GTX 1070) dahil çalışıyor. FIM desteği ile hafif IDE entegrasyonu. Apache 2.0. Giriş seviyesi yerel kodlama için en iyi seçenek.",
+   "weaknesses": "32K bağlam penceresi ve 7B parametre ciddi ajansal görevi kaldırmaz. Daha güçlü donanımda 14B veya 32B tercih edin. Benchmark rakamları 32B'nin önemli ölçüde altında."
+  },
+  "deepseek-coder-v2-16b": {
+   "strengths": "16B MoE varyantı 8.9GB ile 12GB VRAM'da çalışıyor. 160K bağlam penceresi yerel modeller arasında oldukça geniş. GPT4-Turbo ile karşılaştırılabilir performans (çıkış dönemi). 2.4M Ollama indirmesi.",
+   "weaknesses": "2024'ten itibaren güncel yeni modeller tarafından önemli ölçüde geride bırakıldı. 236B varyantı pratikte çalıştırılamaz (133GB). Lisans DeepSeek'e özgü Apache/MIT değil."
+  },
+  "deepseek-r1-14b": {
+   "strengths": "Qwen2.5'ten damıtılmış, 128K bağlam penceresi ile güçlü akıl yürütme. MIT lisansı. 9GB dosya boyutu 12GB VRAM GPU'larda rahatça çalışıyor. Yerel matematiksel akıl yürütme için popüler.",
+   "weaknesses": "Distilled model — tam R1 671B kapasitesinde değil. Kodlama benchmark skoru bağımsız olarak raporlanmamış. DeepSeek V4 serisinin gölgesinde kaldı."
+  },
+  "qwen3-6-max": {
+   "strengths": "AA Zeka Endeksi 52 ile yüksek sıralamada. SWE-Pro, Terminal-Bench 2.0, SkillsBench, QwenClawBench, QwenWebBench, SciCode dahil 6 benchmark'ta #1. Ajan iş akışları için preserve_thinking özelliği.",
+   "weaknesses": "Kapalı ağırlık (Qwen tarihinde ilk kez). SWE-Bench Verified bağımsız skoru yayınlanmadı. Ön izleme döneminde fiyatlandırma netleşmedi. Görüntü/ses yok — yalnızca metin."
+  },
+  "gpt-5-4": {
+   "strengths": "GPT-5.4 serisinin temel modeli, geniş bağlam (1M token), maliyet açısından uygun giriş fiyatlandırması, ChatGPT Plus üzerinden erişim",
+   "weaknesses": "GPT-5.4 ve o3 gibi daha yeni OpenAI modelleri tarafından yerinden edildi, bağımsız benchmark verileri kısıtlı"
+  },
+  "qwen3-6-35b-moe": {
+   "strengths": "35B toplam / 3B aktif MoE, Apache 2.0. SWE-Verified %73.4 açık ağırlıklar arasında olağanüstü. 24GB Apple Silicon Mac'te Unsloth 4-bit ile çalışıyor. GPQA Diamond 86.0 güçlü çoklu disiplin performansı.",
+   "weaknesses": "API fiyatlandırması henüz açıklanmadı. SWE-Pro bağımsız ölçümü yok. F16 tam model ~72GB gerektiriyor (tüketici donanımının üzerinde)."
+  },
+  "o4-mini": {
+   "strengths": "o3'e kıyasla 10 kat daha ucuz, güçlü muhakeme; SWE-bench Verified %58.6 (Vellum bağımsız) / %68.1 (OpenAI scaffold); GPQA Diamond %81.4; LiveCodeBench %80.2; Codeforces ELO 2719",
+   "weaknesses": "SWE-bench skoru scaffold'a göre değişiyor (OpenAI %68.1, Vellum %58.6 — RED, muhafazakar %58.6 seçildi); Artificial Analysis'te aaIdx girişi yok; kapalı ağırlıklı, yerel dağıtılamaz"
+  },
+  "grok-3-mini": {
+   "strengths": "aaIdx=32 (fiyat dilimi medyanının çok üzerinde); GPQA Diamond %79.1; LiveCodeBench %69.6 (muhafazakar); 183 tok/s; 1M token başına $0.30/$0.50 — güçlü maliyet verimliliği",
+   "weaknesses": "Hiçbir Tier-I kaynakta SWE-bench Verified skoru yok; lcbV6 tek kaynak xAI (RED — aynı kaynakta 69.6/80.4 çelişkisi); xAI SWE-bench/SEAL'a katılmıyor"
+  },
+  "gemini-3-1-flash": {
+   "strengths": "1M token bağlam, $0.15-$0.30/M giriş — Pro'dan 4x ucuz. GPQA %86.9 güçlü bilim akıl yürütmesi. Yüksek hacimli üretim için en hızlı Google modeli; AI Studio'da ücretsiz katman.",
+   "weaknesses": "Bağımsız SWE-bench Verified veya LiveCodeBench skoru bulunamadı. Tescilli, kapalı ağırlıklı. Çoğu akıl yürütme benchmark'ında Pro'nun ~5pp gerisinde."
+  },
+  "gemini-3-1-pro": {
+   "strengths": "1M bağlam, SWE-V %80.6 DeepSeek V4-Pro ile eşit, GPQA %94.3 dünya standardı, LCB %88.49, SWE-Pro %46.1, MCP-Atlas %73.9. $2/$12 — frontier'da en iyi Google değeri.",
+   "weaknesses": "HLE %44.4 Claude Opus 4.7 (%46.9) ve MiMo-V2.5-Pro (%48.0) gerisinde. Bağımsız aaAgentic, tb2, tau2 skoru yok. Tescilli kapalı ağırlıklı, yerel dağıtım yok."
+  },
+  "gpt-4-1": {
+   "strengths": "SWE-V %54.6 kendi sınıfı için güçlü, 1M bağlam, $2/$8 /1M $0.50 cache ile. Çok modlu (video+metin). GPT-4o'ya kıyasla %83 maliyet düşüşü. ChatGPT Plus'tan erişilebilir.",
+   "weaknesses": "Bağımsız GPQA, LCB veya SWE-Pro skoru bulunamadı. Akıl yürütme görevlerinde o3 ve o4-mini tarafından geride bırakıldı. Tescilli, kapalı ağırlıklı. Video-MME %72 SOTA değil."
+  },
+  "grok-3": {
+   "strengths": "GPQA %84.6 güçlü bilim, LCB %79.4 kodlama, 1M token bağlam (öncekinin 8x'i), AIME 2025 %93.3. Chatbot Arena Elo lansmanında ~1402. $3/$15 /1M.",
+   "weaknesses": "Hiçbir Tier-I kaynakta SWE-bench Verified veya SWE-Pro skoru yok. Benchmark tartışması: çok denemeli ortalamalar rakip tek-deneme skorlarını şişiriyor. xAI SEAL'a katılmıyor."
+  },
+  "mistral-large-3": {
+   "strengths": "675B toplam / 41B aktif MoE, LCB %82.8 güçlü kodlama, HumanEval %92.0, AIME 2025 %88.0, MATH-500 %93.6. Self-hostable açık ağırlıklı. $0.50/$1.50 uygun fiyat.",
+   "weaknesses": "GPQA %43.9 denk açık ağırlıklı modellerden önemli ölçüde geride (DeepSeek %77+, Kimi %80+). Bağımsız SWE-bench Verified skoru yok. Frontier ajansal ve bilim akıl yürütmesinde geride."
+  },
+  "o3": {
+   "strengths": "SWE-V %71.7, GPQA %87.7, AIME %96.7, Codeforces Elo 2727, ARC-AGI %87.5. Mart 2026'da %80 fiyat düşüşüyle $2/$8 /1M. OpenAI'dan sınıfının en iyi akıl yürütme modeli.",
+   "weaknesses": "Düşünme token'ları çıkış olarak faturalanır (gizli maliyet: 500 görünür token 2000+ faturalı tüketebilir). ARC-AGI-2 yalnızca %2.9. SWE-Pro Tier-I skoru yok. Kapalı ağırlıklı, yerel dağıtım yok."
+  },
+  "qwen3-235b": {
+   "strengths": "235B toplam / 22B aktif MoE, Apache 2.0. LCB %74.8, GPQA %81.1, AIME 2025 %92.3, AIME 2024 %85.7. Gemini 2.5 Pro ile rekabet ediyor. $0.20/$1.00 /1M — GPT-5'ten %70 ucuz.",
+   "weaknesses": "LCB %74.8 yeni frontier modellerin gerisinde (Gemini 3.1 Pro %88.5, DeepSeek V4-Pro %93.5). Bağımsız SWE-bench Verified skoru yok. Yerel dağıtım için birden fazla H100 düğümü gerekli."
+  },
+  "qwen3-32b": {
+   "strengths": "32B yoğun, Apache 2.0. $0.15/$0.75 /1M — en ucuz frontier kalitesinde yoğun model. 119 dil, güçlü çok dilli kodlama. Q4 kuantizasyonla tek A100 veya üst düzey tüketici GPU'ya sığıyor.",
+   "weaknesses": "SWE-bench Pro yalnızca %3.4 (GPT-4o %4.9'un bile gerisinde). Bağımsız Tier-I GPQA veya LCB skoru bulunamadı. 235B MoE kardeşinden küçük — karmaşık akıl yürütmede daha düşük tavan."
+  },
+  "qwen3-6-plus": {
+   "strengths": "Yeniden inşa edilmiş akıl yürütme katmanı sürekli açık düşünce zinciri kullanır. Qwen 3.5 Plus'a kıyasla 515 daha az akıl yürütme token'ı ile daha uzun çıktı üretiyor. Geliştirilmiş tutarlılık ve üretim güvenilirliği.",
+   "weaknesses": "Bağımsız GPQA, SWE-bench veya LiveCodeBench skoru bulunamadı. Çok modlu ses/video görevlerinde 3.5 Plus'ın gerisinde. Büyük sağlayıcı API'lerinde fiyat resmi olarak açıklanmadı."
+  },
+  "devstral-small-2": {
+   "strengths": "24B parametre, SWE-V %68.0 — boyut sınıfının en güçlü açık ağırlıklı modeli. 256K bağlam, Apache 2.0, çok modlu görüntü girişi. RTX 4090 (24GB) veya 32GB Mac'te çalışıyor. 75 tok/s, TTFT 1.18s. $0.10/$0.30.",
+   "weaknesses": "Devstral 2'den (123B) 4.2pp geride. Bağımsız SWE-Pro veya LCB skoru yok. Büyük Devstral 2'ye kıyasla sınırlı sağlayıcı çeşitliliği. Görüntü çıkışı desteklenmiyor."
+  },
+  "gpt-5-5": {
+   "strengths": "Terminal-Bench 2.0'da %82.7 lider; GPQA %93.6; 1M token bağlam; natif çok modallu (omni); MCP-Atlas %75.3; SWE-bench Pro %58.6.",
+   "weaknesses": "SWE-bench Pro'da Opus 4.7'nin 5.7 puan gerisinde; HLE %41.4 (Opus 4.7 = %46.9); $5/$30 yüksek API fiyatı; kapalı ağırlıklar."
+  },
+  "glm-4-5-air": {
+   "strengths": "12B aktif parametreli MoE; self-host icin maliyet-yetenek dengesi iyi; MIT lisansli.",
+   "weaknesses": "Bench kapsami bekliyor; yayin aninda agentic kolonlar buyuk olcude test edilmemis."
+  },
+  "glm-4-7": {
+   "strengths": "GLM serisinde acik-agirlikli kodlama lideri; MIT altinda frontier-sinifi SWE davranisi hedefler.",
+   "weaknesses": "Kullanilabilir quantlarda 40GB+ VRAM ister; tuketici GPU icin gercekci degil."
+  },
+  "mistral-medium-3-5": {
+   "strengths": "Avrupa dilleri destegi guclu, fiyati ongorulebilir orta-seviye Mistral modeli.",
+   "weaknesses": "Modified-MIT lisansi ticari yeniden dagitimi kisitlar; yalnizca cloud."
+  },
+  "qwen3-5-9b": {
+   "strengths": "6-8GB tuketici GPU icin uygun kompakt 9B Qwen; Apache 2.0 kisitsiz.",
+   "weaknesses": "Coklu-dosya refaktorde 27B/35B kardeslerinden daha dusuk kapasite; agentic bosluklar bekleniyor."
+  },
+  "minimax-m2-1": {
+   "strengths": "Token basina 1$ altinda 1M-token baglam penceresi; uzun-dokuman ve coklu-dosya gorevleri icin faydali.",
+   "weaknesses": "Tam hassasiyette yerel calistirma pratik degil; cloud-oncelikli dagitim."
+  },
+  "claude-haiku-4-5": {
+   "strengths": "",
+   "weaknesses": ""
+  },
+  "codestral": {
+   "strengths": "",
+   "weaknesses": ""
+  },
+  "grok-4-1-fast": {
+   "strengths": "",
+   "weaknesses": ""
+  },
+  "grok-4-20": {
+   "strengths": "",
+   "weaknesses": ""
+  },
+  "grok-4-3": {
+   "strengths": "",
+   "weaknesses": ""
+  },
+  "gemini-3-5-flash.strengths": "Agentic ve kodlama iş yükleri için optimize edilmiş hızlı, düşük maliyetli Gemini katmanı; 1M-token bağlam.",
+  "gemini-3-5-flash.weaknesses": "Benchmark kapsamı doğrulanmayı bekliyor; tescilli, yalnızca bulut.",
+  "qwen3-7-max.strengths": "1M-token bağlamlı Qwen amiral gemisi akıl yürütme-agent modeli; güçlü kodlama ve agentic performansı.",
+  "qwen3-7-max.weaknesses": "Kapalı ağırlıklı önizleme; bağımsız bench kapsamı bekliyor; orta seviye Qwen üzerinde fiyat.",
+  "qwen3-7-plus.strengths": "Görüntü ve kod görevlerini birleştiren, 1M-token bağlamlı çok kipli Qwen3.7 varyantı.",
+  "qwen3-7-plus.weaknesses": "Kapalı ağırlıklı önizleme; lansmanda sınırlı bağımsız benchmark.",
+  "claude-opus-4-8.strengths": "Anthropic'in amiral gemisi sınır modeli; sürüm anında SWE-bench ve agentic kodlamada en güçlü Claude.",
+  "claude-opus-4-8.weaknesses": "Premium API fiyatı; kapalı ağırlıklar; tam benchmark kapsamı bu döngünün taramasını bekliyor.",
+  "gpt-5-4-mini.strengths": "400K bağlamlı, maliyet-verimli GPT-5.4 katmanı; kodlama ajanları için gecikme ve yetenek dengesi.",
+  "gpt-5-4-mini.weaknesses": "Zorlu muhakemede tam GPT-5.4'ten zayıf; kapalı ağırlıklar; bench kapsamı taramayı bekliyor.",
+  "gpt-5-4-nano.strengths": "En küçük GPT-5.4 varyantı; yüksek verimli, düşük gecikmeli kodlama çağrıları için en ucuz OpenAI seçeneği.",
+  "gpt-5-4-nano.weaknesses": "Çoklu-dosya görevlerde GPT-5.4 ailesinin en düşük kapasitesi; kapalı ağırlıklar; bench kapsamı bekliyor.",
+  "mistral-small-4.strengths": "256K bağlamlı, Apache-2.0 küçük Mistral; tek orta-seviye GPU'da self-host edilebilir.",
+  "mistral-small-4.weaknesses": "Agentic benchmarklarda sınır seviyesinin altında; tam bench kapsamı bu döngünün taramasını bekliyor.",
+  "nemotron-3-nano-omni.strengths": "Açık-ağırlıklı multimodal NVIDIA Nemotron nano; agentic ve multimodal görevler için kompakt.",
+  "nemotron-3-nano-omni.weaknesses": "Nano ölçeği zorlu kodlama yeteneğini sınırlar; bench kapsamı bu döngünün taramasını bekliyor.",
+  "nemotron-3-ultra": {
+   "strengths": "550B toplam / 55B aktif Hybrid Mamba-Transformer MoE, açık ağırlık (Linux Foundation OpenMDW-1.1). aaIdx=48 ile en güçlü ABD açık-ağırlık modeli. HF + OpenRouter + NVIDIA NIM + AWS SageMaker üzerinde dağıtık.",
+   "weaknesses": "Computex 2026'da yeni duyuruldu (4 Haziran 2026); bağımsız benchmark doğrulaması henüz sınırlı. Fiyatlandırma sağlayıcıya göre değişken."
+  },
+  "muse-spark": {
+   "strengths": "Meta Superintelligence Labs'ın ilk Muse ailesi modeli; çok-kipli akıl yürütme, 262K bağlam. aaIdx=52. meta.ai üzerinde ücretsiz.",
+   "weaknesses": "Meta'nın ilk kapalı-ağırlık modeli; API yalnızca özel önizlemede. Parametre sayısı açıklanmadı; bağımsız benchmark sınırlı."
+  },
+  "step-3-7-flash": {
+   "strengths": "198B MoE (11B aktif) + 1.8B görüntü kodlayıcı, Apache 2.0, 256K bağlam. Kodlama ajanları ve arama akışları için. $0.20/$1.15 ucuz fiyat. OpenRouter + NVIDIA NIM.",
+   "weaknesses": "29 Mayıs 2026'da yeni çıktı; bench hücreleri henüz doldurulmadı (sonraki döngüde gelecek). Bağımsız doğrulama sınırlı."
+  },
+  "glm-5": {
+   "strengths": "744B MoE (40B aktif), 200K bağlam, MIT lisans. Z.ai'nin frontier modeli; SWE-Verified ~%77.8, GPQA ~%86, AIME26 ~%92.7 (lineup kaynağı). Halefi glm-5-1 ayrıca takip ediliyor.",
+   "weaknesses": "Önceki döngüde atlanmıştı (11 Şubat 2026 çıkışlı); bench hücreleri sonraki tam taramada çok-kaynaklı provenance ile doldurulacak."
   }
+ },
+ "benchmarks": {
+  "swePro": {
+   "name": "SWE-bench Pro",
+   "short": "SWE-PRO",
+   "desc": "Contamination-resistant gold standard; 1865 task, 41 repo, çoklu dil."
+  },
+  "sweV": {
+   "name": "SWE-bench Verified",
+   "short": "SWE-V",
+   "desc": "İnsan doğrulamalı 500 task. Pro ile çelişki sık görülür."
+  },
+  "sweMulti": {
+   "name": "SWE-bench Multilingual",
+   "short": "SWE-M",
+   "desc": "9 programlama dilinde yazılım hata düzeltme."
+  },
+  "tb2": {
+   "name": "TerminalBench 2",
+   "short": "TB2",
+   "desc": "Terminal CLI agentic execution; tool kullanım kalitesi."
+  },
+  "tbHard": {
+   "name": "Terminal-Bench Hard",
+   "short": "TB-HARD",
+   "desc": "Terminal-Bench'in en zor 44 task subseti; AA Index v4 bileşeni."
+  },
+  "lcb": {
+   "name": "LiveCodeBench",
+   "short": "LCB",
+   "desc": "Sürekli güncellenen contamination-free yarışmacı kodlama leaderboard'ı (May 2023→bugün)."
+  },
+  "tau2": {
+   "name": "τ²-bench",
+   "short": "τ²",
+   "desc": "Multi-turn tool calling + plan execution (telekom track)."
+  },
+  "mcpA": {
+   "name": "MCP-Atlas",
+   "short": "MCP-A",
+   "desc": "Model Context Protocol tool zinciri kalitesi."
+  },
+  "bfcl": {
+   "name": "BFCL v3/v4",
+   "short": "BFCL",
+   "desc": "Berkeley Function-Calling Leaderboard — fonksiyon/araç seçim doğruluğu."
+  },
+  "browseComp": {
+   "name": "BrowseComp",
+   "short": "BROWSE",
+   "desc": "Web araştırma agent benchmark'ı; çok-adımlı tarama + sentez."
+  },
+  "aaCoding": {
+   "name": "AA Coding",
+   "short": "AA-CODE",
+   "desc": "Artificial Analysis composite coding skoru."
+  },
+  "aaAgentic": {
+   "name": "AA Agentic",
+   "short": "AA-AGT",
+   "desc": "Artificial Analysis agentic kullanım skoru."
+  },
+  "aaIdx": {
+   "name": "AA Index",
+   "short": "AA-IDX",
+   "desc": "Artificial Analysis genel composite (referans, ağırlıkta kullanılmaz)."
+  },
+  "aaOmni": {
+   "name": "AA-Omniscience",
+   "short": "AA-OMNI",
+   "desc": "Artificial Analysis omniscience / hizasızlık skoru (düşük daha iyi)."
+  },
+  "cfElo": {
+   "name": "Codeforces ELO",
+   "short": "CF-ELO",
+   "desc": "Codeforces yarışmacı kodlama ELO puanı; 1000-3500 ham skala."
+  },
+  "webDevElo": {
+   "name": "LMArena WebDev Elo",
+   "short": "WD-ELO",
+   "desc": "LMArena WebDev Arena: ön-yüz kod çıktıları üzerinde insanların kör tercih oylamasıyla hesaplanan Elo; tipik ham aralık 950-1300."
+  },
+  "mmluPro": {
+   "name": "MMLU-Pro",
+   "short": "MMLU-PRO",
+   "desc": "57 disiplinde akıl yürütme; sert dikkat dağıtıcılı sorular."
+  },
+  "mrcr": {
+   "name": "MRCR 1M",
+   "short": "MRCR",
+   "desc": "1M token uzun bağlamda retrieval; çoklu iğne (needle) testi."
+  },
+  "arcAgi2": {
+   "name": "ARC-AGI-2",
+   "short": "ARC-2",
+   "desc": "Soyut akıl yürütme; insan altı tek frontier benchmark."
+  },
+  "gpqa": {
+   "name": "GPQA Diamond",
+   "short": "GPQA",
+   "desc": "Lisansüstü seviye genel akıl yürütme (188 zor soru)."
+  },
+  "aime26": {
+   "name": "AIME 2026",
+   "short": "AIME26",
+   "desc": "AIME 2026 — ileri düzey matematik akıl yürütme."
+  },
+  "hle": {
+   "name": "Humanity's Last Exam",
+   "short": "HLE",
+   "desc": "Kapsamlı ileri düzey çoklu disiplin testi."
+  },
+  "nl2Repo": {
+   "name": "NL2Repo",
+   "short": "NL2REPO",
+   "desc": "Doğal dil tarifinden tam repo üretimi; çok-dosyalı yapı + bağımlılık çözümleme."
+  },
+  "llmStatsIdx": {
+   "name": "LLM-Stats Composite",
+   "short": "LLM-Stats",
+   "desc": "llm-stats.com yayıncısının yayımlanmış benchmarklar üzerinden TrueSkill tarzı composite skoru. Vendor agregatı — bağımsız referans, AICoderMap composite'ine dahil değil."
+  },
+  "vellumRank": {
+   "name": "Vellum Sırası",
+   "short": "Vellum",
+   "desc": "Vellum LLM Leaderboard sıralaması (1=en iyi). Inverse-rank ile normalize edilir. Vendor agregatı."
+  },
+  "benchlmIdx": {
+   "name": "BenchLM Composite",
+   "short": "BenchLM",
+   "desc": "BenchLM.ai çoklu benchmark composite skoru. Vendor agregatı."
+  },
+  "lmArenaElo": {
+   "name": "LMArena Elo",
+   "short": "LMArena",
+   "desc": "LMArena baş-başa karşılaştırma Elo skoru (genel sohbet). 1000-1500 → 0-100 lineer normalize. Vendor agregatı."
+  },
+  "hfOpenAvg": {
+   "name": "HF Open LLM Ort.",
+   "short": "HF Open",
+   "desc": "HuggingFace Open LLM Leaderboard ortalama skoru. Yalnız açık ağırlık modeller. Vendor agregatı."
+  },
+  "kluRank": {
+   "name": "Klu Sırası",
+   "short": "Klu",
+   "desc": "Klu.ai LLM leaderboard sıralaması. Inverse-rank ile normalize edilir. Vendor agregatı."
+  }
+ },
+ "benchCategories": {
+  "coding": {
+   "label": "Kodlama"
+  },
+  "agentic": {
+   "label": "Ajansal"
+  },
+  "reasoning": {
+   "label": "Akıl Yürütme"
+  },
+  "general": {
+   "label": "Genel"
+  }
+ },
+ "verdicts": {
+  "preset": {
+   "balanced": "Dengeli",
+   "sweFocused": "SWE-odaklı",
+   "agenticFocused": "Agentic-odaklı",
+   "reasoningFocused": "Akıl yürütme odaklı",
+   "benchmarkOnly": "Sadece Benchmark",
+   "consensus": "Vendor Konsensüsü"
+  }
+ },
+ "reliability": {
+  "label": "Güvenilirlik",
+  "exceptional": "olağanüstü kaynak",
+  "lowConfidence": "düşük güvenilirlik",
+  "coldStart": "yeterli veri yok"
+ },
+ "vendorPanel": {
+  "title": "Vendor görünümü",
+  "consensus": "uzlaşı",
+  "mild": "hafif fark",
+  "controversy": "anlaşmazlık",
+  "agreementTip": "AICM sıra",
+  "consensusRank": "konsensüs sıra",
+  "limitedData": "sınırlı veri",
+  "limitedCoverage": "sınırlı kapsam",
+  "missingTip": "eksik benchler",
+  "notInScoreTag": "skorda değil",
+  "notInScore": "Bağımsız referans — AICoderMap composite skoruna dahil DEĞİL"
+ },
+ "compat": {
+  "errors": {
+   "webgpuUnsupported": "WebGPU bu tarayıcıda desteklenmiyor"
+  }
+ }
 }
