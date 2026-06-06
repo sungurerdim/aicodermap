@@ -1,38 +1,38 @@
 {
-  "checked": 17,
-  "rejected": [
+  "checked": 18,
+  "rejected": [],
+  "warnings": [
     {
-      "cell": "deepseek-v4-pro.cfElo",
-      "action": "confirm",
-      "value": 3206.0,
-      "reason": "outside-band[cfElo:0-100]"
+      "cell": "mistral-large-3.lcb",
+      "action": "clear",
+      "reason": "missing-reason"
     },
     {
-      "cell": "gemma-4-31b.cfElo",
-      "action": "confirm",
-      "value": 2150.0,
-      "reason": "outside-band[cfElo:0-100]"
+      "cell": "mistral-large-3.gpqa",
+      "action": "clear",
+      "reason": "missing-reason"
     },
     {
-      "cell": "deepseek-r1-14b.cfElo",
-      "action": "confirm",
-      "value": 1481.0,
-      "reason": "outside-band[cfElo:0-100]"
+      "cell": "mimo-v2-5-pro.mmluPro",
+      "action": "clear",
+      "reason": "missing-reason"
     },
     {
-      "cell": "gemma-3-27b.cfElo",
-      "action": "confirm",
-      "value": 110.0,
-      "reason": "outside-band[cfElo:0-100]"
+      "cell": "qwen3-32b.gpqa",
+      "action": "clear",
+      "reason": "missing-reason"
     },
     {
-      "cell": "deepseek-v4-flash.cfElo",
-      "action": "confirm",
-      "value": 3052.0,
-      "reason": "outside-band[cfElo:0-100]"
+      "cell": "qwen3-coder-30b.gpqa",
+      "action": "clear",
+      "reason": "missing-reason"
+    },
+    {
+      "cell": "codestral.aaIdx",
+      "action": "clear",
+      "reason": "missing-reason"
     }
   ],
-  "warnings": [],
-  "ok": false,
-  "filtered": true
+  "ok": true,
+  "filtered": false
 }
