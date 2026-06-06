@@ -68,8 +68,17 @@ def core_bench_keys(whitelist: dict[str, Any]) -> list[str]:
 def bench_band(whitelist: dict[str, Any], key: str) -> tuple[float, float]:
     """SSOT (hardMin, hardMax) for a bench value, from `_schema.benchRanges[key]`
     with `_default` fallback. Was hand-rolled as `_band()` in audit-agent-misfiles,
-    validate-anomaly-verdicts, and audit-data-coherence independently."""
-    ranges = schema(whitelist).get("benchRanges") or {}
+    validate-anomaly-verdicts, and audit-data-coherence independently.
+
+    Accepts EITHER the full whitelist (has a `_schema` key) OR an
+    already-extracted `_schema` block (has `benchRanges` directly). Callers
+    historically passed both; before this guard, passing a `_schema` block made
+    `schema()` double-extract (look for `_schema._schema`), silently fall back to
+    the (0, 100) default, and reject every Elo-scale verdict (cfElo 3206 → wrongly
+    "outside-band[0-100]"). Disambiguating on the `_schema` key makes the helper
+    miscall-proof for any current or future caller."""
+    block = whitelist.get("_schema") if "_schema" in whitelist else whitelist
+    ranges = (block or {}).get("benchRanges") or {}
     entry = ranges.get(key) or ranges.get("_default") or {"hardMin": 0, "hardMax": 100}
     return float(entry.get("hardMin", 0)), float(entry.get("hardMax", 100))
 

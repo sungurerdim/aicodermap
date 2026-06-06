@@ -481,6 +481,18 @@
   "minimax-m3": {
    "strengths": "1M bağlam, çok-kipli (metin/görüntü/video girişi), MSA seyrek dikkat. SWE-Pro ~%59.0, SWE-Verified ~%80.5 (lineup kaynağı). $0.30/$1.20 ucuz fiyat. 1 Haziran 2026 çıkışlı.",
    "weaknesses": "Önceki tam taramada gather lineup-hint ile yakalandı ama dedicated lineup fetch'i kaçırdı (artık harvest-new-models.py çözüyor). Bench hücreleri sonraki döngüde çok-kaynaklı provenance ile dolacak."
+  },
+  "grok-build-0-1": {
+   "strengths": "Grok Build 0.1, lineup keşfinde tespit edildi (çıkış: 2026-05-29). Benchmark verileri sonraki yenilemede çok-kaynaklı provenance ile doldurulacak.",
+   "weaknesses": "Yeni tespit edildi; bağımsız benchmark doğrulaması, fiyatlandırma ve bağlam penceresi sonraki döngüde gelecek."
+  },
+  "gemma-4-12b": {
+   "strengths": "Gemma 4 12B, lineup keşfinde tespit edildi (çıkış: 2026-06-03). Benchmark verileri sonraki yenilemede çok-kaynaklı provenance ile doldurulacak.",
+   "weaknesses": "Yeni tespit edildi; bağımsız benchmark doğrulaması, fiyatlandırma ve bağlam penceresi sonraki döngüde gelecek."
+  },
+  "glm-5-turbo": {
+   "strengths": "GLM-5 Turbo, lineup keşfinde tespit edildi (çıkış: 2026-03). Benchmark verileri sonraki yenilemede çok-kaynaklı provenance ile doldurulacak.",
+   "weaknesses": "Yeni tespit edildi; bağımsız benchmark doğrulaması, fiyatlandırma ve bağlam penceresi sonraki döngüde gelecek."
   }
  },
  "benchmarks": {

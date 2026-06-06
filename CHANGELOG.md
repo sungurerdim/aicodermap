@@ -314,9 +314,12 @@
 - `claude-haiku-4-5.mrcr` *(orchestrator)*: not reached in agent survey cycle; MRCR 1M data unavailable
 - ... and 393 more
 
-### New models detected (pending stub metadata — not yet added)
-- Lineup + new-release net surfaced 6 ids absent from `models.json`. Genuinely new: `grok-build-0-1` (xAI), `gemma-4-12b` (Google), `glm-5-turbo` (Z.ai). Older-than-tracked Anthropic snapshots (`claude-opus-4-6`, `claude-opus-4-5`, `claude-sonnet-4-5`) flagged but superseded by tracked `claude-opus-4-8`/`sonnet-4-6`.
-- All 6 skipped by `add-new-lineup-stubs.py` (no STUB_META). Per the no-hardcoded-model-patches rule, stub metadata is not hand-authored here; detection is preserved in `.aicodermap-lineup.json` for the next cycle. **Follow-up:** extend STUB_META (or research) to admit `grok-build-0-1`, `gemma-4-12b`, `glm-5-turbo`.
+### Added (new models — generic auto-stub)
+- `grok-build-0-1` (xAI), `gemma-4-12b` (Google DeepMind), `glm-5-turbo` (Z.ai) added as schema-complete stubs (bench cells null → fill next cycle). `add-new-lineup-stubs.py` was rewritten to derive metadata GENERICALLY from the lineup entry + the closest family sibling (provider/tier/open/license inherited) — the prior hard `no STUB_META` skip silently dropped every genuinely-new model.
+- Superseded-snapshot filter skipped `claude-opus-4-6`, `claude-opus-4-5`, `claude-sonnet-4-5` (older than tracked `claude-opus-4-8` / `claude-sonnet-4-6`); recomputed from live data each cycle, not a persistent registry.
+
+### Fixed (tooling — future-proofing)
+- `lib.whitelist.bench_band` now accepts either the full whitelist or an already-extracted `_schema` block. The double-extract bug made it return the (0,100) default for callers passing `_schema` (validate-anomaly-verdicts, audit-agent-misfiles), so every Elo-scale verdict (cfElo 3206 → "outside-band[0-100]") was wrongly rejected. cfElo/webDevElo/lmArenaElo verdicts now validate against their true bands.
 
 ### Flagged (anomaly resolution — Layer-3 auto-verify)
 - 9 cells cleared after primary-source investigation: `qwen3-coder-30b.hle` (76.9) + `qwen3-coder-480b.hle` (85.2) were CruxEval/HumanEval values misfiled into HLE (ceiling ~45); `o3.swePro` (78.5) unreconcilable with current Scale SEAL / BenchLM; `gemma-4-e2b.cfElo` (633) + `gemma-4-e4b.cfElo` (940) below Codeforces floor with no published cfElo; plus `mistral-large-3.{aime26,gpqa}`, `qwen3-coder-30b.gpqa`, `mimo-v2-5-pro.aime26`.

@@ -481,6 +481,18 @@
   "minimax-m3": {
    "strengths": "1M context, multimodal (text/image/video input), MSA sparse attention. SWE-Pro ~59.0%, SWE-Verified ~80.5% (lineup source). Cheap $0.30/$1.20. Released June 1 2026.",
    "weaknesses": "Caught via gather lineup-hint in the prior full sweep but missed by the dedicated lineup fetch (now resolved by harvest-new-models.py). Bench cells fill with multi-source provenance next cycle."
+  },
+  "grok-build-0-1": {
+   "strengths": "Grok Build 0.1 detected via lineup discovery (released 2026-05-29). Benchmark data will be filled with multi-source provenance next refresh.",
+   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+  },
+  "gemma-4-12b": {
+   "strengths": "Gemma 4 12B detected via lineup discovery (released 2026-06-03). Benchmark data will be filled with multi-source provenance next refresh.",
+   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+  },
+  "glm-5-turbo": {
+   "strengths": "GLM-5 Turbo detected via lineup discovery (released 2026-03). Benchmark data will be filled with multi-source provenance next refresh.",
+   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
   }
  },
  "benchmarks": {
