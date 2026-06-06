@@ -26,6 +26,7 @@ if hasattr(sys.stderr, "reconfigure"):
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 from lib.matrix import active_models as _active_models  # noqa: E402
+from lib.whitelist import core_bench_keys  # noqa: E402  (SSOT)
 
 TODAY = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d")
 NOW_ISO = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -36,7 +37,7 @@ models = models_data if isinstance(models_data, list) else models_data.get("mode
 wl = json.loads((ROOT / "data/sources-whitelist.json").read_text(encoding="utf-8"))
 i18n_en = json.loads((ROOT / "i18n/en.json").read_text(encoding="utf-8"))
 
-core_keys = wl["_schema"]["coreBenchKeys"]
+core_keys = core_bench_keys(wl)  # SSOT accessor (safe on missing _schema)
 active = _active_models(models)
 active_ids = {m["id"] for m in active}
 

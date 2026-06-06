@@ -157,13 +157,22 @@
   justify-self: end;
 }
 
-/* Search row — primary filter. The "Ara" / "Search" text label is
- * visually hidden (screen readers still read it); a magnifier icon
- * inside the input serves as the visible affordance. Spans 2 grid
- * columns so users have room to type long model+provider strings. */
+/* Search row — model/provider filter. The "Ara" / "Search" text label is
+ * visually hidden (screen readers still read it); a magnifier icon inside the
+ * input serves as the visible affordance. Relocated 2026-06-06 from the top of
+ * the filters grid to a compact single-line bar between the Weights editor and
+ * the Comparison table (was forcing a tall 2-column row at full width). */
 .search-row {
   position: relative;
-  grid-column: span 2;
+}
+/* Standalone single-line search bar (placed after #weights). */
+.search-bar {
+  display: block;
+  margin: 0 0 var(--space-2);
+}
+.search-bar #filter-search {
+  width: 100%;
+  box-sizing: border-box;
 }
 .search-row > span {
   position: absolute;

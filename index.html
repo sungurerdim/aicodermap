@@ -179,10 +179,6 @@
 
   <section id="filters" class="card section-card" data-export-section="filters" aria-labelledby="filters-heading">
     <div class="filters-grid">
-      <label class="select-row search-row">
-        <span data-i18n-key="ui.filter.search">Search</span>
-        <input type="search" id="filter-search" placeholder="model name, provider..." data-i18n-placeholder="ui.filter.searchPlaceholder">
-      </label>
       <label class="select-row">
         <span data-i18n-key="ui.filter.provider">Vendor</span>
         <select id="filter-provider">
@@ -258,6 +254,11 @@
     </header>
     <div id="weights-grid" class="weights-grid"><!-- populated by app.js --></div>
   </section>
+
+  <label class="search-row search-bar" data-no-export>
+    <span data-i18n-key="ui.filter.search">Search</span>
+    <input type="search" id="filter-search" placeholder="model name, provider..." data-i18n-placeholder="ui.filter.searchPlaceholder">
+  </label>
 
   <section id="table" class="section-card" aria-labelledby="table-heading">
     <header class="section-head">

@@ -16,12 +16,13 @@ from collections import defaultdict
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from lib.whitelist import all_bench_keys, contracts  # type: ignore  # noqa: E402
+from lib.whitelist import all_bench_keys, bench_hard_max, contracts  # type: ignore  # noqa: E402
 from lib.matrix import active_models  # type: ignore  # noqa: E402
 from lib import reliability as _reliability  # type: ignore  # noqa: E402
+from lib.tiers import TIER_WEIGHT  # type: ignore  # noqa: E402  (SSOT)
 from lib.tiers import verif_factor as _verif_factor  # type: ignore  # noqa: E402
+from lib.constants import ELO_BENCH_KEYS  # type: ignore  # noqa: E402  (SSOT)
 
-TIER_WEIGHT = {"I": 1.0, "S": 0.7, "C": 0.4, "U": 0.1}
 LEDGER_PATH = ROOT / "data" / "source-reliability.json"
 
 
@@ -73,7 +74,7 @@ def find_batch_artifacts() -> list[Path]:
     return sorted(ROOT.glob(".aicodermap-agent-out-batch*.gather.json"))
 
 
-_ELO_SIBLINGS = {"cfElo", "webDevElo", "lmArenaElo"}
+_ELO_SIBLINGS = ELO_BENCH_KEYS  # SSOT: lib.constants.ELO_BENCH_KEYS
 
 
 def build_host_publishes(wl: dict) -> dict:
@@ -221,12 +222,11 @@ def main() -> int:
                 val = float(val)
             except Exception:
                 continue
-            # Drop out-of-range bench values (mirrors audit-data-coherence.py
-            # _bench_max). A mis-scaled obs — e.g. aaAgentic recorded as a raw
-            # LMArena Elo (1753) instead of the 0-100 index — must never enter
-            # the cluster pool or win a cell. cfElo/webDevElo keep raw-Elo caps.
-            _hi = 3500 if bk == "cfElo" else (2000 if bk == "webDevElo" else 100)
-            if val < 0 or val > _hi:
+            # Drop out-of-range bench values. A mis-scaled obs — e.g. aaAgentic
+            # recorded as a raw LMArena Elo (1753) instead of the 0-100 index —
+            # must never enter the cluster pool. Caps come from the benchRanges
+            # SSOT (was hardcoded 3500/2000/100 here, diverging from the schema).
+            if val < 0 or val > bench_hard_max(wl, bk):
                 continue
             # C1 (2026-05-31): drop Elo values that are sibling-metric misfiles
             # (e.g. a webDevElo scraped off its page and filed as cfElo) before

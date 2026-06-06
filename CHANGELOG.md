@@ -1,25 +1,24 @@
 
-## [2026-06-06] — autonomous refresh-all [WARN: cumulative provenance coverage 63.0% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 538 new fills; 219 cells auto-gapped by orchestrator; 539 explicit agent gaps preserved]
+## [2026-06-06] — autonomous refresh-all [WARN: cumulative provenance coverage 64.0% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 550 new fills; 207 cells auto-gapped by orchestrator; 539 explicit agent gaps preserved]
 
-[fillRatio:0.63 cells:782/1241 contradictions:272 fetch:0.0min tools:None batches:None build:86fa01c]
+[fillRatio:0.64 cells:794/1241 contradictions:272 fetch:0.0min tools:None batches:None build:fca19cb]
 
-### Added (lineup — 5 new models)
-- `minimax-m3` (MiniMax) — released 2026-06-01, 1M ctx, multimodal, SWE-Pro ~59/SWE-Verified ~80.5. Caught via NEW gather-hint harvest (dedicated lineup fetch missed it).
-- `nemotron-3-ultra` (Nvidia), `muse-spark` (Meta), `step-3-7-flash` (StepFun), `glm-5` (Z.ai) — stubs; bench fills next cycle.
+### Refactored (SSOT/DRY/SoC — skill-cycle audit, no behavior change)
+- **Bench-key universe SSOT:** every value-passthrough stage (local-synth, gen_unified, merge, verification-map, gap_gen) now uses the `lib.whitelist` accessors (`all_bench_keys` / `core_bench_keys` / `emerging_bench_keys`) instead of inline `wl["_schema"][...]` derivations that had drifted (verification-map silently omitted emergingBenchKeys).
+- **Constants SSOT:** `VERIFICATION_AGREEMENT_PP`/`CONTRADICTION_*_PP` (was defined 8×), `TIER_WEIGHT`/`TIER_RANK` (5×), `AGENT_BUDGET_BUFFER`/`MAX_PARALLEL`, freshness TTL, and new `ELO_BENCH_KEYS`/`AA_COMPOSITE_KEYS`/`AA_MEASURED_KEYS` now live once in `lib.constants`/`lib.tiers`; consumers import them (merge, reconcile, lib/synth, lib/contracts, detect-anomalies, apply-aa-authoritative, audit-agent-misfiles, dispatch, freshness).
+- **Bench-range caps SSOT:** `bench_hard_max`/`bench_band` accessors added; local-synth's hardcoded `3500/2000/100` Elo caps + two `_band()` copies now read `_schema.benchRanges` (the cfElo cap 3500-vs-2000 disagreement is resolved → 3800 hardMax).
+- **Shared helpers → `lib.util`:** `utc_now_iso` (2 copies) + `slug_norm` (2 copies) deduped.
+- **Quarantine SSOT (DRY):** merge uses `winner.should_quarantine`'s verdict instead of an inline `conf<0.2` copy.
+- **Dead code removed:** `matrix.family_batches`/`_FAMILY_PROVIDER_MAP` (no callers); `add-lineup-stubs.py` (superseded by `add-new-lineup-stubs.py`).
+- **Bug:** `write-batch-ctx.py` read the wrong snapshot-index key (`byUrl` vs `snapshots`) → leaderboardSnapshots was EMPTY every cycle, so agents re-WebFetched instead of reading prefetched snapshots.
 
-### Fixed (pipeline — systematic, all models/benches)
-- **Emerging-bench data loss (SSOT/DRY):** local-synth + gen_unified + merge filtered observations to coreBenchKeys only, silently DROPPING every fresh emerging-bench value (sweMulti/mcpA/browseComp/bfcl) the frontend PRESETS actually score on (45 obs / 33 cells this cycle). All three now use the single `all_bench_keys()` SSOT (core ∪ emerging) for value passthrough; coverage still uses coreBenchKeys (SoC).
-- **Quarantine over-firing (double-penalty):** the `confidence<0.2` floor quarantined 153 clean single-source I-tier cells — canonical AA/Scale-SEAL values — excluding the project's most-trusted evidence from scoring. `should_quarantine` now exempts clean I-tier (non-RED) cells; merge uses that SSOT verdict instead of an inline copy (DRY) and CLEARS stale flags each cycle (quarantine = current-state, not permanent). 319→113 quarantined (remainder = genuine contradiction/dispersion; gpt-5-5.sweV 82.6-vs-88.7 correctly retained).
-- **New-model detection (robustness):** `harvest-new-models.py` unions every gather's `lineupHints[new]` into newModels[], so a release is caught even when the dedicated lineup page is unreachable.
-- **prune-stale-artifacts:** now also prunes `.aicodermap-ctx-batch*.json` (stale cross-plan ctx files polluted the fresh dispatch).
-- **CHANGELOG stacking:** merge consolidates same-day re-runs into one entry (anomaly + stub re-finalize no longer stack duplicates).
-
-### Flagged (review, not auto-applied)
-- `grok-4-20`→`grok-4-3` supersede (soft single-source signal; both active, deprecation deferred).
+### Fixed (UI / GPU)
+- **GPU "Fits (null GB)":** `gpu.js` now filters unsloth variants with null/missing vram before fit math (JS `null<=16` is true → a null-vram variant falsely "fit" any GPU). `render-card.js` omits null size/vram instead of printing literal "null". The null values are an EXTRACTION GAP (variant names captured, vram not — Unsloth GGUF pages do list them), affecting 4 models (minimax-m2-*, nemotron-3-super); next gather fills them.
+- **Search field** relocated from the top of the Filters grid to a compact single-line bar after the Weights editor (was forcing a tall 2-column row at full width).
 
 
 ### Updated
-- 26 models: `minimax-m2-1`, `deepseek-coder-v2-16b`, `minimax-m2-5`, `qwen3-coder-30b`, `grok-4-3`, `mimo-v2-5-pro`, `qwen3-5-9b`, `gemini-3-1-pro`, `qwen3-6-35b-moe`, `deepseek-v4-pro`, `step-3-5-flash`, `mimo-v2-5`, `gpt-5-5`, `qwen25-coder-7b`, `glm-4-7`, `qwen3-235b`, `glm-5-1`, `opus-4-7`, `mistral-large-3`, `gemma-4-e4b`, `qwen3-32b`, `deepseek-v4-flash`, `gemma-4-31b`, `glm-4-5-air`, `gemma-4-26b-moe`, `gemini-3-1-flash`
+- 27 models: `gemini-3-1-flash`, `qwen3-5-9b`, `gemma-4-31b`, `deepseek-v4-flash`, `deepseek-v4-pro`, `mimo-v2-5-pro`, `qwen3-32b`, `gpt-5-5`, `gemma-4-e4b`, `qwen3-6-35b-moe`, `mistral-large-3`, `minimax-m2-7`, `glm-4-7`, `glm-4-5-air`, `minimax-m2-1`, `mimo-v2-5`, `qwen3-coder-30b`, `glm-5-1`, `gemini-3-1-pro`, `qwen3-235b`, `step-3-5-flash`, `grok-4-3`, `minimax-m2-5`, `deepseek-coder-v2-16b`, `qwen25-coder-7b`, `gemma-4-26b-moe`, `opus-4-7`
 
 ### Resolved (auto via trustScore)
 - opus-4-7.sweV: winner={'value': 87.51, 'trustScore': 0.5, 'tier': 'I', 'verifications': 13, 'latestDate': '2026-06-06'} (severity=red, ΔNone)
@@ -284,7 +283,7 @@
 - step-3-5-flash.aaAgentic: winner={'value': 48.23, 'trustScore': 0.5, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-06-06'} (severity=yellow, ΔNone)
 - step-3-5-flash.gpqa: winner={'value': 83.2, 'trustScore': 0.5, 'tier': 'I', 'verifications': 9, 'latestDate': '2026-06-06'} (severity=red, ΔNone)
 - kimi-k2-6.sweV: winner={'value': 80.2, 'trustScore': 0.5, 'tier': 'I', 'verifications': 13, 'latestDate': '2026-06-06'} (severity=red, ΔNone)
-- kimi-k2-6.swePro: winner={'value': 58.6, 'trustScore': 0.467, 'tier': 'I', 'verifications': 16, 'latestDate': '2026-06-06'} (severity=red, ΔNone)
+- kimi-k2-6.swePro: winner={'value': 58.6, 'trustScore': 0.4713, 'tier': 'I', 'verifications': 16, 'latestDate': '2026-06-06'} (severity=red, ΔNone)
 - kimi-k2-6.sweMulti: winner={'value': 76.7, 'trustScore': 0.35, 'tier': 'S', 'verifications': 3, 'latestDate': '2026-06-06'} (severity=red, ΔNone)
 - kimi-k2-6.hle: winner={'value': 54.0, 'trustScore': 0.5, 'tier': 'I', 'verifications': 11, 'latestDate': '2026-06-06'} (severity=red, ΔNone)
 - kimi-k2-6.gpqa: winner={'value': 90.54, 'trustScore': 0.5, 'tier': 'I', 'verifications': 13, 'latestDate': '2026-06-06'} (severity=red, ΔNone)
@@ -295,7 +294,7 @@
 - grok-4-3.aaAgentic: winner={'value': 65.89, 'trustScore': 0.5, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-06-06'} (severity=yellow, ΔNone)
 - opus-4-7.aaCoding: winner={'value': 52.88, 'trustScore': 0.5, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-06-06'} (severity=red, ΔNone)
 
-### Gaps (459 entries — agent:240 orchestrator:219 — see data/known-gaps.json or next refresh)
+### Gaps (447 entries — agent:240 orchestrator:207 — see data/known-gaps.json or next refresh)
 - `opus-4-7.tau2` *(agent)*: agent surveyed; value unavailable
 - `opus-4-7.cfElo` *(agent)*: agent surveyed; value unavailable
 - `opus-4-7.nl2Repo` *(agent)*: agent surveyed; value unavailable
@@ -304,7 +303,7 @@
 - `sonnet-4-6.nl2Repo` *(agent)*: agent surveyed; value unavailable
 - `codestral.aaAgentic` *(orchestrator)*: not reached in agent survey cycle; AA Agentic data unavailable
 - `deepseek-coder-v2-16b.aaAgentic` *(orchestrator)*: not reached in agent survey cycle; AA Agentic data unavailable
-- ... and 451 more
+- ... and 439 more
 
 ## [2026-05-30] — autonomous refresh-all [WARN: cumulative provenance coverage 57.0% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 521 new fills; 5 cells auto-gapped by orchestrator; 492 explicit agent gaps preserved]
 

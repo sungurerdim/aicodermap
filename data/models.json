@@ -73,7 +73,7 @@
     "vramRequirement": null,
     "strengthsKey": "gemini-3-1-flash.strengths",
     "weaknessesKey": "gemini-3-1-flash.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-30",
@@ -248,7 +248,7 @@
     "vramRequirement": null,
     "strengthsKey": "gemini-3-1-pro.strengths",
     "weaknessesKey": "gemini-3-1-pro.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-06-06",
@@ -322,7 +322,7 @@
         "to": 88.48,
         "cycle": "2026-06-06",
         "confidence": 0.85,
-        "winning_cluster_sum_trust": 2.665,
+        "winning_cluster_sum_trust": 2.676,
         "winning_cluster_distinct_sources": 1
       }
     },
@@ -976,7 +976,7 @@
     "vramRequirement": null,
     "strengthsKey": "mistral-large-3.strengths",
     "weaknessesKey": "mistral-large-3.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "status": "active",
     "benchUpdated": {
       "sweV": "2026-06-06",
@@ -1013,7 +1013,7 @@
         "to": 42.0,
         "cycle": "2026-06-06",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 1.44,
+        "winning_cluster_sum_trust": 1.447,
         "winning_cluster_distinct_sources": 1
       },
       "mmluPro": {
@@ -1410,7 +1410,7 @@
     "vramRequirement": null,
     "strengthsKey": "opus-4-7.strengths",
     "weaknessesKey": "opus-4-7.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-06-06",
@@ -1487,7 +1487,7 @@
         "to": 94.2,
         "cycle": "2026-06-06",
         "confidence": 0.85,
-        "winning_cluster_sum_trust": 25.611,
+        "winning_cluster_sum_trust": 25.556,
         "winning_cluster_distinct_sources": 14
       },
       "hle": {
@@ -2249,7 +2249,7 @@
     "vramRequirement": null,
     "strengthsKey": "deepseek-v4-flash.strengths",
     "weaknessesKey": "deepseek-v4-flash.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "ollama": {
       "pullCmd": "ollama pull deepseek-v4-flash:cloud",
       "ollamaUrl": "https://ollama.com/library/deepseek-v4-flash",
@@ -2475,7 +2475,7 @@
     "vramRequirement": null,
     "strengthsKey": "deepseek-v4-pro.strengths",
     "weaknessesKey": "deepseek-v4-pro.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "status": "active",
     "benchUpdated": {
       "sweV": "2026-06-06",
@@ -2557,7 +2557,7 @@
         "to": 52.0,
         "cycle": "2026-06-06",
         "confidence": 1.0,
-        "winning_cluster_sum_trust": 12.595,
+        "winning_cluster_sum_trust": 12.624,
         "winning_cluster_distinct_sources": 5
       },
       "mmluPro": {
@@ -2928,7 +2928,7 @@
     "vramRequirement": null,
     "strengthsKey": "glm-5-1.strengths",
     "weaknessesKey": "glm-5-1.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-06-06",
@@ -3024,7 +3024,7 @@
         "to": 52.1,
         "cycle": "2026-06-06",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 2.577,
+        "winning_cluster_sum_trust": 2.579,
         "winning_cluster_distinct_sources": 2
       },
       "aaIdx": {
@@ -3032,7 +3032,7 @@
         "to": 51.41,
         "cycle": "2026-06-06",
         "confidence": 1.0,
-        "winning_cluster_sum_trust": 5.046,
+        "winning_cluster_sum_trust": 5.055,
         "winning_cluster_distinct_sources": 4
       }
     },
@@ -3812,7 +3812,7 @@
     "vramRequirement": null,
     "strengthsKey": "mimo-v2-5.strengths",
     "weaknessesKey": "mimo-v2-5.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-30",
@@ -3851,7 +3851,7 @@
         "to": 84.9,
         "cycle": "2026-06-06",
         "confidence": 1.0,
-        "winning_cluster_sum_trust": 1.075,
+        "winning_cluster_sum_trust": 1.083,
         "winning_cluster_distinct_sources": 1
       },
       "hle": {
@@ -3866,8 +3866,8 @@
         "from": 90.64,
         "to": 94.2,
         "cycle": "2026-06-06",
-        "confidence": 0.4296,
-        "winning_cluster_sum_trust": 0.758,
+        "confidence": 0.4336,
+        "winning_cluster_sum_trust": 0.765,
         "winning_cluster_distinct_sources": 1
       }
     },
@@ -3974,7 +3974,7 @@
     "vramRequirement": null,
     "strengthsKey": "mimo-v2-5-pro.strengths",
     "weaknessesKey": "mimo-v2-5-pro.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-06-06",
@@ -4036,7 +4036,7 @@
         "to": 94.2,
         "cycle": "2026-06-06",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 1.236,
+        "winning_cluster_sum_trust": 1.248,
         "winning_cluster_distinct_sources": 1
       },
       "gpqa": {
@@ -4044,15 +4044,15 @@
         "to": 86.6,
         "cycle": "2026-06-06",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 3.516,
+        "winning_cluster_sum_trust": 3.532,
         "winning_cluster_distinct_sources": 3
       },
       "aaAgentic": {
         "from": 68.07,
         "to": 68.7,
         "cycle": "2026-06-06",
-        "confidence": 0.7778,
-        "winning_cluster_sum_trust": 3.111,
+        "confidence": 0.7805,
+        "winning_cluster_sum_trust": 3.122,
         "winning_cluster_distinct_sources": 2
       }
     },
@@ -4329,7 +4329,7 @@
       "sweV": 77.99,
       "swePro": null,
       "tb2": 86.7,
-      "tau2": 95.01,
+      "tau2": 96.8,
       "aaCoding": 41.43,
       "aaAgentic": 62.8,
       "mcpA": null,
@@ -4379,12 +4379,12 @@
     "bench.hle": 28.3,
     "benchReconciled": {
       "tau2": {
-        "from": 84.2,
-        "to": 95.0,
-        "cycle": "2026-05-22",
+        "from": 95.01,
+        "to": 96.8,
+        "cycle": "2026-06-06",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 1.516,
-        "winning_cluster_distinct_sources": 2
+        "winning_cluster_sum_trust": 1.234,
+        "winning_cluster_distinct_sources": 1
       },
       "sweV": {
         "from": 76.2,
@@ -4536,7 +4536,7 @@
     "vramRequirement": null,
     "strengthsKey": "minimax-m2-5.strengths",
     "weaknessesKey": "minimax-m2-5.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-05-27",
@@ -4656,8 +4656,8 @@
         "from": 55.8,
         "to": 56.0,
         "cycle": "2026-06-06",
-        "confidence": 0.7778,
-        "winning_cluster_sum_trust": 3.111,
+        "confidence": 0.7805,
+        "winning_cluster_sum_trust": 3.122,
         "winning_cluster_distinct_sources": 2
       }
     },
@@ -4787,7 +4787,7 @@
     "vramRequirement": null,
     "strengthsKey": "minimax-m2-7.strengths",
     "weaknessesKey": "minimax-m2-7.weaknesses",
-    "lastUpdated": "2026-06-06T06:54:49Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "status": "active",
     "benchUpdated": {
       "swePro": "2026-06-06",
@@ -4836,7 +4836,7 @@
         "to": 57.0,
         "cycle": "2026-06-06",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 1.435,
+        "winning_cluster_sum_trust": 1.448,
         "winning_cluster_distinct_sources": 1
       },
       "gpqa": {
@@ -5591,7 +5591,7 @@
     "vramRequirement": 47,
     "strengthsKey": "qwen3-235b.strengths",
     "weaknessesKey": "qwen3-235b.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "ollama": {
       "pullCmd": "ollama pull qwen3:235b",
       "ollamaUrl": "https://ollama.com/library/qwen3",
@@ -5639,7 +5639,7 @@
         "to": 70.0,
         "cycle": "2026-06-06",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 5.774,
+        "winning_cluster_sum_trust": 5.789,
         "winning_cluster_distinct_sources": 5
       },
       "aaIdx": {
@@ -5694,8 +5694,8 @@
         "from": 42.0,
         "to": 11.7,
         "cycle": "2026-06-06",
-        "confidence": 0.5882,
-        "winning_cluster_sum_trust": 0.98,
+        "confidence": 0.5889,
+        "winning_cluster_sum_trust": 0.982,
         "winning_cluster_distinct_sources": 1
       }
     },
@@ -5806,7 +5806,7 @@
     "vramRequirement": 22,
     "strengthsKey": "qwen3-32b.strengths",
     "weaknessesKey": "qwen3-32b.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "ollama": {
       "pullCmd": "ollama pull qwen3:32b",
       "tags": [
@@ -6016,7 +6016,7 @@
     "vramRequirement": 22,
     "strengthsKey": "qwen3-6-35b-moe.strengths",
     "weaknessesKey": "qwen3-6-35b-moe.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "ollama": {
       "pullCmd": "ollama pull qwen3.6:35b-moe",
       "tags": [
@@ -6084,7 +6084,7 @@
         "to": 82.3,
         "cycle": "2026-06-06",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 4.079,
+        "winning_cluster_sum_trust": 4.099,
         "winning_cluster_distinct_sources": 3
       },
       "aime26": {
@@ -6369,7 +6369,7 @@
     "vramRequirement": 21,
     "strengthsKey": "qwen3-coder-30b.strengths",
     "weaknessesKey": "qwen3-coder-30b.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "ollama": {
       "pullCmd": "ollama pull qwen3-coder:30b",
       "pullCount": "4.9M pulls",
@@ -6421,7 +6421,7 @@
         "to": 68.0,
         "cycle": "2026-06-06",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 1.115,
+        "winning_cluster_sum_trust": 1.12,
         "winning_cluster_distinct_sources": 1
       }
     },
@@ -6877,7 +6877,7 @@
     "vramRequirement": 120,
     "strengthsKey": "step-3-5-flash.strengths",
     "weaknessesKey": "step-3-5-flash.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "status": "active",
     "benchUpdated": {
       "sweV": "2026-06-06",
@@ -6927,7 +6927,7 @@
         "to": 22.57,
         "cycle": "2026-06-06",
         "confidence": 1.0,
-        "winning_cluster_sum_trust": 27.868,
+        "winning_cluster_sum_trust": 27.996,
         "winning_cluster_distinct_sources": 7
       },
       "aime26": {
@@ -6958,8 +6958,8 @@
         "from": 34.56,
         "to": 31.64,
         "cycle": "2026-06-06",
-        "confidence": 0.3307,
-        "winning_cluster_sum_trust": 0.496,
+        "confidence": 0.3312,
+        "winning_cluster_sum_trust": 0.497,
         "winning_cluster_distinct_sources": 1
       },
       "tau2": {
@@ -6967,15 +6967,15 @@
         "to": 88.2,
         "cycle": "2026-06-06",
         "confidence": 1.0,
-        "winning_cluster_sum_trust": 19.112,
+        "winning_cluster_sum_trust": 19.305,
         "winning_cluster_distinct_sources": 10
       },
       "aaAgentic": {
         "from": 48.23,
         "to": 52.0,
         "cycle": "2026-06-06",
-        "confidence": 0.2781,
-        "winning_cluster_sum_trust": 0.491,
+        "confidence": 0.279,
+        "winning_cluster_sum_trust": 0.492,
         "winning_cluster_distinct_sources": 1
       }
     },
@@ -7218,7 +7218,7 @@
     "vramRequirement": 16,
     "strengthsKey": "gemma-4-26b-moe.strengths",
     "weaknessesKey": "gemma-4-26b-moe.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "status": "active",
     "ollama": {
       "pullCmd": "ollama pull gemma4:26b-moe",
@@ -7404,7 +7404,7 @@
     "vramRequirement": 24,
     "strengthsKey": "gemma-4-31b.strengths",
     "weaknessesKey": "gemma-4-31b.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "status": "active",
     "ollama": {
       "pullCmd": "ollama pull gemma4:31b",
@@ -7449,7 +7449,7 @@
         "to": 76.3,
         "cycle": "2026-06-06",
         "confidence": 0.6,
-        "winning_cluster_sum_trust": 1.389,
+        "winning_cluster_sum_trust": 1.399,
         "winning_cluster_distinct_sources": 1
       },
       "aime26": {
@@ -7693,7 +7693,7 @@
     "vramRequirement": 8,
     "strengthsKey": "gemma-4-e4b.strengths",
     "weaknessesKey": "gemma-4-e4b.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "status": "active",
     "ollama": {
       "pullCmd": "ollama pull gemma4:e4b",
@@ -7726,8 +7726,8 @@
         "from": 18.92,
         "to": 19.0,
         "cycle": "2026-06-06",
-        "confidence": 0.8489,
-        "winning_cluster_sum_trust": 3.995,
+        "confidence": 0.8491,
+        "winning_cluster_sum_trust": 3.996,
         "winning_cluster_distinct_sources": 2
       },
       "mmluPro": {
@@ -7841,7 +7841,7 @@
     "vramRequirement": 9,
     "strengthsKey": "deepseek-coder-v2-16b.strengths",
     "weaknessesKey": "deepseek-coder-v2-16b.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "ollama": {
       "pullCmd": "ollama pull deepseek-coder-v2:16b",
       "tags": [
@@ -8446,7 +8446,7 @@
     "vramRequirement": 16,
     "strengthsKey": "qwen25-coder-7b.strengths",
     "weaknessesKey": "qwen25-coder-7b.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "ollama": {
       "pullCmd": "ollama pull qwen2.5-coder:7b",
       "tags": [],
@@ -9063,7 +9063,7 @@
     "providers": 2,
     "strengthsKey": "gpt-5-5.strengths",
     "weaknessesKey": "gpt-5-5.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "status": "active",
     "sourcesAdded": [
       {
@@ -9168,7 +9168,7 @@
         "to": 59.83,
         "cycle": "2026-06-06",
         "confidence": 1.0,
-        "winning_cluster_sum_trust": 19.015,
+        "winning_cluster_sum_trust": 19.019,
         "winning_cluster_distinct_sources": 4
       },
       "tau2": {
@@ -9491,7 +9491,7 @@
     "vramRequirement": null,
     "strengthsKey": "grok-4-3.strengths",
     "weaknessesKey": "grok-4-3.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "benchQuarantine": {
       "gpqa": true
     },
@@ -9547,8 +9547,8 @@
         "from": 65.89,
         "to": 67.8,
         "cycle": "2026-06-06",
-        "confidence": 0.5185,
-        "winning_cluster_sum_trust": 0.778,
+        "confidence": 0.5203,
+        "winning_cluster_sum_trust": 0.78,
         "winning_cluster_distinct_sources": 1
       }
     },
@@ -9818,7 +9818,7 @@
     "vramRequirement": 66,
     "strengthsKey": "glm-4-5-air.strengths",
     "weaknessesKey": "glm-4-5-air.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "status": "active",
     "_stubReason": "lineup-discovery placeholder; bench cells pending next /aicodermap refresh cycle",
     "_stubAddedDate": "2026-05-06",
@@ -9852,8 +9852,8 @@
         "from": 23.09,
         "to": 23.17,
         "cycle": "2026-06-06",
-        "confidence": 0.5992,
-        "winning_cluster_sum_trust": 4.994,
+        "confidence": 0.5993,
+        "winning_cluster_sum_trust": 4.995,
         "winning_cluster_distinct_sources": 2
       }
     },
@@ -10028,7 +10028,7 @@
     "vramRequirement": 220,
     "strengthsKey": "glm-4-7.strengths",
     "weaknessesKey": "glm-4-7.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "status": "active",
     "_stubReason": "lineup-discovery placeholder; bench cells pending next /aicodermap refresh cycle",
     "_stubAddedDate": "2026-05-06",
@@ -10062,7 +10062,7 @@
         "from": 34.0,
         "to": 42.11,
         "cycle": "2026-06-06",
-        "confidence": 0.5992,
+        "confidence": 0.5993,
         "winning_cluster_sum_trust": 0.999,
         "winning_cluster_distinct_sources": 1
       }
@@ -10376,7 +10376,7 @@
     "vramRequirement": 20,
     "strengthsKey": "qwen3-5-9b.strengths",
     "weaknessesKey": "qwen3-5-9b.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "status": "active",
     "_stubReason": "lineup-discovery placeholder; bench cells pending next /aicodermap refresh cycle",
     "_stubAddedDate": "2026-05-06",
@@ -10426,8 +10426,8 @@
         "from": 86.77,
         "to": 86.84,
         "cycle": "2026-06-06",
-        "confidence": 0.574,
-        "winning_cluster_sum_trust": 3.113,
+        "confidence": 0.5794,
+        "winning_cluster_sum_trust": 3.131,
         "winning_cluster_distinct_sources": 2
       }
     },
@@ -10582,7 +10582,7 @@
     "vramRequirement": null,
     "strengthsKey": "minimax-m2-1.strengths",
     "weaknessesKey": "minimax-m2-1.weaknesses",
-    "lastUpdated": "2026-06-06T07:52:52Z",
+    "lastUpdated": "2026-06-06T09:05:10Z",
     "status": "active",
     "_stubReason": "lineup-discovery placeholder; bench cells pending next /aicodermap refresh cycle",
     "_stubAddedDate": "2026-05-06",
@@ -11590,13 +11590,13 @@
       "tb2": null,
       "tau2": null,
       "swePro": null,
-      "aaCoding": null,
-      "aaAgentic": null,
+      "aaCoding": 47.47,
+      "aaAgentic": 61.99,
       "mcpA": null,
       "gpqa": null,
       "sweMulti": null,
       "hle": null,
-      "aaIdx": null,
+      "aaIdx": 52.15,
       "bfcl": null,
       "aime26": null,
       "aaOmni": null,
@@ -11616,8 +11616,13 @@
     "vramRequirement": null,
     "strengthsKey": "muse-spark.strengths",
     "weaknessesKey": "muse-spark.weaknesses",
-    "lastUpdated": "2026-06-06T05:46:13Z",
-    "status": "active"
+    "lastUpdated": "2026-06-06T09:05:08Z",
+    "status": "active",
+    "benchUpdated": {
+      "aaIdx": "2026-06-06",
+      "aaCoding": "2026-06-06",
+      "aaAgentic": "2026-06-06"
+    }
   },
   {
     "id": "step-3-7-flash",
@@ -11657,13 +11662,13 @@
       "tb2": null,
       "tau2": null,
       "swePro": null,
-      "aaCoding": null,
-      "aaAgentic": null,
+      "aaCoding": 37.09,
+      "aaAgentic": 59.53,
       "mcpA": null,
       "gpqa": null,
       "sweMulti": null,
       "hle": null,
-      "aaIdx": null,
+      "aaIdx": 42.59,
       "bfcl": null,
       "aime26": null,
       "aaOmni": null,
@@ -11683,8 +11688,13 @@
     "vramRequirement": null,
     "strengthsKey": "step-3-7-flash.strengths",
     "weaknessesKey": "step-3-7-flash.weaknesses",
-    "lastUpdated": "2026-06-06T05:46:13Z",
-    "status": "active"
+    "lastUpdated": "2026-06-06T09:05:08Z",
+    "status": "active",
+    "benchUpdated": {
+      "aaIdx": "2026-06-06",
+      "aaCoding": "2026-06-06",
+      "aaAgentic": "2026-06-06"
+    }
   },
   {
     "id": "glm-5",
@@ -11724,13 +11734,13 @@
       "tb2": null,
       "tau2": null,
       "swePro": null,
-      "aaCoding": null,
-      "aaAgentic": null,
+      "aaCoding": 44.18,
+      "aaAgentic": 63.14,
       "mcpA": null,
       "gpqa": null,
       "sweMulti": null,
       "hle": null,
-      "aaIdx": null,
+      "aaIdx": 49.77,
       "bfcl": null,
       "aime26": null,
       "aaOmni": null,
@@ -11750,8 +11760,13 @@
     "vramRequirement": null,
     "strengthsKey": "glm-5.strengths",
     "weaknessesKey": "glm-5.weaknesses",
-    "lastUpdated": "2026-06-06T05:46:13Z",
-    "status": "active"
+    "lastUpdated": "2026-06-06T09:05:08Z",
+    "status": "active",
+    "benchUpdated": {
+      "aaIdx": "2026-06-06",
+      "aaCoding": "2026-06-06",
+      "aaAgentic": "2026-06-06"
+    }
   },
   {
     "id": "minimax-m3",
@@ -11791,13 +11806,13 @@
       "tb2": null,
       "tau2": null,
       "swePro": null,
-      "aaCoding": null,
-      "aaAgentic": null,
+      "aaCoding": 43.41,
+      "aaAgentic": 68.62,
       "mcpA": null,
       "gpqa": null,
       "sweMulti": null,
       "hle": null,
-      "aaIdx": null,
+      "aaIdx": 54.67,
       "bfcl": null,
       "aime26": null,
       "aaOmni": null,
@@ -11817,7 +11832,12 @@
     "vramRequirement": null,
     "strengthsKey": "minimax-m3.strengths",
     "weaknessesKey": "minimax-m3.weaknesses",
-    "lastUpdated": "2026-06-06T07:22:38Z",
-    "status": "active"
+    "lastUpdated": "2026-06-06T09:05:08Z",
+    "status": "active",
+    "benchUpdated": {
+      "aaIdx": "2026-06-06",
+      "aaCoding": "2026-06-06",
+      "aaAgentic": "2026-06-06"
+    }
   }
 ]

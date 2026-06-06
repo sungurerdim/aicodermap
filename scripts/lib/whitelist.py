@@ -64,6 +64,37 @@ def core_bench_keys(whitelist: dict[str, Any]) -> list[str]:
     return list(schema(whitelist).get("coreBenchKeys") or [])
 
 
+def bench_band(whitelist: dict[str, Any], key: str) -> tuple[float, float]:
+    """SSOT (hardMin, hardMax) for a bench value, from `_schema.benchRanges[key]`
+    with `_default` fallback. Was hand-rolled as `_band()` in audit-agent-misfiles,
+    validate-anomaly-verdicts, and audit-data-coherence independently."""
+    ranges = schema(whitelist).get("benchRanges") or {}
+    entry = ranges.get(key) or ranges.get("_default") or {"hardMin": 0, "hardMax": 100}
+    return float(entry.get("hardMin", 0)), float(entry.get("hardMax", 100))
+
+
+def bench_hard_max(
+    whitelist: dict[str, Any], key: str, default: float = 100.0
+) -> float:
+    """SSOT upper bound for a bench value, from `_schema.benchRanges[key].hardMax`.
+    Used to drop mis-scaled observations (e.g. an Elo 1753 filed as a 0-100 index).
+    benchRanges is the single source — local-synth/merge/audit must not hardcode
+    per-bench caps (cfElo 3800, webDevElo 2000, else 100) independently."""
+    hi = bench_band(whitelist, key)[1]
+    return hi if hi else default
+
+
+# SSOT for the whitelist source categories — was repeated verbatim as an inline
+# tuple in 6+ scripts and drifted (some omit "local", some add others).
+ALL_WHITELIST_CATEGORIES = (
+    "leaderboards",
+    "aggregators",
+    "local",
+    "community",
+    "registries",
+)
+
+
 def deprecated_bench_keys(whitelist: dict[str, Any]) -> list[str]:
     return list(schema(whitelist).get("deprecatedBenchKeys") or [])
 

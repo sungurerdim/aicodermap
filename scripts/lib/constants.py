@@ -50,6 +50,19 @@ DEPLOY_WAIT_SEC = 90  # GitHub Pages settle time.
 AGENT_RETRY = 1  # Single agent retry per cycle.
 FAMILY_BASELINE_MIN = 30  # refresh-all: |models[]+newModels[]| floor.
 
+# ── Bench-key family sets (SSOT — were duplicated across scripts) ──────────
+# Elo-scale benches (raw rating, NOT 0-100): drive the Elo-sibling-misfile
+# filter (local-synth C1) + the anomaly source-mismatch detector. Was defined
+# as ELO_FAMILY / _ELO_SIBLINGS in detect-anomalies.py + local-synth.py.
+ELO_BENCH_KEYS = frozenset({"cfElo", "webDevElo", "lmArenaElo"})
+# Artificial Analysis OWN definitional composite indices (no one else computes
+# them → a stored value disagreeing with AA's is a misfile). Was duplicated in
+# apply-aa-authoritative.py + audit-agent-misfiles.py.
+AA_COMPOSITE_KEYS = frozenset({"aaIdx", "aaCoding", "aaAgentic"})
+# Benches AA MEASURES (independent variance allowed; only corrected when outside
+# AA's observed envelope). Same two scripts duplicated this.
+AA_MEASURED_KEYS = frozenset({"gpqa", "hle", "tau2", "tbHard"})
+
 # ── Quality rules (correctness, NOT effort caps) ───────────────────────────
 VERIFICATION_AGREEMENT_PP = 1.5  # Within 1.5pp = agreement; otherwise contradiction.
 PARALLEL_SOURCES = 5  # Concurrent source fetches (parallelism guideline).

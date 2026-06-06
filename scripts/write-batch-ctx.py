@@ -44,7 +44,11 @@ def main() -> int:
     snap_index = _read_json(
         REPO / "data" / ".leaderboard-snapshots" / "_index.json", {}
     )
-    snapshots = snap_index.get("byUrl") or {}
+    # Index is written by prefetch-leaderboards.py under "snapshots" (NOT
+    # "byUrl"). Reading the wrong key silently produced an EMPTY snapshot map in
+    # every batch ctx, so agents WebFetched leaderboards they could have Read
+    # from disk — defeating the entire PRELIM-B prefetch optimization.
+    snapshots = snap_index.get("snapshots") or {}
     # Layer-3 anomaly verification queue (PRELIM-F). Sliced per batch below so
     # each agent resolves its flagged cells FIRST (agent.md OUTLIERS->INVESTIGATE).
     anomalies = (_read_json(REPO / "data" / "_anomalies.json", {}) or {}).get(

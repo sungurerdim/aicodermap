@@ -180,49 +180,6 @@ def priority_cells(
     return out
 
 
-# Provider families used by family_batches() for fan-out dispatch.
-_FAMILY_PROVIDER_MAP: dict[str, int] = {
-    # Bucket 0 — OpenAI
-    "openai": 0,
-    # Bucket 1 — Anthropic
-    "anthropic": 1,
-    # Bucket 2 — xAI
-    "xai": 2,
-    # Bucket 3 — Google / Mistral / DeepSeek / Qwen / Alibaba
-    "google": 3,
-    "mistral": 3,
-    "deepseek": 3,
-    "qwen": 3,
-    "alibaba": 3,
-    # Bucket 4 — all others (Meta, NVIDIA, MiniMax, MiMo, StepFun, Kimi, etc.)
-}
-
-
-def family_batches(
-    active: list[dict[str, Any]],
-    n: int = 5,
-) -> list[list[dict[str, Any]]]:
-    """Partition active models into n provider-family buckets for parallel fan-out.
-
-    F1 reform: rather than one agent surveying all ~50+ models, the skill
-    dispatches n parallel sub-agents each responsible for one batch. This
-    shrinks idea_context per agent (fewer models → smaller matrixState /
-    priorityCells) and allows each agent's fetch budget to focus on its slice.
-
-    Bucket assignment: provider field lowercased → _FAMILY_PROVIDER_MAP →
-    default bucket (n-1) for unknowns. Buckets balanced round-robin when a
-    provider maps to a bucket that is already the largest.
-
-    Returns: list of n lists of model dicts (empty lists possible when n > active).
-    """
-    buckets: list[list[dict[str, Any]]] = [[] for _ in range(n)]
-    for m in active:
-        prov = (m.get("provider") or "").lower().replace(" ", "")
-        bucket_idx = _FAMILY_PROVIDER_MAP.get(prov, n - 1)
-        buckets[bucket_idx].append(m)
-    return buckets
-
-
 def matrix_snapshot(
     active: list[dict[str, Any]], core_keys: list[str]
 ) -> dict[str, Any]:

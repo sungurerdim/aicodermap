@@ -60,6 +60,9 @@ from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 PROJECT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT / "scripts"))
+from lib.util import utc_now_iso as _utc_now_iso  # noqa: E402  (SSOT)
+
 SNAPSHOTS_DIR = PROJECT / "data" / ".leaderboard-snapshots"
 INDEX_PATH = SNAPSHOTS_DIR / "_index.json"
 USER_AGENT = "AICoderMap-Prefetch/1.0 (+https://sungurerdim.github.io/aicodermap/)"
@@ -71,10 +74,6 @@ DEFAULT_MAX_WORKERS = 8
 FETCH_TIMEOUT_SEC = 15
 
 PREFETCH_CATEGORIES = ("leaderboards", "aggregators", "community", "registries")
-
-
-def _utc_now_iso() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _stable_filename(url: str, content_type: str) -> str:

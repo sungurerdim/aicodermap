@@ -30,6 +30,9 @@ from datetime import date
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO / "scripts"))
+from lib.util import slug_norm as _norm  # noqa: E402  (SSOT)
+
 AA_URL = "https://artificialanalysis.ai/leaderboards/models"
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
 OUT_PATH = REPO / "data" / ".leaderboard-snapshots" / "_aa-rows.json"
@@ -58,12 +61,6 @@ AA_FIELD_MAP: dict[str, tuple[str, float]] = {
 # AA_FIELD_MAP are external benchmarks AA only *measures* (kept in _aa-rows.json
 # for impossible-value detection, NOT injected as synth sources). See gather-write.
 AA_COMPOSITE_KEYS = {"aaIdx", "aaCoding", "aaAgentic"}
-
-
-def _norm(s: str) -> str:
-    """Aggressive normalization for slug/name matching: lowercase, drop every
-    non-alphanumeric so 'Qwen3.6-Max', 'qwen3-6-max', 'Qwen 3.6 Max' collapse."""
-    return re.sub(r"[^a-z0-9]", "", (s or "").lower())
 
 
 def fetch(url: str, timeout: int = 40) -> str:

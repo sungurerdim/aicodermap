@@ -28,19 +28,20 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO / "scripts"))
+from lib.constants import AA_COMPOSITE_KEYS, AA_MEASURED_KEYS  # noqa: E402
+from lib.whitelist import bench_band as _band  # noqa: E402  (SSOT)
+
 AA_ROWS = REPO / "data" / ".leaderboard-snapshots" / "_aa-rows.json"
 
-AA_COMPOSITE = {"aaIdx", "aaCoding", "aaAgentic"}  # AA-definitional -> authoritative
-AA_MEASURED = {"gpqa", "hle", "tau2", "tbHard"}  # AA measures; advisory cross-check
+AA_COMPOSITE = (
+    AA_COMPOSITE_KEYS  # SSOT: lib.constants (AA-definitional → authoritative)
+)
+AA_MEASURED = (
+    AA_MEASURED_KEYS  # SSOT: lib.constants (AA measures; advisory cross-check)
+)
 COMPOSITE_TOL = 6.0  # pp disagreement that flags an AA-composite misfile
 MEASURED_TOL = 8.0  # pp disagreement that flags an AA-measured candidate
-
-
-def _band(schema: dict, key: str) -> tuple[float, float]:
-    ranges = schema.get("benchRanges") or {}
-    d = ranges.get("_default") or {"hardMin": 0, "hardMax": 100}
-    r = ranges.get(key) or d
-    return float(r.get("hardMin", 0)), float(r.get("hardMax", 100))
 
 
 def main() -> int:
@@ -49,7 +50,6 @@ def main() -> int:
         (REPO / "data" / "sources-whitelist.json").read_text(encoding="utf-8")
     )["_schema"]
     core = list(schema.get("coreBenchKeys") or [])
-    by_id = {m["id"]: m for m in models}
 
     aa_obs: dict[tuple[str, str], float] = {}
     if AA_ROWS.is_file():

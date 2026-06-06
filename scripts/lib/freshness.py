@@ -39,8 +39,9 @@ from datetime import date, datetime
 from typing import Any
 
 # Default freshness window. Configurable via _schema.contracts.FRESHNESS_TTL_DAYS.
-DEFAULT_FRESHNESS_TTL_DAYS = 7
-DEFAULT_MIN_VERIFICATIONS = 3
+# SSOT: lib.constants (were independent literals before 2026-06-06).
+from .constants import FRESHNESS_TTL_DAYS as DEFAULT_FRESHNESS_TTL_DAYS
+from .constants import MIN_VERIFICATIONS_FOR_SKIP as DEFAULT_MIN_VERIFICATIONS
 
 
 def _parse_iso_date(s: Any) -> date | None:

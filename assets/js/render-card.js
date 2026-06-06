@@ -275,7 +275,12 @@ function unslothListBlock(model, compat) {
   if (!Array.isArray(model.unslothVariants) || !model.unslothVariants.length) return null;
   const list = el('ul', { class: 'unsloth-list' });
   for (const v of model.unslothVariants) {
-    const li = el('li', null, `${v.name} · ${v.size} · ~${v.vram} GB`);
+    // Omit null/missing size & vram (extraction gap) instead of rendering the
+    // literal "null" — show only the parts we actually have.
+    const parts = [v.name];
+    if (v.size != null) parts.push(String(v.size));
+    if (Number.isFinite(v.vram)) parts.push(`~${v.vram} GB`);
+    const li = el('li', null, parts.join(' · '));
     if (compat.variant && compat.variant.name === v.name) li.classList.add('recommended');
     list.appendChild(li);
   }

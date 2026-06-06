@@ -38,6 +38,7 @@ from lib.whitelist import (  # noqa: E402
     bench_universe,
     core_bench_keys,
     deprecated_bench_keys,
+    emerging_bench_keys,
     leaderboard_index_by_bench,
     load_whitelist,
 )
@@ -146,7 +147,7 @@ def main() -> int:
     # AC7 — all advertised keys (any publisher, live or not) ⊆ core ∪ emerging ∪ deprecated.
     # FAZ 5.C (2026-05-10): emergingBenchKeys are valid universe members,
     # just excluded from the main coverage formula.
-    emerging = set((wl.get("_schema") or {}).get("emergingBenchKeys") or [])
+    emerging = set(emerging_bench_keys(wl))  # SSOT accessor
     advertised = set(by_bench.keys())
     rogue = sorted(advertised - (core | emerging | deprecated))
     if rogue:

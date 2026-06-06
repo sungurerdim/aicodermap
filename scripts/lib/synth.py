@@ -31,10 +31,12 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-TIER_WEIGHTS = {"I": 1.0, "S": 0.7, "C": 0.4, "U": 0.1}
-DEFAULT_AGREEMENT_PP = 1.5
-DEFAULT_WARN_PP = 3.0
-DEFAULT_BLOCK_PP = 5.0
+# SSOT: tier weights live in lib.tiers; pp thresholds in lib.constants (were
+# parallel literals here before 2026-06-06).
+from .constants import CONTRADICTION_BLOCK_PP as DEFAULT_BLOCK_PP
+from .constants import CONTRADICTION_WARN_PP as DEFAULT_WARN_PP
+from .constants import VERIFICATION_AGREEMENT_PP as DEFAULT_AGREEMENT_PP
+from .tiers import TIER_WEIGHT as TIER_WEIGHTS
 
 
 def _parse_date(s: Any) -> datetime.date | None:

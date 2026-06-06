@@ -41,10 +41,12 @@ from __future__ import annotations
 from typing import Any
 
 # Conservative empirical defaults — see docstring.
-AGENT_BUDGET_BUFFER = 50
+# SSOT: AGENT_BUDGET_BUFFER + MAX_PARALLEL live in lib.constants (were independent
+# literals here before 2026-06-06, free to silently diverge from the planner).
+from .constants import AGENT_BUDGET_BUFFER, MAX_PARALLEL  # noqa: E402
+
 CELLS_PER_TOOL_CALL = 3
 MAX_BATCH_CELLS = AGENT_BUDGET_BUFFER * CELLS_PER_TOOL_CALL  # 150
-MAX_PARALLEL = 10  # bumped 5→10 (FAZ 1.2, 2026-05-07): halve wave count
 # B2 (2026-05-31): 8→6. The 2026-05-30 cycle left ~191 cells never reached, the
 # worst in the 8-model batches (8×17=136 cells vs a 50-tool-call budget — the
 # CELLS_PER_TOOL_CALL=3 throughput assumption proved optimistic). 6 models ×17 =

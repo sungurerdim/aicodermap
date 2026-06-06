@@ -25,17 +25,17 @@ from datetime import date
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO / "scripts"))
+from lib.constants import AA_COMPOSITE_KEYS, AA_MEASURED_KEYS  # noqa: E402
+
 AA_ROWS = REPO / "data" / ".leaderboard-snapshots" / "_aa-rows.json"
 MODELS = REPO / "data" / "models.json"
 SOURCES = REPO / "data" / "sources.json"
 AA_URL = "https://artificialanalysis.ai/leaderboards/models"
-AA_COMPOSITE = {"aaIdx", "aaCoding", "aaAgentic"}  # AA-definitional -> always adopt AA
-AA_MEASURED = {
-    "gpqa",
-    "hle",
-    "tau2",
-    "tbHard",
-}  # external; adopt AA only if current impossible
+AA_COMPOSITE = AA_COMPOSITE_KEYS  # SSOT: lib.constants (AA-definitional → adopt AA)
+AA_MEASURED = (
+    AA_MEASURED_KEYS  # SSOT: lib.constants (external → adopt only if impossible)
+)
 MISFILE_TOL = (
     2.0  # composite Δ at-or-below this is precision, not a misfile → leave existing
 )
@@ -150,7 +150,7 @@ def main() -> int:
         SOURCES.write_text(
             json.dumps(sources, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
-        print(f"  wrote models.json + sources.json (.bak rotated)")
+        print("  wrote models.json + sources.json (.bak rotated)")
     else:
         print("  (report-only; pass --apply to write)")
     return 0

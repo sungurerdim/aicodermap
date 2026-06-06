@@ -48,13 +48,16 @@ from datetime import date
 from pathlib import Path
 
 PROJECT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT / "scripts"))
+from lib.constants import (  # noqa: E402
+    MIN_VERIFICATIONS_FOR_SKIP as VERIFICATION_AGREEMENT_THRESHOLD,
+)
+from lib.constants import VERIFICATION_AGREEMENT_PP  # noqa: E402  (SSOT)
+from lib.whitelist import all_bench_keys, load_whitelist  # noqa: E402
+
 ARTIFACT = PROJECT / ".aicodermap-agent-out.json"
 MAP_PATH = PROJECT / ".aicodermap-verification-map.json"
 
-VERIFICATION_AGREEMENT_THRESHOLD = (
-    3  # number of agreeing sources before audit-only `confirmed=true`
-)
-VERIFICATION_AGREEMENT_PP = 1.5
 TODAY = date.today().isoformat()
 
 
@@ -179,19 +182,14 @@ def read_map():
 
 
 def _load_bench_key_universe():
-    """Bench-key universe = whitelist._schema.coreBenchKeys ∪ every
-    leaderboard's publishes[] entry. Mirrors merge.py."""
-    wl_path = PROJECT / "data" / "sources-whitelist.json"
-    if not wl_path.exists():
-        return set()
+    """Bench-value universe = all_bench_keys (core ∪ emerging SSOT) ∪ every
+    leaderboard's publishes[] entry. Was a hand-rolled copy that diverged from
+    merge.py by omitting emergingBenchKeys (mcpA/sweMulti) — fixed 2026-06-06."""
     try:
-        wl = json.loads(wl_path.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
+        wl = load_whitelist()
+    except (json.JSONDecodeError, OSError, FileNotFoundError):
         return set()
-    universe = set()
-    schema = wl.get("_schema") or {}
-    for k in schema.get("coreBenchKeys", []) or []:
-        universe.add(k)
+    universe = set(all_bench_keys(wl))
     for lb in wl.get("leaderboards", []) or []:
         for k in lb.get("publishes", []) or []:
             universe.add(k)

@@ -31,14 +31,18 @@ from __future__ import annotations
 import functools
 import json
 import statistics
+import sys
 from pathlib import Path
 from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent.parent
-MIN_SOURCES = 2
+sys.path.insert(0, str(ROOT / "scripts"))
+from lib.constants import ELO_BENCH_KEYS, MIN_SOURCES_PER_FILLED_CELL  # noqa: E402
+
+MIN_SOURCES = MIN_SOURCES_PER_FILLED_CELL  # SSOT: lib.constants
 K_MAD = 4.0  # robust-outlier threshold (modified z ~ 0.6745*|x-med|/MAD)
 MIN_PEERS = 4  # need this many same-tier peers to call a peer-outlier
-ELO_FAMILY = {"cfElo", "lmArenaElo", "webDevElo"}
+ELO_FAMILY = ELO_BENCH_KEYS  # SSOT: lib.constants
 
 
 @functools.lru_cache(maxsize=8192)

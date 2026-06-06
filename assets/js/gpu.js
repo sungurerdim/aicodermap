@@ -9,7 +9,13 @@ const RAM_OFFLOAD_FACTOR = 2;
 const MIN_OFFLOAD_LIMIT_GB = 8;
 
 export function gpuCompat(model, vram) {
-  const hasUnsloth = Array.isArray(model.unslothVariants) && model.unslothVariants.length > 0;
+  // Only variants with a real numeric vram are usable for fit math. A variant
+  // whose vram is null/missing (extraction gap) must NOT participate: in JS
+  // `null <= 16` is true (null→0), so an unfiltered null-vram variant would
+  // falsely "fit" any GPU and render "Fits (null GB · <quant>)".
+  const variants = (Array.isArray(model.unslothVariants) ? model.unslothVariants : [])
+    .filter(v => Number.isFinite(v.vram));
+  const hasUnsloth = variants.length > 0;
   const hasVramReq = Number.isFinite(model.vramRequirement);
 
   if (model.tier !== 'ollama-local' && !hasVramReq && !hasUnsloth) {
@@ -23,7 +29,7 @@ export function gpuCompat(model, vram) {
 
   let bestVariant = null;
   if (hasUnsloth) {
-    const sorted = [...model.unslothVariants].sort((a, b) => b.vram - a.vram);
+    const sorted = [...variants].sort((a, b) => b.vram - a.vram);
     bestVariant = sorted.find(v => v.vram <= vram) || null;
   }
 
@@ -45,7 +51,7 @@ export function gpuCompat(model, vram) {
   }
 
   if (hasUnsloth) {
-    const smallest = [...model.unslothVariants].sort((a, b) => a.vram - b.vram)[0];
+    const smallest = [...variants].sort((a, b) => a.vram - b.vram)[0];
     const offload = smallest.vram - vram;
     if (offload <= offloadLimit) {
       return {

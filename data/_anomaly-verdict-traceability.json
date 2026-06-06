@@ -1,7 +1,14 @@
 {
   "checked": 12,
-  "rejected": [],
+  "rejected": [
+    {
+      "cell": "deepseek-v4-flash.cfElo",
+      "action": "confirm",
+      "value": 3052.0,
+      "reason": "outside-band[cfElo:0-100]"
+    }
+  ],
   "warnings": [],
-  "ok": true,
-  "filtered": false
+  "ok": false,
+  "filtered": true
 }

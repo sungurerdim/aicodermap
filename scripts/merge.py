@@ -49,9 +49,14 @@ from lib.matrix import gap_cells_from_artifact as _matrix_gaps  # noqa: E402
 from lib.matrix import na_cells as _matrix_na  # noqa: E402
 from lib.matrix import total_universe as _matrix_universe  # noqa: E402
 from lib.matrix import verify_matrix_invariant as _matrix_verify  # noqa: E402
+from lib.whitelist import ALL_WHITELIST_CATEGORIES  # noqa: E402
+from lib.whitelist import all_bench_keys as _wl_all_bench_keys  # noqa: E402
 from lib.whitelist import contracts as _wl_contracts  # noqa: E402
 from lib.whitelist import core_bench_keys as _wl_core_bench_keys  # noqa: E402
 from lib.whitelist import load_whitelist as _wl_load  # noqa: E402
+from lib.constants import VERIFICATION_AGREEMENT_PP as _AGREEMENT_PP  # noqa: E402
+from lib.tiers import TIER_RANK as _TIER_RANK  # noqa: E402
+from lib.tiers import TIER_WEIGHT as _TIER_WEIGHT  # noqa: E402
 from lib.util import canonical_display_name as _canonical_name  # noqa: E402
 from lib.telemetry import build_meta as _telemetry_build_meta  # noqa: E402
 from lib.telemetry import (  # noqa: E402
@@ -418,7 +423,7 @@ def build_whitelist_index():
         logging.warning("build_whitelist_index: loaded empty (%s)", exc)
         return {}
     idx = {}
-    for cat in ("leaderboards", "aggregators", "community", "local", "registries"):
+    for cat in ALL_WHITELIST_CATEGORIES:
         for e in wl.get(cat, []) or []:
             url = e.get("url")
             if not url:
@@ -536,12 +541,8 @@ def _load_bench_key_universe():
             wl = json.load(fp)
     except (FileNotFoundError, json.JSONDecodeError):
         return set()
-    universe = set()
-    schema = wl.get("_schema") or {}
-    for k in schema.get("coreBenchKeys", []) or []:
-        universe.add(k)
-    for k in schema.get("emergingBenchKeys", []) or []:
-        universe.add(k)
+    # core ∪ emerging via the SSOT accessor, then any extra leaderboard publishes[].
+    universe = set(_wl_all_bench_keys(wl))
     for lb in wl.get("leaderboards", []) or []:
         for k in lb.get("publishes", []) or []:
             universe.add(k)
@@ -813,7 +814,7 @@ def main():
     sys.path.insert(0, f"{PROJECT}/scripts")
     from lib.synth import _cluster_observations  # noqa: E402
 
-    AGREEMENT_PP = 1.5
+    AGREEMENT_PP = _AGREEMENT_PP  # SSOT: lib.constants
     MIN_DISTINCT_SAFE = 3
     MIN_DISTINCT_PAIRED = 2
     MIN_SUM_TRUST_PAIRED = 1.5
@@ -825,7 +826,7 @@ def main():
         cluster than `fallback` is part of, return cluster's winner.
         Otherwise return fallback unchanged."""
         obs = []
-        tier_w = {"I": 1.0, "S": 0.7, "C": 0.4, "U": 0.1}
+        tier_w = _TIER_WEIGHT  # SSOT: lib.tiers
         for c_ in candidates_list:
             if c_.get("value") is None:
                 continue
@@ -908,7 +909,7 @@ def main():
                 )
                 continue
             # Provisional fallback if cluster doesn't override.
-            tier_rank = {"I": 3, "S": 2, "C": 1, "U": 0}
+            tier_rank = _TIER_RANK  # SSOT: lib.tiers
             winner = max(
                 healthy_candidates,
                 key=lambda x: (

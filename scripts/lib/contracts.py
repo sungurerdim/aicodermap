@@ -28,10 +28,11 @@ from typing import Any
 PROJECT = Path(__file__).resolve().parents[2]
 WHITELIST_PATH = PROJECT / "data" / "sources-whitelist.json"
 
-# Hard-coded fallback defaults (mirror constants.py)
-_DEFAULT_WARN_PP: float = 3.0
-_DEFAULT_BLOCK_PP: float = 5.0
-_DEFAULT_AGREEMENT_PP: float = 1.5
+# Fallback defaults — SSOT is lib.constants (these were parallel literals before
+# 2026-06-06, free to silently diverge from the canonical values).
+from .constants import CONTRADICTION_BLOCK_PP as _DEFAULT_BLOCK_PP
+from .constants import CONTRADICTION_WARN_PP as _DEFAULT_WARN_PP
+from .constants import VERIFICATION_AGREEMENT_PP as _DEFAULT_AGREEMENT_PP
 
 # Built-in bench-type defaults applied when whitelist entry missing.
 # Keys: canonical bench key → (scale, warnDelta, blockDelta)

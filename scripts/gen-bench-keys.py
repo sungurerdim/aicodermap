@@ -24,6 +24,9 @@ import sys
 from pathlib import Path
 
 PROJECT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT / "scripts"))
+from lib.util import slug_norm as _norm  # noqa: E402  (SSOT)
+
 WHITELIST = PROJECT / "data" / "sources-whitelist.json"
 CORE_JS = PROJECT / "assets" / "js" / "core.js"
 
@@ -154,10 +157,6 @@ def _flatten_alt(a: str) -> str:
     a = a.replace("v?", "").replace("?", "")
     a = re.sub(r"[\\(){}:*+]", "", a)
     return a
-
-
-def _norm(s: str) -> str:
-    return re.sub(r"[^a-z0-9]", "", s.lower())
 
 
 def check_regex_drift() -> int:

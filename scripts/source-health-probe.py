@@ -34,6 +34,9 @@ from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 PROJECT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT / "scripts"))
+from lib.util import utc_now_iso as _utc_now_iso  # noqa: E402  (SSOT)
+
 WHITELIST = PROJECT / "data" / "sources-whitelist.json"
 REPORT = PROJECT / "data" / "_runtime-health-report.json"
 
@@ -51,10 +54,6 @@ ALL_CATEGORIES = (
 )
 # Static formats that should still server-render rows; drift to SPA/bot is bad.
 STATIC_FORMATS = {"static_html_table", "static_html_article"}
-
-
-def _utc_now_iso() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _today() -> str:

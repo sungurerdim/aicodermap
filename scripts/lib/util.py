@@ -12,9 +12,24 @@ from __future__ import annotations
 import json
 import re
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
+
+
+def utc_now_iso() -> str:
+    """Current UTC instant as `YYYY-MM-DDTHH:MM:SSZ`. SSOT — was duplicated as
+    _utc_now_iso() in prefetch-leaderboards.py + source-health-probe.py."""
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def slug_norm(s: str) -> str:
+    """Aggressive slug/name normalization for fuzzy matching: lowercase + drop
+    every non-alphanumeric so 'Qwen3.6-Max', 'qwen3-6-max', 'Qwen 3.6 Max'
+    collapse to the same key. SSOT — was duplicated as _norm() in
+    extract-aa-rsc.py + gen-bench-keys.py."""
+    return re.sub(r"[^a-z0-9]", "", (s or "").lower())
 
 
 def normalize_url(url: str) -> str:

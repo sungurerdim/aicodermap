@@ -49,15 +49,16 @@ from lib.synth import (  # noqa: E402  - runtime path
 # qualifying I-tier cluster override the raw sum_trust ordering. Without these,
 # reconcile could overwrite a value the canonical engine would have kept.
 from lib.winner import _i_tier_cluster, filter_pseudo_sources  # noqa: E402
+from lib.tiers import tier_weight as _tier_weight  # noqa: E402  (SSOT)
 
 SOURCES_PATH = ROOT / "data" / "sources.json"
 MODELS_PATH = ROOT / "data" / "models.json"
 WHITELIST_PATH = ROOT / "data" / "sources-whitelist.json"
 
-# These thresholds are the same the runtime synth path uses, but we read
-# them from the whitelist contracts block so the SSOT can re-tune both
-# layers without touching code.
-DEFAULT_AGREEMENT_PP = 1.5
+# These thresholds are the same the runtime synth path uses, read from the
+# whitelist contracts block at runtime; the static fallback is the lib.constants
+# SSOT (was a parallel 1.5 literal before 2026-06-06).
+from lib.constants import VERIFICATION_AGREEMENT_PP as DEFAULT_AGREEMENT_PP  # noqa: E402
 
 
 def _load_whitelist() -> dict[str, Any]:
@@ -89,9 +90,7 @@ def _entry_to_obs(e: dict[str, Any]) -> dict[str, Any] | None:
         # Fallback: synthesise from tier + verifications. Very approximate
         # but keeps legacy entries (no trustScore stored) in the cluster
         # math instead of dropping them silently.
-        tier_w = {"I": 1.0, "S": 0.7, "C": 0.4, "U": 0.1}.get(
-            (e.get("tier") or "C").upper(), 0.4
-        )
+        tier_w = _tier_weight(e.get("tier") or "C")  # SSOT: lib.tiers
         verifs = max(1, min(int(e.get("verifications") or 1), 3))
         ts = round(tier_w * (verifs / 3), 3)
     return {

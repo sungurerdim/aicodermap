@@ -60,12 +60,7 @@ def _to_float(v):
         return None
 
 
-def _band(schema_block: dict, key: str) -> tuple[float, float]:
-    """Hard plausibility band [hardMin, hardMax] for a bench key (SSOT: benchRanges)."""
-    ranges = schema_block.get("benchRanges") or {}
-    default = ranges.get("_default") or {"hardMin": 0, "hardMax": 100}
-    r = ranges.get(key) or default
-    return float(r.get("hardMin", 0)), float(r.get("hardMax", 100))
+from lib.whitelist import bench_band as _band  # noqa: E402  (SSOT)
 
 
 def _gather_observations() -> dict[tuple[str, str], list[float]]:
