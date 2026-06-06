@@ -46,7 +46,6 @@ from lib.matrix import active_models as _matrix_active  # noqa: E402
 from lib.matrix import expected_total as _matrix_expected_total  # noqa: E402
 from lib.matrix import filled_cells_from_models as _matrix_filled  # noqa: E402
 from lib.matrix import gap_cells_from_artifact as _matrix_gaps  # noqa: E402
-from lib.matrix import na_cells as _matrix_na  # noqa: E402
 from lib.matrix import total_universe as _matrix_universe  # noqa: E402
 from lib.matrix import verify_matrix_invariant as _matrix_verify  # noqa: E402
 from lib.whitelist import ALL_WHITELIST_CATEGORIES  # noqa: E402
@@ -679,7 +678,8 @@ def append_source(sources, key, entry):
 
 def _verify_matrix_invariant(models, artifact):
     """MX1 — every (active_modelId, coreBenchKey) cell ends up in exactly one
-    of FILLED | GAP | NOT_APPLICABLE. Silent omission is a contract violation.
+    of FILLED | GAP (N/A retired 2026-05-25). Silent omission is a contract
+    violation.
 
     Returns (ok: bool, diagnostic: dict).
     On failure the orchestrator rolls models.json + sources.json back to .bak
@@ -691,8 +691,7 @@ def _verify_matrix_invariant(models, artifact):
     universe = _matrix_universe(active, core)
     filled = _matrix_filled(active, core)
     gaps = _matrix_gaps(artifact, core)
-    na = _matrix_na(active, core)
-    diag = _matrix_verify(filled, gaps, na, universe)
+    diag = _matrix_verify(filled, gaps, universe)
     diag["expectedTotal"] = _matrix_expected_total(active, core)
     diag["coreBenchKeys"] = list(core)
     diag["activeModelCount"] = len(active)
@@ -1144,7 +1143,7 @@ def main():
         print("✗ MERGE ABORTED — MX1 matrix invariant violated", file=sys.stderr)
         print("=" * 72, file=sys.stderr)
         print(
-            "  filled+gaps+notApplicable does NOT cover the (active × core_bench) "
+            "  filled+gaps does NOT cover the (active × core_bench) "
             "universe. Silent omission is a contract violation.",
             file=sys.stderr,
         )
@@ -1152,7 +1151,6 @@ def main():
             f"  totalCells={mx_diag.get('totalCells')} "
             f"filled={mx_diag.get('filled')} "
             f"gaps={mx_diag.get('gaps')} "
-            f"notApplicable={mx_diag.get('notApplicable')} "
             f"missing={len(mx_diag.get('missing') or [])}",
             file=sys.stderr,
         )
@@ -1163,9 +1161,8 @@ def main():
         if rolled:
             print(f"  rolled back {len(rolled)} file(s) from .bak", file=sys.stderr)
         print(
-            "  fix the artifact: every missing cell must land in models[].bench, "
-            "gaps[] (with triedSources/triedQueries/triedFormats), or "
-            "models[].notApplicableBenchKeys.",
+            "  fix the artifact: every missing cell must land in models[].bench "
+            "or gaps[] (with triedSources/triedQueries/triedFormats).",
             file=sys.stderr,
         )
         print("=" * 72, file=sys.stderr)

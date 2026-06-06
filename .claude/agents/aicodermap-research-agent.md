@@ -474,8 +474,8 @@ The agent MUST:
    table that intersects your slice — not just the priority cells. One
    Read should yield N×M cells across N models × M benches.
 4. Compare the agent's eventual `coverageMatrix.filledCells +
-   gapsRecorded + notApplicableCells` against `len(target_model_ids) ×
-   len(coreBenchKeys) - |notApplicable|`. If less, the cycle is partial
+   gapsRecorded` against `len(target_model_ids) ×
+   len(coreBenchKeys)`. If less, the cycle is partial
    in the FAZ-1.3 wallclock sense — go back through Phase 3 cascade for
    residual cells before emitting. Unreached cells re-surface in the
    next cycle's priority queue.
@@ -1034,12 +1034,11 @@ Three shapes, never mixed:
     "filledCells": <number>,                   // cells with non-null value in this cycle
     "filledThisCycle": <number>,               // cells the agent actually populated/refreshed
     "gapsRecorded": <number>,                  // |gaps[]| where key matches "<modelId>.<benchKey>"
-    "notApplicableCells": <number>,            // cells covered by notApplicableRules
     "byBench": {
       "<benchKey>": { "filled": <int>, "total": <int> }
     },
     "byModel": {
-      "<modelId>": { "filled": <int>, "total": <int>, "gaps": <int>, "na": <int> }
+      "<modelId>": { "filled": <int>, "total": <int>, "gaps": <int> }
     }
   },
 
@@ -1066,8 +1065,8 @@ Three shapes, never mixed:
 ```
 
 **coverageMatrix audit invariant (HARD)**:
-`filledCells + gapsRecorded + notApplicableCells == totalCells`.
-Any cell that is null AND missing from both `gaps[]` and `notApplicable[]` is
+`filledCells + gapsRecorded == totalCells`.
+Any cell that is null AND missing from `gaps[]` is
 a contract violation — silent omission is forbidden. The orchestrator
 (`scripts/merge.py` MX1 gate) blocks the merge + rolls files back to .bak
 on violation.
@@ -1168,15 +1167,14 @@ artifact.coverageMatrix = {
     filledCells:        |filled_this_cycle|,
     filledThisCycle:    |filled_this_cycle|,
     gapsRecorded:       |explicit_gap_cells| + |attempted_but_missed|,
-    notApplicableCells: |na_cells|,
 }
-artifact.partialReturn = (filledCells + gapsRecorded + notApplicableCells < totalCells)
+artifact.partialReturn = (filledCells + gapsRecorded < totalCells)
 ```
 
 Rules:
 - `coverageMatrix` is required; byBench/byModel sub-objects optional.
 - `gaps[]` carries ONLY actively-attempted cells. NEVER enumerate unfilled cells.
-- N/A cells cite a rule from `_schema.notApplicableRules.rules[]`.
+- N/A retired 2026-05-25: every cell is FILLED or GAP (an unmeasured cell is a gap, re-researched each cycle).
 - Zero loop-back through Phase 3. Emit partial, exit.
 
 ## OUTPUT_DELIVERY

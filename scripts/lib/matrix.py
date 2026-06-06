@@ -1,8 +1,9 @@
 """Matrix invariant + universe helpers.
 
 Cell-level invariant per refresh cycle: every (active_modelId, coreBenchKey)
-must end up in exactly one of FILLED | GAP | NOT_APPLICABLE. Silent omission
-is a contract violation that merge.py blocks via .bak rollback.
+must end up in exactly one of FILLED | GAP (N/A retired 2026-05-25 — an
+unmeasured cell becomes a gap and is re-researched every cycle). Silent
+omission is a contract violation that merge.py blocks via .bak rollback.
 
 Stdlib-only.
 """
@@ -21,18 +22,6 @@ def total_universe(
 ) -> set[tuple[str, str]]:
     keys = list(core_keys)
     return {(m["id"], k) for m in active for k in keys}
-
-
-def na_cells(
-    active: Iterable[dict[str, Any]], core_keys: Iterable[str]
-) -> set[tuple[str, str]]:
-    """RETIRED 2026-05-25: the N/A permanent-skip is gone. Every (model, bench)
-    cell is now FILLED or GAP — an unmeasured cell becomes a gap and is
-    re-researched every cycle (freshness-skip is the only skip). Returns the
-    empty set so every consumer (expected_total / priority_cells /
-    matrix_snapshot / verify_matrix_invariant) treats N/A as permanently empty
-    without signature churn. `notApplicableBenchKeys` is no longer read."""
-    return set()
 
 
 def filled_cells_from_models(
@@ -76,7 +65,7 @@ def gap_cells_from_artifact(
 
 
 def expected_total(active: Iterable[dict[str, Any]], core_keys: Iterable[str]) -> int:
-    """|active_models| × |core_bench_keys|. N/A retired (see na_cells), so the
+    """|active_models| × |core_bench_keys|. N/A retired 2026-05-25, so the
     target is the full cell universe — every cell is FILLED or GAP."""
     return len(list(active)) * len(list(core_keys))
 
@@ -118,7 +107,6 @@ def priority_cells(
 
     today = _dt.date.today()
     keys = list(core_keys)
-    na = na_cells(active, keys)
     bench_filled = {k: 0 for k in keys}
     model_filled = {m["id"]: 0 for m in active}
     for m in active:
@@ -142,8 +130,6 @@ def priority_cells(
     n_models = max(len(active), 1)
     for m in active:
         for k in keys:
-            if (m["id"], k) in na:
-                continue
             v = (m.get("bench") or {}).get(k)
             if v is not None:
                 continue
@@ -185,7 +171,6 @@ def matrix_snapshot(
 ) -> dict[str, Any]:
     """Pre-agent snapshot: counts + per-bench / per-model fill, plus expected total."""
     keys = list(core_keys)
-    na = na_cells(active, keys)
     filled = filled_cells_from_models(active, keys)
     by_bench: dict[str, dict[str, int]] = {}
     by_model: dict[str, dict[str, int]] = {}
@@ -193,19 +178,16 @@ def matrix_snapshot(
         mid = m["id"]
         bench = m.get("bench") or {}
         m_filled = sum(1 for k in keys if bench.get(k) is not None)
-        m_na = sum(1 for k in keys if (mid, k) in na)
-        by_model[mid] = {"filled": m_filled, "na": m_na, "total": len(keys)}
+        by_model[mid] = {"filled": m_filled, "total": len(keys)}
     for k in keys:
         k_filled = sum(1 for m in active if (m.get("bench") or {}).get(k) is not None)
-        k_na = sum(1 for m in active if (m["id"], k) in na)
-        by_bench[k] = {"filled": k_filled, "na": k_na, "total": len(active)}
+        by_bench[k] = {"filled": k_filled, "total": len(active)}
     return {
         "activeModels": len(active),
         "coreKeys": len(keys),
         "totalCells": len(active) * len(keys),
         "filledCells": len(filled),
-        "notApplicableCells": len(na),
-        "expectedTotal": len(active) * len(keys) - len(na),
+        "expectedTotal": len(active) * len(keys),
         "fillRatio": round(len(filled) / max(len(active) * len(keys), 1), 3),
         "byBench": by_bench,
         "byModel": by_model,
@@ -215,28 +197,23 @@ def matrix_snapshot(
 def verify_matrix_invariant(
     filled: set[tuple[str, str]],
     gaps: set[tuple[str, str]],
-    na: set[tuple[str, str]],
     universe: set[tuple[str, str]],
 ) -> dict[str, Any]:
-    """Compute filled/gap/na coverage of the universe and surface missing cells."""
-    accounted = filled | gaps | na
+    """Compute filled/gap coverage of the universe and surface missing cells.
+
+    Every (active_modelId, coreBenchKey) cell must end up in exactly one of
+    FILLED | GAP (N/A retired 2026-05-25). Silent omission or a filled∩gap
+    overlap is a contract violation merge.py blocks via .bak rollback."""
+    accounted = filled | gaps
     missing = universe - accounted
     overlap_filled_gap = filled & gaps
-    overlap_filled_na = filled & na
-    overlap_gap_na = gaps & na
     return {
-        "ok": (not missing)
-        and (not overlap_filled_gap)
-        and (not overlap_filled_na)
-        and (not overlap_gap_na),
+        "ok": (not missing) and (not overlap_filled_gap),
         "totalCells": len(universe),
         "filled": len(filled),
         "gaps": len(gaps),
-        "notApplicable": len(na),
         "missing": sorted(missing),
         "overlap": {
             "filled_gap": sorted(overlap_filled_gap),
-            "filled_na": sorted(overlap_filled_na),
-            "gap_na": sorted(overlap_gap_na),
         },
     }

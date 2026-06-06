@@ -126,7 +126,6 @@ def slim_matrix_state(
         "coreKeys": matrix_state.get("coreKeys"),
         "expectedTotal": matrix_state.get("expectedTotal"),
         "filledCells": matrix_state.get("filledCells"),
-        "notApplicableCells": matrix_state.get("notApplicableCells"),
         "fillRatio": matrix_state.get("fillRatio"),
         "byBench": matrix_state.get("byBench") or {},
         "byModel": {mid: by_model.get(mid, {}) for mid in mids},

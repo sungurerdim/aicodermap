@@ -244,10 +244,10 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
      // Shape: {
      //   activeModels: <int>, coreKeys: <int>,
      //   totalCells: <int>, filledCells: <int>,
-     //   notApplicableCells: <int>, expectedTotal: <int>,
+     //   expectedTotal: <int>,
      //   fillRatio: <float 0..1>,
-     //   byBench: { <key>: {filled, na, total} },
-     //   byModel: { <id>:  {filled, na, total} }
+     //   byBench: { <key>: {filled, total} },
+     //   byModel: { <id>:  {filled, total} }
      // }
      priorityCells: <priority_cells(active_models, coreBenchKeys, limit=200, verification_map=vm, skip_confirmed_within_days=contracts.FRESHNESS_TTL_DAYS)>,
      // FAZ 4.A (2026-05-08): ORDERING (advisory), NOT scope.
@@ -632,11 +632,11 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
     ```
     pre_snapshot := {
        totals: { models: |active|, coreKeys: |coreBenchKeys| },
-       perModel: { id: { filled: <int>, na: <int>, gapKeys: [] } for id in active }
+       perModel: { id: { filled: <int>, gapKeys: [] } for id in active }
     }
     ```
     Skill computes via scripts/lib/matrix.py helpers (active_models +
-    filled_cells_from_models + na_cells). `pre_snapshot` is held in skill
+    filled_cells_from_models). `pre_snapshot` is held in skill
     memory only; never written to disk.
 
 5b. GAP_GEN SUPPLEMENT (mandatory — runs ALWAYS after agent return, not just on failure):
