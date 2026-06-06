@@ -180,6 +180,40 @@ def main() -> int:
             print(f"  skip (superseded by '{sup}'): {mid}")
             continue
 
+        # EVIDENCE GATE (2026-06-06). Auto-stub only adds a model to the PUBLIC
+        # dataset when it is verifiably real + generally available. A lone
+        # low-confidence gather hint (single agent saw a blog mention) or an
+        # explicitly restricted/not-GA model is held out as a lineup hint for
+        # next-cycle ≥2-source verification — never auto-published. This stops
+        # speculative/rumored entries (e.g. a blog-timeline "preview" model) from
+        # polluting the model list. The high-confidence newReleaseProbe path
+        # (vendor docs/lineup pages) is unaffected.
+        conf = str(nm.get("evidenceConfidence") or "").lower()
+        notes = str(nm.get("notes") or "").lower()
+        restricted = any(
+            t in notes
+            for t in (
+                "restricted",
+                "not generally available",
+                "not generally-available",
+                "human review",
+                "waitlist",
+                "preview only",
+                "invite",
+            )
+        )
+        n_sources = len(nm.get("evidence") or nm.get("sources") or [])
+        verified = (conf in ("high", "medium") or n_sources >= 2) and not restricted
+        if not verified:
+            reason = (
+                "restricted/not-GA"
+                if restricted
+                else f"low-confidence:{conf or 'none'}"
+            )
+            skipped.append((mid, reason))
+            print(f"  skip (unverified — {reason}; held as lineup hint): {mid}")
+            continue
+
         meta = derive_meta(nm, ms, vendors)
         api = meta["api"]
         ins = [a["in"] for a in api if a.get("in") is not None]

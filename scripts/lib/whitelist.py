@@ -312,6 +312,14 @@ def banned_fetch_patterns(whitelist: dict[str, Any]) -> list[str]:
     return patterns
 
 
+# Frontend/merge-only `_schema` blocks — never read by the gather agent
+# (0-hit in agent.md, 2026-06-06). Pruned from per-batch ctx; the canonical
+# values still live in data/sources-whitelist.json for the frontend + merge.py.
+_SCHEMA_GATHER_DROP = frozenset(
+    {"presets", "composite", "vendorComposites", "perModelExpansion", "uncertainty"}
+)
+
+
 def filter_for_batch(
     whitelist: dict[str, Any],
     providers: set[str] | list[str],
@@ -359,6 +367,30 @@ def filter_for_batch(
         if k == "vendors":
             continue
         if k in ("community", "registries") and k not in keep_categories:
+            continue
+        if k == "_schema" and isinstance(v, dict):
+            # Gather agents never read the frontend/merge-only schema blocks
+            # (verified 0-hit in agent.md). Pruning them cuts ~12 KB/ctx with
+            # zero quality impact. Keep everything the agent DOES read:
+            # coreBenchKeys, benchAliases, formatTaxonomy, regexLibrary,
+            # newReleaseProbe, benchVerificationStrict, privacyFieldNormalize, …
+            out[k] = {sk: sv for sk, sv in v.items() if sk not in _SCHEMA_GATHER_DROP}
+            continue
+        if k == "_runtime" and isinstance(v, dict):
+            # The agent reads `_runtime.unhealthy` (skip list) + lowConfidenceUrls
+            # but WRITES its own runtime.healthChecks — the injected 142-domain
+            # healthChecks map (~22 KB) is pure orchestrator state, useless to the
+            # agent. Collapse to the fields it actually consults.
+            out[k] = {
+                sk: v[sk]
+                for sk in (
+                    "unhealthy",
+                    "lowConfidenceUrls",
+                    "lastFullCycle",
+                    "schemaVersion",
+                )
+                if sk in v
+            }
             continue
         out[k] = v
 

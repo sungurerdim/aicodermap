@@ -809,7 +809,15 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
      else
          rm -f data/models.json.preanomaly data/sources.json.preanomaly
      fi
-     python scripts/refresh-finalize.py --skip-gen-unified --skip-gap-gen   # re-merge + SSOT audit
+     # NO re-merge here (FIX 2026-06-06). apply-anomaly-verdicts already writes
+     # coherent data/{models,sources}.json directly (clear removes bench+sources,
+     # reclassify moves provenance) and the audit above is the SSOT gate. A
+     # refresh-finalize re-merge would re-read .aicodermap-agent-out.json and
+     # RE-FILL the cleared cells from the still-present artifact observations —
+     # undoing the clear AND tripping merge.py's MX1 (the cleared cell is neither
+     # a fill nor a gap in the live data). The clear/reclassify must be the FINAL
+     # post-merge mutation; the audit-data-coherence.py call above already proved
+     # coherence, so the cycle proceeds straight to git commit.
      ```
    - `single-source` anomalies are NOT auto-dispatched (too many; they are a
      coverage signal) — they stay in `idea_context.anomalies` for the next full
