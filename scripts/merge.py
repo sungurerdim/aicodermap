@@ -58,6 +58,7 @@ from lib.tiers import TIER_RANK as _TIER_RANK  # noqa: E402
 from lib.tiers import TIER_WEIGHT as _TIER_WEIGHT  # noqa: E402
 from lib.util import canonical_display_name as _canonical_name  # noqa: E402
 from lib.util import extract_domain as _extract_domain  # noqa: E402
+from lib.changelog import render_changelog_markdown as _render_changelog  # noqa: E402
 from lib.telemetry import build_meta as _telemetry_build_meta  # noqa: E402
 from lib.telemetry import (  # noqa: E402
     metadata_changelog_row as _telemetry_changelog_row,
@@ -1299,58 +1300,9 @@ def main():
     metadata_row = _telemetry_changelog_row(meta_row)
 
     cl_path = f"{PROJECT}/CHANGELOG.md"
-    cl_lines = [
-        f"\n## [{TODAY}] — autonomous refresh-all{coverage_warn}{partial_info}\n",
-        f"\n{metadata_row}\n",
-    ]
-    if log["added"]:
-        cl_lines.append("\n### Added\n")
-        for mid in log["added"]:
-            cl_lines.append(f"- `{mid}` — new model from vendor lineup discovery\n")
-    if log["updated"]:
-        cl_lines.append("\n### Updated\n")
-        cl_lines.append(
-            f"- {len(log['updated'])} models: {', '.join(f'`{x}`' for x in log['updated'])}\n"
-        )
-    if log["lineup_deprecated"]:
-        cl_lines.append("\n### Deprecated\n")
-        for mid in log["lineup_deprecated"]:
-            cl_lines.append(f"- `{mid}` — vendor-marked deprecated\n")
-    if log["lineup_renamed"]:
-        cl_lines.append("\n### Renamed\n")
-        for r in log["lineup_renamed"]:
-            cl_lines.append(f"- {r}\n")
-    if log["contradictions"]:
-        cl_lines.append("\n### Resolved (auto via trustScore)\n")
-        for c in log["contradictions"]:
-            cl_lines.append(f"- {c}\n")
-    if out.get("gaps"):
-        # FAZ 4.B (2026-05-08): split gaps by source ('agent' vs 'orchestrator').
-        # Agent gaps = "tried and failed"; orchestrator gaps = "didn't reach".
-        agent_gaps = [g for g in out["gaps"] if g.get("source") == "agent"]
-        orch_gaps = [g for g in out["gaps"] if g.get("source") == "orchestrator"]
-        # Legacy entries without source field default to 'agent'.
-        unknown_gaps = [
-            g for g in out["gaps"] if g.get("source") not in ("agent", "orchestrator")
-        ]
-        agent_gaps.extend(unknown_gaps)
-        cl_lines.append(
-            f"\n### Gaps ({len(out['gaps'])} entries — agent:{len(agent_gaps)} "
-            f"orchestrator:{len(orch_gaps)} — see data/known-gaps.json or next refresh)\n"
-        )
-        # Show agent gaps first (real research effort), then orchestrator stubs.
-        for g in agent_gaps[:6]:
-            cl_lines.append(f"- `{g.get('key')}` *(agent)*: {g.get('reason')}\n")
-        if orch_gaps:
-            for g in orch_gaps[:2]:
-                cl_lines.append(
-                    f"- `{g.get('key')}` *(orchestrator)*: {g.get('reason')}\n"
-                )
-        total_shown = min(6, len(agent_gaps)) + min(2, len(orch_gaps))
-        if len(out["gaps"]) > total_shown:
-            cl_lines.append(f"- ... and {len(out['gaps']) - total_shown} more\n")
-
-    cl_blob = "".join(cl_lines)
+    cl_blob = _render_changelog(
+        log, out, metadata_row, coverage_warn, partial_info, TODAY
+    )
     if os.path.exists(cl_path):
         with open(cl_path, encoding="utf-8") as fp:
             existing = fp.read()
