@@ -124,9 +124,7 @@ def synthesize(
     unhealthy_urls: set[str] | None = None,
     historical_pool: dict[tuple[str, str], list[dict[str, Any]]] | None = None,
 ) -> tuple[
-    dict[
-        str, dict[str, Any]
-    ],  # models_by_id: {modelId: {updates, sourcesAdded, notApplicable}}
+    dict[str, dict[str, Any]],  # models_by_id: {modelId: {updates, sourcesAdded}}
     list[dict[str, Any]],  # contradictions[]
     set[tuple[str, str]],  # filled_cells
 ]:
@@ -162,7 +160,6 @@ def synthesize(
         lambda: {
             "updates": {"bench": {}, "lastUpdated": today.isoformat()},
             "sourcesAdded": [],
-            "notApplicable": [],
         }
     )
     contradictions: list[dict[str, Any]] = []
