@@ -1,4 +1,11 @@
 
+## [2026-06-06] — composite scoring: Empirical-Bayes shrinkage (replaces √coverage penalty)
+
+### Changed (leaderboard ranking)
+- The leaderboard point score (`compositeScoreImputed` + `compositeUncertainty`) now uses **Empirical-Bayes shrinkage toward a conservative global-median baseline + a nonlinear low-confidence penalty**, replacing the blunt `raw × √coverage` haircut. A model's score is its own observed-cell mean shrunk toward the "average model" by a `priorWeight` pseudo-weight, then docked only once confidence (observed/active weight) drops below `confThreshold`. Missing benches are neither zeroed (the old penalty) nor scored as full marks — they pull toward *average-until-proven-otherwise*, with the pull inversely proportional to how much real data the model has.
+- **Why:** under `swe-focused`, `gpt-5-5` (which beats `deepseek-v4-pro` on every *measured* SWE bench — sweV 88.6 vs 80.6, swePro 58.5 vs 55.4, tb2 82.7 vs 67.9) was ranked *below* it purely because it is missing `sweMulti` + `cfElo` (OpenAI doesn't publish them) and the √coverage penalty buried it. EB now ranks `gpt-5-5` above `deepseek-v4-pro` on both `balanced` (#2 vs #13) and `swe-focused` (#4 vs #5) while sparse cherry-picks (e.g. `qwen3-7-plus`, 13% covered) stay mid-pack and carry a wide uncertainty band.
+- Tunable + reversible via `data/sources-whitelist.json _schema.composite.eb` (`enabled`, `priorWeight: 25`, `confThreshold: 0.65`, `sigmaPenaltyMax: 18`); `enabled:false` reverts to `raw × coverage^(1/exponent)`. `compositeScore` (cross-validation panel basis) is unchanged. Rank-band parity (`compositeUncertainty.score === effectiveScore`) verified exact; smoke test `6k` locks the behaviour.
+
 ## [2026-06-06] — autonomous refresh-all [WARN: cumulative provenance coverage 67.7% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 603 new fills; 5 cells auto-gapped by orchestrator; 396 explicit agent gaps preserved]
 
 [fillRatio:0.68 cells:840/1241 contradictions:295 fetch:0.0min tools:None batches:None build:a270e58]

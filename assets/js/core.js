@@ -233,6 +233,24 @@ export function getCompositePolicy() {
     maxImputedWeightShare: (cp && cp.imputation && Number.isFinite(cp.imputation.maxImputedWeightShare)) ? cp.imputation.maxImputedWeightShare : 0.30,
     imputedConfidenceFactor: (cp && cp.imputation && Number.isFinite(cp.imputation.imputedConfidenceFactor)) ? cp.imputation.imputedConfidenceFactor : 0.5,
     minCoverageDisplay: (cp && Number.isFinite(cp.minCoverageDisplay)) ? cp.minCoverageDisplay : 0.30,
+    // Empirical-Bayes shrinkage for the leaderboard point score (replaces the
+    // blunt raw×√coverage penalty in compositeScoreImputed/compositeUncertainty).
+    // A model's score is its own observed-cell mean shrunk toward a conservative
+    // global-median baseline by `priorWeight` pseudo-weight, then docked a
+    // nonlinear penalty only once confidence drops below `confThreshold`. Net:
+    // missing benches are neither zeroed (penalty) nor scored as full marks —
+    // they pull toward "average until proven otherwise", with the pull inversely
+    // proportional to how much real data the model has. enabled:false → callers
+    // fall back to raw×√coverage.
+    eb: (() => {
+      const e = (cp && cp.eb) || {};
+      return {
+        enabled: e.enabled !== false,
+        priorWeight: Number.isFinite(e.priorWeight) ? e.priorWeight : 25,
+        confThreshold: (Number.isFinite(e.confThreshold) && e.confThreshold > 0) ? e.confThreshold : 0.65,
+        sigmaPenaltyMax: Number.isFinite(e.sigmaPenaltyMax) ? e.sigmaPenaltyMax : 18,
+      };
+    })(),
     uncertainty: (() => {
       const u = (cp && cp.uncertainty) || {};
       return {

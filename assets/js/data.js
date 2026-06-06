@@ -685,6 +685,72 @@ export function impute(model, key, allModels) {
   return vals.reduce((a, b) => a + b, 0) / vals.length;
 }
 
+// ── Empirical-Bayes leaderboard scoring (2026-06-06) ────────────────────────
+// Replaces the blunt raw×√coverage penalty: a model's score is its observed-cell
+// mean shrunk toward a conservative global-median baseline by `priorWeight`
+// pseudo-weight, then docked a nonlinear penalty only once confidence drops
+// below `confThreshold`. Missing benches are neither zeroed (penalty) nor scored
+// as full marks — they pull toward "average until proven otherwise", with the
+// pull inversely proportional to how much real data the model has. This fixes
+// the case where a model dominating every measured bench ranked below a fully-
+// covered weaker model purely from a √coverage haircut on a couple of gaps.
+
+// Per-bench global median cache, keyed by the allModels array identity so it
+// recomputes only when the dataset changes, not on every weight/sort tweak.
+let _priorMedianCache = { token: null, byKey: new Map() };
+
+function globalBenchMedian(key, allModels) {
+  if (_priorMedianCache.token !== allModels) {
+    _priorMedianCache = { token: allModels, byKey: new Map() };
+  }
+  if (_priorMedianCache.byKey.has(key)) return _priorMedianCache.byKey.get(key);
+  const vals = [];
+  for (const m of (allModels || [])) {
+    if ((m.status || 'active') !== 'active') continue;
+    if (quarantinedBenches(m).has(key)) continue;
+    const raw = m.bench?.[key];
+    if (raw == null || !Number.isFinite(raw)) continue;
+    const s = normalizeBenchScore(key, raw);
+    if (s != null && Number.isFinite(s)) vals.push(s);
+  }
+  let med = null;
+  if (vals.length) {
+    vals.sort((a, b) => a - b);
+    const mid = Math.floor(vals.length / 2);
+    med = vals.length % 2 ? vals[mid] : (vals[mid - 1] + vals[mid]) / 2;
+  }
+  _priorMedianCache.byKey.set(key, med);
+  return med;
+}
+
+// Conservative prior = the weighted global-median profile under these weights
+// (tier-agnostic on purpose: a sparse model shrinks toward the "average model",
+// not the average elite, so cherry-picked sparse data cannot coast). Null when
+// no bench has data (caller then falls back to the model's own mean = no shrink).
+function globalPriorMean(weights, allModels) {
+  let aw = 0, ws = 0;
+  for (const k of BENCH_KEYS) {
+    const w = weights[k];
+    if (!w || isVendorComposite(k)) continue;
+    const med = globalBenchMedian(k, allModels);
+    if (med == null) continue;
+    aw += w; ws += w * med;
+  }
+  return aw ? ws / aw : null;
+}
+
+// EB shrinkage toward priorMean + nonlinear low-confidence penalty. The penalty
+// is ZERO while confidence ≥ confThreshold (a model missing a couple of benches
+// is unpenalized) and grows quadratically below it (genuinely sparse models are
+// pulled down). See getCompositePolicy().eb.
+function ebTransform(realMean, observedWeight, activeWeight, priorMean, ebCfg) {
+  const pm = (priorMean != null && Number.isFinite(priorMean)) ? priorMean : realMean;
+  const eb = (observedWeight * realMean + ebCfg.priorWeight * pm) / (observedWeight + ebCfg.priorWeight);
+  const confidence = activeWeight > 0 ? observedWeight / activeWeight : 0;
+  const deficit = Math.max(0, (ebCfg.confThreshold - confidence) / ebCfg.confThreshold);
+  return Math.max(0, eb - ebCfg.sigmaPenaltyMax * deficit * deficit);
+}
+
 // Composite score with peer-tier imputation for missing cells.
 // F1+F2 (2026-05-18): atomic-only contract + respects preset.imputableBenches
 // (only imputable keys get filled) + caps imputed share via policy.maxImputedWeightShare.
@@ -694,50 +760,31 @@ export function compositeScoreImputed(model, weights, allModels, presetName) {
   const policy = getCompositePolicy();
   const tiers = getPresetTiers(presetName || State.activePresetName || 'balanced');
   const expo = policy.coverageShrinkageExponent > 0 ? policy.coverageShrinkageExponent : 2;
-  const confFactor = policy.imputedConfidenceFactor || 0.5;
-  const maxImputed = policy.maxImputedWeightShare || 0.30;
   const quarantined = quarantinedBenches(model);
-  let coveredWeight = 0;
-  let activeWeight = 0;
-  let weightedSum = 0;
-  let imputedWeight = 0;
+  let observedWeight = 0, activeWeight = 0, weightedSum = 0;
   const imputedKeys = [];
   for (const k of BENCH_KEYS) {
     const w = weights[k];
-    if (!w) continue;
-    if (isVendorComposite(k)) continue;       // atomic-only
+    if (!w || isVendorComposite(k)) continue;   // atomic-only (no double-count)
     activeWeight += w;
     // Quarantined cells (merge.py flagged: single-source / dispersed / low
-    // confidence) are untrusted — treat as missing so they get peer-tier
-    // imputation (reduced weight, capped) instead of distorting the composite
-    // at full weight. Mirrors compositeScore()'s quarantine exclusion and
-    // applies uniformly to every model (current + future). Without this, a
-    // model whose only high scores are quarantined hype-blog values (e.g.
-    // qwen3-7-max lcb=90.5) outranks clean independent-leaderboard data.
-    const haveRaw = quarantined.has(k) ? null : model.bench?.[k];
-    let s = null, isImputed = false;
-    if (haveRaw != null && Number.isFinite(haveRaw)) {
-      s = normalizeBenchScore(k, haveRaw);
-    } else if (tiers.imputable.has(k)) {       // only imputable per preset
-      const imp = impute(model, k, allModels);
-      if (imp != null) { s = imp; isImputed = true; }
-    }
-    if (s == null || !Number.isFinite(s)) continue;
-    if (isImputed) {
-      // Cap total imputed contribution to maxImputedWeightShare of active weight.
-      if ((imputedWeight + w) / activeWeight > maxImputed) continue;
-      coveredWeight += w * confFactor;
-      weightedSum += w * s * confFactor;
-      imputedWeight += w;
-      imputedKeys.push(k);
-    } else {
-      coveredWeight += w;
+    // confidence) are untrusted — treated as missing so EB shrinks them toward
+    // the baseline instead of distorting the mean at full weight.
+    const raw = quarantined.has(k) ? null : model.bench?.[k];
+    const s = (raw != null && Number.isFinite(raw)) ? normalizeBenchScore(k, raw) : null;
+    if (s != null && Number.isFinite(s)) {
+      observedWeight += w;
       weightedSum += w * s;
+    } else if (tiers.imputable.has(k)) {
+      imputedKeys.push(k);   // surfaced as "estimated" in UI; EB supplies the value
     }
   }
-  if (activeWeight === 0 || coveredWeight === 0) return { score: null, imputedKeys };
-  const coverage = coveredWeight / activeWeight;
-  return { score: (weightedSum / coveredWeight) * Math.pow(coverage, 1 / expo), imputedKeys };
+  if (activeWeight === 0 || observedWeight === 0) return { score: null, imputedKeys };
+  const realMean = weightedSum / observedWeight;
+  const score = policy.eb.enabled
+    ? ebTransform(realMean, observedWeight, activeWeight, globalPriorMean(weights, allModels), policy.eb)
+    : realMean * Math.pow(observedWeight / activeWeight, 1 / expo);
+  return { score, imputedKeys };
 }
 
 // CI-overlap rank-band engine (AA/LMArena-inspired, 2026-05-27). Propagates an
@@ -752,60 +799,45 @@ export function compositeScoreImputed(model, weights, allModels, presetName) {
 export function compositeUncertainty(model, weights, allModels, presetName) {
   const policy = getCompositePolicy();
   const u = policy.uncertainty;
-  const tiers = getPresetTiers(presetName || State.activePresetName || 'balanced');
   const expo = policy.coverageShrinkageExponent > 0 ? policy.coverageShrinkageExponent : 2;
-  const confFactor = policy.imputedConfidenceFactor || 0.5;
-  const maxImputed = policy.maxImputedWeightShare || 0.30;
   const quarantined = quarantinedBenches(model);
-  let coveredWeight = 0, activeWeight = 0, weightedSum = 0, imputedWeight = 0;
+  let observedWeight = 0, activeWeight = 0, weightedSum = 0;
   let varAccum = 0, coveredCells = 0, sourcedCells = 0;
   for (const k of BENCH_KEYS) {
     const w = weights[k];
     if (!w) continue;
     if (isVendorComposite(k)) continue;       // atomic-only (no double-count)
     activeWeight += w;
-    const haveRaw = quarantined.has(k) ? null : model.bench?.[k];
-    let s = null, isImputed = false;
-    if (haveRaw != null && Number.isFinite(haveRaw)) {
-      s = normalizeBenchScore(k, haveRaw);
-    } else if (tiers.imputable.has(k)) {
-      const imp = impute(model, k, allModels);
-      if (imp != null) { s = imp; isImputed = true; }
-    }
+    const raw = quarantined.has(k) ? null : model.bench?.[k];
+    const s = (raw != null && Number.isFinite(raw)) ? normalizeBenchScore(k, raw) : null;
     if (s == null || !Number.isFinite(s)) continue;
-    let cw, sigmaCell;
-    if (isImputed) {
-      if ((imputedWeight + w) / activeWeight > maxImputed) continue;
-      cw = w * confFactor;            // parity with compositeScoreImputed
-      imputedWeight += w;
-      sigmaCell = u.imputeSigma;      // estimate, never an observation
-    } else {
-      cw = w;                         // parity with compositeScoreImputed
-      const conf = cellConfidence(model.id, k);
-      const sConf = u.sigmaMax * (1 - conf);
-      const c = contradictionFor(model.id, k);
-      const sContra = (c && Number.isFinite(c.delta)) ? (c.delta / u.contraDivisor) : 0;
-      sigmaCell = Math.sqrt(sConf * sConf + sContra * sContra);
-      const entries = State.sources[`${model.id}.${k}`];
-      if (Array.isArray(entries)) {
-        const urls = new Set(entries.filter(e => e && e.url).map(e => String(e.url).toLowerCase()));
-        if (urls.size >= u.minSourcesForCI) sourcedCells++;
-      }
+    const conf = cellConfidence(model.id, k);
+    const sConf = u.sigmaMax * (1 - conf);
+    const c = contradictionFor(model.id, k);
+    const sContra = (c && Number.isFinite(c.delta)) ? (c.delta / u.contraDivisor) : 0;
+    const sigmaCell = Math.sqrt(sConf * sConf + sContra * sContra);
+    const entries = State.sources[`${model.id}.${k}`];
+    if (Array.isArray(entries)) {
+      const urls = new Set(entries.filter(e => e && e.url).map(e => String(e.url).toLowerCase()));
+      if (urls.size >= u.minSourcesForCI) sourcedCells++;
     }
-    coveredWeight += cw;
-    weightedSum += cw * s;
-    varAccum += (cw * cw) * (sigmaCell * sigmaCell);
+    observedWeight += w;            // parity with compositeScoreImputed (full w)
+    weightedSum += w * s;
+    varAccum += (w * w) * (sigmaCell * sigmaCell);
     coveredCells++;
   }
-  if (activeWeight === 0 || coveredWeight === 0) {
+  if (activeWeight === 0 || observedWeight === 0) {
     return { score: null, sigma: null, lower: null, upper: null, hasCI: false, coverage: 0, imputedShare: 0 };
   }
-  const raw = weightedSum / coveredWeight;
-  const coverage = coveredWeight / activeWeight;
-  const covFactor = Math.pow(coverage, 1 / expo);
-  const score = raw * covFactor;
-  const sigmaMean = covFactor * (Math.sqrt(varAccum) / coveredWeight);  // SD of weighted mean, coverage-scaled
-  const sigmaSparsity = score * u.sparsityAlpha * (1 - coverage);       // missing-profile epistemic width
+  const realMean = weightedSum / observedWeight;
+  const coverage = observedWeight / activeWeight;
+  // EB point score — IDENTICAL formula to compositeScoreImputed so rank bands
+  // sort on the same number the table renders.
+  const score = policy.eb.enabled
+    ? ebTransform(realMean, observedWeight, activeWeight, globalPriorMean(weights, allModels), policy.eb)
+    : realMean * Math.pow(coverage, 1 / expo);
+  const sigmaMean = Math.sqrt(varAccum) / observedWeight;          // SD of the observed weighted mean
+  const sigmaSparsity = score * u.sparsityAlpha * (1 - coverage);  // missing-profile epistemic width
   const sigma = Math.sqrt(sigmaMean * sigmaMean + sigmaSparsity * sigmaSparsity);
   const half = u.bandMult * sigma;
   return {
@@ -815,7 +847,7 @@ export function compositeUncertainty(model, weights, allModels, presetName) {
     upper: Math.min(100, score + half),
     hasCI: coveredCells > 0 && sourcedCells >= Math.ceil(coveredCells / 2),
     coverage,
-    imputedShare: imputedWeight / activeWeight,
+    imputedShare: 0,
   };
 }
 

@@ -1085,6 +1085,13 @@
       "_purpose": "Policy parameters for AICoderMap composite score formula.",
       "coverageShrinkageExponent": 2,
       "_coverageShrinkageNote": "composite = raw * (coverage ^ (1/exponent)). 2 = sqrt (current behavior). >2 = gentler penalty for low coverage. 1 = linear. 0 = no penalty.",
+      "eb": {
+        "enabled": true,
+        "priorWeight": 25,
+        "confThreshold": 0.65,
+        "sigmaPenaltyMax": 18,
+        "_note": "Empirical-Bayes leaderboard point score (compositeScoreImputed + compositeUncertainty). score = (W_obs*observedMean + priorWeight*globalMedianMean)/(W_obs+priorWeight) - sigmaPenaltyMax*max(0,(confThreshold-confidence)/confThreshold)^2, confidence = observedWeight/activeWeight. Missing benches shrink toward the conservative global-median baseline (not zeroed, not full-marks); the penalty is zero until confidence drops below confThreshold so a model missing a couple of benches is not docked, while genuinely sparse models are. enabled:false reverts to raw*coverage^(1/exponent)."
+      },
       "imputation": {
         "enabled": true,
         "mode": "tier-median",

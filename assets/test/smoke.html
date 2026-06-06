@@ -157,6 +157,28 @@
     assertEq('rankBands: second model is ordinal rank 2', rb[1].rank, 2);
     assertTrue('rankBands: clearly-separated models land in different clusters', rb[1].cluster > rb[0].cluster);
 
+    // 6k. EB shrinkage (2026-06-06): a model dominating the benches it HAS ranks
+    // above a fully-covered but weaker model (the √coverage penalty no longer
+    // buries strong-but-incomplete profiles), while a 1-bench cherry-pick is
+    // shrunk toward the global baseline + low-confidence-penalised so it cannot
+    // outrank the genuinely-dominant model. Needs State.models for the prior.
+    const ebW = { swePro: 22, sweV: 10, lcb: 10 };
+    const ebPool = [
+      { id: 'domA', tier: 'frontier', bench: { swePro: 92, sweV: 90 } },           // dominant, missing lcb
+      { id: 'fullB', tier: 'frontier', bench: { swePro: 70, sweV: 70, lcb: 70 } }, // complete but weaker
+      { id: 'cherry', tier: 'frontier', bench: { swePro: 95 } },                   // 1-bench cherry-pick
+      { id: 'p1', tier: 'frontier', bench: { swePro: 55, sweV: 55, lcb: 55 } },
+      { id: 'p2', tier: 'frontier', bench: { swePro: 60, sweV: 60, lcb: 60 } },
+      { id: 'p3', tier: 'frontier', bench: { swePro: 50, sweV: 50, lcb: 50 } },
+    ];
+    const _savedModels = State.models;
+    State.models = ebPool;
+    const ebRb = rankBands(ebPool, ebW, 'balanced');
+    State.models = _savedModels;
+    const ebRank = Object.fromEntries(ebRb.map((r, i) => [r.id, i + 1]));
+    assertTrue('6k EB: dominant-but-incomplete ranks above complete-but-weaker', ebRank['domA'] < ebRank['fullB']);
+    assertTrue('6k EB: 1-bench cherry-pick does not outrank the dominant model', ebRank['cherry'] > ebRank['domA']);
+
     // 7. data: scoreClass thresholds
     assertEq('scoreClass(85) → high', scoreClass(85), 'score-high');
     assertEq('scoreClass(60) → mid', scoreClass(60), 'score-mid');
