@@ -3,7 +3,7 @@
     "compositeMisfiles": 0,
     "measuredCandidates": 37,
     "bandViolations": 0,
-    "crossBenchDups": 5,
+    "crossBenchDups": 6,
     "aaRowsLoaded": 391
   },
   "compositeMisfiles": [],
@@ -309,6 +309,14 @@
       "benchKeys": [
         "mmluPro",
         "tb2"
+      ]
+    },
+    {
+      "modelId": "nemotron-3-ultra",
+      "value": 56.4,
+      "benchKeys": [
+        "tb2",
+        "tbHard"
       ]
     }
   ]

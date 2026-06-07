@@ -1,97 +1,6 @@
 {
-  "checked": 18,
-  "rejected": [
-    {
-      "cell": "gpt-4-1.tau2",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    },
-    {
-      "cell": "grok-3.tau2",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    },
-    {
-      "cell": "grok-3.aaAgentic",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    },
-    {
-      "cell": "mistral-large-3.aaAgentic",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    },
-    {
-      "cell": "mistral-large-3.gpqa",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    },
-    {
-      "cell": "o4-mini.arcAgi2",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    },
-    {
-      "cell": "deepseek-v4-pro.cfElo",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    },
-    {
-      "cell": "devstral-medium.aaAgentic",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    },
-    {
-      "cell": "llama-4-maverick.aaAgentic",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    },
-    {
-      "cell": "llama-4-scout.aaCoding",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    },
-    {
-      "cell": "llama-4-scout.aaAgentic",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    },
-    {
-      "cell": "qwen3-32b.gpqa",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    },
-    {
-      "cell": "gemma-4-26b-moe.aaAgentic",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    },
-    {
-      "cell": "gemma-4-31b.aaCoding",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    },
-    {
-      "cell": "gemma-4-31b.aaAgentic",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    },
-    {
-      "cell": "gemma-4-31b.aaIdx",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    },
-    {
-      "cell": "gpt-5-4-mini.aime26",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    },
-    {
-      "cell": "gpt-5-4-mini.mmluPro",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    }
-  ],
+  "checked": 6,
+  "rejected": [],
   "warnings": [
     {
       "cell": "gpt-4-1.tb2",
@@ -114,6 +23,6 @@
       "reason": "missing-reason"
     }
   ],
-  "ok": false,
-  "filtered": true
+  "ok": true,
+  "filtered": false
 }
