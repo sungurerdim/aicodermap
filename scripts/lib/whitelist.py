@@ -473,3 +473,89 @@ def filter_for_batch(
             out[cat] = filtered
 
     return out
+
+
+# ── Elo/SWE-variant sibling-metric misfile guard (SSOT — 2026-06-07) ───────────
+# Shared by audit-data-coherence.py (merge GATE) and local-synth.py (Stage B) so
+# the synth drops EXACTLY the cells the merge audit would hard-block — eliminating
+# the merge-rollback + manual-fix + full-Stage-B-re-run round-trip the cfElo
+# misfile (gemma-4-26b-moe, 2026-06-07) cost. One definition, two callers.
+CONFUSABLE_FAMILIES: list[set[str]] = [
+    {"cfElo", "lmArenaElo", "webDevElo"},  # Elo (distinct scales)
+    {"sweV", "swePro", "sweMulti"},  # SWE-bench variants
+    {"tb2", "tbHard"},  # Terminal-Bench
+    {"tau2", "tau3"},  # tau-bench
+    {"aaIdx", "aaCoding", "aaAgentic", "aaOmni"},  # AA composites
+]
+# The two families whose misfile most corrupts the composite (distinct scales /
+# difficulty) → a cell supported ONLY by sibling-publishers is merge-BLOCKING.
+HARD_CONFUSABLE: set[str] = {
+    "cfElo",
+    "lmArenaElo",
+    "webDevElo",
+    "sweV",
+    "swePro",
+    "sweMulti",
+}
+# Arena-family Elo publishers seeded even when a whitelist entry's scope is
+# incomplete (chat/webdev Elo, never Codeforces cfElo).
+_ARENA_DOMAINS = ("lmarena.ai", "arena.ai", "lmsys.org", "chatbot-arena.com")
+
+
+def confusable_family(bk: str) -> set[str]:
+    """Return the confusable family set containing bench key `bk`, else empty."""
+    for fam in CONFUSABLE_FAMILIES:
+        if bk in fam:
+            return fam
+    return set()
+
+
+def build_domain_publishes(whitelist: dict[str, Any]) -> dict[str, set]:
+    """host → set(benchKeys published), from the scoped whitelist categories +
+    Arena Elo seeds. SSOT input for the Elo/SWE sibling-metric misfile guard."""
+    dp: dict[str, set] = {}
+    for cat in ("leaderboards", "aggregators", "local", "community", "registries"):
+        for e in whitelist.get(cat) or []:
+            if not isinstance(e, dict):
+                continue
+            pub = e.get("publishes") or []
+            d = extract_domain(e.get("url") or "")
+            if pub and d:
+                dp.setdefault(d, set()).update(pub)
+    for ad in _ARENA_DOMAINS:
+        dp.setdefault(ad, set()).update({"lmArenaElo", "webDevElo"})
+    return dp
+
+
+def elo_swe_misfile(
+    bk: str, source_urls, domain_publishes: dict[str, set]
+) -> tuple[str | None, bool]:
+    """Decide whether a filled confusable cell is a sibling-metric misfile.
+
+    Returns (sibling_hit, is_hard):
+      - sibling_hit: a "<-<domain>(has [<siblings>])" suffix when some source is a
+        KNOWN, scoped publisher of a SIBLING metric but NOT `bk` itself; else None.
+        (The caller prepends "<modelId>.<benchKey>".)
+      - is_hard: True iff `bk` is in HARD_CONFUSABLE AND no source publishes `bk`
+        by name — the merge-BLOCKING condition. Else False (advisory only).
+
+    Mirrors audit-data-coherence §6b exactly so local-synth can pre-drop hard
+    misfiles before they reach (and roll back) the merge.
+    """
+    fam = confusable_family(bk)
+    if not fam:
+        return None, False
+    has_valid = False
+    sibling_hit: str | None = None
+    for u in source_urls:
+        d = extract_domain(u or "")
+        pub = domain_publishes.get(d)
+        if not pub:
+            continue
+        if bk in pub:
+            has_valid = True
+        elif (pub & fam) and sibling_hit is None:
+            sibling_hit = f"<-{d}(has {sorted(pub & fam)})"
+    if sibling_hit is None:
+        return None, False
+    return sibling_hit, (bk in HARD_CONFUSABLE and not has_valid)

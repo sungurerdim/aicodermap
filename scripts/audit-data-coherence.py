@@ -29,7 +29,6 @@ Used as a CI-style gate by:
   - skill workflow before git commit (loud warning if dirty)
 """
 
-import functools
 import json
 import os
 import re
@@ -39,7 +38,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lib.matrix import active_models as _active_models  # noqa: E402
 from lib.util import canonical_display_name as _canonical_name  # noqa: E402
-from lib.util import extract_domain  # noqa: E402
+from lib.whitelist import build_domain_publishes, elo_swe_misfile  # noqa: E402
 
 for _stream in (sys.stdout, sys.stderr):
     _reconf = getattr(_stream, "reconfigure", None)
@@ -282,80 +281,24 @@ def main():
     # trigger (they can report anything about a model) → low false-positive.
     # Advisory: surfaces the cell for re-verification, never blocks. Pairs with
     # the agent.md "BENCH METRIC INTEGRITY" rule (gather-time prevention).
-    @functools.lru_cache(maxsize=8192)
-    def _dom(u):
-        # 6.2 — memoized: source URLs recur across many cells; cache the parse.
-        return extract_domain(u or "")
-
-    domain_publishes: dict[str, set] = {}
-    for _cat in ("leaderboards", "aggregators", "local", "community", "registries"):
-        for e in whitelist.get(_cat) or []:
-            pub = e.get("publishes") or []
-            d = _dom(e.get("url"))
-            if pub and d:
-                domain_publishes.setdefault(d, set()).update(pub)
-    # Known Arena-family Elo publishers (chat/webdev Elo, never Codeforces cfElo)
-    # — ensure coverage even if a whitelist entry's scope is incomplete.
-    for _ad in ("lmarena.ai", "arena.ai", "lmsys.org", "chatbot-arena.com"):
-        domain_publishes.setdefault(_ad, set()).update({"lmArenaElo", "webDevElo"})
-
-    # Confusable bench families — members are easy to misfile into one another
-    # (the Elo family especially: same "Elo" name token, different scales). Flag a
-    # filled cell ONLY when a source publishes a SIBLING in the same family but NOT
-    # this bench — the source reports a confusable metric, so the value likely
-    # belongs to the sibling. Now covers ALL families: scripts/derive-publishes.py
-    # completes whitelist publishes[] from observed provenance, so a source that
-    # legitimately reports both members (e.g. AA → sweV AND swePro) is no longer a
-    # false positive. Advisory only.
-    confusable_families = [
-        {"cfElo", "lmArenaElo", "webDevElo"},  # Elo (distinct scales)
-        {"sweV", "swePro", "sweMulti"},  # SWE-bench variants
-        {"tb2", "tbHard"},  # Terminal-Bench
-        {"tau2", "tau3"},  # tau-bench
-        {"aaIdx", "aaCoding", "aaAgentic", "aaOmni"},  # AA composites
-    ]
-
-    def _family(bk):
-        for fam in confusable_families:
-            if bk in fam:
-                return fam
-        return set()
-
-    # 4.3 — the Elo family (distinct scales 0-3500 vs ~1000-1700) and the
-    # SWE-bench variant family (different difficulty) are the two confusables
-    # whose misfile most corrupts the composite. A cell in these families whose
-    # value is supported ONLY by sibling-publishers (NO source publishes the
-    # actual bench) is a genuine misfile → HARD FAILURE (merge-blocking). The
-    # other families, or a hard-family cell that ALSO has a valid publisher,
-    # stay advisory WARN.
-    hard_confusable = {"cfElo", "lmArenaElo", "webDevElo", "sweV", "swePro", "sweMulti"}
+    # Confusable bench families, domain→publishes map, and the hard/soft misfile
+    # decision now live in lib.whitelist (SSOT — 2026-06-07) so local-synth's
+    # Stage-B guard drops EXACTLY the cells this merge gate would hard-block,
+    # avoiding the rollback + manual-fix + full-re-run round-trip. See
+    # whitelist.elo_swe_misfile / build_domain_publishes.
+    domain_publishes = build_domain_publishes(whitelist)
     src_mismatch = []  # soft / advisory
     src_misfile_hard = []  # merge-blocking
     for m in models:
         for bk, bv in (m.get("bench") or {}).items():
             if bv is None or bk not in canonical_bench:
                 continue
-            fam = _family(bk)
-            if not fam:
-                continue
-            has_valid_publisher = False
-            sibling_hit = None
-            for e in sources.get(f"{m['id']}.{bk}") or []:
-                pub = domain_publishes.get(_dom(e.get("url")))
-                if not pub:
-                    continue
-                if bk in pub:
-                    has_valid_publisher = True
-                elif (pub & fam) and sibling_hit is None:
-                    sibling_hit = (
-                        f"{m['id']}.{bk}<-{_dom(e.get('url'))}(has {sorted(pub & fam)})"
-                    )
+            urls = [e.get("url") for e in sources.get(f"{m['id']}.{bk}") or []]
+            sibling_hit, is_hard = elo_swe_misfile(bk, urls, domain_publishes)
             if sibling_hit is None:
                 continue
-            if bk in hard_confusable and not has_valid_publisher:
-                src_misfile_hard.append(sibling_hit)
-            else:
-                src_mismatch.append(sibling_hit)
+            entry = f"{m['id']}.{bk}{sibling_hit}"
+            (src_misfile_hard if is_hard else src_mismatch).append(entry)
     if src_misfile_hard:
         failures.append(
             f"{len(src_misfile_hard)} Elo/SWE-variant bench cell(s) supported ONLY "

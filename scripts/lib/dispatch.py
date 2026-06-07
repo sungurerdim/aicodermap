@@ -38,6 +38,7 @@ Output: list of dispatch waves; each wave is a list of batch specs that
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 # Conservative empirical defaults — see docstring.
@@ -57,6 +58,52 @@ MAX_BATCH_CELLS = AGENT_BUDGET_BUFFER * CELLS_PER_TOOL_CALL  # 150
 ABSOLUTE_MAX_BATCH_MODELS = 6
 
 
+# Per-vendor density shrink (#1, 2026-06-07). A bench-DENSE family (its models
+# appear on many leaderboards → far more cells to fetch+verify per model) blows
+# past the per-batch wallclock deadline and, in a single-wave plan, sets the whole
+# wave's wall-clock (measured 2026-06-07: batch02-openai 997s vs a 600s target,
+# next-slowest 643s). Shrinking ONLY the proven-slow families to a smaller,
+# vendor-pure batch caps the tail without fragmenting the sparse vendors.
+DENSE_MAX_BATCH_MODELS = 4  # dense families: 4 models/batch (vs 6 default)
+# A family counts as "slow" only when it MEANINGFULLY overran (not a few seconds
+# over) — multiplier on BATCH_WALLCLOCK_SEC. 1.25× of 600 = 750s.
+SLOW_FAMILY_THRESHOLD_MULT = 1.25
+
+
+def slow_families_from_telemetry(
+    telemetry_dir,
+    *,
+    batch_wallclock_sec: int,
+    threshold_mult: float = SLOW_FAMILY_THRESHOLD_MULT,
+) -> set[str]:
+    """Return provider families whose batch overran wallclock LAST cycle, so the
+    orchestrator can shrink them this cycle. Reads the most recent
+    data/_telemetry/<date>.json, maps each over-threshold batch's `batchId`
+    ('batchNN-<familyHint>') back to a family via family_of(hint). Empty set on
+    any error (telemetry is advisory — never blocks dispatch)."""
+    import glob
+    import json
+    import re
+
+    try:
+        files = sorted(glob.glob(str(Path(telemetry_dir) / "*.json")))
+        if not files:
+            return set()
+        data = json.loads(Path(files[-1]).read_text(encoding="utf-8"))
+        threshold = batch_wallclock_sec * threshold_mult
+        slow: set[str] = set()
+        for b in data.get("perBatch") or []:
+            wall = b.get("wallclockSec") or 0
+            bid = b.get("batchId") or ""
+            if wall > threshold:
+                m = re.match(r"batch\d+-(.+)", bid)
+                if m:
+                    slow.add(family_of(m.group(1)))
+        return slow
+    except Exception:
+        return set()
+
+
 def models_per_batch(core_keys_count: int) -> int:
     """Derive how many models fit one agent under the budget cap."""
     if core_keys_count <= 0:
@@ -65,46 +112,49 @@ def models_per_batch(core_keys_count: int) -> int:
     return max(1, min(derived, ABSOLUTE_MAX_BATCH_MODELS))
 
 
+def family_of(provider: str | None) -> str:
+    """Coarse provider-family normalization — group sibling providers under one
+    batch so OpenRouter/openai/etc. don't fragment. SSOT for both family_buckets
+    and the telemetry-driven dense-family shrink (slow_families_from_telemetry)."""
+    provider = (provider or "unknown").lower()
+    if "anthropic" in provider:
+        return "anthropic"
+    if "openai" in provider:
+        return "openai"
+    if "google" in provider or "deepmind" in provider:
+        return "google"
+    if "xai" in provider or "grok" in provider:
+        return "xai"
+    if "deepseek" in provider:
+        return "deepseek"
+    if "alibaba" in provider or "qwen" in provider:
+        return "qwen"
+    if "mistral" in provider:
+        return "mistral"
+    if "meta" in provider or "llama" in provider:
+        return "meta"
+    if "moonshot" in provider or "kimi" in provider:
+        return "moonshot"
+    if "zhipu" in provider or "z.ai" in provider:
+        return "zai"
+    if "minimax" in provider:
+        return "minimax"
+    if "xiaomi" in provider or "mimo" in provider:
+        return "xiaomi"
+    if "stepfun" in provider:
+        return "stepfun"
+    if "nvidia" in provider:
+        return "nvidia"
+    return "other"
+
+
 def family_buckets(active: list[dict[str, Any]]) -> list[list[dict[str, Any]]]:
     """Partition active models into provider-family buckets, then split any
     bucket that exceeds MAX_BATCH_MODELS so no agent ever sees more than its
     budget allows."""
     family_map: dict[str, list[dict[str, Any]]] = {}
     for m in active:
-        provider = (m.get("provider") or "unknown").lower()
-        # Coarse family normalization — group sibling providers under one batch
-        # so OpenRouter/openai/etc. don't fragment.
-        if "anthropic" in provider:
-            family = "anthropic"
-        elif "openai" in provider:
-            family = "openai"
-        elif "google" in provider or "deepmind" in provider:
-            family = "google"
-        elif "xai" in provider or "grok" in provider:
-            family = "xai"
-        elif "deepseek" in provider:
-            family = "deepseek"
-        elif "alibaba" in provider or "qwen" in provider:
-            family = "qwen"
-        elif "mistral" in provider:
-            family = "mistral"
-        elif "meta" in provider or "llama" in provider:
-            family = "meta"
-        elif "moonshot" in provider or "kimi" in provider:
-            family = "moonshot"
-        elif "zhipu" in provider or "z.ai" in provider:
-            family = "zai"
-        elif "minimax" in provider:
-            family = "minimax"
-        elif "xiaomi" in provider or "mimo" in provider:
-            family = "xiaomi"
-        elif "stepfun" in provider:
-            family = "stepfun"
-        elif "nvidia" in provider:
-            family = "nvidia"
-        else:
-            family = "other"
-        family_map.setdefault(family, []).append(m)
+        family_map.setdefault(family_of(m.get("provider")), []).append(m)
     return [family_map[k] for k in sorted(family_map.keys())]
 
 
@@ -206,6 +256,8 @@ def compute_dispatch_plan(
     max_parallel: int = MAX_PARALLEL,
     max_models_override: int | None = None,
     merge_small: bool = True,
+    dense_families: set[str] | None = None,
+    dense_max_models: int = DENSE_MAX_BATCH_MODELS,
 ) -> dict[str, Any]:
     """Plan an adaptive multi-batch dispatch.
 
@@ -228,16 +280,27 @@ def compute_dispatch_plan(
     """
     keys = list(core_keys)
     mpb = max_models_override or models_per_batch(len(keys))
+    dense = dense_families or set()
     buckets = family_buckets(active)
-    # Split oversize families to ≤mpb, THEN FFD-pack every undersized bucket
-    # together so the plan uses the fewest agents (each agent's ~15-20-tool-call
-    # fixed overhead is paid once per BATCH, not per model). pack_batches
-    # subsumes the older merge_small_buckets (which only collapsed ≤2-model
-    # families and left 3-5-model batches fragmented). merge_small=False keeps
-    # the unpacked family layout for callers that want vendor-pure batches.
-    sliced = split_oversize_batches(buckets, mpb)
+    # #1 (2026-06-07) — proven-slow (bench-dense) families split into SMALLER,
+    # vendor-PURE batches (≤dense_max_models) and are EXCLUDED from FFD packing,
+    # so a dense slice can't be re-grown to mpb by co-location. The sparse-vendor
+    # buckets still split at mpb, THEN FFD-pack together (each agent's ~15-20-tool-
+    # call fixed overhead is paid once per BATCH). merge_small=False keeps the
+    # unpacked family layout for callers that want vendor-pure batches.
+    dense_buckets = [
+        b for b in buckets if b and family_of(b[0].get("provider")) in dense
+    ]
+    normal_buckets = [
+        b for b in buckets if not (b and family_of(b[0].get("provider")) in dense)
+    ]
+    dense_sliced = split_oversize_batches(
+        dense_buckets, max(1, min(dense_max_models, mpb))
+    )
+    normal_sliced = split_oversize_batches(normal_buckets, mpb)
     if merge_small:
-        sliced = pack_batches(sliced, mpb)
+        normal_sliced = pack_batches(normal_sliced, mpb)
+    sliced = dense_sliced + normal_sliced
 
     import re
 

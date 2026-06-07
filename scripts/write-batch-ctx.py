@@ -17,7 +17,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "scripts"))
 
-from lib.dispatch import compute_dispatch_plan
+from lib.dispatch import compute_dispatch_plan, slow_families_from_telemetry
 from lib.freshness import compute_skip_cells
 from lib.idea_context import build_per_batch_ctx
 from lib.matrix import active_models, matrix_snapshot, priority_cells
@@ -78,7 +78,18 @@ def main() -> int:
     )
     bp = banned_fetch_patterns(wl)
 
-    plan = compute_dispatch_plan(active, keys)
+    # #1 (2026-06-07) — shrink families that overran wallclock LAST cycle into
+    # smaller, vendor-pure batches so the slowest batch no longer sets the whole
+    # wave's wall-clock. Derived from telemetry (advisory; empty set = no change).
+    slow_families = slow_families_from_telemetry(
+        REPO / "data" / "_telemetry",
+        batch_wallclock_sec=int(ctr.get("BATCH_WALLCLOCK_SEC", 600)),
+    )
+    if slow_families:
+        print(
+            f"  [dense-shrink] slow families from last cycle: {sorted(slow_families)}"
+        )
+    plan = compute_dispatch_plan(active, keys, dense_families=slow_families)
     cycle_started = time.time()
 
     last_refresh = ""

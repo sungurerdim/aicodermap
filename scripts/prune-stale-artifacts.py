@@ -52,6 +52,15 @@ PATTERNS = [
     # assignments (observed 2026-06-06: 9 orphan ctx files collided with 16
     # fresh, duplicating deprecated-model slices). Prune them with the rest.
     ".aicodermap-ctx-batch*.json",
+    # Anomaly verdict + queue artifacts (2026-06-07). The anomaly-verify agent is
+    # supposed to OVERWRITE the verdicts file, but a partial write (or an agent
+    # that reads-then-appends) can leave a PRIOR cycle's verdicts behind — and a
+    # stale `clear` verdict, when applied this cycle, DELETES a currently-valid
+    # cell that this cycle never flagged (observed 2026-06-07: 4 stale clears
+    # would have removed gpt-4-1.aime26 + mimo-v2-5-pro.mmluPro). Pruning them
+    # makes apply-anomaly-verdicts see ONLY this cycle's verdicts.
+    ".aicodermap-anomaly-verdicts.json",
+    ".aicodermap-anomaly-queue.json",
 ]
 
 ARCHIVE_DIR_NAME = ".aicodermap-stale-archive"

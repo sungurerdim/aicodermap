@@ -400,6 +400,16 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
      log(f"✓ wave {wave_index}/{len(plan.waves)} complete: "
          f"{len(wave_results)} batches returned")
 
+     // #2 (2026-06-07) — DEAD-BATCH (API error / no-write) retry MUST be
+     // dispatched the INSTANT the failure is observed, NOT after the wave
+     // barrier. A single batch dying on "API Error: Overloaded" (observed
+     // 2026-06-07: batch11) and retried only after the whole wave returned added
+     // a ~10-min PURELY SERIAL tail (the retry ran alone). The orchestrator
+     // should fire the retry immediately (run_in_background) so it overlaps the
+     // still-running wave instead of trailing it. The 0-fill retry below stays
+     // post-wave (0-fill is only known once the batch returns); the dead-batch
+     // retry is the one that must not wait.
+     //
      // FAZ 2.4 (2026-05-07): 0-fill batch auto-retry — single retry per batch.
      // After each wave completes, scan its results for batches with fills==0
      // (and cellsAttempted > 0 — distinguish "agent ran but found nothing" from
@@ -838,6 +848,15 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
      # post-merge mutation; the audit-data-coherence.py call above already proved
      # coherence, so the cycle proceeds straight to git commit.
      ```
+   - #4 (2026-06-07) — DOUBLE-VERIFY GATE. Before auto-dispatching the
+     `source-mismatch`/`out-of-band` queue, DROP any cell a THIS-cycle gather
+     already resolved through its `idea_context.anomalies[]` pass (i.e. the cell
+     was injected into a batch's anomalies slice AND that batch returned a fresh
+     observation for it). Re-verifying it costs a second serial sonnet pass for
+     zero new information (observed 2026-06-07: the gemma cfElo out-of-band cells
+     were confirmed by batch11's own anomaly resolution, then re-confirmed by the
+     7.7 agent — ~5 min wasted). The remaining (gather-untouched) HIGH-priority
+     cells still auto-dispatch.
    - `single-source` AND `peer-outlier` anomalies are NOT auto-dispatched —
      they stay in `idea_context.anomalies` for the next full gather to pick up
      a 2nd source. `single-source` is a coverage signal (too many). `peer-outlier`

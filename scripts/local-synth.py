@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from lib.whitelist import all_bench_keys, bench_hard_max, contracts  # type: ignore  # noqa: E402
+from lib.whitelist import build_domain_publishes, elo_swe_misfile  # type: ignore  # noqa: E402  (SSOT)
 from lib.matrix import active_models  # type: ignore  # noqa: E402
 from lib import reliability as _reliability  # type: ignore  # noqa: E402
 from lib.tiers import TIER_WEIGHT  # type: ignore  # noqa: E402  (SSOT)
@@ -141,6 +142,15 @@ def main() -> int:
     agreement_pp = float(ctr.get("VERIFICATION_AGREEMENT_PP", 1.5))
     host_pub = build_host_publishes(wl)  # C1 Elo-trap filter input
     elo_dropped = 0
+    # C2 (2026-06-07): cell-level provenance guard, SSOT-shared with the merge
+    # audit. Drops an Elo/SWE-variant cell that NO source publishes by name (only
+    # sibling-metric publishers) BEFORE it reaches merge — exactly what
+    # audit-data-coherence would hard-block. Prevents the merge-rollback +
+    # manual-fix + full-Stage-B-re-run round-trip (gemma-4-26b-moe.cfElo,
+    # 2026-06-07). The per-obs C1 filter above (value-range heuristic) and this
+    # cell-level C2 guard (publisher-name provenance) are complementary.
+    domain_publishes = build_domain_publishes(wl)
+    elo_cell_dropped = 0
 
     active = active_models(models)
     active_ids = {m["id"] for m in active}
@@ -307,6 +317,16 @@ def main() -> int:
     reliability_ledger = _reliability.load_ledger(LEDGER_PATH)
 
     for (mid, bk), entries in cells.items():
+        # C2 — cell-level hard-misfile guard (SSOT with merge audit). If this
+        # confusable cell is supported ONLY by sibling-metric publishers (no
+        # source names `bk`), it is a genuine misfile the merge would hard-block;
+        # drop it here → it becomes a GAP (re-queried next cycle), no merge rollback.
+        _, _is_hard = elo_swe_misfile(
+            bk, [e.get("sourceUrl") or "" for e in entries], domain_publishes
+        )
+        if _is_hard:
+            elo_cell_dropped += 1
+            continue
         # Build per-observation list with trustScore for sum-based cluster ranking.
         obs_list = []
         for e in entries:
@@ -576,7 +596,9 @@ def main() -> int:
     print(f"  gapsCarried: {len(gap_entries)} (deduped from {len(all_raw_gaps)} raw)")
     print(f"  validationCoverage: {validation_coverage * 100:.1f}%")
     if elo_dropped:
-        print(f"  eloSiblingMisfilesDropped (C1): {elo_dropped}")
+        print(f"  eloSiblingMisfilesDropped (C1 per-obs): {elo_dropped}")
+    if elo_cell_dropped:
+        print(f"  eloSiblingMisfilesDropped (C2 cell-level): {elo_cell_dropped}")
     return 0
 
 
