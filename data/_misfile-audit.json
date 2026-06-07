@@ -1,13 +1,20 @@
 {
   "_summary": {
     "compositeMisfiles": 0,
-    "measuredCandidates": 38,
-    "bandViolations": 24,
+    "measuredCandidates": 37,
+    "bandViolations": 0,
     "crossBenchDups": 5,
-    "aaRowsLoaded": 384
+    "aaRowsLoaded": 391
   },
   "compositeMisfiles": [],
   "measuredCandidates": [
+    {
+      "modelId": "glm-5-1",
+      "benchKey": "tau2",
+      "current": 19.9,
+      "aa": 97.66,
+      "delta": 77.76
+    },
     {
       "modelId": "mistral-large-3",
       "benchKey": "tau2",
@@ -21,13 +28,6 @@
       "current": 51.0,
       "aa": 13.16,
       "delta": 37.84
-    },
-    {
-      "modelId": "glm-4-5-air",
-      "benchKey": "tau2",
-      "current": 78.18,
-      "aa": 46.49,
-      "delta": 31.69
     },
     {
       "modelId": "minimax-m2-7",
@@ -65,11 +65,11 @@
       "delta": 24.26
     },
     {
-      "modelId": "mistral-large-3",
-      "benchKey": "gpqa",
-      "current": 43.9,
-      "aa": 67.98,
-      "delta": 24.08
+      "modelId": "glm-4-5-air",
+      "benchKey": "tau2",
+      "current": 70.1,
+      "aa": 46.49,
+      "delta": 23.61
     },
     {
       "modelId": "qwen3-6-max",
@@ -81,9 +81,9 @@
     {
       "modelId": "grok-4-1-fast",
       "benchKey": "gpqa",
-      "current": 85.37,
+      "current": 85.36,
       "aa": 63.74,
-      "delta": 21.63
+      "delta": 21.62
     },
     {
       "modelId": "gemma-4-e4b",
@@ -212,13 +212,6 @@
       "delta": 12.17
     },
     {
-      "modelId": "deepseek-v4-flash",
-      "benchKey": "tau2",
-      "current": 84.5,
-      "aa": 95.03,
-      "delta": 10.53
-    },
-    {
       "modelId": "step-3-7-flash",
       "benchKey": "tau2",
       "current": 88.2,
@@ -275,224 +268,7 @@
       "delta": 8.51
     }
   ],
-  "bandViolations": [
-    {
-      "modelId": "gemini-3-1-pro",
-      "benchKey": "cfElo",
-      "value": 3052,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "gemini-3-1-pro",
-      "benchKey": "lmArenaElo",
-      "value": 1493.0,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "o3",
-      "benchKey": "cfElo",
-      "value": 2727.0,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "o4-mini",
-      "benchKey": "cfElo",
-      "value": 2719,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "deepseek-v3-2",
-      "benchKey": "cfElo",
-      "value": 2046.0,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "deepseek-v4-flash",
-      "benchKey": "cfElo",
-      "value": 3052.0,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "deepseek-v4-pro",
-      "benchKey": "cfElo",
-      "value": 3206,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "glm-5-1",
-      "benchKey": "webDevElo",
-      "value": 1534,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "kimi-k2-6",
-      "benchKey": "webDevElo",
-      "value": 1529,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "mimo-v2-5-pro",
-      "benchKey": "webDevElo",
-      "value": 1479,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "mimo-v2-flash",
-      "benchKey": "webDevElo",
-      "value": 1337,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "qwen3-235b",
-      "benchKey": "cfElo",
-      "value": 2056.0,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "qwen3-32b",
-      "benchKey": "cfElo",
-      "value": 1982.0,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "qwen3-coder-next",
-      "benchKey": "cfElo",
-      "value": 2100.0,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "gemma-3-27b",
-      "benchKey": "cfElo",
-      "value": 110.0,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "gemma-4-26b-moe",
-      "benchKey": "cfElo",
-      "value": 2150.0,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "gemma-4-26b-moe",
-      "benchKey": "webDevElo",
-      "value": 1441,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "gemma-4-26b-moe",
-      "benchKey": "lmArenaElo",
-      "value": 1441.0,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "gemma-4-31b",
-      "benchKey": "cfElo",
-      "value": 2150,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "gemma-4-31b",
-      "benchKey": "webDevElo",
-      "value": 1452,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "gemma-4-31b",
-      "benchKey": "lmArenaElo",
-      "value": 1452.0,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "gemma-4-e2b",
-      "benchKey": "cfElo",
-      "value": 633.0,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "gemma-4-e4b",
-      "benchKey": "cfElo",
-      "value": 940.0,
-      "band": [
-        0.0,
-        100.0
-      ]
-    },
-    {
-      "modelId": "deepseek-r1-14b",
-      "benchKey": "cfElo",
-      "value": 1481.0,
-      "band": [
-        0.0,
-        100.0
-      ]
-    }
-  ],
+  "bandViolations": [],
   "crossBenchDups": [
     {
       "modelId": "opus-4-7",
@@ -500,6 +276,14 @@
       "benchKeys": [
         "aime26",
         "lcb",
+        "mmluPro"
+      ]
+    },
+    {
+      "modelId": "glm-5-1",
+      "value": 58.4,
+      "benchKeys": [
+        "swePro",
         "sweV"
       ]
     },
@@ -509,14 +293,6 @@
       "benchKeys": [
         "tau2",
         "tb2"
-      ]
-    },
-    {
-      "modelId": "nemotron-3-super",
-      "value": 29.0,
-      "benchKeys": [
-        "tb2",
-        "tbHard"
       ]
     },
     {

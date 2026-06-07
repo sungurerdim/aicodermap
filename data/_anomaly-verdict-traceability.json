@@ -1,14 +1,110 @@
 {
   "checked": 18,
-  "rejected": [],
+  "rejected": [
+    {
+      "cell": "gpt-4-1.tau2",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "grok-3.tau2",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "grok-3.aaAgentic",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "mistral-large-3.aaAgentic",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "mistral-large-3.gpqa",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "o4-mini.arcAgi2",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "deepseek-v4-pro.cfElo",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "devstral-medium.aaAgentic",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "llama-4-maverick.aaAgentic",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "llama-4-scout.aaCoding",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "llama-4-scout.aaAgentic",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "qwen3-32b.gpqa",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "gemma-4-26b-moe.aaAgentic",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "gemma-4-31b.aaCoding",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "gemma-4-31b.aaAgentic",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "gemma-4-31b.aaIdx",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "gpt-5-4-mini.aime26",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "gpt-5-4-mini.mmluPro",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    }
+  ],
   "warnings": [
     {
-      "cell": "mistral-large-3.lcb",
+      "cell": "gpt-4-1.tb2",
       "action": "clear",
       "reason": "missing-reason"
     },
     {
-      "cell": "mistral-large-3.gpqa",
+      "cell": "gpt-4-1.aime26",
+      "action": "clear",
+      "reason": "missing-reason"
+    },
+    {
+      "cell": "o3.tb2",
       "action": "clear",
       "reason": "missing-reason"
     },
@@ -16,23 +112,8 @@
       "cell": "mimo-v2-5-pro.mmluPro",
       "action": "clear",
       "reason": "missing-reason"
-    },
-    {
-      "cell": "qwen3-32b.gpqa",
-      "action": "clear",
-      "reason": "missing-reason"
-    },
-    {
-      "cell": "qwen3-coder-30b.gpqa",
-      "action": "clear",
-      "reason": "missing-reason"
-    },
-    {
-      "cell": "codestral.aaIdx",
-      "action": "clear",
-      "reason": "missing-reason"
     }
   ],
-  "ok": true,
-  "filtered": false
+  "ok": false,
+  "filtered": true
 }
