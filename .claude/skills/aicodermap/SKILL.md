@@ -1,6 +1,6 @@
 ---
 description: "AICoderMap update orchestrator. Project-scoped. Manual trigger, zero API cost."
-argument-hint: "[refresh-all|model <id>|new-release|validate|stale-check|changelog|lineup-sync]"
+argument-hint: "[validate]   (no argument = full refresh)"
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Agent, TaskCreate, TaskUpdate
 ---
 
@@ -21,18 +21,28 @@ Orchestrate AI coding LLM tracker updates: discover **official vendor lineup** �
 - **Sources whitelist:** `data/sources-whitelist.json` — single source of truth for every URL the research agent is allowed to fetch. Skill loads this and injects it into `idea_context.sourcesWhitelist` for every agent run. Agent NEVER hardcodes URLs.
 
 ## ARGS
+
+Two entry points only (lean surface, 2026-06-07 — the prior 7-subcommand menu
+was retired: `lineup-sync`/`new-release` are subsets of the full refresh's
+Step 0, `model <id>`/`stale-check`/`changelog` were rarely used, and the
+interactive no-arg prompt always resolved to a full refresh anyway).
+
 | arg | scope | model | typical_duration |
 |-----|-------|-------|------------------|
-| (none) | interactive prompt | — | — |
-| `refresh-all` | full (lineup + bench + pricing + local) | sonnet | 20-60min (N waves × batches, all sonnet gather; per-batch wallclock 5-15min) |
-| `lineup-sync` | vendor lineup discovery only (Step 0) | sonnet | 3-6min (single batch, vendors in parallel) |
-| `model <id>` | specific | sonnet | 3-8min (single-batch, single-model deep sweep) |
-| `new-release` | new-release detection | sonnet | 4-10min |
-| `validate` | (no fetch) | — | <10s |
-| `stale-check` | (no fetch) | — | <5s |
-| `changelog` | (no fetch) | — | <5s |
+| (none) — **DEFAULT** | full (lineup + bench + pricing + local). Equivalent to the old `refresh-all`. | sonnet | 20-60min (N waves × batches, all sonnet gather; per-batch wallclock 5-15min) |
+| `validate` | no-fetch coherence audit (coverage + contradictions + stale list) | — | <10s |
 
-**`refresh-all` baseline:** Agent's `MODEL_FAMILIES` table is non-negotiable — every family must be surveyed, missing ones emit a `gaps[]` entry. Skill rejects returns whose `models[]` + `newModels[]` cardinality < 30 unless agent explains via `gaps[]`.
+`refresh-all` is still accepted as an explicit alias for the default, but typing
+it is optional — bare `/aicodermap` runs the full refresh.
+
+**Break-glass overrides** (env vars / flags — rare, never needed in normal use):
+- `--force` (or `AICODERMAP_FULL_REFRESH=1`): force full Stage A/B even if the
+  matrix is fully fresh (bypasses the PRELIM-E lineup-only fast-path + prefetch TTL).
+- `AICODERMAP_NO_AA=1`: skip the AA RSC extractor for one run if AA changes its
+  Next.js payload format and the extractor errors. Every other pipeline stage is
+  already non-fatal + self-healing, so no other opt-out switch is needed.
+
+**Full-refresh baseline:** Agent's `MODEL_FAMILIES` table is non-negotiable — every family must be surveyed, missing ones emit a `gaps[]` entry. Skill rejects returns whose `models[]` + `newModels[]` cardinality < 30 unless agent explains via `gaps[]`.
 
 ## WORKFLOW
 ```
@@ -73,7 +83,7 @@ PRELIM-B. SOURCE_HEALTH_PROBE + LEADERBOARD_PREFETCH (orchestrator-side single-p
    - **TTL:** snapshots stay fresh for 24h. Re-runs within TTL no-op (`fresh: N to-fetch: 0`). Use `--force` to ignore TTL (rare; only when whitelist URLs change).
    - **Failure tolerance:** prefetch is non-fatal. SSL/DNS/404 misses are logged in `_index.json._meta.totalFailed`; agent's Phase 1 transparently falls back to WebFetch for any URL absent from `leaderboardSnapshots` map.
    - **Output to skill:** the orchestrator reads `_index.json` and injects `idea_context.leaderboardSnapshots = { <url>: { path: "<rel>", contentType, contentLength, fetchedAt } }` into every batch dispatch (Step 3).
-   - This step CANNOT be skipped on `refresh-all` and `lineup-sync`. It is opt-out via `AICODERMAP_NO_PREFETCH=1` env var only for emergency manual reruns.
+   - This step is mandatory on every full refresh (no opt-out — it is pure savings and the agents depend on the prefetched snapshots).
 
 PRELIM-C. STALE_ARTIFACT_PRUNE (FAZ 7.A, 2026-05-10):
    ```
@@ -92,7 +102,7 @@ PRELIM-C. STALE_ARTIFACT_PRUNE (FAZ 7.A, 2026-05-10):
      skipped as confirmed, and force the full Stage A/B path (bypass the
      LINEUP_ONLY_MINI_CYCLE_GATE) this cycle. Log `⚠ verification-map stale
      (age >STALE_DAYS) — all cells re-verified T1`. Missing file → same treatment.
-   - Non-fatal. Opt-out via `AICODERMAP_NO_PRUNE=1`.
+   - Non-fatal (self-healing — never blocks the cycle).
 
 PRELIM-D. SNAPSHOT_ROW_EXTRACTION (FAZ 7.F, 2026-05-10):
    ```
@@ -103,7 +113,7 @@ PRELIM-D. SNAPSHOT_ROW_EXTRACTION (FAZ 7.F, 2026-05-10):
    - **Hint quality:** `confidence: "regex-hint"` — the agent verifies any used row by Reading its sourceUrl snapshot OR by an independent fetch. Multi-bench tables can produce duplicate values across keys (e.g., a single 80.2 attributed to both swePro+sweV); the agent's row-validator (FORMAT_DISPATCH) drops these unless an independent source confirms the bench-key assignment.
    - **6.5 — `confidence: "confirmed"` fast-path:** a row from a page advertising EXACTLY ONE bench key, captured in strict mode (explicit `%` anchor), is emitted as `confirmed` (non-ambiguous: no cross-key duplication is possible). The agent MAY promote a `confirmed` row directly to `observations[]` and SKIP the re-verify fetch — it still counts as one I-tier source toward the ≥2 distinct-source requirement. `regex-hint` rows still require verification.
    - **Quality gate:** rows are NOT auto-promoted to observations[]. The agent must verify before emitting. `_rows.json` is a STARTING POINT, not a source of record.
-   - Non-fatal. Opt-out via `AICODERMAP_NO_ROW_EXTRACT=1`.
+   - Non-fatal (self-healing — never blocks the cycle).
 
 PRELIM-G. AA_STRUCTURED_EXTRACT (2026-05-31) — deterministic Artificial Analysis pull:
    ```
@@ -146,7 +156,7 @@ PRELIM-F. ANOMALY_VERIFICATION_QUEUE (2026-05-27):
      agent.md "OUTLIERS -> INVESTIGATE": find the primary source + exact
      metric/scale, then CONFIRM (keep), RECLASSIFY (correct cell/scale), or FLAG
      (rawGaps note) — never auto-dismiss for being "too high/low".
-   - Advisory: never mutates data. Non-fatal. Opt-out via `AICODERMAP_NO_ANOMALY=1`.
+   - Advisory: never mutates data. Non-fatal (self-healing — never blocks).
    - This is the systematic backbone of "investigate outliers, don't reject them".
      (Full auto-dispatch of a research sub-agent the instant an anomaly surfaces
      mid-merge is future work; v1 = detect + queue + next-cycle research priority.)
@@ -156,7 +166,8 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
    - **Full Phase 0 still runs in this fast path** — `lineup-sync` is the COMPLETE Phase 0, not a bare lineup-URL fetch: the agent still runs the WebSearch new-release net (agent.md step 3b, per-vendor templated probes) and the Phase 0 sub-probes (unknown-vendor / unknown-leaderboard discovery). Only Stage A/B (per-cell bench/pricing fill) and merge are skipped. This is what guarantees a brand-new model (e.g. an Opus-family bump) is still caught on a fully-fresh-matrix cycle even though no cell needs re-research.
    - Why: when the matrix is fully covered AND fresh, there is nothing for gather agents to research that the verification map doesn't already mark `confirmed=true ≤7d`. The cycle's only value is detecting NEW/DEPRECATED/RENAMED models from vendor lineup pages.
    - **Quality preserved:** the gate is hit only when EVERY active model was fully refreshed within the freshness TTL window. If even one cell is starved, full Stage A/B runs. The freshness check uses the verification map's `confirmed` flag (≥3 distinct sources within VERIFICATION_AGREEMENT_PP); not just the date.
-   - Opt-out: `AICODERMAP_FULL_REFRESH=1` env var forces the full Stage A/B regardless. `--force` flag on `/aicodermap refresh-all --force` does the same.
+   - **GAP cells never trigger the fast-path:** `priority_cells(...)` only enumerates EMPTY cells (`bench[k] is None`) and skips one solely when it is `confirmed`+fresh — a never-found GAP cell is empty and can never be `confirmed`, so it is always present in `priorityCells`. Therefore `priorityCells == []` holds only when there are zero open gaps, guaranteeing the mini-cycle is taken exclusively on a fully-FILLED-and-fresh matrix (consistent with "every GAP cell is re-queried every full-run").
+   - Opt-out: `AICODERMAP_FULL_REFRESH=1` env var forces the full Stage A/B regardless. `--force` on `/aicodermap --force` does the same. (`scope=lineup-sync` here is an INTERNAL orchestrator dispatch label — it is no longer a user-typeable subcommand.)
 
 0. LINEUP DISCOVERY (always run first on refresh-all):
    - Agent fetches each vendor's official "active models" page from VENDOR_LINEUP_SOURCES table
@@ -180,22 +191,22 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
    - **Mandatory retry (added 2026-04-28):** if Step 4 returns with `lineup` empty/missing/`{}` AND this is not the first-ever run, the orchestrator dispatches ONE retry agent (sonnet) restricted to Step 0 (fetch vendor lineup pages only, no bench/pricing). On second-cycle empty, log `gaps[]` entry `lineup:incomplete` with reason and continue. Same retry policy applies when `runtime.healthChecks` covers fewer than 3 leaderboard domains.
 
 1. Read data/{models,sources,sources-whitelist}.json + lineup result from Step 0
-2. Parse arg → resolve scope + target_model_ids
+2. Resolve scope: `validate` → run the no-fetch coherence audit (SUBCOMMANDS) and
+   stop. ANY other input (none / `refresh-all` / unrecognized) → `scope=full` over
+   ALL active models. No interactive prompt, no per-model scope.
 3. Build idea_context (DATA-DRIVEN — agent never hardcodes data, only procedure):
 
    **FAZ 7.B/7.C (2026-05-10) — single-helper build:**
    ```python
    from lib.idea_context import build_per_batch_ctx
-   # B (2026-06-07): gap-freshness-tier skip set (no-op until cells accrue
-   # >=3 cycles of gap history in the verification map).
-   gap_sk = compute_gap_skip_cells(vm, active_ids, core_keys)
+   # Only FILLED+fresh cells are skipped (skip_cells, T2). GAP cells are never
+   # skipped — every empty cell is re-queried each full-run.
    ctx = build_per_batch_ctx(
        batch_spec=batch,
        full_whitelist=wl,
        matrix_state=ms,
        priority_cells=pc,
        skip_cells=sk,
-       gap_skip_cells=gap_sk,
        verification_map=vm,
        leaderboard_snapshots=snap,
        contracts=ctr,
@@ -304,22 +315,9 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
      )
        // Shape: { <modelId>: { <benchKey>: {value, sources[], lastChecked, ageDays, verifications} } }
        // Plus _meta: {t1Count, t2Count, totalConsidered}
-
-     // B (2026-06-07): gap-freshness-tier skip cells. A cell empty for
-     // >=GAP_SKIP_MIN_CYCLES (3) consecutive cycles, each with
-     // >=GAP_SKIP_MIN_SOURCES (2) distinct triedSources, is re-checked only
-     // every GAP_RECHECK_EVERY-th (4th) cycle — the ~435 perma-empty cells
-     // (cfElo for non-competitive models, nl2Repo, mrcr) dominate gather
-     // tool-calls re-confirming "still empty". TIME-BASED, never permanent: a
-     // vendor opt-in surfaces within <=4 cycles. Driven by the verification
-     // map's per-cell gapCycles/gapTriedSources (stamped at Step 7.6 from the
-     // merge artifact's gaps[]). The agent emits the carried gap WITHOUT a
-     // fetch, so merge.py's MX1 (filled+gaps+na==total) still holds. No-op until
-     // cells accrue >=3 cycles of gap history. Computed via
-     // scripts/lib/freshness.compute_gap_skip_cells().
-     gapSkipCells: compute_gap_skip_cells(verification_map, active_model_ids, coreBenchKeys)
-       // Shape: { <modelId>: { <benchKey>: {gapCycles, gapSince, triedSources, reason} } }
-       // Plus _meta: {skipCount, eligibleCount, recheckCount}
+       // NOTE: skipCells covers ONLY fresh FILLED cells. There is NO gap-level
+       // skip — every GAP (never-found) cell is re-queried each full-run so a
+       // newly-published value surfaces with zero lag.
    }
    - `.aicodermap-verification-map.json` is the historical audit log of every (model, bench) cell observation across cycles (value, sources[], lastChecked). Used for contradiction analysis only — never read for skip decisions, since every cell is re-fetched every cycle (UNCAPPED + UNCACHED doctrine, reformed 2026-04-28). Skill creates it (empty {}) on first cycle if missing.
    - `data/models.json` is SSOT for "what models we track" — `currentIds` MUST be derived from this file at the moment the skill runs. Hardcoding the id list in a prompt or agent message is a contract violation (any drift between models.json and what the agent receives surfaces as silent omission of new/renamed models).
@@ -768,7 +766,7 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
      ```
    - Persists `.aicodermap-verification-map.json` (gitignored — historical record, regeneratable from sources.json via `bootstrap`)
    - The `confirmed` flag is **audit-only** — used for contradiction analysis and human review. It is NEVER read to skip a FILLED-cell fetch (filled cells re-fetch every cycle; the T2 filled-skip stays dormant while `confirmed` is unset).
-   - **B (2026-06-07) — gap-history stamping (powers the gap-freshness-tier).** The same `update` pass also reads the merge artifact's `gaps[]`: each still-empty cell gets `gapCycles += 1`, `gapSince` set on the first gap of a run, and `gapTriedSources` = the MIN distinct triedSources across the run (conservative). A cell FILLED this cycle has its gap run reset (`gapCycles = 0`). `compute_gap_skip_cells` reads these at the next cycle's ctx build. (This pass also fixed a latent bug — the prior `"bench" not in key` filter skipped EVERY `<modelId>.<benchKey>` sourcesAdded entry, so the incremental verification append was a silent no-op every cycle; now filtered against the bench-key universe.)
+   - **Gap-history stamping (powers lib.matrix's starvation queue ONLY).** The same `update` pass also reads the merge artifact's `gaps[]`: each still-empty cell gets the current cycle appended to `gapHistory` (capped) and `gapSince` set on the first gap of a run. A cell FILLED this cycle has its gap run reset. A cell empty for ≥2 consecutive cycles is pulled to the FRONT of the next cycle's research queue (lib.matrix). This is prioritization, NOT skipping — every gap cell is still re-queried each full-run. (The 2026-06-07 gap-freshness-tier skip — `gapCycles`/`gapTriedSources` + `compute_gap_skip_cells` — was retired the same week; gap cells are never skipped.) (This pass also fixed a latent bug — the prior `"bench" not in key` filter skipped EVERY `<modelId>.<benchKey>` sourcesAdded entry, so the incremental verification append was a silent no-op every cycle; now filtered against the bench-key universe.)
 
 7.6b. AA_AUTHORITATIVE_CORRECTION (2026-05-31, post-merge deterministic corrector):
    ```
@@ -789,8 +787,8 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
      source variance is left untouched.
    - Runs AFTER merge so it corrects the final written data (like
      apply-anomaly-verdicts). Rotates .bak. If `audit-data-coherence.py` then
-     fails, roll back to .bak and log loud (same pattern as 7.7a). Non-fatal.
-     Opt-out `AICODERMAP_NO_AA_AUTHORITATIVE=1`.
+     fails, roll back to .bak and log loud (same pattern as 7.7a). Non-fatal
+     (self-healing — never blocks the cycle).
    - `audit-agent-misfiles.py` is advisory only — writes `data/_misfile-audit.json`
      with the AA-MEASURED moderate disagreements (plausible, not auto-corrected)
      for the next cycle's anomaly→research loop to verify against primary sources.
@@ -851,7 +849,7 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
      cost ~11 min of serial sonnet time for ~0 data change. The scale/metric
      errors a verify pass DOES catch live in `source-mismatch` (wrong-publisher
      Elo) + `out-of-band` (impossible value) — those two remain auto-dispatched.
-     Advisory; never blocks. Opt-out `AICODERMAP_NO_ANOMALY_RESOLVE=1`. This is
+     Advisory; never blocks. This is
      the automated form of the manual cfElo investigation (2026-05-27): an
      anomaly triggers RESEARCH, not rejection.
 
@@ -996,7 +994,7 @@ Termination — all four MUST hold before agent emits final JSON:
 
 ## VENDOR_LINEUP_SOURCES (Step 0 — official "what models exist now")
 
-The vendor URL list is canonical in **`data/sources-whitelist.json`** under `vendors.<vendor>.urls.lineup`. Every entry there with a `lineup` URL is fetched on `refresh-all` and `lineup-sync`.
+The vendor URL list is canonical in **`data/sources-whitelist.json`** under `vendors.<vendor>.urls.lineup`. Every entry there with a `lineup` URL is fetched on every full refresh (and on the PRELIM-E lineup-only fast-path).
 
 The skill iterates `sourcesWhitelist.vendors` and dispatches one parallel fetch per vendor.lineup URL. New vendors are added by editing `data/sources-whitelist.json` only — never by editing this spec.
 
@@ -1306,10 +1304,7 @@ Per-step error handling lives in **SILENT_FAIL_PREVENTION** above (single source
 
 | Arg | Action |
 |-----|--------|
-| `lineup-sync` | Phase 0 only — vendor diff (NEW/DEPRECATED/RENAMED/REMOVED) without bench/pricing survey |
-| `validate` (no fetch) | Read `data/sources.json` → compute coverage + list contradictions + stale entries |
-| `stale-check` | List `data/models.json` entries with `today - lastUpdated > STALE_DAYS` |
-| `changelog` | tail -50 CHANGELOG.md → last 5 release entries |
+| `validate` (no fetch) | Read `data/{models,sources}.json` → run `audit-data-coherence.py` + `audit-bench-source-mapping.py`, compute coverage, list contradictions + entries older than `STALE_DAYS`. No write, no commit. |
 
 ## INVARIANTS
 

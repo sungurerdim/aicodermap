@@ -85,12 +85,16 @@ Orchestrator appends count badges to CHANGELOG: `🔎 New vendor candidates: N`,
 | scope | task | model | parallelism |
 |-------|------|-------|-------------|
 | `full` | Phase 0 lineup + Phase 1 SOURCE_FIRST_SWEEP + Phase 2 per-model fill | sonnet | 5 sources, 5 models |
-| `lineup-sync` | Phase 0 only | sonnet | — |
-| `specific` | Phase 2 only for target_model_ids | sonnet | 3 |
-| `new-release` | new-model detection (subset of Phase 0) | sonnet | 4 |
+| `lineup-sync` | Phase 0 only — lineup fetch + WebSearch new-release net + sub-probes (new-model detection, no bench/pricing). INTERNAL: dispatched by the PRELIM-E fast-path, not a user command. | sonnet | — |
 | `search` | quick single lookup | haiku | 1-2 |
 | `deep-fetch` | targeted single (modelId, field) backfill (skill-spawned) | sonnet | — |
 | `anomaly-verify` | resolve `idea_context.anomalies[]` — primary-source check per cell | sonnet | 5 |
+
+> Scopes `specific` (single-model Phase-2 sweep) and `new-release` (Phase-0-only
+> new-model probe) were retired 2026-06-07 with the skill's `model <id>` /
+> `new-release` subcommands. `lineup-sync` absorbs the new-model-detection job;
+> `full` covers everything else. The skill now dispatches only `full`,
+> `lineup-sync` (PRELIM-E), and `anomaly-verify` (PRELIM-F).
 
 **`anomaly-verify` scope (Layer-3 auto-resolution, 2026-05-27):** input is the
 `data/_anomalies.json` queue (source-mismatch / out-of-band / single-source /
@@ -108,12 +112,12 @@ A value that is simply WRONG (but correctly classified) → do NOT verdict it he
 record the corrected value as a normal observation so merge recomputes trustScore.
 scripts/apply-anomaly-verdicts.py applies confirm/reclassify/clear mechanically.
 
-## SCOPE_NEW_RELEASE
+## SCOPE_LINEUP_SYNC
 
-**`new-release` scope** is a focused subset of Phase 0 whose sole job is catching
-models that exist now but are absent from `idea_context.currentIds`. It is what the
-orchestrator dispatches for a targeted "did anyone ship something?" probe and what
-the PRELIM-E fast path leans on.
+**`lineup-sync` scope** is Phase 0 only — its job is catching models that exist
+now but are absent from `idea_context.currentIds` (plus deprecated/renamed/removed
+deltas), WITHOUT gathering any bench/pricing. It is what the PRELIM-E fast path
+dispatches when the matrix is already fully fresh.
 
 Phase 0 steps that run (in order):
 1. **Step 1** lineup fetch (with redirect-follow + SPA_NO_DATA detect) for every vendor.
@@ -141,16 +145,16 @@ Output shape:
 
 Merge effect: the orchestrator treats `lineupChanges.new[]` / `newModels[]` as
 **detection signals only** — it appends each as a NEW model stub flagged for a
-follow-up `specific`/`full` survey (Step 4) and appends a CHANGELOG `🆕` line. A
-`new-release` run NEVER writes bench/pricing into `data/models.json` directly (no
-values were gathered); it only widens the active set so the next fill cycle covers
-the new id. Ids already in `currentIds` are no-ops.
+follow-up `full` survey (Step 4) and appends a CHANGELOG `🆕` line. A `lineup-sync`
+run NEVER writes bench/pricing into `data/models.json` directly (no values were
+gathered); it only widens the active set so the next fill cycle covers the new id.
+Ids already in `currentIds` are no-ops.
 
 **No `typical duration` column** — the agent runs to completeness, not to a clock. A `full` scope cycle takes as long as walking every advertised source + every per-model URL + every vendor card + every WebSearch fallback for unfilled cells requires. Saturation termination + verification-map confirmed-cell skip make subsequent cycles incremental (most cells already confirmed across 3+ sources skip the sweep entirely).
 
 ## INPUTS
 ```
-scope: <full|lineup-sync|specific|new-release|search|deep-fetch>
+scope: <full|lineup-sync|search|deep-fetch|anomaly-verify>
 query: <focus string>
 idea_context: {
   title: "AICoderMap",
@@ -198,13 +202,12 @@ require_full_matrix: <bool default:true>     # every cell must end as fill | gap
 # 1023s against a 600s deadline because the deadline was both omitted from the
 # prompt AND only checked at sparse Phase boundaries). Honoring it is mandatory.
 #
-# Cell skip — two freshness-tiers (both bypass FORMAT_DISPATCH entirely):
+# Cell skip — ONE freshness-tier (bypasses FORMAT_DISPATCH entirely):
 #   FILLED (T2, FAZ 2.2): confirmed=true AND verifs≥3 AND age≤7d AND no
 #     contradiction → arrives in idea_context.skipCells (cached value emitted).
-#   GAP (B, 2026-06-07): empty ≥3 consecutive cycles (≥2 triedSources each) AND
-#     not the every-4th-cycle re-check → arrives in idea_context.gapSkipCells
-#     (carried gap emitted, NO fetch). Time-based, never permanent.
-# Everything else is T1 (re-fetch this cycle).
+# GAP (never-found) cells are NEVER skipped — every empty cell is re-queried
+# every full-run so a newly-published value surfaces with zero lag. Everything
+# that is not a fresh FILLED cell is T1 (re-fetch this cycle).
 #
 # Sub-agents see ONLY their slice (target_model_ids ≤ 8 models × |coreKeys| cells).
 # The orchestrator parallelizes across slices via plan.waves.
@@ -307,7 +310,6 @@ reliably; nested 2-level structures often degrade.
     {"modelId": "opus-4-7", "field": "trainingDataOptOut", "value": "available", "sourceUrl": "https://privacy.anthropic.com/", "tier": "S", "fetched": "2026-05-19"}
   ],
   "lineupHints": [],
-  "naCandidates": [],
   "rawGaps": [
     {"modelId": "claude-haiku-4-5", "benchKey": "aaAgentic", "triedSources": ["https://artificialanalysis.ai/models/claude-4-5-haiku"], "triedQueries": ["claude haiku 4.5 aa agentic 2026"]}
   ],
@@ -320,7 +322,7 @@ reliably; nested 2-level structures often degrade.
 
 1. **TOP-LEVEL KEYS** must be exactly: `batchId`, `mode`, `observations`,
    `modelMeta`, `pricingObs`, `ollamaObs`, `unslothObs`, `privacyObs`, `lineupHints`,
-   `naCandidates`, `rawGaps`, `runtime`, `partialReason`. Any other keys
+   `rawGaps`, `runtime`, `partialReason`. Any other keys
    (`models`, `updates`, `sourcesAdded`, `gaps`, `confidence`, `synthesis`,
    `lineupChanges`, `coverageMatrix`, `validationCoverage`, `runMetadata`,
    `error`) — these belong to FULL/SYNTH mode, NOT gather. The schema
@@ -393,7 +395,7 @@ reliably; nested 2-level structures often degrade.
       Write a minimal valid stub FIRST:
       `{"batchId":"<id>","mode":"gather","observations":[],"modelMeta":[],
         "pricingObs":[],"ollamaObs":[],"unslothObs":[],"lineupHints":[],
-        "naCandidates":[],"rawGaps":[],"runtime":{"startedAt":"<ISO>",
+        "rawGaps":[],"runtime":{"startedAt":"<ISO>",
         "toolCallCount":N,"wallclockSec":S,"snapshotsRead":K},
         "partialReason":"context_budget"}`
     - Then status: `EMITTED batch=<id> mode=gather observations=0 partial=context_budget path=<output_path>`
@@ -430,9 +432,7 @@ Reads every gather artifact, applies analytical work:
 2. Cross-batch lineup reconciliation (lineupHints → lineupChanges with
    WRONG_ID_AUTO_FIX detection — agent that saw `devstral-medium`'s wrong
    data will surface that here).
-3. notApplicable rule citation: take naCandidates and map to
-   `_schema.notApplicableRules.rules[]`; drop ones that don't match a rule.
-3.5. **PRE-EMIT KEY VALIDATION** (FAZ 8.A, 2026-05-18). Before Write,
+3. **PRE-EMIT KEY VALIDATION** (FAZ 8.A, 2026-05-18). Before Write,
    iterate every `models[i].updates.bench` dict and drop any key NOT in
    `idea_context._schema.coreBenchKeys ∪ idea_context._schema.emergingBenchKeys`.
    Non-canonical keys (e.g., `lcbV6`, `aider`, `aiderPoly`, `aaCoding`
@@ -452,8 +452,8 @@ Reads every gather artifact, applies analytical work:
 ### Mode `full` (sonnet, legacy single-stage — default)
 
 Pre-FAZ-4.C behavior: agent does both gather + synth in one dispatch.
-Used when hybrid is disabled or for `model <id>` / `deep-fetch` scopes
-where single-batch synth has no parallelism benefit.
+Used when hybrid is disabled or for the `deep-fetch` scope where
+single-batch synth has no parallelism benefit.
 
 **Matrix awareness (HARD — FAZ 4.A reform 2026-05-08):**
 The skill ships `matrixState` + `priorityCells` (after T2-skip removal — see
@@ -809,24 +809,12 @@ if (idea_context.skipCells[modelId]?.[benchKey]):
     })
     continue
 
-// GAP-FRESHNESS-TIER CELL SKIP (B, 2026-06-07) — bypass all fetch logic for a
-// cell that has been EMPTY for >=3 consecutive cycles (each with >=2 distinct
-// triedSources) and is NOT due for its every-4th-cycle re-check. Re-confirming
-// a structurally-unpublished cell (cfElo for a non-competitive model, nl2Repo,
-// mrcr) every cycle is the dominant gather tool-call sink. The cell is STILL a
-// gap this cycle — just carried forward without a fetch. NOT a permanent skip:
-// the orchestrator re-checks it every 4th cycle, so a vendor opt-in still
-// surfaces with bounded lag. The carried gap keeps merge.py's MX1 invariant
-// (filled+gaps+na == totalCells) satisfied.
-if (idea_context.gapSkipCells[modelId]?.[benchKey]):
-    g := idea_context.gapSkipCells[modelId][benchKey]
-    rawGaps[].push({
-        key: `${modelId}.${benchKey}`,
-        reason: `gap-freshness-tier skip (${g.reason})`,
-        triedSources: [], triedQueries: [], triedFormats: [],
-        carriedFrom: g.gapSince, gapCycles: g.gapCycles
-    })
-    continue
+// NO GAP-LEVEL SKIP — a cell that has never been found is re-queried EVERY
+// full-run. (The 2026-06-07 gap-freshness-tier skip was retired the same week:
+// a structurally-unpublished value can become published at any time, so skipping
+// it would delay surfacing a real value. The FILLED-cell T2 freshness skip above
+// is the ONLY skip tier; source-health bans below block dead URLs, not benches —
+// the WebSearch fallback still runs.)
 
 // HARD WebFetch GATE — three ban signals (any match → skip primary, jump to fallback):
 //   (a) formatTaxonomy[format].skipWebFetch === true   (spa_full, image_embedded, bot_blocked)
@@ -1140,7 +1128,7 @@ Each privacy field follows a canonical normalize table (whitelist `_schema.priva
 **Mandatory rules:**
 - Every `privacyObs[]` entry MUST include a precise `sourceUrl` that the agent actually fetched and parsed. Citing the vendor's home page without verifying the specific privacy claim is a contract violation; emit a gap instead.
 - The 5 fields are independent — partial coverage is fine. If only `soc2` + `gdpr` reachable for a model, emit those two; the rest stay null/unknown and synth treats them as gaps.
-- For closed-vendor / closed-data scenarios (e.g., research preview, no public privacy policy), emit `naCandidates[]` entries with reasonHint `"no-public-privacy-policy"`.
+- For closed-vendor / closed-data scenarios (e.g., research preview, no public privacy policy), emit a `rawGaps[]` entry for the (model, field) with a triedQueries note (e.g. `"no-public-privacy-policy"`). N/A is retired — an unverifiable privacy field is a GAP, never "not applicable".
 - **Tier override (S vs I):** by HARD RULE 5 in `## EVIDENCE_REQUIRED`, vendor self-report is S-tier (verifications=1, trustScore=0.7). Independent audit registry confirmation is I-tier (verifications≥1, trustScore=1.0). Synth's pick_winner picks I over S when both present — vendor claims override only when no independent registry covers the (model, field) pair.
 
 ## VALIDATION_RULES
