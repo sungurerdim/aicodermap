@@ -465,17 +465,18 @@ def main():
             f"{' ...' if len(has_na) > 5 else ''}"
         )
 
-    # === AC12 — display name version-format canonical (model-agnostic) ===
+    # === AC12 — display name canonical (model-agnostic) ===
     # Every model name must already be in canonical form: a bare minor-version
-    # number uses a dot, not a space ("Qwen3.7 Max", never "Qwen3 7 Max").
-    # Reuses lib.util.canonical_display_name (SSOT with merge.py's auto-fix) so
-    # the gate and the fixer never diverge. Param sizes ("Gemma 3 27B") and
-    # already-dotted versions ("Qwen 3.5 9B") are intentionally left untouched.
+    # number uses a dot, not a space ("Qwen3.7 Max", never "Qwen3 7 Max"), AND a
+    # name must not be a raw id-slug ("minimax-m3" → must be "MiniMax M3").
+    # Reuses lib.util.canonical_display_name (SSOT with merge.py's auto-fix, same
+    # provider arg) so the gate and the fixer never diverge. Param sizes
+    # ("Gemma 3 27B") and already-dotted versions ("Qwen 3.5 9B") are untouched.
     bad_names: list[str] = []
     for m in models:
         nm = m.get("name")
         if isinstance(nm, str):
-            canon = _canonical_name(nm)
+            canon = _canonical_name(nm, m.get("provider"))
             if canon != nm:
                 bad_names.append(f"{m['id']}: {nm!r} -> {canon!r}")
     if bad_names:

@@ -170,17 +170,93 @@ def parse_locale_decimal(raw: str | float | int | None) -> float | None:
         return None
 
 
-def canonical_display_name(name: str) -> str:
-    """Standardize a model display name's version separator (model-agnostic).
+# A name that is still a raw id-slug: all-lowercase, hyphen-separated, no spaces
+# (e.g. "minimax-m3" that leaked from the id because lineup discovery supplied no
+# display name). Already-human-formatted names ("MiniMax M2.7", "Gemma 3 27B",
+# "GPT-5.5") have uppercase and/or spaces, so they never match — that is what
+# makes the slug-repair below safe to run on every model unconditionally.
+_SLUG_NAME_PAT = re.compile(r"[a-z0-9]+(?:-[a-z0-9.]+)+")
+# A version-ish token: optional letter prefix + a digit (+ dotted minors).
+# "m2", "m2.7", "v4", "5", "0528" — used both to join digit fragments with a dot
+# and to decide uppercasing. NOT "pro"/"max"/"flash" (no digit → Title-cased).
+_VERSION_TOKEN_PAT = re.compile(r"^[a-z]*\d[\d.]*$")
 
-    "Qwen3 7 Max" -> "Qwen3.7 Max"; leaves "Gemma 3 27B", "Qwen 3.5 9B" and
-    "GPT-5.5" untouched. Verified against the full model set to change only the
-    two genuine version-dot anomalies. Applied in merge.py before each refresh
-    write so future slug-derived names self-correct without per-model patches.
+
+def _compact(s: str) -> str:
+    """Lowercased alphanumerics only — for matching a provider against id tokens
+    ("MiniMax" -> "minimax", "Z AI" -> "zai")."""
+    return re.sub(r"[^a-z0-9]", "", (s or "").lower())
+
+
+def _case_token(tok: str) -> str:
+    """Title-case one designator token. Version tokens uppercase their letter
+    prefix ("m2.7"->"M2.7", "v4"->"V4", "0528"->"0528"); param sizes keep their
+    unit ("27b"->"27B"); plain words Title-case ("pro"->"Pro")."""
+    if re.match(r"^[a-z]+\d", tok):
+        return re.sub(r"^[a-z]+", lambda m: m.group().upper(), tok)
+    if re.match(r"^\d", tok):
+        return tok.upper()
+    return tok[:1].upper() + tok[1:]
+
+
+def _slug_to_display(slug: str, provider: str | None) -> str:
+    """Rebuild a human display name from a raw id-slug, model-agnostic.
+
+    "minimax-m3"   + provider "MiniMax" -> "MiniMax M3"
+    "minimax-m2-7" + provider "MiniMax" -> "MiniMax M2.7"
+    Brand casing is taken verbatim from `provider` when it prefixes the slug
+    (the provider field is the canonical brand); otherwise the leading token is
+    Title-cased generically. Version digit-fragments are joined with a dot.
+    """
+    tokens = slug.split("-")
+    # Join trailing pure-digit fragments onto the preceding version token so
+    # "m2","7" becomes "m2.7" (the id splits a minor version across a hyphen).
+    merged: list[str] = []
+    for t in tokens:
+        if t.isdigit() and merged and _VERSION_TOKEN_PAT.match(merged[-1]):
+            merged[-1] = f"{merged[-1]}.{t}"
+        else:
+            merged.append(t)
+    # Consume the leading tokens that spell out the provider, and substitute the
+    # provider's exact casing for them.
+    brand_tokens = 0
+    if provider:
+        pc = _compact(provider)
+        acc = ""
+        for i, t in enumerate(merged):
+            acc += _compact(t)
+            if acc == pc:
+                brand_tokens = i + 1
+                break
+            if not pc.startswith(acc):
+                break
+    parts = [provider] if brand_tokens else []
+    parts += [_case_token(t) for t in merged[brand_tokens:]]
+    return " ".join(p for p in parts if p).strip()
+
+
+def canonical_display_name(name: str, provider: str | None = None) -> str:
+    """Standardize a model display name (model-agnostic, SSOT).
+
+    Two layers, both safe to run on every model on every refresh:
+      1. Version-dot fix: "Qwen3 7 Max" -> "Qwen3.7 Max" (leaves "Gemma 3 27B",
+         "Qwen 3.5 9B", "GPT-5.5" untouched).
+      2. Slug repair: a name that is still a raw lowercase id-slug
+         ("minimax-m3") is rebuilt into "<Brand> <Designator>" ("MiniMax M3"),
+         using `provider` for the brand's canonical casing. Already-formatted
+         names (any uppercase or space) skip this layer entirely, so it can
+         never corrupt a good name — only promote a leaked slug.
+
+    Applied in merge.py before each refresh write + enforced by AC12, so every
+    path (agent output, lineup stubs, synth) self-corrects without per-model
+    patches and new/unknown models are covered the moment they land.
     """
     if not name or not isinstance(name, str):
         return name
-    return _VERSION_DOT_PAT.sub(r"\1.\2", name)
+    fixed = _VERSION_DOT_PAT.sub(r"\1.\2", name)
+    if _SLUG_NAME_PAT.fullmatch(fixed):
+        return _slug_to_display(fixed, provider)
+    return fixed
 
 
 def normalize_anomaly_verdict(v: dict) -> dict:

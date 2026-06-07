@@ -1078,12 +1078,14 @@ def main():
     )
 
     # Model-agnostic display-name canonicalization: fix version-dot anomalies
-    # (e.g. slug-derived "Qwen3 7 Max" -> "Qwen3.7 Max") so every refresh
-    # self-corrects without per-model patches. No-op for already-canonical names.
+    # ("Qwen3 7 Max" -> "Qwen3.7 Max") AND repair raw id-slug names that leaked
+    # from lineup discovery ("minimax-m3" -> "MiniMax M3", brand cased from
+    # provider) so every refresh self-corrects without per-model patches. No-op
+    # for already-canonical names.
     for m in models:
         nm = m.get("name")
         if isinstance(nm, str):
-            canon = _canonical_name(nm)
+            canon = _canonical_name(nm, m.get("provider"))
             if canon != nm:
                 m["name"] = canon
                 log.setdefault("name_canonicalized", []).append(f"{nm} -> {canon}")

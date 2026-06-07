@@ -28,11 +28,15 @@ STUB_META below is an OPTIONAL rich-copy override keyed by id; absence is fine.
 
 import json
 import re
+import sys
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO / "scripts"))
+from lib.util import canonical_display_name  # noqa: E402
+
 NOW = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 # Optional rich-copy overrides (id -> dict with provider/tier/open/license/context/
@@ -225,7 +229,11 @@ def main() -> int:
         }
         stub = {
             "id": mid,
-            "name": name,
+            # Born-correct: a lineup entry without a display name falls back to
+            # the raw id slug; canonicalize it ("minimax-m3" -> "MiniMax M3")
+            # using the resolved provider so the stub is never published as a
+            # slug (this step can run after merge's canonicalization pass).
+            "name": canonical_display_name(name, meta["provider"]),
             "provider": meta["provider"],
             "released": meta["released"],
             "tier": meta["tier"],
