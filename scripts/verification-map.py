@@ -55,9 +55,9 @@ from lib.constants import (  # noqa: E402
 from lib.constants import VERIFICATION_AGREEMENT_PP  # noqa: E402  (SSOT)
 from lib.whitelist import all_bench_keys, load_whitelist  # noqa: E402
 
-# B (2026-06-07): cap the gapHistory audit trail so a perma-empty cell does not
-# grow its ledger unbounded across years of cycles. gapCycles (int) is the
-# authoritative counter; gapHistory keeps only the most-recent dates for audit.
+# Cap the gapHistory ledger so a perma-empty cell does not grow it unbounded
+# across years of cycles. Only the trailing-run length matters to lib.matrix's
+# starvation queue (>=2), so keeping the most-recent dates is sufficient.
 _GAP_HISTORY_CAP = 8
 
 ARTIFACT = PROJECT / ".aicodermap-agent-out.json"
@@ -161,20 +161,18 @@ def update_map():
                 appended += 1
                 cell["lastChecked"] = TODAY
 
-    # B (2026-06-07): gap-history stamping. Drives the gap-freshness-tier
-    # (lib.freshness.compute_gap_skip_cells). A cell filled this cycle has its
-    # gap run reset; a cell still in the artifact's gaps[] has its consecutive
-    # gap counter bumped + its triedSources count recorded so the skip gate can
-    # require >=GAP_SKIP_MIN_SOURCES distinct sources tried per gap cycle.
-    # A cell that is neither filled nor gapped this cycle is left untouched
-    # (its run is neither extended nor reset).
+    # Gap-history stamping — feeds ONLY the starvation queue in lib.matrix
+    # (a cell empty for >=2 consecutive cycles is pulled to the front of the
+    # research queue). A cell filled this cycle has its gap run reset; a cell
+    # still in the artifact's gaps[] has the current cycle appended to its
+    # history. NOT a skip mechanism — every gap cell is re-queried every full
+    # run (the 2026-06-07 gap-freshness-tier skip was retired the same week).
+    # A cell that is neither filled nor gapped this cycle is left untouched.
     for ck in filled_keys:
         cell = cells.get(ck)
         if cell is not None:
-            cell["gapCycles"] = 0
             cell["gapHistory"] = []
             cell["gapSince"] = None
-            cell["gapTriedSources"] = 0
     gap_stamped = 0
     for gap in artifact.get("gaps", []) or []:
         key = gap.get("key")
@@ -186,8 +184,6 @@ def update_map():
         ck = f"{parsed[0]}.{parsed[1]}"
         if ck in filled_keys:
             continue  # filled wins over a stale carried gap in the same artifact
-        tried = gap.get("triedSources") or []
-        n_tried = len(tried) if isinstance(tried, list) else 0
         cell = cells.setdefault(
             ck,
             {
@@ -202,20 +198,12 @@ def update_map():
             },
         )
         cell.setdefault("gapHistory", [])
-        prev = cell.get("gapCycles") or 0
-        cell["gapCycles"] = prev + 1
         if not cell.get("gapSince"):
             cell["gapSince"] = TODAY
         hist = cell["gapHistory"]
         hist.append(TODAY)
         if len(hist) > _GAP_HISTORY_CAP:
             del hist[: len(hist) - _GAP_HISTORY_CAP]
-        # Record the MINIMUM triedSources across the current gap run — the skip
-        # gate is conservative (a single low-effort cycle keeps the cell T1).
-        prev_min = cell.get("gapTriedSources")
-        cell["gapTriedSources"] = (
-            n_tried if prev_min in (None, 0) else min(prev_min, n_tried)
-        )
         gap_stamped += 1
 
     # Recompute consensus value (median when ≥ THRESHOLD agree); flag

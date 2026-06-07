@@ -193,7 +193,6 @@ def main() -> int:
         "pricingObsTotal": 0,
         "ollamaObsTotal": 0,
         "unslothObsTotal": 0,
-        "naCandidatesTotal": 0,
         "rawGapsTotal": 0,
     }
 
@@ -274,9 +273,8 @@ def main() -> int:
             if mid in active_ids:
                 all_unsloth[mid].append(uo)
                 runtime_total["unslothObsTotal"] += 1
-        # N/A retired: naCandidates are counted for telemetry only, never
-        # promoted — every (model, bench) cell is FILLED or GAP.
-        runtime_total["naCandidatesTotal"] += len(art.get("naCandidates") or [])
+        # N/A fully retired 2026-05-25: naCandidates are neither produced nor
+        # counted — every (model, bench) cell is FILLED or GAP.
         for rg in art.get("rawGaps") or []:
             all_raw_gaps.append(rg)
             runtime_total["rawGapsTotal"] += 1
@@ -425,8 +423,13 @@ def main() -> int:
         per_model[mid]["updates"]["bench"][bk] = winner_val
         fills_count += 1
 
-        # Build sourcesAdded entry (wrapped Provenance shape, one per winner)
-        for s in winner_bv["sources"][:5]:
+        # Build sourcesAdded entry (wrapped Provenance shape, one per winner).
+        # ALL winner-cluster sources are carried — no truncation — so 6+ sourced
+        # cells keep their full provenance trail in sources.json. The field name
+        # is `fetched` (NOT `date`) to match merge.py's reader (s.get("fetched"))
+        # + the agent's sourcesAdded contract; a `date` key would be dropped and
+        # the original fetch date silently replaced by TODAY.
+        for s in winner_bv["sources"]:
             per_model[mid]["sourcesAdded"].append(
                 {
                     "key": f"{mid}.{bk}",
@@ -436,7 +439,7 @@ def main() -> int:
                     else "",
                     "url": s["url"],
                     "tier": s["tier"],
-                    "date": s["fetched"],
+                    "fetched": s["fetched"],
                     "verifications": winner_bv["verifications"],
                     "trustScore": winner_ts,
                 }

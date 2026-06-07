@@ -471,10 +471,17 @@ def pick_winner(
     # downstream consumers can split clusters when needed.
     valid = tag_evaluation_context(valid)
 
-    # Distinct URL count for verifications cap (FAZ 6.E)
-    distinct_urls = {(o.get("sourceUrl") or "").strip().lower() for o in valid}
+    # Distinct URL count for verifications cap (FAZ 6.E). Count PRIMARY
+    # (non-pseudo) sources only — a backfill / snapshot-extraction stub is
+    # excluded from clustering, so counting it as a verification would be
+    # inconsistent and would inflate the trust of a cell that has no real
+    # source yet. A pseudo-only cell (primary empty) correctly yields
+    # verif_count=0 → verif_factor 0 → low trust until a real source arrives.
+    # Equals the prior value whenever any primary source exists (valid==primary
+    # in that case); only the pseudo-only fallback changes (1→0).
+    distinct_urls = {(o.get("sourceUrl") or "").strip().lower() for o in primary}
     distinct_urls.discard("")
-    verif_count = len(distinct_urls) or len(valid)
+    verif_count = len(distinct_urls) or len(primary)
 
     scored: list[dict[str, Any]] = []
     # Phase R5: resolve per-source recency curve when a whitelist is supplied.

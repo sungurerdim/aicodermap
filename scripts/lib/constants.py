@@ -42,23 +42,12 @@ MAX_PARALLEL = 16  # 2026-06-06: 10→16. With FFD batch-packing a 76-model cycl
 # wave. 16 also matches the workflow concurrency ceiling (min(16, cores-2)).
 
 # ── Freshness contract (FAZ 2.2) ───────────────────────────────────────────
+# Bench-LEVEL freshness skip (T2) applies ONLY to FILLED+confirmed+fresh cells.
+# GAP (never-found) cells are re-queried every full-run — there is no gap-level
+# skip tier (the 2026-06-07 gap-freshness-tier was retired the same week it
+# landed; every GAP cell surfaces a vendor opt-in with zero lag).
 FRESHNESS_TTL_DAYS = 7  # T2 cells skip if confirmed AND age ≤ this.
 MIN_VERIFICATIONS_FOR_SKIP = 3  # T2 cells require ≥3 verifications.
-
-# ── Gap-freshness-tier (B, 2026-06-07) ─────────────────────────────────────
-# A cell that has been a GAP for >=GAP_SKIP_MIN_CYCLES consecutive cycles, each
-# time with >=GAP_SKIP_MIN_SOURCES distinct triedSources, is re-checked only
-# every GAP_RECHECK_EVERY-th cycle instead of every cycle — the ~435 perma-empty
-# cells (cfElo for non-competitive models, nl2Repo, mrcr) dominate gather
-# tool-calls re-confirming "still empty". TIME-BASED, not a permanent skip: the
-# cell is still re-checked periodically, so a vendor opt-in surfaces within
-# <=GAP_RECHECK_EVERY cycles. NOT the retired notApplicableBenchKeys registry.
-GAP_SKIP_MIN_CYCLES = 3  # consecutive gap cycles before a cell becomes skip-eligible
-GAP_SKIP_MIN_SOURCES = 2  # min distinct triedSources per gap cycle of the run (typical
-#                           gap-contract effort; the 3-cycle requirement is the main guard)
-GAP_RECHECK_EVERY = (
-    4  # re-check a skip-eligible gap cell every Nth cycle (skip the other N-1)
-)
 
 # ── Hybrid dispatch (FAZ 4.C) ──────────────────────────────────────────────
 HAIKU_GATHER_MIN_AVG_OBS = 3  # Avg observations per target_model. Below → sonnet retry.

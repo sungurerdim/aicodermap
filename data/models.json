@@ -148,27 +148,7 @@
         "US",
         "EU"
       ]
-    },
-    "naCandidates": [
-      "swePro",
-      "tb2",
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "sweMulti",
-      "bfcl",
-      "aime26",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "gemini-3-1-pro",
@@ -345,16 +325,6 @@
         "EU"
       ]
     },
-    "naCandidates": [
-      "aaCoding",
-      "aaAgentic",
-      "sweMulti",
-      "bfcl",
-      "tbHard",
-      "simpleQa",
-      "programBench",
-      "nl2Repo"
-    ],
     "benchQuarantine": {
       "lmArenaElo": true
     }
@@ -682,20 +652,7 @@
         "US"
       ],
       "apiLogging": "opt_out"
-    },
-    "naCandidates": [
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "sweMulti",
-      "bfcl",
-      "aime26",
-      "lcb",
-      "tbHard",
-      "mmluPro",
-      "simpleQa",
-      "programBench"
-    ]
+    }
   },
   {
     "id": "grok-3",
@@ -1053,24 +1010,7 @@
         "EU",
         "US"
       ]
-    },
-    "naCandidates": [
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "sweMulti",
-      "hle",
-      "bfcl",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "o3",
@@ -1539,16 +1479,7 @@
       "soc2": true,
       "gdpr": true,
       "apiLogging": "opt_out"
-    },
-    "naCandidates": [
-      "aaAgentic",
-      "bfcl",
-      "tbHard",
-      "cfElo",
-      "simpleQa",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "sonnet-4-6",
@@ -1754,17 +1685,7 @@
       "soc2": true,
       "gdpr": true,
       "apiLogging": "opt_out"
-    },
-    "naCandidates": [
-      "aaCoding",
-      "aaAgentic",
-      "bfcl",
-      "tbHard",
-      "cfElo",
-      "simpleQa",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "codestral-22b",
@@ -2155,18 +2076,7 @@
         "CN"
       ],
       "apiLogging": "default_on"
-    },
-    "naCandidates": [
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "bfcl",
-      "aaOmni",
-      "tbHard",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "deepseek-v4-flash",
@@ -2359,22 +2269,7 @@
         "CN"
       ],
       "apiLogging": "default_on"
-    },
-    "naCandidates": [
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "sweMulti",
-      "bfcl",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "deepseek-v4-pro",
@@ -2588,17 +2483,7 @@
         "CN"
       ],
       "apiLogging": "default_on"
-    },
-    "naCandidates": [
-      "aaCoding",
-      "aaAgentic",
-      "bfcl",
-      "aaOmni",
-      "tbHard",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "devstral-2",
@@ -3046,22 +2931,7 @@
         "SG"
       ],
       "apiLogging": "unknown"
-    },
-    "naCandidates": [
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "sweMulti",
-      "bfcl",
-      "lcb",
-      "tbHard",
-      "cfElo",
-      "mmluPro",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench"
-    ]
+    }
   },
   {
     "id": "kimi-k2-6",
@@ -3316,17 +3186,6 @@
       "gdpr": false,
       "apiLogging": "default_on"
     },
-    "naCandidates": [
-      "aaCoding",
-      "aaAgentic",
-      "bfcl",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ],
     "benchQuarantine": {}
   },
   {
@@ -3516,25 +3375,7 @@
         "US"
       ],
       "apiLogging": "not_logged"
-    },
-    "naCandidates": [
-      "tb2",
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "sweMulti",
-      "bfcl",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "llama-4-scout",
@@ -3721,25 +3562,6 @@
       ],
       "apiLogging": "not_logged"
     },
-    "naCandidates": [
-      "swePro",
-      "tb2",
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "sweMulti",
-      "hle",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ],
     "benchQuarantine": {}
   },
   {
@@ -3873,25 +3695,7 @@
         "winning_cluster_sum_trust": 0.781,
         "winning_cluster_distinct_sources": 1
       }
-    },
-    "naCandidates": [
-      "tb2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "bfcl",
-      "aime26",
-      "aaOmni",
-      "cfElo",
-      "browseComp",
-      "mmluPro",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo",
-      "lcb"
-    ]
+    }
   },
   {
     "id": "mimo-v2-5-pro",
@@ -4062,21 +3866,7 @@
         "winning_cluster_sum_trust": 11.081,
         "winning_cluster_distinct_sources": 5
       }
-    },
-    "naCandidates": [
-      "aaCoding",
-      "mcpA",
-      "sweMulti",
-      "bfcl",
-      "aaOmni",
-      "cfElo",
-      "browseComp",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "mimo-v2-flash",
@@ -4272,21 +4062,7 @@
         "winning_cluster_sum_trust": 0.773,
         "winning_cluster_distinct_sources": 1
       }
-    },
-    "naCandidates": [
-      "swePro",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "bfcl",
-      "aaOmni",
-      "cfElo",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "mimo-v2-pro",
@@ -4424,24 +4200,6 @@
         "winning_cluster_distinct_sources": 2
       }
     },
-    "naCandidates": [
-      "swePro",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "sweMulti",
-      "bfcl",
-      "aaOmni",
-      "cfElo",
-      "browseComp",
-      "mmluPro",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo",
-      "aime26"
-    ],
     "benchQuarantine": {}
   },
   {
@@ -4679,20 +4437,7 @@
         "US",
         "EU"
       ]
-    },
-    "naCandidates": [
-      "tau2",
-      "aaCoding",
-      "mcpA",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "minimax-m2-7",
@@ -4915,21 +4660,7 @@
     },
     "privacy": {
       "trainingDataOptOut": "available"
-    },
-    "naCandidates": [
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "bfcl",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench"
-    ]
+    }
   },
   {
     "id": "nemotron-3-super",
@@ -5120,21 +4851,6 @@
       "gdpr": true,
       "apiLogging": "opt_out"
     },
-    "naCandidates": [
-      "swePro",
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "bfcl",
-      "aaOmni",
-      "cfElo",
-      "browseComp",
-      "simpleQa",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ],
     "benchQuarantine": {}
   },
   {
@@ -5313,22 +5029,7 @@
         "winning_cluster_sum_trust": 2.816,
         "winning_cluster_distinct_sources": 4
       }
-    },
-    "naCandidates": [
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "bfcl",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench"
-    ]
+    }
   },
   {
     "id": "qwen3-6-max",
@@ -5486,22 +5187,7 @@
         "winning_cluster_sum_trust": 0.731,
         "winning_cluster_distinct_sources": 2
       }
-    },
-    "naCandidates": [
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "sweMulti",
-      "bfcl",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "mrcr",
-      "arcAgi2",
-      "programBench"
-    ]
+    }
   },
   {
     "id": "qwen3-235b",
@@ -5704,21 +5390,7 @@
         "winning_cluster_sum_trust": 0.984,
         "winning_cluster_distinct_sources": 1
       }
-    },
-    "naCandidates": [
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "sweMulti",
-      "aaOmni",
-      "tbHard",
-      "browseComp",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "qwen3-32b",
@@ -5910,22 +5582,7 @@
         "winning_cluster_sum_trust": 1.486,
         "winning_cluster_distinct_sources": 2
       }
-    },
-    "naCandidates": [
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "sweMulti",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "qwen3-6-35b-moe",
@@ -6130,21 +5787,7 @@
         "winning_cluster_sum_trust": 1.147,
         "winning_cluster_distinct_sources": 1
       }
-    },
-    "naCandidates": [
-      "aaCoding",
-      "aaAgentic",
-      "aaIdx",
-      "bfcl",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench"
-    ]
+    }
   },
   {
     "id": "qwen3-6-plus",
@@ -6293,23 +5936,7 @@
         "winning_cluster_sum_trust": 5.439,
         "winning_cluster_distinct_sources": 5
       }
-    },
-    "naCandidates": [
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "sweMulti",
-      "bfcl",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "qwen3-coder-30b",
@@ -6436,28 +6063,7 @@
         "winning_cluster_sum_trust": 1.136,
         "winning_cluster_distinct_sources": 1
       }
-    },
-    "naCandidates": [
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "gpqa",
-      "sweMulti",
-      "hle",
-      "bfcl",
-      "aime26",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "mmluPro",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "qwen3-coder-480b",
@@ -6609,26 +6215,7 @@
         "winning_cluster_sum_trust": 2.0,
         "winning_cluster_distinct_sources": 3
       }
-    },
-    "naCandidates": [
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "gpqa",
-      "sweMulti",
-      "hle",
-      "aime26",
-      "aaOmni",
-      "tbHard",
-      "browseComp",
-      "mmluPro",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "qwen3-coder-next",
@@ -6781,27 +6368,7 @@
         "winning_cluster_sum_trust": 16.202,
         "winning_cluster_distinct_sources": 5
       }
-    },
-    "naCandidates": [
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "hle",
-      "aaIdx",
-      "bfcl",
-      "aime26",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "mmluPro",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "step-3-5-flash",
@@ -6994,22 +6561,7 @@
         "SG"
       ],
       "apiLogging": "unknown"
-    },
-    "naCandidates": [
-      "swePro",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "sweMulti",
-      "bfcl",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "gemma-3-27b",
@@ -7140,29 +6692,7 @@
         "winning_cluster_sum_trust": 5.356,
         "winning_cluster_distinct_sources": 5
       }
-    },
-    "naCandidates": [
-      "aaIdx",
-      "swePro",
-      "sweV",
-      "tb2",
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "sweMulti",
-      "bfcl",
-      "aaOmni",
-      "lcb",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "gemma-4-26b-moe",
@@ -7300,30 +6830,7 @@
         "winning_cluster_sum_trust": 1.403,
         "winning_cluster_distinct_sources": 1
       }
-    },
-    "naCandidates": [
-      "sweV",
-      "swePro",
-      "tb2",
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "sweMulti",
-      "hle",
-      "aaIdx",
-      "bfcl",
-      "aaOmni",
-      "lcb",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "gemma-4-31b",
@@ -7480,27 +6987,7 @@
         "winning_cluster_sum_trust": 9.225,
         "winning_cluster_distinct_sources": 10
       }
-    },
-    "naCandidates": [
-      "sweV",
-      "tau2",
-      "swePro",
-      "tb2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "sweMulti",
-      "hle",
-      "aaIdx",
-      "bfcl",
-      "aaOmni",
-      "lcb",
-      "browseComp",
-      "simpleQa",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "gemma-4-e2b",
@@ -7620,30 +7107,6 @@
         "winning_cluster_distinct_sources": 4
       }
     },
-    "naCandidates": [
-      "swePro",
-      "sweV",
-      "tb2",
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "gpqa",
-      "sweMulti",
-      "hle",
-      "aaIdx",
-      "bfcl",
-      "aaOmni",
-      "lcb",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ],
     "benchQuarantine": {}
   },
   {
@@ -7757,30 +7220,6 @@
         "winning_cluster_distinct_sources": 5
       }
     },
-    "naCandidates": [
-      "swePro",
-      "sweV",
-      "tb2",
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "gpqa",
-      "sweMulti",
-      "hle",
-      "aaIdx",
-      "bfcl",
-      "aaOmni",
-      "lcb",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ],
     "benchQuarantine": {
       "cfElo": true
     }
@@ -7903,30 +7342,7 @@
         "winning_cluster_sum_trust": 1.462,
         "winning_cluster_distinct_sources": 1
       }
-    },
-    "naCandidates": [
-      "swePro",
-      "tb2",
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "sweMulti",
-      "hle",
-      "aaIdx",
-      "bfcl",
-      "aime26",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "mmluPro",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "deepseek-r1-14b",
@@ -8067,30 +7483,7 @@
         "winning_cluster_sum_trust": 0.963,
         "winning_cluster_distinct_sources": 1
       }
-    },
-    "naCandidates": [
-      "swePro",
-      "sweV",
-      "tb2",
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "sweMulti",
-      "hle",
-      "aaIdx",
-      "bfcl",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "mmluPro",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "qwen25-coder-14b",
@@ -8191,30 +7584,7 @@
         "winning_cluster_sum_trust": 2.372,
         "winning_cluster_distinct_sources": 3
       }
-    },
-    "naCandidates": [
-      "tb2",
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "gpqa",
-      "sweMulti",
-      "hle",
-      "aaIdx",
-      "bfcl",
-      "aime26",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "mmluPro",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "qwen25-coder-32b",
@@ -8351,30 +7721,7 @@
         "winning_cluster_sum_trust": 10.53,
         "winning_cluster_distinct_sources": 3
       }
-    },
-    "naCandidates": [
-      "tb2",
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "gpqa",
-      "sweMulti",
-      "hle",
-      "aaIdx",
-      "bfcl",
-      "aime26",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "mmluPro",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "qwen25-coder-7b",
@@ -8510,30 +7857,7 @@
         "winning_cluster_sum_trust": 1.26,
         "winning_cluster_distinct_sources": 1
       }
-    },
-    "naCandidates": [
-      "tb2",
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "gpqa",
-      "sweMulti",
-      "hle",
-      "aaIdx",
-      "bfcl",
-      "aime26",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "mmluPro",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "codestral",
@@ -8658,29 +7982,7 @@
       "soc2": true,
       "trainingDataOptOut": "available",
       "apiLogging": "default_on"
-    },
-    "naCandidates": [
-      "tb2",
-      "tau2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "gpqa",
-      "sweMulti",
-      "hle",
-      "bfcl",
-      "aime26",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "mmluPro",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "devstral-small-2",
@@ -8985,22 +8287,7 @@
       "soc2": true,
       "gdpr": true,
       "apiLogging": "opt_out"
-    },
-    "naCandidates": [
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "bfcl",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "gpt-5-5",
@@ -9223,16 +8510,7 @@
         "IN"
       ],
       "apiLogging": "opt_out"
-    },
-    "naCandidates": [
-      "tbHard",
-      "simpleQa",
-      "programBench",
-      "lcb",
-      "nl2Repo",
-      "aaCoding",
-      "aaAgentic"
-    ]
+    }
   },
   {
     "id": "grok-4-20",
@@ -9411,17 +8689,7 @@
       "apiLogging": "default_on",
       "gdpr": true,
       "soc2": true
-    },
-    "naCandidates": [
-      "sweMulti",
-      "bfcl",
-      "aaOmni",
-      "tbHard",
-      "simpleQa",
-      "mrcr",
-      "programBench",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "grok-4-3",
@@ -9571,23 +8839,7 @@
       "apiLogging": "opt_out",
       "gdpr": true,
       "soc2": true
-    },
-    "naCandidates": [
-      "tb2",
-      "aaCoding",
-      "aaAgentic",
-      "mcpA",
-      "sweMulti",
-      "bfcl",
-      "aaOmni",
-      "browseComp",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench",
-      "nl2Repo",
-      "tbHard"
-    ]
+    }
   },
   {
     "id": "grok-4-1-fast",
@@ -9882,27 +9134,7 @@
         "SG"
       ],
       "apiLogging": "unknown"
-    },
-    "naCandidates": [
-      "swePro",
-      "sweV",
-      "sweMulti",
-      "lcb",
-      "tb2",
-      "tbHard",
-      "tau3",
-      "mcpA",
-      "aaCoding",
-      "aaAgentic",
-      "cfElo",
-      "webDevElo",
-      "gpqa",
-      "hle",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench"
-    ]
+    }
   },
   {
     "id": "glm-4-7",
@@ -10090,22 +9322,7 @@
         "SG"
       ],
       "apiLogging": "unknown"
-    },
-    "naCandidates": [
-      "swePro",
-      "tbHard",
-      "tau3",
-      "mcpA",
-      "bfcl",
-      "aaCoding",
-      "aaAgentic",
-      "cfElo",
-      "webDevElo",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench"
-    ]
+    }
   },
   {
     "id": "mistral-medium-3-5",
@@ -10252,26 +9469,6 @@
         "US"
       ]
     },
-    "naCandidates": [
-      "sweMulti",
-      "nl2Repo",
-      "tb2",
-      "tbHard",
-      "mcpA",
-      "bfcl",
-      "aaCoding",
-      "aaAgentic",
-      "browseComp",
-      "cfElo",
-      "webDevElo",
-      "hle",
-      "aaOmni",
-      "mmluPro",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench"
-    ],
     "benchQuarantine": {}
   },
   {
@@ -10455,29 +9652,7 @@
         "winning_cluster_sum_trust": 3.176,
         "winning_cluster_distinct_sources": 2
       }
-    },
-    "naCandidates": [
-      "swePro",
-      "sweMulti",
-      "nl2Repo",
-      "tb2",
-      "tbHard",
-      "tau3",
-      "mcpA",
-      "bfcl",
-      "aaCoding",
-      "aaAgentic",
-      "browseComp",
-      "cfElo",
-      "webDevElo",
-      "aime26",
-      "hle",
-      "aaOmni",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench"
-    ]
+    }
   },
   {
     "id": "minimax-m2-1",
@@ -10687,24 +9862,7 @@
     },
     "privacy": {
       "trainingDataOptOut": "available"
-    },
-    "naCandidates": [
-      "nl2Repo",
-      "tb2",
-      "tbHard",
-      "tau3",
-      "mcpA",
-      "aaCoding",
-      "aaAgentic",
-      "browseComp",
-      "cfElo",
-      "webDevElo",
-      "aaOmni",
-      "simpleQa",
-      "mrcr",
-      "arcAgi2",
-      "programBench"
-    ]
+    }
   },
   {
     "id": "gemini-3-5-flash",
@@ -10845,18 +10003,7 @@
         "winning_cluster_sum_trust": 1.06,
         "winning_cluster_distinct_sources": 2
       }
-    },
-    "naCandidates": [
-      "mcpA",
-      "sweMulti",
-      "bfcl",
-      "aime26",
-      "aaOmni",
-      "cfElo",
-      "browseComp",
-      "mmluPro",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "qwen3-7-max",
@@ -10982,16 +10129,7 @@
         "winning_cluster_sum_trust": 5.51,
         "winning_cluster_distinct_sources": 3
       }
-    },
-    "naCandidates": [
-      "sweMulti",
-      "bfcl",
-      "aaOmni",
-      "cfElo",
-      "browseComp",
-      "arcAgi2",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "qwen3-7-plus",
@@ -11081,24 +10219,7 @@
       "swePro": true,
       "tb2": true,
       "mrcr": true
-    },
-    "naCandidates": [
-      "swePro",
-      "tb2",
-      "tau2",
-      "mcpA",
-      "sweMulti",
-      "bfcl",
-      "aime26",
-      "aaOmni",
-      "tbHard",
-      "cfElo",
-      "browseComp",
-      "mmluPro",
-      "mrcr",
-      "arcAgi2",
-      "nl2Repo"
-    ]
+    }
   },
   {
     "id": "claude-opus-4-8",
@@ -11192,17 +10313,7 @@
     "status": "active",
     "_stubReason": "lineup-discovery placeholder; bench cells pending this cycle's gather",
     "_stubAddedDate": "2026-05-30",
-    "_stubSource": "step-0 lineup discovery 2026-05-30",
-    "naCandidates": [
-      "nl2Repo",
-      "tau2",
-      "bfcl",
-      "cfElo",
-      "webDevElo",
-      "aaOmni",
-      "mrcr",
-      "arcAgi2"
-    ]
+    "_stubSource": "step-0 lineup discovery 2026-05-30"
   },
   {
     "id": "gpt-5-4-mini",
@@ -11308,19 +10419,7 @@
         "winning_cluster_sum_trust": 1.941,
         "winning_cluster_distinct_sources": 3
       }
-    },
-    "naCandidates": [
-      "sweV",
-      "nl2Repo",
-      "tbHard",
-      "mcpA",
-      "bfcl",
-      "browseComp",
-      "cfElo",
-      "webDevElo",
-      "aaOmni",
-      "arcAgi2"
-    ]
+    }
   },
   {
     "id": "gpt-5-4-nano",
@@ -11423,20 +10522,7 @@
         "winning_cluster_sum_trust": 0.992,
         "winning_cluster_distinct_sources": 1
       }
-    },
-    "naCandidates": [
-      "sweV",
-      "sweMulti",
-      "nl2Repo",
-      "lcb",
-      "mcpA",
-      "bfcl",
-      "browseComp",
-      "cfElo",
-      "webDevElo",
-      "aaOmni",
-      "arcAgi2"
-    ]
+    }
   },
   {
     "id": "mistral-small-4",
@@ -11523,24 +10609,7 @@
     "status": "active",
     "_stubReason": "lineup-discovery placeholder; bench cells pending this cycle's gather",
     "_stubAddedDate": "2026-05-30",
-    "_stubSource": "step-0 lineup discovery 2026-05-30",
-    "naCandidates": [
-      "swePro",
-      "sweV",
-      "sweMulti",
-      "nl2Repo",
-      "lcb",
-      "tb2",
-      "mcpA",
-      "bfcl",
-      "browseComp",
-      "cfElo",
-      "webDevElo",
-      "aime26",
-      "aaOmni",
-      "mrcr",
-      "arcAgi2"
-    ]
+    "_stubSource": "step-0 lineup discovery 2026-05-30"
   },
   {
     "id": "nemotron-3-nano-omni",
@@ -11630,21 +10699,7 @@
     "status": "active",
     "_stubReason": "lineup-discovery placeholder; bench cells pending this cycle's gather",
     "_stubAddedDate": "2026-05-30",
-    "_stubSource": "step-0 lineup discovery 2026-05-30",
-    "naCandidates": [
-      "swePro",
-      "sweMulti",
-      "nl2Repo",
-      "tb2",
-      "mcpA",
-      "bfcl",
-      "browseComp",
-      "cfElo",
-      "webDevElo",
-      "aaOmni",
-      "mrcr",
-      "arcAgi2"
-    ]
+    "_stubSource": "step-0 lineup discovery 2026-05-30"
   },
   {
     "id": "nemotron-3-ultra",

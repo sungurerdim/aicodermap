@@ -447,20 +447,21 @@ def main():
     if bad_status:
         failures.append(f"models with non-canonical status: {bad_status}")
 
-    # === AC9 — N/A retired (no notApplicableBenchKeys / notApplicable) ===
+    # === AC9 — N/A retired (no notApplicableBenchKeys / notApplicable /
+    #           naCandidates) ===
     # The N/A permanent-skip was retired 2026-05-26: every (model, bench) cell
     # is FILLED or GAP — unmeasured cells become gaps and are re-researched each
     # cycle (freshness-skip only). A reappearing notApplicableBenchKeys /
-    # notApplicable field means a stale data path or reverted agent contract.
-    has_na = [
-        m["id"]
-        for m in models
-        if m.get("notApplicableBenchKeys") or m.get("notApplicable")
-    ]
+    # notApplicable / naCandidates field means a stale data path or reverted
+    # agent contract. (naCandidates added to the guard 2026-06-07 — it had
+    # leaked into every model in data/models.json unnoticed because the prior
+    # guard only checked the other two field names.)
+    _NA_FIELDS = ("notApplicableBenchKeys", "notApplicable", "naCandidates")
+    has_na = [m["id"] for m in models if any(m.get(f) for f in _NA_FIELDS)]
     if has_na:
         failures.append(
             f"AC9 — N/A is retired but {len(has_na)} model(s) still carry "
-            f"notApplicableBenchKeys/notApplicable: {has_na[:5]}"
+            f"{'/'.join(_NA_FIELDS)}: {has_na[:5]}"
             f"{' ...' if len(has_na) > 5 else ''}"
         )
 

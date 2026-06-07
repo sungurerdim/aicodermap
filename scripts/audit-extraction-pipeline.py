@@ -2,7 +2,7 @@
 """End-to-end audit of every data extraction layer.
 
 For each data type (bench, modelMeta, pricing, ollama, unslothVariants,
-lineupChanges, naCandidates, rawGaps, i18n strengths/weaknesses), verify:
+lineupChanges, rawGaps, i18n strengths/weaknesses), verify:
 
   1. Gather artifact integrity — modelId resolves; benchKey is canonical;
      value is the right type; sourceUrl present where required.

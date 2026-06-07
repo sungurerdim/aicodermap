@@ -226,17 +226,18 @@ def apply_quarantine_and_gap_policy(
     of the trigger conditions below, stamp the appropriate flag.
 
     Triggers:
-      - force_quarantine    (consecutive gap cycles ≥ 5) -> benchQuarantine[bk]=True
-      - auto_na_candidate   (≥ 3)                         -> append to naCandidates[]
-      - confidence < 0.2    (cell-level pick_winner)      -> benchQuarantine[bk]=True
-
-    New gap cells (no prior gapHistory) get gapSince=cycle_id stamped.
+      - pick_winner.quarantine  (dispersion / <2 sources / confidence)
+                                                          -> benchQuarantine[bk]=True
+    A CURRENT-state verdict from the cumulative provenance pool — never a
+    permanent or gap-age-based mark. (Gap-age force-quarantine + auto-na were
+    retired 2026-06-07: a cell being empty for N cycles is a coverage gap to
+    re-query, not evidence of bad data.) gapHistory/gapSince are still stamped
+    for the starvation-queue prioritization in lib.matrix.
 
     Returns the mutated verification map dict so the caller can write it
     back to disk.
     """
     sys.path.insert(0, f"{PROJECT}/scripts")
-    from lib.synth_core import compute_gap_age  # noqa: E402
     from lib.winner import compute_cell_confidence, pick_winner  # noqa: E402
 
     vmap_path = Path(PROJECT) / ".aicodermap-verification-map.json"
@@ -250,7 +251,6 @@ def apply_quarantine_and_gap_policy(
     cells = vmap.setdefault("cells", {})
 
     quarantined_count = 0
-    auto_na_count = 0
     gap_stamps = 0
 
     for m in models:
@@ -279,21 +279,15 @@ def apply_quarantine_and_gap_policy(
 
             is_gap = val is None
             if is_gap:
+                # Stamp the gap ledger for lib.matrix's starvation queue only —
+                # a long gap raises a cell's research priority, it NEVER
+                # quarantines or N/A-flags it (gap-age policy retired 2026-06-07).
                 hist = cell_entry["gapHistory"]
                 if not hist or hist[-1] != cycle_id:
                     hist.append(cycle_id)
                 if not cell_entry.get("gapSince"):
                     cell_entry["gapSince"] = cycle_id
                     gap_stamps += 1
-                age = compute_gap_age(cell_key, vmap, cycle_id)
-                if age["force_quarantine"]:
-                    m.setdefault("benchQuarantine", {})[bk] = True
-                    quarantined_count += 1
-                if age["auto_na_candidate"]:
-                    nc = m.setdefault("naCandidates", [])
-                    if bk not in nc:
-                        nc.append(bk)
-                        auto_na_count += 1
             else:
                 # Cell filled this cycle — clear the gap run.
                 cell_entry["gapHistory"] = []
@@ -398,7 +392,7 @@ def apply_quarantine_and_gap_policy(
 
     print(
         f"quarantine + gap policy: quarantined={quarantined_count} "
-        f"auto_na={auto_na_count} new_gap_stamps={gap_stamps}"
+        f"new_gap_stamps={gap_stamps}"
     )
     return vmap
 

@@ -195,10 +195,9 @@ def aggregate_per_batch_telemetry(per_batch_artifacts: list[dict]) -> dict:
             or "unknown"
         )
         # FAZ 7.C (2026-05-10): mode-aware fill/gap counting.
-        # Gather artifacts use FLAT schema (observations[], rawGaps[],
-        # naCandidates[]). Synth/full use models[].updates.bench + gaps[]
-        # + notApplicable[]. Prior version always read FULL schema, so
-        # gather-only cycles reported fills=0/gaps=0/na=0 (cycle 2026-05-10).
+        # Gather artifacts use FLAT schema (observations[], rawGaps[]). Synth/full
+        # use models[].updates.bench + gaps[]. Prior version always read FULL
+        # schema, so gather-only cycles reported fills=0/gaps=0 (cycle 2026-05-10).
         mode = art.get("mode")
         if mode == "gather":
             fills = len(art.get("observations") or [])
@@ -206,7 +205,9 @@ def aggregate_per_batch_telemetry(per_batch_artifacts: list[dict]) -> dict:
             gaps = len(all_gaps)
             agent_gaps = gaps  # gather rawGaps are always agent-emitted
             orch_gaps = 0
-            na = len(art.get("naCandidates") or [])
+            # N/A retired: gather artifacts never carry naCandidates (forbidden by
+            # the gather schema). Kept as 0 for telemetry-schema stability.
+            na = 0
         else:
             models = art.get("models") or []
             fills = sum(

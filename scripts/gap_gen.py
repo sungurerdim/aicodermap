@@ -230,7 +230,6 @@ artifact = {
     "coverageMatrix": {
         "filledCells": len(agent_filled),
         "gapsRecorded": gap_count,
-        "notApplicableCells": 0,
         "expectedTotal": total_cells,
     },
     "validationCoverage": round(filled_count / max(total_cells, 1), 4),

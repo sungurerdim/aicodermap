@@ -123,7 +123,6 @@ def merge_artifacts(
     coverage_total = 0
     coverage_filled = 0
     coverage_gaps = 0
-    coverage_na = 0
     tool_calls = 0
     fetch_attempts = 0
     batch_count = 0
@@ -226,7 +225,6 @@ def merge_artifacts(
         coverage_total += int(cov.get("totalCells") or 0)
         coverage_filled += int(cov.get("filledCells") or 0)
         coverage_gaps += int(cov.get("gapsRecorded") or 0)
-        coverage_na += int(cov.get("notApplicableCells") or 0)
 
         rm = data.get("runMetadata") or runtime
         tool_calls += int(rm.get("toolCallCount") or 0)
@@ -326,7 +324,6 @@ def merge_artifacts(
             "totalCells": coverage_total,
             "filledCells": coverage_filled,
             "gapsRecorded": coverage_gaps,
-            "notApplicableCells": coverage_na,
         },
         "runtime": {
             "healthChecks": health_checks,

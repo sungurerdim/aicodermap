@@ -41,9 +41,6 @@ from typing import Any
 # Default freshness window. Configurable via _schema.contracts.FRESHNESS_TTL_DAYS.
 # SSOT: lib.constants (were independent literals before 2026-06-06).
 from .constants import FRESHNESS_TTL_DAYS as DEFAULT_FRESHNESS_TTL_DAYS
-from .constants import GAP_RECHECK_EVERY as DEFAULT_GAP_RECHECK_EVERY
-from .constants import GAP_SKIP_MIN_CYCLES as DEFAULT_GAP_SKIP_MIN_CYCLES
-from .constants import GAP_SKIP_MIN_SOURCES as DEFAULT_GAP_SKIP_MIN_SOURCES
 from .constants import MIN_VERIFICATIONS_FOR_SKIP as DEFAULT_MIN_VERIFICATIONS
 
 
@@ -181,82 +178,6 @@ def compute_skip_cells(
                 t1 += 1
 
     skip["_meta"] = {"t1Count": t1, "t2Count": t2, "totalConsidered": total}
-    return skip
-
-
-def compute_gap_skip_cells(
-    verification_map: dict[str, Any],
-    active_model_ids: list[str],
-    core_bench_keys: list[str],
-    *,
-    min_cycles: int = DEFAULT_GAP_SKIP_MIN_CYCLES,
-    min_sources: int = DEFAULT_GAP_SKIP_MIN_SOURCES,
-    recheck_every: int = DEFAULT_GAP_RECHECK_EVERY,
-) -> dict[str, Any]:
-    """B (2026-06-07) — gap-freshness-tier skip set.
-
-    A (modelId, benchKey) cell that has been a GAP for `min_cycles` consecutive
-    cycles (verification-map `gapCycles`), each cycle having tried at least
-    `min_sources` distinct sources (`gapTriedSources`), is re-checked only every
-    `recheck_every`-th cycle. On the other `recheck_every - 1` cycles it is
-    skipped — the agent emits its carried gap WITHOUT re-fetching.
-
-    Re-check trigger is `gapCycles % recheck_every == 0`. Because a skipped gap
-    is still carried as a gap (so `gapCycles` keeps incrementing), this fires on
-    cycle min_cycles..→ exactly every Nth cycle while the cell stays empty, and
-    stops the moment the cell is filled (verification-map resets `gapCycles=0`).
-
-    TIME-BASED, never permanent: every skip-eligible cell is still re-checked
-    within `recheck_every` cycles, so a vendor opt-in surfaces with bounded lag.
-
-    Returns:
-      {
-        "<modelId>": { "<benchKey>": {gapCycles, gapSince, triedSources, reason} },
-        ...,
-        "_meta": {skipCount, eligibleCount, recheckCount}
-      }
-    """
-    cells = (verification_map or {}).get("cells") or {}
-    active = set(active_model_ids)
-    keys = set(core_bench_keys)
-    skip: dict[str, Any] = {}
-    skip_count = 0
-    eligible = 0
-    recheck = 0
-
-    for cell_key, cell in cells.items():
-        if not isinstance(cell, dict):
-            continue
-        parts = cell_key.split(".")
-        if len(parts) < 2:
-            continue
-        bk = parts[-1]
-        mid = ".".join(parts[:-1])
-        if mid not in active or bk not in keys:
-            continue
-        gap_cycles = cell.get("gapCycles") or 0
-        tried = cell.get("gapTriedSources") or 0
-        if gap_cycles < min_cycles or tried < min_sources:
-            continue
-        eligible += 1
-        # Re-check on every Nth cycle; skip the rest.
-        if recheck_every <= 1 or gap_cycles % recheck_every == 0:
-            recheck += 1
-            continue
-        skip_count += 1
-        skip.setdefault(mid, {})[bk] = {
-            "gapCycles": gap_cycles,
-            "gapSince": cell.get("gapSince"),
-            "triedSources": tried,
-            "reason": f"gap x{gap_cycles} cycles (>={min_sources} sources each); "
-            f"re-check every {recheck_every}th",
-        }
-
-    skip["_meta"] = {
-        "skipCount": skip_count,
-        "eligibleCount": eligible,
-        "recheckCount": recheck,
-    }
     return skip
 
 
