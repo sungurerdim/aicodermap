@@ -279,8 +279,19 @@ function rankedModels() {
 
 function sortRanked(ranked, cols) {
   const sortCol = cols.find(c => c.key === State.sort.col);
+  // Gate-aware composite ordering: in the canonical leaderboard view (composite
+  // desc) rank-gated models (missing a required bench / below coverage floor)
+  // always sink below the ranked set, mirroring rankBands so the band divider
+  // lines up. Other sorts leave gated rows in place (they keep the is-rank-gated
+  // marker but are not repositioned), consistent with cluster-break handling.
+  const gateAware = State.sort.col === 'composite' && State.sort.dir === 'desc';
   if (sortCol && sortCol.sortable !== false) {
     ranked.sort((A, B) => {
+      if (gateAware) {
+        const ag = A.band && A.band.gated ? 1 : 0;
+        const bg = B.band && B.band.gated ? 1 : 0;
+        if (ag !== bg) return ag - bg;
+      }
       const va = sortCol.get(A.model, { score: A.score });
       const vb = sortCol.get(B.model, { score: B.score });
       return compareValues(va, vb, State.sort.dir);
@@ -296,9 +307,24 @@ function renderTableBody(tbody, ranked, cols) {
   // (the band clusters are computed in that order). Other sorts keep the stable
   // composite rank number but draw no dividers.
   const showBreaks = State.sort.col === 'composite' && State.sort.dir === 'desc';
+  let bandHeaderShown = false;
   ranked.forEach((entry, index) => {
+    // Limited-coverage band header — inserted once, before the first gated row,
+    // in the composite-desc view (the only order where gated rows are pooled at
+    // the bottom). Spans the full table width.
+    if (showBreaks && !bandHeaderShown && entry.band && entry.band.gated) {
+      const hr = document.createElement('tr');
+      hr.className = 'limited-coverage-band-header';
+      const td = document.createElement('td');
+      td.colSpan = cols.length;
+      td.textContent = t('ui.table.limitedCoverageBand');
+      hr.appendChild(td);
+      tbody.appendChild(hr);
+      bandHeaderShown = true;
+    }
     const tr = document.createElement('tr');
     tr.dataset.modelId = entry.model.id;
+    if (entry.band && entry.band.gated) tr.classList.add('is-rank-gated');
     if (showBreaks && index > 0 && entry.band && ranked[index - 1].band
         && entry.band.cluster !== ranked[index - 1].band.cluster) {
       tr.classList.add('cluster-break');
@@ -347,6 +373,11 @@ export function renderModelCards() {
   clear(list);
 
   const ranked = rankedModels().sort((a, b) => {
+    // Rank-gated cards (limited coverage) sink to the bottom, matching the table
+    // band ordering. Within each group: score desc, then tier, then name.
+    const ag = a.band && a.band.gated ? 1 : 0;
+    const bg = b.band && b.band.gated ? 1 : 0;
+    if (ag !== bg) return ag - bg;
     const sa = a.score == null ? -1 : a.score;
     const sb = b.score == null ? -1 : b.score;
     if (sa !== sb) return sb - sa;
@@ -359,7 +390,8 @@ export function renderModelCards() {
   if (ranked.length === 0) {
     list.appendChild(el('p', { class: 'loading' }, t('ui.noData')));
   } else {
-    ranked.forEach((entry, i) => list.appendChild(buildModelCard(entry.model, i + 1)));
+    ranked.forEach((entry, i) => list.appendChild(
+      buildModelCard(entry.model, i + 1, { gated: !!(entry.band && entry.band.gated) })));
   }
 
   const count = document.getElementById('models-count');

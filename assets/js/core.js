@@ -246,9 +246,20 @@ export function getCompositePolicy() {
       const e = (cp && cp.eb) || {};
       return {
         enabled: e.enabled !== false,
-        priorWeight: Number.isFinite(e.priorWeight) ? e.priorWeight : 25,
+        priorWeight: Number.isFinite(e.priorWeight) ? e.priorWeight : 30,
         confThreshold: (Number.isFinite(e.confThreshold) && e.confThreshold > 0) ? e.confThreshold : 0.65,
         sigmaPenaltyMax: Number.isFinite(e.sigmaPenaltyMax) ? e.sigmaPenaltyMax : 18,
+      };
+    })(),
+    // Leaderboard rank gate (2026-06-07): models missing a required bench for the
+    // active preset (or below coverageFloor of preset weight) are demoted out of
+    // the main ranking into a "Limited Coverage" band. enabled:false → no gate.
+    rankGate: (() => {
+      const r = (cp && cp.rankGate) || {};
+      return {
+        enabled: r.enabled !== false,
+        demoteMissingRequired: r.demoteMissingRequired !== false,
+        coverageFloor: (Number.isFinite(r.coverageFloor) && r.coverageFloor >= 0) ? r.coverageFloor : 0.4,
       };
     })(),
     uncertainty: (() => {

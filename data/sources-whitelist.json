@@ -1085,12 +1085,18 @@
       "_purpose": "Policy parameters for AICoderMap composite score formula.",
       "coverageShrinkageExponent": 2,
       "_coverageShrinkageNote": "composite = raw * (coverage ^ (1/exponent)). 2 = sqrt (current behavior). >2 = gentler penalty for low coverage. 1 = linear. 0 = no penalty.",
+      "rankGate": {
+        "enabled": true,
+        "demoteMissingRequired": true,
+        "coverageFloor": 0.4,
+        "_note": "Leaderboard rank gate (2026-06-07). A model missing any of the active preset's requiredBenches, or below coverageFloor of preset weight, is DEMOTED out of the main ranking into a contiguous 'Limited Coverage' band at the bottom (never hidden). Primary mechanism behind the EB anomaly fix: EB shrinkage toward the global median otherwise lets a model with a few extreme cells but a missing heaviest-weighted required bench (e.g. swePro in swe-focused) float into the top. demoteMissingRequired:true uses the SAME requiredBenches list presetTiersFor reads (SSOT). enabled:false → no gate (anomaly sweep uses this to surface the gated population). Independent of the eb block."
+      },
       "eb": {
         "enabled": true,
-        "priorWeight": 25,
+        "priorWeight": 30,
         "confThreshold": 0.65,
         "sigmaPenaltyMax": 18,
-        "_note": "Empirical-Bayes leaderboard point score (compositeScoreImputed + compositeUncertainty). score = (W_obs*observedMean + priorWeight*globalMedianMean)/(W_obs+priorWeight) - sigmaPenaltyMax*max(0,(confThreshold-confidence)/confThreshold)^2, confidence = observedWeight/activeWeight. Missing benches shrink toward the conservative global-median baseline (not zeroed, not full-marks); the penalty is zero until confidence drops below confThreshold so a model missing a couple of benches is not docked, while genuinely sparse models are. enabled:false reverts to raw*coverage^(1/exponent)."
+        "_note": "Empirical-Bayes leaderboard point score (compositeScoreImputed + compositeUncertainty). score = (W_obs*observedMean + priorWeight*globalMedianMean)/(W_obs+priorWeight) - sigmaPenaltyMax*max(0,(confThreshold-confidence)/confThreshold)^2, confidence = observedWeight/activeWeight. Missing benches shrink toward the conservative global-median baseline (not zeroed, not full-marks); the penalty is zero until confidence drops below confThreshold so a model missing a couple of benches is not docked, while genuinely sparse models are. priorWeight raised 25→30 on 2026-06-07 as a hygiene nudge alongside the rankGate (slightly stronger shrink toward the baseline for sparse profiles); confThreshold/sigmaPenaltyMax unchanged. enabled:false reverts to raw*coverage^(1/exponent)."
       },
       "imputation": {
         "enabled": true,

@@ -470,7 +470,7 @@ function limitedDataBadge(model) {
   return el('span', { class: `bench-tier-badge is-${cls}`, 'data-tip': tip }, `⚠ ${lbl}`);
 }
 
-export function buildModelCard(model, rank) {
+export function buildModelCard(model, rank, opts = {}) {
   model.__rank = rank;
   // F1+F2 (2026-05-18): effectiveScore dispatches based on State.scoreFn.
   // 'consensus' preset → vendorConsensusScore; otherwise → compositeScore.
@@ -484,8 +484,11 @@ export function buildModelCard(model, rank) {
     : null;
   const status = model.status || 'active';
   const statusClass = status === 'active' ? '' : ` is-${status}`;
+  // Rank-gated cards (limited coverage — missing a required bench for the active
+  // preset) carry a marker class so CSS can tint them like the table band.
+  const gatedClass = opts.gated ? ' is-rank-gated' : '';
   const card = el('article', {
-    class: `model-card${statusClass}`,
+    class: `model-card${statusClass}${gatedClass}`,
     id: `card-${model.id}`,
     dataset: { modelId: model.id, tier: model.tier, status },
     'data-export-section': `model-${model.id}`,

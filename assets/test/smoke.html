@@ -30,7 +30,7 @@
     } from '../js/core.js';
     import {
       compositeScore, coverageOf, disputedCount, contradictionFor, pricingView, fmtPriceRange, fmtContext,
-      isLocalRunnable, scoreClass, fmtScore, loadData, compositeUncertainty, rankBands,
+      isLocalRunnable, scoreClass, fmtScore, loadData, compositeUncertainty, rankBands, rankGateStatus,
     } from '../js/data.js';
     import { gpuCompat } from '../js/gpu.js';
     import { modelSourcesSummary, buildSourcesMarkdown } from '../js/sources.js';
@@ -350,6 +350,31 @@
       }
       assertTrue('every pricing.api is an array (multi-provider schema)',
         badPricing.length === 0, badPricing.length ? badPricing.slice(0, 5).join(',') : '');
+
+      // 14f. rankGateStatus (schema loaded → requiredBenches populated). A model
+      // missing a required bench for the preset is gated; a fully-covered one is
+      // not. Exercises the SSOT requiredBenches path that drives the demotion.
+      const gMissing = { id: '__t_gate', tier: 'frontier', bench: { tb2: 80, cfElo: 1500 } }; // swePro & lcb missing
+      assertTrue('rankGateStatus gates a model missing required swePro/lcb (swe-focused)',
+        rankGateStatus(gMissing, 'swe-focused', 0.5).gated === true);
+      const gFull = { id: '__t_full', tier: 'frontier', bench: {
+        swePro: 70, tb2: 70, lcb: 70, sweMulti: 70, sweV: 70, cfElo: 1500, mcpA: 70 } };
+      assertTrue('rankGateStatus does NOT gate a fully-covered model (swe-focused)',
+        rankGateStatus(gFull, 'swe-focused', 0.95).gated === false);
+
+      // 14g. Rank-anomaly sweep (2026-06-07): for every atomic preset, no
+      // rank-gated model (missing a required bench / below coverage floor) may
+      // occupy the top 10 of the leaderboard. Regression guard for the EB
+      // anomaly where a sparse-but-extreme model (MiMo v2 Pro in swe-focused)
+      // floated to #2. Temporarily set _schema.composite.rankGate.enabled=false
+      // to surface the full gated population (these asserts then list the leak).
+      const TOPN = 10;
+      for (const pname of Object.keys(PRESETS)) {
+        const bands = rankBands(State.models, PRESETS[pname], pname);
+        const leaked = bands.slice(0, TOPN).filter(r => r.gated).map(r => r.id);
+        assertTrue(`rank-anomaly sweep: no gated model in top-${TOPN} for '${pname}'`,
+          leaked.length === 0, leaked.length ? `leaked: ${leaked.join(',')}` : '');
+      }
     } catch (e) {
       row('loadData failed (HTTP server required)', false, e.message);
     }

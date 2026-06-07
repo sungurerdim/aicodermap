@@ -32,6 +32,11 @@ html[data-theme="dark"] {
   --ok-tint: rgba(110, 231, 179, 0.18);
   --danger-tint: rgba(244, 123, 139, 0.18);
   --warn-tint: rgba(251, 191, 107, 0.18);
+  /* Limited-coverage band (rank-gated rows/cards): a warm desaturated tone,
+     clearly distinct from --surface/--bg yet readable in dark theme. */
+  --surface-limited: #3a3328;
+  --bg-limited: #2c2820;
+  --border-limited: #6b5a36;
 }
 html[data-theme="light"] {
   /* LIGHT palette */
@@ -64,6 +69,10 @@ html[data-theme="light"] {
   --ok-tint: rgba(20, 160, 90, 0.14);
   --danger-tint: rgba(220, 38, 38, 0.12);
   --warn-tint: rgba(194, 99, 12, 0.14);
+  /* Limited-coverage band (rank-gated rows/cards) — warm parchment tint. */
+  --surface-limited: #fbf2dd;
+  --bg-limited: #f5e9cc;
+  --border-limited: #d8b873;
 }
 :root {
   --radius: 10px;

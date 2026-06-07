@@ -529,6 +529,33 @@ export function presetTiersFor(model, presetName) {
   };
 }
 
+// Leaderboard rank gate (2026-06-07). A model is GATED — demoted out of the main
+// ranking into a contiguous "Limited Coverage" band at the bottom — when it is
+// missing any of the active preset's requiredBenches, or when its coverage falls
+// below policy.rankGate.coverageFloor. Pure (no side effects). Reuses the SSOT
+// missingRequired computation from presetTiersFor so the gate and the card badge
+// can never disagree. `coverage` is the 0..1 fraction already computed by
+// compositeUncertainty (passed in to avoid recomputing). Returns
+// { gated, reason } where reason ∈ {'missing-required','low-coverage', null}.
+//
+// Why a gate on top of EB shrinkage: EB pulls missing benches toward the global
+// median rather than zeroing them, so a model with a couple of extreme cells but
+// a missing heaviest-weighted required bench (e.g. swePro in swe-focused) can
+// float into the top. The gate enforces the preset's already-declared
+// requiredBenches policy that the EB score alone ignores.
+export function rankGateStatus(model, presetName, coverage) {
+  const gate = getCompositePolicy().rankGate;
+  if (!gate.enabled) return { gated: false, reason: null };
+  if (gate.demoteMissingRequired) {
+    const tiers = presetTiersFor(model, presetName);
+    if (tiers.missingRequired.length > 0) return { gated: true, reason: 'missing-required' };
+  }
+  if (Number.isFinite(coverage) && coverage < gate.coverageFloor) {
+    return { gated: true, reason: 'low-coverage' };
+  }
+  return { gated: false, reason: null };
+}
+
 // Count of cells in the active preset that actually trigger a confidence
 // haircut — same-tier disputes with ≥3pp intra-tier disagreement on top of
 // the ≥5pp BLOCK threshold. Cells with cross-tier-only disagreement are
@@ -858,28 +885,47 @@ export function compositeUncertainty(model, weights, allModels, presetName) {
 // { id, score, sigma, lower, upper, hasCI, coverage, imputedShare, rank,
 //   tied } where `tied` = another model shares this rank.
 export function rankBands(models, weights, presetName) {
+  const byId = new Map((models || []).map(m => [m.id, m]));
   const rows = (models || [])
     .filter(m => (m.status || 'active') !== 'archived')
     .map(m => ({ id: m.id, ...compositeUncertainty(m, weights, State.models, presetName) }))
-    .filter(r => r.score != null)
-    .sort((a, b) => b.score - a.score);
+    .filter(r => r.score != null);
+  // Rank gate (2026-06-07): stamp each row's gate status (missing a required
+  // bench for this preset, or below the coverage floor), then sort GATED rows
+  // into a contiguous block at the bottom. The gate is the PRIMARY sort key;
+  // score is secondary within each group. This is what keeps a sparse-but-
+  // extreme model (EB-shrunk into the top) out of the main leaderboard.
+  for (const r of rows) {
+    const m = byId.get(r.id);
+    r.gate = m ? rankGateStatus(m, presetName, r.coverage) : { gated: false, reason: null };
+    r.gated = r.gate.gated;
+  }
+  rows.sort((a, b) => {
+    if (a.gated !== b.gated) return a.gated ? 1 : -1;   // gated → bottom
+    return b.score - a.score;
+  });
   // Granular ordinal rank (1..N) keeps the table discriminating + familiar; the
   // ±σ band on each score carries the honesty (overlapping bands = close). A
   // `cluster` id increments only at a SIGNIFICANCE BREAK — where a model's
   // uncertainty band no longer overlaps the current cluster leader's band
   // (upper < leaderLower) — so the UI can draw a divider between statistically
-  // distinct groups WITHOUT collapsing ranks into opaque tiers.
+  // distinct groups WITHOUT collapsing ranks into opaque tiers. The gate
+  // boundary (ranked → gated) is ALWAYS forced to a new cluster so the UI can
+  // draw the "Limited Coverage" band divider there.
   let cluster = 0;
   let leaderLower = Infinity;
+  let prevGated = null;
   rows.forEach((r, i) => {
     r.rank = i + 1;
-    if (r.upper >= leaderLower) {
-      r.cluster = cluster;
-    } else {
+    const gateBoundary = prevGated !== null && r.gated !== prevGated;
+    if (gateBoundary || r.upper < leaderLower) {
       cluster += 1;
       r.cluster = cluster;
       leaderLower = r.lower;
+    } else {
+      r.cluster = cluster;
     }
+    prevGated = r.gated;
   });
   return rows;
 }

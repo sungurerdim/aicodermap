@@ -613,6 +613,14 @@ table#comparison-table td.bench-group-divider {
 .model-card.is-deprecated:hover { opacity: 0.85; }
 .model-card.is-archived { display: none; }
 
+/* Rank-gated card (limited coverage — missing a required bench for the active
+ * preset). Warm band tint matching the comparison-table band so the card grid
+ * tells the same story as the table. */
+.model-card.is-rank-gated {
+  background: var(--surface-limited);
+  border-color: var(--border-limited);
+}
+
 .deprecated-badge,
 .archived-badge {
   display: inline-flex;

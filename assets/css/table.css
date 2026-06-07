@@ -112,6 +112,33 @@ table#comparison-table .tier-badge {
 }
 table#comparison-table td.col-rank { color: var(--muted); }
 
+/* Limited-coverage band (rank-gated rows): a labelled divider row followed by a
+ * distinct warm row background so demoted models (missing a required bench for
+ * the active preset) are unmistakable from the main ranking. A separate tone —
+ * not mere dimming — keeps the band readable with enough contrast in both
+ * themes. The header td is sticky-left so its label stays visible on h-scroll. */
+table#comparison-table tr.limited-coverage-band-header td {
+  background: var(--bg-limited);
+  color: var(--text);
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-align: left;
+  white-space: normal;
+  padding: 7px 10px;
+  border-top: 2px solid var(--border-limited);
+  border-bottom: 1px solid var(--border-limited);
+  position: sticky;
+  left: 0;
+}
+table#comparison-table tbody tr.is-rank-gated td,
+table#comparison-table tbody tr.is-rank-gated .col-name {
+  background: var(--surface-limited);
+}
+table#comparison-table tbody tr.is-rank-gated:hover td,
+table#comparison-table tbody tr.is-rank-gated:hover .col-name {
+  background: var(--bg-limited);
+}
+
 /* Privacy table */
 table.privacy-table {
   width: 100%;
