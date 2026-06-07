@@ -186,12 +186,16 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
    **FAZ 7.B/7.C (2026-05-10) — single-helper build:**
    ```python
    from lib.idea_context import build_per_batch_ctx
+   # B (2026-06-07): gap-freshness-tier skip set (no-op until cells accrue
+   # >=3 cycles of gap history in the verification map).
+   gap_sk = compute_gap_skip_cells(vm, active_ids, core_keys)
    ctx = build_per_batch_ctx(
        batch_spec=batch,
        full_whitelist=wl,
        matrix_state=ms,
        priority_cells=pc,
        skip_cells=sk,
+       gap_skip_cells=gap_sk,
        verification_map=vm,
        leaderboard_snapshots=snap,
        contracts=ctr,
@@ -300,6 +304,22 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
      )
        // Shape: { <modelId>: { <benchKey>: {value, sources[], lastChecked, ageDays, verifications} } }
        // Plus _meta: {t1Count, t2Count, totalConsidered}
+
+     // B (2026-06-07): gap-freshness-tier skip cells. A cell empty for
+     // >=GAP_SKIP_MIN_CYCLES (3) consecutive cycles, each with
+     // >=GAP_SKIP_MIN_SOURCES (2) distinct triedSources, is re-checked only
+     // every GAP_RECHECK_EVERY-th (4th) cycle — the ~435 perma-empty cells
+     // (cfElo for non-competitive models, nl2Repo, mrcr) dominate gather
+     // tool-calls re-confirming "still empty". TIME-BASED, never permanent: a
+     // vendor opt-in surfaces within <=4 cycles. Driven by the verification
+     // map's per-cell gapCycles/gapTriedSources (stamped at Step 7.6 from the
+     // merge artifact's gaps[]). The agent emits the carried gap WITHOUT a
+     // fetch, so merge.py's MX1 (filled+gaps+na==total) still holds. No-op until
+     // cells accrue >=3 cycles of gap history. Computed via
+     // scripts/lib/freshness.compute_gap_skip_cells().
+     gapSkipCells: compute_gap_skip_cells(verification_map, active_model_ids, coreBenchKeys)
+       // Shape: { <modelId>: { <benchKey>: {gapCycles, gapSince, triedSources, reason} } }
+       // Plus _meta: {skipCount, eligibleCount, recheckCount}
    }
    - `.aicodermap-verification-map.json` is the historical audit log of every (model, bench) cell observation across cycles (value, sources[], lastChecked). Used for contradiction analysis only — never read for skip decisions, since every cell is re-fetched every cycle (UNCAPPED + UNCACHED doctrine, reformed 2026-04-28). Skill creates it (empty {}) on first cycle if missing.
    - `data/models.json` is SSOT for "what models we track" — `currentIds` MUST be derived from this file at the moment the skill runs. Hardcoding the id list in a prompt or agent message is a contract violation (any drift between models.json and what the agent receives surfaces as silent omission of new/renamed models).
@@ -747,7 +767,8 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
        map.cells[modelId.benchKey].lastChecked = TODAY (only if at least one new verification appended this cycle)
      ```
    - Persists `.aicodermap-verification-map.json` (gitignored — historical record, regeneratable from sources.json via `bootstrap`)
-   - The `confirmed` flag is **audit-only** — used for contradiction analysis and human review. It is NEVER read by the agent or orchestrator to skip a fetch (every cell is re-fetched every cycle).
+   - The `confirmed` flag is **audit-only** — used for contradiction analysis and human review. It is NEVER read to skip a FILLED-cell fetch (filled cells re-fetch every cycle; the T2 filled-skip stays dormant while `confirmed` is unset).
+   - **B (2026-06-07) — gap-history stamping (powers the gap-freshness-tier).** The same `update` pass also reads the merge artifact's `gaps[]`: each still-empty cell gets `gapCycles += 1`, `gapSince` set on the first gap of a run, and `gapTriedSources` = the MIN distinct triedSources across the run (conservative). A cell FILLED this cycle has its gap run reset (`gapCycles = 0`). `compute_gap_skip_cells` reads these at the next cycle's ctx build. (This pass also fixed a latent bug — the prior `"bench" not in key` filter skipped EVERY `<modelId>.<benchKey>` sourcesAdded entry, so the incremental verification append was a silent no-op every cycle; now filtered against the bench-key universe.)
 
 7.6b. AA_AUTHORITATIVE_CORRECTION (2026-05-31, post-merge deterministic corrector):
    ```
@@ -779,7 +800,7 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
    python scripts/detect-anomalies.py        # refresh the queue post-merge
    ```
    - If `data/_anomalies.json` has entries in the HIGH-PRIORITY classes
-     (`source-mismatch`, `peer-outlier`, `out-of-band`), the orchestrator
+     (`source-mismatch`, `out-of-band`), the orchestrator
      dispatches ONE research sub-agent (`scope=anomaly-verify`, `model: "sonnet"`)
      with `idea_context.anomalies` = the top-N such cells. The agent applies
      agent.md rule 9 (OUTLIERS→INVESTIGATE) per cell — primary-source +
@@ -819,11 +840,20 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
      # post-merge mutation; the audit-data-coherence.py call above already proved
      # coherence, so the cycle proceeds straight to git commit.
      ```
-   - `single-source` anomalies are NOT auto-dispatched (too many; they are a
-     coverage signal) — they stay in `idea_context.anomalies` for the next full
-     gather to pick up a 2nd source. Advisory; never blocks. Opt-out
-     `AICODERMAP_NO_ANOMALY_RESOLVE=1`. This is the automated form of the manual
-     cfElo investigation (2026-05-27): an anomaly triggers RESEARCH, not rejection.
+   - `single-source` AND `peer-outlier` anomalies are NOT auto-dispatched —
+     they stay in `idea_context.anomalies` for the next full gather to pick up
+     a 2nd source. `single-source` is a coverage signal (too many). `peer-outlier`
+     was DEMOTED from auto-dispatch on 2026-06-07: the 2026-06-07 cycle measured
+     22 peer-outlier verdicts → 17 confirm / 0 reclassify, i.e. ~100%
+     confirm-as-legit. Peer-outlier is overwhelmingly a tier-grouping artifact
+     (a 2026 reasoning model sitting far above its tier median, or genuine
+     no-tools-vs-tooled benchmark variance) — NOT a misfile. Auto-dispatching it
+     cost ~11 min of serial sonnet time for ~0 data change. The scale/metric
+     errors a verify pass DOES catch live in `source-mismatch` (wrong-publisher
+     Elo) + `out-of-band` (impossible value) — those two remain auto-dispatched.
+     Advisory; never blocks. Opt-out `AICODERMAP_NO_ANOMALY_RESOLVE=1`. This is
+     the automated form of the manual cfElo investigation (2026-05-27): an
+     anomaly triggers RESEARCH, not rejection.
 
 8. Render diff summary (markdown table) to user-visible output: models[].updates fields, newModels[], lineup changes (NEW/DEPRECATED/RENAMED/REMOVED), contradictions auto-resolved, coverage% achieved, partialCoverage flag.
 9. AUTO-APPROVE — NO USER PROMPT. The workflow proceeds straight from Step 8 to Step 10. The only halt at this stage is schema-breaking discovery (a brand-new top-level field in a model entry not in the existing whitelist) — and even then, the unrecognized field is logged to gaps[] and merge continues with the recognized fields. RED contradictions are already auto-resolved at Step 7. REMOVED entries are auto-archived per LIFECYCLE_STATES.
@@ -873,7 +903,11 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
     "🔎 New vendor candidates: N (review queue)" and/or
     "🔎 New benchmark candidates: M (review queue)"
 
-11a. CYCLE_TELEMETRY (FAZ 2.4, 2026-05-07):
+11a. CYCLE_TELEMETRY (FAZ 2.4, 2026-05-07) — **MANDATORY every refresh-all/model cycle; do NOT skip:**
+    Without it the batch auto-tune (below) starves — the 2026-06-07 cycle ran with
+    the last telemetry file dated 2026-05-28 because this step was silently skipped.
+    Inject `_batchId` + `_wallclockSec` (from the dispatch wall-clock measurements)
+    into each artifact BEFORE aggregating, then write — even on partial/failed cycles.
     ```
     from lib.telemetry import aggregate_per_batch_telemetry, write_cycle_telemetry
     # IMPORTANT: orchestrator MUST inject `_batchId` (and ideally `_wallclockSec`,
@@ -1287,4 +1321,5 @@ Per-step error handling lives in **SILENT_FAIL_PREVENTION** above (single source
 - **M5 ≤14-day freshness gate.**
 - **Project-scoped:** skill + agent only in `D:\GitHub\aicodermap\` session.
 - **Explicit `model: "sonnet"` on every Agent() dispatch (HARD):** orchestrator MUST pass the `model` parameter explicitly on EVERY `aicodermap-research-agent` call — gather, synth, lineup-retry, health-check-retry, 0-fill-retry. Omitting it causes the subagent to inherit the parent's model (Opus) at ~60x cost per call. The pre-tool-use hook surfaces this mistake; treat its warning as a HARD STOP — kill the agents and re-dispatch with `model: "sonnet"`. Synth higher-budget exception still uses `sonnet` (FAZ 4.C); no dispatch path in this spec routes to opus or haiku.
+- **Explicit `wallclock_deadline_unix` in EVERY gather/anomaly prompt (HARD, 2026-06-07):** the dispatch contract's `wallclock_deadline_unix: now() + BATCH_WALLCLOCK_SEC` is the ONLY wallclock enforcement — there is NO orchestrator SIGKILL/subprocess timeout on the Agent-tool path. If the orchestrator omits the deadline string from the actual prompt (not just the pseudo-code), the agent runs uncapped and the slowest batch sets the whole wave's wall-clock. The 2026-06-07 cycle proved this: deadline omitted → batch06 ran 1023s vs a 600s target, making Stage A 17 min instead of ~10. Every `aicodermap-research-agent` gather/anomaly prompt MUST literally carry the computed epoch deadline + the instruction to hard-stop at `deadline-30`. agent.md enforces the self-stop; the orchestrator MUST supply the number.
 - **`sourcesAdded[].key` canonical form (HARD):** every Provenance-shape entry written by the agent OR post-hoc patched by the orchestrator MUST use `key: "<modelId>.<benchKey>"` (e.g., `"opus-4-7.sweV"`). Forms like `"bench.swePro"` (canonical-bench-prefix) or `"sweV"` (bare key) are contract violations — they cause `sources.json` to nest entries under `"bench.swePro"` as if it were a modelId, which MX-audit then flags as "unknown model id" and rolls the merge back. `gen_unified_artifact.py` is the SSOT for this format; any pipeline outside it that writes `sourcesAdded[]` (e.g., recovery patches) MUST mirror the same scheme.

@@ -268,12 +268,54 @@ def banned_fetch_patterns(whitelist: dict[str, Any]) -> list[str]:
     """
     import re
 
+    from urllib.parse import urlparse
+
     ft = schema(whitelist).get("formatTaxonomy") or {}
     banned_formats = {
         k
         for k, v in ft.items()
         if isinstance(v, dict) and v.get("skipWebFetch") is True
     }
+
+    # D (2026-06-07): immediate dead-URL ban. A host the source-health-probe
+    # marked dead/unreachable/bot-blocked THIS cycle burns the full per-fetch
+    # timeout budget (404, DNS-fail, 403) on the slowest (CN/data-sparse)
+    # batches BEFORE the agent falls back to WebSearch. The pre-existing ban
+    # only fired on `_runtime.unhealthy=true` (>=3 consecutive cycles) — too
+    # slow to react. Here we ban any entry whose `_runtime.healthChecks[key]`
+    # status is a reachability failure right now. `ssl-env-unverified` is the
+    # local cert-bundle artifact (per SKILL.md PRELIM-B) — NOT a dead source —
+    # so it is explicitly excluded.
+    dead_statuses = {"dead", "unreachable", "bot_blocked", "403_blocked"}
+
+    def _is_dead_status(s: object) -> bool:
+        if not isinstance(s, str):
+            return False
+        if s == "ssl-env-unverified":
+            return False
+        return s in dead_statuses or "404" in s
+
+    health_checks = (whitelist.get("_runtime") or {}).get("healthChecks") or {}
+    dead_keys = {
+        k
+        for k, v in health_checks.items()
+        if isinstance(v, dict) and _is_dead_status(v.get("status"))
+    }
+
+    def _domain_key(url: str | None) -> str:
+        # Mirror source-health-probe._domain_key: host (www-stripped) + first
+        # path segment. Keys must match the probe's exactly or the ban misses.
+        if not isinstance(url, str) or not url:
+            return ""
+        p = urlparse(url)
+        host = (p.hostname or "").lower()
+        if host.startswith("www."):
+            host = host[4:]
+        seg = [s for s in (p.path or "").split("/") if s]
+        return f"{host}/{seg[0]}" if seg else host
+
+    def _dead_now(url: str | None) -> bool:
+        return bool(dead_keys) and _domain_key(url) in dead_keys
 
     patterns: list[str] = []
     seen: set[str] = set()
@@ -295,7 +337,12 @@ def banned_fetch_patterns(whitelist: dict[str, Any]) -> list[str]:
             fmt = e.get("format")
             unhealthy = (e.get("_runtime") or {}).get("unhealthy") is True
             override = e.get("skipWebFetch") is True
-            if fmt in banned_formats or unhealthy or override:
+            if (
+                fmt in banned_formats
+                or unhealthy
+                or override
+                or _dead_now(e.get("url"))
+            ):
                 _add(e.get("url"))
 
     # Vendor URL bundles — every per-vendor URL whose format mirrors one
@@ -306,7 +353,7 @@ def banned_fetch_patterns(whitelist: dict[str, Any]) -> list[str]:
         formats_map = (v or {}).get("urlFormats") or {}
         for url_key, url in urls.items():
             fmt = formats_map.get(url_key)
-            if fmt in banned_formats:
+            if fmt in banned_formats or _dead_now(url):
                 _add(url)
 
     return patterns

@@ -189,19 +189,28 @@ require_full_matrix: <bool default:true>     # every cell must end as fill | gap
 # UNCAPPED applies to RESEARCH QUALITY (sources, fallbacks, gap fabrication).
 # Per-dispatch resource ceilings remain hard:
 #   • agent_budget_buffer (50 tool-calls) — enforced by self-monitoring
-#   • wallclock_deadline_unix             — enforced by orchestrator SIGKILL
+#   • wallclock_deadline_unix             — enforced by AGENT SELF-STOP (no SIGKILL)
 # When either fires, agent emits + partialReason; gap-gen closes the matrix.
+# CORRECTION (2026-06-07): there is NO orchestrator SIGKILL — the dispatch path
+# is the Claude main-loop Agent tool, which has no subprocess timeout. The
+# deadline is enforced ENTIRELY by the agent's own self-stop discipline below.
+# An agent that ignores it runs uncapped (the 2026-06-07 cycle saw batch06 run
+# 1023s against a 600s deadline because the deadline was both omitted from the
+# prompt AND only checked at sparse Phase boundaries). Honoring it is mandatory.
 #
-# Cell skip — freshness-tier ONLY (T2 cells, see SKILL.md FAZ 2.2):
-#   T1 (re-fetch): confirmed=false OR verifs<3 OR age>7d OR contradicted OR absent.
-#   T2 (skip):     confirmed=true AND verifs≥3 AND age≤7d AND no contradiction.
-# T2 cells arrive in idea_context.skipCells and bypass FORMAT_DISPATCH entirely.
+# Cell skip — two freshness-tiers (both bypass FORMAT_DISPATCH entirely):
+#   FILLED (T2, FAZ 2.2): confirmed=true AND verifs≥3 AND age≤7d AND no
+#     contradiction → arrives in idea_context.skipCells (cached value emitted).
+#   GAP (B, 2026-06-07): empty ≥3 consecutive cycles (≥2 triedSources each) AND
+#     not the every-4th-cycle re-check → arrives in idea_context.gapSkipCells
+#     (carried gap emitted, NO fetch). Time-based, never permanent.
+# Everything else is T1 (re-fetch this cycle).
 #
 # Sub-agents see ONLY their slice (target_model_ids ≤ 8 models × |coreKeys| cells).
 # The orchestrator parallelizes across slices via plan.waves.
 agent_budget_buffer: <int default:50>      # tool-call ceiling; near (buffer-5), finish current cell + emit
 batch_id: <string>                          # orchestrator batch label; surfaced in runMetadata
-wallclock_deadline_unix: <int>             # epoch seconds. Self-check at every Phase boundary; if Date.now()/1000 >= deadline-30 → STOP fetching, Write artifact, return EMITTED. Orchestrator SIGKILLs at deadline. Cells written survive; mid-flight lost. 30s soft buffer is for the Write call.
+wallclock_deadline_unix: <int>             # epoch seconds. HARD self-stop — the SOLE wallclock enforcement (no SIGKILL exists). Check the clock at EVERY Phase boundary AND every ~5 cells inside the Phase 3 per-model loop (not just at Phase boundaries — a 100-cell slice can spend its whole budget inside one Phase-3 pass). The instant `Date.now()/1000 >= deadline-30`: STOP fetching immediately, write whatever cells you have, emit gaps[] for every unswept cell, set partialReason{code:'wallclock'}, return EMITTED. 30s soft buffer is for the Write call. Cells written survive; the next cycle re-attempts the gaps. Running past the deadline is a contract violation — a fast partial beats a slow complete because the tail batch sets the entire wave's wall-clock.
 mode: "gather" | "synth" | "full"          # FAZ 4.C dispatch mode (default: "full" — legacy single-stage). See DISPATCH_MODES below.
 synth_input_paths: <string[]>              # SYNTH mode only: list of gather artifact paths to consume.
 ```
@@ -797,6 +806,25 @@ if (idea_context.skipCells[modelId]?.[benchKey]):
     sourcesAdded[].push({
         bench: benchKey, value: cached.value, sources: cached.sources,
         lastChecked: cached.lastChecked, extractedVia: "freshness-tier-skip"
+    })
+    continue
+
+// GAP-FRESHNESS-TIER CELL SKIP (B, 2026-06-07) — bypass all fetch logic for a
+// cell that has been EMPTY for >=3 consecutive cycles (each with >=2 distinct
+// triedSources) and is NOT due for its every-4th-cycle re-check. Re-confirming
+// a structurally-unpublished cell (cfElo for a non-competitive model, nl2Repo,
+// mrcr) every cycle is the dominant gather tool-call sink. The cell is STILL a
+// gap this cycle — just carried forward without a fetch. NOT a permanent skip:
+// the orchestrator re-checks it every 4th cycle, so a vendor opt-in still
+// surfaces with bounded lag. The carried gap keeps merge.py's MX1 invariant
+// (filled+gaps+na == totalCells) satisfied.
+if (idea_context.gapSkipCells[modelId]?.[benchKey]):
+    g := idea_context.gapSkipCells[modelId][benchKey]
+    rawGaps[].push({
+        key: `${modelId}.${benchKey}`,
+        reason: `gap-freshness-tier skip (${g.reason})`,
+        triedSources: [], triedQueries: [], triedFormats: [],
+        carriedFrom: g.gapSince, gapCycles: g.gapCycles
     })
     continue
 

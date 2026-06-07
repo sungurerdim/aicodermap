@@ -55,6 +55,11 @@ from lib.constants import (  # noqa: E402
 from lib.constants import VERIFICATION_AGREEMENT_PP  # noqa: E402  (SSOT)
 from lib.whitelist import all_bench_keys, load_whitelist  # noqa: E402
 
+# B (2026-06-07): cap the gapHistory audit trail so a perma-empty cell does not
+# grow its ledger unbounded across years of cycles. gapCycles (int) is the
+# authoritative counter; gapHistory keeps only the most-recent dates for audit.
+_GAP_HISTORY_CAP = 8
+
 ARTIFACT = PROJECT / ".aicodermap-agent-out.json"
 MAP_PATH = PROJECT / ".aicodermap-verification-map.json"
 
@@ -92,17 +97,30 @@ def update_map():
     else:
         cells = {}
 
+    # B (2026-06-07): bench-universe filter. The prior `"bench" not in key`
+    # guard was a latent bug — sourcesAdded keys are `<modelId>.<benchKey>`
+    # (e.g. "opus-4-7.sweV") which contain no "bench" substring, so EVERY entry
+    # was skipped and the incremental update appended 0 verifications every
+    # cycle. (T2 filled-skip stayed dormant regardless because the `confirmed`
+    # flag is retired — so fixing this does NOT activate filled-cell skipping;
+    # it only restores correct audit-history append + powers B's fill-reset.)
+    bench_universe = _load_bench_key_universe()
+
     appended = 0
+    filled_keys: set[str] = set()
     for model in artifact.get("models", []) or []:
         for src in model.get("sourcesAdded", []) or []:
             key = src.get("key")
-            if not key or "bench" not in key:
+            if not key:
                 continue
             parsed = parse_cell_key(key)
             if not parsed:
                 continue
             mid, bk = parsed
+            if bench_universe and bk not in bench_universe:
+                continue
             cell_key = f"{mid}.{bk}"
+            filled_keys.add(cell_key)
             cell = cells.setdefault(
                 cell_key,
                 {
@@ -142,6 +160,63 @@ def update_map():
                 )
                 appended += 1
                 cell["lastChecked"] = TODAY
+
+    # B (2026-06-07): gap-history stamping. Drives the gap-freshness-tier
+    # (lib.freshness.compute_gap_skip_cells). A cell filled this cycle has its
+    # gap run reset; a cell still in the artifact's gaps[] has its consecutive
+    # gap counter bumped + its triedSources count recorded so the skip gate can
+    # require >=GAP_SKIP_MIN_SOURCES distinct sources tried per gap cycle.
+    # A cell that is neither filled nor gapped this cycle is left untouched
+    # (its run is neither extended nor reset).
+    for ck in filled_keys:
+        cell = cells.get(ck)
+        if cell is not None:
+            cell["gapCycles"] = 0
+            cell["gapHistory"] = []
+            cell["gapSince"] = None
+            cell["gapTriedSources"] = 0
+    gap_stamped = 0
+    for gap in artifact.get("gaps", []) or []:
+        key = gap.get("key")
+        if not key:
+            continue
+        parsed = parse_cell_key(key)
+        if not parsed:
+            continue
+        ck = f"{parsed[0]}.{parsed[1]}"
+        if ck in filled_keys:
+            continue  # filled wins over a stale carried gap in the same artifact
+        tried = gap.get("triedSources") or []
+        n_tried = len(tried) if isinstance(tried, list) else 0
+        cell = cells.setdefault(
+            ck,
+            {
+                "value": None,
+                "verifications": [],
+                "lastChecked": None,
+                "gapHistory": [],
+                "gapSince": None,
+                "confidence": 0.0,
+                "stability": None,
+                "bayesianPoint": None,
+            },
+        )
+        cell.setdefault("gapHistory", [])
+        prev = cell.get("gapCycles") or 0
+        cell["gapCycles"] = prev + 1
+        if not cell.get("gapSince"):
+            cell["gapSince"] = TODAY
+        hist = cell["gapHistory"]
+        hist.append(TODAY)
+        if len(hist) > _GAP_HISTORY_CAP:
+            del hist[: len(hist) - _GAP_HISTORY_CAP]
+        # Record the MINIMUM triedSources across the current gap run — the skip
+        # gate is conservative (a single low-effort cycle keeps the cell T1).
+        prev_min = cell.get("gapTriedSources")
+        cell["gapTriedSources"] = (
+            n_tried if prev_min in (None, 0) else min(prev_min, n_tried)
+        )
+        gap_stamped += 1
 
     # Recompute consensus value (median when ≥ THRESHOLD agree); flag
     # contested cells for stats. No `confirmed` flag — readers compute on

@@ -1,0 +1,161 @@
+{
+  "cycleEndedAt": "2026-06-07T02:28:27Z",
+  "cycleStartedAt": "2026-06-07T00:00:00Z",
+  "perBatch": [
+    {
+      "agentGaps": 50,
+      "batchId": "batch00-google_deepm",
+      "fills": 64,
+      "gaps": 50,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 42,
+      "wallclockSec": 883.0
+    },
+    {
+      "agentGaps": 77,
+      "batchId": "batch01-mistral_ai",
+      "fills": 28,
+      "gaps": 77,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 33,
+      "wallclockSec": 578.0
+    },
+    {
+      "agentGaps": 60,
+      "batchId": "batch02-openai",
+      "fills": 51,
+      "gaps": 60,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 30,
+      "wallclockSec": 674.0
+    },
+    {
+      "agentGaps": 25,
+      "batchId": "batch03-alibaba_qwen",
+      "fills": 91,
+      "gaps": 25,
+      "naCount": 15,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 38,
+      "wallclockSec": 482.0
+    },
+    {
+      "agentGaps": 77,
+      "batchId": "batch04-alibaba_qwen",
+      "fills": 32,
+      "gaps": 77,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 42,
+      "wallclockSec": 797.0
+    },
+    {
+      "agentGaps": 72,
+      "batchId": "batch05-xai",
+      "fills": 34,
+      "gaps": 72,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "grok-4-20/grok-4-3 AA sub-scores (aaCoding/aaAgentic/tbHard) unavailable from SPA; grok-3-mini not in AA leaderboard snapshot; grok-build-0-1 not yet in independent leaderboards",
+      "toolCallCount": 28,
+      "wallclockSec": 631.0
+    },
+    {
+      "agentGaps": 67,
+      "batchId": "batch06-deepseek",
+      "fills": 52,
+      "gaps": 67,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 28,
+      "wallclockSec": 1023.0
+    },
+    {
+      "agentGaps": 51,
+      "batchId": "batch07-openai",
+      "fills": 67,
+      "gaps": 51,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 32,
+      "wallclockSec": 633.0
+    },
+    {
+      "agentGaps": 60,
+      "batchId": "batch08-anthropic",
+      "fills": 56,
+      "gaps": 60,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 38,
+      "wallclockSec": 842.0
+    },
+    {
+      "agentGaps": 37,
+      "batchId": "batch09-minimax",
+      "fills": 83,
+      "gaps": 37,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 38,
+      "wallclockSec": 732.0
+    },
+    {
+      "agentGaps": 30,
+      "batchId": "batch10-xiaomi",
+      "fills": 43,
+      "gaps": 30,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 22,
+      "wallclockSec": 519.0
+    },
+    {
+      "agentGaps": 72,
+      "batchId": "batch11-google_deepm",
+      "fills": 43,
+      "gaps": 72,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 28,
+      "wallclockSec": 625.0
+    },
+    {
+      "agentGaps": 60,
+      "batchId": "batch12-alibaba_qwen",
+      "fills": 69,
+      "gaps": 60,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 32,
+      "wallclockSec": 897.0
+    }
+  ],
+  "totalBatches": 13,
+  "totals": {
+    "agentGaps": 738,
+    "fills": 713,
+    "gaps": 738,
+    "na": 15,
+    "orchestratorGaps": 0,
+    "toolCallSum": 431,
+    "wallclockSecMax": 1023.0,
+    "wallclockSecP95": 1023.0
+  },
+  "zeroFillBatches": []
+}

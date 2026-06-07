@@ -20,7 +20,10 @@ Slim contract per batch:
   leaderboardSnapshots url -> path mapping ONLY (drop contentLength, contentType,
                                                   fetchedAt, etag — agent does
                                                   not need these)
-  skipCells           per-batch slice
+  skipCells           per-batch slice (T2 filled-cell freshness skip)
+  gapSkipCells        per-batch slice (B: gap-freshness-tier — cells empty for
+                      >=3 cycles, re-checked every 4th; agent emits carried gap
+                      WITHOUT re-fetching on a skip cycle)
   verificationMap     CELLS slice for batch's modelIds only
                       (drop the rest — was 93 KB inline previously)
   lineup              copy (small, may be {})
@@ -150,6 +153,7 @@ def build_per_batch_ctx(
     current_ids: list[str],
     lineup: dict[str, Any] | None = None,
     bench_keys: list[str] | None = None,
+    gap_skip_cells: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Compose the slim per-batch idea_context dict.
 
@@ -176,6 +180,7 @@ def build_per_batch_ctx(
         "bannedFetchPatterns": banned_fetch_patterns,
         "leaderboardSnapshots": slim_snapshots(leaderboard_snapshots),
         "skipCells": slim_skip_cells(skip_cells, model_ids),
+        "gapSkipCells": slim_skip_cells(gap_skip_cells, model_ids),
         "verificationMap": slim_verification_slice(verification_map, model_ids),
         "lineup": lineup or {},
         "_batchSpec": {
