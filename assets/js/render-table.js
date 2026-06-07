@@ -121,23 +121,28 @@ function benchColumns() {
 function renderBenchValue(m, k) {
   const v = m.bench?.[k];
   const wrap = document.createDocumentFragment();
+  // Contradiction flag sits to the LEFT of the value: these cells are
+  // right-aligned, so a trailing flag pushed every flagged number off the
+  // right edge and broke the decimal-column alignment. Flag-then-value keeps
+  // the number flush-right and aligned across all rows.
+  const c = contradictionFor(m.id, k);
+  if (c) {
+    const flag = document.createElement('span');
+    flag.className = 'flag';
+    flag.textContent = c.severity === 'danger' ? '🚨' : '⚠';
+    flag.tabIndex = 0;
+    flag.setAttribute('role', 'button');
+    flag.setAttribute('aria-label', t('ui.contradiction.title'));
+    flag.addEventListener('mouseenter', (e) => showContradictionTooltip(e.currentTarget, c));
+    flag.addEventListener('focus', (e) => showContradictionTooltip(e.currentTarget, c));
+    flag.addEventListener('mouseleave', hideTooltip);
+    flag.addEventListener('blur', hideTooltip);
+    wrap.appendChild(flag);
+  }
   const span = document.createElement('span');
   span.className = scoreClass(v);
   span.textContent = fmtScore(v);
   wrap.appendChild(span);
-  const c = contradictionFor(m.id, k);
-  if (!c) return wrap;
-  const flag = document.createElement('span');
-  flag.className = 'flag';
-  flag.textContent = c.severity === 'danger' ? '🚨' : '⚠';
-  flag.tabIndex = 0;
-  flag.setAttribute('role', 'button');
-  flag.setAttribute('aria-label', t('ui.contradiction.title'));
-  flag.addEventListener('mouseenter', (e) => showContradictionTooltip(e.currentTarget, c));
-  flag.addEventListener('focus', (e) => showContradictionTooltip(e.currentTarget, c));
-  flag.addEventListener('mouseleave', hideTooltip);
-  flag.addEventListener('blur', hideTooltip);
-  wrap.appendChild(flag);
   return wrap;
 }
 
