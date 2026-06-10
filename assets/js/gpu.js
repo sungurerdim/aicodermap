@@ -85,16 +85,83 @@ export function gpuCompat(model, vram) {
   return { kind: 'unknown', label: '—' };
 }
 
+// WebGL renderer-string fallback. Browsers redact WebGPU adapter info far more
+// aggressively than the long-standing WEBGL_debug_renderer_info extension, and
+// Firefox ships no usable WebGPU at all — so when the WebGPU path yields
+// nothing, the ANGLE/driver renderer string ("ANGLE (NVIDIA, NVIDIA GeForce
+// RTX 4090 Direct3D11 ...)", "Apple M3 Pro") is matched generically against
+// the gpu-database entry ids. No GPU names are hardcoded here: an entry id
+// like "rtx-4090" or "m3-pro-18gb" is split into word tokens (RAM-size
+// suffixes dropped) and every token must appear as a whole word in the
+// renderer string; the most-specific match wins. Same-token entries that
+// differ only by RAM size (Apple unified memory tiers) collapse into one
+// 'approximate' result with the conservative (lowest) VRAM so a "fits" verdict
+// is never optimistic.
+const RAM_SUFFIX_RE = /^\d+gb$/;
+
+function matchRendererString(raw) {
+  const words = new Set(
+    String(raw).toLowerCase().replace(/[^a-z0-9.]+/g, ' ').split(' ').filter(Boolean)
+  );
+  let best = null;
+  for (const group of ['nvidia', 'apple', 'amd', 'intel']) {
+    const list = State.gpu[group];
+    if (!list) continue;
+    for (const [id, info] of Object.entries(list)) {
+      const tokens = id.split('-').filter(t => t && !RAM_SUFFIX_RE.test(t));
+      if (!tokens.length || !tokens.every(t => words.has(t))) continue;
+      const key = `${group}:${tokens.join('-')}`;
+      const cand = { group, id, info, specificity: tokens.length, key };
+      if (!best || cand.specificity > best.specificity) {
+        best = { key, specificity: cand.specificity, matches: [cand] };
+      } else if (cand.specificity === best.specificity && cand.key === best.key) {
+        best.matches.push(cand);
+      }
+    }
+  }
+  if (!best) return null;
+  const sorted = [...best.matches].sort(
+    (a, b) => (Number(a.info.vram) || 0) - (Number(b.info.vram) || 0)
+  );
+  const low = sorted[0];
+  if (sorted.length === 1) {
+    return { id: `${low.group}.${low.id}`, detectionMode: 'exact', ...low.info };
+  }
+  const vrams = sorted.map(v => Number(v.info.vram)).filter(Number.isFinite);
+  return {
+    id: `${low.group}.${low.id}`,
+    detectionMode: 'approximate',
+    architectureLabel: String(low.info.displayName || '').replace(/\s*\d+\s*GB$/i, ''),
+    vramRange: [vrams[0], vrams[vrams.length - 1]],
+    ...low.info,
+    vram: vrams[0],
+  };
+}
+
+function detectGpuWebGL() {
+  try {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (!gl) return null;
+    const ext = gl.getExtension('WEBGL_debug_renderer_info');
+    const raw = gl.getParameter(ext ? ext.UNMASKED_RENDERER_WEBGL : gl.RENDERER);
+    if (!raw) return null;
+    return matchRendererString(raw);
+  } catch (_) {
+    return null;
+  }
+}
+
 export async function detectGpu() {
   try {
-    if (!('gpu' in navigator) || !navigator.gpu) return null;
+    if (!('gpu' in navigator) || !navigator.gpu) return detectGpuWebGL();
     const adapter = await navigator.gpu.requestAdapter();
-    if (!adapter) return null;
+    if (!adapter) return detectGpuWebGL();
     let info = adapter.info;
     if (!info && typeof adapter.requestAdapterInfo === 'function') {
       info = await adapter.requestAdapterInfo();
     }
-    if (!info) return null;
+    if (!info) return detectGpuWebGL();
 
     const vendor = (info.vendor || '').toLowerCase().replace(/\s+/g, '_');
     const arch = (info.architecture || '').toLowerCase();
@@ -139,14 +206,19 @@ export async function detectGpu() {
       }
     }
 
-    // 3. Privacy-stripped: WebGPU present but browser stripped all device info
+    // 3. WebGL renderer-string fallback — WebGPU exposed an adapter but its
+    // info matched nothing in the database (or was redacted to empty strings).
+    const webgl = detectGpuWebGL();
+    if (webgl) return webgl;
+
+    // 4. Privacy-stripped: both paths yielded no usable device identity
     if (!vendor && !arch && !device) {
       return { id: null, detectionMode: 'privacy-stripped' };
     }
 
     return { id: null, detectionMode: 'unknown', vendor, arch };
   } catch (_) {
-    return null;
+    return detectGpuWebGL();
   }
 }
 
@@ -233,8 +305,12 @@ export function updateGpuStatus() {
   const sel = document.getElementById('filter-gpu-select');
   if (!status || !sel) return;
 
-  // Bind orphan i18n key: webgpuUnsupported — shown when browser lacks WebGPU entirely
-  if (!('gpu' in navigator) || !navigator.gpu) {
+  const detected = State.detectedGpu;
+  const detectedUsable = !!(detected && (Number.isFinite(detected.vram) || detected.vramRange));
+
+  // webgpuUnsupported — only when WebGPU is absent AND the WebGL renderer
+  // fallback also failed; a successful WebGL detection keeps auto usable.
+  if ((!('gpu' in navigator) || !navigator.gpu) && !detectedUsable) {
     status.textContent = t('compat.errors.webgpuUnsupported') || 'WebGPU not supported — select GPU manually';
     const autoOpt = sel.querySelector('option[value="auto"]');
     if (autoOpt) {
@@ -246,7 +322,6 @@ export function updateGpuStatus() {
   }
 
   const autoOpt = sel.querySelector('option[value="auto"]');
-  const detected = State.detectedGpu;
 
   // Privacy-stripped path: WebGPU present but browser hid all device info
   if (detected?.detectionMode === 'privacy-stripped') {
