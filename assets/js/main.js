@@ -7,7 +7,7 @@ import {
 import { loadI18n, applyI18n } from './i18n.js';
 import { loadData } from './data.js';
 import {
-  detectGpu, populateGpuSelect, resolveGpuVram, updateGpuStatus,
+  detectGpu, populateGpuSelect, resolveGpuVram, resolveSystemRam, updateGpuStatus,
 } from './gpu.js';
 import { el, clear } from './dom.js';
 import {
@@ -88,6 +88,8 @@ function bootstrapPrefs() {
   State.selectedGpu = readStorage(STORAGE.gpu, 'auto');
   const storedVram = readStorage(STORAGE.vram, null);
   if (Number.isFinite(storedVram)) State.vram = storedVram;
+  const storedRam = readStorage(STORAGE.ram, null);
+  if (Number.isFinite(storedRam)) State.ram = storedRam;
 }
 
 async function bootstrapI18n() {
@@ -166,7 +168,16 @@ async function bootstrapGpu() {
     if (vramEl) vramEl.value = String(State.vram);
   }
 
+  // Stored RAM pick (storage holds only explicit dropdown picks; Auto = null →
+  // resolveSystemRam falls back to navigator.deviceMemory).
+  const ramSel = document.getElementById('filter-ram-select');
+  if (ramSel && Number.isFinite(State.ram)
+      && [...ramSel.options].some(o => Number(o.value) === State.ram)) {
+    ramSel.value = String(State.ram);
+  }
+
   resolveGpuVram();
+  resolveSystemRam();
   updateGpuStatus();
 }
 

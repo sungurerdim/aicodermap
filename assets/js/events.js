@@ -10,7 +10,7 @@ import {
 } from './render-controls.js';
 import { renderAll } from './render-table.js';
 import { renderPrivacyTable } from './render-privacy.js';
-import { resolveGpuVram, updateGpuStatus, populateGpuSelect } from './gpu.js';
+import { resolveGpuVram, resolveSystemRam, updateGpuStatus, populateGpuSelect } from './gpu.js';
 import { exportElement, hideTooltip } from './overlay.js';
 import { pushUrlState, buildShareUrl } from './url-state.js';
 import { showToast } from './dom.js';
@@ -82,6 +82,8 @@ function wireFiltersReset() {
     if (search) search.value = '';
     if (deployment) deployment.value = 'all';
     if (vramOverride) vramOverride.value = '';
+    const ramSel = document.getElementById('filter-ram-select');
+    if (ramSel) ramSel.value = '';
     if (tier) tier.value = 'all';
     if (provider) provider.value = 'all';
     if (openOnly) openOnly.checked = false;
@@ -94,10 +96,12 @@ function wireFiltersReset() {
     State.filters = { search: '', deployment: 'all', tier: 'all', provider: 'all', openOnly: false };
     State.selectedGpu = gpuSel ? gpuSel.value : 'auto';
     resolveGpuVram();
+    resolveSystemRam();
     updateGpuStatus();
     writeStorage(STORAGE.filters, State.filters);
     writeStorage(STORAGE.gpu, State.selectedGpu);
     writeStorage(STORAGE.vram, State.vram);
+    writeStorage(STORAGE.ram, null);
     renderAll();
   });
 }
@@ -171,6 +175,15 @@ function wireGpuControls() {
     vram.addEventListener('input', () => {
       resolveGpuVram();
       writeStorage(STORAGE.vram, State.vram);
+      updateGpuStatus();
+      renderAll();
+    });
+  }
+  const ramSel = document.getElementById('filter-ram-select');
+  if (ramSel) {
+    ramSel.addEventListener('change', () => {
+      resolveSystemRam();
+      writeStorage(STORAGE.ram, ramSel.value ? Number(ramSel.value) : null);
       updateGpuStatus();
       renderAll();
     });

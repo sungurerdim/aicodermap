@@ -6,6 +6,32 @@ import { t } from './i18n.js';
 
 const RAM_OFFLOAD_FACTOR = 2;
 const MIN_OFFLOAD_LIMIT_GB = 8;
+// OS + apps keep a slice of system RAM for themselves; only the remainder is
+// realistically available to spill model weights into. 6GB VRAM + 8GB RAM →
+// budget 6 + (8-4) = 10GB, so a 14GB model is correctly "too large".
+const RAM_OS_RESERVE_GB = 4;
+
+// Spill budget beyond VRAM. Known system RAM (dropdown pick, else the
+// navigator.deviceMemory floor — browsers cap it at 8, which only ever
+// UNDER-estimates) → usable = ram - OS reserve. Unknown → the legacy
+// 2×VRAM heuristic.
+function offloadBudget(vram) {
+  if (Number.isFinite(State.ram) && State.ram > 0) {
+    return Math.max(State.ram - RAM_OS_RESERVE_GB, 0);
+  }
+  return Math.max(vram * RAM_OFFLOAD_FACTOR, MIN_OFFLOAD_LIMIT_GB);
+}
+
+export function resolveSystemRam() {
+  const sel = document.getElementById('filter-ram-select');
+  const picked = sel ? Number(sel.value) : NaN;
+  if (Number.isFinite(picked) && picked > 0) {
+    State.ram = picked;
+    return;
+  }
+  const dm = (typeof navigator !== 'undefined' && Number(navigator.deviceMemory)) || NaN;
+  State.ram = Number.isFinite(dm) && dm > 0 ? dm : null;
+}
 
 // A model is locally runnable when it ships a local tier, a known VRAM
 // requirement, or at least one Unsloth quant variant. Lives here (not in the
@@ -13,7 +39,11 @@ const MIN_OFFLOAD_LIMIT_GB = 8;
 export function isLocalRunnable(m) {
   if (m.tier === 'ollama-local' || m.tier === 'gemma') return true;
   if (Number.isFinite(m.vramRequirement)) return true;
-  if (Array.isArray(m.unslothVariants) && m.unslothVariants.length > 0) return true;
+  // Variants without a real vram number can't participate in fit math
+  // (gpuCompat filters them out and then labels the model "cloud"), so they
+  // must not count as local-runnable either — else the fit view shows
+  // cloud-badged rows.
+  if (Array.isArray(m.unslothVariants) && m.unslothVariants.some(v => Number.isFinite(v.vram))) return true;
   return false;
 }
 
@@ -34,7 +64,7 @@ export function gpuCompat(model, vram) {
     return { kind: 'unknown', label: '—' };
   }
 
-  const offloadLimit = Math.max(vram * RAM_OFFLOAD_FACTOR, MIN_OFFLOAD_LIMIT_GB);
+  const offloadLimit = offloadBudget(vram);
 
   let bestVariant = null;
   if (hasUnsloth) {
@@ -366,15 +396,21 @@ export function updateGpuStatus() {
     }
   }
 
+  const budget = Number.isFinite(State.ram) && State.ram > 0
+    ? State.vram + Math.max(State.ram - RAM_OS_RESERVE_GB, 0)
+    : null;
+  const totalSuffix = budget != null
+    ? ` + RAM → ~${budget} GB ${t('ui.filter.totalBudget') || 'total'}`
+    : '';
   if (State.vram == null) {
     status.textContent = autoOpt && autoOpt.disabled
       ? (t('ui.filter.gpuAutoUnavailable') || 'Auto-detect unavailable')
       : '';
   } else if (detected?.detectionMode === 'approximate') {
     const approxLabel = t('ui.filter.gpuApproximate') || 'approx.';
-    status.textContent = `~${State.vram} GB · ${detected.architectureLabel || ''} (${approxLabel})`;
+    status.textContent = `~${State.vram} GB · ${detected.architectureLabel || ''} (${approxLabel})${totalSuffix}`;
   } else {
-    status.textContent = `~${State.vram} GB`;
+    status.textContent = `~${State.vram} GB${totalSuffix}`;
   }
 }
 
@@ -404,8 +440,11 @@ export function passesFilters(model) {
   } else if (f.deployment === 'local') {
     if (!local) return false;
     if (Number.isFinite(State.vram) && State.vram > 0) {
+      // Fit view keeps ONLY models with a positive verdict. 'unknown'/'cloud'
+      // (no usable VRAM data) are as unactionable as 'too-large' here — a row
+      // the user can't actually run must not survive the fit filter.
       const c = gpuCompat(model, State.vram);
-      if (c.kind === 'too-large') return false;
+      if (c.kind !== 'fits' && c.kind !== 'offload') return false;
     }
   }
   return true;

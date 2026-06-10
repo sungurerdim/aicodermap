@@ -253,6 +253,20 @@
         <span data-i18n-key="ui.filter.gpuOverride">VRAM</span>
         <input type="number" id="filter-vram-override" min="0" max="256" step="1" inputmode="numeric" placeholder="GB">
       </label>
+      <label class="select-row ram-row">
+        <span data-i18n-key="ui.filter.ramLabel">RAM</span>
+        <select id="filter-ram-select">
+          <option value="" data-i18n-key="ui.filter.ramAuto">Auto</option>
+          <option value="8">8 GB</option>
+          <option value="16">16 GB</option>
+          <option value="24">24 GB</option>
+          <option value="32">32 GB</option>
+          <option value="48">48 GB</option>
+          <option value="64">64 GB</option>
+          <option value="96">96 GB</option>
+          <option value="128">128 GB</option>
+        </select>
+      </label>
       <label class="checkbox-row">
         <input type="checkbox" id="filter-open-only">
         <span data-i18n-key="ui.filter.openOnly">Open only</span>

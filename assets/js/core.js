@@ -5,6 +5,7 @@ export const STORAGE = {
   weights: 'acm.v1.weights',
   language: 'acm.v1.language',
   vram: 'acm.v1.vram',
+  ram: 'acm.v1.ram',
   gpu: 'acm.v1.gpu',
   filters: 'acm.v1.filters',
   sort: 'acm.v1.sort',
@@ -311,6 +312,9 @@ export const State = {
   filters: { deployment: 'all', openOnly: false, tier: 'all', provider: 'all', search: '' },
   sort: { col: 'composite', dir: 'desc' },
   vram: null,
+  // System RAM (GB) — dropdown pick, else navigator.deviceMemory floor.
+  // Feeds the offload budget: usable = ram - OS reserve (see gpu.js).
+  ram: null,
   selectedGpu: 'auto',
   detectedGpu: null,
   dataDeployedAt: null,
