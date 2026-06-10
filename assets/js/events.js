@@ -186,6 +186,17 @@ function wireGpuControls() {
       renderAll();
     });
   }
+  const fit = document.getElementById('gpu-fit-toggle');
+  if (fit) {
+    fit.addEventListener('click', () => {
+      State.filters.deployment = State.filters.deployment === 'local' ? 'all' : 'local';
+      const dep = document.getElementById('filter-deployment');
+      if (dep) dep.value = State.filters.deployment;
+      writeStorage(STORAGE.filters, State.filters);
+      updateGpuStatus();
+      renderAll();
+    });
+  }
 }
 
 function wireExports() {

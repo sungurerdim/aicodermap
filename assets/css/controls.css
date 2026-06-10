@@ -140,8 +140,15 @@
   letter-spacing: 0;
   color: var(--text);
 }
-.gpu-status-line {
+.gpu-status-row {
   grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-height: 0;
+}
+.gpu-status-line {
   margin: 0;
   font-size: 0.74rem;
   color: var(--muted);
@@ -149,6 +156,7 @@
   text-align: right;
 }
 .gpu-status-line:empty { display: none; }
+#gpu-fit-toggle[hidden] { display: none; }
 /* Reset button gets its own full-width row so it doesn't sit stranded
  * in a single auto-fit cell with empty space around it. Right-aligned
  * keeps it where users expect a destructive action. */

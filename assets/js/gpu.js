@@ -300,7 +300,26 @@ export function resolveGpuVram() {
   State.vram = info ? effectiveVram(info) : null;
 }
 
+// One-click bridge from "VRAM is known" (auto-detected OR picked) to the
+// local-fit list view. Auto-detect resolves a VRAM silently on page load, but
+// flipping the Deploy filter for the user unasked would be surprising — the
+// button makes the action explicit and single-click instead of hunting the
+// Deploy select. Label toggles to "show all" while the fit view is active.
+function syncGpuFitToggle() {
+  const btn = document.getElementById('gpu-fit-toggle');
+  if (!btn) return;
+  if (!Number.isFinite(State.vram) || State.vram <= 0) {
+    btn.hidden = true;
+    return;
+  }
+  btn.hidden = false;
+  btn.textContent = State.filters.deployment === 'local'
+    ? (t('ui.filter.showAllDeploy') || 'Show all models')
+    : `${t('ui.filter.showFitting') || 'Show models that fit'} (~${State.vram} GB)`;
+}
+
 export function updateGpuStatus() {
+  syncGpuFitToggle();
   const status = document.getElementById('gpu-status');
   const sel = document.getElementById('filter-gpu-select');
   if (!status || !sel) return;
