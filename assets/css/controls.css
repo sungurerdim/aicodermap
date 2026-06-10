@@ -99,9 +99,15 @@
  * Each control is a single row (label + input/select). The reset button
  * and gpu-status hint fold into the same wrap so users see all filters
  * at a glance instead of scanning a tall column. */
+/* Flex-wrap toolbar (2026-06-10, was CSS grid): every control grows to fill
+ * its row so no dead space remains, and wrapping can never overlap — the
+ * grid-column auto/-1 trick used before let the actions cell land on top of
+ * auto-placed neighbours. Sizing intent: selects share rows equally, VRAM
+ * stays narrow, the open-only checkbox takes its natural width, search gets
+ * double growth, and the actions cluster right-aligns on whatever remains. */
 .filters-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 4px var(--space-2);
   align-items: center;
 }
@@ -113,7 +119,10 @@
   font-size: 0.85rem;
   color: var(--muted);
   min-width: 0;
+  flex: 1 1 170px;
 }
+.number-row { flex: 0 1 120px; }
+.filters-grid .checkbox-row { flex: 0 0 auto; }
 .select-row > span, .number-row > span {
   flex: 0 0 auto;
   font-size: 0.7rem;
@@ -140,16 +149,17 @@
   letter-spacing: 0;
   color: var(--text);
 }
-/* Status + fit-toggle + reset share ONE actions cell that fills whatever
- * remains of the current grid row (auto / -1) instead of forcing two extra
- * full-width rows — keeps the filters card a tight one-to-two-row toolbar. */
+/* Status + fit-toggle + reset share ONE actions cluster that right-aligns on
+ * whatever remains of the current flex row (margin-left:auto), wrapping to its
+ * own right-aligned line only when the row is genuinely full. */
 .filters-actions {
-  grid-column: auto / -1;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
   min-width: 0;
+  flex: 1 0 auto;
+  margin-left: auto;
 }
 .gpu-status-line {
   margin: 0;
@@ -174,6 +184,7 @@
 .search-row {
   position: relative;
   min-width: 0;
+  flex: 2 1 200px;
 }
 .search-row > span {
   position: absolute;

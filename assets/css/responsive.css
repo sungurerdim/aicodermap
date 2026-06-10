@@ -28,7 +28,7 @@
   .app-title { font-size: 1.5rem; }
   .models-list { grid-template-columns: 1fr; }
   .model-card { padding: var(--space-3); }
-  .filters-grid { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+  .filters-grid .select-row { flex-basis: 190px; }
 }
 
 /* DESKTOP: >1024 */
@@ -38,7 +38,7 @@
   .app-title { font-size: 1.6rem; }
   .section-head h2 { font-size: 1.18rem; }
   .composite-score .value { font-size: 1.7rem; }
-  .filters-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .filters-grid .select-row { flex-basis: 200px; }
 }
 
 /* Reduced motion */
