@@ -102,7 +102,7 @@
 .filters-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-  gap: 6px var(--space-2);
+  gap: 4px var(--space-2);
   align-items: center;
 }
 .checkbox-row, .select-row, .number-row {
@@ -140,13 +140,16 @@
   letter-spacing: 0;
   color: var(--text);
 }
-.gpu-status-row {
-  grid-column: 1 / -1;
+/* Status + fit-toggle + reset share ONE actions cell that fills whatever
+ * remains of the current grid row (auto / -1) instead of forcing two extra
+ * full-width rows — keeps the filters card a tight one-to-two-row toolbar. */
+.filters-actions {
+  grid-column: auto / -1;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-  min-height: 0;
+  min-width: 0;
 }
 .gpu-status-line {
   margin: 0;
@@ -154,16 +157,14 @@
   color: var(--muted);
   font-style: italic;
   text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 .gpu-status-line:empty { display: none; }
 #gpu-fit-toggle[hidden] { display: none; }
-/* Reset button gets its own full-width row so it doesn't sit stranded
- * in a single auto-fit cell with empty space around it. Right-aligned
- * keeps it where users expect a destructive action. */
-#filters-reset.btn-compact {
-  grid-column: 1 / -1;
-  justify-self: end;
-}
+.filters-actions .btn-compact { flex: 0 0 auto; }
 
 /* Search row — model/provider filter. The "Ara" / "Search" text label is
  * visually hidden (screen readers still read it); a magnifier icon inside the
