@@ -134,6 +134,15 @@ table#comparison-table tbody tr.is-rank-gated td,
 table#comparison-table tbody tr.is-rank-gated .col-name {
   background: var(--surface-limited);
 }
+/* Per-row missing-bench count on gated rows — tooltip lists the benches. */
+.gated-missing-count {
+  margin-left: 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--warn, #b45309);
+  cursor: help;
+  white-space: nowrap;
+}
 table#comparison-table tbody tr.is-rank-gated:hover td,
 table#comparison-table tbody tr.is-rank-gated:hover .col-name {
   background: var(--bg-limited);

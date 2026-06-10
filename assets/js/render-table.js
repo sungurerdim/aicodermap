@@ -3,7 +3,7 @@
 
 import { State, TIER_ORDER, STORAGE, writeStorage } from './core.js';
 import { contradictionFor } from './data.js';
-import { coverageOf, effectiveScore, rankBands } from './scoring.js';
+import { coverageOf, effectiveScore, rankBands, presetTiersFor } from './scoring.js';
 import {
   fmtScore, scoreClass, pricingView, fmtPriceRange, fmtContext,
   fmtLastUpdated, fmtTimeAgo, orderedBenchKeys,
@@ -51,6 +51,20 @@ function staticColumns() {
           }
         });
         return a;
+      },
+      // Gated rows show HOW MANY required benches are missing (the band header
+      // alone read as "one missing test" even when a model lacks four). The
+      // count marker's tooltip lists the missing benches by short label.
+      renderExtra: (m, ctx) => {
+        if (!ctx.band || !ctx.band.gated) return null;
+        const tiers = presetTiersFor(m, State.activePresetName || 'balanced');
+        const missing = [...new Set([...tiers.missingRequired, ...tiers.missingCritical])];
+        if (!missing.length) return null;
+        const labels = missing.map(k => t(`benchmarks.${k}.short`) || k).join(', ');
+        return el('span', {
+          class: 'gated-missing-count',
+          'data-tip': `${t('vendorPanel.missingTip') || 'missing benches'}: ${labels}`,
+        }, `⚠${missing.length}`);
       } },
     { key: 'provider', i18n: 'ui.table.provider', sortable: true,
       get: (m) => (m.provider || '').toLowerCase(),
@@ -364,6 +378,10 @@ function renderTableBody(tbody, ranked, cols) {
       const out = col.render(entry.model, ctx);
       if (out instanceof Node) td.appendChild(out);
       else td.textContent = String(out ?? '—');
+      if (typeof col.renderExtra === 'function') {
+        const extra = col.renderExtra(entry.model, ctx);
+        if (extra instanceof Node) td.appendChild(extra);
+      }
       tr.appendChild(td);
     }
     tbody.appendChild(tr);
