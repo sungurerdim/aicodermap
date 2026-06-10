@@ -159,20 +159,12 @@
 
 /* Search row — model/provider filter. The "Ara" / "Search" text label is
  * visually hidden (screen readers still read it); a magnifier icon inside the
- * input serves as the visible affordance. Relocated 2026-06-06 from the top of
- * the filters grid to a compact single-line bar between the Weights editor and
- * the Comparison table (was forcing a tall 2-column row at full width). */
+ * input serves as the visible affordance. Lives inside .filters-grid as a
+ * regular cell right after the open-only checkbox (relocated 2026-06-10 from
+ * a standalone bar so all list-narrowing controls share one toolbar). */
 .search-row {
   position: relative;
-}
-/* Standalone single-line search bar (placed after #weights). */
-.search-bar {
-  display: block;
-  margin: 0 0 var(--space-2);
-}
-.search-bar #filter-search {
-  width: 100%;
-  box-sizing: border-box;
+  min-width: 0;
 }
 .search-row > span {
   position: absolute;

@@ -184,6 +184,37 @@
 
 <main class="app-main">
 
+  <section id="weights" class="card section-card" data-export-section="weights" aria-labelledby="weights-heading">
+    <header class="section-head section-head-compact">
+      <h2 id="weights-heading" class="section-title-compact" data-i18n-key="ui.section.weights">Weights Editor</h2>
+      <label class="select-row inline-compact">
+        <span data-i18n-key="ui.weights.preset">Preset</span>
+        <select id="weights-preset">
+          <option value="custom">—</option>
+          <option value="consensus" data-i18n-key="verdicts.preset.consensus">Vendor Consensus</option>
+          <option value="balanced" data-i18n-key="verdicts.preset.balanced">Balanced</option>
+          <option value="swe-focused" data-i18n-key="verdicts.preset.sweFocused" selected>SWE-focused</option>
+          <option value="agentic-focused" data-i18n-key="verdicts.preset.agenticFocused">Agentic-focused</option>
+          <option value="reasoning-focused" data-i18n-key="verdicts.preset.reasoningFocused">Reasoning-focused</option>
+          <option value="benchmark-only" data-i18n-key="verdicts.preset.benchmarkOnly">Benchmark only</option>
+        </select>
+      </label>
+      <button id="weights-reset" class="btn btn-ghost btn-compact" type="button" data-i18n-key="ui.weights.reset">Reset</button>
+      <output id="weights-total" class="weights-total" aria-live="polite">100</output>
+      <button class="btn-icon-only" type="button" data-export-trigger="weights"
+              data-i18n-tip="ui.export.weights" data-i18n-aria-label="ui.export.weights"
+              data-tip="Save weights as PNG" data-tip-position="bottom"
+              aria-label="Save weights as PNG">
+        <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+        <span class="sr-only" data-i18n-key="ui.export.weights">Save weights as PNG</span>
+      </button>
+    </header>
+    <div id="weights-grid" class="weights-grid"><!-- populated by app.js --></div>
+  </section>
+
   <section id="filters" class="card section-card" data-export-section="filters" aria-labelledby="filters-heading">
     <div class="filters-grid">
       <label class="select-row">
@@ -226,46 +257,14 @@
         <input type="checkbox" id="filter-open-only">
         <span data-i18n-key="ui.filter.openOnly">Open only</span>
       </label>
+      <label class="search-row" data-no-export>
+        <span data-i18n-key="ui.filter.search">Search</span>
+        <input type="search" id="filter-search" placeholder="model name, provider..." data-i18n-placeholder="ui.filter.searchPlaceholder">
+      </label>
       <small id="gpu-status" class="muted-note inline gpu-status-line" aria-live="polite"></small>
       <button id="filters-reset" class="btn btn-ghost btn-compact" type="button" data-i18n-key="ui.filter.reset">Reset filters</button>
     </div>
   </section>
-
-  <section id="weights" class="card section-card" data-export-section="weights" aria-labelledby="weights-heading">
-    <header class="section-head section-head-compact">
-      <h2 id="weights-heading" class="section-title-compact" data-i18n-key="ui.section.weights">Weights Editor</h2>
-      <label class="select-row inline-compact">
-        <span data-i18n-key="ui.weights.preset">Preset</span>
-        <select id="weights-preset">
-          <option value="custom">—</option>
-          <option value="consensus" data-i18n-key="verdicts.preset.consensus">Vendor Consensus</option>
-          <option value="balanced" data-i18n-key="verdicts.preset.balanced">Balanced</option>
-          <option value="swe-focused" data-i18n-key="verdicts.preset.sweFocused" selected>SWE-focused</option>
-          <option value="agentic-focused" data-i18n-key="verdicts.preset.agenticFocused">Agentic-focused</option>
-          <option value="reasoning-focused" data-i18n-key="verdicts.preset.reasoningFocused">Reasoning-focused</option>
-          <option value="benchmark-only" data-i18n-key="verdicts.preset.benchmarkOnly">Benchmark only</option>
-        </select>
-      </label>
-      <button id="weights-reset" class="btn btn-ghost btn-compact" type="button" data-i18n-key="ui.weights.reset">Reset</button>
-      <output id="weights-total" class="weights-total" aria-live="polite">100</output>
-      <button class="btn-icon-only" type="button" data-export-trigger="weights"
-              data-i18n-tip="ui.export.weights" data-i18n-aria-label="ui.export.weights"
-              data-tip="Save weights as PNG" data-tip-position="bottom"
-              aria-label="Save weights as PNG">
-        <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-          <circle cx="12" cy="13" r="4"/>
-        </svg>
-        <span class="sr-only" data-i18n-key="ui.export.weights">Save weights as PNG</span>
-      </button>
-    </header>
-    <div id="weights-grid" class="weights-grid"><!-- populated by app.js --></div>
-  </section>
-
-  <label class="search-row search-bar" data-no-export>
-    <span data-i18n-key="ui.filter.search">Search</span>
-    <input type="search" id="filter-search" placeholder="model name, provider..." data-i18n-placeholder="ui.filter.searchPlaceholder">
-  </label>
 
   <section id="table" class="section-card" aria-labelledby="table-heading">
     <header class="section-head">
