@@ -6,7 +6,7 @@
 //
 // Keys:
 //   lang        — tr | en
-//   preset      — balanced | swe-focused | agentic-focused | reasoning-focused | benchmark-only | custom
+//   preset      — consensus | balanced | swe-focused | agentic-focused | reasoning-focused | benchmark-only | custom
 //   w           — comma-separated benchKey:weight pairs; only honoured when preset=custom
 //   tier        — frontier | open-flagship | coder-specialized | gemma | ollama-local | all
 //   deployment  — all | cloud | local
@@ -18,10 +18,12 @@
 //   sort        — <colKey>-<asc|desc>
 //   theme       — dark | light
 
-import { State, BENCH_KEYS, DEFAULT_WEIGHTS, validateWeights } from './core.js';
+import {
+  State, BENCH_KEYS, PRESETS, getPresets, validateWeights,
+} from './core.js';
 
 const VALID_PRESETS = new Set([
-  'balanced', 'swe-focused', 'agentic-focused', 'reasoning-focused', 'benchmark-only', 'custom',
+  'consensus', 'balanced', 'swe-focused', 'agentic-focused', 'reasoning-focused', 'benchmark-only', 'custom',
 ]);
 const VALID_TIERS = new Set([
   'all', 'frontier', 'open-flagship', 'coder-specialized', 'gemma', 'ollama-local',
@@ -84,8 +86,11 @@ export function readUrlState() {
   const deployment = params.get('deployment');
   if (deployment && VALID_DEPLOY.has(deployment)) out.deployment = deployment;
 
+  // Provider is free-form (vendor names come from data, not a static list) —
+  // cap length and reject markup-capable characters for symmetry with the
+  // allowlisted params above.
   const provider = params.get('provider');
-  if (provider) out.provider = provider;
+  if (provider && provider.length <= 80 && !/[<>"'&]/.test(provider)) out.provider = provider;
 
   const vramRaw = params.get('vram');
   if (vramRaw != null && vramRaw !== '') {
@@ -94,7 +99,7 @@ export function readUrlState() {
   }
 
   const gpu = params.get('gpu');
-  if (gpu) out.gpu = gpu;
+  if (gpu && /^[\w.-]{1,64}$/.test(gpu)) out.gpu = gpu;
 
   const open = params.get('open');
   if (open === '1' || open === 'true') out.openOnly = true;
@@ -130,38 +135,34 @@ export function applyUrlState(urlState) {
 
 function presetOf(weights) {
   // Returns the preset name when current weights exactly match a registered
-  // preset; otherwise 'custom'. Used to keep URL share-string compact.
-  // Imported here so we can avoid a top-level circular dependency.
-  // eslint-disable-next-line global-require
-  // (we can't require in module land — fall back to 'custom' if no match)
+  // preset; otherwise 'custom'. Walks schema-driven presets first (the
+  // authoritative source), then the literal PRESETS fallback — mirrors
+  // render-controls.js:detectMatchingPreset without importing the render layer.
   if (!weights) return 'custom';
-  const sumA = Object.values(weights).reduce((a, b) => a + (b || 0), 0);
-  if (Math.abs(sumA - 100) > 0.01) return 'custom';
-  // Compare with DEFAULT_WEIGHTS first (most common case).
-  let allMatch = true;
-  for (const k of BENCH_KEYS) {
-    if ((weights[k] || 0) !== (DEFAULT_WEIGHTS[k] || 0)) { allMatch = false; break; }
+  const sum = Object.values(weights).reduce((a, b) => a + (b || 0), 0);
+  if (Math.abs(sum - 100) > 0.01) return 'custom';
+  for (const src of [getPresets(), PRESETS]) {
+    if (!src) continue;
+    for (const [name, preset] of Object.entries(src)) {
+      if (name.startsWith('_')) continue;
+      if (preset && preset.__kind === 'vendorConsensus') continue;
+      if (BENCH_KEYS.every((k) => (weights[k] || 0) === (preset[k] || 0))) return name;
+    }
   }
-  return allMatch ? 'balanced' : 'custom';
+  return 'custom';
 }
 
-export function buildShareUrl({ presets, theme } = {}) {
-  // presets: optional registry of named presets to detect non-balanced matches
-  // theme:   optional explicit theme to embed (defaults to current document theme)
+export function buildShareUrl({ theme } = {}) {
+  // theme: optional explicit theme to embed (defaults to current document theme)
   const params = new URLSearchParams();
 
   if (State.lang) params.set('lang', State.lang);
 
-  let presetName = presetOf(State.weights);
-  if (presetName === 'custom' && presets && typeof presets === 'object') {
-    for (const [name, w] of Object.entries(presets)) {
-      let match = true;
-      for (const k of BENCH_KEYS) {
-        if ((State.weights[k] || 0) !== (w[k] || 0)) { match = false; break; }
-      }
-      if (match) { presetName = name; break; }
-    }
-  }
+  // Consensus preset carries no atomic weights (all-zero), so weight matching
+  // can't detect it — branch on the active score function instead.
+  const presetName = (State.scoreFn === 'vendorConsensus' && State.activePresetName)
+    ? State.activePresetName
+    : presetOf(State.weights);
   params.set('preset', presetName);
   if (presetName === 'custom') {
     const wStr = serializeWeights(State.weights);
@@ -192,13 +193,13 @@ export function buildShareUrl({ presets, theme } = {}) {
 }
 
 let pushTimer = null;
-export function pushUrlState({ presets, theme, immediate } = {}) {
+export function pushUrlState({ theme, immediate } = {}) {
   // Debounced replaceState. Avoids URL-bar churn during slider drag while
   // still committing the final state quickly enough that copy-share works.
   const run = () => {
     pushTimer = null;
     try {
-      const url = buildShareUrl({ presets, theme });
+      const url = buildShareUrl({ theme });
       const next = url.replace(window.location.origin, '');
       if (next !== window.location.pathname + window.location.search) {
         window.history.replaceState(null, '', next);

@@ -20,8 +20,11 @@ Static web tracker (GitHub Pages) + local Claude Code skill orchestrator + resea
 ```
 index.html              — structure + interactive UI
 assets/
-  app.js               — fetch + render + weights editor + filter + PNG + GPU detect
-  app.css              — responsive 3-breakpoint
+  js/                  — 17 ES modules (main, core, data, scoring, format,
+                         gpu, i18n, dom, overlay, freshness, sources,
+                         url-state, events, render-controls/-card/-table/-privacy)
+  css/                 — 7 stylesheets (base, layout, table, controls,
+                         models, toast, responsive)
   vendor/
     html2canvas.min.js — PNG export, self-hosted SRI
 data/
@@ -40,7 +43,7 @@ README.md              — installation guide
 SKILL.md               — orchestrator definition
 ```
 
-**Research Agent (local, `~/.claude/agents/`):**
+**Research Agent (project-scoped, `.claude/agents/`):**
 ```
 aicodermap-research-agent.md    — domain-specialized research-agent definition
 ```
@@ -347,7 +350,7 @@ No auth, no query params, CORS-friendly static asset. The dataset's
 `distribution[]` is also discoverable from the JSON-LD `Dataset` block in
 `/index.html` for AI agents and crawlers.
 
-### 4.5 URL state (deep-linkable view)
+### 4.4 URL state (deep-linkable view)
 
 The page's full visible state lives in the address bar — sharing a URL
 shares the exact ranking the recipient will see. State precedence at first
@@ -359,7 +362,7 @@ back into the URL via `history.replaceState` (debounced 250 ms).
 |--------------|--------|
 | `lang`       | `tr` \| `en` |
 | `theme`      | `dark` \| `light` |
-| `preset`     | `balanced` \| `swe-focused` \| `agentic-focused` \| `reasoning-focused` \| `benchmark-only` \| `custom` |
+| `preset`     | `consensus` \| `balanced` \| `swe-focused` \| `agentic-focused` \| `reasoning-focused` \| `benchmark-only` \| `custom` |
 | `w`          | `<benchKey>:<weight>,...` — only honoured when `preset=custom`; missing keys default to 0; total must be in `validateWeights` shape (sums to 100) |
 | `tier`       | `frontier` \| `open-flagship` \| `coder-specialized` \| `gemma` \| `ollama-local` \| `all` |
 | `deployment` | `all` \| `cloud` \| `local` |
@@ -375,7 +378,7 @@ Stability contract: param names, value sets, and shape are versioned with
 Consumers (CLI, agents, embedded preview tools) can rely on the codec
 documented above. `assets/js/url-state.js` is the reference implementation.
 
-### 4.4 Browser → External Services
+### 4.5 Browser → External Services
 
 | Service | Method |
 |---------|--------|
@@ -405,7 +408,7 @@ documented above. `assets/js/url-state.js` is the reference implementation.
 - Schema validation on read (wrong shape → reset-to-default)
 - Versioned keys (canonical, see `assets/js/core.js:STORAGE`):
   `acm.v1.weights`, `acm.v1.language`, `acm.v1.vram`, `acm.v1.gpu`,
-  `acm.v1.filters`, `acm.v1.sort`, `acm.v1.theme`, `aicm.pricingBaseline`.
+  `acm.v1.filters`, `acm.v1.sort`, `acm.v1.theme`.
 - Migration plan to v2 already in place
 
 ### GDPR / Privacy
@@ -429,7 +432,7 @@ documented above. `assets/js/url-state.js` is the reference implementation.
 ### Git/Repo
 - No secrets in repo (no API keys)
 - `.gitignore` comprehensive (`.env`, `node_modules/`, tmp)
-- Pre-commit hook: `grep -r 'sk-\|ghp_\|api_key' src/` block
+- Pre-commit hook (`scripts/hooks/pre-commit`, installed via `scripts/install-hooks.sh`): data-coherence audit gate; no automated secrets scan — manual discipline + defensive `.gitignore`
 
 **Top 3 threats mitigated:** XSS, scraped content injection, supply chain.
 

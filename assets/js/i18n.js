@@ -21,6 +21,12 @@ export function t(path) {
   return null;
 }
 
+// Localized tier label with raw-key fallback. Shared by the comparison table
+// and the model card (was duplicated in both render modules).
+export function tierLabel(tier) {
+  return t(`ui.tier.${tier}`) || tier;
+}
+
 export function applyI18n(root) {
   const scope = root || document;
   document.documentElement.setAttribute('lang', State.lang);

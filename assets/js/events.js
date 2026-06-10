@@ -8,7 +8,7 @@ import {
   applyPreset, resetWeights, syncPresetSelect, switchTheme, syncLangToggleUi,
   renderWeightsEditor, renderDeployStamp, populateProviderFilter,
 } from './render-controls.js';
-import { renderAll, renderTable } from './render-table.js';
+import { renderAll } from './render-table.js';
 import { renderPrivacyTable } from './render-privacy.js';
 import { resolveGpuVram, updateGpuStatus, populateGpuSelect } from './gpu.js';
 import { exportElement, hideTooltip } from './overlay.js';
@@ -285,6 +285,4 @@ export function wireEvents() {
   wireUrlSync();
   wireWindowEvents();
   wireTooltipClamp();
-  // Re-export for sort wiring inside renderTable; keeps reference live.
-  void renderTable;
 }

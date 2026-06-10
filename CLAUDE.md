@@ -24,11 +24,13 @@
 aicodermap/
 ├── index.html              # Main page (structure + interactive UI)
 ├── assets/
-│   ├── js/                 # ES modules (browser-loaded, no build) — 15 files
+│   ├── js/                 # ES modules (browser-loaded, no build) — 17 files
 │   │   ├── main.js         # bootstrap entry (split-phase init)
 │   │   ├── core.js         # State + constants + STORAGE + schema validation
 │   │   ├── i18n.js         # t() + applyI18n + loadI18n
-│   │   ├── data.js         # fetch + score + contradiction + pricing + format
+│   │   ├── data.js         # fetch + provenance + confidence + contradiction
+│   │   ├── scoring.js      # composite + EB shrinkage + rank bands + cross-validation
+│   │   ├── format.js       # score/price/date formatters + pricing view
 │   │   ├── gpu.js          # gpuCompat + WebGPU detect + filter predicate
 │   │   ├── dom.js          # el + clear + cameraIconButton + showToast
 │   │   ├── overlay.js      # tooltip + html2canvas export
@@ -101,7 +103,7 @@ Five advantages — none of which any competitor combines:
 
 - **A** Multi-language TR + EN coverage
 - **B** Reusable skill+agent template (cloneable to other tracker domains)
-- **C** **Coding-focused, user-editable composite, on top of vendor consensus** — site default is honest "vendor consensus" (median rank across AA Idx + AA Coding + AA Agentic); SWE-focused / agentic-focused / reasoning-focused / balanced editorial presets remain prominent for users who want a coding-oriented lens; full slider customization for everyone who knows their own workload.
+- **C** **Coding-focused, user-editable composite, on top of vendor consensus** — site default is the SWE-focused coding lens; an honest "vendor consensus" preset (median rank across AA Idx + AA Coding + AA Agentic) sits one click away as a neutral second opinion; agentic-focused / reasoning-focused / balanced editorial presets remain prominent; full slider customization for everyone who knows their own workload.
 - **D** Cross-source contradiction flagging + manual verification discipline (provenance trail + trustScore on every cell + ⚠/🚨 rozet)
 - **E** **Cross-validation panel (AICM vs vendor composite)** — every model card surfaces an agreement indicator (🟢 consensus / 🟡 mild gap / 🔴 controversy) between our atomic-only composite and the vendor-aggregated composites we deliberately excluded from our score (no double-counting). Gives users a free second opinion + flags suspicious rankings automatically.
 

@@ -85,7 +85,7 @@ def _promote_leaderboard(entry: dict, whitelist: dict):
             "tier": "I",
             "publishes": entry.get("suggestedKeys", []),
             "lastVerifiedDate": None,
-            "_note": f"promoted from discovery queue",
+            "_note": "promoted from discovery queue",
         }
     )
     whitelist["leaderboards"] = lbs

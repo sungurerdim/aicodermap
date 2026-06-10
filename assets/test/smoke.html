@@ -24,17 +24,45 @@
     <thead><tr><th>#</th><th>Status</th><th>Test</th><th>Detail</th></tr></thead>
     <tbody id="results"></tbody>
   </table>
+  <script>
+    // Headless-runner support: trap module-load/runtime errors BEFORE the
+    // module executes (a failed import otherwise dies silently with an empty
+    // results table), and expose them in the DOM for --dump-dom consumers.
+    window.addEventListener('error', (e) => {
+      const tb = document.getElementById('results');
+      if (!tb) return;
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 4;
+      td.className = 'fail';
+      td.textContent = `UNCAUGHT: ${e.message} @ ${e.filename || '?'}:${e.lineno || '?'}`;
+      tr.appendChild(td);
+      tb.appendChild(tr);
+      document.title = 'SMOKE ERROR';
+    });
+  </script>
   <script type="module">
     import {
-      State, BENCH_KEYS, DEFAULT_WEIGHTS, PRESETS, validateModels, validateWeights, isValidModel,
+      State, BENCH_KEYS, DEFAULT_WEIGHTS, PRESETS, STORAGE, getPresets,
+      validateModels, validateWeights, isValidModel,
     } from '../js/core.js';
+    import { disputedCount, contradictionFor, loadData, INTERVAL_DECAY_CURVES } from '../js/data.js';
     import {
-      compositeScore, coverageOf, disputedCount, contradictionFor, pricingView, fmtPriceRange, fmtContext,
-      isLocalRunnable, scoreClass, fmtScore, loadData, compositeUncertainty, rankBands, rankGateStatus,
-    } from '../js/data.js';
-    import { gpuCompat } from '../js/gpu.js';
+      compositeScore, coverageOf, compositeUncertainty, rankBands, rankGateStatus,
+    } from '../js/scoring.js';
+    import { pricingView, fmtPriceRange, fmtContext, scoreClass, fmtScore } from '../js/format.js';
+    import { gpuCompat, isLocalRunnable } from '../js/gpu.js';
     import { modelSourcesSummary, buildSourcesMarkdown } from '../js/sources.js';
     import { readUrlState, buildShareUrl, applyUrlState } from '../js/url-state.js';
+    import { t, tierLabel, applyI18n } from '../js/i18n.js';
+    import { showContradictionTooltip, hideTooltip } from '../js/overlay.js';
+    import { buildModelCard, buildBenchCell } from '../js/render-card.js';
+    import { renderAll } from '../js/render-table.js';
+    import { renderPrivacyTable } from '../js/render-privacy.js';
+    import {
+      renderWeightsEditor, applyPreset, detectMatchingPreset, syncPresetSelect, updateWeightsTotal,
+    } from '../js/render-controls.js';
+    import { wireEvents } from '../js/events.js';
 
     const tbody = document.getElementById('results');
     let n = 0;
@@ -64,9 +92,11 @@
       row(name, !!cond, cond ? '' : (hint || ''));
     }
 
-    // 1. core: validateWeights happy path
+    // 1. core: validateWeights happy path — contract expects the FULL
+    // BENCH_KEYS shape (missing keys are invalid; url-state's parseWeights
+    // zero-fills the same way before calling this).
     assertTrue('validateWeights accepts DEFAULT_WEIGHTS shape', validateWeights({
-      ...DEFAULT_WEIGHTS, aaIdx: 0, bfcl: 0, aime26: 0, aaOmni: 0,
+      ...Object.fromEntries(BENCH_KEYS.map(k => [k, 0])), ...DEFAULT_WEIGHTS,
     }) !== null);
 
     // 2. core: validateWeights rejects out-of-range
@@ -113,26 +143,34 @@
     const mNone = { id: 'n', name: 'N', tier: 'frontier', bench: { hle: 50 } };
     assertEq('compositeScore null when no active key has score', compositeScore(mNone, w), null);
 
-    // 6f. confidence haircut: same-tier dispute on swePro
+    // 6f. confidence haircut (FAZ 8.A.3c per-cell confidence weighting):
+    // a contested cell contributes at reduced confidence, so the composite
+    // lands below the dispute-free baseline. Relational assert — the exact
+    // factor is schema-driven (verif depth × trust × contradiction penalty).
+    const mCleanBase = { id: 'cl', name: 'CL', tier: 'frontier', bench: { swePro: 80, sweV: 60 } };
+    const csClean = compositeScore(mCleanBase, w);
     const mSameTier = { id: 'sm', name: 'SM', tier: 'frontier', bench: { swePro: 80, sweV: 60 } };
     State.sources['sm.swePro'] = [
       { tier: 'I', trustScore: 0.9, source: 'a', value: 76 },
-      { tier: 'I', trustScore: 0.9, source: 'b', value: 84 }, // intra-tier Δ=8
+      { tier: 'I', trustScore: 0.9, source: 'b', value: 84 }, // intra-tier Δ=8 ≥ BLOCK
     ];
     const csSame = compositeScore(mSameTier, w);
-    // expected: weightedSum = 22*80+10*60 = 2360, haircut = 22 * min((8-3)/2, 5) = 22*2.5=55
-    // raw = (2360 - 55) / 32 = 72.03, coverage=1, score=72.03
-    assertTrue('same-tier dispute applies confidence haircut', Math.abs(csSame - ((22*80 + 10*60 - 22*2.5) / 32)) < 0.01);
+    assertTrue('same-tier dispute applies confidence haircut', csSame < csClean - 0.01,
+      `clean=${csClean} disputed=${csSame}`);
     assertEq('disputedCount sees the same-tier dispute', disputedCount(mSameTier, w), 1);
 
-    // 6g. cross-tier-only dispute: no haircut (autoResolveWinner already conservative)
+    // 6g. cross-tier dispute: since FAZ 8.A.3c the contradiction penalty in
+    // cellConfidence applies on ANY-tier Δ (autoResolveWinner already settled
+    // the value, but residual disagreement still widens uncertainty) — yet it
+    // does NOT count toward the same-tier "disputed" badge.
     const mCross = { id: 'cx', name: 'CX', tier: 'frontier', bench: { swePro: 80, sweV: 60 } };
     State.sources['cx.swePro'] = [
       { tier: 'I', trustScore: 1.0, source: 'a', value: 80 },
-      { tier: 'S', trustScore: 0.5, source: 'b', value: 86 }, // total Δ=6 but cross-tier only
+      { tier: 'S', trustScore: 0.5, source: 'b', value: 86 }, // total Δ=6, cross-tier only
     ];
     const csCross = compositeScore(mCross, w);
-    assertTrue('cross-tier-only dispute applies NO haircut', Math.abs(csCross - ((22*80 + 10*60) / 32)) < 0.01);
+    assertTrue('cross-tier dispute reduces confidence (any-tier penalty)', csCross < csClean - 0.01,
+      `clean=${csClean} crossDisputed=${csCross}`);
     assertEq('disputedCount excludes cross-tier-only', disputedCount(mCross, w), 0);
 
     // 6h. compositeUncertainty: sparse coverage widens the uncertainty band
@@ -235,11 +273,11 @@
       { tier: 'C', trustScore: 0.4, source: 'aggregator-z', url: 'https://z.example', value: 70 },
     ];
     const ms = { id: 'ms', name: 'MS', tier: 'frontier', bench: { swePro: 80, sweV: 70 } };
-    const summary = modelSourcesSummary(ms);
-    assertEq('modelSourcesSummary unique count (dedupe by URL)', summary.totalUnique, 3);
-    assertEq('modelSourcesSummary datapoints count', summary.totalDatapoints, 4);
-    assertEq('modelSourcesSummary I-tier dedup', summary.byTier.I.length, 1);
-    assertEq('modelSourcesSummary I-tier x2 datapoints', summary.byTier.I[0].count, 2);
+    const srcSummary = modelSourcesSummary(ms);
+    assertEq('modelSourcesSummary unique count (dedupe by URL)', srcSummary.totalUnique, 3);
+    assertEq('modelSourcesSummary datapoints count', srcSummary.totalDatapoints, 4);
+    assertEq('modelSourcesSummary I-tier dedup', srcSummary.byTier.I.length, 1);
+    assertEq('modelSourcesSummary I-tier x2 datapoints', srcSummary.byTier.I[0].count, 2);
 
     // 13c. sources: markdown export contains expected sections
     State.i18n = { benchmarks: { swePro: { name: 'SWE-bench Pro' }, sweV: { name: 'SWE-bench Verified' } } };
@@ -258,17 +296,18 @@
       tb2: null, tbHard: null,            // absent
       gpqa: 50, sweMulti: 70, hle: 40,    // present (low-weight in default)
     } };
-    // Default (balanced) — DEFAULT_WEIGHTS:
-    //   swePro:20 sweV:10 lcb:13 → 43 covered (present);
-    //   gpqa:2 sweMulti:2 hle:1 → 5 covered (present, low weight).
-    //   Active = 100 (every preset sums to 100), covered = 43 + 5 = 48.
+    // Default (balanced) — 2026-05-28 retuned DEFAULT_WEIGHTS, atomic-only:
+    //   present: swePro:18 + sweV:5 + lcb:10 + gpqa:4 + sweMulti:5 + hle:10 = 52.
+    //   active = 100 − vendor composites (aaIdx:3 + aaCoding:3 + aaAgentic:3) = 91.
+    //   coverage = 52/91 ≈ 0.571 → 57.
     const covBalanced = coverageOf(fakeModel, DEFAULT_WEIGHTS);
-    assertEq('coverage(balanced)=48/100=0.48', Math.round(covBalanced * 100), 48);
-    // benchmark-only preset:
-    //   swePro:18 sweV:15 lcb:13 → 46 covered;
-    //   gpqa:7 sweMulti:8 hle:5 → 20 covered. Total covered = 66.
+    assertEq('coverage(balanced)=52/91→57%', Math.round(covBalanced * 100), 57);
+    // benchmark-only preset (2026-05-28 weights, atomic-only):
+    //   present: swePro:12 + sweV:6 + lcb:8 + gpqa:6 + sweMulti:4 + hle:9 = 45.
+    //   active = 100 − vendor composites (aaIdx:4 + aaCoding:2 + aaAgentic:2) = 92.
+    //   coverage = 45/92 ≈ 0.489 → 49.
     const covBO = coverageOf(fakeModel, PRESETS['benchmark-only']);
-    assertEq('coverage(benchmark-only)=66%', Math.round(covBO * 100), 66);
+    assertEq('coverage(benchmark-only)=45/92→49%', Math.round(covBO * 100), 49);
     // All-zero weights → null
     const allZero = Object.fromEntries(BENCH_KEYS.map(k => [k, 0]));
     assertEq('coverage(all-zero)=null', coverageOf(fakeModel, allZero), null);
@@ -291,7 +330,11 @@
     // 14. integration: live data load (requires HTTP)
     try {
       await loadData();
+      // sources.json loads in the background since the 2026-06-10 lazy-load —
+      // await it so provenance/confidence-dependent assertions see full data.
+      await State.sourcesReady;
       assertTrue('loadData populated State.models', State.models.length > 0, `models=${State.models.length}`);
+      assertTrue('sourcesReady resolved with provenance data', Object.keys(State.sources).length > 0, 'State.sources empty');
 
       // 14b. SSOT coherence — every bench cell key in live data must be in
       // BENCH_KEYS, every BENCH_KEY must have an i18n label, every model id
@@ -375,6 +418,29 @@
         assertTrue(`rank-anomaly sweep: no gated model in top-${TOPN} for '${pname}'`,
           leaked.length === 0, leaked.length ? `leaked: ${leaked.join(',')}` : '');
       }
+
+      // 14h. Cross-language SSOT tripwire (2026-06-10): the JS mirror of
+      // INTERVAL_DECAY_CURVES must match scripts/lib/tiers.py. Textual check —
+      // each (threshold, weight) pair must appear inside its curve's section
+      // of the Python dict literal. Drift here = the documented mirror lied.
+      const pyRes = await fetch('../../scripts/lib/tiers.py');
+      if (pyRes.ok) {
+        const pyText = await pyRes.text();
+        const dictStart = pyText.indexOf('INTERVAL_DECAY_CURVES');
+        const body = dictStart >= 0 ? pyText.slice(dictStart, dictStart + 1500) : '';
+        const drift = [];
+        for (const [curve, pairs] of Object.entries(INTERVAL_DECAY_CURVES)) {
+          const ci = body.indexOf(`"${curve}"`);
+          const section = ci >= 0 ? body.slice(ci, body.indexOf('],', ci) + 1) : '';
+          for (const [days, w] of pairs) {
+            const dayTok = days >= 1e9 ? '10\\*\\*9' : String(days);
+            const pat = new RegExp(`\\(\\s*${dayTok}\\s*,\\s*${w.toFixed(2)}\\s*\\)`);
+            if (!pat.test(section)) drift.push(`${curve}:(${days},${w})`);
+          }
+        }
+        assertTrue('INTERVAL_DECAY_CURVES matches lib/tiers.py (SSOT tripwire)',
+          drift.length === 0, drift.length ? `drifted pairs: ${drift.join(' ')}` : '');
+      }
     } catch (e) {
       row('loadData failed (HTTP server required)', false, e.message);
     }
@@ -408,6 +474,23 @@
     assertTrue('tier encodes as tier=open-flagship', /tier=open-flagship/.test(url3), url3);
     assertTrue('vram encodes as vram=16', /vram=16/.test(url3), url3);
 
+    // 16d. Named presets serialize by NAME (2026-06-10: presetOf walks the
+    // full preset registry; previously only 'balanced' matched and everything
+    // else leaked as preset=custom&w=…).
+    State.weights = Object.fromEntries(BENCH_KEYS.map(k => [k, PRESETS['swe-focused'][k] || 0]));
+    const url4 = buildShareUrl();
+    assertTrue('swe-focused weights serialize as preset=swe-focused', /preset=swe-focused/.test(url4), url4);
+
+    // 16e. Consensus round-trips via scoreFn (it has no atomic weights to match).
+    State.weights = Object.fromEntries(BENCH_KEYS.map(k => [k, 0]));
+    State.scoreFn = 'vendorConsensus';
+    State.activePresetName = 'consensus';
+    const url5 = buildShareUrl();
+    assertTrue('consensus mode serializes as preset=consensus', /preset=consensus/.test(url5), url5);
+    State.scoreFn = 'aicm';
+    State.activePresetName = 'balanced';
+    State.weights = { ...DEFAULT_WEIGHTS };
+
     // Cleanup so subsequent tests start from a known state.
     State.filters = { search: '', deployment: 'all', tier: 'all', provider: 'all', openOnly: false };
     State.vram = null;
@@ -438,7 +521,196 @@
       row('i18n parity check failed (HTTP server required)', false, e.message);
     }
 
-    // Summary header
+    // ── 18. UI module coverage (2026-06-10): i18n, overlay, render-card,
+    // render-table (+ sort delegation), render-privacy, render-controls,
+    // events. Runs against hidden DOM fixtures; restores State + localStorage
+    // afterwards so the harness never pollutes real app preferences.
+    const lsSnapshot = {};
+    for (const k of Object.values(STORAGE)) lsSnapshot[k] = localStorage.getItem(k);
+    const realModels = State.models;
+    try {
+      const fix = document.createElement('div');
+      fix.id = 'ui-fixtures';
+      fix.style.display = 'none';
+      document.body.appendChild(fix);
+      const mk = (tag, id, parent) => {
+        const n = document.createElement(tag);
+        if (id) n.id = id;
+        (parent || fix).appendChild(n);
+        return n;
+      };
+
+      // 18a. i18n: nested path, fallback walk, miss → null, tierLabel.
+      State.lang = 'en';
+      State.i18n = { a: { b: { c: 'deep-value' } }, ui: { tier: { frontier: 'Öncü' } } };
+      State.i18nFallback = { only: { fb: 'fallback-value' } };
+      assertEq("t('a.b.c') resolves nested path", t('a.b.c'), 'deep-value');
+      assertEq("t() falls back to State.i18nFallback", t('only.fb'), 'fallback-value');
+      assertEq("t() returns null on miss", t('no.such.key'), null);
+      assertEq("tierLabel uses i18n when present", tierLabel('frontier'), 'Öncü');
+      assertEq("tierLabel falls back to raw tier", tierLabel('mystery-tier'), 'mystery-tier');
+      const i18nSpan = mk('span');
+      i18nSpan.setAttribute('data-i18n-key', 'a.b.c');
+      applyI18n(fix);
+      assertEq('applyI18n writes data-i18n-key targets', i18nSpan.textContent, 'deep-value');
+
+      // 18b. overlay: contradiction tooltip renders sources + hides again.
+      const tooltip = mk('div', 'tooltip', document.body);
+      tooltip.hidden = true;
+      const anchor = mk('button');
+      showContradictionTooltip(anchor, { delta: 6.0, sources: [
+        { value: 80, tier: 'I', source: 'leaderboard-a', url: 'https://a.example/lb', date: '2026-06-01' },
+        { value: 86, tier: 'S', source: 'vendor-b', date: '2026-06-02' },
+      ] });
+      assertEq('tooltip becomes visible', tooltip.hidden, false);
+      assertEq('tooltip lists one <dt> per source', tooltip.querySelectorAll('dt').length, 2);
+      assertTrue('tooltip source link carries rel=noopener',
+        !!tooltip.querySelector('a[rel="noopener noreferrer"]'));
+      hideTooltip();
+      assertEq('hideTooltip hides the tooltip', tooltip.hidden, true);
+
+      // 18c. render-card: structure, rank, bench grid, badges, gating.
+      State.scoreFn = 'aicm';
+      State.activePresetName = 'balanced';
+      State.weights = { ...Object.fromEntries(BENCH_KEYS.map(k => [k, 0])), swePro: 50, sweV: 50 };
+      const cardModel = {
+        id: 'smoke-card', name: 'Smoke Card 9000', provider: 'Acme AI',
+        released: '2026-05-01', license: 'MIT', tier: 'frontier', open: true,
+        context: 200000, bench: { swePro: 71.5, sweV: 68.2 },
+        pricing: { api: [{ provider: 'Acme', in: 2.5, out: 12.99 }] },
+        privacy: { trainingDataOptOut: 'available', dataResidency: ['EU', 'US'], soc2: true, gdpr: false, apiLogging: 'default_on' },
+      };
+      const tableModel = {
+        id: 'smoke-card-2', name: 'Smoke Card Mini', provider: 'Beta Labs',
+        released: '2026-04-15', license: 'Apache 2.0', tier: 'open-flagship', open: true,
+        context: 128000, bench: { swePro: 50.4, sweV: 41.0 },
+        pricing: { api: [{ provider: 'Beta', in: 0.4, out: 1.6 }] },
+      };
+      State.models = [cardModel, tableModel];
+      const card = buildModelCard(cardModel, 7, { gated: false });
+      assertEq('buildModelCard returns an <article>', card.tagName, 'ARTICLE');
+      assertEq('card id carries the model id', card.id, 'card-smoke-card');
+      assertEq('card rank renders as #7', card.querySelector('.model-rank').textContent, '#7');
+      assertEq('card bench grid renders every BENCH_KEY cell',
+        card.querySelectorAll('.bench-cell').length, BENCH_KEYS.length);
+      assertTrue('open-weights badge present', !!card.querySelector('.open-badge'));
+      assertTrue('gated card carries is-rank-gated class',
+        buildModelCard(cardModel, 8, { gated: true }).classList.contains('is-rank-gated'));
+      const exclCell = buildBenchCell(cardModel, 'hle');
+      assertTrue('zero-weight bench cell dims out (.excluded)', exclCell.classList.contains('excluded'));
+
+      // 18d. render-table: rows, counts, delegated sort.
+      const cmpTable = mk('table', 'comparison-table');
+      const cmpHead = document.createElement('thead');
+      cmpHead.appendChild(document.createElement('tr'));
+      cmpTable.appendChild(cmpHead);
+      cmpTable.appendChild(document.createElement('tbody'));
+      mk('span', 'table-count');
+      mk('div', 'models-list');
+      mk('span', 'models-count');
+      State.filters = { search: '', deployment: 'all', tier: 'all', provider: 'all', openOnly: false };
+      State.sort = { col: 'composite', dir: 'desc' };
+      State.vram = null;
+      State.selectedGpu = 'auto';
+      renderAll();
+      assertEq('table renders one row per model',
+        cmpTable.querySelectorAll('tbody tr[data-model-id]').length, 2);
+      assertEq('table-count shows filtered/total',
+        document.getElementById('table-count').textContent, '2 / 2');
+      assertEq('models-list renders one card per model',
+        document.querySelectorAll('#models-list article.model-card').length, 2);
+      const nameTh = cmpTable.querySelector('th[data-col="name"]');
+      nameTh.click();   // delegated listener on the persistent header row
+      assertEq('delegated header click switches sort column', State.sort.col, 'name');
+      assertTrue('re-rendered header marks the sorted column',
+        cmpTable.querySelector('th[data-col="name"]').classList.contains('sorted'));
+      State.sort = { col: 'composite', dir: 'desc' };
+
+      // 18e. render-controls: weights editor, preset application + sync.
+      mk('div', 'weights-grid');
+      const presetSel = mk('select', 'weights-preset');
+      for (const v of ['custom', 'consensus', 'balanced', 'swe-focused', 'agentic-focused', 'reasoning-focused', 'benchmark-only']) {
+        const o = document.createElement('option');
+        o.value = v;
+        presetSel.appendChild(o);
+      }
+      mk('output', 'weights-total');
+      renderWeightsEditor();
+      assertEq('weights editor renders one row per BENCH_KEY',
+        document.querySelectorAll('#weights-grid .weight-row').length, BENCH_KEYS.length);
+      applyPreset('swe-focused');
+      assertEq('applyPreset(swe-focused) installs matching weights',
+        detectMatchingPreset(State.weights), 'swe-focused');
+      assertEq('applyPreset persists the preset NAME',
+        JSON.parse(localStorage.getItem(STORAGE.preset)), 'swe-focused');
+      syncPresetSelect();
+      assertEq('syncPresetSelect mirrors the active preset', presetSel.value, 'swe-focused');
+      updateWeightsTotal();
+      assertEq('weights total sums to 100', document.getElementById('weights-total').textContent, '100');
+      if (getPresets()['consensus']) {
+        applyPreset('consensus');
+        assertEq('consensus preset switches scoreFn', State.scoreFn, 'vendorConsensus');
+        syncPresetSelect();
+        assertEq('syncPresetSelect handles consensus (no atomic weights)', presetSel.value, 'consensus');
+        applyPreset('swe-focused');
+        assertEq('leaving consensus restores aicm scoring', State.scoreFn, 'aicm');
+      } else {
+        row('consensus preset checks skipped (schema not loaded — file:// or fetch fail)', true, '');
+      }
+
+      // 18f. render-privacy: badges + residency join.
+      const privTable = mk('table', 'privacy-table');
+      const privHead = document.createElement('thead');
+      privHead.appendChild(document.createElement('tr'));
+      privTable.appendChild(privHead);
+      privTable.appendChild(document.createElement('tbody'));
+      renderPrivacyTable();
+      assertEq('privacy table renders one row per active model',
+        privTable.querySelectorAll('tbody tr').length, 2);
+      assertTrue('trainingOptOut=available renders a priv-yes badge',
+        !!privTable.querySelector('tr[data-model-id="smoke-card"] .priv-badge.priv-yes'));
+      assertTrue('dataResidency joins codes with comma',
+        privTable.querySelector('tr[data-model-id="smoke-card"]').textContent.includes('EU, US'));
+
+      // 18g. events: wiring is live (reset + search input mutate State).
+      mk('button', 'weights-reset');
+      mk('button', 'filters-reset');
+      const searchIn = mk('input', 'filter-search');
+      const depSel = mk('select', 'filter-deployment');
+      for (const v of ['all', 'cloud', 'local']) {
+        const o = document.createElement('option');
+        o.value = v;
+        depSel.appendChild(o);
+      }
+      mk('select', 'filter-tier').appendChild(new Option('all', 'all'));
+      mk('select', 'filter-provider').appendChild(new Option('all', 'all'));
+      const openChk = mk('input', 'filter-open-only');
+      openChk.type = 'checkbox';
+      const gpuSel = mk('select', 'filter-gpu-select');
+      gpuSel.appendChild(new Option('auto', 'auto'));
+      mk('input', 'filter-vram-override');
+      mk('small', 'gpu-status');
+      wireEvents();
+      State.filters.search = 'stale';
+      State.filters.tier = 'frontier';
+      document.getElementById('filters-reset').click();
+      assertEq('filters-reset clears tier filter', State.filters.tier, 'all');
+      assertEq('filters-reset clears search filter', State.filters.search, '');
+      searchIn.value = 'qwen';
+      searchIn.dispatchEvent(new Event('input', { bubbles: true }));
+      assertEq('search input syncs State.filters.search', State.filters.search, 'qwen');
+    } catch (e) {
+      row('UI module coverage block threw', false, `${e.message}\n${(e.stack || '').split('\n')[1] || ''}`);
+    } finally {
+      State.models = realModels;
+      for (const [k, v] of Object.entries(lsSnapshot)) {
+        if (v == null) localStorage.removeItem(k);
+        else localStorage.setItem(k, v);
+      }
+    }
+
+    // Summary header + machine-readable completion marker (headless runners
+    // poll document.title; "SMOKE DONE" only appears after every assertion ran).
     const passes = tbody.querySelectorAll('.ok').length;
     const fails = tbody.querySelectorAll('.fail').length;
     const summary = document.createElement('p');
@@ -447,6 +719,7 @@
     summary.textContent = `${passes} pass · ${fails} fail`;
     summary.style.color = fails === 0 ? '#6ee7b3' : '#f47b8b';
     document.body.appendChild(summary);
+    document.title = `SMOKE DONE pass=${passes} fail=${fails}`;
   </script>
 </body>
 </html>

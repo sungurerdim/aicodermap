@@ -16,7 +16,7 @@ PRIMARY (configurable via .autotune.json):
     coverage — the necessary (not sufficient) condition for fill.
 
 SECONDARY:
-  hit_rate_at_1: slug-correctness on auto/fixtures.json (already optimized
+  hit_rate_at_1: slug-correctness on ds/tune/fixtures.json (already optimized
     to 0.96 in the prior tuning phase). Kept as monitoring guard so coverage
     experiments don't accidentally regress slug ordering.
 
@@ -27,9 +27,9 @@ import json
 import re
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 WHITELIST = ROOT / "data" / "sources-whitelist.json"
-FIXTURES = ROOT / "auto" / "fixtures.json"
+FIXTURES = Path(__file__).resolve().parent / "fixtures.json"
 MODELS = ROOT / "data" / "models.json"
 
 BENCH_KEYS = [

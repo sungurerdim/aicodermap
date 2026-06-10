@@ -4,11 +4,11 @@
 
 import {
   State, BENCH_KEYS, DEFAULT_WEIGHTS, PRESETS, STORAGE, writeStorage, readStorage,
-  getPresets,
+  getPresets, shortEtagHash,
 } from './core.js';
 import { el, clear } from './dom.js';
 import { t } from './i18n.js';
-import { fmtDeployTime } from './data.js';
+import { fmtDeployTime } from './format.js';
 
 export function renderWeightsEditor(onChange) {
   const grid = document.getElementById('weights-grid');
@@ -65,6 +65,11 @@ function onWeightChange(key, input, onChange) {
   v = Math.max(0, Math.min(100, Math.round(v)));
   input.value = String(v);
   State.weights[key] = v;
+  // Manual slider edits define an atomic-weights profile — leave consensus
+  // mode (vendorConsensus ignores atomic weights entirely).
+  State.scoreFn = 'aicm';
+  State.activePresetName = detectMatchingPreset(State.weights);
+  writeStorage(STORAGE.preset, State.activePresetName);
   syncPresetSelect();
   writeStorage(STORAGE.weights, State.weights);
   updateWeightsTotal();
@@ -93,6 +98,9 @@ export function applyPreset(name, onChange) {
   // Zero-base merge: every preset is the full intended distribution.
   State.weights = Object.fromEntries(BENCH_KEYS.map(k => [k, preset[k] || 0]));
   writeStorage(STORAGE.weights, State.weights);
+  // Persist the NAME too — consensus has no atomic weights, so weights alone
+  // can't round-trip it across sessions.
+  writeStorage(STORAGE.preset, name);
   renderWeightsEditor(onChange);
   if (typeof onChange === 'function') onChange();
 }
@@ -115,11 +123,16 @@ export function detectMatchingPreset(weights) {
 export function syncPresetSelect() {
   const sel = document.getElementById('weights-preset');
   if (!sel) return;
-  sel.value = detectMatchingPreset(State.weights);
+  // Consensus carries no atomic weights (all-zero), so weight matching can't
+  // detect it — branch on the active score function instead.
+  sel.value = (State.scoreFn === 'vendorConsensus' && State.activePresetName)
+    ? State.activePresetName
+    : detectMatchingPreset(State.weights);
 }
 
 export function resetWeights(onChange) {
-  // Reset = default preset = swe-focused (was balanced).
+  // Reset = default preset = swe-focused (product decision 2026-06-10; the
+  // vendor-consensus preset remains available in the dropdown).
   applyPreset('swe-focused', onChange);
 }
 
@@ -183,12 +196,6 @@ export function syncLangToggleUi() {
 // timestamp from the Pages CDN plus a short hash derived from the ETag (GitHub
 // Pages computes ETag from file contents, so distinct deploys never share it).
 // Re-rendered on language switch so the prefix follows the active locale.
-function shortBuildHash(etag) {
-  if (!etag || typeof etag !== 'string') return null;
-  const hex = etag.replace(/^W\//, '').replace(/^"|"$/g, '').split('-')[0] || '';
-  return hex ? hex.slice(-7) : null;
-}
-
 export function renderDeployStamp() {
   const node = document.getElementById('deployed-at');
   if (!node) return;
@@ -200,7 +207,7 @@ export function renderDeployStamp() {
   // data/_meta.json. Fall back to the ETag-derived short hash (legacy).
   const sha = (meta && typeof meta.buildSha === 'string' && meta.buildSha !== 'unknown')
     ? meta.buildSha
-    : shortBuildHash(State.dataEtag);
+    : shortEtagHash(State.dataEtag);
   const fillRatioPct = (meta && Number.isFinite(meta.fillRatio))
     ? Math.round(meta.fillRatio * 100)
     : null;

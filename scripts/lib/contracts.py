@@ -30,9 +30,9 @@ WHITELIST_PATH = PROJECT / "data" / "sources-whitelist.json"
 
 # Fallback defaults — SSOT is lib.constants (these were parallel literals before
 # 2026-06-06, free to silently diverge from the canonical values).
-from .constants import CONTRADICTION_BLOCK_PP as _DEFAULT_BLOCK_PP
-from .constants import CONTRADICTION_WARN_PP as _DEFAULT_WARN_PP
-from .constants import VERIFICATION_AGREEMENT_PP as _DEFAULT_AGREEMENT_PP
+from .constants import CONTRADICTION_BLOCK_PP as _DEFAULT_BLOCK_PP  # noqa: E402
+from .constants import CONTRADICTION_WARN_PP as _DEFAULT_WARN_PP  # noqa: E402
+from .constants import VERIFICATION_AGREEMENT_PP as _DEFAULT_AGREEMENT_PP  # noqa: E402
 
 # Built-in bench-type defaults applied when whitelist entry missing.
 # Keys: canonical bench key → (scale, warnDelta, blockDelta)

@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 import os
 import sys
-from datetime import date, datetime
+from datetime import date
 from pathlib import Path
 from collections import defaultdict
 
@@ -20,56 +20,18 @@ from lib.whitelist import all_bench_keys, bench_hard_max, contracts  # type: ign
 from lib.whitelist import build_domain_publishes, elo_swe_misfile  # type: ignore  # noqa: E402  (SSOT)
 from lib.matrix import active_models  # type: ignore  # noqa: E402
 from lib import reliability as _reliability  # type: ignore  # noqa: E402
-from lib.tiers import TIER_WEIGHT  # type: ignore  # noqa: E402  (SSOT)
-from lib.tiers import verif_factor as _verif_factor  # type: ignore  # noqa: E402
+
+# SSOT (2026-06-10): trust scoring delegates to the canonical lib.tiers
+# implementation — the previous inline recency_decay copy had silently
+# diverged (missing-date → 0.30 vs the canonical 0.50 legacy contract, no
+# R5 source_type curve selection). effective_trust_score is signature-
+# compatible with the old local trust_score (source_type defaults to the
+# pre-R5 curve; is_pseudo defaults to False — gather entries are real).
+from lib.tiers import effective_trust_score as trust_score  # type: ignore  # noqa: E402  (SSOT)
 from lib.constants import ELO_BENCH_KEYS  # type: ignore  # noqa: E402  (SSOT)
 from lib.util import extract_domain  # type: ignore  # noqa: E402  (SSOT)
 
 LEDGER_PATH = ROOT / "data" / "source-reliability.json"
-
-
-def recency_decay(d: str) -> float:
-    try:
-        dt = datetime.fromisoformat(d.replace("Z", ""))
-        age = (datetime.utcnow() - dt).days
-    except Exception:
-        age = 999
-    if age < 30:
-        return 1.00
-    if age < 90:
-        return 0.85
-    if age < 180:
-        return 0.70
-    if age < 365:
-        return 0.50
-    return 0.30
-
-
-def trust_score(
-    tier: str,
-    verifications: int,
-    dtstr: str,
-    *,
-    source_url: str = "",
-    bench_key: str = "",
-    reliability_ledger: dict | None = None,
-) -> float:
-    """Phase R2+R3: log-base-4 verif_factor + optional Beta-Binomial multiplier.
-
-    Stays behaviourally identical to the pre-R2 formula when verifications
-    equals 3 and no ledger is supplied; otherwise applies the canonical
-    `tiers.verif_factor` and (when ledger present) the per-(source, bench)
-    reliability posterior.
-    """
-    tw = TIER_WEIGHT.get(tier, 0.1)
-    v = _verif_factor(int(verifications) if verifications is not None else 0)
-    base = round(tw * v * recency_decay(dtstr), 4)
-    if reliability_ledger and source_url:
-        mult = _reliability.reliability_multiplier(
-            reliability_ledger, source_url, bench_key
-        )
-        return round(base * mult, 4)
-    return base
 
 
 def find_batch_artifacts() -> list[Path]:

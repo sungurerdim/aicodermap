@@ -469,11 +469,19 @@ def apply_model_update(model, updates):
     return touched
 
 
-def find(models, mid):
-    for m in models:
-        if m.get("id") == mid:
-            return m
-    return None
+# Whitelist parsed once per merge run — it was previously re-read and
+# re-parsed 6× per run (4× _wl_load + 2 direct open()s on the same file).
+# merge.py is a one-shot process, so a module-level memo is safe; raises
+# exactly like load_whitelist on a missing/corrupt file (callers needing
+# graceful degradation keep their existing try/except).
+_WL_CACHE = None
+
+
+def _wl_cached():
+    global _WL_CACHE
+    if _WL_CACHE is None:
+        _WL_CACHE = _wl_load()
+    return _WL_CACHE
 
 
 def _is_unhealthy_source(entry, unhealthy_urls):
@@ -528,8 +536,7 @@ def _build_bench_advertised_count():
     """For each bench key, count high-weight (>=0.7) leaderboards advertising
     it in publishes[]. Used by adaptive gate."""
     try:
-        with open(WHITELIST, encoding="utf-8") as fp:
-            wl = json.load(fp)
+        wl = _wl_cached()
     except (FileNotFoundError, json.JSONDecodeError) as exc:
         logging.warning("_build_bench_advertised_count: loaded empty (%s)", exc)
         return {}
@@ -548,12 +555,12 @@ def _load_bench_key_universe():
     BENCH_KEYS / all_bench_keys SSOT) ∪ every leaderboard's publishes[] entry.
     Emerging keys are explicit members so an emerging cell with no dedicated
     leaderboard publisher (e.g. a vendor-only mcpA/sweMulti) still passes through
-    instead of being filtered out. Loaded fresh on each merge so a leaderboard
-    adding a new publishes[] key also flows through automatically. SoC: coverage/
-    matrix uses coreBenchKeys (_wl_core_bench_keys); value passthrough uses this."""
+    instead of being filtered out. Re-read once per merge run (via _wl_cached) so
+    a leaderboard adding a new publishes[] key also flows through automatically.
+    SoC: coverage/matrix uses coreBenchKeys (_wl_core_bench_keys); value
+    passthrough uses this."""
     try:
-        with open(WHITELIST, encoding="utf-8") as fp:
-            wl = json.load(fp)
+        wl = _wl_cached()
     except (FileNotFoundError, json.JSONDecodeError):
         return set()
     # core ∪ emerging via the SSOT accessor, then any extra leaderboard publishes[].
@@ -701,7 +708,7 @@ def _verify_matrix_invariant(models, artifact):
     On failure the orchestrator rolls models.json + sources.json back to .bak
     and exits non-zero before CHANGELOG is touched.
     """
-    wl = _wl_load()
+    wl = _wl_cached()
     core = _wl_core_bench_keys(wl)
     active = _matrix_active(models)
     universe = _matrix_universe(active, core)
@@ -751,8 +758,13 @@ def main():
     with open(sources_path, encoding="utf-8") as fp:
         sources = json.load(fp)
 
-    wl_idx = _wl_hostname_index(_wl_load())
+    wl_idx = _wl_hostname_index(_wl_cached())
     unhealthy_urls = _wl_load_unhealthy(Path(PROJECT))
+
+    # O(1) id lookup — replaces the old find() linear scan that ran inside
+    # three loops. Kept in sync manually at the single place models grows
+    # (the newModels append below).
+    models_by_id = {m.get("id"): m for m in models if isinstance(m, dict)}
 
     log = {
         "updated": [],
@@ -771,7 +783,7 @@ def main():
 
     for upd in out.get("models", []):
         mid = upd["id"]
-        m = find(models, mid)
+        m = models_by_id.get(mid)
         if m is None:
             log["gaps"].append(f"unknown id in updates: {mid}")
             continue
@@ -817,8 +829,9 @@ def main():
                 log["sources_appended"] += 1
 
     for nm in out.get("newModels", []) or []:
-        if find(models, nm["id"]) is None:
+        if nm["id"] not in models_by_id:
             models.append(nm)
+            models_by_id[nm["id"]] = nm
             log["added"].append(nm["id"])
 
     BENCH_KEYS = _load_bench_key_universe()
@@ -941,7 +954,7 @@ def main():
             )
             winner = new_winner
         winner_value = winner["value"]
-        m = find(models, mid)
+        m = models_by_id.get(mid)
         if m is not None and bench_field in BENCH_KEYS:
             if "bench" not in m:
                 m["bench"] = {}
@@ -1051,8 +1064,8 @@ def main():
 
     lineup = out.get("lineupChanges", {}) or {}
     for d in lineup.get("deprecated", []) or []:
-        if find(models, d.get("id")) is not None:
-            target = find(models, d["id"])
+        target = models_by_id.get(d.get("id"))
+        if target is not None:
             target["status"] = "deprecated"
             target["deprecatedAt"] = d.get("deprecationDate") or TODAY
             if d.get("successor"):

@@ -12,7 +12,7 @@
 //    informational; the freshness decision is purely ETag-based, so a
 //    GitHub API rate-limit hit doesn't suppress the warning.
 
-import { State } from './core.js';
+import { State, shortEtagHash } from './core.js';
 import { t } from './i18n.js';
 
 const COMMITS_API = 'https://api.github.com/repos/sungurerdim/aicodermap/commits/main';
@@ -79,15 +79,6 @@ function showStaleBanner({ servedShort, liveSha, ageMin }) {
   bannerShown = true;
 }
 
-function shortHash(etag) {
-  if (!etag || typeof etag !== 'string') return null;
-  // GitHub Pages ETag form: `"<hex>-<hex>"` — keep the first hex chunk's
-  // last 7 chars to mirror git short-SHA conventions.
-  const hex = etag.replace(/^W\//, '').replace(/^"|"$/g, '').split('-')[0] || '';
-  if (!hex) return null;
-  return hex.slice(-7);
-}
-
 async function probe() {
   if (bannerShown) return;
   if (!State.dataEtag) return;
@@ -106,7 +97,7 @@ async function probe() {
       if (Number.isFinite(ms) && ms > 0) ageMin = Math.max(1, Math.round(ms / 60_000));
     }
   }
-  const servedShort = shortHash(State.dataEtag);
+  const servedShort = shortEtagHash(State.dataEtag);
   showStaleBanner({ servedShort, liveSha, ageMin });
 }
 

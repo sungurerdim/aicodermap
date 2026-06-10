@@ -12,7 +12,7 @@ import {
 import { el, clear } from './dom.js';
 import {
   applyTheme, syncLangToggleUi, renderWeightsEditor, syncPresetSelect,
-  renderDeployStamp, populateProviderFilter,
+  renderDeployStamp, populateProviderFilter, applyPreset,
 } from './render-controls.js';
 import { renderAll } from './render-table.js';
 import { renderPrivacyTable } from './render-privacy.js';
@@ -50,11 +50,13 @@ function bootstrapPrefs() {
 
   const storedWeights = readStorage(STORAGE.weights, null);
   const validW = validateWeights(storedWeights);
-  // Default preset is swe-focused for first-time visitors. The literal here
-  // is just a placeholder — `applyDefaultPresetIfFresh` swaps it for the
-  // schema-driven values once loadData() has populated State.schema. Track
-  // whether the user has stored weights so we know whether to overwrite.
-  State.weights = validW || (function buildSweFocused() {
+  // Default preset is swe-focused for first-time visitors (product decision
+  // 2026-06-10: coding lens by default; vendor-consensus preset stays one
+  // click away). The schema-driven weights need loadData(), so bootstrap()
+  // re-applies the preset after data lands; the literal here is only a
+  // pre-data placeholder. Track whether the user has stored weights so we
+  // know whether to overwrite.
+  State.weights = validW || (function buildPlaceholder() {
     const out = Object.fromEntries(
       Object.keys(DEFAULT_WEIGHTS).map(k => [k, 0]),
     );
@@ -105,11 +107,19 @@ async function bootstrapData() {
     return true;
   } catch (e) {
     console.error('data load failed', e);
+    const errMsg = (State.i18n?.ui?.errors?.fetchFailed) || 'Failed to load data';
     const list = document.getElementById('models-list');
     if (list) {
       clear(list);
-      const errMsg = (State.i18n?.ui?.errors?.fetchFailed) || 'Failed to load data';
       list.appendChild(el('p', { class: 'loading' }, errMsg));
+    }
+    // The comparison table renders nothing on failure — surface the same
+    // message there so the section isn't a silent blank.
+    const tbody = document.querySelector('#comparison-table tbody');
+    if (tbody) {
+      clear(tbody);
+      const td = el('td', { class: 'loading' }, errMsg);
+      tbody.appendChild(el('tr', {}, td));
     }
     return false;
   }
@@ -184,22 +194,25 @@ async function bootstrap() {
   const ok = await bootstrapData();
   if (!ok) return;
 
-  // After loadData() has populated State.schema, re-apply the swe-focused
-  // default using the schema's authoritative atomicWeights so the dimmed
-  // weights and the dropdown selection stay in sync with the canonical
-  // preset. Skipped when the user has stored weights from a prior session.
-  if (State._weightsAreDefault) {
-    const sp = State.schema && State.schema.presets;
-    const sf = sp && sp['swe-focused'] && sp['swe-focused'].atomicWeights;
-    if (sf) State.weights = Object.fromEntries(Object.keys(State.weights).map(k => [k, sf[k] || 0]));
-  }
-
   renderDeployStamp();
   populateProviderFilter();
   restoreFilterUi();
   await bootstrapGpu();
 
   renderWeightsEditor(renderAll);
+  // Preset resolution order: URL deep link > stored preset name > swe-focused
+  // default for first-time visitors. The stored NAME (not just weights) is
+  // needed to restore consensus, which has no atomic weights to match on.
+  // `?preset=custom` is already covered: applyUrlState() set the weights.
+  const urlPreset = window.__ACM_URL_PRESET__;
+  const storedPreset = readStorage(STORAGE.preset, null);
+  if (urlPreset && urlPreset !== 'custom') {
+    applyPreset(urlPreset);
+  } else if (!urlPreset && storedPreset === 'consensus') {
+    applyPreset('consensus');
+  } else if (!urlPreset && State._weightsAreDefault) {
+    applyPreset('swe-focused');
+  }
   syncPresetSelect();
   renderAll();
   renderPrivacyTable();
@@ -207,6 +220,15 @@ async function bootstrap() {
   // Push the resolved state back into the URL so that the address bar always
   // reflects what the page is showing — including localStorage-driven defaults.
   pushUrlState({ immediate: true });
+
+  // sources.json loads in the background (2MB — no longer blocks first
+  // render). Re-render once provenance lands so contradiction flags, source
+  // counts and confidence-weighted scores appear.
+  if (State.sourcesReady) {
+    State.sourcesReady.then((sources) => {
+      if (sources && Object.keys(sources).length) renderAll();
+    });
+  }
 
   // Watch for a fresh deploy by polling models.json's ETag (GitHub Pages
   // content hash) on a delay + 5min interval + tab-visibility change.

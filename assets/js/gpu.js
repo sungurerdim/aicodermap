@@ -3,10 +3,19 @@
 
 import { State } from './core.js';
 import { t } from './i18n.js';
-import { isLocalRunnable } from './data.js';
 
 const RAM_OFFLOAD_FACTOR = 2;
 const MIN_OFFLOAD_LIMIT_GB = 8;
+
+// A model is locally runnable when it ships a local tier, a known VRAM
+// requirement, or at least one Unsloth quant variant. Lives here (not in the
+// data layer) because GPU compatibility is its only consumer.
+export function isLocalRunnable(m) {
+  if (m.tier === 'ollama-local' || m.tier === 'gemma') return true;
+  if (Number.isFinite(m.vramRequirement)) return true;
+  if (Array.isArray(m.unslothVariants) && m.unslothVariants.length > 0) return true;
+  return false;
+}
 
 export function gpuCompat(model, vram) {
   // Only variants with a real numeric vram are usable for fit math. A variant

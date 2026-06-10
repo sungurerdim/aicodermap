@@ -4,22 +4,22 @@
 
 import { State } from './core.js';
 import {
-  compositeScore, coverageOf, disputedCount, fmtScore, contradictionFor,
-  pricingView, fmtPriceMoney, fmtPriceRange, fmtPriceCell, fmtContext,
-  fmtLastUpdated, fmtTimeAgo, formatBenchValue, isCellStale, getCellFreshness,
-  sourceReliabilityBadge, orderedBenchKeys,
-  effectiveScore, vendorComposites, vendorConsensusScore,
-  crossValidationAgreement, presetTiersFor, compositeUncertainty,
+  disputedCount, contradictionFor, isCellStale, getCellFreshness,
+  sourceReliabilityBadge,
 } from './data.js';
+import {
+  coverageOf, effectiveScore, vendorComposites,
+  crossValidationAgreement, presetTiersFor, compositeUncertainty,
+} from './scoring.js';
+import {
+  fmtScore, pricingView, fmtPriceMoney, fmtPriceRange, fmtPriceCell,
+  fmtContext, fmtLastUpdated, fmtTimeAgo, formatBenchValue, orderedBenchKeys,
+} from './format.js';
 import { gpuCompat, getActiveVram } from './gpu.js';
 import { el, cameraIconButton, docIconButton } from './dom.js';
-import { t } from './i18n.js';
+import { t, tierLabel } from './i18n.js';
 import { showContradictionTooltip, hideTooltip, exportElement } from './overlay.js';
 import { modelSourcesSummary, exportSourcesMarkdown } from './sources.js';
-
-function tierLabel(tier) {
-  return t(`ui.tier.${tier}`) || tier;
-}
 
 function lastUpdatedNode(iso) {
   const wrap = el('span', { class: 'last-updated' });

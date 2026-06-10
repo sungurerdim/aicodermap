@@ -1,7 +1,7 @@
 // Tooltip + PNG export. Both are visual overlays on top of the base UI.
 
 import { el, showToast } from './dom.js';
-import { fmtScore } from './data.js';
+import { fmtScore } from './format.js';
 import { t } from './i18n.js';
 
 export function showContradictionTooltip(anchor, contradiction) {

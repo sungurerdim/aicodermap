@@ -17,11 +17,11 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "scripts"))
 
-from lib.dispatch import compute_dispatch_plan, slow_families_from_telemetry
-from lib.freshness import compute_skip_cells
-from lib.idea_context import build_per_batch_ctx
-from lib.matrix import active_models, matrix_snapshot, priority_cells
-from lib.whitelist import (
+from lib.dispatch import compute_dispatch_plan, slow_families_from_telemetry  # noqa: E402
+from lib.freshness import compute_skip_cells  # noqa: E402
+from lib.idea_context import build_per_batch_ctx  # noqa: E402
+from lib.matrix import active_models, matrix_snapshot, priority_cells  # noqa: E402
+from lib.whitelist import (  # noqa: E402
     banned_fetch_patterns,
     contracts,
     core_bench_keys,

@@ -1,21 +1,18 @@
 // Comparison table + model list render. Columns are split into helper builders;
 // renderAll wires both surfaces together.
 
-import { State, TIER_ORDER, STORAGE, writeStorage, readStorage } from './core.js';
+import { State, TIER_ORDER, STORAGE, writeStorage } from './core.js';
+import { contradictionFor } from './data.js';
+import { coverageOf, effectiveScore, rankBands } from './scoring.js';
 import {
-  compositeScore, coverageOf, fmtScore, scoreClass, contradictionFor,
-  pricingView, fmtPriceRange, fmtContext, fmtLastUpdated, fmtTimeAgo,
-  effectiveScore, rankBands, orderedBenchKeys,
-} from './data.js';
+  fmtScore, scoreClass, pricingView, fmtPriceRange, fmtContext,
+  fmtLastUpdated, fmtTimeAgo, orderedBenchKeys,
+} from './format.js';
 import { gpuCompat, getActiveVram, passesFilters } from './gpu.js';
 import { el, clear } from './dom.js';
-import { t } from './i18n.js';
+import { t, tierLabel } from './i18n.js';
 import { showContradictionTooltip, hideTooltip } from './overlay.js';
 import { buildModelCard } from './render-card.js';
-
-function tierLabel(tier) {
-  return t(`ui.tier.${tier}`) || tier;
-}
 
 function staticColumns() {
   return [
@@ -217,7 +214,28 @@ function onSortClick(colKey) {
   renderTable();
 }
 
+// Sort clicks/keys are delegated: two listeners on the persistent header row
+// instead of 2×N per-column listeners re-created every render.
+function wireHeaderSort(headerRow) {
+  if (headerRow.dataset.sortWired) return;
+  headerRow.dataset.sortWired = 'true';
+  const colOf = (e) => {
+    const th = e.target.closest && e.target.closest('th[data-sortable="true"]');
+    return th ? th.dataset.col : null;
+  };
+  headerRow.addEventListener('click', (e) => {
+    const col = colOf(e);
+    if (col) onSortClick(col);
+  });
+  headerRow.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const col = colOf(e);
+    if (col) { e.preventDefault(); onSortClick(col); }
+  });
+}
+
 function renderTableHeader(thead, cols) {
+  wireHeaderSort(thead);
   clear(thead);
   for (const col of cols) {
     const th = document.createElement('th');
@@ -227,11 +245,7 @@ function renderTableHeader(thead, cols) {
     if (col.groupDivider) th.classList.add('bench-group-divider');
     if (col.sortable) {
       th.dataset.sortable = 'true';
-      th.addEventListener('click', () => onSortClick(col.key));
       th.tabIndex = 0;
-      th.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSortClick(col.key); }
-      });
     }
     if (State.sort.col === col.key) th.classList.add('sorted', State.sort.dir);
     th.textContent = t(col.i18n);

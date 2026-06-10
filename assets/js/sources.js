@@ -2,7 +2,8 @@
 // footer and the per-cell Markdown export used by the doc-icon action.
 
 import { State, BENCH_KEYS } from './core.js';
-import { contradictionFor, fmtScore, fmtLastUpdated } from './data.js';
+import { contradictionFor } from './data.js';
+import { fmtScore, fmtLastUpdated } from './format.js';
 import { t } from './i18n.js';
 
 // Aggregate every source mention across all bench entries for a model and

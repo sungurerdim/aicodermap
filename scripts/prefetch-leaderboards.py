@@ -373,7 +373,9 @@ def _main() -> int:
         f"failed: {len(failed)}  elapsed: {elapsed:.1f}s"
     )
     print(f"index: {INDEX_PATH.relative_to(PROJECT)}")
-    return 0 if not failed else 0  # non-fatal — partial prefetch is OK
+    # Always exit 0 by design: prefetch failures (partial or total) are
+    # non-fatal — the orchestrator recovers via gaps[] + WebSearch fallback.
+    return 0
 
 
 if __name__ == "__main__":

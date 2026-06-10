@@ -64,7 +64,7 @@ type ModelEntry = {
   name: string;                  // "Claude Opus 4.7"
   provider: string;              // "Anthropic"
   released: string;              // ISO date "2026-04-16"
-  tier: "frontier" | "open-tier1" | "openrouter" | "gemma" | "ollama";
+  tier: "frontier" | "open-flagship" | "coder-specialized" | "gemma" | "ollama-local";
   open: boolean;
   license: string;               // "MIT" | "Apache 2.0" | "Proprietary" | ...
   context: number;               // tokens
