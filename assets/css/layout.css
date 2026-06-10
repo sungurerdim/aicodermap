@@ -100,6 +100,9 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  /* Anchor jumps (#privacy etc.) must land the heading BELOW the sticky nav,
+   * not underneath it — nav is ~34px tall, 48px adds breathing room. */
+  scroll-margin-top: 48px;
 }
 .card {
   background: var(--surface);
