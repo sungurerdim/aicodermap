@@ -1,0 +1,161 @@
+{
+  "cycleEndedAt": "2026-06-10T18:37:55Z",
+  "cycleStartedAt": "2026-06-10T08:00:00Z",
+  "perBatch": [
+    {
+      "agentGaps": 44,
+      "batchId": "batch00-google_deepm",
+      "fills": 62,
+      "gaps": 44,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 48,
+      "wallclockSec": 4780.0
+    },
+    {
+      "agentGaps": 59,
+      "batchId": "batch01-alibaba_qwen",
+      "fills": 59,
+      "gaps": 59,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 47,
+      "wallclockSec": 5958.0
+    },
+    {
+      "agentGaps": 51,
+      "batchId": "batch02-alibaba_qwen",
+      "fills": 49,
+      "gaps": 51,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 34,
+      "wallclockSec": 5795.0
+    },
+    {
+      "agentGaps": 37,
+      "batchId": "batch03-deepseek",
+      "fills": 75,
+      "gaps": 37,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "Batch contained 5 confirmed DeepSeek models (not 6 — batch context file unreadable at batchSpec section due to single-line JSON; 6th model could not be identified). Some cells missing for coder/r1 small models due to sparse public leaderboard coverage.",
+      "toolCallCount": 47,
+      "wallclockSec": 8082.0
+    },
+    {
+      "agentGaps": 33,
+      "batchId": "batch04-z_ai__zhipu_",
+      "fills": 62,
+      "gaps": 33,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 42,
+      "wallclockSec": 3587.0
+    },
+    {
+      "agentGaps": 33,
+      "batchId": "batch05-anthropic",
+      "fills": 35,
+      "gaps": 33,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 42,
+      "wallclockSec": 2778.0
+    },
+    {
+      "agentGaps": 26,
+      "batchId": "batch06-minimax",
+      "fills": 56,
+      "gaps": 26,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 47,
+      "wallclockSec": 5946.0
+    },
+    {
+      "agentGaps": 31,
+      "batchId": "batch07-mistral_ai",
+      "fills": 41,
+      "gaps": 31,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 45,
+      "wallclockSec": 4744.0
+    },
+    {
+      "agentGaps": 12,
+      "batchId": "batch08-openai",
+      "fills": 61,
+      "gaps": 12,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 48,
+      "wallclockSec": 6981.0
+    },
+    {
+      "agentGaps": 39,
+      "batchId": "batch10-google_deepm",
+      "fills": 99,
+      "gaps": 39,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 32,
+      "wallclockSec": 6981.0
+    },
+    {
+      "agentGaps": 17,
+      "batchId": "batch12-xai",
+      "fills": 44,
+      "gaps": 17,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 38,
+      "wallclockSec": 2585.0
+    },
+    {
+      "agentGaps": 42,
+      "batchId": "batch09-xiaomi-retry",
+      "fills": 46,
+      "gaps": 42,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 36,
+      "wallclockSec": 650.0
+    },
+    {
+      "agentGaps": 41,
+      "batchId": "batch11-alibaba_qwen-retry",
+      "fills": 67,
+      "gaps": 41,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 42,
+      "wallclockSec": 1322.0
+    }
+  ],
+  "totalBatches": 13,
+  "totals": {
+    "agentGaps": 465,
+    "fills": 756,
+    "gaps": 465,
+    "na": 0,
+    "orchestratorGaps": 0,
+    "toolCallSum": 548,
+    "wallclockSecMax": 8082.0,
+    "wallclockSecP95": 8082.0
+  },
+  "zeroFillBatches": []
+}
