@@ -357,29 +357,36 @@ export function updateGpuStatus() {
   const detected = State.detectedGpu;
   const detectedUsable = !!(detected && (Number.isFinite(detected.vram) || detected.vramRange));
 
+  const autoOpt = sel.querySelector('option[value="auto"]');
+
   // webgpuUnsupported — only when WebGPU is absent AND the WebGL renderer
   // fallback also failed; a successful WebGL detection keeps auto usable.
+  // Only show the error message (and return) when VRAM is also unknown —
+  // a manually-typed VRAM value should still produce a budget note below.
   if ((!('gpu' in navigator) || !navigator.gpu) && !detectedUsable) {
-    status.textContent = t('compat.errors.webgpuUnsupported') || 'WebGPU not supported — select GPU manually';
-    const autoOpt = sel.querySelector('option[value="auto"]');
     if (autoOpt) {
       autoOpt.disabled = true;
       autoOpt.title = t('ui.filter.gpuAutoUnavailable') || '';
       if (sel.value === 'auto') sel.value = '';
     }
-    return;
+    if (State.vram == null) {
+      status.textContent = t('compat.errors.webgpuUnsupported') || 'WebGPU not supported — select GPU manually';
+      return;
+    }
+    // VRAM was typed manually — fall through to show budget note below.
   }
 
-  const autoOpt = sel.querySelector('option[value="auto"]');
-
-  // Privacy-stripped path: WebGPU present but browser hid all device info
+  // Privacy-stripped path: WebGPU present but browser hid all device info.
+  // Same logic: only exit early when there is no manual VRAM to display.
   if (detected?.detectionMode === 'privacy-stripped') {
-    status.textContent = t('ui.filter.gpuPrivacyStripped') || 'GPU detected — browser hides device info, select GPU manually';
     if (autoOpt) {
       autoOpt.disabled = true;
       if (sel.value === 'auto') sel.value = '';
     }
-    return;
+    if (State.vram == null) {
+      status.textContent = t('ui.filter.gpuPrivacyStripped') || 'GPU detected — browser hides device info, select GPU manually';
+      return;
+    }
   }
 
   if (autoOpt) {
@@ -396,16 +403,37 @@ export function updateGpuStatus() {
     }
   }
 
-  const budget = Number.isFinite(State.ram) && State.ram > 0
+  // Update the RAM dropdown's "Auto" option to show the detected/inferred value
+  // so users can see what budget is actually being applied.
+  const ramSel = document.getElementById('filter-ram-select');
+  if (ramSel) {
+    const ramAutoOpt = ramSel.querySelector('option[value=""]');
+    if (ramAutoOpt && ramSel.value === '') {
+      const autoBase = t('ui.filter.ramAuto') || 'Auto';
+      ramAutoOpt.textContent = Number.isFinite(State.ram) && State.ram > 0
+        ? `${autoBase} (~${State.ram} GB)`
+        : autoBase;
+    }
+  }
+
+  const vramKnown = Number.isFinite(State.vram) && State.vram > 0;
+  const ramKnown  = Number.isFinite(State.ram)  && State.ram  > 0;
+  const budget = vramKnown && ramKnown
     ? State.vram + Math.max(State.ram - RAM_OS_RESERVE_GB, 0)
     : null;
   const totalSuffix = budget != null
     ? ` + RAM → ~${budget} GB ${t('ui.filter.totalBudget') || 'total'}`
     : '';
-  if (State.vram == null) {
-    status.textContent = autoOpt && autoOpt.disabled
-      ? (t('ui.filter.gpuAutoUnavailable') || 'Auto-detect unavailable')
-      : '';
+
+  if (!vramKnown) {
+    if (ramKnown) {
+      const offload = Math.max(State.ram - RAM_OS_RESERVE_GB, 0);
+      status.textContent = `RAM: ~${offload} GB ${t('ui.filter.ramOffload') || 'offload budget'}`;
+    } else {
+      status.textContent = autoOpt && autoOpt.disabled
+        ? (t('ui.filter.gpuAutoUnavailable') || 'Auto-detect unavailable')
+        : '';
+    }
   } else if (detected?.detectionMode === 'approximate') {
     const approxLabel = t('ui.filter.gpuApproximate') || 'approx.';
     status.textContent = `~${State.vram} GB · ${detected.architectureLabel || ''} (${approxLabel})${totalSuffix}`;

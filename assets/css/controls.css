@@ -121,7 +121,7 @@
   min-width: 0;
   flex: 1 1 170px;
 }
-.number-row { flex: 0 1 120px; }
+.number-row { flex: 0 1 148px; }
 .filters-grid .checkbox-row { flex: 0 0 auto; }
 .select-row > span, .number-row > span {
   flex: 0 0 auto;
@@ -140,8 +140,8 @@
 }
 /* Hard floors so flex shrink can never crush a control into illegibility —
  * the toolbar wraps instead. */
-.select-row select { min-width: 96px; }
-.number-row input { min-width: 60px; }
+.select-row select { min-width: 120px; }
+.number-row input { min-width: 80px; }
 .search-row { min-width: 180px; }
 .checkbox-row {
   font-size: 0.82rem;
