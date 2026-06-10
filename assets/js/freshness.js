@@ -58,6 +58,30 @@ async function fetchLiveModelsEtag() {
   }
 }
 
+// A plain location.reload() reuses HTTP-cached CSS/JS (Pages serves
+// max-age=600), so the "new build" reload kept showing the OLD design until a
+// manual Ctrl+Shift+R. Force-refetch every same-origin asset this page loaded
+// — performance resource entries include ES-module imports the DOM doesn't
+// list — with cache:'reload' (updates each HTTP-cache entry), then reload.
+async function hardRefresh() {
+  const assets = new Set([location.href]);
+  try {
+    for (const e of performance.getEntriesByType('resource')) {
+      try {
+        const u = new URL(e.name, location.href);
+        if (u.origin === location.origin) {
+          u.search = '';
+          assets.add(u.href);
+        }
+      } catch (_) { /* skip unparsable */ }
+    }
+    await Promise.allSettled(
+      [...assets].map((u) => fetch(u, { cache: 'reload' }))
+    );
+  } catch (_) { /* best effort — reload regardless */ }
+  location.reload();
+}
+
 function showStaleBanner({ servedShort, liveSha, ageMin }) {
   const banner = document.getElementById('freshness-banner');
   if (!banner) return;
@@ -73,7 +97,7 @@ function showStaleBanner({ servedShort, liveSha, ageMin }) {
     ageMin: ageMin != null ? ageMin : '?',
   });
   refreshBtn.textContent = t('ui.freshness.refresh') || 'Refresh';
-  refreshBtn.onclick = () => location.reload();
+  refreshBtn.onclick = () => { hardRefresh(); };
   dismissBtn.onclick = () => { banner.hidden = true; };
   banner.hidden = false;
   bannerShown = true;

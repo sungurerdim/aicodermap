@@ -134,11 +134,15 @@
 .number-row input,
 .select-row input[type="search"] {
   flex: 1 1 auto;
-  min-width: 0;
   max-width: 100%;
   padding: 3px 6px;
   font-size: 0.85rem;
 }
+/* Hard floors so flex shrink can never crush a control into illegibility —
+ * the toolbar wraps instead. */
+.select-row select { min-width: 96px; }
+.number-row input { min-width: 60px; }
+.search-row { min-width: 180px; }
 .checkbox-row {
   font-size: 0.82rem;
 }
@@ -154,13 +158,16 @@
  * own right-aligned line only when the row is genuinely full. */
 .filters-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
-  min-width: 0;
+  gap: 4px 8px;
+  min-width: 200px;
   flex: 1 0 auto;
   margin-left: auto;
 }
+.filters-actions .btn-compact { white-space: nowrap; }
+.gpu-status-line { flex: 0 1 auto; }
 .gpu-status-line {
   margin: 0;
   font-size: 0.74rem;
