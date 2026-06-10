@@ -1239,6 +1239,36 @@ recovered from `subagents/*.jsonl` via `scripts/extract-agent-output.py`).
 
 ## VRAM_FORMULA
 
+### Source priority (per open/local model — walk IN ORDER, stop at first hit)
+1. **Unsloth docs model page** (`unsloth.ai/docs/models/<family>`) — when it
+   publishes a per-quant VRAM table, copy those numbers verbatim (measured,
+   I-tier for fit purposes).
+2. **HF GGUF file listing** (`huggingface.co/unsloth/<model>-GGUF` preferred,
+   else `<org>/<model>-GGUF` → Files tab) — each quant's FILE SIZE is the
+   `quant_size_GB` input to the Quick formula below. This is the highest-yield
+   single page: one fetch gives every variant's size at once.
+3. **Ollama tags table** (`ollama.com/library/<id>` → Tags) — per-tag size
+   column, same Quick formula.
+4. **Parameter count** (model card / config.json) — Precise formula below.
+5. Community fit reports (r/LocalLLaMA, llama.cpp issues) — C-tier CROSS-CHECK
+   only, never the sole source of a vram number.
+
+### Emission rules (HARD)
+- Every open-weight / local-tier model in the slice MUST end with either
+  `vramRequirement` (number, GB) + ≥1 `unslothVariants[]` entry carrying a
+  numeric `vram`, OR a gaps[] entry for `<id>.vramRequirement` documenting
+  that the chain above was walked.
+- An `unslothVariants[]`/`ollama.tags[]` entry WITHOUT a numeric `vram` is a
+  contract violation: the frontend's fit math drops null-vram variants, the
+  model regresses to "cloud" in the GPU-fit view, and the cell is wasted.
+  When the source gives only a file size, COMPUTE vram via the Quick formula
+  instead of emitting null.
+- `vramRequirement` = vram of the RECOMMENDED quant (Q4_K_M unless the vendor
+  or Unsloth page names another), NOT the smallest runnable quant.
+- Cross-check: two sources disagreeing by >2 GB on the same quant → prefer
+  measured (Unsloth table / GGUF file size) over computed; emit the loser as a
+  sourcesAdded candidate so the contradiction trail persists.
+
 ### Quick (when GGUF size known)
 ```
 vram_GB = quant_size_GB + 1-2 GB context buffer
