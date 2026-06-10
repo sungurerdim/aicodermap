@@ -151,19 +151,10 @@ function wireFilterControls() {
   }
 }
 
-// A deliberate GPU pick / VRAM entry expresses "what runs on my hardware?" —
-// without this hop the selection only repaints compat badges and the list
-// itself never changes (the fit filter lives behind deployment==='local').
-// Auto-detect on page load never triggers it; only explicit user input does.
-function switchDeploymentToLocalFit() {
-  if (!Number.isFinite(State.vram) || State.vram <= 0) return;
-  if (State.filters.deployment === 'local') return;
-  State.filters.deployment = 'local';
-  const dep = document.getElementById('filter-deployment');
-  if (dep) dep.value = 'local';
-  writeStorage(STORAGE.filters, State.filters);
-}
-
+// Picking a GPU / typing a VRAM never narrows the list by itself — the
+// default stance is "show all models". The fit view is strictly opt-in via
+// the gpu-fit-toggle button (or the Deploy select); the selection here only
+// refreshes compat badges and the button's "(~N GB)" label.
 function wireGpuControls() {
   const sel = document.getElementById('filter-gpu-select');
   if (sel) {
@@ -171,7 +162,6 @@ function wireGpuControls() {
       State.selectedGpu = e.target.value;
       writeStorage(STORAGE.gpu, State.selectedGpu);
       resolveGpuVram();
-      switchDeploymentToLocalFit();
       updateGpuStatus();
       renderAll();
     });
@@ -181,7 +171,6 @@ function wireGpuControls() {
     vram.addEventListener('input', () => {
       resolveGpuVram();
       writeStorage(STORAGE.vram, State.vram);
-      switchDeploymentToLocalFit();
       updateGpuStatus();
       renderAll();
     });
