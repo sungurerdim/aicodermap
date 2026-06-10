@@ -94,6 +94,51 @@ def _mode(vals):
     return Counter(vals).most_common(1)[0][0] if vals else None
 
 
+def _hostname(url: str) -> str:
+    from urllib.parse import urlparse
+
+    h = (urlparse(url).hostname or "").lower()
+    return h[4:] if h.startswith("www.") else h
+
+
+def vendor_hostnames(vendor_entry: dict) -> set[str]:
+    """Every hostname appearing in the vendor's whitelist urls block."""
+    hosts = set()
+    for u in (vendor_entry.get("urls") or {}).values():
+        for url in u if isinstance(u, list) else [u]:
+            if isinstance(url, str) and url.startswith("http"):
+                h = _hostname(url)
+                if h:
+                    hosts.add(h)
+    return hosts
+
+
+def is_official_evidence(nm: dict, vendors: dict) -> bool:
+    """True iff any evidence URL is hosted on the candidate's OWN vendor's
+    official domain (from the whitelist). A vendor announcing a model on its
+    own site is the primary source for 'this model exists' — single-source
+    sufficiency by design; ≥2-source applies to non-official evidence only."""
+    urls = (
+        [nm.get("evidenceUrl")]
+        + list(nm.get("evidence") or [])
+        + list(nm.get("sources") or [])
+    )
+    urls = [u for u in urls if isinstance(u, str) and u.startswith("http")]
+    if not urls:
+        return False
+    vid = nm.get("vendor") or nm.get("provider") or ""
+    entries = [vendors[vid]] if vid in vendors else list(vendors.values())
+    hosts = set()
+    for e in entries:
+        hosts |= vendor_hostnames(e or {})
+    return any(
+        h == vh or h.endswith("." + vh)
+        for u in urls
+        if (h := _hostname(u))
+        for vh in hosts
+    )
+
+
 def derive_meta(nm: dict, existing: list[dict], vendors: dict) -> dict:
     """Build stub metadata from the lineup entry + the candidate's family siblings.
     Explicit lineup values win; otherwise inherit the sibling mode; otherwise a
@@ -184,16 +229,23 @@ def main() -> int:
             print(f"  skip (superseded by '{sup}'): {mid}")
             continue
 
-        # EVIDENCE GATE (2026-06-06). Auto-stub only adds a model to the PUBLIC
-        # dataset when it is verifiably real + generally available. A lone
-        # low-confidence gather hint (single agent saw a blog mention) or an
-        # explicitly restricted/not-GA model is held out as a lineup hint for
-        # next-cycle ≥2-source verification — never auto-published. This stops
-        # speculative/rumored entries (e.g. a blog-timeline "preview" model) from
-        # polluting the model list. The high-confidence newReleaseProbe path
-        # (vendor docs/lineup pages) is unaffected.
+        # EVIDENCE GATE (2026-06-06, reformed 2026-06-10). The question the gate
+        # answers is "is this model verifiably REAL?", and the primary source for
+        # that is the vendor's OWN official announcement/docs page. Therefore:
+        #   - OFFICIAL evidence (URL on the candidate's vendor whitelist domain)
+        #     admits the model on a SINGLE source — vendor self-publication is
+        #     definitionally authoritative for lineup existence (it is the same
+        #     trust basis as Step 0 lineup discovery itself).
+        #   - NON-official evidence still needs high/medium confidence or ≥2
+        #     sources, and the restricted/not-GA hold-out applies — this is what
+        #     keeps speculative/rumored blog entries out.
+        # Pre-reform the gate ignored `evidenceUrl` entirely (only counted
+        # evidence[]/sources[] arrays) and read `notes` while agents emit
+        # `_note` — so an officially-announced model (claude-fable-5,
+        # anthropic.com/news) was held back as "low-confidence:none".
+        official = is_official_evidence(nm, vendors)
         conf = str(nm.get("evidenceConfidence") or "").lower()
-        notes = str(nm.get("notes") or "").lower()
+        notes = str(nm.get("notes") or nm.get("_note") or "").lower()
         restricted = any(
             t in notes
             for t in (
@@ -207,7 +259,9 @@ def main() -> int:
             )
         )
         n_sources = len(nm.get("evidence") or nm.get("sources") or [])
-        verified = (conf in ("high", "medium") or n_sources >= 2) and not restricted
+        verified = official or (
+            (conf in ("high", "medium") or n_sources >= 2) and not restricted
+        )
         if not verified:
             reason = (
                 "restricted/not-GA"
