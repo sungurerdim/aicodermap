@@ -32,7 +32,7 @@ Orchestrate AI coding LLM tracker updates: discover **official vendor lineup** �
 | `stale-check` | (no fetch) | — | <5s |
 | `changelog` | (no fetch) | — | <5s |
 
-**`refresh-all` baseline:** Agent's `MODEL_FAMILIES` table is non-negotiable — every family must be surveyed, missing ones emit a `gaps[]` entry. Skill rejects returns whose `models[]` + `newModels[]` cardinality < 30 unless agent explains via `gaps[]`.
+**`refresh-all` baseline:** Agent's `SCOPE_CATEGORIES` tier taxonomy is non-negotiable — every tier/family must be surveyed, missing ones emit a `gaps[]` entry. Skill rejects returns whose `models[]` + `newModels[]` cardinality < 30 unless agent explains via `gaps[]`.
 
 ## WORKFLOW
 ```
