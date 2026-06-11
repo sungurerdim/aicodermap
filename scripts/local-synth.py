@@ -27,7 +27,7 @@ from lib import reliability as _reliability  # type: ignore  # noqa: E402
 # R5 source_type curve selection). effective_trust_score is signature-
 # compatible with the old local trust_score (source_type defaults to the
 # pre-R5 curve; is_pseudo defaults to False — gather entries are real).
-from lib.tiers import effective_trust_score as trust_score  # type: ignore  # noqa: E402  (SSOT)
+from lib.tiers import effective_trust_score as trust_score, is_pseudo_source  # type: ignore  # noqa: E402  (SSOT)
 from lib.constants import ELO_BENCH_KEYS  # type: ignore  # noqa: E402  (SSOT)
 from lib.util import extract_domain  # type: ignore  # noqa: E402  (SSOT)
 
@@ -135,6 +135,8 @@ def main() -> int:
             if bk not in value_keys:
                 continue
             for e in entries:
+                if is_pseudo_source(e):
+                    continue  # auto-resolution/synth-backfill entries never anchor historical pool
                 v = e.get("value")
                 if v is None:
                     continue

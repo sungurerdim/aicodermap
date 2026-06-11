@@ -4515,7 +4515,7 @@
         "status": "unreachable",
         "observedFormat": "unreachable",
         "lastProbedAt": "2026-06-10",
-        "consecutiveFailures": 7,
+        "consecutiveFailures": 8,
         "problems": [
           "unreachable"
         ]
@@ -4539,7 +4539,7 @@
         "status": "dead",
         "observedFormat": "dead",
         "lastProbedAt": "2026-06-10",
-        "consecutiveFailures": 9,
+        "consecutiveFailures": 10,
         "problems": [
           "format-drift",
           "http-404"
@@ -4567,7 +4567,7 @@
         "status": "bot_blocked",
         "observedFormat": "bot_blocked",
         "lastProbedAt": "2026-06-10",
-        "consecutiveFailures": 9,
+        "consecutiveFailures": 10,
         "problems": [
           "bot-block",
           "format-drift"
@@ -4587,7 +4587,7 @@
         "status": "unreachable",
         "observedFormat": "unreachable",
         "lastProbedAt": "2026-06-10",
-        "consecutiveFailures": 9,
+        "consecutiveFailures": 10,
         "problems": [
           "unreachable"
         ]
@@ -4695,7 +4695,7 @@
         "status": "dead",
         "observedFormat": "dead",
         "lastProbedAt": "2026-06-10",
-        "consecutiveFailures": 9,
+        "consecutiveFailures": 10,
         "problems": [
           "format-drift",
           "http-404"
@@ -4711,17 +4711,21 @@
         "status": "dead",
         "observedFormat": "dead",
         "lastProbedAt": "2026-06-10",
-        "consecutiveFailures": 9,
+        "consecutiveFailures": 10,
         "problems": [
           "format-drift",
           "http-404"
         ]
       },
       "novita.ai/model-api": {
-        "status": "static_html_article",
-        "observedFormat": "static_html_article",
+        "status": "spa_full",
+        "observedFormat": "spa_full",
         "lastProbedAt": "2026-06-10",
-        "consecutiveFailures": 0
+        "consecutiveFailures": 0,
+        "problems": [
+          "format-drift",
+          "spa"
+        ]
       },
       "siliconflow.cn/models": {
         "status": "static_html_article",
@@ -5041,7 +5045,7 @@
         "problems": [
           "redirect"
         ],
-        "redirectedTo": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DUIyMSAdjGEYW3ryJ922cLW7Z2dhVcD4nF_g2CEaxVbiIvS1sK0kZbD0Qp8ViCwlg5AnzDnhLAew53kA4gSUfIdZurL5xnRVtuqPqaulewyVNGyuYfmnuz1Frp_B1Mswxa4AFxg9BN6VLvD5dp_eH5GqgVBK-YKJIcqWLd6LwBjA&response_mode=form_post&nonce=639166743380701290.YjczOTQxM2EtMWU1Mi00YmQ3LWJiMjUtYjAwZTVlNzNkYTBlZTgyOGM2MTktNmIyYy00Zjk4LWFiYTItYzYzOGQxMDEwOTQz&client-request-id=02a89110-ea08-47ae-a126-5e8f97b626a4&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
+        "redirectedTo": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3D5tYq3NqRfK3eEDntQRRUorPJng1DR_gOBO09EJRccFYv4g9b3Lowl-5Kpt8uwJdpYh3rXgFWo-M2IDzOdyKOeHEI6S9J8zuFD9ECpt174u39sX47aJOoBSETTibrXqT63rl3oOy1jwwEfu7wPXpt7TULfgJOyOYvasw2th8_PmA&response_mode=form_post&nonce=639167182249971076.YWZkYmYzNTctYTliYS00M2JiLWJmZjEtYzdhMDJmMWUxZWViMzBiYjY3M2ItYjZlYi00Y2RhLTk0MzgtOGFmOTE3NjRiZGY5&client-request-id=15400237-8b31-41ed-98ee-912529b8b38a&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
       },
       "aicpa-cima.com/topic": {
         "status": "spa_full",
@@ -5079,7 +5083,7 @@
         "status": "bot_blocked",
         "observedFormat": "bot_blocked",
         "lastProbedAt": "2026-06-10",
-        "consecutiveFailures": 9,
+        "consecutiveFailures": 10,
         "problems": [
           "bot-block",
           "format-drift"
@@ -5159,7 +5163,7 @@
         "status": "dead",
         "observedFormat": "dead",
         "lastProbedAt": "2026-06-10",
-        "consecutiveFailures": 9,
+        "consecutiveFailures": 10,
         "problems": [
           "http-404"
         ]
@@ -5198,7 +5202,7 @@
         "status": "dead",
         "observedFormat": "dead",
         "lastProbedAt": "2026-06-10",
-        "consecutiveFailures": 9,
+        "consecutiveFailures": 10,
         "problems": [
           "http-404"
         ]
@@ -5207,7 +5211,7 @@
         "status": "dead",
         "observedFormat": "dead",
         "lastProbedAt": "2026-06-10",
-        "consecutiveFailures": 9,
+        "consecutiveFailures": 10,
         "problems": [
           "http-404"
         ]
@@ -5225,7 +5229,7 @@
         "status": "dead",
         "observedFormat": "dead",
         "lastProbedAt": "2026-06-10",
-        "consecutiveFailures": 9,
+        "consecutiveFailures": 10,
         "problems": [
           "http-404"
         ]

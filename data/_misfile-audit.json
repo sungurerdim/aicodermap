@@ -1,10 +1,10 @@
 {
   "_summary": {
     "compositeMisfiles": 0,
-    "measuredCandidates": 38,
+    "measuredCandidates": 39,
     "bandViolations": 0,
-    "crossBenchDups": 6,
-    "aaRowsLoaded": 391
+    "crossBenchDups": 7,
+    "aaRowsLoaded": 398
   },
   "compositeMisfiles": [],
   "measuredCandidates": [
@@ -81,9 +81,9 @@
     {
       "modelId": "grok-4-1-fast",
       "benchKey": "gpqa",
-      "current": 85.36,
+      "current": 85.32,
       "aa": 63.74,
-      "delta": 21.62
+      "delta": 21.58
     },
     {
       "modelId": "gemma-4-e4b",
@@ -179,9 +179,9 @@
     {
       "modelId": "deepseek-v3-2",
       "benchKey": "hle",
-      "current": 24.87,
+      "current": 24.86,
       "aa": 10.52,
-      "delta": 14.35
+      "delta": 14.34
     },
     {
       "modelId": "step-3-5-flash",
@@ -217,6 +217,13 @@
       "current": 91.7,
       "aa": 79.53,
       "delta": 12.17
+    },
+    {
+      "modelId": "claude-fable-5",
+      "benchKey": "hle",
+      "current": 64.5,
+      "aa": 53.34,
+      "delta": 11.16
     },
     {
       "modelId": "step-3-7-flash",
@@ -284,6 +291,14 @@
         "aime26",
         "lcb",
         "mmluPro"
+      ]
+    },
+    {
+      "modelId": "devstral-medium",
+      "value": 9.1,
+      "benchKeys": [
+        "tb2",
+        "tbHard"
       ]
     },
     {

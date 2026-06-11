@@ -1,10 +1,10 @@
 {
-  "probedAt": "2026-06-10T07:45:52Z",
+  "probedAt": "2026-06-10T19:57:21Z",
   "total": 138,
   "counts": {
-    "format-drift": 14,
+    "format-drift": 15,
     "redirect": 8,
-    "spa": 15,
+    "spa": 16,
     "bot-block": 2,
     "dead": 11
   },
@@ -43,6 +43,11 @@
       "url": "https://www.lepton.ai/pricing",
       "declared": "static_html_table",
       "observed": "dead"
+    },
+    {
+      "url": "https://novita.ai/model-api",
+      "declared": "static_html_table",
+      "observed": "spa_full"
     },
     {
       "url": "https://www.anyscale.com/endpoints",
@@ -99,7 +104,7 @@
     },
     {
       "url": "https://compliance.microsoft.com/compliancemanager",
-      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DUIyMSAdjGEYW3ryJ922cLW7Z2dhVcD4nF_g2CEaxVbiIvS1sK0kZbD0Qp8ViCwlg5AnzDnhLAew53kA4gSUfIdZurL5xnRVtuqPqaulewyVNGyuYfmnuz1Frp_B1Mswxa4AFxg9BN6VLvD5dp_eH5GqgVBK-YKJIcqWLd6LwBjA&response_mode=form_post&nonce=639166743380701290.YjczOTQxM2EtMWU1Mi00YmQ3LWJiMjUtYjAwZTVlNzNkYTBlZTgyOGM2MTktNmIyYy00Zjk4LWFiYTItYzYzOGQxMDEwOTQz&client-request-id=02a89110-ea08-47ae-a126-5e8f97b626a4&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
+      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3D5tYq3NqRfK3eEDntQRRUorPJng1DR_gOBO09EJRccFYv4g9b3Lowl-5Kpt8uwJdpYh3rXgFWo-M2IDzOdyKOeHEI6S9J8zuFD9ECpt174u39sX47aJOoBSETTibrXqT63rl3oOy1jwwEfu7wPXpt7TULfgJOyOYvasw2th8_PmA&response_mode=form_post&nonce=639167182249971076.YWZkYmYzNTctYTliYS00M2JiLWJmZjEtYzdhMDJmMWUxZWViMzBiYjY3M2ItYjZlYi00Y2RhLTk0MzgtOGFmOTE3NjRiZGY5&client-request-id=15400237-8b31-41ed-98ee-912529b8b38a&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
     },
     {
       "url": "https://edpb.europa.eu/our-work-tools/consistency-findings/register-for-decisions_en",
@@ -120,6 +125,7 @@
     "https://openrouter.ai/rankings",
     "https://openrouter.ai",
     "https://deepinfra.com/models",
+    "https://novita.ai/model-api",
     "https://www.anyscale.com/endpoints",
     "https://ai.azure.com/explore/models",
     "https://benchlm.ai/models/gemini-3-1-pro",
