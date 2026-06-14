@@ -40,7 +40,7 @@
   grid-area: main;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 6px;
   min-width: 0;
 }
 .model-name-title {
@@ -114,7 +114,6 @@
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 .composite-score .value {
   display: block;
@@ -228,13 +227,14 @@ table#comparison-table td.bench-group-divider {
 .bench-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(98px, 1fr));
-  gap: 6px;
+  gap: 2px;
 }
 .bench-cell {
   display: flex;
   flex-direction: column;
   gap: 1px;
-  padding: 5px 22px 5px 8px;
+  padding: 2px 6px;
+  font-size: 0.88em;
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -533,7 +533,6 @@ table#comparison-table td.bench-group-divider {
   font-weight: 600;
   letter-spacing: 0.04em;
   color: var(--text);
-  text-transform: uppercase;
   font-size: 0.7rem;
 }
 .sources-footer .sources-count {
@@ -711,21 +710,6 @@ table#comparison-table td.bench-group-divider {
 }
 .model-card.is-target { animation: card-flash 1.6s ease-out; }
 
-/* F6 (2026-05-18): compact card overrides — denser spacing, smaller bench cells */
-.model-card-main {
-  gap: 6px !important;
-}
-.model-card-row {
-  padding: 4px 0 !important;
-}
-.bench-grid {
-  gap: 2px !important;
-}
-.bench-cell {
-  padding: 2px 6px !important;
-  font-size: 0.88em !important;
-}
-
 /* F6 (2026-05-18): vendor composite group — visually distinct from atomic score */
 .vendor-composite-group {
   margin-top: var(--space-2);
@@ -744,7 +728,6 @@ table#comparison-table td.bench-group-divider {
   font-weight: 700;
   font-size: 0.85em;
   letter-spacing: 0.04em;
-  text-transform: uppercase;
   color: var(--accent-2);
 }
 .vendor-group-tag {

@@ -120,9 +120,9 @@ export function buildBenchCell(model, key) {
   return cell;
 }
 
-function cardHead(model) {
+function cardHead(model, rank) {
   const head = el('div', { class: 'model-card-head' });
-  head.appendChild(el('span', { class: 'model-rank' }, `#${model.__rank}`));
+  head.appendChild(el('span', { class: 'model-rank' }, `#${rank}`));
   head.appendChild(el('h3', { class: 'model-name-title' }, model.name));
   head.appendChild(el('span', { class: `tier-badge ${model.tier}` }, tierLabel(model.tier)));
 
@@ -471,7 +471,6 @@ function limitedDataBadge(model) {
 }
 
 export function buildModelCard(model, rank, opts = {}) {
-  model.__rank = rank;
   // F1+F2 (2026-05-18): effectiveScore dispatches based on State.scoreFn.
   // 'consensus' preset → vendorConsensusScore; otherwise → compositeScore.
   const composite = effectiveScore(model, State.weights, State.activePresetName);
@@ -500,7 +499,7 @@ export function buildModelCard(model, rank, opts = {}) {
   // sidebar), main (everything else stacked). Score sits at align-self:
   // start so its small height never pushes main content down; main flows
   // freely from the top of the card alongside the score column.
-  card.appendChild(cardHead(model));
+  card.appendChild(cardHead(model, rank));
   card.appendChild(compositeBlock(composite, coverage, disputed, unc));
 
   const main = el('div', { class: 'model-card-main' });

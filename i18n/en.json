@@ -15,7 +15,7 @@
   "weights": {
    "total": "Total",
    "totalWarn": "Total must equal 100",
-   "preset": "Preset",
+   "preset": "PRESET",
    "reset": "Reset to default",
    "editor": "Weights Editor",
    "weightLabel": "Weight",
@@ -33,17 +33,17 @@
    "gpuPrivacyStripped": "GPU detected — browser hides device info, select GPU manually",
    "reset": "Reset filters",
    "gpuManual": "Manual select",
-   "gpuOverride": "Manual VRAM",
-   "tier": "Tier",
+   "gpuOverride": "MANUAL VRAM",
+   "tier": "TIER",
    "openOnly": "Open models only",
    "all": "All",
-   "deployment": "View",
+   "deployment": "VIEW",
    "deploymentAll": "All models",
    "cloudOnly": "Cloud / subscription only",
    "localFit": "Local models that fit my GPU",
    "search": "Search",
    "searchPlaceholder": "model name, provider...",
-   "provider": "Vendor",
+   "provider": "VENDOR",
    "providerAll": "All vendors",
    "gpuPopular": "Popular hardware",
    "showFitting": "Show models that fit my GPU",
@@ -163,13 +163,15 @@
   "rankTip": "Composite rank by score (stable across sort). The ±range on each score shows uncertainty — models with overlapping ranges are statistically close. A divider line marks a significance break: a real gap to the group below.",
   "disputed": "disputed",
   "disputedTip": "Cells in the active preset that have same-tier source disagreement (≥3pp inside one tier on top of the ≥5pp BLOCK threshold). The composite carries a confidence haircut for these — capped at 5pp per cell so a single extreme outlier cannot dominate. Cross-tier disputes (e.g. I-tier vs S-tier) are not counted because autoResolveWinner already picked the higher-trust source.",
-  "sources": "Sources",
+  "sources": "SOURCES",
   "sourcesUnique": "unique",
   "sourcesDatapoints": "datapoints",
   "lowConfidence": "low confidence",
   "lowConfidenceTip": "Composite computed from fewer than 40% of active profile weight. Score reliability is limited.",
   "a11y": {
-   "skipToContent": "Skip to content"
+   "skipToContent": "Skip to content",
+   "themeGroup": "Theme",
+   "langGroup": "Language"
   },
   "share": {
    "tooltip": "Copy a link that captures your current weights and filters",
@@ -191,12 +193,12 @@
   "heading": "Privacy & Compliance",
   "subheading": "Training opt-out policies, data residency, and certification status. Verify with your compliance team.",
   "col": {
-   "model": "Model",
-   "trainingOptOut": "Training opt-out",
-   "dataResidency": "Data residency",
+   "model": "MODEL",
+   "trainingOptOut": "TRAINING OPT-OUT",
+   "dataResidency": "DATA RESIDENCY",
    "soc2": "SOC 2",
    "gdpr": "GDPR",
-   "apiLogging": "API logging"
+   "apiLogging": "API LOGGING"
   },
   "val": {
    "available": "Available",
@@ -687,7 +689,7 @@
   "coldStart": "insufficient data"
  },
  "vendorPanel": {
-  "title": "Vendor view",
+  "title": "VENDOR VIEW",
   "consensus": "consensus",
   "mild": "mild gap",
   "controversy": "controversy",

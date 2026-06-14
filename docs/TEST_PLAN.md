@@ -63,7 +63,7 @@ support) and Firefox (no WebGPU) recommended for parity coverage.
 After running `/aicodermap` and committing:
 
 - Smoke test still passes (`smoke.html`)
-- 55+ models render with no console errors
+- 78+ models render with no console errors
 - TR ↔ EN parity preserved (`scripts/regex-lint.js` for whitelist; manual scan for new keys)
 - Dark + light themes both legible (visual check)
 - Screen reader: tab through header → filters → weights → table → cards (NVDA / VoiceOver / Orca)

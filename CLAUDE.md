@@ -141,3 +141,22 @@ MIT — code and data are public. Attribution appreciated.
 - `docs/IMPLGUIDE.md` — ⭐ Coding-ready implementation guide (for Claude Code sessions)
 - `docs/TASKS.md` — 23-task / 5-milestone breakdown
 - `docs/WORKFLOW.md` — Update workflow (14 happy-path + 5 exception steps)
+
+## Blueprint Profile
+
+Type: web (static SPA + Python data pipeline) | Stack: vanilla HTML/CSS/JS + Python (scripts) | Target: Production
+Priorities: data-integrity, source-contradiction discipline, a11y, TR/EN i18n, $0-ongoing | Constraints: no-build, no-framework, no-deps, no-CI
+Data: public model data + localStorage prefs (no PII) | Regulations: none
+Audience: public | Deploy: GitHub Pages (main branch)
+
+Entry: index.html + assets/js/main.js (split-phase bootstrap)
+Modules: assets/js=UI/scoring/data(17); scripts=data pipeline + lib(SSOT); ds/tune=eval harness
+Data Flow: /aicodermap → research-agent → gather/synth → merge.py → data/*.json → GitHub Pages → browser
+External: html2canvas(vendored, SRI); api.github.com(staleness banner); WebGPU(GPU detect)
+Toolchain: node --check + ruff + regex-lint | CI: none (manual discipline) | Container: none
+
+Ideal: coupling=low cohesion=high complexity<=15 coverage=80%
+
+Scores: sec=84 quality=62 arch=68 perf=85 resil=76 test=60 stack=88 dx=85 docs=66 overall=74 model=claude-opus-4-8[1m]
+
+## End Blueprint Profile

@@ -301,6 +301,10 @@ export const TIER_ORDER = { 'frontier': 0, 'open-flagship': 1, 'coder-specialize
 export const State = {
   models: [],
   sources: {},
+  // Per-model gap list consumed by render-card gap-pending highlight; empty
+  // until a future cycle populates it from data. Declared so the contract is
+  // explicit (was referenced undeclared → always []).
+  gaps: [],
   // Resolves once the background sources.json fetch lands (see data.js
   // loadData). Null until loadData runs; main.js re-renders on resolution.
   sourcesReady: null,
@@ -366,7 +370,7 @@ export function writeStorage(key, value) {
 export function isValidModel(m) {
   if (!m || typeof m !== 'object') return false;
   if (typeof m.id !== 'string' || !m.id) return false;
-  if (typeof m.name !== 'string') return false;
+  if (typeof m.name !== 'string' || !m.name) return false;
   if (typeof m.tier !== 'string') return false;
   if (!m.bench || typeof m.bench !== 'object') return false;
   // benchUpdated is optional per-cell timestamp map; reject only if present

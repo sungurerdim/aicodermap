@@ -228,14 +228,14 @@ async function loadData() {
    - `<input type="number" min="0" max="100">` per benchmark
    - Total=100% live constraint (auto-rebalance other sliders proportionally)
    - Live composite recalc < 100ms
-   - 4 preset buttons: SWE-focused, Agentic-focused, Balanced, Benchmark-only
+   - 6 preset buttons: SWE-focused, Agentic-focused, Reasoning-focused, Balanced, Benchmark-only, Consensus
    - Reset-to-default button
-   - localStorage persist: `cmt.v1.weights`
+   - localStorage persist: `acm.v1.weights`
 10. **T8 [1.5 hr]** — i18n TR/EN switch
     - Runtime fetch `/i18n/{lang}.json`
     - `<html lang>` attribute update
     - All `data-i18n-key` attributes → textContent replace
-    - localStorage persist: `cmt.v1.language`
+    - localStorage persist: `acm.v1.language`
 11. **T9 [1 hr]** — Contradiction flagging UI
     - For each cell with score: lookup `sources.json[modelId.bench]`
     - If 2+ values with delta > 3pp: render warning badge
@@ -252,7 +252,7 @@ async function loadData() {
     - Filter UI: `<input type="checkbox">` "Show only models that run on my GPU"
     - Per local model: compatibility badge (fits ≤vram-1, offload ≤vram, too-large >vram)
     - Unsloth UD priority: select highest-quality variant ≤ user vram, recommend
-    - localStorage persist: `cmt.v1.vram`
+    - localStorage persist: `acm.v1.vram`
 14. **T15 [1 hr]** — Skill validation logic
     - In `SKILL.md`: validate agent output (≥2 sources per score, ≥95% coverage, contradiction detect)
     - Block release if coverage < 95%, show user warning + force-override option
@@ -323,48 +323,50 @@ async function loadData() {
 
 ### `WEIGHTS` (default editorial weights — `assets/js/core.js`)
 
-Weights are integers 0-100 summing to exactly 100. The 19-key default set
-covers the coding-centric and agentic columns; reasoning-only keys
-(`aime26`, `aaOmni`, `simpleQa`) are zeroed in the default and surface via
-the `reasoning-focused` preset. The full bench universe (16 core + 10
-emerging = 26 keys) lives in `BENCH_KEYS` — every preset zero-bases against
+Weights are integers 0-100 summing to exactly 100. The default set covers
+the coding-centric and agentic columns; reasoning-only keys are zeroed in
+the default and surface via the `reasoning-focused` preset. The full bench
+universe (29 keys) lives in `BENCH_KEYS` — every preset zero-bases against
 it (no leak from default). The authoritative list lives in
-`data/sources-whitelist.json _schema.coreBenchKeys / emergingBenchKeys`.
+`data/sources-whitelist.json _schema.benchCategories`.
 
 ```javascript
 const DEFAULT_WEIGHTS = {
-  swePro: 16, tb2: 11, lcb: 11, sweV: 9, tbHard: 7, cfElo: 7,
-  nl2Repo: 5, aaCoding: 5, mcpA: 4, aaAgentic: 4, webDevElo: 4,
-  tau2: 3, browseComp: 3, arcAgi2: 3, programBench: 1,
-  gpqa: 2, sweMulti: 2, hle: 1, mmluPro: 1, tau3: 1
+  swePro: 18, tb2: 12, lcb: 10, hle: 10, sweV: 5, tau2: 8, mcpA: 4,
+  sweMulti: 5, arcAgi2: 4, tbHard: 3, cfElo: 3,
+  aaCoding: 3, aaAgentic: 3, gpqa: 4, aime26: 3, aaIdx: 3,
+  browseComp: 2,
 };
-// Total: 100 (20 keys; 26-key universe — remaining 6 keys default to 0)
+// Total: 100 (17 keys; 29-key universe — remaining keys default to 0)
 ```
 
-### Preset profiles (5 — see `assets/js/core.js:PRESETS`)
+### Preset profiles (6 — see `assets/js/core.js:PRESETS`)
 
 ```javascript
 const PRESETS = {
-  'balanced':         { ...DEFAULT_WEIGHTS },
-  'swe-focused':      {
-    swePro: 23, sweV: 16, sweMulti: 13, lcb: 11, tb2: 9, tbHard: 9,
-    nl2Repo: 9, cfElo: 5, aaCoding: 5
+  'balanced': { ...DEFAULT_WEIGHTS },
+  'swe-focused': {
+    swePro: 32, tb2: 17, lcb: 13, sweMulti: 14, sweV: 9, cfElo: 9, mcpA: 6,
   },
-  'agentic-focused':  {
-    tb2: 15, mcpA: 13, tbHard: 10, browseComp: 10, aaAgentic: 10,
-    tau2: 8, tau3: 8, swePro: 7, lcb: 7, bfcl: 5
+  'agentic-focused': {
+    tau2: 21, tb2: 18, mcpA: 17, browseComp: 9, aaAgentic: 9, bfcl: 4,
+    swePro: 10, tbHard: 8, lcb: 4,
   },
   'reasoning-focused': {
-    gpqa: 18, aime26: 15, hle: 15, arcAgi2: 12, mmluPro: 10,
-    aaIdx: 7, aaOmni: 8, simpleQa: 5, mrcr: 5,
-    swePro: 3, lcb: 2
+    hle: 27, arcAgi2: 9, gpqa: 16, aime26: 13, aaOmni: 4, mmluPro: 10,
+    aaIdx: 6, mrcr: 7, swePro: 4, lcb: 4,
   },
-  'benchmark-only':   {
-    swePro: 16, sweV: 12, tb2: 10, lcb: 10, tbHard: 8, sweMulti: 7, cfElo: 7,
-    gpqa: 6, hle: 5, webDevElo: 5, nl2Repo: 5, mmluPro: 3, tau3: 3
-  }
+  'benchmark-only': {
+    swePro: 12, tb2: 10, hle: 9, lcb: 8, tau2: 8, sweV: 6, mmluPro: 6,
+    gpqa: 6, aime26: 5, sweMulti: 4, aaIdx: 4, arcAgi2: 4, mcpA: 4,
+    cfElo: 4, tbHard: 3, aaCoding: 2, aaAgentic: 2, browseComp: 2,
+    mrcr: 1,
+  },
+  // 'consensus' uses vendor-median ranking (no atomic weights).
+  // kind: 'vendorConsensus' — downstream code branches on __kind, not weights.
+  'consensus': { __kind: 'vendorConsensus' },
 };
-// Each preset sums to exactly 100.
+// Each atomic preset sums to exactly 100. 'consensus' carries no atomic weights.
 ```
 
 ### Contradiction thresholds

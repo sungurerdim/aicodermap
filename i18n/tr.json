@@ -15,7 +15,7 @@
   "weights": {
    "total": "Toplam",
    "totalWarn": "Toplam 100 olmalı",
-   "preset": "Hazır Profil",
+   "preset": "HAZIR PROFİL",
    "reset": "Varsayılana Dön",
    "editor": "Ağırlık Editörü",
    "weightLabel": "Ağırlık",
@@ -33,17 +33,17 @@
    "gpuPrivacyStripped": "GPU algılandı — tarayıcı cihaz bilgisini gizliyor, lütfen GPU'yu elle seçin",
    "reset": "Filtreleri sıfırla",
    "gpuManual": "Manuel seç",
-   "gpuOverride": "Manuel VRAM",
-   "tier": "Tier",
+   "gpuOverride": "MANUEL VRAM",
+   "tier": "TIER",
    "openOnly": "Sadece açık model",
    "all": "Tümü",
-   "deployment": "Görüntü",
+   "deployment": "GÖRÜNTÜ",
    "deploymentAll": "Tüm modeller",
    "cloudOnly": "Yalnızca bulut/abonelik",
    "localFit": "GPU'ma sığan yerel modeller",
    "search": "Ara",
    "searchPlaceholder": "model adı, sağlayıcı...",
-   "provider": "Üretici",
+   "provider": "ÜRETİCİ",
    "providerAll": "Tüm üreticiler",
    "gpuPopular": "Popüler donanım",
    "showFitting": "GPU'ma sığan modelleri göster",
@@ -163,13 +163,15 @@
   "rankTip": "Skora göre bileşik sıra (sıralama sütunundan bağımsız sabit). Her skorun yanındaki ±aralık belirsizliği gösterir — aralıkları çakışan modeller istatistiksel olarak yakındır. Ayraç çizgisi anlamlı kopuşu işaret eder: alttaki gruba gerçek bir fark.",
   "disputed": "tartışmalı",
   "disputedTip": "Aktif preset'te aynı-tier kaynaklar arasında uyumsuzluk taşıyan hücre sayısı (≥5pp BLOCK eşiğinin üstünde, tek bir tier içinde ≥3pp). Composite bu hücreler için güven kesintisi içerir — hücre başına maks 5pp, böylece tek bir outlier composite'i ezemez. Cross-tier uyumsuzluklar (örn. I-tier ↔ S-tier) sayılmaz, çünkü autoResolveWinner zaten yüksek-tier kaynağı seçti.",
-  "sources": "Kaynaklar",
+  "sources": "KAYNAKLAR",
   "sourcesUnique": "benzersiz",
   "sourcesDatapoints": "veri noktası",
   "lowConfidence": "düşük güven",
   "lowConfidenceTip": "Composite, aktif profil ağırlığının %40'ından azından hesaplandı. Skor güvenilirliği sınırlı.",
   "a11y": {
-   "skipToContent": "İçeriğe atla"
+   "skipToContent": "İçeriğe atla",
+   "themeGroup": "Tema",
+   "langGroup": "Dil"
   },
   "share": {
    "tooltip": "Mevcut ağırlıklarını ve filtrelerini içeren paylaşılabilir link oluştur",
@@ -191,12 +193,12 @@
   "heading": "Gizlilik ve Uyumluluk",
   "subheading": "Eğitim verisi opt-out politikaları, veri barındırma ve sertifikasyon durumu. Uyumluluk ekibinizle doğrulayın.",
   "col": {
-   "model": "Model",
-   "trainingOptOut": "Eğitim opt-out",
-   "dataResidency": "Veri konumu",
+   "model": "MODEL",
+   "trainingOptOut": "EĞİTİM OPT-OUT",
+   "dataResidency": "VERİ KONUMU",
    "soc2": "SOC 2",
    "gdpr": "GDPR",
-   "apiLogging": "API loglama"
+   "apiLogging": "API LOGLAMA"
   },
   "val": {
    "available": "Mevcut",
@@ -687,7 +689,7 @@
   "coldStart": "yeterli veri yok"
  },
  "vendorPanel": {
-  "title": "Vendor görünümü",
+  "title": "VENDOR GÖRÜNÜMÜ",
   "consensus": "uzlaşı",
   "mild": "hafif fark",
   "controversy": "anlaşmazlık",

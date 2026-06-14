@@ -84,6 +84,24 @@ COMPLETENESS_TERMINATION = True  # Sole research termination condition.
 # 3. Every priorityCells[] entry attempted (FAZ 2.3 authoritative work list).
 # 4. Every still-empty cell carries a gaps[] entry; advisory GAP_VALIDITY_GATE never strips.
 
+# ── Source format fetch-quality weights (SSOT — merge.py + eval.py) ────────
+# Mirrors the orchestrator's deep-fetch quality assessment: static sources
+# score 1.0; image-embedded / SPA sources score lower; bot-blocked lowest.
+FORMAT_WEIGHTS: dict[str, float] = {
+    "static_html_table": 1.0,
+    "static_html_article": 1.0,
+    "static_markdown": 1.0,
+    "static_json_api": 1.0,
+    "github_raw_json": 1.0,
+    "github_raw_markdown": 1.0,
+    "meta_tag_extract": 1.0,
+    "pdf_report": 0.7,
+    "spa_partial": 0.5,
+    "image_embedded": 0.5,
+    "spa_full": 0.3,
+    "bot_blocked": 0.1,
+}
+
 # ── File paths (gitignored artifacts) ──────────────────────────────────────
 VERIFICATION_MAP_PATH = ".aicodermap-verification-map.json"
 SINGLE_ARTIFACT_PATH = ".aicodermap-agent-out.json"

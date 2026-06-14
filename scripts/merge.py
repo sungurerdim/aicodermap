@@ -53,6 +53,7 @@ from lib.whitelist import contracts as _wl_contracts  # noqa: E402
 from lib.whitelist import core_bench_keys as _wl_core_bench_keys  # noqa: E402
 from lib.whitelist import hostname_index as _wl_hostname_index  # noqa: E402
 from lib.whitelist import load_whitelist as _wl_load  # noqa: E402
+from lib.constants import FORMAT_WEIGHTS as _FORMAT_WEIGHTS  # noqa: E402
 from lib.constants import VERIFICATION_AGREEMENT_PP as _AGREEMENT_PP  # noqa: E402
 from lib.tiers import TIER_RANK as _TIER_RANK  # noqa: E402
 from lib.tiers import TIER_WEIGHT as _TIER_WEIGHT  # noqa: E402
@@ -172,11 +173,11 @@ def run_post_write_audits(models_path, sources_path, project):
     return True
 
 
-def deep_merge(dst, src):
-    """Recursively merge src into dst. Arrays are replaced unless handled specially."""
+def _deep_merge_inplace(dst, src):
+    """Recursively merge src into dst in place. Arrays are replaced unless handled specially."""
     for k, v in src.items():
         if isinstance(v, dict) and isinstance(dst.get(k), dict):
-            deep_merge(dst[k], v)
+            _deep_merge_inplace(dst[k], v)
         else:
             dst[k] = v
 
@@ -216,6 +217,162 @@ def merge_pricing(dst_pricing, src_pricing):
         }
 
 
+def _load_vmap(project: str) -> dict:
+    """Load or initialise the verification-map JSON from disk.
+
+    Returns the parsed dict with a `cells` key guaranteed present. On a missing
+    or corrupt file returns a fresh `{"cells": {}}` so callers always get a
+    consistent shape.
+    """
+    vmap_path = Path(project) / ".aicodermap-verification-map.json"
+    if vmap_path.exists():
+        try:
+            vmap = json.loads(vmap_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            vmap = {"cells": {}}
+    else:
+        vmap = {"cells": {}}
+    vmap.setdefault("cells", {})
+    return vmap
+
+
+def _stamp_gap_history(cell_entry: dict, cycle_id: str) -> int:
+    """Stamp the gap ledger on cell_entry in place for lib.matrix starvation queue.
+
+    Returns 1 when gapSince is freshly set this call (used to accumulate
+    gap_stamps in the caller), 0 otherwise.
+    """
+    # Stamp the gap ledger for lib.matrix's starvation queue only —
+    # a long gap raises a cell's research priority, it NEVER
+    # quarantines or N/A-flags it (gap-age policy retired 2026-06-07).
+    hist = cell_entry["gapHistory"]
+    if not hist or hist[-1] != cycle_id:
+        hist.append(cycle_id)
+    if not cell_entry.get("gapSince"):
+        cell_entry["gapSince"] = cycle_id
+        return 1
+    return 0
+
+
+def _apply_cell_verdict(
+    m: dict,
+    bk: str,
+    val,
+    bench: dict,
+    cell_key: str,
+    cell_entry: dict,
+    sources: dict,
+    cycle_id: str,
+    pick_winner,
+    compute_cell_confidence,
+    reliability_ledger,
+) -> int:
+    """Run pick_winner on the cumulative provenance pool for one (model, benchKey) cell.
+
+    Stamps cell_entry["confidence"], mutates m["benchQuarantine"] and
+    m["benchReconciled"] in place, and may update bench[bk] on reconciliation.
+
+    Returns 1 when the cell is quarantined this call, 0 otherwise.
+    """
+    # Confidence from the CUMULATIVE provenance pool — every entry in
+    # sources.json for this cell, historical ∪ this-cycle (5.5: the pool
+    # must include historical observations, not just the fresh ones, so
+    # a long-confirmed cell keeps its high confidence even on a cycle that
+    # re-cites only one source). sources.json is append/dedupe, so this
+    # get() already spans all cycles.
+    obs = sources.get(cell_key) or []
+    if not (isinstance(obs, list) and obs):
+        return 0
+    pw_obs = [
+        {
+            "value": e.get("value"),
+            "tier": (e.get("tier") or "C").upper(),
+            "sourceUrl": e.get("url") or "",
+            "fetched": e.get("date") or e.get("fetched") or "",
+            "verifications": e.get("verifications") or 1,
+            "source": e.get("source") or "",
+        }
+        for e in obs
+        if isinstance(e, dict) and e.get("value") is not None
+    ]
+    if not pw_obs:
+        return 0
+    result = pick_winner(
+        pw_obs,
+        bench_key=bk,
+        reliability_ledger=reliability_ledger,
+    )
+    conf = compute_cell_confidence(result)
+    cell_entry["confidence"] = conf
+    # SSOT/DRY (2026-06-06): use pick_winner's quarantine verdict
+    # (lib.winner.should_quarantine) instead of re-deriving the
+    # `conf < 0.2` rule inline. The previous inline copy bypassed
+    # should_quarantine's I-tier exemption, so clean canonical-
+    # leaderboard cells (AA aaCoding, Scale SEAL swePro) stayed
+    # quarantined here even though winner.py cleared them. One
+    # quarantine decision, one source of truth.
+    if result.get("quarantine"):
+        m.setdefault("benchQuarantine", {})[bk] = True
+        return 1
+    else:
+        # Quarantine is a CURRENT-state verdict, not a permanent
+        # mark (2026-06-06). Authoritatively CLEAR a stale flag
+        # when the cell is now trusted — a 2nd source arrived, a
+        # contradiction resolved, or the I-tier exemption applies.
+        # Without this, the old "never clear" policy let flags
+        # accumulate forever (319 stuck cells), so improving the
+        # evidence never lifted a model's score.
+        bq = m.get("benchQuarantine")
+        if isinstance(bq, dict):
+            bq.pop(bk, None)
+    # Winner-authoritative reconciliation (fix: synth-emitted
+    # single-observation values can disagree with the
+    # multi-source consensus across data/sources.json).
+    # pick_winner already aggregates the full provenance
+    # cluster (sum trustScore + recency + reliability ledger);
+    # apply its winner_value when it confidently differs from
+    # what the artifact merge wrote.
+    wv = result.get("winner_value")
+    wc = result.get("winning_cluster") or {}
+    # Only reconcile when consensus is real:
+    #   - winner has multi-source backing (>=2 distinct urls)
+    #   - OR exceptional-source-override (Phase R4) fired
+    # Single-source winners cannot evict an existing value
+    # (they go to data/sources.json for audit; the existing
+    # value stays canonical until a 2nd source confirms).
+    multi_source = wc.get("distinct_sources", 0) >= 2
+    is_override = result.get("override_mode") in (
+        "exceptional-source-override",
+        "independent-override",
+    )
+    if (
+        wv is not None
+        and conf >= 0.2
+        and not result.get("quarantine")
+        and val is not None
+        and isinstance(wv, (int, float))
+        and isinstance(val, (int, float))
+        and abs(float(wv) - float(val)) > 0.05
+        and (multi_source or is_override)
+    ):
+        bench[bk] = wv
+        reconciled = m.setdefault("benchReconciled", {})
+        reconciled[bk] = {
+            "from": val,
+            "to": wv,
+            "cycle": cycle_id,
+            "confidence": conf,
+            "winning_cluster_sum_trust": round(
+                (result.get("winning_cluster") or {}).get("sum_trust", 0.0),
+                3,
+            ),
+            "winning_cluster_distinct_sources": (
+                result.get("winning_cluster") or {}
+            ).get("distinct_sources", 0),
+        }
+    return 0
+
+
 def apply_quarantine_and_gap_policy(
     models, sources, cycle_id, *, reliability_ledger=None
 ):
@@ -240,15 +397,8 @@ def apply_quarantine_and_gap_policy(
     sys.path.insert(0, f"{PROJECT}/scripts")
     from lib.winner import compute_cell_confidence, pick_winner  # noqa: E402
 
-    vmap_path = Path(PROJECT) / ".aicodermap-verification-map.json"
-    if vmap_path.exists():
-        try:
-            vmap = json.loads(vmap_path.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            vmap = {"cells": {}}
-    else:
-        vmap = {"cells": {}}
-    cells = vmap.setdefault("cells", {})
+    vmap = _load_vmap(PROJECT)
+    cells = vmap["cells"]
 
     quarantined_count = 0
     gap_stamps = 0
@@ -279,116 +429,25 @@ def apply_quarantine_and_gap_policy(
 
             is_gap = val is None
             if is_gap:
-                # Stamp the gap ledger for lib.matrix's starvation queue only —
-                # a long gap raises a cell's research priority, it NEVER
-                # quarantines or N/A-flags it (gap-age policy retired 2026-06-07).
-                hist = cell_entry["gapHistory"]
-                if not hist or hist[-1] != cycle_id:
-                    hist.append(cycle_id)
-                if not cell_entry.get("gapSince"):
-                    cell_entry["gapSince"] = cycle_id
-                    gap_stamps += 1
+                gap_stamps += _stamp_gap_history(cell_entry, cycle_id)
             else:
                 # Cell filled this cycle — clear the gap run.
                 cell_entry["gapHistory"] = []
                 cell_entry["gapSince"] = None
 
-            # Confidence from the CUMULATIVE provenance pool — every entry in
-            # sources.json for this cell, historical ∪ this-cycle (5.5: the pool
-            # must include historical observations, not just the fresh ones, so
-            # a long-confirmed cell keeps its high confidence even on a cycle that
-            # re-cites only one source). sources.json is append/dedupe, so this
-            # get() already spans all cycles.
-            obs = sources.get(cell_key) or []
-            if isinstance(obs, list) and obs:
-                pw_obs = [
-                    {
-                        "value": e.get("value"),
-                        "tier": (e.get("tier") or "C").upper(),
-                        "sourceUrl": e.get("url") or "",
-                        "fetched": e.get("date") or e.get("fetched") or "",
-                        "verifications": e.get("verifications") or 1,
-                        "source": e.get("source") or "",
-                    }
-                    for e in obs
-                    if isinstance(e, dict) and e.get("value") is not None
-                ]
-                if pw_obs:
-                    result = pick_winner(
-                        pw_obs,
-                        bench_key=bk,
-                        reliability_ledger=reliability_ledger,
-                    )
-                    conf = compute_cell_confidence(result)
-                    cell_entry["confidence"] = conf
-                    # SSOT/DRY (2026-06-06): use pick_winner's quarantine verdict
-                    # (lib.winner.should_quarantine) instead of re-deriving the
-                    # `conf < 0.2` rule inline. The previous inline copy bypassed
-                    # should_quarantine's I-tier exemption, so clean canonical-
-                    # leaderboard cells (AA aaCoding, Scale SEAL swePro) stayed
-                    # quarantined here even though winner.py cleared them. One
-                    # quarantine decision, one source of truth.
-                    if result.get("quarantine"):
-                        m.setdefault("benchQuarantine", {})[bk] = True
-                        quarantined_count += 1
-                    else:
-                        # Quarantine is a CURRENT-state verdict, not a permanent
-                        # mark (2026-06-06). Authoritatively CLEAR a stale flag
-                        # when the cell is now trusted — a 2nd source arrived, a
-                        # contradiction resolved, or the I-tier exemption applies.
-                        # Without this, the old "never clear" policy let flags
-                        # accumulate forever (319 stuck cells), so improving the
-                        # evidence never lifted a model's score.
-                        bq = m.get("benchQuarantine")
-                        if isinstance(bq, dict):
-                            bq.pop(bk, None)
-                    # Winner-authoritative reconciliation (fix: synth-emitted
-                    # single-observation values can disagree with the
-                    # multi-source consensus across data/sources.json).
-                    # pick_winner already aggregates the full provenance
-                    # cluster (sum trustScore + recency + reliability ledger);
-                    # apply its winner_value when it confidently differs from
-                    # what the artifact merge wrote.
-                    wv = result.get("winner_value")
-                    wc = result.get("winning_cluster") or {}
-                    # Only reconcile when consensus is real:
-                    #   - winner has multi-source backing (>=2 distinct urls)
-                    #   - OR exceptional-source-override (Phase R4) fired
-                    # Single-source winners cannot evict an existing value
-                    # (they go to data/sources.json for audit; the existing
-                    # value stays canonical until a 2nd source confirms).
-                    multi_source = wc.get("distinct_sources", 0) >= 2
-                    is_override = result.get("override_mode") in (
-                        "exceptional-source-override",
-                        "independent-override",
-                    )
-                    if (
-                        wv is not None
-                        and conf >= 0.2
-                        and not result.get("quarantine")
-                        and val is not None
-                        and isinstance(wv, (int, float))
-                        and isinstance(val, (int, float))
-                        and abs(float(wv) - float(val)) > 0.05
-                        and (multi_source or is_override)
-                    ):
-                        bench[bk] = wv
-                        reconciled = m.setdefault("benchReconciled", {})
-                        reconciled[bk] = {
-                            "from": val,
-                            "to": wv,
-                            "cycle": cycle_id,
-                            "confidence": conf,
-                            "winning_cluster_sum_trust": round(
-                                (result.get("winning_cluster") or {}).get(
-                                    "sum_trust", 0.0
-                                ),
-                                3,
-                            ),
-                            "winning_cluster_distinct_sources": (
-                                result.get("winning_cluster") or {}
-                            ).get("distinct_sources", 0),
-                        }
+            quarantined_count += _apply_cell_verdict(
+                m,
+                bk,
+                val,
+                bench,
+                cell_key,
+                cell_entry,
+                sources,
+                cycle_id,
+                pick_winner,
+                compute_cell_confidence,
+                reliability_ledger,
+            )
 
     print(
         f"quarantine + gap policy: quarantined={quarantined_count} "
@@ -514,22 +573,6 @@ def format_consistency_warn(source_entry, wl_idx):
             f"chain (mirror/WebSearch/OCR) and not direct SPA scrape"
         )
     return None
-
-
-_FORMAT_WEIGHTS = {
-    "static_html_table": 1.0,
-    "static_html_article": 1.0,
-    "static_markdown": 1.0,
-    "static_json_api": 1.0,
-    "github_raw_json": 1.0,
-    "github_raw_markdown": 1.0,
-    "meta_tag_extract": 1.0,
-    "pdf_report": 0.7,
-    "spa_partial": 0.5,
-    "image_embedded": 0.5,
-    "spa_full": 0.3,
-    "bot_blocked": 0.1,
-}
 
 
 def _build_bench_advertised_count():
@@ -719,6 +762,179 @@ def _verify_matrix_invariant(models, artifact):
     diag["coreBenchKeys"] = list(core)
     diag["activeModelCount"] = len(active)
     return diag["ok"], diag
+
+
+def _green_cell_reliability_sweep(
+    sources: dict,
+    contradicted_cells: set,
+    agreement_pp: float,
+    reliability_ledger: dict,
+    today: str,
+) -> None:
+    """R1: credit non-contradicted cells where >=2 fresh sources agree.
+
+    GREEN-cell sweep — runs after the contradictions loop. Historical entries
+    (date != today) are never re-credited; they were tallied in their original
+    cycle.
+    """
+    for cell_key, entries in sources.items():
+        if not isinstance(cell_key, str) or "." not in cell_key:
+            continue
+        try:
+            mid_parsed, bench_key = cell_key.rsplit(".", 1)
+        except ValueError:
+            continue
+        if (mid_parsed, bench_key) in contradicted_cells:
+            continue
+        fresh = [
+            e
+            for e in (entries or [])
+            if isinstance(e, dict)
+            and (e.get("date") or "") == today
+            and e.get("value") is not None
+        ]
+        if len(fresh) < 2:
+            continue
+        try:
+            vals = [float(e["value"]) for e in fresh]
+        except (TypeError, ValueError):
+            continue
+        if max(vals) - min(vals) > agreement_pp:
+            # Latent contradiction not flagged by the agent — don't credit.
+            continue
+        for e in fresh:
+            url = e.get("url")
+            if not url:
+                continue
+            _reliability.update_reliability(
+                reliability_ledger,
+                url,
+                bench_key,
+                True,
+                today,
+                source_label=e.get("source") or "",
+            )
+
+
+def _process_lineup_changes(
+    out: dict,
+    models_by_id: dict,
+    log: dict,
+    today: str,
+    now: str,
+) -> None:
+    """Apply lineup deprecations and renames from the artifact to models and log."""
+    lineup = out.get("lineupChanges", {}) or {}
+    for d in lineup.get("deprecated", []) or []:
+        target = models_by_id.get(d.get("id"))
+        if target is not None:
+            target["status"] = "deprecated"
+            target["deprecatedAt"] = d.get("deprecationDate") or today
+            if d.get("successor"):
+                target["successor"] = d["successor"]
+            target["lastUpdated"] = now
+            log["lineup_deprecated"].append(d["id"])
+    for r in lineup.get("renamed", []) or []:
+        log["lineup_renamed"].append(f"{r.get('from')} -> {r.get('to')}")
+
+
+def _audit_run_metadata(out: dict) -> str:
+    """FAZ C: validate runMetadata telemetry fields; return warning string or ''."""
+    rm = out.get("runMetadata") or {}
+    rm_required = ("toolCallCount", "fetchAttemptCount", "batchCount")
+    rm_missing = [k for k in rm_required if k not in rm]
+    if rm_missing:
+        return f" [WARN: runMetadata missing fields {rm_missing}]"
+    rm_warn = ""
+    tc = rm.get("toolCallCount", 0)
+    bc = rm.get("batchCount", 0)
+    # Heuristic alarms — surface to CHANGELOG without blocking merge.
+    if isinstance(tc, int) and tc >= 80:
+        rm_warn += f" [WARN: toolCallCount={tc} near agent ceiling — priority cascade likely starved]"
+    if isinstance(bc, int) and bc < 5:
+        rm_warn += f" [WARN: batchCount={bc}<5 — multi-agent fan-out collapsed]"
+    return rm_warn
+
+
+def _format_partial_reason(out: dict) -> str:
+    """F8: format structured partialReason telemetry for CHANGELOG; returns string or ''."""
+    partial_reason = out.get("partialReason")
+    if not partial_reason:
+        return ""
+    if isinstance(partial_reason, dict):
+        code = partial_reason.get("code", "unknown")
+        attempted: int | None = partial_reason.get("cellsAttempted")
+        filled: int | None = partial_reason.get("cellsFilled")
+        blockers: list = partial_reason.get("topBlockingSources") or []
+        parts = [f"code={code}"]
+        if attempted is not None:
+            fill_ratio = (
+                round(filled / attempted, 2)
+                if (attempted and filled is not None)
+                else "?"
+            )
+            parts.append(f"attempted={attempted} filled={filled} ({fill_ratio})")
+        if blockers:
+            parts.append(f"blockers=[{', '.join(blockers[:3])}]")
+        return f" [partial: {'; '.join(parts)}]"
+    return f" [partial: {partial_reason}]"
+
+
+def _print_merge_summary(
+    log: dict,
+    matrix,
+    matrix_warn: str,
+    cov_pct: float,
+    issues: list,
+    models: list,
+) -> None:
+    """Print the end-of-merge human-readable summary to stdout."""
+    print("merge complete:")
+    print(f"  added:      {len(log['added'])} -> {log['added']}")
+    print(f"  updated:    {len(log['updated'])}")
+    print(f"  deprecated: {len(log['lineup_deprecated'])}")
+    print(f"  renamed:    {len(log['lineup_renamed'])}")
+    print(f"  contradictions auto-resolved: {len(log['contradictions'])}")
+    print(f"  sources appended: {log['sources_appended']}")
+    print(f"  coverage:   {cov_pct}%{' (PARTIAL WARN)' if cov_pct < 50 else ''}")
+    if matrix_warn:
+        print(f"  audit:     {matrix_warn.lstrip(' [').rstrip(']')}")
+    elif isinstance(matrix, dict):
+        print(
+            f"  audit:      coverageMatrix OK "
+            f"(filled={matrix.get('filledCells')}/{matrix.get('totalCells')}, "
+            f"gaps={matrix.get('gapsRecorded')})"
+        )
+    print("  coherence:  OK SSOT (bench keys + model ids aligned across surfaces)")
+    if log["format_warnings"]:
+        print(f"  format warnings: {len(log['format_warnings'])} (non-blocking)")
+        for w in log["format_warnings"][:5]:
+            print(f"    - {w}")
+        if len(log["format_warnings"]) > 5:
+            print(f"    - ... and {len(log['format_warnings']) - 5} more")
+    if log.get("fabricated_suspicions"):
+        n = len(log["fabricated_suspicions"])
+        print(
+            f"  low-effort gap suspicions: {n} (advisory only — "
+            f"suggested triedSources = clamp(advertised_high_weight, 3, 5)). "
+            f"Originals retained in gaps[]."
+        )
+        for fg in log["fabricated_suspicions"][:8]:
+            print(
+                f"    - {fg.get('modelId')}.{fg.get('bench_key', fg.get('field'))}: "
+                f"triedSources={fg['counts']['triedSources']} "
+                f"suggested>={fg.get('suggested_floor', 3)} "
+                f"(advertised_high_weight={fg.get('n_advertised', 0)})"
+            )
+        if n > 8:
+            print(f"    - ... and {n - 8} more")
+    if issues:
+        print("self-check issues:")
+        for i in issues:
+            print(f"  - {i}")
+    else:
+        print("self-check: PASS")
+    print(f"total models: {len(models)}")
 
 
 def main():
@@ -1024,56 +1240,11 @@ def main():
     # (date == TODAY) sources agree within AGREEMENT_PP. Skips cells already
     # processed by the contradictions loop. Historical entries (date != TODAY)
     # never get re-credited; they were tallied in their original cycle.
-    for cell_key, entries in sources.items():
-        if not isinstance(cell_key, str) or "." not in cell_key:
-            continue
-        try:
-            mid_parsed, bench_key = cell_key.rsplit(".", 1)
-        except ValueError:
-            continue
-        if (mid_parsed, bench_key) in _contradicted_cells:
-            continue
-        fresh = [
-            e
-            for e in (entries or [])
-            if isinstance(e, dict)
-            and (e.get("date") or "") == TODAY
-            and e.get("value") is not None
-        ]
-        if len(fresh) < 2:
-            continue
-        try:
-            vals = [float(e["value"]) for e in fresh]
-        except (TypeError, ValueError):
-            continue
-        if max(vals) - min(vals) > AGREEMENT_PP:
-            # Latent contradiction not flagged by the agent — don't credit.
-            continue
-        for e in fresh:
-            url = e.get("url")
-            if not url:
-                continue
-            _reliability.update_reliability(
-                reliability_ledger,
-                url,
-                bench_key,
-                True,
-                TODAY,
-                source_label=e.get("source") or "",
-            )
+    _green_cell_reliability_sweep(
+        sources, _contradicted_cells, AGREEMENT_PP, reliability_ledger, TODAY
+    )
 
-    lineup = out.get("lineupChanges", {}) or {}
-    for d in lineup.get("deprecated", []) or []:
-        target = models_by_id.get(d.get("id"))
-        if target is not None:
-            target["status"] = "deprecated"
-            target["deprecatedAt"] = d.get("deprecationDate") or TODAY
-            if d.get("successor"):
-                target["successor"] = d["successor"]
-            target["lastUpdated"] = NOW
-            log["lineup_deprecated"].append(d["id"])
-    for r in lineup.get("renamed", []) or []:
-        log["lineup_renamed"].append(f"{r.get('from')} -> {r.get('to')}")
+    _process_lineup_changes(out, models_by_id, log, TODAY, NOW)
 
     # FAZ 8.A.3d (2026-05-18): quarantine + gap policy must run BEFORE the
     # final models.json write so the stamps appear in the persisted shape
@@ -1136,7 +1307,7 @@ def main():
     # MX1 — Cell-level matrix invariant (HARD BLOCK, no override).
     # Every (active_modelId, coreBenchKey) cell must end up in exactly one
     # of FILLED | GAP | NOT_APPLICABLE. Silent omission = contract violation.
-    contracts_block = _wl_contracts(_wl_load())
+    contracts_block = _wl_contracts(_wl_cached())
     matrix_warn = ""
     invariant_ok, mx_diag = _verify_matrix_invariant(models, out)
     if not invariant_ok:
@@ -1251,50 +1422,12 @@ def main():
     # fields are surfaced as a CHANGELOG warning so the next cycle's prelude
     # picks them up; the merge is NOT rolled back (legacy artifacts may
     # predate FAZ C).
-    rm_warn = ""
-    rm = out.get("runMetadata") or {}
-    rm_required = ("toolCallCount", "fetchAttemptCount", "batchCount")
-    rm_missing = [k for k in rm_required if k not in rm]
-    if rm_missing:
-        rm_warn = f" [WARN: runMetadata missing fields {rm_missing}]"
-    else:
-        tc = rm.get("toolCallCount", 0)
-        bc = rm.get("batchCount", 0)
-        # Heuristic alarms — surface to CHANGELOG without blocking merge.
-        if isinstance(tc, int) and tc >= 80:
-            rm_warn = (
-                rm_warn
-                + f" [WARN: toolCallCount={tc} near agent ceiling — priority cascade likely starved]"
-            )
-        if isinstance(bc, int) and bc < 5:
-            rm_warn = (
-                rm_warn + f" [WARN: batchCount={bc}<5 — multi-agent fan-out collapsed]"
-            )
+    rm_warn = _audit_run_metadata(out)
     if rm_warn:
         coverage_warn = (coverage_warn or "") + rm_warn
 
     # F8: Emit structured partialReason telemetry to CHANGELOG for root-cause analysis.
-    partial_reason = out.get("partialReason")
-    partial_info = ""
-    if partial_reason:
-        if isinstance(partial_reason, dict):
-            code = partial_reason.get("code", "unknown")
-            attempted: int | None = partial_reason.get("cellsAttempted")
-            filled: int | None = partial_reason.get("cellsFilled")
-            blockers: list = partial_reason.get("topBlockingSources") or []
-            parts = [f"code={code}"]
-            if attempted is not None:
-                fill_ratio = (
-                    round(filled / attempted, 2)
-                    if (attempted and filled is not None)
-                    else "?"
-                )
-                parts.append(f"attempted={attempted} filled={filled} ({fill_ratio})")
-            if blockers:
-                parts.append(f"blockers=[{', '.join(blockers[:3])}]")
-            partial_info = f" [partial: {'; '.join(parts)}]"
-        else:
-            partial_info = f" [partial: {partial_reason}]"
+    partial_info = _format_partial_reason(out)
 
     # FAZ D — write data/_meta.json + append data/refresh-history.json
     # ring-buffer. The browser's freshness.js + verify-deploy.py both consume
@@ -1310,7 +1443,7 @@ def main():
         prev_etag = None
     meta_row = _telemetry_build_meta(
         models=models,
-        bench_keys=_wl_core_bench_keys(_wl_load()),
+        bench_keys=_wl_core_bench_keys(_wl_cached()),
         matrix_diag=mx_diag,
         artifact=out,
         contradictions_resolved=contradictions_resolved,
@@ -1345,53 +1478,7 @@ def main():
         with open(cl_path, "w", encoding="utf-8") as fp:
             fp.write("# Changelog\n\n" + cl_blob)
 
-    print("merge complete:")
-    print(f"  added:      {len(log['added'])} -> {log['added']}")
-    print(f"  updated:    {len(log['updated'])}")
-    print(f"  deprecated: {len(log['lineup_deprecated'])}")
-    print(f"  renamed:    {len(log['lineup_renamed'])}")
-    print(f"  contradictions auto-resolved: {len(log['contradictions'])}")
-    print(f"  sources appended: {log['sources_appended']}")
-    print(f"  coverage:   {cov_pct}%{' (PARTIAL WARN)' if coverage < 0.50 else ''}")
-    if matrix_warn:
-        print(f"  audit:     {matrix_warn.lstrip(' [').rstrip(']')}")
-    elif isinstance(matrix, dict):
-        print(
-            f"  audit:      coverageMatrix OK "
-            f"(filled={matrix.get('filledCells')}/{matrix.get('totalCells')}, "
-            f"gaps={matrix.get('gapsRecorded')})"
-        )
-
-    print("  coherence:  OK SSOT (bench keys + model ids aligned across surfaces)")
-    if log["format_warnings"]:
-        print(f"  format warnings: {len(log['format_warnings'])} (non-blocking)")
-        for w in log["format_warnings"][:5]:
-            print(f"    - {w}")
-        if len(log["format_warnings"]) > 5:
-            print(f"    - ... and {len(log['format_warnings']) - 5} more")
-    if log.get("fabricated_suspicions"):
-        n = len(log["fabricated_suspicions"])
-        print(
-            f"  low-effort gap suspicions: {n} (advisory only — "
-            f"suggested triedSources = clamp(advertised_high_weight, 3, 5)). "
-            f"Originals retained in gaps[]."
-        )
-        for fg in log["fabricated_suspicions"][:8]:
-            print(
-                f"    - {fg.get('modelId')}.{fg.get('bench_key', fg.get('field'))}: "
-                f"triedSources={fg['counts']['triedSources']} "
-                f"suggested>={fg.get('suggested_floor', 3)} "
-                f"(advertised_high_weight={fg.get('n_advertised', 0)})"
-            )
-        if n > 8:
-            print(f"    - ... and {n - 8} more")
-    if issues:
-        print("self-check issues:")
-        for i in issues:
-            print(f"  - {i}")
-    else:
-        print("self-check: PASS")
-    print(f"total models: {len(models)}")
+    _print_merge_summary(log, matrix, matrix_warn, cov_pct, issues, models)
 
 
 if __name__ == "__main__":

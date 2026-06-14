@@ -34,7 +34,7 @@
 }
 .section-head-compact .weights-total { margin-left: auto; }
 .select-row.inline-compact { gap: 6px; font-size: 0.82rem; }
-.select-row.inline-compact > span { color: var(--muted); font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.select-row.inline-compact > span { color: var(--muted); font-weight: 600; font-size: 0.7rem; letter-spacing: 0.04em; }
 .select-row.inline-compact select { flex: 0 0 auto; min-width: 130px; padding: 3px 6px; font-size: 0.85rem; }
 .btn-compact { padding: 3px 10px; font-size: 0.82rem; }
 .weights-total.invalid {
@@ -127,7 +127,6 @@
   flex: 0 0 auto;
   font-size: 0.7rem;
   font-weight: 600;
-  text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 .select-row select,

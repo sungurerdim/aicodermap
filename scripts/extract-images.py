@@ -31,8 +31,6 @@ import urllib.parse
 import urllib.request
 
 CTX = ssl.create_default_context()
-CTX.check_hostname = False
-CTX.verify_mode = ssl.CERT_NONE
 UA = {"User-Agent": "Mozilla/5.0 AICoderMap/extract-images"}
 
 OUT_DIR = os.path.join(

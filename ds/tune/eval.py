@@ -25,6 +25,7 @@ No network calls. Runs in ~1s.
 
 import json
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -32,45 +33,19 @@ WHITELIST = ROOT / "data" / "sources-whitelist.json"
 FIXTURES = Path(__file__).resolve().parent / "fixtures.json"
 MODELS = ROOT / "data" / "models.json"
 
-BENCH_KEYS = [
-    "swePro",
-    "sweV",
-    "sweMulti",
-    "tb2",
-    "tbHard",
-    "lcb",
-    "tau2",
-    "mcpA",
-    "bfcl",
-    "browseComp",
-    "aaCoding",
-    "aaAgentic",
-    "aaIdx",
-    "aaOmni",
-    "cfElo",
-    "mmluPro",
-    "simpleQa",
-    "mrcr",
-    "arcAgi2",
-    "gpqa",
-    "aime26",
-    "hle",
-]
+# Allow `from lib.whitelist import ...` and `from lib.constants import ...`
+# (scripts/ is not on sys.path when eval.py is run from the repo root or ds/tune/).
+_SCRIPTS = str(ROOT / "scripts")
+if _SCRIPTS not in sys.path:
+    sys.path.insert(0, _SCRIPTS)
 
-FORMAT_WEIGHTS = {
-    "static_html_table": 1.0,
-    "static_html_article": 1.0,
-    "static_markdown": 1.0,
-    "static_json_api": 1.0,
-    "github_raw_json": 1.0,
-    "github_raw_markdown": 1.0,
-    "meta_tag_extract": 1.0,
-    "pdf_report": 0.7,
-    "spa_partial": 0.5,
-    "image_embedded": 0.5,
-    "spa_full": 0.3,
-    "bot_blocked": 0.1,
-}
+from lib.constants import FORMAT_WEIGHTS  # noqa: E402
+from lib.whitelist import core_bench_keys, load_whitelist  # noqa: E402
+
+# BENCH_KEYS is derived from _schema.coreBenchKeys in data/sources-whitelist.json
+# via lib.whitelist.core_bench_keys() — do NOT hardcode here (ARCH-05).
+# Loaded lazily in main() so the whitelist is read only once.
+BENCH_KEYS: list[str] = []  # populated in main() before compute_predicted_reach()
 
 
 def family(model_id: str) -> str:
@@ -219,7 +194,10 @@ def compute_predicted_reach(wl, models):
 
 
 def main():
-    wl = json.loads(WHITELIST.read_text(encoding="utf-8"))
+    global BENCH_KEYS
+    wl = load_whitelist(WHITELIST)
+    # Derive bench keys from whitelist SSOT (ARCH-05) — do not hardcode.
+    BENCH_KEYS = core_bench_keys(wl)
     fx_doc = json.loads(FIXTURES.read_text(encoding="utf-8"))
     fixtures = fx_doc["fixtures"]
     models = json.loads(MODELS.read_text(encoding="utf-8"))

@@ -15,6 +15,9 @@
 import { State, shortEtagHash } from './core.js';
 import { t } from './i18n.js';
 
+// COUPLING: must match the GitHub Pages repo (user/repo). Update here if the
+// repo is renamed or transferred. SHA fetch is informational-only — a rate-limit
+// hit will not suppress the staleness banner (ETag mismatch is the real signal).
 const COMMITS_API = 'https://api.github.com/repos/sungurerdim/aicodermap/commits/main';
 const POLL_INTERVAL_MS = 5 * 60 * 1000;
 const INITIAL_DELAY_MS = 30 * 1000;
@@ -97,8 +100,8 @@ function showStaleBanner({ servedShort, liveSha, ageMin }) {
     ageMin: ageMin != null ? ageMin : '?',
   });
   refreshBtn.textContent = t('ui.freshness.refresh') || 'Refresh';
-  refreshBtn.onclick = () => { hardRefresh(); };
-  dismissBtn.onclick = () => { banner.hidden = true; };
+  refreshBtn.addEventListener('click', () => { hardRefresh(); });
+  dismissBtn.addEventListener('click', () => { banner.hidden = true; });
   banner.hidden = false;
   bannerShown = true;
 }

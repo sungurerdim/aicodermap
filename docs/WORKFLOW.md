@@ -109,7 +109,7 @@
 | **F1** Skill+agent | `/aicodermap` is invokable, agent delegation starts <5s |
 | **F3** i18n switch | Instant change, no reload, localStorage persist |
 | **F7** Cross-source validation | Release gate enforced (warning if <95%) |
-| **F9** Weights editor | Total=100% constraint, live recalc <100ms, 4 presets work, reset-to-default works |
+| **F9** Weights editor | Total=100% constraint, live recalc <100ms, 6 presets work, reset-to-default works |
 | **F10** PNG export | Section export no clipping, full page scroll-aware, iOS Safari + Chrome Android tests pass |
 | **F11** Responsive | Mobile <640px + tablet 641-1024 + desktop >1024 — overflow=0 in each |
 | **F12** Contradiction flagging | ≥3pp delta renders warning in UI, tooltip source breakdown |

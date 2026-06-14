@@ -32,6 +32,7 @@ import sys
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlparse
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "scripts"))
@@ -95,8 +96,6 @@ def _mode(vals):
 
 
 def _hostname(url: str) -> str:
-    from urllib.parse import urlparse
-
     h = (urlparse(url).hostname or "").lower()
     return h[4:] if h.startswith("www.") else h
 

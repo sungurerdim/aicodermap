@@ -349,13 +349,9 @@ def main() -> int:
                     "winner": cluster_winner,
                 }
             )
-        cluster_meta.sort(
-            key=lambda c: (-c["n_distinct"], -c["sum_trust"], c["latest"]),
-            reverse=False,
-        )
         cluster_meta = sorted(
             cluster_meta,
-            key=lambda c: (-c["n_distinct"], -c["sum_trust"]),
+            key=lambda c: (-c["n_distinct"], -c["sum_trust"], c["latest"]),
         )
 
         best_cluster = cluster_meta[0]

@@ -80,7 +80,7 @@ Browser load:
 
 ### `data/models.json` — MODELS array entry
 
-The canonical 26-key bench universe is defined in
+The canonical 29-key bench universe is defined in
 `data/sources-whitelist.json._schema.coreBenchKeys` and mirrored by
 `assets/js/core.js BENCH_KEYS`. Pricing is a per-provider array
 (multi-provider rule) — each entry pins to a single provider and is
@@ -114,11 +114,11 @@ attributed in `data/sources.json` separately.
     "aaIdx": 57,
     "swePro": 64.3, "sweV": 87.6, "sweMulti": 79.3, "nl2Repo": null,
     "lcb": null, "tb2": 69.4, "tbHard": null,
-    "tau2": 59, "tau3": null, "mcpA": 77.3, "bfcl": null,
+    "tau2": 59, "mcpA": 77.3, "bfcl": null,
     "aaCoding": 53, "aaAgentic": null, "browseComp": null,
     "cfElo": null, "webDevElo": null,
     "gpqa": 94.2, "aime26": null, "hle": 46.9, "aaOmni": null,
-    "mmluPro": null, "simpleQa": null, "mrcr": null, "arcAgi2": null
+    "mmluPro": null, "mrcr": null, "arcAgi2": null
   },
   "benchUpdated": {
     "swePro": "2026-04-30",
@@ -407,8 +407,9 @@ documented above. `assets/js/url-state.js` is the reference implementation.
 ### localStorage
 - Schema validation on read (wrong shape → reset-to-default)
 - Versioned keys (canonical, see `assets/js/core.js:STORAGE`):
-  `acm.v1.weights`, `acm.v1.language`, `acm.v1.vram`, `acm.v1.gpu`,
-  `acm.v1.filters`, `acm.v1.sort`, `acm.v1.theme`.
+  `acm.v1.weights`, `acm.v1.language`, `acm.v1.vram`, `acm.v1.ram`,
+  `acm.v1.gpu`, `acm.v1.filters`, `acm.v1.sort`, `acm.v1.theme`,
+  `acm.v1.preset`.
 - Migration plan to v2 already in place
 
 ### GDPR / Privacy
@@ -440,7 +441,7 @@ documented above. `assets/js/url-state.js` is the reference implementation.
 
 ## 6. Scalability
 
-**Static site = trivially scalable.** GitHub Pages CDN handles up to 100GB/month bandwidth (free tier). ~50 models × 16 benchmarks JSON ~95KB; 1M visitors/month = ~95GB → within free tier limits.
+**Static site = trivially scalable.** GitHub Pages CDN handles up to 100GB/month bandwidth (free tier). ~78+ models × 29 benchmarks JSON ~95KB; 1M visitors/month = ~95GB → within free tier limits.
 
 **Bottleneck:** Skill update workflow throughput (manual + research agent), practical max ~1-2 updates/day. The M5 metric (≤14 days) is well below this capacity.
 

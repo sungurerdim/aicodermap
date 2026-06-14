@@ -35,7 +35,7 @@ models = models_data if isinstance(models_data, list) else models_data.get("mode
 wl = json.loads((ROOT / "data/sources-whitelist.json").read_text(encoding="utf-8"))
 i18n_en = json.loads((ROOT / "i18n/en.json").read_text(encoding="utf-8"))
 
-core_keys = wl["_schema"]["coreBenchKeys"]
+core_keys = wl.get("_schema", {}).get("coreBenchKeys", [])
 active = _active_models(models)
 active_ids = {m["id"] for m in active}
 

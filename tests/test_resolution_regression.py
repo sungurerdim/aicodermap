@@ -57,6 +57,7 @@ def expect(label: str, actual, predicate, description: str):
     print(f"  [{status}] {label}: {description} -> actual={actual!r}")
     if not ok:
         FAILED.append(label)
+        raise AssertionError(f"[{label}] {description} — actual={actual!r}")
 
 
 def test_1_grok_4_20_swe_v_scaffold():
@@ -267,17 +268,20 @@ def test_9_verif_information_scaling():
 def test_10_quarterly_decay_slower_than_default():
     """Phase R5 — vendor with quarterly cadence ages slower.
 
-    Same date, age ~100 days: default curve drops to 0.70 (< 180 bucket),
-    quarterly stays at 0.85 (< 180 bucket but slower curve). Confirms
-    INTERVAL_DECAY_CURVES selection works.
+    Fixed anchor: 2026-06-10. Observation date: 100 days prior = 2026-03-02.
+    default curve: age=100 falls in (90, 180) bucket -> 0.70.
+    quarterly curve: age=100 falls in (90, 180) bucket -> 0.85 (slower).
+    Confirms INTERVAL_DECAY_CURVES selection works.
     """
     import datetime as _dt
 
     print("\n#10 recency_decay -- quarterly slower than default (R5)")
-    age_days = 100
-    target_date = (_dt.date.today() - _dt.timedelta(days=age_days)).isoformat()
-    default_weight = recency_decay(target_date)
-    quarterly_weight = recency_decay(target_date, source_type="quarterly")
+    _anchor = _dt.date(2026, 6, 10)
+    target_date = (_anchor - _dt.timedelta(days=100)).isoformat()  # 2026-03-02
+    default_weight = recency_decay(target_date, _today=_anchor)
+    quarterly_weight = recency_decay(
+        target_date, source_type="quarterly", _today=_anchor
+    )
     expect(
         "10.default100",
         default_weight,
@@ -295,16 +299,17 @@ def test_10_quarterly_decay_slower_than_default():
 def test_11_weekly_decay_faster_than_default():
     """Phase R5 — weekly publishers age fastest.
 
-    Same date, age ~20 days: default curve still 1.00 (< 30 bucket),
-    weekly drops immediately to 0.80 (high churn assumption).
+    Fixed anchor: 2026-06-10. Observation date: 20 days prior = 2026-05-21.
+    default curve: age=20 falls in (0, 30) bucket -> 1.00.
+    weekly curve: age=20 falls in (0, 30) bucket -> 0.80 (high churn).
     """
     import datetime as _dt
 
     print("\n#11 recency_decay -- weekly faster than default (R5)")
-    age_days = 20
-    target_date = (_dt.date.today() - _dt.timedelta(days=age_days)).isoformat()
-    default_weight = recency_decay(target_date)
-    weekly_weight = recency_decay(target_date, source_type="weekly")
+    _anchor = _dt.date(2026, 6, 10)
+    target_date = (_anchor - _dt.timedelta(days=20)).isoformat()  # 2026-05-21
+    default_weight = recency_decay(target_date, _today=_anchor)
+    weekly_weight = recency_decay(target_date, source_type="weekly", _today=_anchor)
     expect(
         "11.default20",
         default_weight,

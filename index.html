@@ -130,7 +130,7 @@
     </h1>
     <div class="header-actions">
       <div class="header-toggles">
-      <div class="theme-toggle" role="group" aria-label="Theme">
+      <div class="theme-toggle" role="group" aria-label="Theme" data-i18n-aria-label="ui.a11y.themeGroup">
         <button type="button" data-theme="light"
                 data-tip="Light theme" data-i18n-tip="ui.theme.light" data-tip-position="bottom"
                 aria-label="Light theme" aria-pressed="false">
@@ -154,7 +154,7 @@
           </svg>
         </button>
       </div>
-      <div class="lang-toggle" role="group" aria-label="Language">
+      <div class="lang-toggle" role="group" aria-label="Language" data-i18n-aria-label="ui.a11y.langGroup">
         <button type="button" data-lang="tr" aria-pressed="false">TR</button>
         <button type="button" data-lang="en" aria-pressed="true">EN</button>
       </div>
@@ -253,7 +253,7 @@
         <span data-i18n-key="ui.filter.gpuOverride">VRAM</span>
         <input type="number" id="filter-vram-override" min="0" max="256" step="1" inputmode="numeric" placeholder="GB">
       </label>
-      <label class="select-row ram-row">
+      <label class="select-row">
         <span data-i18n-key="ui.filter.ramLabel">RAM</span>
         <select id="filter-ram-select">
           <option value="" data-i18n-key="ui.filter.ramAuto">Auto</option>
@@ -376,7 +376,7 @@
 
 <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
 
-<script src="assets/vendor/html2canvas.min.js" integrity="sha256-6H5VB5QyLldKH9oMFUmjxw2uWpPZETQXpCkBaDjquMs=" defer></script>
+<script src="assets/vendor/html2canvas.min.js" integrity="sha256-6H5VB5QyLldKH9oMFUmjxw2uWpPZETQXpCkBaDjquMs=" crossorigin="anonymous" defer></script>
 <script type="module" src="assets/js/main.js"></script>
 </body>
 </html>

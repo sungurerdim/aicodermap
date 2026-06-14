@@ -12,6 +12,7 @@ from __future__ import annotations
 import datetime
 import math
 from typing import Any
+from urllib.parse import urlparse
 
 # Canonical tier weights (SKILL.md TRUST_SCORE_FORMULA)
 TIER_WEIGHT: dict[str, float] = {
@@ -96,37 +97,50 @@ INTERVAL_DECAY_CURVES: dict[str, list[tuple[int, float]]] = {
 }
 
 
-def _age_days(date_str: Any) -> int | None:
-    """Parse an ISO date and return its age in days from today. Returns
-    None when the input is missing or unparseable."""
+def _age_days(date_str: Any, _today: datetime.date | None = None) -> int | None:
+    """Parse an ISO date and return its age in days from today.
+
+    `_today` overrides the current date — for deterministic testing only.
+    Returns None when the input is missing or unparseable.
+    """
     if not date_str:
         return None
     try:
         s = str(date_str).strip()
+        today = _today or datetime.date.today()
+        # Try datetime formats first so sub-day precision is handled correctly.
         for fmt in ("%Y-%m-%d", "%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%dT%H:%M:%S%z"):
             try:
                 dt = datetime.datetime.strptime(s[: len(fmt.replace("%", "XX"))], fmt)
-                return (
-                    datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
-                    - dt
-                ).days
+                if _today is not None:
+                    return (today - dt.date()).days
+                now = datetime.datetime.now(datetime.timezone.utc)
+                if dt.tzinfo is None:
+                    now = now.replace(tzinfo=None)
+                return (now - dt).days
             except ValueError:
                 continue
-        return (datetime.date.today() - datetime.date.fromisoformat(s[:10])).days
+        return (today - datetime.date.fromisoformat(s[:10])).days
     except Exception:
         return None
 
 
-def recency_decay(date_str: Any, *, source_type: str = "default") -> float:
+def recency_decay(
+    date_str: Any,
+    *,
+    source_type: str = "default",
+    _today: datetime.date | None = None,
+) -> float:
     """Recency-decay multiplier for an ISO date.
 
     Phase R5: `source_type` selects the curve from `INTERVAL_DECAY_CURVES`.
     Unknown source_types fall back to the `default` curve so any caller
     written before R5 keeps the pre-R5 behaviour exactly.
 
+    `_today` overrides the current date — for deterministic testing only.
     Missing/unparseable dates return 0.50 (legacy contract).
     """
-    age = _age_days(date_str)
+    age = _age_days(date_str, _today)
     if age is None:
         return 0.50
     curve = INTERVAL_DECAY_CURVES.get(
@@ -149,8 +163,6 @@ def vendor_update_interval(url: str, whitelist_vendors: dict | None) -> str:
     if not url or not whitelist_vendors:
         return "default"
     try:
-        from urllib.parse import urlparse
-
         host = (urlparse(str(url)).hostname or "").lower().strip()
     except Exception:
         return "default"
@@ -174,8 +186,6 @@ def vendor_update_interval(url: str, whitelist_vendors: dict | None) -> str:
             url_values = []
         for u in url_values:
             try:
-                from urllib.parse import urlparse
-
                 vh = (urlparse(str(u)).hostname or "").lower().strip()
                 if vh.startswith("www."):
                     vh = vh[4:]

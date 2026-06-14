@@ -26,6 +26,15 @@ from pathlib import Path
 PROJECT = Path(__file__).resolve().parents[1]
 MODELS_PATH = PROJECT / "data" / "models.json"
 
+# ARCH-07: No "promoted keys" category exists in data/sources-whitelist.json
+# (_schema has coreBenchKeys and emergingBenchKeys but no promotedBenchKeys).
+# Deriving from coreBenchKeys would seed all 17 core keys — changing this
+# script's intentionally narrow FAZ 8.A scope (6 keys that were missing when
+# they were promoted from emerging to core). Hardcode is retained; if a future
+# refresh cycle promotes additional keys, add a _schema.promotedBenchKeys list
+# to sources-whitelist.json and update this script to use
+#   lib.whitelist.promoted_bench_keys(wl)
+# All 6 keys below are verified in _schema.coreBenchKeys as of 2026-06-14.
 PROMOTED_KEYS = (
     "tbHard",
     "cfElo",

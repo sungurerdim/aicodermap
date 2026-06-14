@@ -129,7 +129,7 @@ Body:
 **Depends on:** #T6
 **User story trace:** P1-2, P2-2, P3-3
 **Feature trace:** F9
-**Acceptance criteria:** AC-F9 (total=100% constraint, live recalc <100ms, 4 presets work, reset-to-default works)
+**Acceptance criteria:** AC-F9 (total=100% constraint, live recalc <100ms, 6 presets work, reset-to-default works)
 Labels: type:feature, milestone:m3-integration, priority:p1
 ```
 
