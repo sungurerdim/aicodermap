@@ -1,0 +1,161 @@
+{
+  "cycleEndedAt": "2026-06-15T07:04:54Z",
+  "cycleStartedAt": "2026-06-15T00:00:00Z",
+  "perBatch": [
+    {
+      "agentGaps": 58,
+      "batchId": "batch00-anthropic",
+      "fills": 63,
+      "gaps": 58,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 30,
+      "wallclockSec": 1009.0
+    },
+    {
+      "agentGaps": 25,
+      "batchId": "batch01-google_deepm",
+      "fills": 91,
+      "gaps": 25,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 32,
+      "wallclockSec": 1022.0
+    },
+    {
+      "agentGaps": 41,
+      "batchId": "batch02-mistral_ai",
+      "fills": 67,
+      "gaps": 41,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 42,
+      "wallclockSec": 879.0
+    },
+    {
+      "agentGaps": 60,
+      "batchId": "batch03-openai",
+      "fills": 58,
+      "gaps": 60,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "openai.com bot-blocked (403); artificialanalysis.ai SPA â€” only composite aaIdx values returned. Gaps for lcb/tbHard/aaCoding/aaAgentic/cfElo/nl2Repo/aime26/mmluPro across several models reflect true data unavailability: these benches are not published for these specific models in any source reached during this cycle.",
+      "toolCallCount": 32,
+      "wallclockSec": 1038.0
+    },
+    {
+      "agentGaps": 37,
+      "batchId": "batch04-alibaba_qwen",
+      "fills": 76,
+      "gaps": 37,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 34,
+      "wallclockSec": 1059.0
+    },
+    {
+      "agentGaps": 74,
+      "batchId": "batch05-alibaba_qwen",
+      "fills": 35,
+      "gaps": 74,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 28,
+      "wallclockSec": 792.0
+    },
+    {
+      "agentGaps": 39,
+      "batchId": "batch06-xai",
+      "fills": 70,
+      "gaps": 39,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 35,
+      "wallclockSec": 796.0
+    },
+    {
+      "agentGaps": 65,
+      "batchId": "batch07-deepseek",
+      "fills": 46,
+      "gaps": 65,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "Many cells for deepseek-v4-flash and deepseek-coder-v2-16b have no published benchmarks on standard suites; V4 scores are vendor-reported only with no independent leaderboard entries as of June 2026. DeepSeek Coder V2 16B is a 2024 model with sparse coverage on 2026 coreBenchKeys.",
+      "toolCallCount": 38,
+      "wallclockSec": 782.0
+    },
+    {
+      "agentGaps": 27,
+      "batchId": "batch08-openai",
+      "fills": 82,
+      "gaps": 27,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 34,
+      "wallclockSec": 874.0
+    },
+    {
+      "agentGaps": 75,
+      "batchId": "batch09-minimax",
+      "fills": 38,
+      "gaps": 75,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 34,
+      "wallclockSec": 767.0
+    },
+    {
+      "agentGaps": 33,
+      "batchId": "batch10-stepfun",
+      "fills": 43,
+      "gaps": 33,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 37,
+      "wallclockSec": 915.0
+    },
+    {
+      "agentGaps": 60,
+      "batchId": "batch11-google_deepm",
+      "fills": 77,
+      "gaps": 60,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 39,
+      "wallclockSec": 1111.0
+    },
+    {
+      "agentGaps": 65,
+      "batchId": "batch12-alibaba_qwen",
+      "fills": 39,
+      "gaps": 65,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "Many cells not publicly reported by vendors for these models (especially Nemotron-nano-omni multimodal-focused model, Qwen3.7-Plus newly released, Qwen3.5-9B small model with limited bench coverage). Core cells filled where data was available.",
+      "toolCallCount": 30,
+      "wallclockSec": 1005.0
+    }
+  ],
+  "totalBatches": 13,
+  "totals": {
+    "agentGaps": 659,
+    "fills": 785,
+    "gaps": 659,
+    "na": 0,
+    "orchestratorGaps": 0,
+    "toolCallSum": 445,
+    "wallclockSecMax": 1111.0,
+    "wallclockSecP95": 1111.0
+  },
+  "zeroFillBatches": []
+}

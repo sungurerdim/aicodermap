@@ -1,28 +1,38 @@
 {
   "checked": 6,
-  "rejected": [],
-  "warnings": [
+  "rejected": [
     {
-      "cell": "gpt-4-1.tb2",
-      "action": "clear",
-      "reason": "missing-reason"
+      "cell": "deepseek-v4-pro.cfElo",
+      "action": "confirm",
+      "reason": "missing-evidence"
     },
     {
-      "cell": "gpt-4-1.aime26",
-      "action": "clear",
-      "reason": "missing-reason"
+      "cell": "gemma-3-27b.cfElo",
+      "action": "confirm",
+      "reason": "missing-evidence"
     },
     {
-      "cell": "o3.tb2",
-      "action": "clear",
-      "reason": "missing-reason"
+      "cell": "gemma-4-31b.cfElo",
+      "action": "confirm",
+      "reason": "missing-evidence"
     },
     {
-      "cell": "mimo-v2-5-pro.mmluPro",
-      "action": "clear",
-      "reason": "missing-reason"
+      "cell": "gemma-4-e2b.cfElo",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "gemma-4-e4b.cfElo",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "deepseek-r1-14b.cfElo",
+      "action": "confirm",
+      "reason": "missing-evidence"
     }
   ],
-  "ok": true,
-  "filtered": false
+  "warnings": [],
+  "ok": false,
+  "filtered": true
 }
