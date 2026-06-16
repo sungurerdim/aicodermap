@@ -1,26 +1,30 @@
 """Freshness-tiered skip — verification-map-driven.
 
-FAZ 2.2 (2026-05-07): partial retirement of the UNCAPPED+UNCACHED doctrine.
-Prior policy was "every (modelId, benchKey) cell re-fetched every cycle"
-because vendor scores can change overnight. Reform: cells with strong
-agreement (≥3 sources confirming) AND recent verification (≤7 days) earn a
-"skip this cycle" pass; everything else still re-fetches per the original
-contract.
+FAZ 2.2 (2026-05-07), reliability-driven since 2026-06-16: partial retirement
+of the UNCAPPED+UNCACHED doctrine. Prior policy was "every (modelId, benchKey)
+cell re-fetched every cycle." Reform: a cell confirmed by ≥3 agreeing sources
+is treated as SETTLED — a released model's published benchmark score does not
+change, so re-fetching it every cycle has no concrete benefit. Such cells skip
+the research sweep and re-validate only after a 90-day backstop (or when a new
+contradiction surfaces). Everything sparse/contested still re-fetches.
+
+The `confirmed`/`contradicted` flags are DERIVED in verification-map.py from
+accumulated provenance (count + agreement); they were wrongly retired there
+2026-05/06, which left this skip set permanently empty until the 2026-06-16 fix.
 
 Two tiers:
   T1 — re-fetch (every cycle):
-       confirmed=false OR verifs<3 OR age>FRESHNESS_TTL_DAYS
-       OR cell has unresolved contradiction OR cell missing from map
-       (default for never-seen cells).
+       confirmed=false OR verifs<MIN_VERIFICATIONS_FOR_SKIP
+       OR age>FRESHNESS_TTL_DAYS OR cell has unresolved contradiction
+       OR cell missing from map (default for never-seen cells).
   T2 — skip (copy from map):
-       confirmed=true AND verifs≥3 AND age≤FRESHNESS_TTL_DAYS
-       AND no unresolved contradiction.
+       confirmed=true AND verifs≥MIN_VERIFICATIONS_FOR_SKIP
+       AND age≤FRESHNESS_TTL_DAYS AND no unresolved contradiction.
 
-T1 ALWAYS dominates uncertainty: any of the disqualifiers triggers a
-re-fetch. The "vendor scores can change overnight" guarantee is preserved
-because the freshness window is 7 days max — drift takes at most one cycle
-to surface in low-verification cells (they're T1 always) and the next
-cycle for confirmed cells (their freshness expires).
+T1 ALWAYS dominates uncertainty: any disqualifier triggers a re-fetch. Drift is
+still caught — low-verification/contested cells are T1 always, and
+detect-anomalies runs on live data every cycle regardless of skip. Confirmed
+cells re-validate when their FRESHNESS_TTL_DAYS window expires.
 
 Usage:
     from lib.freshness import compute_skip_cells

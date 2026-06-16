@@ -1,21 +1,6 @@
 {
-  "checked": 6,
+  "checked": 2,
   "rejected": [
-    {
-      "cell": "deepseek-v4-pro.cfElo",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    },
-    {
-      "cell": "gemma-3-27b.cfElo",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    },
-    {
-      "cell": "gemma-4-31b.cfElo",
-      "action": "confirm",
-      "reason": "missing-evidence"
-    },
     {
       "cell": "gemma-4-e2b.cfElo",
       "action": "confirm",
@@ -25,14 +10,15 @@
       "cell": "gemma-4-e4b.cfElo",
       "action": "confirm",
       "reason": "missing-evidence"
-    },
-    {
-      "cell": "deepseek-r1-14b.cfElo",
-      "action": "confirm",
-      "reason": "missing-evidence"
     }
   ],
-  "warnings": [],
+  "warnings": [
+    {
+      "cell": "gemma-3-27b.cfElo",
+      "action": "clear",
+      "reason": "missing-reason"
+    }
+  ],
   "ok": false,
   "filtered": true
 }

@@ -23,6 +23,17 @@ import re
 import sys
 from pathlib import Path
 
+# Never crash on a console/pipe whose locale (e.g. Windows cp1254) can't encode
+# the status lines' arrow glyph — the script writes core.js BEFORE printing, so a
+# UnicodeEncodeError here would falsely signal failure to any subprocess caller.
+for _stream in (sys.stdout, sys.stderr):
+    _reconf = getattr(_stream, "reconfigure", None)
+    if callable(_reconf):
+        try:
+            _reconf(encoding="utf-8", errors="replace")
+        except (OSError, ValueError):
+            pass
+
 PROJECT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT / "scripts"))
 from lib.util import slug_norm as _norm  # noqa: E402  (SSOT)

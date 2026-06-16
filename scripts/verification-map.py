@@ -8,14 +8,18 @@ Two operations:
   - `read`:  print the map (for skill orchestrator inline injection into
     idea_context).
 
-The map is HISTORICAL audit-only — never read for skip decisions, never
-gates a fetch. Every cell is re-fetched every cycle per the
-UNCAPPED + UNCACHED doctrine. The previous `confirmed` flag was retired
-(P9 YAGNI: nothing read it; agreement is recomputed on demand by
-contradiction analysis from the verifications[] history).
+The map is the provenance audit log AND the freshness-skip source of truth.
+2026-06-16: the FAZ 2.2 reliability-driven skip was reactivated. Each cell
+carries a DERIVED `confirmed` flag (≥VERIFICATION_AGREEMENT_THRESHOLD distinct
+numeric sources agreeing within VERIFICATION_AGREEMENT_PP) and a `contradicted`
+flag (≥2 numeric sources disagreeing). `freshness.compute_skip_cells` reads
+these to drop well-covered cells from the research sweep (re-validated only
+after FRESHNESS_TTL_DAYS or when a new contradiction surfaces). The flag had
+been wrongly retired as "nothing reads it" — freshness.py + matrix.py both do,
+so retiring it left the skip set permanently empty and every confirmed cell was
+re-fetched every cycle for zero benefit.
 
-`contested` cells (multi-source disagreement) still surface in stats so
-human reviewers can spot drift across cycles.
+`contested`/`confirmed` counts surface in stats so reviewers can spot drift.
 
 `lastChecked` is updated to TODAY only when at least one new verification
 was appended this cycle (i.e., a successful fetch contributed). Cycles
@@ -140,9 +144,6 @@ def update_map():
             cell.setdefault("confidence", 0.0)
             cell.setdefault("stability", None)
             cell.setdefault("bayesianPoint", None)
-            # `confirmed` field retired — strip on read so legacy maps don't
-            # leak the field forward.
-            cell.pop("confirmed", None)
             # Append this verification (dedupe by url). lastChecked stamps
             # only when a NEW verification actually lands this cycle — empty
             # cycles leave the prior date intact (per-cell freshness contract).
@@ -206,17 +207,31 @@ def update_map():
             del hist[: len(hist) - _GAP_HISTORY_CAP]
         gap_stamped += 1
 
-    # Recompute consensus value (median when ≥ THRESHOLD agree); flag
-    # contested cells for stats. No `confirmed` flag — readers compute on
-    # demand from verifications[].
+    # Recompute consensus value (median when ≥ THRESHOLD agree) AND derive the
+    # `confirmed`/`contradicted` skip signals the freshness reader needs.
+    # 2026-06-16: `confirmed` UN-retired — the FAZ 2.2 freshness-tier skip
+    # (freshness.compute_skip_cells + matrix.priority_cells) reads this flag, so
+    # popping it kept the skip set permanently empty and every well-covered cell
+    # was re-fetched every cycle. It is DERIVED here from accumulated provenance
+    # (≥THRESHOLD distinct numeric sources agreeing within VERIFICATION_AGREEMENT_PP),
+    # not stored by an agent — so it stays SSOT-consistent with verifications[].
     contested_count = 0
+    confirmed_count = 0
     for cell_key, cell in cells.items():
         verifs = cell.get("verifications", [])
-        values = [v.get("value") for v in verifs if v.get("value") is not None]
-        if len(verifs) >= VERIFICATION_AGREEMENT_THRESHOLD and values_agree(values):
-            nums = sorted(v for v in values if isinstance(v, (int, float)))
-            cell["value"] = nums[len(nums) // 2] if nums else None
-        elif len(verifs) >= 2 and not values_agree(values):
+        nums = [
+            v.get("value") for v in verifs if isinstance(v.get("value"), (int, float))
+        ]
+        agree = values_agree(nums)
+        confirmed = len(nums) >= VERIFICATION_AGREEMENT_THRESHOLD and agree
+        contradicted = len(nums) >= 2 and not agree
+        cell["confirmed"] = confirmed
+        cell["contradicted"] = contradicted
+        if confirmed:
+            nums_sorted = sorted(nums)
+            cell["value"] = nums_sorted[len(nums_sorted) // 2]
+            confirmed_count += 1
+        elif contradicted:
             cell["value"] = None
             contested_count += 1
 
@@ -225,13 +240,15 @@ def update_map():
         "stats": {
             "totalCells": len(cells),
             "contested": contested_count,
+            "confirmed": confirmed_count,
         },
         "cells": cells,
     }
     MAP_PATH.write_text(json.dumps(m_out, indent=2) + "\n", encoding="utf-8")
     print(
         f"verification-map: appended {appended} verifications | "
-        f"{len(cells)} total cells, {contested_count} contested"
+        f"{len(cells)} total cells, {confirmed_count} confirmed, "
+        f"{contested_count} contested"
     )
     return 0
 
@@ -310,13 +327,20 @@ def bootstrap_from_sources():
                 }
             )
     contested = 0
+    confirmed_count = 0
     for cell in cells.values():
         verifs = cell["verifications"]
-        values = [v["value"] for v in verifs if v["value"] is not None]
-        if len(verifs) >= VERIFICATION_AGREEMENT_THRESHOLD and values_agree(values):
-            nums = sorted(v for v in values if isinstance(v, (int, float)))
-            cell["value"] = nums[len(nums) // 2] if nums else None
-        elif len(verifs) >= 2 and not values_agree(values):
+        nums = [v["value"] for v in verifs if isinstance(v["value"], (int, float))]
+        agree = values_agree(nums)
+        confirmed = len(nums) >= VERIFICATION_AGREEMENT_THRESHOLD and agree
+        contradicted = len(nums) >= 2 and not agree
+        cell["confirmed"] = confirmed
+        cell["contradicted"] = contradicted
+        if confirmed:
+            nums_sorted = sorted(nums)
+            cell["value"] = nums_sorted[len(nums_sorted) // 2]
+            confirmed_count += 1
+        elif contradicted:
             cell["value"] = None
             contested += 1
     m_out = {
@@ -324,6 +348,7 @@ def bootstrap_from_sources():
         "stats": {
             "totalCells": len(cells),
             "contested": contested,
+            "confirmed": confirmed_count,
         },
         "cells": cells,
     }

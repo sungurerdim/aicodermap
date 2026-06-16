@@ -178,16 +178,31 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
      * RENAMED (vendor changed canonical id) → auto-rename per WRONG_ID_AUTO_FIX rule
      * REMOVED (no longer on vendor page after grace period) → archive to data/archive/<id>.json
    - This step CANNOT be skipped on refresh-all; it's the source of truth for "what models exist".
-   - **Gather-hint harvest (MANDATORY, added 2026-06-06) — second new-model detection channel:**
-     after Stage A gather returns, run `python scripts/harvest-new-models.py`. It unions
-     every gather artifact's `lineupHints[event='new']` into `.aicodermap-lineup.json`'s
-     `newModels[]`, deduped against `currentIds`. ROOT CAUSE this closes: the dedicated
-     lineup agent depends on a vendor's lineup page being reachable; when it is SPA/403/dead
-     and the WebSearch fallback misses the release, a genuinely-new model is dropped even
-     though a gather agent researching that vendor's slice SAW it (e.g. `minimax-m3`,
-     released 2026-06-01, was flagged by batch04-minimax's gather but absent from the lineup
-     file). Harvesting makes detection robust to any single source failing. The harvested
-     entries flow into the same stub-add + CHANGELOG path as lineup-agent newModels.
+   - **Detection harvest (MANDATORY) — source-agnostic union of EVERY new-model/
+     new-benchmark signal.** After Stage A gather returns, run BOTH:
+     - `python scripts/harvest-new-models.py` — unions, across ALL artifacts
+       (gather + synth + agent-out), BOTH new-model channels into
+       `.aicodermap-lineup.json`'s `newModels[]` (deduped vs `currentIds`):
+       (1) `lineupHints[event='new']` (incidental gather sightings) AND
+       (2) `lineupChanges.new[]` (the dedicated Phase-0 WebSearch new-release net,
+       agent.md step 3b). ROOT CAUSES this closes: the lineup agent depends on a
+       vendor's lineup page being reachable (SPA/403/dead → dropped, e.g.
+       `minimax-m3`); AND (added 2026-06-16) `lineupChanges.new` previously had NO
+       path to `newModels[]` at all — local-synth.py drops it and
+       gen_unified_artifact.py copies synth verbatim — so a model surfaced ONLY by
+       the WebSearch net (the safety net for broken vendor pages) never became a
+       stub. Both channels now flow into the same stub-add + CHANGELOG path.
+     - `python scripts/harvest-discoveries.py --promote` — unions
+       `discoveries.{benchmarks,vendors}` from ALL artifacts into
+       `data/discoveries.json` (pending, AC6-flagged), and AUTO-PROMOTES any
+       benchmark clearing AC6 (≥2 distinct publisher domains) into the bench-key
+       universe (`_schema.emergingBenchKeys` + `benchCategories` → gen-bench-keys
+       → core.js, plus i18n en/tr labels). AUDIT-GATED: a coherence failure rolls
+       back every surface and leaves the benchmark queued. New benchmark names are
+       proper nouns (identical EN/TR); the TR `desc` is seeded from EN and flagged
+       `needsLocaleReview` for later human refinement. ROOT CAUSE: nothing wrote
+       `data/discoveries.json` from agent output before, so every new benchmark a
+       sub-probe saw was silently lost.
    - **Mandatory retry (added 2026-04-28):** if Step 4 returns with `lineup` empty/missing/`{}` AND this is not the first-ever run, the orchestrator dispatches ONE retry agent (sonnet) restricted to Step 0 (fetch vendor lineup pages only, no bench/pricing). On second-cycle empty, log `gaps[]` entry `lineup:incomplete` with reason and continue. Same retry policy applies when `runtime.healthChecks` covers fewer than 3 leaderboard domains.
 
 1. Read data/{models,sources,sources-whitelist}.json + lineup result from Step 0
@@ -319,10 +334,10 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
        // skip — every GAP (never-found) cell is re-queried each full-run so a
        // newly-published value surfaces with zero lag.
    }
-   - `.aicodermap-verification-map.json` is the historical audit log of every (model, bench) cell observation across cycles (value, sources[], lastChecked). Used for contradiction analysis only — never read for skip decisions, since every cell is re-fetched every cycle (UNCAPPED + UNCACHED doctrine, reformed 2026-04-28). Skill creates it (empty {}) on first cycle if missing.
+   - `.aicodermap-verification-map.json` is the provenance audit log of every (model, bench) cell observation across cycles (value, sources[], lastChecked, derived `confirmed`/`contradicted`). It is ALSO the freshness-skip source of truth (reliability-driven since 2026-06-16): a cell confirmed by ≥`MIN_VERIFICATIONS_FOR_SKIP` agreeing sources is SETTLED and skips the research sweep, re-validating only after `FRESHNESS_TTL_DAYS` (90d backstop) or when a new contradiction surfaces. This applies to FILLED cells only — every GAP cell is still re-queried each full-run. `verification-map.py update` derives the flags; before 2026-06-16 they were wrongly popped, leaving the skip set permanently empty (every well-covered cell re-fetched for zero benefit). Skill creates it (empty {}) on first cycle if missing.
    - `data/models.json` is SSOT for "what models we track" — `currentIds` MUST be derived from this file at the moment the skill runs. Hardcoding the id list in a prompt or agent message is a contract violation (any drift between models.json and what the agent receives surfaces as silent omission of new/renamed models).
    - `data/sources-whitelist.json` is SSOT for "what URLs the agent is allowed to fetch" AND for the bench-key universe (`_schema.coreBenchKeys`). Frontend `BENCH_KEYS` (assets/js/core.js), i18n `benchmarks.*`, and the data-file `bench` cells all mirror this canonical set. `scripts/audit-data-coherence.py` enforces the mirroring by failing loudly on any drift.
-   - No skip registry: every (modelId, benchKey) pair is re-attempted every cycle so vendor opt-outs that close are surfaced immediately
+   - Reliability-driven skip (not a permanent registry): a FILLED cell confirmed by ≥3 agreeing sources skips until its 90-day backstop expires or a contradiction surfaces; every GAP (unfilled) cell AND every sparse/contested cell is re-attempted each cycle, so vendor opt-outs that close are surfaced with ≤1-cycle lag
    - The agent file (.claude/agents/aicodermap-research-agent.md) only carries PROCEDURE (how) — every list of URLs, vendors, or model IDs lives in data files
 // FAZ 4.C (2026-05-09) → A3 (2026-05-31): SONNET GATHER + DETERMINISTIC SYNTH.
    // Two-stage pipeline: gather (N batches × sonnet) + synth (1 × local-synth.py).

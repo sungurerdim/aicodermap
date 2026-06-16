@@ -1,10 +1,10 @@
 {
-  "probedAt": "2026-06-15T06:32:37Z",
+  "probedAt": "2026-06-16T15:30:18Z",
   "total": 138,
   "counts": {
-    "format-drift": 16,
+    "format-drift": 15,
     "redirect": 8,
-    "spa": 17,
+    "spa": 16,
     "bot-block": 2,
     "dead": 11
   },
@@ -31,11 +31,6 @@
     },
     {
       "url": "https://deepinfra.com/models",
-      "declared": "static_html_table",
-      "observed": "spa_full"
-    },
-    {
-      "url": "https://console.groq.com/docs/models",
       "declared": "static_html_table",
       "observed": "spa_full"
     },
@@ -109,7 +104,7 @@
     },
     {
       "url": "https://compliance.microsoft.com/compliancemanager",
-      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DwbQDQgMMpSY7AOwVogiI4WOP8c3CcyWaOz-WVMJ6VrAP1sCpyZpUBVdmmAxLMGmBXRMVabE_lDXn-6iFG0k0BWOVnyumQhIcA79wjipr3T2B7BvqV-3XnkoxIS2TQi1Hw2BjY7VjNxhKuTExM_uMBdAYaaVrhFJb1-NE-xCUSns&response_mode=form_post&nonce=639171019456793756.YTQ4OTM2MmMtMGQyZS00MWM5LTg0NjQtNmQzNjNlMWRiYTI5NzcyZjA0NWUtMzk1ZC00Y2MwLWEzNWItY2QzMjlmZDhhMWU5&client-request-id=d1701161-0591-436a-88ed-6dbfc7e4cbb1&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
+      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3D5XZMuaW_5pneLbR5UfA6mGu2nWtn3Kyk6DuUmm-H3hnH45F0wvzhgAD0mRNSMjL7D2AQr7NkawFMLKOvX3X4yNIoNWcMlxeApIGsBqMrSBo8bAiXRbZh_YEd5HdlUxCKZ7kBTxDNDrQgGzvlxlSxt5ECKgAjVc4TRYkigOhQTR0&response_mode=form_post&nonce=639172206027230982.ZWQ0MjNiNTUtMTlhNi00MTk3LTk2MzUtMjlmYWIyOGVhNDM5ZGU3YWJkMmEtM2Y3My00MGFiLWJlYmUtOTI4YTJhZTVhNWFi&client-request-id=35e4aa49-dd94-4cc1-bbec-31a0a4842f40&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
     },
     {
       "url": "https://edpb.europa.eu/our-work-tools/consistency-findings/register-for-decisions_en",
@@ -130,7 +125,6 @@
     "https://openrouter.ai/rankings",
     "https://openrouter.ai",
     "https://deepinfra.com/models",
-    "https://console.groq.com/docs/models",
     "https://novita.ai/model-api",
     "https://www.anyscale.com/endpoints",
     "https://ai.azure.com/explore/models",

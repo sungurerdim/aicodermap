@@ -425,8 +425,10 @@ class TestFreshness(unittest.TestCase):
         self.assertEqual(
             classify_cell(self._cell(verifications=[{}]), self.TODAY)["tier"], "T1"
         )
+        # Stale backstop is FRESHNESS_TTL_DAYS=90 (reliability-driven since
+        # 2026-06-16) — a cell last checked >90d ago re-validates (T1).
         self.assertEqual(
-            classify_cell(self._cell(lastChecked="2026-05-01"), self.TODAY)["tier"],
+            classify_cell(self._cell(lastChecked="2026-02-01"), self.TODAY)["tier"],
             "T1",
         )
         self.assertEqual(

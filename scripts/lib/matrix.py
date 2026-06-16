@@ -75,7 +75,7 @@ def priority_cells(
     core_keys: list[str],
     limit: int = 200,
     verification_map: dict[str, Any] | None = None,
-    skip_confirmed_within_days: int = 7,
+    skip_confirmed_within_days: int = 90,
 ) -> list[dict[str, Any]]:
     """Top-N most starved (modelId, benchKey) cells — ORDERING (advisory).
 
@@ -96,8 +96,8 @@ def priority_cells(
 
     F2 skip-cache (aligned with FAZ 2.2 freshness contract):
     cells confirmed AND verified within `skip_confirmed_within_days` are
-    excluded from the priority queue (default 7d, matching
-    `_schema.contracts.FRESHNESS_TTL_DAYS`). The agent gets these cells
+    excluded from the priority queue (default matches
+    `_schema.contracts.FRESHNESS_TTL_DAYS`, 90d since 2026-06-16). The agent gets these cells
     via `idea_context.skipCells` (FAZ 2.2) instead. Pass `verification_map`
     to activate the skip; omit to retain UNCAPPED behaviour for legacy callers.
 

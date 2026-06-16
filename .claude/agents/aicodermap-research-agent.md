@@ -76,7 +76,12 @@ observedAt, modelCount, latestRelease, suggestedTier }`. Promotion requires
 artificialanalysis.ai/leaderboards for benches absent from
 `_schema.coreBenchKeys ∪ deprecatedBenchKeys`. Emit
 `discoveries.benchmarks[] = { key, label, sourceUrl, firstObserved,
-suggestedPublishers }`. Promotion requires AC6 (≥2 publishers) + human review.
+suggestedPublishers }` (list ≥2 distinct publisher domains when known — that is
+the AC6 gate). The orchestrator's `harvest-discoveries.py --promote` AUTO-PROMOTES
+any benchmark clearing AC6 (≥2 publishers) into `_schema.emergingBenchKeys` +
+core.js + i18n (audit-gated rollback); sub-AC6 benchmarks stay queued in
+`data/discoveries.json` for human review. Emit the richest `suggestedPublishers`
+you can so the AC6 gate resolves correctly.
 
 Orchestrator appends count badges to CHANGELOG: `🔎 New vendor candidates: N`,
 `🔎 New benchmark candidates: M`.
