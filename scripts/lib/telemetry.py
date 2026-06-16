@@ -46,6 +46,27 @@ def _utc_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def _norm_ts(value: Any) -> str | None:
+    """Normalize a runtime timestamp to an ISO-8601 UTC string.
+
+    Gather artifacts store runtime.startedAt/endedAt inconsistently — some as
+    int/float epoch seconds, some as ISO strings. Coercing here keeps the
+    later min()/max() comparison type-homogeneous (a mixed list raises
+    TypeError: '<' not supported between 'int' and 'str').
+    """
+    if value is None:
+        return None
+    if isinstance(value, bool):  # guard: bool is an int subclass
+        return None
+    if isinstance(value, (int, float)):
+        return datetime.fromtimestamp(value, timezone.utc).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
+    if isinstance(value, str):
+        return value
+    return None
+
+
 def _read_json(path: Path, default: Any) -> Any:
     if not path.is_file():
         return default
@@ -242,10 +263,12 @@ def aggregate_per_batch_telemetry(per_batch_artifacts: list[dict]) -> dict:
         tool_sum += tool_call_count
         if wallclock > 0:
             wallclocks.append(wallclock)
-        if rm.get("startedAt"):
-            started.append(rm["startedAt"])
-        if rm.get("endedAt"):
-            ended.append(rm["endedAt"])
+        started_ts = _norm_ts(rm.get("startedAt"))
+        if started_ts:
+            started.append(started_ts)
+        ended_ts = _norm_ts(rm.get("endedAt"))
+        if ended_ts:
+            ended.append(ended_ts)
 
         per_batch.append(
             {

@@ -505,6 +505,41 @@ class TestTelemetry(unittest.TestCase):
         self.assertEqual(tele["totals"]["toolCallSum"], 22)
         self.assertEqual(tele["totals"]["wallclockSecMax"], 300.0)
 
+    def test_aggregate_mixed_timestamp_types_no_crash(self):
+        # Regression (2026-06-16): gather artifacts store runtime.startedAt as
+        # int epoch in some batches and ISO string in others; min()/max() over
+        # the mixed list used to raise TypeError. Normalized at ingestion now.
+        arts = [
+            {
+                "batchId": "b0",
+                "mode": "gather",
+                "observations": [{}],
+                "runtime": {"startedAt": 1781623839, "endedAt": 1781624400},
+            },
+            {
+                "batchId": "b1",
+                "mode": "gather",
+                "observations": [{}],
+                "runtime": {
+                    "startedAt": "2026-06-16T15:30:00Z",
+                    "endedAt": "2026-06-16T15:42:00Z",
+                },
+            },
+            {
+                "batchId": "b2",
+                "mode": "gather",
+                "observations": [{}],
+                "runtime": {"startedAt": 1781624000.5},
+            },
+        ]
+        tele = aggregate_per_batch_telemetry(arts)  # must not raise
+        self.assertEqual(tele["totalBatches"], 3)
+        # min/max computed over normalized ISO strings
+        self.assertTrue(isinstance(tele["cycleStartedAt"], str))
+        self.assertTrue(isinstance(tele["cycleEndedAt"], str))
+        self.assertEqual(tele["cycleStartedAt"], "2026-06-16T15:30:00Z")
+        self.assertEqual(tele["cycleEndedAt"], "2026-06-16T15:42:00Z")
+
 
 # ── idea_context slims ───────────────────────────────────────────────────────
 
