@@ -161,6 +161,110 @@ def write_meta_and_history(meta: dict) -> None:
     )
 
 
+def _count_fills_and_gaps(
+    art: dict, mode: str | None
+) -> tuple[int, int, int, int, int]:
+    """FAZ 7.C (2026-05-10): mode-aware fill/gap counting.
+
+    Gather artifacts use FLAT schema (observations[], rawGaps[]). Synth/full
+    use models[].updates.bench + gaps[]. Prior version always read FULL schema,
+    so gather-only cycles reported fills=0/gaps=0 (cycle 2026-05-10).
+
+    Returns (fills, gaps, agent_gaps, orch_gaps, na).
+    """
+    if mode == "gather":
+        fills = len(art.get("observations") or [])
+        all_gaps = art.get("rawGaps") or []
+        gaps = len(all_gaps)
+        agent_gaps = gaps  # gather rawGaps are always agent-emitted
+        orch_gaps = 0
+        # N/A retired: gather artifacts never carry naCandidates (forbidden by
+        # the gather schema). Kept as 0 for telemetry-schema stability.
+        na = 0
+    else:
+        models = art.get("models") or []
+        fills = sum(
+            len((m.get("updates") or {}).get("bench") or {})
+            for m in models
+            if isinstance(m, dict)
+        )
+        all_gaps = art.get("gaps") or []
+        gaps = len(all_gaps)
+        # FAZ 4.B (2026-05-08): split by source — 'agent' = real research,
+        # 'orchestrator' = auto-stub placeholder. Legacy entries default 'agent'.
+        agent_gaps = sum(
+            1
+            for g in all_gaps
+            if isinstance(g, dict) and g.get("source") != "orchestrator"
+        )
+        orch_gaps = gaps - agent_gaps
+        na = sum(
+            len(m.get("notApplicable") or []) for m in models if isinstance(m, dict)
+        )
+    return fills, gaps, agent_gaps, orch_gaps, na
+
+
+def _extract_batch_entry(art: dict) -> tuple:
+    """Extract a single per-batch telemetry row from one batch artifact.
+
+    Returns (entry dict, wallclock, tool_call_count, fills, gaps, na,
+             started_ts, ended_ts) — side-channel timing strings are used by
+    the caller for cycle-level min/max aggregation.
+    """
+    rm = art.get("runtime") or art.get("runMetadata") or {}
+    # Source priority for batch_id:
+    #   1. art.batchId (agent emits it)
+    #   2. runtime.batchId / runMetadata.batchId
+    #   3. art._batchId (orchestrator-injected from artifact filename)
+    #   4. partialReason.batchId (when partialReason is a dict)
+    partial_reason = art.get("partialReason")
+    partial_batch_id = (
+        partial_reason.get("batchId") if isinstance(partial_reason, dict) else None
+    )
+    batch_id = (
+        art.get("batchId")
+        or rm.get("batchId")
+        or art.get("_batchId")
+        or partial_batch_id
+        or "unknown"
+    )
+
+    fills, gaps, agent_gaps, orch_gaps, na = _count_fills_and_gaps(art, art.get("mode"))
+
+    wallclock = float(
+        art.get("_wallclockSec")
+        or rm.get("wallclockSec")
+        or rm.get("elapsedSec")
+        or 0.0
+    )
+    tool_call_count = int(rm.get("toolCallCount") or 0)
+    started_ts = _norm_ts(rm.get("startedAt"))
+    ended_ts = _norm_ts(rm.get("endedAt"))
+
+    entry = {
+        "batchId": batch_id,
+        "wallclockSec": wallclock,
+        "toolCallCount": tool_call_count,
+        "fills": fills,
+        "gaps": gaps,
+        "agentGaps": agent_gaps,
+        "orchestratorGaps": orch_gaps,
+        "naCount": na,
+        "partialReason": partial_reason,
+    }
+    return entry, wallclock, tool_call_count, fills, gaps, na, started_ts, ended_ts
+
+
+def _compute_wallclock_stats(wallclocks: list[float]) -> tuple[float, float]:
+    """Return (wc_max, wc_p95) from a list of per-batch wallclock seconds."""
+    if not wallclocks:
+        return 0.0, 0.0
+    wc_sorted = sorted(wallclocks)
+    wc_max = wc_sorted[-1]
+    wc_p95 = wc_sorted[int(len(wc_sorted) * 0.95)] if len(wc_sorted) > 1 else wc_max
+    return wc_max, wc_p95
+
+
 def aggregate_per_batch_telemetry(per_batch_artifacts: list[dict]) -> dict:
     """FAZ 2.4 (2026-05-07): walk per-batch artifacts, compute cycle telemetry.
 
@@ -198,101 +302,23 @@ def aggregate_per_batch_telemetry(per_batch_artifacts: list[dict]) -> dict:
     for art in per_batch_artifacts or []:
         if not isinstance(art, dict):
             continue
-        rm = art.get("runtime") or art.get("runMetadata") or {}
-        # Source priority for batch_id:
-        #   1. art.batchId (agent emits it)
-        #   2. runtime.batchId / runMetadata.batchId
-        #   3. art._batchId (orchestrator-injected from artifact filename)
-        #   4. partialReason.batchId (when partialReason is a dict)
-        partial_reason = art.get("partialReason")
-        partial_batch_id = (
-            partial_reason.get("batchId") if isinstance(partial_reason, dict) else None
+        entry, wallclock, tool_call_count, fills, gaps, na, started_ts, ended_ts = (
+            _extract_batch_entry(art)
         )
-        batch_id = (
-            art.get("batchId")
-            or rm.get("batchId")
-            or art.get("_batchId")
-            or partial_batch_id
-            or "unknown"
-        )
-        # FAZ 7.C (2026-05-10): mode-aware fill/gap counting.
-        # Gather artifacts use FLAT schema (observations[], rawGaps[]). Synth/full
-        # use models[].updates.bench + gaps[]. Prior version always read FULL
-        # schema, so gather-only cycles reported fills=0/gaps=0 (cycle 2026-05-10).
-        mode = art.get("mode")
-        if mode == "gather":
-            fills = len(art.get("observations") or [])
-            all_gaps = art.get("rawGaps") or []
-            gaps = len(all_gaps)
-            agent_gaps = gaps  # gather rawGaps are always agent-emitted
-            orch_gaps = 0
-            # N/A retired: gather artifacts never carry naCandidates (forbidden by
-            # the gather schema). Kept as 0 for telemetry-schema stability.
-            na = 0
-        else:
-            models = art.get("models") or []
-            fills = sum(
-                len((m.get("updates") or {}).get("bench") or {})
-                for m in models
-                if isinstance(m, dict)
-            )
-            all_gaps = art.get("gaps") or []
-            gaps = len(all_gaps)
-            # FAZ 4.B (2026-05-08): split by source — 'agent' = real research,
-            # 'orchestrator' = auto-stub placeholder. Legacy entries default 'agent'.
-            agent_gaps = sum(
-                1
-                for g in all_gaps
-                if isinstance(g, dict) and g.get("source") != "orchestrator"
-            )
-            orch_gaps = gaps - agent_gaps
-            na = sum(
-                len(m.get("notApplicable") or []) for m in models if isinstance(m, dict)
-            )
-        wallclock = float(
-            art.get("_wallclockSec")
-            or rm.get("wallclockSec")
-            or rm.get("elapsedSec")
-            or 0.0
-        )
-        tool_call_count = int(rm.get("toolCallCount") or 0)
-
         fills_total += fills
         gaps_total += gaps
         na_total += na
         tool_sum += tool_call_count
         if wallclock > 0:
             wallclocks.append(wallclock)
-        started_ts = _norm_ts(rm.get("startedAt"))
         if started_ts:
             started.append(started_ts)
-        ended_ts = _norm_ts(rm.get("endedAt"))
         if ended_ts:
             ended.append(ended_ts)
-
-        per_batch.append(
-            {
-                "batchId": batch_id,
-                "wallclockSec": wallclock,
-                "toolCallCount": tool_call_count,
-                "fills": fills,
-                "gaps": gaps,
-                "agentGaps": agent_gaps,
-                "orchestratorGaps": orch_gaps,
-                "naCount": na,
-                "partialReason": partial_reason,
-            }
-        )
+        per_batch.append(entry)
 
     zero_fill = [pb["batchId"] for pb in per_batch if pb["fills"] == 0]
-
-    if wallclocks:
-        wc_sorted = sorted(wallclocks)
-        wc_max = wc_sorted[-1]
-        wc_p95 = wc_sorted[int(len(wc_sorted) * 0.95)] if len(wc_sorted) > 1 else wc_max
-    else:
-        wc_max = 0.0
-        wc_p95 = 0.0
+    wc_max, wc_p95 = _compute_wallclock_stats(wallclocks)
 
     return {
         "cycleStartedAt": min(started) if started else _utc_iso(),

@@ -100,13 +100,12 @@ def _artifact_paths() -> list[str]:
     return paths
 
 
-def harvest() -> dict:
-    """Union discoveries.{benchmarks,vendors} from all artifacts into
-    data/discoveries.json. Returns summary counts."""
+def _load_discovery_state() -> tuple[dict, set, set, dict, dict]:
+    """Load whitelist + existing discoveries; return (disc, known_benchkeys,
+    known_vendors, bench_by_key, vendor_by_id)."""
     wl = load_whitelist()
     known_benchkeys = set(all_bench_keys(wl))
     known_vendors = set((wl.get("vendors") or {}).keys())
-
     disc = (
         _load(DISCOVERIES_PATH)
         if DISCOVERIES_PATH.exists()
@@ -119,7 +118,17 @@ def harvest() -> dict:
     )
     bench_by_key = {e.get("key"): e for e in disc.get("benchmarks", []) if e.get("key")}
     vendor_by_id = {e.get("id"): e for e in disc.get("vendors", []) if e.get("id")}
+    return disc, known_benchkeys, known_vendors, bench_by_key, vendor_by_id
 
+
+def _merge_artifact_discoveries(
+    known_benchkeys: set,
+    known_vendors: set,
+    bench_by_key: dict,
+    vendor_by_id: dict,
+) -> tuple[int, int]:
+    """Scan every artifact file and merge benchmarks/vendors into the index maps.
+    Returns (new_bench_count, new_vendor_count)."""
     new_bench = 0
     new_vendor = 0
     for f in _artifact_paths():
@@ -166,12 +175,13 @@ def harvest() -> dict:
                 or prior.get("suggestedTier", "S"),
                 "status": prior.get("status", "pending"),
             }
+    return new_bench, new_vendor
 
-    disc["benchmarks"] = list(bench_by_key.values())
-    disc["vendors"] = list(vendor_by_id.values())
+
+def _save_and_report_harvest(disc: dict, new_bench: int, new_vendor: int) -> dict:
+    """Persist merged discoveries, print summary, and return counts dict."""
     disc.setdefault("leaderboards", [])
     _save(DISCOVERIES_PATH, disc)
-
     pending_bench = [e for e in disc["benchmarks"] if e.get("status") == "pending"]
     ac6_ready = [e for e in pending_bench if e.get("ac6Pass")]
     print(
@@ -186,27 +196,33 @@ def harvest() -> dict:
     return {"newBench": new_bench, "newVendor": new_vendor, "ac6Ready": ac6_ready}
 
 
+def harvest() -> dict:
+    """Union discoveries.{benchmarks,vendors} from all artifacts into
+    data/discoveries.json. Returns summary counts."""
+    disc, known_benchkeys, known_vendors, bench_by_key, vendor_by_id = (
+        _load_discovery_state()
+    )
+    new_bench, new_vendor = _merge_artifact_discoveries(
+        known_benchkeys, known_vendors, bench_by_key, vendor_by_id
+    )
+    disc["benchmarks"] = list(bench_by_key.values())
+    disc["vendors"] = list(vendor_by_id.values())
+    return _save_and_report_harvest(disc, new_bench, new_vendor)
+
+
 def _short_label(label: str, key: str) -> str:
     return label if 0 < len(label) <= 10 else key
 
 
-def promote_ac6() -> int:
-    """Auto-add AC6-passing pending benchmarks to the bench-key universe.
-    Audit-gated: rolls back every surface on coherence failure."""
-    disc = _load(DISCOVERIES_PATH) if DISCOVERIES_PATH.exists() else {"benchmarks": []}
-    ready = [
-        e
-        for e in disc.get("benchmarks", [])
-        if e.get("status") == "pending" and e.get("ac6Pass")
-    ]
-    if not ready:
-        print("=== PROMOTE === no AC6-ready benchmarks to promote")
-        return 0
-
-    surfaces = [WHITELIST_PATH, CORE_JS, EN_PATH, TR_PATH, DISCOVERIES_PATH]
-    snapshots = {p: p.read_text(encoding="utf-8") for p in surfaces}
-
-    wl = _load(WHITELIST_PATH)
+def _apply_promote_mutations(
+    ready: list,
+    wl: dict,
+    en: dict,
+    tr: dict,
+    disc: dict,
+) -> tuple[list, list]:
+    """Mutate whitelist, i18n dicts, and discovery entries in-place for all
+    AC6-ready benchmarks. Returns (promoted_keys, review_keys)."""
     schema = wl["_schema"]
     emerging = schema.setdefault("emergingBenchKeys", [])
     cats = schema.setdefault("benchCategories", [])
@@ -214,8 +230,6 @@ def promote_ac6() -> int:
     if cat is None:
         cat = {"id": DEFAULT_CATEGORY, "keys": []}
         cats.append(cat)
-    en = _load(EN_PATH)
-    tr = _load(TR_PATH)
     en.setdefault("benchmarks", {})
     tr.setdefault("benchmarks", {})
 
@@ -247,7 +261,29 @@ def promote_ac6() -> int:
         e["needsLocaleReview"] = True
         promoted.append(key)
         review.append(key)
+    return promoted, review
 
+
+def _run_promote_subprocess(script: str, env: dict) -> "subprocess.CompletedProcess":
+    return subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / script)],
+        capture_output=True,
+        text=True,
+        env=env,
+        timeout=300,
+    )
+
+
+def _commit_promote_surfaces_or_rollback(
+    snapshots: dict,
+    wl: dict,
+    en: dict,
+    tr: dict,
+    disc: dict,
+    promoted: list,
+) -> int:
+    """Save all mutated surfaces, run gen-bench-keys + audit. On failure, restore
+    snapshots and re-run gen-bench-keys. Returns 0 on success, 1 on rollback."""
     _save(WHITELIST_PATH, wl)
     _save(EN_PATH, en, indent=1)
     _save(TR_PATH, tr, indent=1)
@@ -257,26 +293,44 @@ def promote_ac6() -> int:
     # re-verify SSOT coherence. utf-8 env so a cp1254 child never crashes on the
     # status glyphs and falsely trips the rollback gate.
     env = {**os.environ, "PYTHONIOENCODING": "utf-8"}
-
-    def _run(script: str):
-        return subprocess.run(
-            [sys.executable, str(ROOT / "scripts" / script)],
-            capture_output=True,
-            text=True,
-            env=env,
-        )
-
-    gen = _run("gen-bench-keys.py")
-    audit = _run("audit-data-coherence.py")
+    gen = _run_promote_subprocess("gen-bench-keys.py", env)
+    audit = _run_promote_subprocess("audit-data-coherence.py", env)
     if gen.returncode != 0 or audit.returncode != 0:
         for p, text in snapshots.items():
             p.write_text(text, encoding="utf-8")
-        _run("gen-bench-keys.py")
+        _run_promote_subprocess("gen-bench-keys.py", env)
         print(
             "=== PROMOTE ROLLED BACK === coherence audit failed; benchmarks left "
             f"queued: {promoted}\n{audit.stdout}\n{audit.stderr}"
         )
         return 1
+    return 0
+
+
+def promote_ac6() -> int:
+    """Auto-add AC6-passing pending benchmarks to the bench-key universe.
+    Audit-gated: rolls back every surface on coherence failure."""
+    disc = _load(DISCOVERIES_PATH) if DISCOVERIES_PATH.exists() else {"benchmarks": []}
+    ready = [
+        e
+        for e in disc.get("benchmarks", [])
+        if e.get("status") == "pending" and e.get("ac6Pass")
+    ]
+    if not ready:
+        print("=== PROMOTE === no AC6-ready benchmarks to promote")
+        return 0
+
+    surfaces = [WHITELIST_PATH, CORE_JS, EN_PATH, TR_PATH, DISCOVERIES_PATH]
+    snapshots = {p: p.read_text(encoding="utf-8") for p in surfaces}
+
+    wl = _load(WHITELIST_PATH)
+    en = _load(EN_PATH)
+    tr = _load(TR_PATH)
+
+    promoted, review = _apply_promote_mutations(ready, wl, en, tr, disc)
+    rc = _commit_promote_surfaces_or_rollback(snapshots, wl, en, tr, disc, promoted)
+    if rc != 0:
+        return rc
 
     print(f"=== PROMOTE === auto-added {len(promoted)} AC6 benchmarks: {promoted}")
     if review:

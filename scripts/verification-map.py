@@ -89,27 +89,51 @@ def values_agree(values, threshold_pp=VERIFICATION_AGREEMENT_PP):
     return all(abs(v - median) <= threshold_pp for v in nums)
 
 
-def update_map():
+def _make_empty_cell(last_checked=None):
+    """Return a zero-valued cell dict with all additive fields initialised."""
+    return {
+        "value": None,
+        "verifications": [],
+        "lastChecked": last_checked if last_checked is not None else TODAY,
+        "gapHistory": [],
+        "gapSince": None,
+        "confidence": 0.0,
+        "stability": None,
+        "bayesianPoint": None,
+    }
+
+
+def _backfill_cell_fields(cell):
+    """Idempotently add additive fields to older cells that may lack them."""
+    cell.setdefault("gapHistory", [])
+    cell.setdefault("gapSince", None)
+    cell.setdefault("confidence", 0.0)
+    cell.setdefault("stability", None)
+    cell.setdefault("bayesianPoint", None)
+
+
+def _load_artifact_and_cells():
+    """Load the agent artifact and the existing verification-map cells.
+
+    Returns (artifact dict, cells dict) on success, or None on missing artifact.
+    """
     if not ARTIFACT.exists():
         print(f"no artifact at {ARTIFACT}; nothing to update", file=sys.stderr)
-        return 1
-
+        return None
     artifact = json.loads(ARTIFACT.read_text(encoding="utf-8"))
     if MAP_PATH.exists():
         m = json.loads(MAP_PATH.read_text(encoding="utf-8"))
         cells = m.get("cells", {})
     else:
         cells = {}
+    return artifact, cells
 
-    # B (2026-06-07): bench-universe filter. The prior `"bench" not in key`
-    # guard was a latent bug — sourcesAdded keys are `<modelId>.<benchKey>`
-    # (e.g. "opus-4-7.sweV") which contain no "bench" substring, so EVERY entry
-    # was skipped and the incremental update appended 0 verifications every
-    # cycle. (T2 filled-skip stayed dormant regardless because the `confirmed`
-    # flag is retired — so fixing this does NOT activate filled-cell skipping;
-    # it only restores correct audit-history append + powers B's fill-reset.)
-    bench_universe = _load_bench_key_universe()
 
+def _append_verifications(artifact, cells, bench_universe):
+    """Walk artifact.models[].sourcesAdded and append new provenance entries.
+
+    Returns (appended count, set of cell keys that received a fill this cycle).
+    """
     appended = 0
     filled_keys: set[str] = set()
     for model in artifact.get("models", []) or []:
@@ -125,25 +149,8 @@ def update_map():
                 continue
             cell_key = f"{mid}.{bk}"
             filled_keys.add(cell_key)
-            cell = cells.setdefault(
-                cell_key,
-                {
-                    "value": None,
-                    "verifications": [],
-                    "lastChecked": TODAY,
-                    "gapHistory": [],
-                    "gapSince": None,
-                    "confidence": 0.0,
-                    "stability": None,
-                    "bayesianPoint": None,
-                },
-            )
-            # Backfill additive fields on older cells (idempotent).
-            cell.setdefault("gapHistory", [])
-            cell.setdefault("gapSince", None)
-            cell.setdefault("confidence", 0.0)
-            cell.setdefault("stability", None)
-            cell.setdefault("bayesianPoint", None)
+            cell = cells.setdefault(cell_key, _make_empty_cell())
+            _backfill_cell_fields(cell)
             # Append this verification (dedupe by url). lastChecked stamps
             # only when a NEW verification actually lands this cycle — empty
             # cycles leave the prior date intact (per-cell freshness contract).
@@ -161,14 +168,19 @@ def update_map():
                 )
                 appended += 1
                 cell["lastChecked"] = TODAY
+    return appended, filled_keys
 
-    # Gap-history stamping — feeds ONLY the starvation queue in lib.matrix
-    # (a cell empty for >=2 consecutive cycles is pulled to the front of the
-    # research queue). A cell filled this cycle has its gap run reset; a cell
-    # still in the artifact's gaps[] has the current cycle appended to its
-    # history. NOT a skip mechanism — every gap cell is re-queried every full
-    # run (the 2026-06-07 gap-freshness-tier skip was retired the same week).
-    # A cell that is neither filled nor gapped this cycle is left untouched.
+
+def _stamp_gap_history(artifact, cells, filled_keys):
+    """Update gapHistory/gapSince for cells reported as gaps in the artifact.
+
+    Feeds ONLY the starvation queue in lib.matrix (a cell empty for >=2
+    consecutive cycles is pulled to the front of the research queue).
+    A cell filled this cycle has its gap run reset; a cell still in the
+    artifact's gaps[] has the current cycle appended to its history.
+    NOT a skip mechanism — every gap cell is re-queried every full run.
+    A cell that is neither filled nor gapped this cycle is left untouched.
+    """
     for ck in filled_keys:
         cell = cells.get(ck)
         if cell is not None:
@@ -185,19 +197,7 @@ def update_map():
         ck = f"{parsed[0]}.{parsed[1]}"
         if ck in filled_keys:
             continue  # filled wins over a stale carried gap in the same artifact
-        cell = cells.setdefault(
-            ck,
-            {
-                "value": None,
-                "verifications": [],
-                "lastChecked": None,
-                "gapHistory": [],
-                "gapSince": None,
-                "confidence": 0.0,
-                "stability": None,
-                "bayesianPoint": None,
-            },
-        )
+        cell = cells.setdefault(ck, _make_empty_cell(last_checked=None))
         cell.setdefault("gapHistory", [])
         if not cell.get("gapSince"):
             cell["gapSince"] = TODAY
@@ -206,18 +206,22 @@ def update_map():
         if len(hist) > _GAP_HISTORY_CAP:
             del hist[: len(hist) - _GAP_HISTORY_CAP]
         gap_stamped += 1
+    return gap_stamped
 
-    # Recompute consensus value (median when ≥ THRESHOLD agree) AND derive the
-    # `confirmed`/`contradicted` skip signals the freshness reader needs.
-    # 2026-06-16: `confirmed` UN-retired — the FAZ 2.2 freshness-tier skip
-    # (freshness.compute_skip_cells + matrix.priority_cells) reads this flag, so
-    # popping it kept the skip set permanently empty and every well-covered cell
-    # was re-fetched every cycle. It is DERIVED here from accumulated provenance
-    # (≥THRESHOLD distinct numeric sources agreeing within VERIFICATION_AGREEMENT_PP),
-    # not stored by an agent — so it stays SSOT-consistent with verifications[].
+
+def _recompute_consensus(cells):
+    """Derive confirmed/contradicted flags and consensus value for every cell.
+
+    2026-06-16: `confirmed` UN-retired — the FAZ 2.2 freshness-tier skip
+    (freshness.compute_skip_cells + matrix.priority_cells) reads this flag.
+    It is DERIVED from accumulated provenance (≥THRESHOLD distinct numeric
+    sources agreeing within VERIFICATION_AGREEMENT_PP), not stored by an agent.
+
+    Returns (confirmed_count, contested_count).
+    """
     contested_count = 0
     confirmed_count = 0
-    for cell_key, cell in cells.items():
+    for cell in cells.values():
         verifs = cell.get("verifications", [])
         nums = [
             v.get("value") for v in verifs if isinstance(v.get("value"), (int, float))
@@ -234,6 +238,27 @@ def update_map():
         elif contradicted:
             cell["value"] = None
             contested_count += 1
+    return confirmed_count, contested_count
+
+
+def update_map():
+    loaded = _load_artifact_and_cells()
+    if loaded is None:
+        return 1
+    artifact, cells = loaded
+
+    # B (2026-06-07): bench-universe filter. The prior `"bench" not in key`
+    # guard was a latent bug — sourcesAdded keys are `<modelId>.<benchKey>`
+    # (e.g. "opus-4-7.sweV") which contain no "bench" substring, so EVERY entry
+    # was skipped and the incremental update appended 0 verifications every
+    # cycle. (T2 filled-skip stayed dormant regardless because the `confirmed`
+    # flag is retired — so fixing this does NOT activate filled-cell skipping;
+    # it only restores correct audit-history append + powers B's fill-reset.)
+    bench_universe = _load_bench_key_universe()
+
+    appended, filled_keys = _append_verifications(artifact, cells, bench_universe)
+    _stamp_gap_history(artifact, cells, filled_keys)
+    confirmed_count, contested_count = _recompute_consensus(cells)
 
     m_out = {
         "lastUpdate": TODAY,
@@ -276,17 +301,12 @@ def _load_bench_key_universe():
     return universe
 
 
-def bootstrap_from_sources():
-    """Rebuild verification map from data/sources.json (the on-disk provenance
-    log accumulated across all prior cycles). Use once when introducing the
-    map mid-project, then incremental updates take over."""
-    sources_path = PROJECT / "data" / "sources.json"
-    if not sources_path.exists():
-        print("no data/sources.json — nothing to bootstrap from", file=sys.stderr)
-        return 1
-    sources = json.loads(sources_path.read_text(encoding="utf-8"))
+def _build_cells_from_sources(sources, bench_keys):
+    """Iterate sources.json entries and build the verification-map cells dict.
+
+    Returns cells dict with verifications populated (no consensus flags yet).
+    """
     cells = {}
-    bench_keys = _load_bench_key_universe()
     for key, entries in sources.items():
         if not isinstance(entries, list):
             continue
@@ -298,19 +318,7 @@ def bootstrap_from_sources():
         # Skip non-bench fields — only known bench keys go in the verification map
         if bk not in bench_keys:
             continue
-        cell = cells.setdefault(
-            f"{mid}.{bk}",
-            {
-                "value": None,
-                "verifications": [],
-                "lastChecked": TODAY,
-                "gapHistory": [],
-                "gapSince": None,
-                "confidence": 0.0,
-                "stability": None,
-                "bayesianPoint": None,
-            },
-        )
+        cell = cells.setdefault(f"{mid}.{bk}", _make_empty_cell())
         seen_urls = set()
         for e in entries:
             url = e.get("url", "")
@@ -326,23 +334,23 @@ def bootstrap_from_sources():
                     "fetched": e.get("date") or e.get("fetched") or TODAY,
                 }
             )
-    contested = 0
-    confirmed_count = 0
-    for cell in cells.values():
-        verifs = cell["verifications"]
-        nums = [v["value"] for v in verifs if isinstance(v["value"], (int, float))]
-        agree = values_agree(nums)
-        confirmed = len(nums) >= VERIFICATION_AGREEMENT_THRESHOLD and agree
-        contradicted = len(nums) >= 2 and not agree
-        cell["confirmed"] = confirmed
-        cell["contradicted"] = contradicted
-        if confirmed:
-            nums_sorted = sorted(nums)
-            cell["value"] = nums_sorted[len(nums_sorted) // 2]
-            confirmed_count += 1
-        elif contradicted:
-            cell["value"] = None
-            contested += 1
+    return cells
+
+
+def bootstrap_from_sources():
+    """Rebuild verification map from data/sources.json (the on-disk provenance
+    log accumulated across all prior cycles). Use once when introducing the
+    map mid-project, then incremental updates take over."""
+    sources_path = PROJECT / "data" / "sources.json"
+    if not sources_path.exists():
+        print("no data/sources.json — nothing to bootstrap from", file=sys.stderr)
+        return 1
+    sources = json.loads(sources_path.read_text(encoding="utf-8"))
+    bench_keys = _load_bench_key_universe()
+
+    cells = _build_cells_from_sources(sources, bench_keys)
+    confirmed_count, contested = _recompute_consensus(cells)
+
     m_out = {
         "lastUpdate": TODAY,
         "stats": {

@@ -173,15 +173,6 @@ def run_post_write_audits(models_path, sources_path, project):
     return True
 
 
-def _deep_merge_inplace(dst, src):
-    """Recursively merge src into dst in place. Arrays are replaced unless handled specially."""
-    for k, v in src.items():
-        if isinstance(v, dict) and isinstance(dst.get(k), dict):
-            _deep_merge_inplace(dst[k], v)
-        else:
-            dst[k] = v
-
-
 def merge_pricing(dst_pricing, src_pricing):
     """Multi-provider pricing array merge: dedupe api[] by provider, recompute range."""
     if "api" in src_pricing and isinstance(src_pricing["api"], list):
@@ -373,6 +364,77 @@ def _apply_cell_verdict(
     return 0
 
 
+def _ensure_cell_entry(cells: dict, cell_key: str) -> dict:
+    """Fetch-or-create the verification-map cell entry for cell_key, ensuring the
+    gapHistory/gapSince/confidence keys exist on a possibly-legacy entry."""
+    cell_entry = cells.setdefault(
+        cell_key,
+        {
+            "value": None,
+            "verifications": [],
+            "lastChecked": TODAY,
+            "gapHistory": [],
+            "gapSince": None,
+            "confidence": 0.0,
+            "stability": None,
+            "bayesianPoint": None,
+        },
+    )
+    cell_entry.setdefault("gapHistory", [])
+    cell_entry.setdefault("gapSince", None)
+    cell_entry.setdefault("confidence", 0.0)
+    return cell_entry
+
+
+def _stamp_quarantine_and_gaps(
+    models,
+    sources,
+    cells,
+    cycle_id,
+    pick_winner,
+    compute_cell_confidence,
+    reliability_ledger,
+) -> tuple[int, int]:
+    """Walk every (active model, benchKey) cell: stamp gap ledger + apply the
+    pick_winner quarantine/reconciliation verdict in place. Returns
+    (quarantined_count, gap_stamps)."""
+    quarantined_count = 0
+    gap_stamps = 0
+
+    for m in models:
+        mid = m.get("id")
+        if not mid or m.get("status") not in (None, "active"):
+            continue
+        bench = m.get("bench") or {}
+        for bk, val in bench.items():
+            cell_key = f"{mid}.{bk}"
+            cell_entry = _ensure_cell_entry(cells, cell_key)
+
+            is_gap = val is None
+            if is_gap:
+                gap_stamps += _stamp_gap_history(cell_entry, cycle_id)
+            else:
+                # Cell filled this cycle — clear the gap run.
+                cell_entry["gapHistory"] = []
+                cell_entry["gapSince"] = None
+
+            quarantined_count += _apply_cell_verdict(
+                m,
+                bk,
+                val,
+                bench,
+                cell_key,
+                cell_entry,
+                sources,
+                cycle_id,
+                pick_winner,
+                compute_cell_confidence,
+                reliability_ledger,
+            )
+
+    return quarantined_count, gap_stamps
+
+
 def apply_quarantine_and_gap_policy(
     models, sources, cycle_id, *, reliability_ledger=None
 ):
@@ -400,54 +462,15 @@ def apply_quarantine_and_gap_policy(
     vmap = _load_vmap(PROJECT)
     cells = vmap["cells"]
 
-    quarantined_count = 0
-    gap_stamps = 0
-
-    for m in models:
-        mid = m.get("id")
-        if not mid or m.get("status") not in (None, "active"):
-            continue
-        bench = m.get("bench") or {}
-        for bk, val in bench.items():
-            cell_key = f"{mid}.{bk}"
-            cell_entry = cells.setdefault(
-                cell_key,
-                {
-                    "value": None,
-                    "verifications": [],
-                    "lastChecked": TODAY,
-                    "gapHistory": [],
-                    "gapSince": None,
-                    "confidence": 0.0,
-                    "stability": None,
-                    "bayesianPoint": None,
-                },
-            )
-            cell_entry.setdefault("gapHistory", [])
-            cell_entry.setdefault("gapSince", None)
-            cell_entry.setdefault("confidence", 0.0)
-
-            is_gap = val is None
-            if is_gap:
-                gap_stamps += _stamp_gap_history(cell_entry, cycle_id)
-            else:
-                # Cell filled this cycle — clear the gap run.
-                cell_entry["gapHistory"] = []
-                cell_entry["gapSince"] = None
-
-            quarantined_count += _apply_cell_verdict(
-                m,
-                bk,
-                val,
-                bench,
-                cell_key,
-                cell_entry,
-                sources,
-                cycle_id,
-                pick_winner,
-                compute_cell_confidence,
-                reliability_ledger,
-            )
+    quarantined_count, gap_stamps = _stamp_quarantine_and_gaps(
+        models,
+        sources,
+        cells,
+        cycle_id,
+        pick_winner,
+        compute_cell_confidence,
+        reliability_ledger,
+    )
 
     print(
         f"quarantine + gap policy: quarantined={quarantined_count} "
@@ -937,7 +960,9 @@ def _print_merge_summary(
     print(f"total models: {len(models)}")
 
 
-def main():
+def _validate_and_load_artifact():
+    """Schema-validate the agent artifact (HARD BLOCK on failure), load it, and
+    run gap validation. Returns (out, fabricated_suspicions)."""
     import subprocess as _sp
 
     # Schema validation — HARD BLOCK before any file writes.
@@ -963,7 +988,14 @@ def main():
         out = json.load(fp)
 
     fabricated_suspicions = validate_gaps(out)
+    return out, fabricated_suspicions
 
+
+def _load_data_files(fabricated_suspicions):
+    """Rotate backups, load models.json + sources.json, build the id index +
+    whitelist/unhealthy lookups, and initialise the run log. Returns
+    (models_path, sources_path, models, sources, models_by_id, wl_idx,
+    unhealthy_urls, log)."""
     models_path = f"{PROJECT}/data/models.json"
     sources_path = f"{PROJECT}/data/sources.json"
     rotate_backup(models_path)
@@ -996,7 +1028,22 @@ def main():
     }
     if unhealthy_urls:
         print(f"FAZ 6.A SPA guard active: {len(unhealthy_urls)} unhealthy URL(s)")
+    return (
+        models_path,
+        sources_path,
+        models,
+        sources,
+        models_by_id,
+        wl_idx,
+        unhealthy_urls,
+        log,
+    )
 
+
+def _apply_model_updates(
+    out, models, sources, models_by_id, wl_idx, unhealthy_urls, log
+):
+    """Apply per-model updates + sourcesAdded provenance, then append newModels."""
     for upd in out.get("models", []):
         mid = upd["id"]
         m = models_by_id.get(mid)
@@ -1050,6 +1097,15 @@ def main():
             models_by_id[nm["id"]] = nm
             log["added"].append(nm["id"])
 
+
+def _resolve_contradictions(out, models, sources, models_by_id, unhealthy_urls, log):
+    """FAZ 6.B contradiction auto-resolution + R1 source-reliability crediting.
+
+    Re-clusters candidate observations, applies multi-source consensus override,
+    writes the resolved winner to models[].bench, appends all candidates to
+    sources.json provenance, and accumulates the Beta-Binomial reliability
+    posterior (contradictions loop + GREEN-cell sweep). Returns the loaded +
+    decayed reliability ledger so the caller can persist it after writes."""
     BENCH_KEYS = _load_bench_key_universe()
     # FAZ 6.B (2026-05-10): cluster-consensus winner override. The agent
     # may emit autoResolveWinner per single-argmax trustScore, which lets
@@ -1243,7 +1299,22 @@ def main():
     _green_cell_reliability_sweep(
         sources, _contradicted_cells, AGREEMENT_PP, reliability_ledger, TODAY
     )
+    return reliability_ledger
 
+
+def _finalize_and_write(
+    out,
+    models,
+    sources,
+    models_path,
+    sources_path,
+    models_by_id,
+    log,
+    reliability_ledger,
+):
+    """Apply lineup changes, quarantine/gap policy, name canonicalization, and
+    self-check; then write models.json + sources.json + verification map +
+    reliability ledger. Returns (issues, mx_diag) for the post-write gates."""
     _process_lineup_changes(out, models_by_id, log, TODAY, NOW)
 
     # FAZ 8.A.3d (2026-05-18): quarantine + gap policy must run BEFORE the
@@ -1293,7 +1364,14 @@ def main():
         fp.write("\n")
     # R1: persist the source-reliability ledger after sources.json is on disk.
     _reliability.save_ledger(LEDGER_PATH, reliability_ledger)
+    return issues
 
+
+def _run_post_write_gates_and_changelog(
+    out, models, models_path, sources_path, log, issues
+):
+    """Coverage warnings + MX1/MX2 invariant gates + post-write audits +
+    telemetry + CHANGELOG write + final summary print."""
     coverage = out.get("validationCoverage", 0)
     cov_pct = round(coverage * 100, 1)
     coverage_warn = ""
@@ -1479,6 +1557,43 @@ def main():
             fp.write("# Changelog\n\n" + cl_blob)
 
     _print_merge_summary(log, matrix, matrix_warn, cov_pct, issues, models)
+
+
+def main():
+    out, fabricated_suspicions = _validate_and_load_artifact()
+    (
+        models_path,
+        sources_path,
+        models,
+        sources,
+        models_by_id,
+        wl_idx,
+        unhealthy_urls,
+        log,
+    ) = _load_data_files(fabricated_suspicions)
+
+    _apply_model_updates(
+        out, models, sources, models_by_id, wl_idx, unhealthy_urls, log
+    )
+
+    reliability_ledger = _resolve_contradictions(
+        out, models, sources, models_by_id, unhealthy_urls, log
+    )
+
+    issues = _finalize_and_write(
+        out,
+        models,
+        sources,
+        models_path,
+        sources_path,
+        models_by_id,
+        log,
+        reliability_ledger,
+    )
+
+    _run_post_write_gates_and_changelog(
+        out, models, models_path, sources_path, log, issues
+    )
 
 
 if __name__ == "__main__":
