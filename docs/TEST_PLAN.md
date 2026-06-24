@@ -37,7 +37,7 @@ support) and Firefox (no WebGPU) recommended for parity coverage.
 
 | AC | Scenario | Expected |
 |----|----------|----------|
-| AC1 | First load with empty `localStorage` | TR locale if browser lang starts with `tr`, otherwise EN. Dark theme. Default weights sum 100. 55 models render with `loading` placeholder gone. |
+| AC1 | First load with empty `localStorage` | TR locale if browser lang starts with `tr`, otherwise EN. Dark theme. Default weights sum 100. 79 models render with `loading` placeholder gone. |
 | AC2 | Switch language EN ↔ TR via segmented control | All `data-i18n-key` text updates, `<html lang>` updates, persisted to `localStorage`. |
 | AC3 | Switch theme dark ↔ light | `html[data-theme]` flips, palette swaps, persisted to `localStorage`. Subsequent reload honours the choice. |
 | AC4 | Move a weight slider | Numeric input mirrors slider, total badge updates, "Custom" preset is selected, table + cards re-rank. |
@@ -63,7 +63,7 @@ support) and Firefox (no WebGPU) recommended for parity coverage.
 After running `/aicodermap` and committing:
 
 - Smoke test still passes (`smoke.html`)
-- 78+ models render with no console errors
+- 79+ models render with no console errors
 - TR ↔ EN parity preserved (`scripts/regex-lint.js` for whitelist; manual scan for new keys)
 - Dark + light themes both legible (visual check)
 - Screen reader: tab through header → filters → weights → table → cards (NVDA / VoiceOver / Orca)

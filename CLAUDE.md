@@ -157,6 +157,6 @@ Toolchain: node --check + ruff + regex-lint | CI: none (manual discipline) | Con
 
 Ideal: coupling=low cohesion=high complexity<=15 coverage=80%
 
-Scores: sec=84 quality=62 arch=68 perf=85 resil=76 test=60 stack=88 dx=85 docs=66 overall=74 model=claude-opus-4-8[1m]
+Scores: sec=88 quality=72 arch=68 perf=88 resil=78 test=78 stack=88 dx=85 docs=80 overall=79 model=claude-opus-4-8[1m]
 
 ## End Blueprint Profile
