@@ -1,19 +1,14 @@
 {
-  "probedAt": "2026-06-16T15:30:18Z",
+  "probedAt": "2026-06-24T19:31:50Z",
   "total": 138,
   "counts": {
-    "format-drift": 15,
-    "redirect": 8,
-    "spa": 16,
+    "format-drift": 13,
+    "redirect": 10,
+    "spa": 14,
     "bot-block": 2,
-    "dead": 11
+    "dead": 9
   },
   "formatDrift": [
-    {
-      "url": "https://lmarena.ai/leaderboard/webdev",
-      "declared": "static_html_table",
-      "observed": "dead"
-    },
     {
       "url": "https://klu.ai/llm-leaderboard",
       "declared": "static_html_table",
@@ -21,11 +16,6 @@
     },
     {
       "url": "https://benchlm.ai/benchmarks/programBench",
-      "declared": "static_html_table",
-      "observed": "spa_full"
-    },
-    {
-      "url": "https://openrouter.ai",
       "declared": "static_html_table",
       "observed": "spa_full"
     },
@@ -87,12 +77,20 @@
   ],
   "redirects": [
     {
+      "url": "https://lmarena.ai/leaderboard/webdev",
+      "to": "https://arena.ai/leaderboard/webdev"
+    },
+    {
       "url": "https://paperswithcode.com/area/code-generation",
       "to": "https://huggingface.co/papers/trending"
     },
     {
       "url": "https://cerebras.ai/inference",
       "to": "https://www.cerebras.ai/inference"
+    },
+    {
+      "url": "https://tensorix.ai/",
+      "to": "https://tensorx.ai/"
     },
     {
       "url": "https://www.swyx.io/",
@@ -104,11 +102,11 @@
     },
     {
       "url": "https://compliance.microsoft.com/compliancemanager",
-      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3D5XZMuaW_5pneLbR5UfA6mGu2nWtn3Kyk6DuUmm-H3hnH45F0wvzhgAD0mRNSMjL7D2AQr7NkawFMLKOvX3X4yNIoNWcMlxeApIGsBqMrSBo8bAiXRbZh_YEd5HdlUxCKZ7kBTxDNDrQgGzvlxlSxt5ECKgAjVc4TRYkigOhQTR0&response_mode=form_post&nonce=639172206027230982.ZWQ0MjNiNTUtMTlhNi00MTk3LTk2MzUtMjlmYWIyOGVhNDM5ZGU3YWJkMmEtM2Y3My00MGFiLWJlYmUtOTI4YTJhZTVhNWFi&client-request-id=35e4aa49-dd94-4cc1-bbec-31a0a4842f40&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
+      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3Dk39s6CQ5wWWsaKvl4ie6Hu7k_DX7Z1wUrlMAw5pY63iU_T7DooffZ-zfI7E_rJrZoKObjop1ENHGdLu8mjwGJqe2RJ-v4geNJK5hcmpb-arLoQXHRG74HN03WPXm_X0LGi4ycXZ27GIs-_F7cXQ3tDW2aCYlB7OZQXHwy5EpSq4&response_mode=form_post&nonce=639179262969078694.NDk5ZDk3MTItN2I2OC00ZTY2LTllYTEtODVlZmU5YTlkMDRiOGIxZTlmNWItY2M2Yy00Zjk1LWI4YjgtZDI0NDk0NThlNjI3&client-request-id=5328531a-5d16-46b7-917b-6418a252476a&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
     },
     {
       "url": "https://edpb.europa.eu/our-work-tools/consistency-findings/register-for-decisions_en",
-      "to": "https://www.edpb.europa.eu/our-work-tools/consistency-findings/register-for-decisions_en"
+      "to": "https://www.edpb.europa.eu/registers/register-of-consistency-and-of-accountability-tools/national-decisions-or-measures-taken_en"
     },
     {
       "url": "https://platform.openai.com/docs/models",
@@ -122,8 +120,6 @@
   "spa": [
     "https://livebench.ai/",
     "https://benchlm.ai/benchmarks/programBench",
-    "https://openrouter.ai/rankings",
-    "https://openrouter.ai",
     "https://deepinfra.com/models",
     "https://novita.ai/model-api",
     "https://www.anyscale.com/endpoints",
@@ -142,14 +138,6 @@
     "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
   ],
   "dead": [
-    {
-      "url": "https://terminal-bench.io/",
-      "error": "URLError: <urlopen error [Errno 11001] getaddrinfo failed>"
-    },
-    {
-      "url": "https://lmarena.ai/leaderboard/webdev",
-      "error": "HTTP 404 Not Found"
-    },
     {
       "url": "https://klu.ai/llm-leaderboard",
       "error": "HTTP 403 Forbidden"

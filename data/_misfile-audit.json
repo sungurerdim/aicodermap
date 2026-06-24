@@ -1,20 +1,13 @@
 {
   "_summary": {
     "compositeMisfiles": 0,
-    "measuredCandidates": 39,
+    "measuredCandidates": 40,
     "bandViolations": 0,
-    "crossBenchDups": 7,
-    "aaRowsLoaded": 398
+    "crossBenchDups": 6,
+    "aaRowsLoaded": 348
   },
   "compositeMisfiles": [],
   "measuredCandidates": [
-    {
-      "modelId": "glm-5-1",
-      "benchKey": "tau2",
-      "current": 19.9,
-      "aa": 97.66,
-      "delta": 77.76
-    },
     {
       "modelId": "mistral-large-3",
       "benchKey": "tau2",
@@ -28,6 +21,20 @@
       "current": 51.0,
       "aa": 13.16,
       "delta": 37.84
+    },
+    {
+      "modelId": "gemma-4-12b",
+      "benchKey": "tau2",
+      "current": 69.0,
+      "aa": 36.26,
+      "delta": 32.74
+    },
+    {
+      "modelId": "glm-4-5-air",
+      "benchKey": "tau2",
+      "current": 78.18,
+      "aa": 46.49,
+      "delta": 31.69
     },
     {
       "modelId": "minimax-m2-7",
@@ -63,13 +70,6 @@
       "current": 52.3,
       "aa": 28.04,
       "delta": 24.26
-    },
-    {
-      "modelId": "glm-4-5-air",
-      "benchKey": "tau2",
-      "current": 70.1,
-      "aa": 46.49,
-      "delta": 23.61
     },
     {
       "modelId": "qwen3-6-max",
@@ -254,6 +254,13 @@
       "delta": 9.97
     },
     {
+      "modelId": "gemma-4-12b",
+      "benchKey": "hle",
+      "current": 5.2,
+      "aa": 14.78,
+      "delta": 9.58
+    },
+    {
       "modelId": "gemma-4-31b",
       "benchKey": "gpqa",
       "current": 76.3,
@@ -289,8 +296,7 @@
       "value": 87.6,
       "benchKeys": [
         "aime26",
-        "lcb",
-        "mmluPro"
+        "lcb"
       ]
     },
     {
@@ -315,14 +321,6 @@
       "benchKeys": [
         "tau2",
         "tb2"
-      ]
-    },
-    {
-      "modelId": "grok-4-3",
-      "value": 53.0,
-      "benchKeys": [
-        "aaIdx",
-        "hle"
       ]
     },
     {
