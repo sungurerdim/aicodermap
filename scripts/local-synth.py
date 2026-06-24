@@ -127,7 +127,8 @@ def main() -> int:
     historical_path = ROOT / "data" / "sources.json"
     historical: dict[tuple, list] = defaultdict(list)
     if historical_path.exists():
-        hist = json.load(open(historical_path, encoding="utf-8"))
+        with open(historical_path, encoding="utf-8") as _f:
+            hist = json.load(_f)
         for full_key, entries in hist.items():
             if "." not in full_key:
                 continue
@@ -176,7 +177,8 @@ def main() -> int:
     parsed_artifacts: list[tuple[Path, dict]] = []
     for p in artifacts:
         try:
-            parsed_artifacts.append((p, json.load(open(p, encoding="utf-8"))))
+            with open(p, encoding="utf-8") as _f:
+                parsed_artifacts.append((p, json.load(_f)))
         except Exception as e:
             print(f"  ! skip {p.name}: {e}")
 

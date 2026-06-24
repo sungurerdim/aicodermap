@@ -30,10 +30,25 @@ TODAY = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d")
 NOW_ISO = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 ARTIFACT_PATH = ROOT / ".aicodermap-agent-out.json"
 
-models_data = json.loads((ROOT / "data/models.json").read_text(encoding="utf-8"))
+try:
+    models_data = json.loads((ROOT / "data/models.json").read_text(encoding="utf-8"))
+except FileNotFoundError:
+    raise SystemExit(
+        "gap_gen: required file not found: data/models.json — run from repo root"
+    )
 models = models_data if isinstance(models_data, list) else models_data.get("models", [])
-wl = json.loads((ROOT / "data/sources-whitelist.json").read_text(encoding="utf-8"))
-i18n_en = json.loads((ROOT / "i18n/en.json").read_text(encoding="utf-8"))
+try:
+    wl = json.loads((ROOT / "data/sources-whitelist.json").read_text(encoding="utf-8"))
+except FileNotFoundError:
+    raise SystemExit(
+        "gap_gen: required file not found: data/sources-whitelist.json — run from repo root"
+    )
+try:
+    i18n_en = json.loads((ROOT / "i18n/en.json").read_text(encoding="utf-8"))
+except FileNotFoundError:
+    raise SystemExit(
+        "gap_gen: required file not found: i18n/en.json — run from repo root"
+    )
 
 core_keys = wl.get("_schema", {}).get("coreBenchKeys", [])
 active = _active_models(models)

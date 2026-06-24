@@ -68,7 +68,8 @@ def _gather_observations() -> dict[tuple[str, str], list[float]]:
     obs: dict[tuple[str, str], list[float]] = defaultdict(list)
     for p in sorted(ROOT.glob(".aicodermap-agent-out-batch*.gather.json")):
         try:
-            art = json.load(open(p, encoding="utf-8"))
+            with open(p, encoding="utf-8") as _f:
+                art = json.load(_f)
         except (OSError, json.JSONDecodeError):
             continue
         for o in art.get("observations") or []:
@@ -84,7 +85,8 @@ def _historical_values() -> dict[tuple[str, str], list[float]]:
     hist: dict[tuple[str, str], list[float]] = defaultdict(list)
     if not SOURCES_PATH.is_file():
         return hist
-    data = json.load(open(SOURCES_PATH, encoding="utf-8"))
+    with open(SOURCES_PATH, encoding="utf-8") as _f:
+        data = json.load(_f)
     for full_key, entries in data.items():
         if "." not in full_key or not isinstance(entries, list):
             continue

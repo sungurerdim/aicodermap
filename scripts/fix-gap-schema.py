@@ -18,7 +18,8 @@ ROOT = Path(__file__).resolve().parent.parent
 
 def main() -> int:
     p = ROOT / ".aicodermap-agent-out.json"
-    art = json.load(open(p, encoding="utf-8"))
+    with open(p, encoding="utf-8") as _f:
+        art = json.load(_f)
 
     # Build the set of filled (modelId, field) pairs:
     # 1. Existing data/models.json bench values (will persist post-merge)
@@ -26,7 +27,8 @@ def main() -> int:
     filled: set[tuple[str, str]] = set()
     data_path = ROOT / "data" / "models.json"
     if data_path.exists():
-        existing = json.load(open(data_path, encoding="utf-8"))
+        with open(data_path, encoding="utf-8") as _f:
+            existing = json.load(_f)
         existing_list = (
             existing if isinstance(existing, list) else existing.get("models", [])
         )

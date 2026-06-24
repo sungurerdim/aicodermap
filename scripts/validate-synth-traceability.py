@@ -68,7 +68,8 @@ def _gather_observations() -> dict[tuple[str, str], list[float]]:
     obs: dict[tuple[str, str], list[float]] = defaultdict(list)
     for p in sorted(ROOT.glob(".aicodermap-agent-out-batch*.gather.json")):
         try:
-            art = json.load(open(p, encoding="utf-8"))
+            with open(p, encoding="utf-8") as _f:
+                art = json.load(_f)
         except (OSError, json.JSONDecodeError):
             continue
         for o in art.get("observations") or []:
@@ -108,7 +109,8 @@ def _historical_values() -> dict[tuple[str, str], list[float]]:
     if not SOURCES_PATH.is_file():
         return hist
     fabricated = _prior_fabricated_cells()
-    data = json.load(open(SOURCES_PATH, encoding="utf-8"))
+    with open(SOURCES_PATH, encoding="utf-8") as _f:
+        data = json.load(_f)
     for full_key, entries in data.items():
         if "." not in full_key or not isinstance(entries, list):
             continue
@@ -188,7 +190,8 @@ def classify(
 
 
 def _validate_once(warn_pp: float) -> dict:
-    synth = json.load(open(SYNTH_PATH, encoding="utf-8"))
+    with open(SYNTH_PATH, encoding="utf-8") as _f:
+        synth = json.load(_f)
     return classify(synth, _gather_observations(), _historical_values(), warn_pp)
 
 
@@ -208,11 +211,8 @@ def main() -> int:
         return 2
 
     try:
-        warn_pp = float(
-            contracts(json.load(open(WHITELIST_PATH, encoding="utf-8"))).get(
-                "CONTRADICTION_WARN_PP", 3.0
-            )
-        )
+        with open(WHITELIST_PATH, encoding="utf-8") as _f:
+            warn_pp = float(contracts(json.load(_f)).get("CONTRADICTION_WARN_PP", 3.0))
     except Exception:
         warn_pp = 3.0
 
