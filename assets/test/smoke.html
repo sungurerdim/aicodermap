@@ -54,6 +54,8 @@
     import { gpuCompat, isLocalRunnable } from '../js/gpu.js';
     import { modelSourcesSummary, buildSourcesMarkdown } from '../js/sources.js';
     import { readUrlState, buildShareUrl, applyUrlState } from '../js/url-state.js';
+    import { el, clear, showToast } from '../js/dom.js';
+    import { startFreshnessWatch } from '../js/freshness.js';
     import { t, tierLabel, applyI18n } from '../js/i18n.js';
     import { showContradictionTooltip, hideTooltip } from '../js/overlay.js';
     import { buildModelCard, buildBenchCell } from '../js/render-card.js';
@@ -708,6 +710,140 @@
         else localStorage.setItem(k, v);
       }
     }
+
+    // ── 19. url-state round-trip: applyUrlState mutates State correctly.
+    // readUrlState() reads window.location.search; when smoke.html is loaded
+    // without query params it returns {}, so we assert that contract first.
+    // The deeper round-trip test drives applyUrlState directly with a
+    // hand-crafted urlState object and verifies each field lands in State.
+    {
+      const savedLang   = State.lang;
+      const savedFilters = { ...State.filters };
+      const savedVram   = State.vram;
+      const savedGpu    = State.selectedGpu;
+      const savedSort   = { ...State.sort };
+      const savedWeights = { ...State.weights };
+
+      // 19a. readUrlState returns an object (never throws, even without params).
+      let parsed;
+      try { parsed = readUrlState(); } catch (e) { parsed = null; }
+      assertTrue('readUrlState() returns an object', parsed !== null && typeof parsed === 'object',
+        parsed == null ? 'threw or returned null' : '');
+
+      // 19b. applyUrlState round-trip: build a synthetic urlState, apply it,
+      // then verify each field landed in State.
+      const synth = {
+        lang: 'tr',
+        tier: 'open-flagship',
+        deployment: 'cloud',
+        provider: 'Acme AI',
+        search: 'round-trip-test',
+        openOnly: true,
+        vram: 32,
+        gpu: 'nvidia.rtx4090',
+        sort: { col: 'name', dir: 'asc' },
+      };
+      applyUrlState(synth);
+      assertEq('applyUrlState sets State.lang', State.lang, 'tr');
+      assertEq('applyUrlState sets State.filters.tier', State.filters.tier, 'open-flagship');
+      assertEq('applyUrlState sets State.filters.deployment', State.filters.deployment, 'cloud');
+      assertEq('applyUrlState sets State.filters.provider', State.filters.provider, 'Acme AI');
+      assertEq('applyUrlState sets State.filters.search', State.filters.search, 'round-trip-test');
+      assertEq('applyUrlState sets State.filters.openOnly', State.filters.openOnly, true);
+      assertEq('applyUrlState sets State.vram', State.vram, 32);
+      assertEq('applyUrlState sets State.selectedGpu', State.selectedGpu, 'nvidia.rtx4090');
+      assertEq('applyUrlState sets State.sort.col', State.sort.col, 'name');
+      assertEq('applyUrlState sets State.sort.dir', State.sort.dir, 'asc');
+
+      // 19c. applyUrlState ignores null/non-object input (must not throw).
+      try {
+        applyUrlState(null);
+        applyUrlState('bad');
+        applyUrlState(42);
+        assertTrue('applyUrlState is safe on null/non-object input', true);
+      } catch (e) {
+        assertTrue('applyUrlState is safe on null/non-object input', false, e.message);
+      }
+
+      // Restore State so subsequent tests are unaffected.
+      State.lang       = savedLang;
+      State.filters    = savedFilters;
+      State.vram       = savedVram;
+      State.selectedGpu = savedGpu;
+      State.sort       = savedSort;
+      State.weights    = savedWeights;
+    }
+
+    // ── 20. dom.js helpers: el() and clear().
+    {
+      // 20a. el() builds the correct element type.
+      const span = el('span');
+      assertEq('el("span") creates a SPAN element', span.tagName, 'SPAN');
+
+      // 20b. el() sets className via the "class" attr key.
+      const div = el('div', { class: 'my-class' });
+      assertEq('el() sets className via "class"', div.className, 'my-class');
+
+      // 20c. el() sets arbitrary attributes.
+      const btn = el('button', { type: 'button', 'aria-label': 'test-btn' });
+      assertEq('el() sets type attribute', btn.getAttribute('type'), 'button');
+      assertEq('el() sets aria-label attribute', btn.getAttribute('aria-label'), 'test-btn');
+
+      // 20d. el() skips null/false attribute values.
+      const p = el('p', { id: null, 'data-x': false, title: 'keep' });
+      assertEq('el() keeps truthy attr', p.getAttribute('title'), 'keep');
+      assertEq('el() skips null attr', p.hasAttribute('id'), false);
+
+      // 20e. el() appends string children as text nodes.
+      const h = el('h2', {}, 'hello world');
+      assertEq('el() appends string child as textContent', h.textContent, 'hello world');
+
+      // 20f. el() appends element children.
+      const child = el('em', {}, 'inner');
+      const wrapper = el('p', {}, child);
+      assertEq('el() appends element child', wrapper.firstChild.tagName, 'EM');
+
+      // 20g. clear() removes all children from a node.
+      const host = el('div', {}, el('span'), el('span'), el('span'));
+      assertEq('clear() precondition: 3 children', host.childNodes.length, 3);
+      clear(host);
+      assertEq('clear() removes all children', host.childNodes.length, 0);
+
+      // 20h. clear() is a no-op on an already-empty node.
+      try {
+        clear(host);
+        assertTrue('clear() is safe on already-empty node', true);
+      } catch (e) {
+        assertTrue('clear() is safe on already-empty node', false, e.message);
+      }
+
+      // 20i. showToast() creates the #toast-host and renders the message.
+      // Remove any prior toast-host so we test the creation branch.
+      const priorHost = document.getElementById('toast-host');
+      if (priorHost) priorHost.remove();
+      showToast('smoke-toast-test', 'info', 99999);
+      const toastHost = document.getElementById('toast-host');
+      assertTrue('showToast creates #toast-host', !!toastHost);
+      const toastEl = toastHost && toastHost.querySelector('.toast');
+      assertTrue('showToast appends a .toast element', !!toastEl);
+      assertEq('showToast sets textContent to the message', toastEl && toastEl.textContent, 'smoke-toast-test');
+      assertTrue('showToast applies the kind class (toast-info)', !!toastEl && toastEl.classList.contains('toast-info'));
+      // Cleanup: remove the injected toast-host.
+      if (toastHost) toastHost.remove();
+    }
+
+    // ── 21. freshness.js unit-testability note.
+    // freshness.js exports only `startFreshnessWatch`, which schedules network
+    // probes (HEAD data/models.json + GitHub Commits API) via setTimeout and
+    // setInterval. The internal helpers (applyTemplate, showStaleBanner, probe,
+    // fetchLiveModelsEtag, fetchLatestCommitSha) are all module-private.
+    // No pure function with deterministic input/output is exported, so there
+    // is nothing to unit-test here without either:
+    //   (a) making private helpers exportable (out of scope), or
+    //   (b) a network mock layer (no deps allowed in this harness).
+    // Covered indirectly by the 14h SSOT tripwire (live ETag + tiers.py mirror)
+    // and the DOM banner check in the browser integration run.
+    assertTrue('freshness.js: startFreshnessWatch is a function (export check)', typeof startFreshnessWatch === 'function');
 
     // Summary header + machine-readable completion marker (headless runners
     // poll document.title; "SMOKE DONE" only appears after every assertion ran).

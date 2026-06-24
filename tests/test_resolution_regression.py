@@ -286,13 +286,21 @@ def test_10_quarterly_decay_slower_than_default():
         "10.default100",
         default_weight,
         lambda v: abs(v - 0.70) < 0.001,
-        "default 100d -> 0.70",
+        (
+            "curve='default' bucket=(90,180)d: expected weight=0.70 for age=100d "
+            "(INTERVAL_DECAY_CURVES['default'] (90,180) bucket changed — update the frozen "
+            "anchor or the expected value if the curve was intentionally reshaped)"
+        ),
     )
     expect(
         "10.quarterly100",
         quarterly_weight,
         lambda v: abs(v - 0.85) < 0.001,
-        "quarterly 100d -> 0.85 (slower)",
+        (
+            "curve='quarterly' bucket=(90,180)d: expected weight=0.85 for age=100d "
+            "(INTERVAL_DECAY_CURVES['quarterly'] (90,180) bucket changed — update the frozen "
+            "anchor or the expected value if the curve was intentionally reshaped)"
+        ),
     )
 
 
@@ -314,13 +322,21 @@ def test_11_weekly_decay_faster_than_default():
         "11.default20",
         default_weight,
         lambda v: abs(v - 1.00) < 0.001,
-        "default 20d -> 1.00",
+        (
+            "curve='default' bucket=(0,30)d: expected weight=1.00 for age=20d "
+            "(INTERVAL_DECAY_CURVES['default'] (0,30) bucket changed — update the frozen "
+            "anchor or the expected value if the curve was intentionally reshaped)"
+        ),
     )
     expect(
         "11.weekly20",
         weekly_weight,
         lambda v: abs(v - 0.80) < 0.001,
-        "weekly 20d -> 0.80 (faster)",
+        (
+            "curve='weekly' bucket=(0,30)d: expected weight=0.80 for age=20d "
+            "(INTERVAL_DECAY_CURVES['weekly'] (0,30) bucket changed — update the frozen "
+            "anchor or the expected value if the curve was intentionally reshaped)"
+        ),
     )
 
 
