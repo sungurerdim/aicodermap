@@ -1,12 +1,12 @@
 {
-  "probedAt": "2026-06-27T06:44:03Z",
-  "total": 138,
+  "probedAt": "2026-06-27T09:07:16Z",
+  "total": 139,
   "counts": {
-    "format-drift": 13,
-    "redirect": 10,
-    "spa": 14,
+    "format-drift": 12,
+    "redirect": 9,
+    "spa": 12,
     "bot-block": 2,
-    "dead": 9
+    "dead": 6
   },
   "formatDrift": [
     {
@@ -23,11 +23,6 @@
       "url": "https://deepinfra.com/models",
       "declared": "static_html_table",
       "observed": "spa_full"
-    },
-    {
-      "url": "https://cloud.sambanova.ai/models",
-      "declared": "static_html_table",
-      "observed": "dead"
     },
     {
       "url": "https://www.lepton.ai/pricing",
@@ -102,19 +97,15 @@
     },
     {
       "url": "https://compliance.microsoft.com/compliancemanager",
-      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DO1JaAEyPeZna8rhb8u1EUo9H5z7fZrZKwcD2TfEtivDW9inmsVbGDq3klnzSkzZN-p-eLy--p9V2E8MrMhIvlBfcHjvue_UzkUn2czSzwWK3OhzuZSArt7TLJwobldwcooRyQfJeTTHabaG-k6KqeeTtZ7NiIccb0chJf4LV2Hw&response_mode=form_post&nonce=639181394300531712.NmM2Y2QyMjItM2U0MS00MDk4LWJjOTctYzE2OTQ1ZjdjMjk1ODNhYWNiZmEtMmJmZC00OGI1LWE2OGEtMThhNTc4OWViZTIy&client-request-id=2bcdfd18-3761-43f5-9245-0f30429f1298&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
+      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DFD3DZS-ounaZXQNcbtHH_d2thNAKb3aAaPxSZHzM20-74ERwj4emB8_y-Bz_Nmtvgkl9H0AQAYcAo1kWnBKMpc958dTLpjYK0mdtRSH8kK3aMvCQcudGR4SP3nCY55XwGGYHvyir4FflyOpSt3BEnLcAc_9zwUa7klQQyyzAx18&response_mode=form_post&nonce=639181479119635424.YWU4NmIzZGYtOWQ0ZC00MDMxLWI0ZDItMDU3YzA2N2QwMGZlOWFhODAwYjItZGZlOS00MTgzLTljNGQtMWJmOGM0NjlmMDI4&client-request-id=55ce99e3-33d8-4a2e-ac9d-d659ff25b7de&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
     },
     {
       "url": "https://edpb.europa.eu/our-work-tools/consistency-findings/register-for-decisions_en",
       "to": "https://www.edpb.europa.eu/registers/register-of-consistency-and-of-accountability-tools/national-decisions-or-measures-taken_en"
     },
     {
-      "url": "https://platform.openai.com/docs/models",
-      "to": "https://developers.openai.com/api/docs/models"
-    },
-    {
-      "url": "https://www.all-hands.dev",
-      "to": "https://www.openhands.dev/"
+      "url": "https://minimax.io/news",
+      "to": "https://www.minimax.io/news"
     }
   ],
   "spa": [
@@ -129,9 +120,7 @@
     "https://tokenmix.ai/blog/",
     "https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-for-service-organizations",
     "https://trust.openai.com/",
-    "https://trust.anthropic.com/",
-    "https://mimo.xiaomi.com",
-    "https://www.stepfun.com"
+    "https://trust.anthropic.com/"
   ],
   "botBlocked": [
     "https://klu.ai/llm-leaderboard",
@@ -148,7 +137,7 @@
     },
     {
       "url": "https://cloud.sambanova.ai/models",
-      "error": "HTTP 404 Not Found"
+      "error": "URLError: <urlopen error _ssl.c:1015: The handshake operation timed out>"
     },
     {
       "url": "https://www.lepton.ai/pricing",
@@ -159,20 +148,8 @@
       "error": "HTTP 403 Forbidden"
     },
     {
-      "url": "https://www.deepseek.com/news",
-      "error": "HTTP 404 Not Found"
-    },
-    {
-      "url": "https://z.ai/news",
-      "error": "HTTP 404 Not Found"
-    },
-    {
-      "url": "https://xiaomimimo.github.io",
-      "error": "HTTP 404 Not Found"
-    },
-    {
-      "url": "https://platform.minimaxi.com/document",
-      "error": "HTTP 404 Not Found"
+      "url": "https://www.zhipuai.cn",
+      "error": "URLError: <urlopen error timed out>"
     }
   ]
 }

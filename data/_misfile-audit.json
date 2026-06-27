@@ -3,8 +3,8 @@
     "compositeMisfiles": 0,
     "measuredCandidates": 40,
     "bandViolations": 0,
-    "crossBenchDups": 8,
-    "aaRowsLoaded": 354
+    "crossBenchDups": 9,
+    "aaRowsLoaded": 366
   },
   "compositeMisfiles": [],
   "measuredCandidates": [
@@ -337,6 +337,14 @@
       "benchKeys": [
         "tb2",
         "tbHard"
+      ]
+    },
+    {
+      "modelId": "gemma-4-e2b",
+      "value": 9.0,
+      "benchKeys": [
+        "aaCoding",
+        "aaIdx"
       ]
     },
     {

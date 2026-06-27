@@ -181,10 +181,18 @@ def is_official_evidence(nm: dict, vendors: dict) -> bool:
 
 def _artifact_paths() -> list[str]:
     """Every artifact that may carry a new-model signal — gather batches plus the
-    synth + final unified outputs (source-agnostic: any single source failing must
-    not suppress detection)."""
+    synth + final unified outputs AND the dedicated Step-0 lineup-sync artifact
+    (source-agnostic: any single source failing must not suppress detection). The
+    lineup artifact is the home of Channel-2 `lineupChanges.new[]` (the Phase-0
+    WebSearch new-release net) when Step 0 is dispatched as a standalone agent;
+    omitting it silently dropped fully-evidenced new models (kimi-k2-7-code +
+    grok-4-20-multi-agent, 2026-06-27)."""
     paths = glob.glob(str(REPO / ".aicodermap-agent-out-*.gather.json"))
-    for extra in (".aicodermap-agent-out-synth.json", ".aicodermap-agent-out.json"):
+    for extra in (
+        ".aicodermap-agent-out-synth.json",
+        ".aicodermap-agent-out.json",
+        ".aicodermap-agent-out-lineup.json",
+    ):
         p = REPO / extra
         if p.exists():
             paths.append(str(p))

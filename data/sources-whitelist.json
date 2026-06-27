@@ -4650,7 +4650,7 @@
         "status": "bot_blocked",
         "observedFormat": "bot_blocked",
         "lastProbedAt": "2026-06-27",
-        "consecutiveFailures": 14,
+        "consecutiveFailures": 15,
         "problems": [
           "bot-block",
           "format-drift"
@@ -4670,7 +4670,7 @@
         "status": "unreachable",
         "observedFormat": "unreachable",
         "lastProbedAt": "2026-06-27",
-        "consecutiveFailures": 14,
+        "consecutiveFailures": 15,
         "problems": [
           "unreachable"
         ]
@@ -4772,13 +4772,12 @@
         "redirectedTo": "https://www.cerebras.ai/inference"
       },
       "cloud.sambanova.ai/models": {
-        "status": "dead",
-        "observedFormat": "dead",
+        "status": "unreachable",
+        "observedFormat": "unreachable",
         "lastProbedAt": "2026-06-27",
-        "consecutiveFailures": 14,
+        "consecutiveFailures": 15,
         "problems": [
-          "format-drift",
-          "http-404"
+          "unreachable"
         ]
       },
       "replicate.com": {
@@ -4791,7 +4790,7 @@
         "status": "dead",
         "observedFormat": "dead",
         "lastProbedAt": "2026-06-27",
-        "consecutiveFailures": 14,
+        "consecutiveFailures": 15,
         "problems": [
           "format-drift",
           "http-404"
@@ -5129,7 +5128,7 @@
         "problems": [
           "redirect"
         ],
-        "redirectedTo": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DO1JaAEyPeZna8rhb8u1EUo9H5z7fZrZKwcD2TfEtivDW9inmsVbGDq3klnzSkzZN-p-eLy--p9V2E8MrMhIvlBfcHjvue_UzkUn2czSzwWK3OhzuZSArt7TLJwobldwcooRyQfJeTTHabaG-k6KqeeTtZ7NiIccb0chJf4LV2Hw&response_mode=form_post&nonce=639181394300531712.NmM2Y2QyMjItM2U0MS00MDk4LWJjOTctYzE2OTQ1ZjdjMjk1ODNhYWNiZmEtMmJmZC00OGI1LWE2OGEtMThhNTc4OWViZTIy&client-request-id=2bcdfd18-3761-43f5-9245-0f30429f1298&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
+        "redirectedTo": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DFD3DZS-ounaZXQNcbtHH_d2thNAKb3aAaPxSZHzM20-74ERwj4emB8_y-Bz_Nmtvgkl9H0AQAYcAo1kWnBKMpc958dTLpjYK0mdtRSH8kK3aMvCQcudGR4SP3nCY55XwGGYHvyir4FflyOpSt3BEnLcAc_9zwUa7klQQyyzAx18&response_mode=form_post&nonce=639181479119635424.YWU4NmIzZGYtOWQ0ZC00MDMxLWI0ZDItMDU3YzA2N2QwMGZlOWFhODAwYjItZGZlOS00MTgzLTljNGQtMWJmOGM0NjlmMDI4&client-request-id=55ce99e3-33d8-4a2e-ac9d-d659ff25b7de&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
       },
       "aicpa-cima.com/topic": {
         "status": "spa_full",
@@ -5167,7 +5166,7 @@
         "status": "bot_blocked",
         "observedFormat": "bot_blocked",
         "lastProbedAt": "2026-06-27",
-        "consecutiveFailures": 14,
+        "consecutiveFailures": 15,
         "problems": [
           "bot-block",
           "format-drift"
@@ -5378,6 +5377,79 @@
           "redirect"
         ],
         "redirectedTo": "https://www.openhands.dev/"
+      },
+      "developers.openai.com/api": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-06-27",
+        "consecutiveFailures": 0
+      },
+      "openai.com/news": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-06-27",
+        "consecutiveFailures": 0
+      },
+      "deepseek.com": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-06-27",
+        "consecutiveFailures": 0
+      },
+      "qwen.ai": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-06-27",
+        "consecutiveFailures": 0
+      },
+      "docs.z.ai/guides": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-06-27",
+        "consecutiveFailures": 0
+      },
+      "zhipuai.cn": {
+        "status": "unreachable",
+        "observedFormat": "unreachable",
+        "lastProbedAt": "2026-06-27",
+        "consecutiveFailures": 1,
+        "problems": [
+          "unreachable"
+        ]
+      },
+      "mimo.mi.com/docs": {
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-06-27",
+        "consecutiveFailures": 0
+      },
+      "platform.minimax.io": {
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-06-27",
+        "consecutiveFailures": 0
+      },
+      "minimax.io/news": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-06-27",
+        "consecutiveFailures": 0,
+        "problems": [
+          "redirect"
+        ],
+        "redirectedTo": "https://www.minimax.io/news"
+      },
+      "platform.stepfun.com/docs": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-06-27",
+        "consecutiveFailures": 0
+      },
+      "openhands.dev/press": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-06-27",
+        "consecutiveFailures": 0
       }
     },
     "lastFullCycle": "2026-06-27",
