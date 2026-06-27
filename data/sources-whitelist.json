@@ -1687,7 +1687,7 @@
       "name": "Alibaba (Qwen)",
       "tier": "S",
       "urls": {
-        "lineup": "https://qwenlm.github.io/blog",
+        "lineup": "https://www.alibabacloud.com/help/en/model-studio/models",
         "models": "https://huggingface.co/Qwen",
         "alt": "https://qwen-lm.github.io",
         "blog": "https://qwen.ai/blog",
@@ -1773,7 +1773,7 @@
       "name": "MiniMax",
       "tier": "S",
       "urls": {
-        "lineup": "https://platform.minimax.io/",
+        "lineup": "https://platform.minimax.io/docs/release-notes/models",
         "news": "https://minimax.io/news",
         "models": "https://huggingface.co/MiniMaxAI",
         "hfModelCard": "https://huggingface.co/MiniMaxAI/{slug}",
@@ -1794,7 +1794,7 @@
       "name": "Nvidia",
       "tier": "S",
       "urls": {
-        "lineup": "https://build.nvidia.com",
+        "lineup": "https://developer.nvidia.com/topics/ai/nemotron",
         "news": "https://blogs.nvidia.com",
         "models": "https://huggingface.co/nvidia",
         "hfModelCard": "https://huggingface.co/nvidia/{slug}",
@@ -1843,7 +1843,7 @@
       "name": "Google (Gemma)",
       "tier": "S",
       "urls": {
-        "lineup": "https://huggingface.co/google",
+        "lineup": "https://ai.google.dev/gemma/docs",
         "docs": "https://ai.google.dev/gemma/docs",
         "hfModelCard": "https://huggingface.co/google/{slug}",
         "hfReadme": "https://huggingface.co/google/{slug}/raw/main/README.md",
@@ -1896,7 +1896,8 @@
       "extracts": "Devstral co-development announcements",
       "postFormat": "static_html_article",
       "lastVerifiedDate": "2026-04-27",
-      "vendorUpdateInterval": "quarterly"
+      "vendorUpdateInterval": "quarterly",
+      "_note": "lineup-N/A: platform, not a model publisher; Devstral weights tracked under mistral vendor"
     }
   },
   "leaderboards": [
