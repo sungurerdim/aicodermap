@@ -135,6 +135,20 @@ Phase 0 steps that run (in order):
 Steps that DO NOT run: Phase 1 SOURCE_FIRST_SWEEP, Phase 2 per-model fill, Stage A/B
 cell research. No bench/pricing values are gathered.
 
+**Merged official-bench extraction (full-cycle only, 2026-06-27 — opt-in via
+`extract_official_bench:true` in the dispatch):** when the Step-0 lineup pass is
+part of a FULL run (not the PRELIM-E fast-path), the page content for each vendor
+lineup/announcement/model-card is ALREADY in hand. In that case ALSO emit
+`observations[]` (tier `S`) for any coreBenchKey value visibly published on those
+official pages — NO extra fetch, just read what's already loaded. This gives a
+freshly-discovered model its official-announcement benchmarks in the SAME run.
+Rationale: avoid fetching the official page twice (once for lineup, once in Stage
+A). The independent-leaderboard I-tier pass + cross-validation STILL run in Stage
+A for every model (the contradiction/quarantine moat needs ≥2 distinct sources —
+an official-only S-tier cell stays single-source/quarantined until Stage A adds
+an I-tier corroboration). The pure `lineup-sync` fast-path (PRELIM-E) keeps
+`extract_official_bench` OFF and gathers no benches.
+
 Output shape:
 ```jsonc
 {

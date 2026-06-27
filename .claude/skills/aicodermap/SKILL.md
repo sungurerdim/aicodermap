@@ -163,11 +163,34 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10; TTL removed 2026-06-
    - **GAP cells never trigger the fast-path:** `priority_cells(...)` enumerates EMPTY cells (`bench[k] is None`) only. A never-found GAP cell is always present in `priorityCells`, so `priorityCells == []` holds only on a fully-FILLED matrix (consistent with "every GAP cell is re-queried every full-run").
    - Opt-out: `AICODERMAP_FULL_REFRESH=1` env var forces the full Stage A/B regardless. `--force` on `/aicodermap --force` does the same. (`scope=lineup-sync` here is an INTERNAL orchestrator dispatch label — it is no longer a user-typeable subcommand.)
 
-0. LINEUP DISCOVERY (always run first on refresh-all):
+0. LINEUP DISCOVERY (always run first on refresh-all — COMPLETES before Stage A):
+   - **ORDERING CONTRACT (HARD, 2026-06-27) — lineup-first, new-model no-defer:**
+     Step 0 runs to completion and ADMITS new-model stubs into `data/models.json`
+     BEFORE the Stage-A dispatch plan is built (`write-batch-ctx.py` reads the
+     active list AFTER admission). Consequence: a model discovered this cycle is
+     in `matrix.active_models` for THIS run's gather, so its benches are filled in
+     the SAME full run — never deferred to "next cycle". The old flow admitted new
+     stubs only AFTER merge (Step 10), so a freshly-discovered model shipped with
+     null benches and waited a whole cycle (kimi-k2-7-code, 2026-06-27). Banned.
+   - **MERGED DISCOVERY + OFFICIAL-BENCH EXTRACTION:** the lineup agent fetches
+     each vendor's official lineup/announcement/model-card pages ONCE and, in the
+     same pass, extracts any coreBenchKey values present there as S-tier
+     observations (agent.md lineup-sync mode). The vendor official page is fetched
+     once, not twice (lineup + gather). Independent-leaderboard I-tier benches +
+     cross-validation remain Stage A's job (the contradiction/quarantine moat
+     requires the independent pass — official S-tier alone stays single-source/
+     quarantined until Stage A adds an I-tier corroboration). So: Step 0 = lineup
+     deltas + official S-tier benches; Stage A = independent I-tier benches for
+     EVERY model incl. the new ones + the cells official pages didn't cover.
+   - Prefer vendor lineup URLs that list the COMPLETE current model set (a
+     docs/models catalog, not a blog/news page that shows only recent posts);
+     `data/sources-whitelist.json vendors.<id>.urls.lineup` is curated for this
+     (2026-06-27 audit). A blog-only lineup misses older active models.
    - Agent fetches each vendor's official "active models" page from VENDOR_LINEUP_SOURCES table
    - Returns canonical lineup: { vendorId: { active: [...], deprecated: [...], renamed: [{from,to}] } }
    - Skill diffs against current data/models.json:
-     * NEW (in lineup, not in data) → flag for newModels[] survey in Step 4
+     * NEW (in lineup, not in data) → admit a schema-complete stub NOW (pre-gather,
+       see Detection harvest below) so Stage A surveys it this run
      * DEPRECATED (in data, marked deprecated by vendor) → set status="deprecated", retain entry, gray-out in UI
      * RENAMED (vendor changed canonical id) → auto-rename per WRONG_ID_AUTO_FIX rule
      * REMOVED (no longer on vendor page) → set status="deprecated", RETAIN the full entry in data/models.json (no archive-out, no data stripping — 2026-06-27). The model renders faded (.is-deprecated) from its last-known frozen data and drops out of the research universe (matrix.active_models), so it is never re-fetched but never lost.
@@ -175,22 +198,38 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10; TTL removed 2026-06-
    - **Detection harvest (MANDATORY) — source-agnostic union of EVERY new-model/
      new-benchmark signal.**
      - NEW MODELS: admission is a SINGLE consolidated step,
-       `python scripts/add-new-lineup-stubs.py`, run by `refresh-finalize.py`
-       AFTER `merge.py` (Step 10) — NOT a separate post-gather harvest. It scans
-       THIS cycle's gather/synth/agent-out artifacts IN-MEMORY (no intermediate
-       `.aicodermap-lineup.json`), unions BOTH new-model channels per candidate id
-       — (1) `lineupHints[event='new']` (incidental gather sightings) AND
-       (2) `lineupChanges.new[]` (the dedicated Phase-0 WebSearch new-release net,
-       agent.md step 3b) — collecting EVERY evidence URL cross-artifact, gates each
-       candidate, and writes schema-complete stubs into `data/models.json` + i18n.
-       ROOT CAUSES this closes (2026-06-27 consolidation): the old two-script split
+       `python scripts/add-new-lineup-stubs.py`. **It runs TWICE per full cycle
+       (2026-06-27 ordering reform):**
+       (i) **PRE-GATHER (primary, Step 0)** — immediately after the lineup agent
+           returns, BEFORE `write-batch-ctx.py` / the dispatch plan. This admits
+           freshly-discovered models into `data/models.json` so they enter
+           `matrix.active_models` and Stage A surveys them THIS run (no-defer
+           contract above).
+       (ii) **POST-MERGE (safety net, Step 10 via `refresh-finalize.py`)** — catches
+           any model first sighted mid-gather (a `lineupHints[event='new']` a gather
+           agent emitted that Step 0's lineup pass missed). Idempotent: a model
+           already admitted in (i) is skipped.
+       The script scans THIS cycle's artifacts IN-MEMORY — gather/synth/agent-out
+       (`*.gather.json` + synth + unified) AND the standalone Step-0 lineup artifact
+       `.aicodermap-agent-out-lineup.json` (added to the glob 2026-06-27 — the
+       dedicated lineup agent's `lineupChanges.new[]` lives there; omitting it
+       silently dropped fully-evidenced models). It unions BOTH new-model channels
+       per candidate id — (1) `lineupHints[event='new']` (incidental gather
+       sightings) AND (2) `lineupChanges.new[]` (the dedicated Phase-0 WebSearch
+       new-release net, agent.md step 3b) — collecting EVERY evidence URL
+       cross-artifact, gates each candidate, and writes schema-complete stubs into
+       `data/models.json` + i18n.
+       ROOT CAUSES this closes (2026-06-27): (a) admission ran only AFTER merge, so
+       a discovered model shipped with null benches and waited a full cycle; now (i)
+       admits pre-gather so benches fill same-run. (b) the old two-script split
        (`harvest-new-models.py` → `.aicodermap-lineup.json` → this script) lost
-       models because (a) the intermediate file PERSISTED across cycles so a
-       rejected candidate was re-fed+re-rejected every run, and (b) the evidence
-       gate REJECTED `evidenceConfidence=="confirmed"` and never counted
-       `evidenceUrl` hosts, so harvested entries were always `n_sources=0`
-       (kimi-k2-7-code + glm-5-2, detected 2026-06-16, never admitted). Detection
-       still survives broken vendor pages (channel 1) and channel-2-only sightings.
+       models because the intermediate file PERSISTED across cycles (rejected
+       candidate re-fed+re-rejected every run) and the evidence gate REJECTED
+       `evidenceConfidence=="confirmed"` + never counted `evidenceUrl` hosts
+       (n_sources=0). (c) the standalone lineup artifact was not in the scan glob,
+       so a dedicated lineup agent's finds were invisible (kimi-k2-7-code +
+       grok-4-20-multi-agent, 2026-06-27). Detection survives broken vendor pages
+       (channel 1) and channel-2-only sightings.
      - `python scripts/harvest-discoveries.py --promote` — unions
        `discoveries.{benchmarks,vendors}` from ALL artifacts into
        `data/discoveries.json` (pending, AC6-flagged), and AUTO-PROMOTES any
@@ -918,7 +957,7 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10; TTL removed 2026-06-
     ```
     python scripts/refresh-finalize.py
     ```
-    Combines the previously-separate `gen_unified_artifact.py` + `.aicodermap-gap-gen.py` + `merge.py` calls into ONE process invocation, then runs `add-new-lineup-stubs.py` (the SINGLE SSOT new-model admission step) AFTER merge. Each underlying script is unchanged (idempotent + same logic); the wrapper saves 2 redundant Python interpreter spawns + 2 file load/parse cycles. Failure of gen_unified/merge propagates exit code; merge.py's audit (SSOT coherence + MX1 invariant) still gates the commit. The stub-add step is non-fatal (a good merge is never undone — new-model admission retries next cycle). New stubs land with null bench cells that fill next refresh. Use `--skip-merge` for dry-run preview (also skips stub-add).
+    Combines the previously-separate `gen_unified_artifact.py` + `.aicodermap-gap-gen.py` + `merge.py` calls into ONE process invocation, then runs `add-new-lineup-stubs.py` AFTER merge as the **SAFETY-NET** new-model admission (the PRIMARY admission already ran PRE-GATHER in Step 0 — see ORDERING CONTRACT; this post-merge pass only catches models first sighted mid-gather via `lineupHints`, and is idempotent on already-admitted ids). Each underlying script is unchanged (idempotent + same logic); the wrapper saves 2 redundant Python interpreter spawns + 2 file load/parse cycles. Failure of gen_unified/merge propagates exit code; merge.py's audit (SSOT coherence + MX1 invariant) still gates the commit. The stub-add step is non-fatal (a good merge is never undone). A model admitted PRE-GATHER (Step 0) is filled THIS run by Stage A; only a mid-gather-sighted model admitted by this safety-net pass lands with null bench cells (those fill next refresh — the no-defer contract covers lineup-discovered models, not models that surface only as an incidental gather sighting after dispatch). Use `--skip-merge` for dry-run preview (also skips stub-add).
 
     Outputs (unchanged from per-script behavior):
     - data/models.json (multi-provider pricing array, subscription array, status field, full bench, ollama, unslothVariants, etc.)
