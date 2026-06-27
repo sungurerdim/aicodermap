@@ -1506,12 +1506,16 @@
       "name": "Anthropic",
       "tier": "S",
       "urls": {
-        "lineup": "https://platform.claude.com/docs/en/about-claude/models",
+        "lineup": "https://platform.claude.com/docs/en/docs/about-claude/models/overview",
         "news": "https://www.anthropic.com/news",
-        "docs": "https://docs.claude.com",
+        "docs": "https://platform.claude.com/docs/en/intro",
         "pricing": "https://platform.claude.com/docs/en/about-claude/pricing",
         "blog": "https://www.anthropic.com/news",
-        "postUrlPattern": "https://www.anthropic.com/news/{slug}"
+        "postUrlPattern": "https://www.anthropic.com/news/{slug}",
+        "homepage": "https://www.anthropic.com",
+        "x": "https://x.com/AnthropicAI",
+        "hfOrg": "https://huggingface.co/anthropic",
+        "githubOrg": "https://github.com/anthropics"
       },
       "extracts": "Active model IDs, deprecation dates, pricing, bench",
       "postSlugStrategy": "try_variations",
@@ -1534,11 +1538,16 @@
       "name": "OpenAI",
       "tier": "S",
       "urls": {
-        "lineup": "https://platform.openai.com/docs/models",
-        "news": "https://openai.com/blog",
-        "pricing": "https://openai.com/api/pricing/",
-        "blog": "https://openai.com/index",
-        "postUrlPattern": "https://openai.com/index/{slug}/"
+        "lineup": "https://developers.openai.com/api/docs/models",
+        "news": "https://openai.com/news/",
+        "pricing": "https://developers.openai.com/api/docs/pricing",
+        "blog": "https://openai.com/news/",
+        "postUrlPattern": "https://openai.com/index/{slug}/",
+        "homepage": "https://openai.com",
+        "docs": "https://developers.openai.com/api/docs/overview",
+        "x": "https://x.com/OpenAI",
+        "hfOrg": "https://huggingface.co/openai",
+        "githubOrg": "https://github.com/openai"
       },
       "extracts": "Active models + deprecation table",
       "postSlugStrategy": "try_variations",
@@ -1557,14 +1566,19 @@
       "tier": "S",
       "urls": {
         "lineup": "https://ai.google.dev/gemini-api/docs/models",
-        "news": "https://deepmind.google/discover",
+        "news": "https://deepmind.google/discover/blog",
         "pricing": "https://ai.google.dev/gemini-api/docs/pricing",
         "model_pages": "https://deepmind.google/models/gemini/",
-        "blog": "https://blog.google",
+        "blog": "https://blog.google/technology/google-deepmind/",
         "postUrlPattern": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/{slug}/",
         "modelCardsBase": "https://deepmind.google/models/model-cards/",
         "modelCardUrlTemplate": "https://deepmind.google/models/model-cards/{slug}/",
-        "modelPagesPerVariant": "https://deepmind.google/models/gemini/{variant}/"
+        "modelPagesPerVariant": "https://deepmind.google/models/gemini/{variant}/",
+        "homepage": "https://deepmind.google",
+        "docs": "https://ai.google.dev/gemini-api/docs",
+        "x": "https://x.com/googledeepmind",
+        "hfOrg": "https://huggingface.co/google",
+        "githubOrg": "https://github.com/google-deepmind"
       },
       "extracts": "Gemini active list, bench, pricing",
       "postSlugStrategy": "descriptive_kebab",
@@ -1595,7 +1609,13 @@
         "postUrlPattern": "https://mistral.ai/news/{slug}",
         "hfModelCard": "https://huggingface.co/mistralai/{slug}",
         "hfReadme": "https://huggingface.co/mistralai/{slug}/raw/main/README.md",
-        "hfApi": "https://huggingface.co/api/models/mistralai/{slug}"
+        "hfApi": "https://huggingface.co/api/models/mistralai/{slug}",
+        "homepage": "https://mistral.ai",
+        "docs": "https://docs.mistral.ai",
+        "pricing": "https://mistral.ai/pricing",
+        "x": "https://x.com/mistralai",
+        "hfOrg": "https://huggingface.co/mistralai",
+        "githubOrg": "https://github.com/mistralai"
       },
       "extracts": "Mistral + Devstral + Codestral lineup",
       "postSlugStrategy": "websearch_required",
@@ -1613,13 +1633,18 @@
       "tier": "S",
       "urls": {
         "lineup": "https://api-docs.deepseek.com/quick_start/pricing",
-        "news": "https://www.deepseek.com/news",
+        "news": "https://www.deepseek.com",
         "docs": "https://api-docs.deepseek.com",
-        "blog": "https://api-docs.deepseek.com/news",
+        "blog": "https://www.deepseek.com",
         "postUrlPattern": "https://api-docs.deepseek.com/news/news{date}",
         "hfModelCard": "https://huggingface.co/deepseek-ai/{slug}",
         "hfReadme": "https://huggingface.co/deepseek-ai/{slug}/raw/main/README.md",
-        "hfApi": "https://huggingface.co/api/models/deepseek-ai/{slug}"
+        "hfApi": "https://huggingface.co/api/models/deepseek-ai/{slug}",
+        "homepage": "https://www.deepseek.com",
+        "pricing": "https://api-docs.deepseek.com/quick_start/pricing",
+        "x": "https://x.com/deepseek_ai",
+        "hfOrg": "https://huggingface.co/deepseek-ai",
+        "githubOrg": "https://github.com/deepseek-ai"
       },
       "extracts": "Active API model IDs, pricing",
       "postSlugStrategy": "date_coded",
@@ -1637,8 +1662,14 @@
       "urls": {
         "lineup": "https://docs.x.ai/docs/models",
         "news": "https://x.ai/news",
-        "blog": "https://x.ai/news",
-        "postUrlPattern": "https://x.ai/news/{slug}"
+        "blog": "https://x.ai/blog",
+        "postUrlPattern": "https://x.ai/news/{slug}",
+        "homepage": "https://x.ai",
+        "docs": "https://docs.x.ai",
+        "pricing": "https://docs.x.ai/docs/pricing",
+        "x": "https://x.com/xai",
+        "hfOrg": "https://huggingface.co/xai-org",
+        "githubOrg": "https://github.com/xai-org"
       },
       "extracts": "Grok active models",
       "postSlugStrategy": "try_variations",
@@ -1659,11 +1690,17 @@
         "lineup": "https://qwenlm.github.io/blog",
         "models": "https://huggingface.co/Qwen",
         "alt": "https://qwen-lm.github.io",
-        "blog": "https://qwenlm.github.io/blog",
+        "blog": "https://qwen.ai/blog",
         "postUrlPattern": "https://qwenlm.github.io/blog/{slug}/",
         "hfModelCard": "https://huggingface.co/Qwen/{slug}",
         "hfReadme": "https://huggingface.co/Qwen/{slug}/raw/main/README.md",
-        "hfApi": "https://huggingface.co/api/models/Qwen/{slug}"
+        "hfApi": "https://huggingface.co/api/models/Qwen/{slug}",
+        "homepage": "https://qwenlm.github.io",
+        "news": "https://qwen.ai",
+        "docs": "https://qwen.readthedocs.io",
+        "x": "https://x.com/Alibaba_Qwen",
+        "hfOrg": "https://huggingface.co/Qwen",
+        "githubOrg": "https://github.com/QwenLM"
       },
       "extracts": "Qwen series releases",
       "postSlugStrategy": "try_variations",
@@ -1683,7 +1720,14 @@
       "tier": "S",
       "urls": {
         "lineup": "https://platform.kimi.com/docs",
-        "news": "https://www.kimi.com/blog"
+        "news": "https://www.kimi.com/blog",
+        "homepage": "https://www.moonshot.ai",
+        "blog": "https://www.kimi.com/blog",
+        "docs": "https://platform.kimi.com/docs",
+        "pricing": "https://platform.kimi.com/pricing",
+        "x": "https://x.com/Kimi_Moonshot",
+        "hfOrg": "https://huggingface.co/moonshotai",
+        "githubOrg": "https://github.com/MoonshotAI"
       },
       "extracts": "Kimi K-series catalog",
       "vendorUpdateInterval": "quarterly"
@@ -1692,9 +1736,14 @@
       "name": "Z.ai (GLM)",
       "tier": "S",
       "urls": {
-        "lineup": "https://docs.z.ai/api-reference",
-        "news": "https://z.ai/news",
-        "docs": "https://docs.z.ai"
+        "lineup": "https://docs.z.ai/guides/llm",
+        "news": "https://www.zhipuai.cn",
+        "docs": "https://docs.z.ai",
+        "homepage": "https://z.ai",
+        "pricing": "https://docs.z.ai/guides/overview/pricing",
+        "x": "https://x.com/Zai_org",
+        "hfOrg": "https://huggingface.co/zai-org",
+        "githubOrg": "https://github.com/zai-org"
       },
       "extracts": "GLM active list",
       "vendorUpdateInterval": "quarterly"
@@ -1703,12 +1752,19 @@
       "name": "Xiaomi (MiMo)",
       "tier": "S",
       "urls": {
-        "lineup": "https://xiaomimimo.github.io",
-        "news": "https://mimo.xiaomi.com",
+        "lineup": "https://mimo.mi.com/docs/en-US/quick-start/summary/model",
+        "news": "https://mimo.mi.com/docs/en-US/updates/model",
         "models": "https://huggingface.co/XiaomiMiMo",
         "hfModelCard": "https://huggingface.co/XiaomiMiMo/{slug}",
         "hfReadme": "https://huggingface.co/XiaomiMiMo/{slug}/raw/main/README.md",
-        "hfApi": "https://huggingface.co/api/models/XiaomiMiMo/{slug}"
+        "hfApi": "https://huggingface.co/api/models/XiaomiMiMo/{slug}",
+        "homepage": "https://mimo.mi.com",
+        "blog": "https://mimo.xiaomi.com",
+        "docs": "https://mimo.mi.com/docs/en-US/quick-start/summary/introduction",
+        "pricing": "https://mimo.mi.com/docs/en-US/quick-start/pricing/text-model",
+        "x": "https://x.com/XiaomiMiMo",
+        "hfOrg": "https://huggingface.co/XiaomiMiMo",
+        "githubOrg": "https://github.com/XiaomiMiMo"
       },
       "extracts": "MiMo series",
       "vendorUpdateInterval": "quarterly"
@@ -1717,12 +1773,19 @@
       "name": "MiniMax",
       "tier": "S",
       "urls": {
-        "lineup": "https://platform.minimaxi.com/document",
-        "news": "https://www.minimaxi.com/news",
+        "lineup": "https://platform.minimax.io/",
+        "news": "https://minimax.io/news",
         "models": "https://huggingface.co/MiniMaxAI",
         "hfModelCard": "https://huggingface.co/MiniMaxAI/{slug}",
         "hfReadme": "https://huggingface.co/MiniMaxAI/{slug}/raw/main/README.md",
-        "hfApi": "https://huggingface.co/api/models/MiniMaxAI/{slug}"
+        "hfApi": "https://huggingface.co/api/models/MiniMaxAI/{slug}",
+        "homepage": "https://minimax.io",
+        "blog": "https://www.minimaxi.com/blog",
+        "docs": "https://platform.minimax.io/",
+        "pricing": "https://platform.minimax.io/docs/pricing/overview",
+        "x": "https://x.com/MiniMax_AI",
+        "hfOrg": "https://huggingface.co/MiniMaxAI",
+        "githubOrg": "https://github.com/MiniMax-AI"
       },
       "extracts": "M-series",
       "vendorUpdateInterval": "quarterly"
@@ -1736,7 +1799,14 @@
         "models": "https://huggingface.co/nvidia",
         "hfModelCard": "https://huggingface.co/nvidia/{slug}",
         "hfReadme": "https://huggingface.co/nvidia/{slug}/raw/main/README.md",
-        "hfApi": "https://huggingface.co/api/models/nvidia/{slug}"
+        "hfApi": "https://huggingface.co/api/models/nvidia/{slug}",
+        "homepage": "https://www.nvidia.com/en-us/",
+        "blog": "https://blogs.nvidia.com",
+        "docs": "https://docs.nvidia.com/nim/",
+        "pricing": "https://build.nvidia.com/pricing",
+        "x": "https://x.com/nvidia",
+        "hfOrg": "https://huggingface.co/nvidia",
+        "githubOrg": "https://github.com/NVIDIA"
       },
       "extracts": "Nemotron variants, NIM catalog",
       "vendorUpdateInterval": "quarterly"
@@ -1746,12 +1816,17 @@
       "tier": "S",
       "urls": {
         "lineup": "https://huggingface.co/meta-llama",
-        "news": "https://ai.meta.com/blog",
-        "blog": "https://ai.meta.com/blog",
+        "news": "https://ai.meta.com/blog/",
+        "blog": "https://ai.meta.com/blog/",
         "postUrlPattern": "https://ai.meta.com/blog/{slug}/",
         "hfModelCard": "https://huggingface.co/meta-llama/{slug}",
         "hfReadme": "https://huggingface.co/meta-llama/{slug}/raw/main/README.md",
-        "hfApi": "https://huggingface.co/api/models/meta-llama/{slug}"
+        "hfApi": "https://huggingface.co/api/models/meta-llama/{slug}",
+        "homepage": "https://developer.meta.com/ai/",
+        "docs": "https://developer.meta.com/ai/docs/",
+        "x": "https://x.com/AIatMeta",
+        "hfOrg": "https://huggingface.co/meta-llama",
+        "githubOrg": "https://github.com/meta-llama"
       },
       "extracts": "Released Llama models",
       "postSlugStrategy": "descriptive_kebab",
@@ -1769,10 +1844,16 @@
       "tier": "S",
       "urls": {
         "lineup": "https://huggingface.co/google",
-        "docs": "https://ai.google.dev/gemma",
+        "docs": "https://ai.google.dev/gemma/docs",
         "hfModelCard": "https://huggingface.co/google/{slug}",
         "hfReadme": "https://huggingface.co/google/{slug}/raw/main/README.md",
-        "hfApi": "https://huggingface.co/api/models/google/{slug}"
+        "hfApi": "https://huggingface.co/api/models/google/{slug}",
+        "homepage": "https://deepmind.google/models/gemma",
+        "news": "https://deepmind.google/discover/blog",
+        "blog": "https://blog.google/technology/google-deepmind/",
+        "x": "https://x.com/googledeepmind",
+        "hfOrg": "https://huggingface.co/google",
+        "githubOrg": "https://github.com/google-deepmind"
       },
       "extracts": "Gemma releases",
       "vendorUpdateInterval": "quarterly"
@@ -1781,11 +1862,17 @@
       "name": "StepFun",
       "tier": "S",
       "urls": {
-        "lineup": "https://www.stepfun.com",
+        "lineup": "https://platform.stepfun.com/docs/api-reference/models/list",
         "models": "https://huggingface.co/stepfun-ai",
         "hfModelCard": "https://huggingface.co/stepfun-ai/{slug}",
         "hfReadme": "https://huggingface.co/stepfun-ai/{slug}/raw/main/README.md",
-        "hfApi": "https://huggingface.co/api/models/stepfun-ai/{slug}"
+        "hfApi": "https://huggingface.co/api/models/stepfun-ai/{slug}",
+        "homepage": "https://www.stepfun.com",
+        "docs": "https://platform.stepfun.com/docs",
+        "pricing": "https://platform.stepfun.com/docs/zh/pricing/details",
+        "x": "https://x.com/StepFun_ai",
+        "hfOrg": "https://huggingface.co/stepfun-ai",
+        "githubOrg": "https://github.com/stepfun-ai"
       },
       "extracts": "Step series",
       "vendorUpdateInterval": "quarterly"
@@ -1795,11 +1882,16 @@
       "tier": "S",
       "urls": {
         "lineup": "https://www.openhands.dev",
-        "news": "https://www.all-hands.dev",
-        "blog": "https://openhands.dev/blog",
+        "news": "https://www.openhands.dev/press",
+        "blog": "https://www.openhands.dev/blog",
         "indexPage": "https://index.openhands.dev/home",
         "blogPattern": "https://openhands.dev/blog/{slug}",
-        "redirectFrom": "https://www.all-hands.dev"
+        "redirectFrom": "https://www.all-hands.dev",
+        "homepage": "https://www.openhands.dev",
+        "docs": "https://docs.openhands.dev",
+        "pricing": "https://www.openhands.dev/pricing",
+        "x": "https://x.com/allhands_ai",
+        "githubOrg": "https://github.com/All-Hands-AI"
       },
       "extracts": "Devstral co-development announcements",
       "postFormat": "static_html_article",
@@ -5302,6 +5394,27 @@
         "https://github.com/sierra-research/tau-bench": true,
         "https://labs.scale.com/leaderboard/": true
       }
+    },
+    "officialSourcesAudit": {
+      "date": "2026-06-27",
+      "vendorsUpdated": [
+        "alibaba_qwen",
+        "all_hands_ai",
+        "anthropic",
+        "deepseek",
+        "google_deepmind",
+        "google_gemma",
+        "meta_llama",
+        "minimax",
+        "mistral",
+        "moonshot_kimi",
+        "nvidia",
+        "openai",
+        "stepfun",
+        "xai",
+        "xiaomi_mimo",
+        "zai_glm"
+      ]
     }
   },
   "complianceAggregators": [

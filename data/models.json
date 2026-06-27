@@ -11805,5 +11805,108 @@
       "mcpA": true,
       "mrcr": true
     }
+  },
+  {
+    "id": "glm-5-2",
+    "name": "GLM-5.2",
+    "provider": "Z.ai (Zhipu AI)",
+    "released": "2026-06-13",
+    "tier": "open-flagship",
+    "open": true,
+    "license": "MIT",
+    "context": 1000000,
+    "pricing": {
+      "api": [],
+      "range": {
+        "in": null,
+        "out": null,
+        "cacheHit": null
+      }
+    },
+    "bench": {
+      "swePro": null,
+      "gpqa": null,
+      "mcpA": null,
+      "sweV": null,
+      "tb2": null,
+      "tau2": null,
+      "aaCoding": null,
+      "aaAgentic": null,
+      "sweMulti": null,
+      "hle": null,
+      "aaIdx": null,
+      "bfcl": null,
+      "aime26": null,
+      "aaOmni": null,
+      "lcb": null,
+      "tbHard": null,
+      "cfElo": null,
+      "browseComp": null,
+      "mmluPro": null,
+      "mrcr": null,
+      "arcAgi2": null,
+      "nl2Repo": null,
+      "webDevElo": null
+    },
+    "providers": null,
+    "uptime": null,
+    "ollamaSize": null,
+    "unslothVariants": [],
+    "vramRequirement": null,
+    "strengthsKey": "glm-5-2.strengths",
+    "weaknessesKey": "glm-5-2.weaknesses",
+    "lastUpdated": "2026-06-27T08:18:50Z",
+    "status": "active"
+  },
+  {
+    "id": "mimo-v2-omni",
+    "name": "MiMo-V2-Omni",
+    "provider": "Xiaomi",
+    "released": null,
+    "tier": "open-flagship",
+    "open": true,
+    "license": "apache-2.0",
+    "context": 262144,
+    "pricing": {
+      "api": [],
+      "range": {
+        "in": null,
+        "out": null,
+        "cacheHit": null
+      }
+    },
+    "bench": {
+      "swePro": null,
+      "sweV": null,
+      "tb2": null,
+      "tau2": null,
+      "aaCoding": null,
+      "aaAgentic": null,
+      "mcpA": null,
+      "gpqa": null,
+      "sweMulti": null,
+      "hle": null,
+      "aaIdx": null,
+      "bfcl": null,
+      "aime26": null,
+      "aaOmni": null,
+      "lcb": null,
+      "tbHard": null,
+      "cfElo": null,
+      "browseComp": null,
+      "mmluPro": null,
+      "mrcr": null,
+      "arcAgi2": null,
+      "nl2Repo": null
+    },
+    "providers": null,
+    "uptime": null,
+    "ollamaSize": null,
+    "unslothVariants": [],
+    "vramRequirement": null,
+    "strengthsKey": "mimo-v2-omni.strengths",
+    "weaknessesKey": "mimo-v2-omni.weaknesses",
+    "lastUpdated": "2026-06-27T08:18:50Z",
+    "status": "active"
   }
 ]
