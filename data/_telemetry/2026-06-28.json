@@ -1,0 +1,260 @@
+{
+  "cycleEndedAt": "2026-06-27T22:09:47Z",
+  "cycleStartedAt": "2026-06-27T10:00:00Z",
+  "perBatch": [
+    {
+      "agentGaps": 40,
+      "batchId": "batch00-anthropic",
+      "fills": 47,
+      "gaps": 40,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 37,
+      "wallclockSec": 1183.0
+    },
+    {
+      "agentGaps": 12,
+      "batchId": "batch01-anthropic",
+      "fills": 43,
+      "gaps": 12,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 22,
+      "wallclockSec": 755.0
+    },
+    {
+      "agentGaps": 18,
+      "batchId": "batch02-deepseek",
+      "fills": 44,
+      "gaps": 18,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 28,
+      "wallclockSec": 1070.0
+    },
+    {
+      "agentGaps": 6,
+      "batchId": "batch03-deepseek",
+      "fills": 8,
+      "gaps": 6,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 20,
+      "wallclockSec": 890.0
+    },
+    {
+      "agentGaps": 20,
+      "batchId": "batch04-google_deepm",
+      "fills": 36,
+      "gaps": 20,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 38,
+      "wallclockSec": 1169.0
+    },
+    {
+      "agentGaps": 29,
+      "batchId": "batch05-google_deepm",
+      "fills": 40,
+      "gaps": 29,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 18,
+      "wallclockSec": 653.0
+    },
+    {
+      "agentGaps": 11,
+      "batchId": "batch06-google_deepm",
+      "fills": 16,
+      "gaps": 11,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 34,
+      "wallclockSec": 762.0
+    },
+    {
+      "agentGaps": 20,
+      "batchId": "batch07-meta",
+      "fills": 30,
+      "gaps": 20,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 28,
+      "wallclockSec": 873.0
+    },
+    {
+      "agentGaps": 12,
+      "batchId": "batch08-minimax",
+      "fills": 66,
+      "gaps": 12,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 22,
+      "wallclockSec": 538.0
+    },
+    {
+      "agentGaps": 25,
+      "batchId": "batch09-mistral_ai",
+      "fills": 25,
+      "gaps": 25,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 28,
+      "wallclockSec": 911.0
+    },
+    {
+      "agentGaps": 25,
+      "batchId": "batch10-moonshot_ai",
+      "fills": 13,
+      "gaps": 25,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 28,
+      "wallclockSec": 886.0
+    },
+    {
+      "agentGaps": 8,
+      "batchId": "batch11-openai",
+      "fills": 37,
+      "gaps": 8,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "wallclock",
+      "toolCallCount": 28,
+      "wallclockSec": 898.0
+    },
+    {
+      "agentGaps": 10,
+      "batchId": "batch12-openai",
+      "fills": 21,
+      "gaps": 10,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 28,
+      "wallclockSec": 807.0
+    },
+    {
+      "agentGaps": 44,
+      "batchId": "batch13-alibaba_qwen",
+      "fills": 33,
+      "gaps": 44,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 38,
+      "wallclockSec": 898.0
+    },
+    {
+      "agentGaps": 22,
+      "batchId": "batch14-alibaba_qwen",
+      "fills": 43,
+      "gaps": 22,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 43,
+      "wallclockSec": 1056.0
+    },
+    {
+      "agentGaps": 9,
+      "batchId": "batch15-alibaba_qwen",
+      "fills": 17,
+      "gaps": 9,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 32,
+      "wallclockSec": 876.0
+    },
+    {
+      "agentGaps": 37,
+      "batchId": "batch16-alibaba_qwen",
+      "fills": 35,
+      "gaps": 37,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 24,
+      "wallclockSec": 829.0
+    },
+    {
+      "agentGaps": 14,
+      "batchId": "batch17-xai",
+      "fills": 21,
+      "gaps": 14,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 32,
+      "wallclockSec": 1047.0
+    },
+    {
+      "agentGaps": 29,
+      "batchId": "batch18-xiaomi",
+      "fills": 33,
+      "gaps": 29,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 33,
+      "wallclockSec": 863.0
+    },
+    {
+      "agentGaps": 23,
+      "batchId": "batch19-z_ai__zhipu_",
+      "fills": 48,
+      "gaps": 23,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 24,
+      "wallclockSec": 799.0
+    },
+    {
+      "agentGaps": 11,
+      "batchId": "batch20-z_ai__zhipu_",
+      "fills": 23,
+      "gaps": 11,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 33,
+      "wallclockSec": 665.0
+    },
+    {
+      "agentGaps": 38,
+      "batchId": "batch21-nvidia",
+      "fills": 43,
+      "gaps": 38,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 38,
+      "wallclockSec": 1164.0
+    }
+  ],
+  "totalBatches": 22,
+  "totals": {
+    "agentGaps": 463,
+    "fills": 722,
+    "gaps": 463,
+    "na": 0,
+    "orchestratorGaps": 0,
+    "toolCallSum": 656,
+    "wallclockSecMax": 1183.0,
+    "wallclockSecP95": 1169.0
+  },
+  "zeroFillBatches": []
+}

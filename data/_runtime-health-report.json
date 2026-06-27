@@ -1,12 +1,12 @@
 {
-  "probedAt": "2026-06-27T09:07:16Z",
+  "probedAt": "2026-06-27T12:00:27Z",
   "total": 139,
   "counts": {
-    "format-drift": 12,
+    "format-drift": 13,
     "redirect": 9,
     "spa": 12,
     "bot-block": 2,
-    "dead": 6
+    "dead": 5
   },
   "formatDrift": [
     {
@@ -23,6 +23,11 @@
       "url": "https://deepinfra.com/models",
       "declared": "static_html_table",
       "observed": "spa_full"
+    },
+    {
+      "url": "https://cloud.sambanova.ai/models",
+      "declared": "static_html_table",
+      "observed": "dead"
     },
     {
       "url": "https://www.lepton.ai/pricing",
@@ -97,7 +102,7 @@
     },
     {
       "url": "https://compliance.microsoft.com/compliancemanager",
-      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DFD3DZS-ounaZXQNcbtHH_d2thNAKb3aAaPxSZHzM20-74ERwj4emB8_y-Bz_Nmtvgkl9H0AQAYcAo1kWnBKMpc958dTLpjYK0mdtRSH8kK3aMvCQcudGR4SP3nCY55XwGGYHvyir4FflyOpSt3BEnLcAc_9zwUa7klQQyyzAx18&response_mode=form_post&nonce=639181479119635424.YWU4NmIzZGYtOWQ0ZC00MDMxLWI0ZDItMDU3YzA2N2QwMGZlOWFhODAwYjItZGZlOS00MTgzLTljNGQtMWJmOGM0NjlmMDI4&client-request-id=55ce99e3-33d8-4a2e-ac9d-d659ff25b7de&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
+      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DIfCz0JGG20MsdMMHXQIiYh72YxrYsfVnESS8HKeQ_7I57Z0zAmq1sJnIA1D6cvZwoTE1Dsj8mBNMyFeyxOM-ou6CsZPaoKQUnPatQRe7vZ1AeLB8PB2Lmh_Kd_3YJN9-qY20pm7mYNGSiN1ngFxW6s3kxZqf5_DS296SyH0oagw&response_mode=form_post&nonce=639181584180098710.NTFjMWJjYmYtMzlkZS00NTM5LWEyMGQtMGMwYjI5NWM4ZDVjZGZkMTI0ODYtNmQ4ZC00MTc5LWI3YjItOGUwMmIyMTc3Njlm&client-request-id=fab710b4-9b0c-49f3-b861-2c90874c365b&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
     },
     {
       "url": "https://edpb.europa.eu/our-work-tools/consistency-findings/register-for-decisions_en",
@@ -137,7 +142,7 @@
     },
     {
       "url": "https://cloud.sambanova.ai/models",
-      "error": "URLError: <urlopen error _ssl.c:1015: The handshake operation timed out>"
+      "error": "HTTP 404 Not Found"
     },
     {
       "url": "https://www.lepton.ai/pricing",
@@ -146,10 +151,6 @@
     {
       "url": "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html",
       "error": "HTTP 403 Forbidden"
-    },
-    {
-      "url": "https://www.zhipuai.cn",
-      "error": "URLError: <urlopen error timed out>"
     }
   ]
 }
