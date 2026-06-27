@@ -92,16 +92,11 @@ PRELIM-C. STALE_ARTIFACT_PRUNE (FAZ 7.A, 2026-05-10):
    - Renames prior-cycle artifacts to `<name>.stale-<epoch>` so dispatched agents cannot reuse them. Patterns: `.aicodermap-agent-out-batch*.gather.json`, `.aicodermap-agent-out-batch*-gather.json`, `.aicodermap-agent-out-synth.json`, `.aicodermap-agent-out.json`, `.aicodermap-ctx-batch*.json` (added 2026-06-06 — the dispatch plan can split providers into DIFFERENT batchIds cycle-to-cycle, so a prior-cycle ctx whose batchId is gone from the fresh plan is never overwritten and pollutes the fresh ctx glob with stale/duplicate model slices).
    - Defends against the cycle 2026-05-10 failure mode: gather/synth agents observed prior-cycle artifacts, deemed them complete, emitted EMITTED status without fresh fetches.
    - Orchestrator records `cycle_started_unix = time.time()` AFTER prune; this flows into `idea_context.cycleStartedUnix` and into gather validator's `--cycle-started-unix`.
-   - **6.4 — verificationMap file-age guard.** Before computing `priorityCells`/
-     `skipCells`, stat `.aicodermap-verification-map.json`. If its mtime predates
-     `cycle_started_unix - STALE_DAYS×86400` (i.e. the audit log is older than one
-     full refresh interval), its `confirmed` flags are no longer trustworthy — a
-     long-stale map would otherwise let PRELIM-E's fast-path skip a real refresh on
-     outdated "confirmed ≤7d" evidence. In that case DEGRADE every cell to Tier-1:
-     pass `skip_confirmed_within_days=0` to `priority_cells(...)` so NO cell is
-     skipped as confirmed, and force the full Stage A/B path (bypass the
-     LINEUP_ONLY_MINI_CYCLE_GATE) this cycle. Log `⚠ verification-map stale
-     (age >STALE_DAYS) — all cells re-verified T1`. Missing file → same treatment.
+   - (The prior 6.4 verificationMap file-age guard was removed 2026-06-27 with the
+     TTL: a `confirmed` flag now means a FROZEN published score, so an old map file
+     is not "stale evidence" — re-validation is event-triggered, not age-triggered.
+     A confirmed cell simply skips regardless of map mtime; a contradiction/anomaly
+     re-opens it. Nothing to degrade.)
    - Non-fatal (self-healing — never blocks the cycle).
 
 PRELIM-D. SNAPSHOT_ROW_EXTRACTION (FAZ 7.F, 2026-05-10):
@@ -161,12 +156,11 @@ PRELIM-F. ANOMALY_VERIFICATION_QUEUE (2026-05-27):
      (Full auto-dispatch of a research sub-agent the instant an anomaly surfaces
      mid-merge is future work; v1 = detect + queue + next-cycle research priority.)
 
-PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-only fast path:
-   - Computes `priorityCells = priority_cells(active, coreBenchKeys, limit=200, vmap, ttl=FRESHNESS_TTL_DAYS)`. If `priorityCells == []` AND every active model's `lastUpdated` is within `contracts.STALE_DAYS - 7` (default 7 days), the orchestrator switches the cycle to **lineup-sync only**: dispatches a single sonnet lineup agent (`scope=lineup-sync`, Step 0 only) and skips Stage A + Stage B + merge entirely. Output is whatever vendor-lineup deltas surface; data/{models,sources}.json values are unchanged.
-   - **Full Phase 0 still runs in this fast path** — `lineup-sync` is the COMPLETE Phase 0, not a bare lineup-URL fetch: the agent still runs the WebSearch new-release net (agent.md step 3b, per-vendor templated probes) and the Phase 0 sub-probes (unknown-vendor / unknown-leaderboard discovery). Only Stage A/B (per-cell bench/pricing fill) and merge are skipped. This is what guarantees a brand-new model (e.g. an Opus-family bump) is still caught on a fully-fresh-matrix cycle even though no cell needs re-research.
-   - Why: when the matrix is fully covered AND fresh, there is nothing for gather agents to research that the verification map doesn't already mark `confirmed=true ≤7d`. The cycle's only value is detecting NEW/DEPRECATED/RENAMED models from vendor lineup pages.
-   - **Quality preserved:** the gate is hit only when EVERY active model was fully refreshed within the freshness TTL window. If even one cell is starved, full Stage A/B runs. The freshness check uses the verification map's `confirmed` flag (≥3 distinct sources within VERIFICATION_AGREEMENT_PP); not just the date.
-   - **GAP cells never trigger the fast-path:** `priority_cells(...)` only enumerates EMPTY cells (`bench[k] is None`) and skips one solely when it is `confirmed`+fresh — a never-found GAP cell is empty and can never be `confirmed`, so it is always present in `priorityCells`. Therefore `priorityCells == []` holds only when there are zero open gaps, guaranteeing the mini-cycle is taken exclusively on a fully-FILLED-and-fresh matrix (consistent with "every GAP cell is re-queried every full-run").
+PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10; TTL removed 2026-06-27) — orchestrator-only fast path:
+   - Computes `priorityCells = priority_cells(active, coreBenchKeys, limit=200, vmap)`. The gate is purely coverage-based now (no age/TTL clause): if `priorityCells == []` — i.e. there are NO open core gaps, every core cell is FILLED — the orchestrator switches the cycle to **lineup/deprecation + new-model only**: dispatches a single sonnet lineup agent (`scope=lineup-sync`, Step 0 only) and skips Stage A + Stage B + merge entirely. Output is whatever vendor-lineup deltas + new models surface; data/{models,sources}.json bench values are unchanged (a confirmed cell holds a frozen score — there is nothing to re-fetch).
+   - **Full Phase 0 still runs in this fast path** — `lineup-sync` is the COMPLETE Phase 0, not a bare lineup-URL fetch: the agent still runs the WebSearch new-release net (agent.md step 3b, per-vendor templated probes) and the Phase 0 sub-probes (unknown-vendor / unknown-leaderboard discovery), and the consolidated new-model admission (`add-new-lineup-stubs.py`) still runs on its artifacts. Only Stage A/B (per-cell bench/pricing fill) and merge are skipped. This is what guarantees a brand-new model (e.g. an Opus-family bump, or kimi/glm) is still caught on a fully-covered matrix.
+   - Why: when every core cell is FILLED, there is nothing for gather agents to research — a confirmed score is frozen and re-fetching it has no benefit. The cycle's only value is detecting NEW/DEPRECATED/RENAMED models + filling any GAP that opened. Event-triggered re-validation (a contradiction/anomaly flagged by detect-anomalies) re-opens individual confirmed cells, which would surface as open work and take the full path.
+   - **GAP cells never trigger the fast-path:** `priority_cells(...)` enumerates EMPTY cells (`bench[k] is None`) only. A never-found GAP cell is always present in `priorityCells`, so `priorityCells == []` holds only on a fully-FILLED matrix (consistent with "every GAP cell is re-queried every full-run").
    - Opt-out: `AICODERMAP_FULL_REFRESH=1` env var forces the full Stage A/B regardless. `--force` on `/aicodermap --force` does the same. (`scope=lineup-sync` here is an INTERNAL orchestrator dispatch label — it is no longer a user-typeable subcommand.)
 
 0. LINEUP DISCOVERY (always run first on refresh-all):
@@ -176,22 +170,27 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
      * NEW (in lineup, not in data) → flag for newModels[] survey in Step 4
      * DEPRECATED (in data, marked deprecated by vendor) → set status="deprecated", retain entry, gray-out in UI
      * RENAMED (vendor changed canonical id) → auto-rename per WRONG_ID_AUTO_FIX rule
-     * REMOVED (no longer on vendor page after grace period) → archive to data/archive/<id>.json
+     * REMOVED (no longer on vendor page) → set status="deprecated", RETAIN the full entry in data/models.json (no archive-out, no data stripping — 2026-06-27). The model renders faded (.is-deprecated) from its last-known frozen data and drops out of the research universe (matrix.active_models), so it is never re-fetched but never lost.
    - This step CANNOT be skipped on refresh-all; it's the source of truth for "what models exist".
    - **Detection harvest (MANDATORY) — source-agnostic union of EVERY new-model/
-     new-benchmark signal.** After Stage A gather returns, run BOTH:
-     - `python scripts/harvest-new-models.py` — unions, across ALL artifacts
-       (gather + synth + agent-out), BOTH new-model channels into
-       `.aicodermap-lineup.json`'s `newModels[]` (deduped vs `currentIds`):
-       (1) `lineupHints[event='new']` (incidental gather sightings) AND
+     new-benchmark signal.**
+     - NEW MODELS: admission is a SINGLE consolidated step,
+       `python scripts/add-new-lineup-stubs.py`, run by `refresh-finalize.py`
+       AFTER `merge.py` (Step 10) — NOT a separate post-gather harvest. It scans
+       THIS cycle's gather/synth/agent-out artifacts IN-MEMORY (no intermediate
+       `.aicodermap-lineup.json`), unions BOTH new-model channels per candidate id
+       — (1) `lineupHints[event='new']` (incidental gather sightings) AND
        (2) `lineupChanges.new[]` (the dedicated Phase-0 WebSearch new-release net,
-       agent.md step 3b). ROOT CAUSES this closes: the lineup agent depends on a
-       vendor's lineup page being reachable (SPA/403/dead → dropped, e.g.
-       `minimax-m3`); AND (added 2026-06-16) `lineupChanges.new` previously had NO
-       path to `newModels[]` at all — local-synth.py drops it and
-       gen_unified_artifact.py copies synth verbatim — so a model surfaced ONLY by
-       the WebSearch net (the safety net for broken vendor pages) never became a
-       stub. Both channels now flow into the same stub-add + CHANGELOG path.
+       agent.md step 3b) — collecting EVERY evidence URL cross-artifact, gates each
+       candidate, and writes schema-complete stubs into `data/models.json` + i18n.
+       ROOT CAUSES this closes (2026-06-27 consolidation): the old two-script split
+       (`harvest-new-models.py` → `.aicodermap-lineup.json` → this script) lost
+       models because (a) the intermediate file PERSISTED across cycles so a
+       rejected candidate was re-fed+re-rejected every run, and (b) the evidence
+       gate REJECTED `evidenceConfidence=="confirmed"` and never counted
+       `evidenceUrl` hosts, so harvested entries were always `n_sources=0`
+       (kimi-k2-7-code + glm-5-2, detected 2026-06-16, never admitted). Detection
+       still survives broken vendor pages (channel 1) and channel-2-only sightings.
      - `python scripts/harvest-discoveries.py --promote` — unions
        `discoveries.{benchmarks,vendors}` from ALL artifacts into
        `data/discoveries.json` (pending, AC6-flagged), and AUTO-PROMOTES any
@@ -279,7 +278,7 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
      //   byBench: { <key>: {filled, total} },
      //   byModel: { <id>:  {filled, total} }
      // }
-     priorityCells: <priority_cells(active_models, coreBenchKeys, limit=200, verification_map=vm, skip_confirmed_within_days=contracts.FRESHNESS_TTL_DAYS)>,
+     priorityCells: <priority_cells(active_models, coreBenchKeys, limit=200, verification_map=vm)>,
      // FAZ 4.A (2026-05-08): ORDERING (advisory), NOT scope.
      // Top-N empty (modelId, benchKey) pairs ranked by starvation. Agent
      // resolves priorityCells FIRST inside its slice, then sweeps the rest
@@ -313,31 +312,29 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
      leaderboardSnapshots: load_snapshot_index(),
        // Shape: { <url>: { path, contentType, contentLength, fetchedAt, etag } }
 
-     // FAZ 2.2: freshness-tier skip cells (T2 only — T1 always re-fetches).
-     // T2 = confirmed=true AND verifs≥3 AND age≤FRESHNESS_TTL_DAYS AND no contradiction.
-     // Agent FORMAT_DISPATCH treats T2 cells as already-filled and emits cached
-     // value + provenance without any fetch. Computed via
-     // scripts/lib/freshness.compute_skip_cells(). NOT a known-gaps registry redux:
-     // any cell with <3 verifs, missing freshness, or any contradiction is T1
-     // (re-fetched every cycle). Drift surfaces within ≤7d for confirmed cells.
+     // Confirmed-cell skip (T2 only — T1 always re-fetches). TTL removed
+     // 2026-06-27: T2 = confirmed=true AND not contradicted (no age clause — a
+     // confirmed published score is frozen). Agent FORMAT_DISPATCH treats T2 cells
+     // as already-filled and emits cached value + provenance without any fetch.
+     // Computed via scripts/lib/freshness.compute_skip_cells(). NOT a known-gaps
+     // registry redux: any unconfirmed or contradicted cell is T1 (re-fetched).
+     // Re-validation is event-triggered — a contradiction/anomaly re-opens a cell.
      skipCells: compute_skip_cells(
        verification_map,
        today,
        active_model_ids,
        coreBenchKeys,
-       ttl_days=contracts.FRESHNESS_TTL_DAYS or 7,
-       min_verifs=contracts.MIN_VERIFICATIONS_FOR_SKIP or 3,
      )
        // Shape: { <modelId>: { <benchKey>: {value, sources[], lastChecked, ageDays, verifications} } }
        // Plus _meta: {t1Count, t2Count, totalConsidered}
-       // NOTE: skipCells covers ONLY fresh FILLED cells. There is NO gap-level
+       // NOTE: skipCells covers ONLY confirmed FILLED cells. There is NO gap-level
        // skip — every GAP (never-found) cell is re-queried each full-run so a
        // newly-published value surfaces with zero lag.
    }
-   - `.aicodermap-verification-map.json` is the provenance audit log of every (model, bench) cell observation across cycles (value, sources[], lastChecked, derived `confirmed`/`contradicted`). It is ALSO the freshness-skip source of truth (reliability-driven since 2026-06-16): a cell confirmed by ≥`MIN_VERIFICATIONS_FOR_SKIP` agreeing sources is SETTLED and skips the research sweep, re-validating only after `FRESHNESS_TTL_DAYS` (90d backstop) or when a new contradiction surfaces. This applies to FILLED cells only — every GAP cell is still re-queried each full-run. `verification-map.py update` derives the flags; before 2026-06-16 they were wrongly popped, leaving the skip set permanently empty (every well-covered cell re-fetched for zero benefit). Skill creates it (empty {}) on first cycle if missing.
+   - `.aicodermap-verification-map.json` is the provenance audit log of every (model, bench) cell observation across cycles (value, sources[], lastChecked, derived `confirmed`/`contradicted`). It is ALSO the confirmed-cell skip source of truth (reliability-driven, TTL removed 2026-06-27): a cell confirmed by ≥`MIN_VERIFICATIONS_FOR_SKIP` agreeing sources is SETTLED and skips the research sweep, re-validating ONLY when a contradiction surfaces (event-triggered — there is no time backstop, a frozen published score does not drift). This applies to FILLED cells only — every GAP cell is still re-queried each full-run. `verification-map.py update` derives the flags. Skill creates it (empty {}) on first cycle if missing.
    - `data/models.json` is SSOT for "what models we track" — `currentIds` MUST be derived from this file at the moment the skill runs. Hardcoding the id list in a prompt or agent message is a contract violation (any drift between models.json and what the agent receives surfaces as silent omission of new/renamed models).
    - `data/sources-whitelist.json` is SSOT for "what URLs the agent is allowed to fetch" AND for the bench-key universe (`_schema.coreBenchKeys`). Frontend `BENCH_KEYS` (assets/js/core.js), i18n `benchmarks.*`, and the data-file `bench` cells all mirror this canonical set. `scripts/audit-data-coherence.py` enforces the mirroring by failing loudly on any drift.
-   - Reliability-driven skip (not a permanent registry): a FILLED cell confirmed by ≥3 agreeing sources skips until its 90-day backstop expires or a contradiction surfaces; every GAP (unfilled) cell AND every sparse/contested cell is re-attempted each cycle, so vendor opt-outs that close are surfaced with ≤1-cycle lag
+   - Reliability-driven skip (not a permanent registry): a FILLED cell confirmed by ≥3 agreeing sources skips until a contradiction surfaces (no time backstop — TTL removed 2026-06-27); every GAP (unfilled) cell AND every sparse/contested cell is re-attempted each cycle, so vendor opt-outs that close are surfaced with ≤1-cycle lag
    - The agent file (.claude/agents/aicodermap-research-agent.md) only carries PROCEDURE (how) — every list of URLs, vendors, or model IDs lives in data files
 // FAZ 4.C (2026-05-09) → A3 (2026-05-31): SONNET GATHER + DETERMINISTIC SYNTH.
    // Two-stage pipeline: gather (N batches × sonnet) + synth (1 × local-synth.py).
@@ -888,7 +885,7 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
      anomaly triggers RESEARCH, not rejection.
 
 8. Render diff summary (markdown table) to user-visible output: models[].updates fields, newModels[], lineup changes (NEW/DEPRECATED/RENAMED/REMOVED), contradictions auto-resolved, coverage% achieved, partialCoverage flag.
-9. AUTO-APPROVE — NO USER PROMPT. The workflow proceeds straight from Step 8 to Step 10. The only halt at this stage is schema-breaking discovery (a brand-new top-level field in a model entry not in the existing whitelist) — and even then, the unrecognized field is logged to gaps[] and merge continues with the recognized fields. RED contradictions are already auto-resolved at Step 7. REMOVED entries are auto-archived per LIFECYCLE_STATES.
+9. AUTO-APPROVE — NO USER PROMPT. The workflow proceeds straight from Step 8 to Step 10. The only halt at this stage is schema-breaking discovery (a brand-new top-level field in a model entry not in the existing whitelist) — and even then, the unrecognized field is logged to gaps[] and merge continues with the recognized fields. RED contradictions are already auto-resolved at Step 7. REMOVED entries are set status="deprecated" (retained in full, never archived-out) per LIFECYCLE_STATES.
 
 9b. SSOT_COHERENCE_AUDIT (scripts/audit-data-coherence.py — runs inside merge.py post-write):
     Verifies every surface that mirrors a SSOT set is still aligned:
@@ -921,13 +918,13 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10) — orchestrator-onl
     ```
     python scripts/refresh-finalize.py
     ```
-    Combines the previously-separate `gen_unified_artifact.py` + `.aicodermap-gap-gen.py` + `merge.py` calls into ONE process invocation. Each underlying script is unchanged (idempotent + same logic); the wrapper saves 2 redundant Python interpreter spawns + 2 file load/parse cycles. Failure of any inner step propagates exit code; merge.py's audit (SSOT coherence + MX1 invariant) still gates the commit. Use `--skip-merge` for dry-run preview.
+    Combines the previously-separate `gen_unified_artifact.py` + `.aicodermap-gap-gen.py` + `merge.py` calls into ONE process invocation, then runs `add-new-lineup-stubs.py` (the SINGLE SSOT new-model admission step) AFTER merge. Each underlying script is unchanged (idempotent + same logic); the wrapper saves 2 redundant Python interpreter spawns + 2 file load/parse cycles. Failure of gen_unified/merge propagates exit code; merge.py's audit (SSOT coherence + MX1 invariant) still gates the commit. The stub-add step is non-fatal (a good merge is never undone — new-model admission retries next cycle). New stubs land with null bench cells that fill next refresh. Use `--skip-merge` for dry-run preview (also skips stub-add).
 
     Outputs (unchanged from per-script behavior):
     - data/models.json (multi-provider pricing array, subscription array, status field, full bench, ollama, unslothVariants, etc.)
     - data/sources.json (append sourcesAdded[] + every contradiction's losing candidate, dedup by (key, url, value), include trustScore per entry)
     - i18n/{tr,en}.json (merge i18nUpdates into models[id]={strengths,weaknesses})
-    - data/archive/<id>.json (when REMOVED from vendor lineup past grace period)
+    - (REMOVED models stay in data/models.json as status="deprecated" — no archive-out file; data is never stripped)
     - lastUpdated := now (ISO 8601 UTC, "YYYY-MM-DDTHH:MM:SSZ") per touched entry only — same-day reruns disambiguate by wallclock time
 11. Append CHANGELOG.md (Keep a Changelog):
     ## [Unreleased] / ### Updated|Added|Deprecated|Removed|Flagged
@@ -1151,17 +1148,22 @@ trustScore − 0.5). merge.py enforces this at ingestion and records the cell in
 
 Every model carries a `status` field:
 
+**Core principle (2026-06-27): model DATA is never stripped.** A model's last-known
+record stays in `data/models.json` in full regardless of lifecycle state — only the
+*research universe* membership and *render styling* change. There is no archive-out
+file move, no stub reduction, no data loss. (Run-residue ≠ model data: the
+prune/freshness machinery clears orchestrator SCRATCH, never model records.)
+
 | Status | When set | UI behavior | Survey behavior |
 |--------|----------|-------------|-----------------|
 | `active` | Default; vendor lineup includes it | Normal rendering | Full bench/pricing refresh every cycle |
-| `deprecated` | Vendor lineup explicitly marks it deprecated OR vendor has named a successor and grace period started | Gray-out, "⚠ Deprecated <date>" badge, sortable but visually de-emphasized; tooltip points to successor | Pricing/availability refresh only (no bench re-survey unless user requests) |
-| `archived` | Vendor removed from lineup AND > DEPRECATION_GRACE_DAYS (60d) since deprecation | Hidden by default; visible only via "Show archived" filter | Skip in refresh; data/archive/<id>.json holds full last-known snapshot |
+| `deprecated` | Vendor lineup marks it deprecated, names a successor, OR REMOVES it from the lineup entirely | Gray-out, "⚠ Deprecated <date>" badge, sortable but visually de-emphasized; tooltip points to successor; **renders from full frozen data** | OUT of research universe (matrix.active_models) — frozen, never re-fetched |
+| `archived` | Manual only (`/aicodermap` never auto-sets it) | Faded "ARCHIVED" badge; still renders from full data; excluded from leaderboard *ranking* only | OUT of research universe — frozen, never re-fetched |
 
 **Transition rules (auto, no user prompt):**
-- `active` → `deprecated`: when Step 0 lineup marks deprecated. Set `deprecatedAt: today`, `successor: <id>?` from vendor announcement.
-- `deprecated` → `archived`: when `today - deprecatedAt > DEPRECATION_GRACE_DAYS`. Move full entry to `data/archive/<id>.json`, leave only stub `{ id, name, status:"archived", archivedAt, deprecatedAt }` in main models.json.
-- `deprecated` → `active`: when vendor re-lists. Restore from main entry, clear `deprecatedAt`.
-- `archived` → `active`: never automatic; requires manual `/aicodermap restore <id>`.
+- `active` → `deprecated`: when Step 0 lineup marks deprecated OR removes the model from the vendor lineup. Set `deprecatedAt: today`, `successor: <id>?` from vendor announcement. The entry is RETAINED in full.
+- `deprecated` → `active`: when vendor re-lists. Clear `deprecatedAt`; the model rejoins the research universe next cycle.
+- `* → archived`: never automatic — a manual curation choice only. Even then the full record stays in `data/models.json` (no `data/archive/` move). Reversible by editing `status` back.
 
 ## WRONG_ID_AUTO_FIX (handles cases like devstral-medium holding Devstral Small 2 data)
 

@@ -11,7 +11,7 @@ union that would have collected them), and the only writer of data/discoveries.j
 was the manual promote-discovery.py. Net effect: every new benchmark a sub-probe
 saw was silently lost, so a brand-new coding leaderboard could never enter the
 tracker. This harvest closes that gap source-agnostically (gather + synth +
-agent-out), exactly like harvest-new-models.py does for new MODELS.
+agent-out), the same way add-new-lineup-stubs.py does for new MODELS.
 
 Modes:
   (default)   harvest discoveries → data/discoveries.json (pending, AC6-flagged).

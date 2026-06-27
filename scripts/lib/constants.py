@@ -41,22 +41,19 @@ MAX_PARALLEL = 16  # 2026-06-06: 10→16. With FFD batch-packing a 76-model cycl
 # wave-barrier idle time where fast agents waited ~290s for the slowest in their
 # wave. 16 also matches the workflow concurrency ceiling (min(16, cores-2)).
 
-# ── Freshness contract (FAZ 2.2, reliability-driven since 2026-06-16) ───────
-# Bench-LEVEL freshness skip (T2) applies ONLY to FILLED+confirmed+fresh cells.
-# GAP (never-found) cells are re-queried every full-run — there is no gap-level
-# skip tier (the 2026-06-07 gap-freshness-tier was retired the same week it
-# landed; every GAP cell surfaces a vendor opt-in with zero lag).
+# ── Confirmed-cell skip (TTL removed 2026-06-27) ───────────────────────────
+# Bench-LEVEL skip (T2) applies ONLY to FILLED+confirmed cells. GAP (never-found)
+# cells are re-queried every full-run — there is no gap-level skip tier.
 #
-# Doctrine (user decision 2026-06-16): a cell confirmed by ≥3 agreeing sources
-# is treated as settled — a released model's published benchmark score does not
-# change, so re-fetching it every cycle has no concrete benefit. Skip is
-# RELIABILITY-driven (count + agreement), with a 90-day staleness BACKSTOP as
-# the safety net. Drift is still caught: <3-source / contested cells stay T1
-# (re-fetched every cycle) and detect-anomalies runs on live data each cycle
-# regardless of skip. This replaces the prior 7-day window, which — combined
-# with the retired `confirmed` flag — meant nothing ever actually skipped.
-FRESHNESS_TTL_DAYS = 90  # T2 cells re-validate after this many days (backstop).
-MIN_VERIFICATIONS_FOR_SKIP = 3  # T2 cells require ≥3 agreeing numeric sources.
+# Doctrine: a released model's published benchmark score is FROZEN, so a cell
+# confirmed by ≥MIN_VERIFICATIONS_FOR_SKIP agreeing sources is settled and never
+# re-fetched on a clock. Skip iff `confirmed and not contradicted` — there is no
+# time backstop (the prior FRESHNESS_TTL_DAYS window was removed: it only slowed
+# the cycle, since a frozen score doesn't drift). Re-validation is EVENT-driven —
+# detect-anomalies runs on live data every cycle and a contradiction/peer-outlier
+# flips `contradicted`, re-opening the cell. MIN_VERIFICATIONS_FOR_SKIP stays as
+# part of the `confirmed` flag's definition (derived in verification-map.py).
+MIN_VERIFICATIONS_FOR_SKIP = 3  # ≥3 agreeing numeric sources → `confirmed`.
 
 # ── Hybrid dispatch (FAZ 4.C) ──────────────────────────────────────────────
 HAIKU_GATHER_MIN_AVG_OBS = 3  # Avg observations per target_model. Below → sonnet retry.

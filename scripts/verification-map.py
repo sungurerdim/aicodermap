@@ -13,8 +13,9 @@ The map is the provenance audit log AND the freshness-skip source of truth.
 carries a DERIVED `confirmed` flag (≥VERIFICATION_AGREEMENT_THRESHOLD distinct
 numeric sources agreeing within VERIFICATION_AGREEMENT_PP) and a `contradicted`
 flag (≥2 numeric sources disagreeing). `freshness.compute_skip_cells` reads
-these to drop well-covered cells from the research sweep (re-validated only
-after FRESHNESS_TTL_DAYS or when a new contradiction surfaces). The flag had
+these to drop well-covered cells from the research sweep (re-validated EVENT-only
+— when a new contradiction surfaces; the time-based TTL was removed 2026-06-27, a
+frozen published score does not drift). The flag had
 been wrongly retired as "nothing reads it" — freshness.py + matrix.py both do,
 so retiring it left the skip set permanently empty and every confirmed cell was
 re-fetched every cycle for zero benefit.

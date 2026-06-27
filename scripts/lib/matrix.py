@@ -14,7 +14,13 @@ from typing import Any, Iterable
 
 
 def active_models(models: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    return [m for m in models if (m.get("status") or "active") != "archived"]
+    """Models in the RESEARCH universe = status 'active' only. `deprecated` and
+    `archived` are EXCLUDED (2026-06-27): their data is FROZEN — never re-fetched —
+    but NEVER stripped. The frontend still RENDERS them (faded via .is-deprecated /
+    .is-archived) from their last-known data; the matrix/dispatch/gap pipeline just
+    stops surveying them so a retired model can't reopen gaps or consume fetch
+    budget. Storage retention vs. research universe are deliberately separate."""
+    return [m for m in models if (m.get("status") or "active") == "active"]
 
 
 def total_universe(
@@ -75,7 +81,6 @@ def priority_cells(
     core_keys: list[str],
     limit: int = 200,
     verification_map: dict[str, Any] | None = None,
-    skip_confirmed_within_days: int = 90,
 ) -> list[dict[str, Any]]:
     """Top-N most starved (modelId, benchKey) cells — ORDERING (advisory).
 
@@ -94,18 +99,14 @@ def priority_cells(
       2. cells in models with fewer total filled hits → starve-the-model bias
       3. lex order on (modelId, benchKey) for deterministic tie-break
 
-    F2 skip-cache (aligned with FAZ 2.2 freshness contract):
-    cells confirmed AND verified within `skip_confirmed_within_days` are
-    excluded from the priority queue (default matches
-    `_schema.contracts.FRESHNESS_TTL_DAYS`, 90d since 2026-06-16). The agent gets these cells
-    via `idea_context.skipCells` (FAZ 2.2) instead. Pass `verification_map`
-    to activate the skip; omit to retain UNCAPPED behaviour for legacy callers.
+    `verification_map` (optional) drives ONLY the starvation re-ordering below
+    (gapHistory). There is no time-based confirmed-cell skip here: this function
+    enumerates EMPTY cells (`bench[k] is None`), and a confirmed cell is by
+    definition FILLED, so it never appears in this queue. The FILLED+confirmed
+    skip lives in lib.freshness.compute_skip_cells (→ idea_context.skipCells).
 
     Returns: [{modelId, benchKey, benchFillRatio, modelFillRatio}], capped at limit.
     """
-    import datetime as _dt
-
-    today = _dt.date.today()
     keys = list(core_keys)
     bench_filled = {k: 0 for k in keys}
     model_filled = {m["id"]: 0 for m in active}
@@ -135,16 +136,6 @@ def priority_cells(
                 continue
             cell_key = f"{m['id']}.{k}"
             vm_entry = vm_cells.get(cell_key) or {} if vm_cells else {}
-            # F2: skip cells recently confirmed by ≥2 independent sources
-            if vm_entry.get("confirmed"):
-                last_checked = vm_entry.get("lastChecked") or ""
-                try:
-                    checked_date = _dt.date.fromisoformat(last_checked[:10])
-                    age_days = (today - checked_date).days
-                    if age_days < skip_confirmed_within_days:
-                        continue  # skip — recently confirmed, not yet stale
-                except (ValueError, TypeError):
-                    pass  # malformed date → include cell (safe fallback)
             # Starvation flag: ≥2 consecutive gap cycles -> -1.0 (front).
             gap_hist = vm_entry.get("gapHistory") or []
             starve_key = -1.0 if len(gap_hist) >= 2 else 0.0

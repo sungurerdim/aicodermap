@@ -3,8 +3,8 @@
     "compositeMisfiles": 0,
     "measuredCandidates": 40,
     "bandViolations": 0,
-    "crossBenchDups": 6,
-    "aaRowsLoaded": 348
+    "crossBenchDups": 8,
+    "aaRowsLoaded": 354
   },
   "compositeMisfiles": [],
   "measuredCandidates": [
@@ -316,11 +316,27 @@
       ]
     },
     {
+      "modelId": "mimo-v2-pro",
+      "value": 87.0,
+      "benchKeys": [
+        "gpqa",
+        "lcb"
+      ]
+    },
+    {
       "modelId": "minimax-m2-7",
       "value": 57.0,
       "benchKeys": [
         "tau2",
         "tb2"
+      ]
+    },
+    {
+      "modelId": "nemotron-3-super",
+      "value": 29.0,
+      "benchKeys": [
+        "tb2",
+        "tbHard"
       ]
     },
     {

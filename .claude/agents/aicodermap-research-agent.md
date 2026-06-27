@@ -207,12 +207,13 @@ require_full_matrix: <bool default:true>     # every cell must end as fill | gap
 # 1023s against a 600s deadline because the deadline was both omitted from the
 # prompt AND only checked at sparse Phase boundaries). Honoring it is mandatory.
 #
-# Cell skip — ONE freshness-tier (bypasses FORMAT_DISPATCH entirely):
-#   FILLED (T2, FAZ 2.2): confirmed=true AND verifs≥3 AND age≤7d AND no
-#     contradiction → arrives in idea_context.skipCells (cached value emitted).
+# Cell skip — confirmed-cell skip (bypasses FORMAT_DISPATCH entirely):
+#   FILLED (T2): confirmed=true AND not contradicted → arrives in
+#     idea_context.skipCells (cached value emitted; no fetch). No age clause —
+#     a confirmed published score is frozen (TTL removed 2026-06-27).
 # GAP (never-found) cells are NEVER skipped — every empty cell is re-queried
 # every full-run so a newly-published value surfaces with zero lag. Everything
-# that is not a fresh FILLED cell is T1 (re-fetch this cycle).
+# that is not a confirmed FILLED cell is T1 (re-fetch this cycle).
 #
 # Sub-agents see ONLY their slice (target_model_ids ≤ 8 models × |coreKeys| cells).
 # The orchestrator parallelizes across slices via plan.waves.

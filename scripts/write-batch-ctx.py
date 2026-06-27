@@ -61,21 +61,8 @@ def main() -> int:
     today = date.today()
 
     ms = matrix_snapshot(active, keys)
-    pc = priority_cells(
-        active,
-        keys,
-        limit=200,
-        verification_map=vmap,
-        skip_confirmed_within_days=ctr.get("FRESHNESS_TTL_DAYS", 7),
-    )
-    sk = compute_skip_cells(
-        vmap,
-        today,
-        [m["id"] for m in active],
-        keys,
-        ttl_days=ctr.get("FRESHNESS_TTL_DAYS", 7),
-        min_verifs=ctr.get("MIN_VERIFICATIONS_FOR_SKIP", 3),
-    )
+    pc = priority_cells(active, keys, limit=200, verification_map=vmap)
+    sk = compute_skip_cells(vmap, today, [m["id"] for m in active], keys)
     bp = banned_fetch_patterns(wl)
 
     # #1 (2026-06-07) — shrink families that overran wallclock LAST cycle into

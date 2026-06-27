@@ -1040,10 +1040,12 @@ def _load_data_files(fabricated_suspicions):
     )
 
 
-def _apply_model_updates(
-    out, models, sources, models_by_id, wl_idx, unhealthy_urls, log
-):
-    """Apply per-model updates + sourcesAdded provenance, then append newModels."""
+def _apply_model_updates(out, sources, models_by_id, wl_idx, unhealthy_urls, log):
+    """Apply per-model updates + sourcesAdded provenance.
+
+    New-model admission lives in scripts/add-new-lineup-stubs.py (run by
+    refresh-finalize.py after merge), NOT here — the old in-merge append was
+    gate-less and dead (synth always emits newModels=[])."""
     for upd in out.get("models", []):
         mid = upd["id"]
         m = models_by_id.get(mid)
@@ -1091,11 +1093,12 @@ def _apply_model_updates(
             if append_source(sources, s["key"], _entry):
                 log["sources_appended"] += 1
 
-    for nm in out.get("newModels", []) or []:
-        if nm["id"] not in models_by_id:
-            models.append(nm)
-            models_by_id[nm["id"]] = nm
-            log["added"].append(nm["id"])
+    # New-model admission is NOT done here. The prior raw `out.newModels` append
+    # was gate-less + schema-incomplete AND dead: synth sets newModels=[] and
+    # gen_unified copies synth verbatim, so this loop never ran. The single SSOT
+    # admission path is scripts/add-new-lineup-stubs.py, invoked by
+    # refresh-finalize.py AFTER this merge — it scans the cycle's artifacts,
+    # applies the evidence gate, and writes schema-complete stubs + i18n parity.
 
 
 def _resolve_contradictions(out, models, sources, models_by_id, unhealthy_urls, log):
@@ -1572,9 +1575,7 @@ def main():
         log,
     ) = _load_data_files(fabricated_suspicions)
 
-    _apply_model_updates(
-        out, models, sources, models_by_id, wl_idx, unhealthy_urls, log
-    )
+    _apply_model_updates(out, sources, models_by_id, wl_idx, unhealthy_urls, log)
 
     reliability_ledger = _resolve_contradictions(
         out, models, sources, models_by_id, unhealthy_urls, log

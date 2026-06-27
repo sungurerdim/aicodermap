@@ -1,30 +1,22 @@
-"""Freshness-tiered skip — verification-map-driven.
+"""Confirmed-cell skip — verification-map-driven, time-independent.
 
-FAZ 2.2 (2026-05-07), reliability-driven since 2026-06-16: partial retirement
-of the UNCAPPED+UNCACHED doctrine. Prior policy was "every (modelId, benchKey)
-cell re-fetched every cycle." Reform: a cell confirmed by ≥3 agreeing sources
-is treated as SETTLED — a released model's published benchmark score does not
-change, so re-fetching it every cycle has no concrete benefit. Such cells skip
-the research sweep and re-validate only after a 90-day backstop (or when a new
-contradiction surfaces). Everything sparse/contested still re-fetches.
+Doctrine (TTL removed 2026-06-27): a released model's published benchmark score
+(SWE-bench, GPQA, …) is FROZEN — once a cell is `confirmed` it never changes, so
+re-fetching it on a clock has no benefit and only slows + complicates the cycle.
+The skip rule is therefore a single condition:
+
+  SKIP (T2): confirmed=true AND not contradicted   → emit cached value, no fetch.
+  FETCH (T1): everything else — unconfirmed, contradicted, or never-seen.
 
 The `confirmed`/`contradicted` flags are DERIVED in verification-map.py from
-accumulated provenance (count + agreement); they were wrongly retired there
-2026-05/06, which left this skip set permanently empty until the 2026-06-16 fix.
+accumulated provenance (count + agreement; `confirmed` already requires
+MIN_VERIFICATIONS_FOR_SKIP agreeing sources). This module just reads them.
 
-Two tiers:
-  T1 — re-fetch (every cycle):
-       confirmed=false OR verifs<MIN_VERIFICATIONS_FOR_SKIP
-       OR age>FRESHNESS_TTL_DAYS OR cell has unresolved contradiction
-       OR cell missing from map (default for never-seen cells).
-  T2 — skip (copy from map):
-       confirmed=true AND verifs≥MIN_VERIFICATIONS_FOR_SKIP
-       AND age≤FRESHNESS_TTL_DAYS AND no unresolved contradiction.
-
-T1 ALWAYS dominates uncertainty: any disqualifier triggers a re-fetch. Drift is
-still caught — low-verification/contested cells are T1 always, and
-detect-anomalies runs on live data every cycle regardless of skip. Confirmed
-cells re-validate when their FRESHNESS_TTL_DAYS window expires.
+Re-validation is EVENT-triggered, not time-triggered: detect-anomalies.py runs on
+live data every cycle, and a contradiction / peer-outlier / fresh-divergence
+flips `contradicted` (or clears `confirmed`), re-opening the cell next cycle. The
+prior age>FRESHNESS_TTL_DAYS / verifs-threshold branches are gone — they added a
+clock that the frozen-score model makes pointless.
 
 Usage:
     from lib.freshness import compute_skip_cells
@@ -42,11 +34,6 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Any
 
-# Default freshness window. Configurable via _schema.contracts.FRESHNESS_TTL_DAYS.
-# SSOT: lib.constants (were independent literals before 2026-06-06).
-from .constants import FRESHNESS_TTL_DAYS as DEFAULT_FRESHNESS_TTL_DAYS
-from .constants import MIN_VERIFICATIONS_FOR_SKIP as DEFAULT_MIN_VERIFICATIONS
-
 
 def _parse_iso_date(s: Any) -> date | None:
     if not isinstance(s, str):
@@ -63,11 +50,12 @@ def _parse_iso_date(s: Any) -> date | None:
 def classify_cell(
     cell: dict[str, Any] | None,
     today: date,
-    *,
-    ttl_days: int = DEFAULT_FRESHNESS_TTL_DAYS,
-    min_verifs: int = DEFAULT_MIN_VERIFICATIONS,
 ) -> dict[str, Any]:
     """Classify a single verification-map cell into T1 (re-fetch) or T2 (skip).
+
+    SKIP (T2) iff `confirmed` AND not `contradicted` — a confirmed cell holds a
+    frozen published score, so it is never re-fetched on age. Everything else is
+    T1. `ageDays` is informational only (no longer drives the tier).
 
     Returns:
       {
@@ -81,38 +69,13 @@ def classify_cell(
         return {"tier": "T1", "skip": False, "reason": "no-map-entry", "ageDays": None}
 
     confirmed = cell.get("confirmed") is True
-    verifs = cell.get("verifications") or []
-    nv = len(verifs) if isinstance(verifs, list) else 0
-    last_checked_str = cell.get("lastChecked")
-    last_checked = _parse_iso_date(last_checked_str)
-
+    contradicted = cell.get("contradicted") is True
+    last_checked = _parse_iso_date(cell.get("lastChecked"))
     age = None if last_checked is None else (today - last_checked).days
 
-    # T1 disqualifiers (any one triggers re-fetch)
     if not confirmed:
         return {"tier": "T1", "skip": False, "reason": "unconfirmed", "ageDays": age}
-    if nv < min_verifs:
-        return {
-            "tier": "T1",
-            "skip": False,
-            "reason": f"verifs<{min_verifs} (have {nv})",
-            "ageDays": age,
-        }
-    if age is None:
-        return {
-            "tier": "T1",
-            "skip": False,
-            "reason": "no-lastChecked",
-            "ageDays": None,
-        }
-    if age > ttl_days:
-        return {
-            "tier": "T1",
-            "skip": False,
-            "reason": f"stale (age {age}d > {ttl_days}d)",
-            "ageDays": age,
-        }
-    if cell.get("contradicted") is True:
+    if contradicted:
         return {
             "tier": "T1",
             "skip": False,
@@ -120,12 +83,7 @@ def classify_cell(
             "ageDays": age,
         }
 
-    return {
-        "tier": "T2",
-        "skip": True,
-        "reason": f"confirmed; verifs={nv}; age={age}d",
-        "ageDays": age,
-    }
+    return {"tier": "T2", "skip": True, "reason": "confirmed", "ageDays": age}
 
 
 def compute_skip_cells(
@@ -133,9 +91,6 @@ def compute_skip_cells(
     today: date,
     active_model_ids: list[str],
     core_bench_keys: list[str],
-    *,
-    ttl_days: int = DEFAULT_FRESHNESS_TTL_DAYS,
-    min_verifs: int = DEFAULT_MIN_VERIFICATIONS,
 ) -> dict[str, Any]:
     """Walk every (active_model × core_bench_key) cell, classify via the
     verification map, and return the skip set.
@@ -168,7 +123,7 @@ def compute_skip_cells(
             total += 1
             key = f"{mid}.{bk}"
             entry = cells.get(key)
-            cls = classify_cell(entry, today, ttl_days=ttl_days, min_verifs=min_verifs)
+            cls = classify_cell(entry, today)
             if cls["tier"] == "T2":
                 t2 += 1
                 skip.setdefault(mid, {})[bk] = {

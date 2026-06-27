@@ -61,6 +61,15 @@ PATTERNS = [
     # makes apply-anomaly-verdicts see ONLY this cycle's verdicts.
     ".aicodermap-anomaly-verdicts.json",
     ".aicodermap-anomaly-queue.json",
+    # New-model lineup scratch (2026-06-27). This file used to PERSIST a
+    # cross-cycle newModels[] queue (written by the now-deleted
+    # harvest-new-models.py); a candidate rejected one cycle was re-fed and
+    # re-rejected every subsequent cycle (false-positive feedback loop).
+    # add-new-lineup-stubs.py no longer writes it (it scans artifacts in-memory),
+    # but prune it here too as a hygiene safety net so NO run's decision leaks into
+    # the next. NOTE: .aicodermap-verification-map.json is deliberately NOT pruned
+    # — it is the cross-cycle confirmed-cell cache and MUST persist.
+    ".aicodermap-lineup.json",
 ]
 
 ARCHIVE_DIR_NAME = ".aicodermap-stale-archive"

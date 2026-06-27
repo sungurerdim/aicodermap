@@ -32,6 +32,16 @@ from lib.contracts import bench_delta_thresholds  # noqa: E402
 from lib.telemetry import aggregate_per_batch_telemetry  # noqa: E402
 from lib import idea_context  # noqa: E402
 
+# scripts/add-new-lineup-stubs.py is hyphenated (a script, not a package module),
+# so load it by path for the new-model admission gate regression tests.
+import importlib.util as _ilu  # noqa: E402
+
+_stub_spec = _ilu.spec_from_file_location(
+    "add_new_lineup_stubs", PROJECT / "scripts" / "add-new-lineup-stubs.py"
+)
+add_stubs = _ilu.module_from_spec(_stub_spec)
+_stub_spec.loader.exec_module(add_stubs)
+
 
 # ── util ─────────────────────────────────────────────────────────────────────
 
@@ -288,27 +298,27 @@ class TestMatrix(unittest.TestCase):
         {"id": "gamma", "status": "archived", "bench": {"swePro": 60.0}},
     ]
 
-    def test_active_models_excludes_archived_keeps_deprecated(self):
+    def test_active_models_excludes_deprecated_and_archived(self):
+        # 2026-06-27: deprecated + archived are both OUT of the research universe
+        # (data frozen, still rendered). Only status 'active' is researched.
         ids = [m["id"] for m in matrix.active_models(self.MODELS)]
-        self.assertEqual(ids, ["alpha", "beta"])
+        self.assertEqual(ids, ["alpha"])
 
     def test_filled_and_universe_and_expected_total(self):
         active = matrix.active_models(self.MODELS)
         keys = ["swePro", "cfElo"]
-        self.assertEqual(matrix.expected_total(active, keys), 4)
+        self.assertEqual(matrix.expected_total(active, keys), 2)
         self.assertEqual(
             matrix.total_universe(active, keys),
             {
                 ("alpha", "swePro"),
                 ("alpha", "cfElo"),
-                ("beta", "swePro"),
-                ("beta", "cfElo"),
             },
         )
         # None-valued cells are NOT filled.
         self.assertEqual(
             matrix.filled_cells_from_models(active, keys),
-            {("alpha", "swePro"), ("beta", "swePro")},
+            {("alpha", "swePro")},
         )
 
     def test_parse_gap_cell_both_shapes(self):
@@ -411,26 +421,25 @@ class TestFreshness(unittest.TestCase):
         cell.update(over)
         return cell
 
-    def test_t2_skip_when_confirmed_fresh_and_verified(self):
+    def test_t2_skip_when_confirmed(self):
         cls = classify_cell(self._cell(), self.TODAY)
         self.assertEqual(cls["tier"], "T2")
         self.assertTrue(cls["skip"])
-        self.assertEqual(cls["ageDays"], 2)
+        self.assertEqual(cls["ageDays"], 2)  # informational only
+
+    def test_t2_skip_ignores_age(self):
+        # TTL removed 2026-06-27: a confirmed cell skips regardless of age — a
+        # released model's published score is frozen, so age is irrelevant.
+        cls = classify_cell(self._cell(lastChecked="2026-02-01"), self.TODAY)
+        self.assertEqual(cls["tier"], "T2")
+        self.assertTrue(cls["skip"])
 
     def test_t1_disqualifiers(self):
         self.assertEqual(classify_cell(None, self.TODAY)["reason"], "no-map-entry")
         self.assertEqual(
             classify_cell(self._cell(confirmed=False), self.TODAY)["tier"], "T1"
         )
-        self.assertEqual(
-            classify_cell(self._cell(verifications=[{}]), self.TODAY)["tier"], "T1"
-        )
-        # Stale backstop is FRESHNESS_TTL_DAYS=90 (reliability-driven since
-        # 2026-06-16) — a cell last checked >90d ago re-validates (T1).
-        self.assertEqual(
-            classify_cell(self._cell(lastChecked="2026-02-01"), self.TODAY)["tier"],
-            "T1",
-        )
+        # contradiction is the SOLE event that re-opens a confirmed cell.
         self.assertEqual(
             classify_cell(self._cell(contradicted=True), self.TODAY)["tier"], "T1"
         )
@@ -579,6 +588,89 @@ class TestIdeaContextSlims(unittest.TestCase):
         self.assertEqual(
             idea_context.slim_priority_cells(cells, ["beta"]), [{"modelId": "beta"}]
         )
+
+
+# ── new-model admission gate (2026-06-27 consolidation regression) ────────────
+
+
+class TestNewModelGate(unittest.TestCase):
+    """Regression for the two bugs that silently dropped kimi-k2-7-code +
+    glm-5-2 every cycle: (a) evidenceConfidence=="confirmed" was REJECTED;
+    (b) evidenceUrl hosts were never counted toward the ≥2-source bar."""
+
+    VENDORS = {
+        "moonshot": {"urls": {"lineup": "https://platform.moonshot.ai/models"}},
+    }
+
+    def test_confirmed_confidence_admits(self):
+        # THE core bug: a harvested entry tagged confidence='confirmed' must pass.
+        nm = {"id": "kimi-k2-7-code", "confidence": "confirmed", "evidenceUrls": []}
+        admit, reason = add_stubs.gate_admit(nm, self.VENDORS)
+        self.assertTrue(admit, reason)
+
+    def test_two_distinct_hosts_admit(self):
+        # glm-5-2: marktechpost (channel 2) ∪ artificialanalysis (channel 1).
+        nm = {
+            "id": "glm-5-2",
+            "confidence": "newReleaseProbe",
+            "evidenceUrls": [
+                "https://www.marktechpost.com/2026/06/13/glm-5-2/",
+                "https://artificialanalysis.ai/models/glm-5-2",
+            ],
+        }
+        self.assertEqual(len(add_stubs.evidence_hosts(nm)), 2)
+        admit, reason = add_stubs.gate_admit(nm, self.VENDORS)
+        self.assertTrue(admit, reason)
+
+    def test_official_single_source_admits(self):
+        nm = {
+            "id": "kimi-k2-7-code",
+            "provider": "moonshot",
+            "confidence": "newReleaseProbe",
+            "evidenceUrls": ["https://platform.moonshot.ai/docs/kimi-k2-7"],
+        }
+        self.assertTrue(add_stubs.is_official_evidence(nm, self.VENDORS))
+        admit, _ = add_stubs.gate_admit(nm, self.VENDORS)
+        self.assertTrue(admit)
+
+    def test_single_nonofficial_low_conf_rejected(self):
+        nm = {
+            "id": "rumor-x",
+            "confidence": "newReleaseProbe",
+            "evidenceUrls": ["https://randomblog.example/rumor"],
+        }
+        admit, reason = add_stubs.gate_admit(nm, self.VENDORS)
+        self.assertFalse(admit)
+        self.assertIn("insufficient-evidence", reason)
+
+    def test_hyphenated_minor_version_not_superseded(self):
+        # glm-5-2 (slug form) must parse to (5, 2), NOT (5,), so GLM-5.1=(5,1)
+        # does not falsely supersede it. Existing snapshot from the live lineup.
+        existing = [
+            {"id": "glm-5-1", "name": "GLM-5.1"},
+            {"id": "glm-5", "name": "GLM-5"},
+        ]
+        self.assertEqual(add_stubs.parse_name("glm-5-2")[1], (5, 2))
+        self.assertIsNone(add_stubs.is_superseded("glm-5-2", existing))
+        # A genuinely-older snapshot IS still superseded.
+        self.assertEqual(
+            add_stubs.is_superseded("Claude Opus 4.6", [{"name": "Claude Opus 4.8"}]),
+            "Claude Opus 4.8",
+        )
+
+    def test_restricted_held_even_if_admissible(self):
+        nm = {
+            "id": "preview-y",
+            "confidence": "confirmed",
+            "notes": "preview only, waitlist required",
+            "evidenceUrls": [
+                "https://a.example/y",
+                "https://b.example/y",
+            ],
+        }
+        admit, reason = add_stubs.gate_admit(nm, self.VENDORS)
+        self.assertFalse(admit)
+        self.assertEqual(reason, "restricted/not-GA")
 
 
 if __name__ == "__main__":

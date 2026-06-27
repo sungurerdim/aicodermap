@@ -135,6 +135,20 @@ def main() -> int:
             return rc
         rc_total |= rc
 
+        # 4. add-new-lineup-stubs.py — the SINGLE SSOT new-model admission step.
+        # Runs AFTER merge (this is the only place it runs every full cycle): it
+        # scans THIS cycle's gather/synth/agent-out artifacts in-memory, gates
+        # each candidate, and writes schema-complete stubs into data/models.json
+        # + i18n. Bench cells start null and fill next refresh. Non-fatal — a
+        # stub-add failure must never undo a good merge.
+        rc_stub = runner(SCRIPTS / "add-new-lineup-stubs.py", name="add-new-stubs")
+        if rc_stub != 0:
+            print(
+                "  ⚠ add-new-stubs exit non-zero — continuing (merge already wrote "
+                "data; new-model admission retries next cycle)",
+                flush=True,
+            )
+
     print(f"\n=== FINALIZE OK === total exit={rc_total}", flush=True)
     return rc_total
 

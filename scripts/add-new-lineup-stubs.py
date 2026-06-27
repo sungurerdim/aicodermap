@@ -1,31 +1,50 @@
 #!/usr/bin/env python3
-"""Add NEW models discovered by this cycle's lineup agent (.aicodermap-lineup.json)
-as schema-complete stubs. Bench cells start null (next refresh fills them with
-multi-source provenance); metadata is DERIVED GENERICALLY from the lineup entry's
+"""SINGLE SSOT admission step for NEW models — detect + gate + add in one pass.
+
+This is the ONLY path that admits a freshly-released model into data/models.json.
+It runs in refresh-finalize.py AFTER merge.py (every full run), reads this cycle's
+gather/synth/agent-out artifacts directly (in-memory, no intermediate file), and
+writes schema-complete stubs whose bench cells start null (next refresh fills them
+with multi-source provenance). Metadata is DERIVED GENERICALLY from the candidate's
 own fields + the closest already-tracked family sibling — never hand-authored
 per-model (see feedback_no_hardcoded_model_patches). i18n strengths/weaknesses are
 written for both TR and EN to keep parity audits green.
 
-Two guards make new-model admission automatic AND safe:
+Consolidated 2026-06-27 (was two scripts: harvest-new-models.py wrote
+.aicodermap-lineup.json's newModels[], then this script read it). That split lost
+models every cycle:
+  - the intermediate .aicodermap-lineup.json PERSISTED across cycles, so a
+    candidate rejected once was re-fed (and re-rejected) every run;
+  - the evidence gate REJECTED `evidenceConfidence=="confirmed"` (only high/medium
+    passed) and counted `n_sources` from evidence[]/sources[] arrays ONLY — never
+    `evidenceUrl` — so harvest entries (which carry evidenceUrl, not arrays) were
+    always n_sources=0 and dropped as "low-confidence:confirmed". kimi-k2-7-code
+    (2026-06-12) + glm-5-2 (2026-06-13) were detected 2026-06-16 yet never admitted.
+Now: signals are unioned IN-MEMORY across ALL artifacts per candidate id (so a
+model seen by two different hosts clears the ≥2-distinct-host bar), the gate is
+fixed, and nothing is persisted between cycles — residue can't re-feed.
 
-  1. GENERIC DERIVATION. provider / tier / open / license are inherited from the
-     mode of existing models that share the candidate's name LINE token (e.g.
-     "Grok Build 0.1" → line "grok" → inherits xAI/frontier from the Grok family);
-     provider falls back to the whitelist vendor display name. context / pricing /
-     bench start empty and fill next cycle. No STUB_META entry is required — the
-     prior hard skip ("no STUB_META") silently dropped every genuinely-new model.
+Two source-agnostic signal channels (mirrors the old harvest-new-models.py):
+  1. `lineupHints[event='new']`  — incidental sightings a gather agent emits while
+     researching its model slice (vendor lineup page may be SPA/403/dead).
+  2. `lineupChanges.new[]`       — the dedicated Phase-0 WebSearch new-release net
+     (agent.md step 3b) + vendor-lineup diff. Carries richer evidence
+     (suggestedId, vendor, evidenceUrl, evidenceConfidence).
 
-  2. SUPERSESSION FILTER. A "new" id surfaced by the WebSearch new-release net is
-     often an OLDER snapshot the vendor still lists (e.g. "Claude Opus 4.6" when
-     "Claude Opus 4.8" is already tracked). It is skipped iff an existing model
-     shares its exact family key AND carries a strictly higher version. This is
-     recomputed from live data every cycle (NOT a persistent skip registry — see
-     feedback_known_gaps_registry), so a model stops being filtered the moment it
-     is no longer superseded.
+Two guards make admission automatic AND safe:
+  1. GENERIC DERIVATION (derive_meta). provider / tier / open / license are
+     inherited from the mode of existing models sharing the candidate's name LINE
+     token; context / pricing / bench start empty and fill next cycle.
+  2. SUPERSESSION FILTER (is_superseded). A "new" id is skipped iff an existing
+     model shares its exact family key AND carries a strictly higher version
+     (recomputed from live data every cycle — NOT a persistent skip registry).
 
 STUB_META below is an OPTIONAL rich-copy override keyed by id; absence is fine.
 """
 
+from __future__ import annotations
+
+import glob
 import json
 import re
 import sys
@@ -44,6 +63,9 @@ NOW = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 # released/api + tr_s/tr_w/en_s/en_w). Absence falls back to generic derivation.
 STUB_META: dict[str, dict] = {}
 
+# Confidence ranking for picking the strongest signal across artifacts.
+_CONF_RANK = {"confirmed": 3, "high": 3, "medium": 2, "low": 1}
+
 # A pure size/variant token (12B, 27B, 550B, A55B, E2B, E4B) — excluded from the
 # family key so a new SIZE of an existing generation is admitted, not mistaken for
 # a version bump.
@@ -61,8 +83,13 @@ def parse_name(name: str) -> tuple[tuple[str, ...], tuple[int, ...] | None]:
         if not t:
             continue
         if VER_RE.fullmatch(t):
-            if version is None:
-                version = tuple(int(x) for x in t.split("."))
+            # Accumulate consecutive numeric tokens so an id with a HYPHEN-separated
+            # minor ("glm-5-2") parses to the same version as its dotted display
+            # name ("GLM-5.2") → (5, 2). Without this, "glm-5-2" parsed to (5,) and
+            # GLM-5.1=(5,1) FALSELY superseded it (a longer tuple with the same
+            # prefix compares greater), silently blocking a genuinely-newer model.
+            parts = tuple(int(x) for x in t.split("."))
+            version = parts if version is None else version + parts
             continue
         if SIZE_RE.fullmatch(t):
             continue
@@ -112,17 +139,31 @@ def vendor_hostnames(vendor_entry: dict) -> set[str]:
     return hosts
 
 
-def is_official_evidence(nm: dict, vendors: dict) -> bool:
-    """True iff any evidence URL is hosted on the candidate's OWN vendor's
-    official domain (from the whitelist). A vendor announcing a model on its
-    own site is the primary source for 'this model exists' — single-source
-    sufficiency by design; ≥2-source applies to non-official evidence only."""
+def evidence_urls(nm: dict) -> list[str]:
+    """Every evidence URL a candidate carries. The canonical candidate shape (built
+    by collect_candidates) stores the cross-artifact union under `evidenceUrls`; raw
+    `evidenceUrl`/`evidence[]`/`sources[]` shapes are tolerated too. The old gate
+    ignored `evidenceUrl` entirely, which zeroed n_sources for every harvested
+    entry — that bug is exactly what this consolidation fixes."""
     urls = (
-        [nm.get("evidenceUrl")]
+        list(nm.get("evidenceUrls") or [])
+        + [nm.get("evidenceUrl")]
         + list(nm.get("evidence") or [])
         + list(nm.get("sources") or [])
     )
-    urls = [u for u in urls if isinstance(u, str) and u.startswith("http")]
+    return [u for u in urls if isinstance(u, str) and u.startswith("http")]
+
+
+def evidence_hosts(nm: dict) -> set[str]:
+    return {h for u in evidence_urls(nm) if (h := _hostname(u))}
+
+
+def is_official_evidence(nm: dict, vendors: dict) -> bool:
+    """True iff any evidence URL is hosted on the candidate's OWN vendor's official
+    domain (from the whitelist). A vendor announcing a model on its own site is the
+    primary source for 'this model exists' — single-source sufficiency by design;
+    ≥2-source applies to non-official evidence only."""
+    urls = evidence_urls(nm)
     if not urls:
         return False
     vid = nm.get("vendor") or nm.get("provider") or ""
@@ -138,10 +179,145 @@ def is_official_evidence(nm: dict, vendors: dict) -> bool:
     )
 
 
+def _artifact_paths() -> list[str]:
+    """Every artifact that may carry a new-model signal — gather batches plus the
+    synth + final unified outputs (source-agnostic: any single source failing must
+    not suppress detection)."""
+    paths = glob.glob(str(REPO / ".aicodermap-agent-out-*.gather.json"))
+    for extra in (".aicodermap-agent-out-synth.json", ".aicodermap-agent-out.json"):
+        p = REPO / extra
+        if p.exists():
+            paths.append(str(p))
+    return paths
+
+
+def collect_candidates(current_ids: set[str]) -> tuple[dict[str, dict], bool]:
+    """Scan all artifacts; union both new-model channels per candidate id, merging
+    EVERY evidence URL cross-artifact so a model sighted by two hosts clears the
+    ≥2-distinct-host bar. Returns (candidates_by_id, any_artifact_seen)."""
+    cands: dict[str, dict] = {}
+    seen_artifact = False
+
+    def _merge(
+        mid: str,
+        *,
+        name=None,
+        provider=None,
+        released=None,
+        ev_url=None,
+        conf=None,
+        notes=None,
+    ):
+        c = cands.setdefault(
+            mid,
+            {
+                "id": mid,
+                "name": None,
+                "provider": None,
+                "released": None,
+                "evidenceUrls": [],
+                "confidence": None,
+                "notes": "",
+            },
+        )
+        if name and not c["name"]:
+            c["name"] = name
+        if provider and not c["provider"]:
+            c["provider"] = provider
+        if released and not c["released"]:
+            c["released"] = released
+        if ev_url and isinstance(ev_url, str) and ev_url.startswith("http"):
+            if ev_url not in c["evidenceUrls"]:
+                c["evidenceUrls"].append(ev_url)
+        if conf:
+            cur = _CONF_RANK.get(str(c["confidence"] or "").lower(), 0)
+            if _CONF_RANK.get(str(conf).lower(), 0) > cur:
+                c["confidence"] = conf
+        if notes and notes not in c["notes"]:
+            c["notes"] = (c["notes"] + " " + notes).strip()
+
+    for f in _artifact_paths():
+        try:
+            d = json.loads(Path(f).read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if not isinstance(d, dict):
+            continue
+        seen_artifact = True
+
+        # Channel 1 — incidental gather sightings.
+        for h in d.get("lineupHints", []) or []:
+            if h.get("event") != "new":
+                continue
+            mid = h.get("modelId")
+            if not mid or mid in current_ids:
+                continue
+            _merge(
+                mid,
+                ev_url=h.get("evidence"),
+                conf=h.get("evidenceConfidence") or "gather-hint",
+                notes=h.get("details", ""),
+            )
+
+        # Channel 2 — dedicated WebSearch new-release net / lineup diff.
+        lc = d.get("lineupChanges") or {}
+        for n in lc.get("new", []) or []:
+            mid = n.get("suggestedId") or n.get("id")
+            if not mid or mid in current_ids:
+                continue
+            _merge(
+                mid,
+                name=n.get("name"),
+                provider=n.get("vendor") or n.get("provider"),
+                released=n.get("released"),
+                ev_url=n.get("evidenceUrl") or n.get("evidence"),
+                conf=n.get("evidenceConfidence") or "newReleaseProbe",
+                notes=n.get("notes") or n.get("observedVersion") or "",
+            )
+            # Some agents emit evidence as an array alongside evidenceUrl.
+            for u in list(n.get("evidence") or []) + list(n.get("sources") or []):
+                _merge(mid, ev_url=u)
+
+    return cands, seen_artifact
+
+
+def gate_admit(nm: dict, vendors: dict) -> tuple[bool, str]:
+    """The evidence gate (consolidated + fixed 2026-06-27). Answers "is this model
+    verifiably REAL?". Returns (admit, reason). Admit when ANY of:
+      (a) OFFICIAL evidence (URL on the candidate's vendor whitelist domain) —
+          vendor self-publication is definitionally authoritative;
+      (b) confidence ∈ {confirmed, high, medium} (was: `confirmed` REJECTED);
+      (c) ≥2 DISTINCT evidence hosts (evidenceUrl counted — was: IGNORED).
+    In ALL cases a restricted/not-GA/preview/waitlist/invite note holds the
+    candidate back (waits for GA), even if otherwise admissible."""
+    official = is_official_evidence(nm, vendors)
+    conf = str(nm.get("confidence") or "").lower()
+    notes = str(nm.get("notes") or "").lower()
+    restricted = any(
+        t in notes
+        for t in (
+            "restricted",
+            "not generally available",
+            "not generally-available",
+            "human review",
+            "waitlist",
+            "preview only",
+            "invite",
+        )
+    )
+    n_hosts = len(evidence_hosts(nm))
+    admissible = official or conf in ("confirmed", "high", "medium") or n_hosts >= 2
+    if restricted:
+        return False, "restricted/not-GA"
+    if not admissible:
+        return False, f"insufficient-evidence (conf={conf or 'none'}, hosts={n_hosts})"
+    return True, "ok"
+
+
 def derive_meta(nm: dict, existing: list[dict], vendors: dict) -> dict:
-    """Build stub metadata from the lineup entry + the candidate's family siblings.
-    Explicit lineup values win; otherwise inherit the sibling mode; otherwise a
-    safe default. Bench/pricing/context stay empty — they fill next cycle."""
+    """Build stub metadata from the candidate + its family siblings. Explicit
+    candidate values win; otherwise inherit the sibling mode; otherwise a safe
+    default. Bench/pricing/context stay empty — they fill next cycle."""
     name = nm.get("name") or nm["id"]
     line = line_token(name)
     sibs = [m for m in existing if line and line_token(m.get("name", "")) == line]
@@ -203,7 +379,6 @@ def derive_meta(nm: dict, existing: list[dict], vendors: dict) -> dict:
 
 
 def main() -> int:
-    lineup = json.loads((REPO / ".aicodermap-lineup.json").read_text(encoding="utf-8"))
     models_path = REPO / "data" / "models.json"
     models = json.loads(models_path.read_text(encoding="utf-8"))
     ms = models["models"] if isinstance(models, dict) else models
@@ -215,12 +390,12 @@ def main() -> int:
     tr = json.loads((REPO / "i18n" / "tr.json").read_text(encoding="utf-8"))
     en = json.loads((REPO / "i18n" / "en.json").read_text(encoding="utf-8"))
 
+    candidates, seen_artifact = collect_candidates(existing)
+
     added, skipped = [], []
-    for nm in lineup.get("newModels", []):
-        mid = nm["id"]
+    for mid, nm in candidates.items():
         name = nm.get("name") or mid
         if mid in existing:
-            print(f"  skip (already present): {mid}")
             continue
         sup = is_superseded(name, ms)
         if sup:
@@ -228,47 +403,10 @@ def main() -> int:
             print(f"  skip (superseded by '{sup}'): {mid}")
             continue
 
-        # EVIDENCE GATE (2026-06-06, reformed 2026-06-10). The question the gate
-        # answers is "is this model verifiably REAL?", and the primary source for
-        # that is the vendor's OWN official announcement/docs page. Therefore:
-        #   - OFFICIAL evidence (URL on the candidate's vendor whitelist domain)
-        #     admits the model on a SINGLE source — vendor self-publication is
-        #     definitionally authoritative for lineup existence (it is the same
-        #     trust basis as Step 0 lineup discovery itself).
-        #   - NON-official evidence still needs high/medium confidence or ≥2
-        #     sources, and the restricted/not-GA hold-out applies — this is what
-        #     keeps speculative/rumored blog entries out.
-        # Pre-reform the gate ignored `evidenceUrl` entirely (only counted
-        # evidence[]/sources[] arrays) and read `notes` while agents emit
-        # `_note` — so an officially-announced model (claude-fable-5,
-        # anthropic.com/news) was held back as "low-confidence:none".
-        official = is_official_evidence(nm, vendors)
-        conf = str(nm.get("evidenceConfidence") or "").lower()
-        notes = str(nm.get("notes") or nm.get("_note") or "").lower()
-        restricted = any(
-            t in notes
-            for t in (
-                "restricted",
-                "not generally available",
-                "not generally-available",
-                "human review",
-                "waitlist",
-                "preview only",
-                "invite",
-            )
-        )
-        n_sources = len(nm.get("evidence") or nm.get("sources") or [])
-        verified = official or (
-            (conf in ("high", "medium") or n_sources >= 2) and not restricted
-        )
-        if not verified:
-            reason = (
-                "restricted/not-GA"
-                if restricted
-                else f"low-confidence:{conf or 'none'}"
-            )
+        admit, reason = gate_admit(nm, vendors)
+        if not admit:
             skipped.append((mid, reason))
-            print(f"  skip (unverified — {reason}; held as lineup hint): {mid}")
+            print(f"  skip (unverified — {reason}): {mid}")
             continue
 
         meta = derive_meta(nm, ms, vendors)
@@ -282,10 +420,9 @@ def main() -> int:
         }
         stub = {
             "id": mid,
-            # Born-correct: a lineup entry without a display name falls back to
-            # the raw id slug; canonicalize it ("minimax-m3" -> "MiniMax M3")
-            # using the resolved provider so the stub is never published as a
-            # slug (this step can run after merge's canonicalization pass).
+            # Born-correct: a candidate without a display name falls back to the raw
+            # id slug; canonicalize it ("minimax-m3" -> "MiniMax M3") using the
+            # resolved provider so the stub is never published as a slug.
             "name": canonical_display_name(name, meta["provider"]),
             "provider": meta["provider"],
             "released": meta["released"],
@@ -306,6 +443,7 @@ def main() -> int:
             "status": "active",
         }
         ms.append(stub)
+        existing.add(mid)
         tr["models"][mid] = {"strengths": meta["tr_s"], "weaknesses": meta["tr_w"]}
         en["models"][mid] = {"strengths": meta["en_s"], "weaknesses": meta["en_w"]}
         added.append(mid)
@@ -323,12 +461,26 @@ def main() -> int:
         (REPO / "i18n" / "en.json").write_text(
             json.dumps(en, ensure_ascii=False, indent=1), encoding="utf-8"
         )
+
+    # Loud gate (feedback_no_silent_fails): detection ran this cycle (fresh
+    # artifacts present) but admitted nothing → INFO, not a silent pass.
+    if seen_artifact and not added:
+        print(
+            "  ℹ detection ran (artifacts present) but 0 new models admitted "
+            f"({len(candidates)} candidate(s), {len(skipped)} gated)"
+        )
     print(
         f"=== STUBS === added: {len(added)} {added} | "
-        f"superseded-skipped: {len(skipped)} {[s[0] for s in skipped]}"
+        f"gated: {len(skipped)} {[s[0] for s in skipped]}"
     )
     return 0
 
 
 if __name__ == "__main__":
+    reconf = getattr(sys.stdout, "reconfigure", None)
+    if callable(reconf):
+        try:
+            reconf(encoding="utf-8", errors="replace")
+        except (OSError, ValueError):
+            pass
     raise SystemExit(main())
