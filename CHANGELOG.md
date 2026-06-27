@@ -1,4 +1,12 @@
 
+## [2026-06-27] — same-run new-model fill (announcement-first + leaderboard scan)
+
+### Updated
+- `kimi-k2-7-code` — filled 5 cells (sweV 78.2, hle 38.2, lcb 68.5, mmluPro 71.4 via aggregators; aaIdx 42 via Artificial Analysis I-tier). Official Moonshot docs publish only proprietary benches (Kimi Code Bench v2, MCP-Atlas) that don't map to our coreBenchKeys; standard-leaderboard coverage is still sparse for this 2026-06-12 model. `gpqa` left as a gap — the only candidate (65.8, single C-tier) was flagged as likely misattributed (K2.6 GPQA is 90.5), so it is withheld pending an independent I-tier source.
+- `grok-4-20-multi-agent` — filled 11 cells (sweV 70.8 official xAI; aaIdx 48 + arcAgi2 15.9 via I-tier; gpqa 87.7, hle 30, tau2 96.5, lcb 81.9, tbHard 40.9, mmluPro 86.6, aaCoding 42.2, aaAgentic 68.7 via AA-sourced aggregators).
+- Source: `platform.kimi.ai/docs/models` promoted to the Moonshot lineup whitelist URL (lists the full active+deprecated model set).
+- Sparse single-source cells are auto-quarantined (MX5) and re-queried next cycle for I-tier cross-validation.
+
 ## [2026-06-27] — autonomous refresh-all [WARN: cumulative provenance coverage 71.2% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 628 new fills; 0 cells auto-gapped by orchestrator; 392 explicit agent gaps preserved]
 
 [fillRatio:0.71 cells:860/1207 contradictions:221 fetch:0.0min tools:None batches:None build:1667267]
