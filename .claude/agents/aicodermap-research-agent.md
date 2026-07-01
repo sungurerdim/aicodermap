@@ -203,7 +203,7 @@ include_unsloth: <bool default:true>
 trusted_sources_only: <bool default:true>
 parallel_sources: <int default:5>          # parallelism, NOT a cap
 parallel_models: <int default:5>           # parallelism, NOT a cap
-verification_map_path: ".aicodermap-verification-map.json"  # tarihsel audit + contradiction analiz cache; SKIP kararı vermez
+verification_map_path: ".aicodermap-verification-map.json"  # historical audit + contradiction analysis cache; makes NO SKIP decisions
 trust_score_required: <bool default:true>
 termination: "completeness"                # explicit doctrine — see SKILL.md COMPLETENESS_TERMINATION
 expected_total: <int>                      # |active|×|coreKeys|; matrix invariant target (N/A retired)
@@ -545,7 +545,7 @@ The skill loads the whole file and passes it via `idea_context.sourcesWhitelist`
 
 5. C-tier sources from whitelist `community[]` are emitted when the agent has tried every vendor + leaderboard + aggregator option for the (modelId, field) pair AND found nothing — they are last-resort, not mid-tier.
 
-6. **In-cycle source promotion** (2026-04-28 rev3 — the user's "yeni her bulguyu, kaynağı, veriyi o anda kullan" mandate): when WebSearch (Phase 3 step 5) surfaces a URL that is NOT in the whitelist but appears to carry the missing (modelId, benchKey) pair, the agent fetches that URL THIS cycle subject to:
+6. **In-cycle source promotion** (2026-04-28 rev3 — the user's "use every new finding, source, and datum the moment it appears" mandate): when WebSearch (Phase 3 step 5) surfaces a URL that is NOT in the whitelist but appears to carry the missing (modelId, benchKey) pair, the agent fetches that URL THIS cycle subject to:
    - **HTTPS only** (http:// blocked — no transport-layer trust)
    - **Domain not in `_runtime.unhealthy`** (cooldown still respected)
    - **No private/internal address space** (no 10.x, 192.168.x, 127.x, .local, .lan)
@@ -762,7 +762,7 @@ The single biggest source of data loss in prior runs was a single mega-regex doi
    exact metric+scale: (a) corroborated on the same scale → keep it (real); (b)
    wrong scale/metric → file in the correct cell or gap it with a note; (c)
    unverifiable → record with a `rawGaps`/note flag so synth + the next cycle
-   re-verify. "Fark çok yüksek" is never, by itself, grounds to discard.
+   re-verify. "The gap is too large" is never, by itself, grounds to discard.
    The orchestrator pre-flags such cells in `idea_context.anomalies[]` (the
    PRELIM-F detector: source-mismatch / out-of-band / single-source /
    peer-outlier) — resolve every anomaly intersecting your slice FIRST, with a

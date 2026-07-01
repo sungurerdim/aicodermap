@@ -41,7 +41,7 @@ Merhaba — kodlama-LLM seçimini saniyeler içinde yapan açık-kaynak bir
 takipçi yayınladım: AICoderMap. SWE-bench Pro / Verified çelişkilerini
 işaretliyor, GPU'na sığacak Unsloth quant'ını yazıyor, ağırlıklarını
 sürükleyerek kendi sıralamanı çıkartıyorsun. Her 14 günde bir tazeleniyor,
-55 model + 25 benchmark, TR + EN. Geri bildirim çok kıymetli:
+86 model + 29 benchmark, TR + EN. Geri bildirim çok kıymetli:
 https://sungurerdim.github.io/aicodermap/?lang=tr
 ```
 
@@ -68,7 +68,7 @@ AICoderMap — open-source benchmark tracker for coding LLMs that lets you
 weight benchmarks yourself. Drag SWE-Pro to 30 %, agentic to 5 %; ranking
 updates instantly. Cross-source contradiction flags (>3pp warn, >5pp red).
 WebGPU detect → every local model labeled with the exact Unsloth quant
-that fits your card. 55 models × 25 benchmarks, refreshed every 14 days.
+that fits your card. 86 models × 29 benchmarks, refreshed every 14 days.
 TR + EN. MIT, $0/mo (GitHub Pages). Feedback welcome.
 https://sungurerdim.github.io/aicodermap/
 ```
