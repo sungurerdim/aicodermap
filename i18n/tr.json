@@ -417,24 +417,24 @@
    "weaknesses": "SWE-bench Pro'da Opus 4.7'nin 5.7 puan gerisinde; HLE %41.4 (Opus 4.7 = %46.9); $5/$30 yüksek API fiyatı; kapalı ağırlıklar."
   },
   "glm-4-5-air": {
-   "strengths": "12B aktif parametreli MoE; self-host icin maliyet-yetenek dengesi iyi; MIT lisansli.",
-   "weaknesses": "Bench kapsami bekliyor; yayin aninda agentic kolonlar buyuk olcude test edilmemis."
+   "strengths": "12B aktif parametreli MoE; self-host için maliyet-yetenek dengesi iyi; MIT lisanslı.",
+   "weaknesses": "Bench kapsamı bekliyor; yayın anında agentic kolonlar büyük ölçüde test edilmemiş."
   },
   "glm-4-7": {
-   "strengths": "GLM serisinde acik-agirlikli kodlama lideri; MIT altinda frontier-sinifi SWE davranisi hedefler.",
-   "weaknesses": "Kullanilabilir quantlarda 40GB+ VRAM ister; tuketici GPU icin gercekci degil."
+   "strengths": "GLM serisinde açık-ağırlıklı kodlama lideri; MIT altında frontier-sınıfı SWE davranışı hedefler.",
+   "weaknesses": "Kullanılabilir quantlarda 40GB+ VRAM ister; tüketici GPU için gerçekçi değil."
   },
   "mistral-medium-3-5": {
-   "strengths": "Avrupa dilleri destegi guclu, fiyati ongorulebilir orta-seviye Mistral modeli.",
-   "weaknesses": "Modified-MIT lisansi ticari yeniden dagitimi kisitlar; yalnizca cloud."
+   "strengths": "Avrupa dilleri desteği güçlü, fiyatı öngörülebilir orta-seviye Mistral modeli.",
+   "weaknesses": "Modified-MIT lisansı ticari yeniden dağıtımı kısıtlar; yalnızca cloud."
   },
   "qwen3-5-9b": {
-   "strengths": "6-8GB tuketici GPU icin uygun kompakt 9B Qwen; Apache 2.0 kisitsiz.",
-   "weaknesses": "Coklu-dosya refaktorde 27B/35B kardeslerinden daha dusuk kapasite; agentic bosluklar bekleniyor."
+   "strengths": "6-8GB tüketici GPU için uygun kompakt 9B Qwen; Apache 2.0 kısıtsız.",
+   "weaknesses": "Çoklu-dosya refaktörde 27B/35B kardeşlerinden daha düşük kapasite; agentic boşluklar bekleniyor."
   },
   "minimax-m2-1": {
-   "strengths": "Token basina 1$ altinda 1M-token baglam penceresi; uzun-dokuman ve coklu-dosya gorevleri icin faydali.",
-   "weaknesses": "Tam hassasiyette yerel calistirma pratik degil; cloud-oncelikli dagitim."
+   "strengths": "Token başına 1$ altında 1M-token bağlam penceresi; uzun-doküman ve çoklu-dosya görevleri için faydalı.",
+   "weaknesses": "Tam hassasiyette yerel çalıştırma pratik değil; cloud-öncelikli dağıtım."
   },
   "claude-haiku-4-5": {
    "strengths": "",
@@ -456,22 +456,38 @@
    "strengths": "",
    "weaknesses": ""
   },
-  "gemini-3-5-flash.strengths": "Agentic ve kodlama iş yükleri için optimize edilmiş hızlı, düşük maliyetli Gemini katmanı; 1M-token bağlam.",
-  "gemini-3-5-flash.weaknesses": "Benchmark kapsamı doğrulanmayı bekliyor; tescilli, yalnızca bulut.",
-  "qwen3-7-max.strengths": "1M-token bağlamlı Qwen amiral gemisi akıl yürütme-agent modeli; güçlü kodlama ve agentic performansı.",
-  "qwen3-7-max.weaknesses": "Kapalı ağırlıklı önizleme; bağımsız bench kapsamı bekliyor; orta seviye Qwen üzerinde fiyat.",
-  "qwen3-7-plus.strengths": "Görüntü ve kod görevlerini birleştiren, 1M-token bağlamlı çok kipli Qwen3.7 varyantı.",
-  "qwen3-7-plus.weaknesses": "Kapalı ağırlıklı önizleme; lansmanda sınırlı bağımsız benchmark.",
-  "claude-opus-4-8.strengths": "Anthropic'in amiral gemisi sınır modeli; sürüm anında SWE-bench ve agentic kodlamada en güçlü Claude.",
-  "claude-opus-4-8.weaknesses": "Premium API fiyatı; kapalı ağırlıklar; tam benchmark kapsamı bu döngünün taramasını bekliyor.",
-  "gpt-5-4-mini.strengths": "400K bağlamlı, maliyet-verimli GPT-5.4 katmanı; kodlama ajanları için gecikme ve yetenek dengesi.",
-  "gpt-5-4-mini.weaknesses": "Zorlu muhakemede tam GPT-5.4'ten zayıf; kapalı ağırlıklar; bench kapsamı taramayı bekliyor.",
-  "gpt-5-4-nano.strengths": "En küçük GPT-5.4 varyantı; yüksek verimli, düşük gecikmeli kodlama çağrıları için en ucuz OpenAI seçeneği.",
-  "gpt-5-4-nano.weaknesses": "Çoklu-dosya görevlerde GPT-5.4 ailesinin en düşük kapasitesi; kapalı ağırlıklar; bench kapsamı bekliyor.",
-  "mistral-small-4.strengths": "256K bağlamlı, Apache-2.0 küçük Mistral; tek orta-seviye GPU'da self-host edilebilir.",
-  "mistral-small-4.weaknesses": "Agentic benchmarklarda sınır seviyesinin altında; tam bench kapsamı bu döngünün taramasını bekliyor.",
-  "nemotron-3-nano-omni.strengths": "Açık-ağırlıklı multimodal NVIDIA Nemotron nano; agentic ve multimodal görevler için kompakt.",
-  "nemotron-3-nano-omni.weaknesses": "Nano ölçeği zorlu kodlama yeteneğini sınırlar; bench kapsamı bu döngünün taramasını bekliyor.",
+  "gemini-3-5-flash": {
+   "strengths": "Agentic ve kodlama iş yükleri için optimize edilmiş hızlı, düşük maliyetli Gemini katmanı; 1M-token bağlam.",
+   "weaknesses": "Benchmark kapsamı doğrulanmayı bekliyor; tescilli, yalnızca bulut."
+  },
+  "qwen3-7-max": {
+   "strengths": "1M-token bağlamlı Qwen amiral gemisi akıl yürütme-agent modeli; güçlü kodlama ve agentic performansı.",
+   "weaknesses": "Kapalı ağırlıklı önizleme; bağımsız bench kapsamı bekliyor; orta seviye Qwen üzerinde fiyat."
+  },
+  "qwen3-7-plus": {
+   "strengths": "Görüntü ve kod görevlerini birleştiren, 1M-token bağlamlı çok kipli Qwen3.7 varyantı.",
+   "weaknesses": "Kapalı ağırlıklı önizleme; lansmanda sınırlı bağımsız benchmark."
+  },
+  "claude-opus-4-8": {
+   "strengths": "Anthropic'in amiral gemisi sınır modeli; sürüm anında SWE-bench ve agentic kodlamada en güçlü Claude.",
+   "weaknesses": "Premium API fiyatı; kapalı ağırlıklar; tam benchmark kapsamı bu döngünün taramasını bekliyor."
+  },
+  "gpt-5-4-mini": {
+   "strengths": "400K bağlamlı, maliyet-verimli GPT-5.4 katmanı; kodlama ajanları için gecikme ve yetenek dengesi.",
+   "weaknesses": "Zorlu muhakemede tam GPT-5.4'ten zayıf; kapalı ağırlıklar; bench kapsamı taramayı bekliyor."
+  },
+  "gpt-5-4-nano": {
+   "strengths": "En küçük GPT-5.4 varyantı; yüksek verimli, düşük gecikmeli kodlama çağrıları için en ucuz OpenAI seçeneği.",
+   "weaknesses": "Çoklu-dosya görevlerde GPT-5.4 ailesinin en düşük kapasitesi; kapalı ağırlıklar; bench kapsamı bekliyor."
+  },
+  "mistral-small-4": {
+   "strengths": "256K bağlamlı, Apache-2.0 küçük Mistral; tek orta-seviye GPU'da self-host edilebilir.",
+   "weaknesses": "Agentic benchmarklarda sınır seviyesinin altında; tam bench kapsamı bu döngünün taramasını bekliyor."
+  },
+  "nemotron-3-nano-omni": {
+   "strengths": "Açık-ağırlıklı multimodal NVIDIA Nemotron nano; agentic ve multimodal görevler için kompakt.",
+   "weaknesses": "Nano ölçeği zorlu kodlama yeteneğini sınırlar; bench kapsamı bu döngünün taramasını bekliyor."
+  },
   "nemotron-3-ultra": {
    "strengths": "550B toplam / 55B aktif Hybrid Mamba-Transformer MoE, açık ağırlık (Linux Foundation OpenMDW-1.1). aaIdx=48 ile en güçlü ABD açık-ağırlık modeli. HF + OpenRouter + NVIDIA NIM + AWS SageMaker üzerinde dağıtık.",
    "weaknesses": "Computex 2026'da yeni duyuruldu (4 Haziran 2026); bağımsız benchmark doğrulaması henüz sınırlı. Fiyatlandırma sağlayıcıya göre değişken."
