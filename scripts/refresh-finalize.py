@@ -135,12 +135,14 @@ def main() -> int:
             return rc
         rc_total |= rc
 
-        # 4. add-new-lineup-stubs.py — the SINGLE SSOT new-model admission step.
-        # Runs AFTER merge (this is the only place it runs every full cycle): it
-        # scans THIS cycle's gather/synth/agent-out artifacts in-memory, gates
-        # each candidate, and writes schema-complete stubs into data/models.json
-        # + i18n. Bench cells start null and fill next refresh. Non-fatal — a
-        # stub-add failure must never undo a good merge.
+        # 4. add-new-lineup-stubs.py — SAFETY-NET pass of the new-model admission
+        # step (c930089, 2026-06-27 lineup-first ordering). The PRIMARY admission
+        # already ran PRE-GATHER in Step 0, so a model discovered there is already
+        # in data/models.json and had its benches filled by Stage A this run. This
+        # post-merge call only catches a model first sighted mid-gather (idempotent
+        # — ids already admitted pre-gather are skipped); such a model's bench
+        # cells start null and fill next refresh. Non-fatal — a stub-add failure
+        # must never undo a good merge.
         rc_stub = runner(SCRIPTS / "add-new-lineup-stubs.py", name="add-new-stubs")
         if rc_stub != 0:
             print(

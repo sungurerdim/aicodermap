@@ -2,13 +2,21 @@
 """SINGLE SSOT admission step for NEW models — detect + gate + add in one pass.
 
 This is the ONLY path that admits a freshly-released model into data/models.json.
-It runs in refresh-finalize.py AFTER merge.py (every full run), reads this cycle's
-gather/synth/agent-out artifacts directly (in-memory, no intermediate file), and
-writes schema-complete stubs whose bench cells start null (next refresh fills them
-with multi-source provenance). Metadata is DERIVED GENERICALLY from the candidate's
-own fields + the closest already-tracked family sibling — never hand-authored
-per-model (see feedback_no_hardcoded_model_patches). i18n strengths/weaknesses are
-written for both TR and EN to keep parity audits green.
+Since c930089 (2026-06-27, lineup-first ordering) it runs TWICE per full cycle:
+  (i)  PRE-GATHER (primary) — invoked from Step 0 right after lineup discovery,
+       BEFORE the dispatch plan is built, so an admitted model enters
+       matrix.active_models and Stage A fills its benches THIS SAME run
+       (no-defer contract — never waits a cycle for scores);
+  (ii) POST-MERGE (safety net) — invoked by refresh-finalize.py AFTER merge.py,
+       catches a model first sighted mid-gather; idempotent (an id already
+       admitted by (i) is skipped via `mid in existing`).
+Both passes read this cycle's gather/synth/agent-out artifacts directly
+(in-memory, no intermediate file) and write schema-complete stubs; bench cells
+start null and are filled by Stage A this run for (i), or next refresh for (ii).
+Metadata is DERIVED GENERICALLY from the candidate's own fields + the closest
+already-tracked family sibling — never hand-authored per-model (see
+feedback_no_hardcoded_model_patches). i18n strengths/weaknesses are written for
+both TR and EN to keep parity audits green.
 
 Consolidated 2026-06-27 (was two scripts: harvest-new-models.py wrote
 .aicodermap-lineup.json's newModels[], then this script read it). That split lost
@@ -72,6 +80,14 @@ _CONF_RANK = {"confirmed": 3, "high": 3, "medium": 2, "low": 1}
 SIZE_RE = re.compile(r"^[aex]?\d+(?:\.\d+)?[bm]$", re.I)
 # A pure version token (4, 4.6, 4.20, 3.1).
 VER_RE = re.compile(r"^\d+(?:\.\d+)*$")
+# A version fused to a single-letter family marker (K2.7, V4, M2.7, K2) — the
+# marker letter joins the family key (so it still matches its slug form, e.g.
+# "kimi-k2-7-code"'s "k2" token) and the digits accumulate as version, same as
+# VER_RE. Checked AFTER SIZE_RE so genuine size/variant tokens (A55B, E4B — same
+# shape but end in b/m) are not reinterpreted. A multi-letter prefix ("Qwen3.7")
+# never matches (only ONE leading letter) and keeps falling through to the plain
+# alpha branch below, unaffected.
+FUSED_VER_RE = re.compile(r"^([A-Za-z])(\d+(?:\.\d+)*)$")
 
 
 def parse_name(name: str) -> tuple[tuple[str, ...], tuple[int, ...] | None]:
@@ -92,6 +108,18 @@ def parse_name(name: str) -> tuple[tuple[str, ...], tuple[int, ...] | None]:
             version = parts if version is None else version + parts
             continue
         if SIZE_RE.fullmatch(t):
+            continue
+        fused = FUSED_VER_RE.fullmatch(t)
+        if fused:
+            # Letter-fused version ("Kimi K2.7 Code", "MiniMax M2.7", "DeepSeek
+            # V4 Pro") used to fall through to the plain alpha branch, which
+            # stripped the digits and left version=None — is_superseded's `not
+            # ver` guard then short-circuited to None (fails open), so a
+            # re-listed older sibling ("Kimi K2.6 Code") was admitted as a fresh
+            # stub even though a newer one was already tracked.
+            family.append(fused.group(1).lower())
+            parts = tuple(int(x) for x in fused.group(2).split("."))
+            version = parts if version is None else version + parts
             continue
         alpha = re.sub(r"[\d.]+", "", t).lower()
         if alpha:
@@ -167,10 +195,13 @@ def is_official_evidence(nm: dict, vendors: dict) -> bool:
     if not urls:
         return False
     vid = nm.get("vendor") or nm.get("provider") or ""
-    entries = [vendors[vid]] if vid in vendors else list(vendors.values())
-    hosts = set()
-    for e in entries:
-        hosts |= vendor_hostnames(e or {})
+    if vid not in vendors:
+        # Candidate's own vendor didn't resolve — do NOT fall back to matching
+        # every whitelisted vendor's domain (that would call evidence hosted on
+        # an UNRELATED vendor's site "official"). The ≥2-host / confirmed paths
+        # in gate_admit still admit these candidates via their own logic.
+        return False
+    hosts = vendor_hostnames(vendors[vid] or {})
     return any(
         h == vh or h.endswith("." + vh)
         for u in urls

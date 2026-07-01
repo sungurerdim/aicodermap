@@ -658,6 +658,22 @@ class TestNewModelGate(unittest.TestCase):
             "Claude Opus 4.8",
         )
 
+    def test_letter_fused_version_not_falsely_open(self):
+        # PY-01: a version fused to a single-letter marker ("K2.7", "K2.6")
+        # used to parse to version=None, so is_superseded's `not ver` guard
+        # short-circuited to None (fails OPEN) — a re-listed older sibling was
+        # admitted as a fresh stub even though a newer one was already tracked.
+        existing = [{"id": "kimi-k2-7-code", "name": "Kimi K2.7 Code"}]
+        self.assertEqual(
+            add_stubs.parse_name("Kimi K2.7 Code"), (("kimi", "k", "code"), (2, 7))
+        )
+        # A re-listed older sibling IS recognized as superseded.
+        self.assertEqual(
+            add_stubs.is_superseded("Kimi K2.6 Code", existing), "Kimi K2.7 Code"
+        )
+        # A genuinely-new, higher version in the same family is NOT flagged.
+        self.assertIsNone(add_stubs.is_superseded("Kimi K3 Code", existing))
+
     def test_restricted_held_even_if_admissible(self):
         nm = {
             "id": "preview-y",
