@@ -143,7 +143,10 @@ function renderBenchValue(m, k) {
     flag.textContent = c.severity === 'danger' ? '🚨' : '⚠';
     flag.tabIndex = 0;
     flag.setAttribute('role', 'button');
-    flag.setAttribute('aria-label', t('ui.contradiction.title'));
+    // FE-03: fold the delta + source-count the tooltip shows into the label
+    // itself so screen-reader users get the detail without hover/focus reveal.
+    flag.setAttribute('aria-label',
+      `${t('ui.contradiction.title')}: ${t('ui.contradiction.delta')} ${c.delta.toFixed(1)} pp (${c.sources.length})`);
     flag.addEventListener('mouseenter', (e) => showContradictionTooltip(e.currentTarget, c));
     flag.addEventListener('focus', (e) => showContradictionTooltip(e.currentTarget, c));
     flag.addEventListener('mouseleave', hideTooltip);
@@ -260,8 +263,12 @@ function renderTableHeader(thead, cols) {
     if (col.sortable) {
       th.dataset.sortable = 'true';
       th.tabIndex = 0;
+      th.setAttribute('aria-sort', 'none');
     }
-    if (State.sort.col === col.key) th.classList.add('sorted', State.sort.dir);
+    if (State.sort.col === col.key) {
+      th.classList.add('sorted', State.sort.dir);
+      th.setAttribute('aria-sort', State.sort.dir === 'asc' ? 'ascending' : 'descending');
+    }
     th.textContent = t(col.i18n);
     if (col.i18nTitle) {
       const fullName = t(col.i18nTitle);
@@ -293,7 +300,10 @@ function renderTableHeader(thead, cols) {
 function rankedModels() {
   // F1+F2 (2026-05-18): effectiveScore dispatches to compositeScore (atomic)
   // or vendorConsensusScore based on State.scoreFn (set by applyPreset).
-  const filtered = State.models.filter(passesFilters);
+  // FE-04: exclude archived models here so table rows and both count badges
+  // match what the card grid shows (models.css hides archived cards; rankBands
+  // already excludes them from the leaderboard band computation below).
+  const filtered = State.models.filter(m => (m.status || 'active') !== 'archived' && passesFilters(m));
   // CI-overlap rank bands (2026-05-27) — only on the AICM atomic path; the
   // vendorConsensus path scores differently so bands would mismatch. bandById
   // gives each row its composite tier + uncertainty (sigma) regardless of which

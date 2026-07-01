@@ -103,11 +103,14 @@ export function buildBenchCell(model, key) {
   const c = contradictionFor(model.id, key);
   if (c) {
     cell.classList.add(c.severity === 'danger' ? 'flag-danger' : 'flag-warn');
+    // FE-03: fold the delta + source-count the tooltip shows into the label
+    // itself so screen-reader users get the detail without hover/focus reveal.
+    const flagLabel = `${t('ui.contradiction.title')}: ${t('ui.contradiction.delta')} ${c.delta.toFixed(1)} pp (${c.sources.length})`;
     const flag = el('span', {
       class: 'flag',
       tabindex: '0',
       role: 'button',
-      'aria-label': t('ui.contradiction.title'),
+      'aria-label': flagLabel,
     }, c.severity === 'danger' ? '🚨' : '⚠');
     flag.dataset.modelId = model.id;
     flag.dataset.benchKey = key;
