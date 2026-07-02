@@ -1,4 +1,113 @@
 
+## [2026-07-02] — autonomous refresh-all [WARN: cumulative provenance coverage 65.5% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 295 new fills; 12 cells auto-gapped by orchestrator; 658 explicit agent gaps preserved]
+
+[fillRatio:0.66 cells:891/1360 contradictions:78 fetch:0.0min tools:None batches:None build:a201de9]
+
+### Lineup
+- New: `claude-mythos-preview` (Anthropic, Project Glasswing cybersecurity preview), `gpt-5-6-sol`/`gpt-5-6-terra`/`gpt-5-6-luna` (OpenAI GPT-5.6 restricted-preview 3-tier family), `gemini-omni-flash` (Google DeepMind), `ministral-3-14b`/`ministral-3-8b`/`ministral-3-3b` (Mistral AI, Apache-2.0 edge family), `minimax-m2-7-highspeed` (MiniMax, `benchMirrorOf: minimax-m2-7` — vendor-confirmed byte-identical results, faster serving)
+- Deprecated (vendor-confirmed, 2026-06-30): `mimo-v2-pro`, `mimo-v2-flash`, `mimo-v2-omni` → successors `mimo-v2-5-pro`/`mimo-v2-5`
+- Gated (insufficient/superseded evidence, held for next cycle): `minimax-m2-5-highspeed`, `kimi-k2-5`, `grok-4-5`
+
+### Operational notes
+- 7 of 14 Stage-A gather batches initially returned the FULL/SYNTH-mode `models[].updates`/`sourcesAdded[]`/`gaps[]` shape instead of the gather-mode `observations[]`/`rawGaps[]` shape mandated by agent.md HARD RULE 1; converted in place to the canonical schema before Stage B so no research was lost (all 15 artifacts then passed `validate-artifact-keys.py`).
+- `minimax-m2-7-highspeed` had 15 bench cells filled by copying its sibling `minimax-m2-7`'s values with no source URL (MX4 violation, merge aborted once). Root cause: vendor states the two API tiers are byte-identical except for serving speed — the correct fix per the existing `benchMirrorOf` convention (see `kimi-k2-7-code-highspeed`) is an empty bench map + `benchMirrorOf` pointer, not independently-cited values. Applied; merge re-ran clean.
+- `local-synth.py`/`merge.py` currently have no consumer for gather-mode `modelMeta[]`/`pricingObs[]`/`ollamaObservations`/`unslothObservations` (bench-only pipeline) — this cycle's scalar-field/pricing/Unsloth-variant findings (11 models, mostly the fresh stubs above) were applied directly to `data/models.json`/`data/sources.json` to avoid re-losing already-gathered data. Flagged as a pipeline gap for a future dedicated fix.
+- Step 7.7 anomaly-verify (post-merge, 4 cells: `gemma-3-27b`/`gemma-4-e2b`/`gemma-4-e4b`/`gemma-4-31b` `.cfElo`) — all 4 CONFIRMED genuine against Google's official Gemma 4 model card; the automated out-of-band/sibling-metric heuristics were false positives here.
+
+### Updated
+- 37 models: `mistral-small-4`, `deepseek-v4-pro`, `ministral-3-3b`, `gemma-4-31b`, `nemotron-3-super`, `llama-4-maverick`, `step-3-7-flash`, `gemma-3-27b`, `minimax-m2-5`, `gpt-5-4`, `glm-4-5-air`, `ministral-3-14b`, `mimo-v2-5-pro`, `glm-5-turbo`, `gemma-4-e2b`, `qwen3-6-flash`, `qwen3-5-9b`, `minimax-m2-1`, `deepseek-v4-flash`, `mimo-v2-5`, `glm-5`, `minimax-m2-7`, `qwen3-6-35b-moe`, `gpt-5-6-sol`, `ministral-3-8b`, `glm-5-2`, `muse-spark`, `minimax-m3`, `glm-4-7`, `grok-4-3`, `claude-mythos-preview`, `gpt-5-4-nano`, `qwen3-coder-next`, `llama-4-scout`, `nemotron-3-nano-omni`, `claude-sonnet-5`, `opus-4-7`
+
+### Resolved (auto via trustScore)
+- claude-fable-5.aaIdx: winner={'value': 60.0, 'trustScore': 0.5, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-07-02'} (severity=yellow, ΔNone)
+- claude-mythos-5.sweV: winner={'value': 93.9, 'trustScore': 0.4736, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-06-27'} (severity=yellow, ΔNone)
+- claude-opus-4-8.hle: winner={'value': 49.8, 'trustScore': 0.4964, 'tier': 'I', 'verifications': 6, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- opus-4-7.swePro: winner={'value': 64.3, 'trustScore': 0.4985, 'tier': 'I', 'verifications': 16, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- gemma-4-26b-moe.tau2: winner={'value': 85.5, 'trustScore': 0.4756, 'tier': 'I', 'verifications': 6, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- gemma-4-26b-moe.hle: winner={'value': 22.0, 'trustScore': 0.4964, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- gemma-4-31b.tau2: winner={'value': 86.4, 'trustScore': 0.4879, 'tier': 'I', 'verifications': 15, 'latestDate': '2026-06-16'} (severity=red, ΔNone)
+- gemma-4-31b.hle: winner={'value': 22.95, 'trustScore': 0.4889, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-06-07'} (severity=red, ΔNone)
+- gemma-4-31b.gpqa: winner={'value': 84.3, 'trustScore': 0.5, 'tier': 'I', 'verifications': 27, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- gemma-4-e2b.gpqa: winner={'value': 43.4, 'trustScore': 0.4779, 'tier': 'I', 'verifications': 10, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- gpt-5-5.tb2: winner={'value': 82.7, 'trustScore': 0.4985, 'tier': 'I', 'verifications': 10, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- qwen3-32b.aaIdx: winner={'value': 76.4, 'trustScore': 0.4683, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-06-24'} (severity=red, ΔNone)
+- qwen3-6-plus.aaAgentic: winner={'value': 27.55, 'trustScore': 0.4915, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- qwen3-coder-30b.aaIdx: winner={'value': 20.0, 'trustScore': 0.4244, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-05-11'} (severity=red, ΔNone)
+- qwen3-coder-480b.aaIdx: winner={'value': 25.0, 'trustScore': 0.4244, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-05-11'} (severity=red, ΔNone)
+- qwen3-coder-next.aaIdx: winner={'value': 21.18, 'trustScore': 0.4993, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- qwen3-coder-next.sweV: winner={'value': 70.6, 'trustScore': 0.5, 'tier': 'I', 'verifications': 13, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- qwen25-coder-32b.sweV: winner={'value': 69.6, 'trustScore': 0.4736, 'tier': 'I', 'verifications': 7, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- deepseek-v4-pro.gpqa: winner={'value': 90.1, 'trustScore': 0.4779, 'tier': 'I', 'verifications': 18, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- deepseek-v4-pro.lcb: winner={'value': 93.5, 'trustScore': 0.4809, 'tier': 'I', 'verifications': 21, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- deepseek-v4-pro.sweV: winner={'value': 80.6, 'trustScore': 0.4736, 'tier': 'I', 'verifications': 13, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- deepseek-v4-pro.swePro: winner={'value': 55.4, 'trustScore': 0.425, 'tier': 'I', 'verifications': 14, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- deepseek-coder-v2-16b.aaIdx: winner={'value': 8.0, 'trustScore': 0.4993, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-06-10'} (severity=red, ΔNone)
+- deepseek-r1-14b.aaIdx: winner={'value': 16.0, 'trustScore': 0.4993, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- deepseek-r1-14b.gpqa: winner={'value': 59.1, 'trustScore': 0.5, 'tier': 'I', 'verifications': 14, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- deepseek-r1-14b.lcb: winner={'value': 53.1, 'trustScore': 0.5, 'tier': 'I', 'verifications': 8, 'latestDate': '2026-06-10'} (severity=red, ΔNone)
+- minimax-m2-5.nl2Repo: winner={'value': 39.8, 'trustScore': 0.4985, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- glm-4-5-air.tb2: winner={'value': 30.0, 'trustScore': 0.4985, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- glm-4-5-air.lcb: winner={'value': 72.9, 'trustScore': 0.254, 'tier': 'S', 'verifications': 3, 'latestDate': '2026-05-27'} (severity=red, ΔNone)
+- glm-4-5-air.tau2: winner={'value': 78.11, 'trustScore': 0.5, 'tier': 'I', 'verifications': 7, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- glm-4-7.gpqa: winner={'value': 85.71, 'trustScore': 0.4851, 'tier': 'I', 'verifications': 17, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- glm-5.tau2: winner={'value': 98.12, 'trustScore': 0.4889, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-06-10'} (severity=red, ΔNone)
+- glm-5.tb2: winner={'value': 56.2, 'trustScore': 0.4916, 'tier': 'I', 'verifications': 7, 'latestDate': '2026-07-02'} (severity=yellow, ΔNone)
+- glm-5.gpqa: winner={'value': 85.35, 'trustScore': 0.4858, 'tier': 'I', 'verifications': 8, 'latestDate': '2026-07-02'} (severity=yellow, ΔNone)
+- claude-sonnet-5.sweV: winner={'value': 85.2, 'trustScore': 0.4736, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- claude-sonnet-5.hle: winner={'value': 57.4, 'trustScore': 0.2, 'tier': 'C', 'verifications': 2, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- gemma-4-e4b.mmluPro: winner={'value': 69.4, 'trustScore': 0.4756, 'tier': 'I', 'verifications': 16, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- mistral-large-3.gpqa: winner={'value': 67.98, 'trustScore': 0.4779, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-06-16'} (severity=red, ΔNone)
+- mistral-medium-3-5.sweV: winner={'value': 77.6, 'trustScore': 0.4756, 'tier': 'I', 'verifications': 18, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- mistral-medium-3-5.aaCoding: winner={'value': 46.9, 'trustScore': 0.496, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- mistral-medium-3-5.aaAgentic: winner={'value': 19.0, 'trustScore': 0.4915, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- mistral-medium-3-5.tau2: winner={'value': 91.4, 'trustScore': 0.4123, 'tier': 'I', 'verifications': 6, 'latestDate': '2026-06-16'} (severity=yellow, ΔNone)
+- kimi-k2-6.sweV: winner={'value': 80.2, 'trustScore': 0.5, 'tier': 'I', 'verifications': 18, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- kimi-k2-6.lcb: winner={'value': 89.6, 'trustScore': 0.4123, 'tier': 'I', 'verifications': 18, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- kimi-k2-6.gpqa: winner={'value': 90.54, 'trustScore': 0.4851, 'tier': 'I', 'verifications': 17, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- kimi-k2-6.tb2: winner={'value': 66.7, 'trustScore': 0.4179, 'tier': 'I', 'verifications': 16, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- kimi-k2-6.hle: winner={'value': 54.0, 'trustScore': 0.4219, 'tier': 'I', 'verifications': 16, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- kimi-k2-6.tau2: winner={'value': 70.6, 'trustScore': 0.4879, 'tier': 'I', 'verifications': 7, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- kimi-k2-6.aaIdx: winner={'value': 42.84, 'trustScore': 0.4993, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- kimi-k2-7-code.sweV: winner={'value': 78.2, 'trustScore': 0.2, 'tier': 'C', 'verifications': 1, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- nemotron-3-super.gpqa: winner={'value': 79.23, 'trustScore': 0.4858, 'tier': 'I', 'verifications': 15, 'latestDate': '2026-07-02'} (severity=yellow, ΔNone)
+- nemotron-3-super.lcb: winner={'value': 81.1, 'trustScore': 0.4851, 'tier': 'I', 'verifications': 11, 'latestDate': '2026-07-02'} (severity=yellow, ΔNone)
+- nemotron-3-super.tb2: winner={'value': 29.0, 'trustScore': 0.4851, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-06-10'} (severity=yellow, ΔNone)
+- nemotron-3-super.tbHard: winner={'value': 28.96, 'trustScore': 0.4974, 'tier': 'I', 'verifications': 6, 'latestDate': '2026-07-02'} (severity=yellow, ΔNone)
+- nemotron-3-ultra.mmluPro: winner={'value': 86.8, 'trustScore': 0.5, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-06-10'} (severity=red, ΔNone)
+- nemotron-3-nano.aaIdx: winner={'value': 7.0, 'trustScore': 0.4993, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-06-28'} (severity=red, ΔNone)
+- nemotron-3-nano.mmluPro: winner={'value': 77.3, 'trustScore': 0.35, 'tier': 'S', 'verifications': 2, 'latestDate': '2026-07-01'} (severity=red, ΔNone)
+- nemotron-3-nano.tau2: winner={'value': 49.04, 'trustScore': 0.3424, 'tier': 'S', 'verifications': 2, 'latestDate': '2026-07-01'} (severity=red, ΔNone)
+- nemotron-3-nano-omni.aaIdx: winner={'value': 21.0, 'trustScore': 0.4993, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- nemotron-3-nano-omni.gpqa: winner={'value': 72.2, 'trustScore': 0.4858, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- nemotron-3-nano-omni.tau2: winner={'value': 49.04, 'trustScore': 0.4616, 'tier': 'I', 'verifications': 7, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- qwen3-5-9b.sweV: winner={'value': 42.3, 'trustScore': 0.4736, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-06-24'} (severity=red, ΔNone)
+- qwen3-5-9b.lcb: winner={'value': 65.6, 'trustScore': 0.4809, 'tier': 'I', 'verifications': 6, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- qwen3-7-max.aaIdx: winner={'value': 45.99, 'trustScore': 0.4993, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- step-3-5-flash.sweV: winner={'value': 74.4, 'trustScore': 0.5, 'tier': 'I', 'verifications': 16, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- step-3-5-flash.tb2: winner={'value': 51.0, 'trustScore': 0.4237, 'tier': 'I', 'verifications': 9, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- step-3-5-flash.aaIdx: winner={'value': 25.5, 'trustScore': 0.4993, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- step-3-7-flash.tb2: winner={'value': 59.55, 'trustScore': 0.4985, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- step-3-7-flash.aaIdx: winner={'value': 29.73, 'trustScore': 0.4993, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- step-3-7-flash.tbHard: winner={'value': 32.6, 'trustScore': 0.4974, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-06-07'} (severity=yellow, ΔNone)
+- mimo-v2-5-pro.lcb: winner={'value': 76.2, 'trustScore': 0.3954, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-06-15'} (severity=red, ΔNone)
+- mimo-v2-5-pro.gpqa: winner={'value': 66.7, 'trustScore': 0.3424, 'tier': 'S', 'verifications': 6, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- qwen3-5-9b.aaCoding: winner={'value': 25.3, 'trustScore': 0.496, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-06-27'} (severity=yellow, ΔNone)
+- mistral-small-4.aaCoding: winner={'value': 24.27, 'trustScore': 0.496, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-06-27'} (severity=yellow, ΔNone)
+- mistral-small-4.aaAgentic: winner={'value': 25.87, 'trustScore': 0.4915, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- qwen3-6-35b-moe.aaCoding: winner={'value': 35.2, 'trustScore': 0.496, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- opus-4-7.aaIdx: winner={'value': 57.0, 'trustScore': 0.5, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-06-24'} (severity=yellow, ΔNone)
+- muse-spark.aaCoding: winner={'value': 47.5, 'trustScore': 0.496, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+
+### Gaps (469 entries — agent:457 orchestrator:12 — see data/known-gaps.json or next refresh)
+- `opus-4-7.tau2` *(agent)*: agent surveyed; value unavailable
+- `opus-4-7.cfElo` *(agent)*: agent surveyed; value unavailable
+- `opus-4-7.nl2Repo` *(agent)*: agent surveyed; value unavailable
+- `sonnet-4-6.cfElo` *(agent)*: agent surveyed; value unavailable
+- `sonnet-4-6.nl2Repo` *(agent)*: agent surveyed; value unavailable
+- `claude-haiku-4-5.cfElo` *(agent)*: agent surveyed; value unavailable
+- `claude-sonnet-5.mrcr` *(orchestrator)*: not reached in agent survey cycle; MRCR 1M data unavailable
+- `deepseek-coder-v2-16b.aaAgentic` *(orchestrator)*: not reached in agent survey cycle; AA Agentic data unavailable
+- ... and 461 more
+
 ## [2026-07-01] — autonomous refresh-all [WARN: cumulative provenance coverage 68.8% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 477 new fills; 110 cells auto-gapped by orchestrator; 494 explicit agent gaps preserved]
 
 [fillRatio:0.69 cells:854/1241 contradictions:177 fetch:0.0min tools:None batches:None build:993775e]
