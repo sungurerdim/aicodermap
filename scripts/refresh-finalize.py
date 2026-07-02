@@ -151,6 +151,28 @@ def main() -> int:
                 flush=True,
             )
 
+        # 5. reconcile-stored-winners.py — enforce the SSOT invariant
+        # `stored == pick_winner(full sources.json provenance)` for every cell.
+        # merge only recomputes a cell's winner when THIS cycle produced fresh
+        # observations; a confirmed/skip cell is otherwise frozen and can hold a
+        # stale single-source minority value even as a multi-source consensus
+        # accumulates (deepseek-v4-pro.lcb 85.9 vs 22 sources @ 93.5, 2026-07-02).
+        # This deterministic no-fetch pass re-derives every stored scalar from the
+        # ALWAYS-RETAINED provenance pool each run — records are kept forever, the
+        # computation is dynamic over all data. AA-definitional indices are skipped
+        # (apply-aa-authoritative owns them). Non-fatal — a reconcile failure must
+        # never undo a good merge; its own coherence guard rolls back on drift.
+        rc_rec = _run_subprocess(
+            [sys.executable, str(SCRIPTS / "reconcile-stored-winners.py"), "--apply"],
+            name="reconcile-winners",
+        )
+        if rc_rec != 0:
+            print(
+                "  ⚠ reconcile-winners exit non-zero — continuing (merge already "
+                "wrote coherent data; invariant re-enforced next cycle)",
+                flush=True,
+            )
+
     print(f"\n=== FINALIZE OK === total exit={rc_total}", flush=True)
     return rc_total
 
