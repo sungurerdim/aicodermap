@@ -1,12 +1,12 @@
 {
-  "probedAt": "2026-06-27T12:00:27Z",
+  "probedAt": "2026-07-01T19:59:21Z",
   "total": 139,
   "counts": {
-    "format-drift": 13,
+    "format-drift": 14,
     "redirect": 9,
     "spa": 12,
-    "bot-block": 2,
-    "dead": 5
+    "bot-block": 3,
+    "dead": 7
   },
   "formatDrift": [
     {
@@ -70,6 +70,11 @@
       "observed": "spa_full"
     },
     {
+      "url": "https://www.iso.org/standard/27001",
+      "declared": "static_html_article",
+      "observed": "bot_blocked"
+    },
+    {
       "url": "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html",
       "declared": "static_html_article",
       "observed": "bot_blocked"
@@ -102,7 +107,7 @@
     },
     {
       "url": "https://compliance.microsoft.com/compliancemanager",
-      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DIfCz0JGG20MsdMMHXQIiYh72YxrYsfVnESS8HKeQ_7I57Z0zAmq1sJnIA1D6cvZwoTE1Dsj8mBNMyFeyxOM-ou6CsZPaoKQUnPatQRe7vZ1AeLB8PB2Lmh_Kd_3YJN9-qY20pm7mYNGSiN1ngFxW6s3kxZqf5_DS296SyH0oagw&response_mode=form_post&nonce=639181584180098710.NTFjMWJjYmYtMzlkZS00NTM5LWEyMGQtMGMwYjI5NWM4ZDVjZGZkMTI0ODYtNmQ4ZC00MTc5LWI3YjItOGUwMmIyMTc3Njlm&client-request-id=fab710b4-9b0c-49f3-b861-2c90874c365b&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
+      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DAJWPuR6bJKuZon8NLJTtx2sNNjzU6KF2iRO8svokWt3CESZczTImeAcZyCTT7gNjQaG0eWfC56Xe5eRHrDGj4LykeN0bI8jbMoxxPWIWL8TnDXpfw_Jhoo5KnskBI4UAEBrFryc10HS3nchZ1TUd1EKBxqR9GTBZCxlhxFeqRtU&response_mode=form_post&nonce=639185327481282148.OWVlYzIxYmUtMjg4Yi00NzVjLTg2MzEtNDZkNzdjOTNhZjFmZGY3MzVkYzMtYjUwZC00MTJlLTk1YjAtMTg2YmZjOWU5ZGFm&client-request-id=7421f98f-b17b-482d-939a-e9242a0614e1&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
     },
     {
       "url": "https://edpb.europa.eu/our-work-tools/consistency-findings/register-for-decisions_en",
@@ -129,6 +134,7 @@
   ],
   "botBlocked": [
     "https://klu.ai/llm-leaderboard",
+    "https://www.iso.org/standard/27001",
     "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
   ],
   "dead": [
@@ -149,8 +155,16 @@
       "error": "HTTP 404 Not Found"
     },
     {
+      "url": "https://www.iso.org/standard/27001",
+      "error": "HTTP 403 Forbidden"
+    },
+    {
       "url": "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html",
       "error": "HTTP 403 Forbidden"
+    },
+    {
+      "url": "https://platform.minimax.io/docs/release-notes/models",
+      "error": "HTTP 502 Bad Gateway"
     }
   ]
 }

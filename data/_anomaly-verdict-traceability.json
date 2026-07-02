@@ -1,7 +1,23 @@
 {
-  "checked": 5,
-  "rejected": [],
+  "checked": 3,
+  "rejected": [
+    {
+      "cell": "gemma-3-27b.cfElo",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "gemma-4-e2b.cfElo",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    },
+    {
+      "cell": "gemma-4-e4b.cfElo",
+      "action": "confirm",
+      "reason": "missing-evidence"
+    }
+  ],
   "warnings": [],
-  "ok": true,
-  "filtered": false
+  "ok": false,
+  "filtered": true
 }

@@ -1,0 +1,277 @@
+{
+  "cycleEndedAt": "2026-07-01T21:20:04Z",
+  "cycleStartedAt": "2026-07-01T00:00:00Z",
+  "perBatch": [
+    {
+      "agentGaps": 46,
+      "batchId": "batch00-anthropic",
+      "fills": 35,
+      "gaps": 46,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "wallclock: 9-minute time-box reached before nl2Repo/mmluPro/aime26/tbHard/cfElo/aaCoding/aaAgentic/mrcr/lcb cells could be attempted via deeper per-cell WebSearch cascade; anomaly claude-haiku-4-5.tau2 resolved via 3 fresh sub-score observations (retail 83.2 + telecom 83.0 average to the stored 83.1, corroborating the prior value over the flagged 54.7 outlier) but not formally reclassified (gather mode defers to synth).",
+      "toolCallCount": 14,
+      "wallclockSec": 480.0
+    },
+    {
+      "agentGaps": 32,
+      "batchId": "batch01-anthropic",
+      "fills": 33,
+      "gaps": 32,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 26,
+      "wallclockSec": 480.0
+    },
+    {
+      "agentGaps": 27,
+      "batchId": "batch02-deepseek",
+      "fills": 24,
+      "gaps": 27,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 13,
+      "wallclockSec": 420.0
+    },
+    {
+      "agentGaps": 11,
+      "batchId": "batch03-deepseek",
+      "fills": 15,
+      "gaps": 11,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 16,
+      "wallclockSec": 300.0
+    },
+    {
+      "agentGaps": 21,
+      "batchId": "batch04-google_deepm",
+      "fills": 50,
+      "gaps": 21,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 24,
+      "wallclockSec": 520.0
+    },
+    {
+      "agentGaps": 48,
+      "batchId": "batch05-google_deepm",
+      "fills": 20,
+      "gaps": 48,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 22,
+      "wallclockSec": 480.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch06-google_deepm",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 14,
+      "wallclockSec": 540.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch07-meta",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "wallclock: 9-minute time-box for this batch reached after exhausting whitelist + WebSearch fallback cascade for priorityCells (nl2Repo, cfElo, mrcr, arcAgi2) and all flagged anomalies; general non-priority sweep of remaining core-bench gaps not fully completed for this slice.",
+      "toolCallCount": 19,
+      "wallclockSec": 480.0
+    },
+    {
+      "agentGaps": 34,
+      "batchId": "batch08-mistral_ai",
+      "fills": 45,
+      "gaps": 34,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "wallclock_timebox_9min: prioritized anomaly cells (mistral-large-3 aaAgentic/lcb/tb2/gpqa/mmluPro/tau2; mistral-medium-3-5 gpqa) and priorityCells (nl2Repo/arcAgi2/cfElo/mrcr) per instructions; extracted all reachable cells from pre-existing artificialanalysis.ai + llm-stats.com snapshots plus cached skipCells provenance; niche benches (nl2Repo/arcAgi2/cfElo/mrcr) and codestral's non-coding-composite benches are not present in AA's current schema fields or llm-stats tables for these models and are recorded as rawGaps with triedSources/triedQueries.",
+      "toolCallCount": 33,
+      "wallclockSec": 480.0
+    },
+    {
+      "agentGaps": 25,
+      "batchId": "batch09-moonshot_ai",
+      "fills": 31,
+      "gaps": 25,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 24,
+      "wallclockSec": 480.0
+    },
+    {
+      "agentGaps": 8,
+      "batchId": "batch10-nvidia",
+      "fills": 20,
+      "gaps": 8,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "time-box reached before full 4-model x 17-coreBenchKey slice was exhaustively swept; priority anomalies for all 4 models were resolved/investigated first, plus pricing + context metadata; several non-priority cells (swePro/tb2/cfElo/aaCoding/aaAgentic/nl2Repo/mrcr/aime26/arcAgi2) across the 4 models were not yet attempted and are left for the next cycle's gap-gen supplement",
+      "toolCallCount": 22,
+      "wallclockSec": 480.0
+    },
+    {
+      "agentGaps": 14,
+      "batchId": "batch11-openai",
+      "fills": 28,
+      "gaps": 14,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 19,
+      "wallclockSec": 480.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch12-openai",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "wallclock",
+      "toolCallCount": 32,
+      "wallclockSec": 480.0
+    },
+    {
+      "agentGaps": 25,
+      "batchId": "batch13-alibaba_qwen",
+      "fills": 52,
+      "gaps": 25,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "timebox",
+      "toolCallCount": 22,
+      "wallclockSec": 500.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch14-alibaba_qwen",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 21,
+      "wallclockSec": 480.0
+    },
+    {
+      "agentGaps": 46,
+      "batchId": "batch15-alibaba_qwen",
+      "fills": 14,
+      "gaps": 46,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "9min-timebox reached after full core-slice sweep (4 models x 17 coreBenchKeys); anomaly cells investigated at primary source (Qwen3-Coder-Next arxiv 2603.00729 tech report + Qwen2.5-Coder arxiv 2409.12186v3 tech report) rather than deep-dived per rare bench. NOTE for synth: qwen3-coder-next.aime26 existing value 83.07 traces to arxiv 2603.00729 reporting AIME25=83.07 / AIME24=89.01, NOT AIME26 -- likely metric-year misfile, flagged not reconfirmed. qwen25-coder-7b.sweV existing this-cycle-obs 18.2 traces to Qwen's own LiveCodeBench=18.2 score for the 7B base model (arxiv 2409.12186v3), not an SWE-bench Verified number -- the 18.2 'obs' looks like a metric mislabel from a prior cycle, not a genuine sweV reading; left uncorroborated pending anomaly-verify. Independent SWE-bench scores found in literature (SWE-Gym-32B, SWE-smith-LM-32B, SWE-SynInfer-7B) belong to derivative fine-tuned models built ON TOP of the Qwen2.5-Coder base models, not the base Instruct models themselves -- NOT attributed to qwen25-coder-{7b,14b,32b} to avoid WRONG_ID misattribution.",
+      "toolCallCount": 29,
+      "wallclockSec": 480.0
+    },
+    {
+      "agentGaps": 49,
+      "batchId": "batch16-alibaba_qwen",
+      "fills": 22,
+      "gaps": 49,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "wallclock_timebox: 9-minute research budget reached after priorityCells + anomaly cells covered for 3/4 models; qwen3-6-flash confirmed to genuinely lack published benchmark data (emerging release) after exhaustive websearch.",
+      "toolCallCount": 24,
+      "wallclockSec": 520.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch17-xai",
+      "fills": 0,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "wallclock: 9-minute time-box reached before exhausting per-model fallback chains for grok-build-0-1 sparse cells; sweV/swePro/cfElo/mrcr/arcAgi2/aime26 for that model rest on third-party placeholder pages (BenchLM 0.0/100 unpopulated) rather than confirmed absence.",
+      "toolCallCount": 24,
+      "wallclockSec": 470.0
+    },
+    {
+      "agentGaps": 17,
+      "batchId": "batch18-xiaomi",
+      "fills": 16,
+      "gaps": 17,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 34,
+      "wallclockSec": 480.0
+    },
+    {
+      "agentGaps": 47,
+      "batchId": "batch19-z_ai__zhipu_",
+      "fills": 30,
+      "gaps": 47,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "wallclock",
+      "toolCallCount": 30,
+      "wallclockSec": 480.0
+    },
+    {
+      "agentGaps": 9,
+      "batchId": "batch20-z_ai__zhipu_",
+      "fills": 16,
+      "gaps": 9,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 13,
+      "wallclockSec": 420.0
+    },
+    {
+      "agentGaps": 35,
+      "batchId": "batch21-minimax",
+      "fills": 66,
+      "gaps": 35,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "wallclock",
+      "toolCallCount": 21,
+      "wallclockSec": 480.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch90-aa-rsc",
+      "fills": 133,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 0,
+      "wallclockSec": 540.0
+    }
+  ],
+  "totalBatches": 23,
+  "totals": {
+    "agentGaps": 494,
+    "fills": 650,
+    "gaps": 494,
+    "na": 0,
+    "orchestratorGaps": 0,
+    "toolCallSum": 496,
+    "wallclockSecMax": 540.0,
+    "wallclockSecP95": 540.0
+  },
+  "zeroFillBatches": [
+    "batch06-google_deepm",
+    "batch07-meta",
+    "batch12-openai",
+    "batch14-alibaba_qwen",
+    "batch17-xai"
+  ]
+}
