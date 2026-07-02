@@ -1,0 +1,4 @@
+# Minimal lint config — default rule set (E/F: pycodestyle errors + pyflakes).
+# Scope: scripts/ (data pipeline). Wired into scripts/hooks/pre-commit.
+target-version = "py313"
+line-length = 100

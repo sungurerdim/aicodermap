@@ -70,4 +70,46 @@ if [ -f "$BENCH_AUDIT" ]; then
   fi
 fi
 
+# Ruff lint over the pipeline scripts (config: ruff.toml). Quality gate —
+# skipped silently when ruff is not installed.
+if command -v ruff >/dev/null 2>&1; then
+  if ! ruff check "$REPO_ROOT/scripts" >/dev/null 2>&1; then
+    echo "" >&2
+    echo "✗ COMMIT BLOCKED — ruff lint errors in scripts/." >&2
+    echo "  See: ruff check scripts/" >&2
+    echo "  Emergency override: git commit --no-verify" >&2
+    echo "" >&2
+    exit 1
+  fi
+fi
+
+# Syntax-check staged JS modules (no build step — a syntax error would only
+# surface in the browser). Skipped silently when node is not installed.
+if command -v node >/dev/null 2>&1; then
+  STAGED_JS=$(git diff --cached --name-only --diff-filter=ACM | grep '^assets/js/.*\.js$' || true)
+  for f in $STAGED_JS; do
+    if ! node --check "$REPO_ROOT/$f" >/dev/null 2>&1; then
+      echo "" >&2
+      echo "✗ COMMIT BLOCKED — JS syntax error in $f" >&2
+      echo "  See: node --check $f" >&2
+      echo "  Emergency override: git commit --no-verify" >&2
+      echo "" >&2
+      exit 1
+    fi
+  done
+
+  # Regex-lint: extraction patterns in data/sources-whitelist.json must parse
+  # + satisfy the locale-decimal contract (script docstring: pre-commit guard).
+  if [ -f "$REPO_ROOT/scripts/regex-lint.js" ]; then
+    if ! node "$REPO_ROOT/scripts/regex-lint.js" >/dev/null 2>&1; then
+      echo "" >&2
+      echo "✗ COMMIT BLOCKED — regex-lint failed." >&2
+      echo "  See: node scripts/regex-lint.js" >&2
+      echo "  Emergency override: git commit --no-verify" >&2
+      echo "" >&2
+      exit 1
+    fi
+  fi
+fi
+
 exit 0
