@@ -203,24 +203,19 @@ satisfied OR with explicit rollback.
 | **AC8** | `audit-bench-source-mapping.py` | per-bench publisher count ≥ 2 | true | WARN |
 | **AC9** | `audit-data-coherence.py` | notApplicableBenchKeys ⊆ coreBenchKeys | subset | BLOCK |
 | SSOT | `merge.py` post-write | AC1-AC9 unified | pass | BLOCK + .bak rollback |
-| **MX1** | `merge.py` pre-CHANGELOG | filled+gap+na == total | equality | BLOCK + .bak rollback (W2+); WARN via `--warn-only-invariant` or `AICODERMAP_MX1_WARN_ONLY=1` |
-| **MX2** | `merge.py` post-write | filled/total ≥ ABSOLUTE_COVERAGE_FLOOR (0.30) | true | BLOCK via `AICODERMAP_MX2_BLOCK=1` (W3+); one-time bypass `--bypass-floor-check` |
-| **MX3** | `merge.py validate_gaps()` | every gap has triedSources ≥ 1 | true | STRIP gap → MX1 catches as silent omission |
-| **MX4** | `audit-data-coherence.py` | every filled cell has ≥ 1 sources.json entry | true | BLOCK via `AICODERMAP_MX4_BLOCK=1` (W3+); WARN by default |
+| **MX1** | `merge.py` pre-CHANGELOG | filled+gap+na == total | equality | BLOCK + .bak rollback (no override) |
+| **MX2** | `merge.py` post-write | filled/total ≥ ABSOLUTE_COVERAGE_FLOOR (0.30) | true | BLOCK by default + .bak rollback; WARN via `AICODERMAP_MX2_WARN_ONLY=1`; one-time bypass `--bypass-floor-check` |
+| **MX3** | `merge.py validate_gaps()` | every gap has triedSources ≥ 1 | true | REPAIR in place (stub triedSources/Queries/Formats) + fabrication-suspicion telemetry — never stripped (MX1 guard) |
+| **MX4** | `audit-data-coherence.py` | every filled cell has ≥ 1 sources.json entry | true | BLOCK (unconditional; runs in merge post-write audit + pre-commit) |
 | **MX5** | `audit-data-coherence.py` | per filled cell ≥ 2 distinct source URLs | true | WARN + benchQuarantine[key]=true |
 | **CP1** | `SKILL.md` Step 5b | `coverageMatrix` artifact completeness | filled+gap+na == total | agent retry (1×), then CHANGELOG warn (no halt) |
 
 ### Activation phases
 
-- **W1 (current)** — All MX/AC gates land in WARN-only mode behind env flags.
-  Pre-commit hook runs both audits but bench-source mapping is non-blocking.
-  Scripts learn the new contract; data backfills via the skill cycle.
-- **W2** — `AICODERMAP_MX1_WARN_ONLY` removed; AC6/AC7 promoted to HARD BLOCK
-  in pre-commit; agent retries unfilled cells once before partial CHANGELOG warn.
-- **W3** — `AICODERMAP_MX2_BLOCK=1` + `AICODERMAP_MX4_BLOCK=1` set as default.
-  `--bypass-floor-check` flag retired. P10 research-pipeline optimizations
-  (concurrent Phase 0+1, parallel batching, low-coverage queue, phaseElapsed
-  observability) wired in.
+- **W1–W3 (complete)** — all MX/AC gates are live in their final modes shown
+  in the matrix above: MX1/MX4 hard-block unconditionally, MX2 hard-blocks by
+  default (sole runtime knob: `AICODERMAP_MX2_WARN_ONLY=1`, plus the one-shot
+  `--bypass-floor-check` CLI flag), AC6/AC7 hard-block in pre-commit.
 
 ### Adding a new bench key (checklist)
 
