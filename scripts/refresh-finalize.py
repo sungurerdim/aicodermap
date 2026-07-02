@@ -3,7 +3,7 @@
 Combines three previously-separate process spawns into ONE pass:
   1. gen_unified_artifact — picks best source (synth artifact preferred,
      gather union as fallback) and writes `.aicodermap-agent-out.json`.
-  2. .aicodermap-gap-gen — supplements unfilled cells with auto-gap entries
+  2. scripts/gap_gen.py — supplements unfilled cells with auto-gap entries
      so merge.py's MX1 invariant (filled+gaps+na == totalCells) holds.
   3. merge.py — atomic write to data/{models,sources}.json + audit.
 
@@ -29,6 +29,9 @@ from pathlib import Path
 
 PROJECT = Path(__file__).resolve().parent.parent
 SCRIPTS = PROJECT / "scripts"
+sys.path.insert(0, str(SCRIPTS))
+from lib.constants import SINGLE_ARTIFACT_PATH  # noqa: E402
+from lib.util import configure_utf8_output  # noqa: E402
 
 
 def _run_script(path: Path, *, name: str) -> int:
@@ -100,18 +103,26 @@ def main() -> int:
             return rc
         rc_total |= rc
 
+    # 1b. validate-artifact-keys.py — pre-merge guard: reject non-canonical
+    # bench keys in the unified artifact BEFORE merge.py's MX4 audit would
+    # roll back the entire write (cycle 2026-05-18 data-loss mode).
+    if not args.skip_gen_unified:
+        rc = _run_subprocess(
+            [
+                sys.executable,
+                str(SCRIPTS / "validate-artifact-keys.py"),
+                str(PROJECT / SINGLE_ARTIFACT_PATH),
+            ],
+            name="validate-artifact-keys",
+        )
+        if rc != 0:
+            print("  ✗ validate-artifact-keys failed; aborting finalize", flush=True)
+            return rc
+        rc_total |= rc
+
     # 2. scripts/gap_gen.py (F1.3: moved from project root to scripts/)
     if not args.skip_gap_gen:
-        # Canonical path (F1.3); backwards-compat fallback to old root location.
         gapgen = SCRIPTS / "gap_gen.py"
-        if not gapgen.is_file():
-            gapgen = PROJECT / ".aicodermap-gap-gen.py"
-            if gapgen.is_file():
-                print(
-                    "\n=== gap-gen === ⚠ using legacy root path (.aicodermap-gap-gen.py); "
-                    "update to scripts/gap_gen.py",
-                    flush=True,
-                )
         if gapgen.is_file():
             rc = runner(gapgen, name="gap-gen")
             if rc != 0:
@@ -178,12 +189,5 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    # Force UTF-8 stdout on Windows (cp1254 default mangles ✓/⚠). Accessed via
-    # getattr so the type checker doesn't flag reconfigure on the TextIO stub.
-    _reconfigure = getattr(sys.stdout, "reconfigure", None)
-    if callable(_reconfigure):
-        try:
-            _reconfigure(encoding="utf-8", errors="replace")
-        except Exception:
-            pass
+    configure_utf8_output()
     raise SystemExit(main())
