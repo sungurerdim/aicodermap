@@ -12,6 +12,7 @@ Exit code:
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -19,23 +20,28 @@ from pathlib import Path
 PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from lib.constants import SINGLE_ARTIFACT_PATH  # noqa: E402
 from lib.jsonschema_min import validate  # noqa: E402
+from lib.util import configure_utf8_output  # noqa: E402
 
 SCHEMA_PATH = Path(__file__).resolve().parent / "lib" / "agent-out.schema.json"
-DEFAULT_ARTIFACT = PROJECT / ".aicodermap-agent-out.json"
+DEFAULT_ARTIFACT = PROJECT / SINGLE_ARTIFACT_PATH
 
-for _stream in (sys.stdout, sys.stderr):
-    _reconf = getattr(_stream, "reconfigure", None)
-    if callable(_reconf):
-        try:
-            _reconf(encoding="utf-8", errors="replace")
-        except (OSError, ValueError):
-            pass
+configure_utf8_output()
 
 
 def main() -> int:
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    artifact_path = Path(args[0]) if args else DEFAULT_ARTIFACT
+    parser = argparse.ArgumentParser(
+        description="Validate the agent output artifact against its schema."
+    )
+    parser.add_argument(
+        "artifact",
+        nargs="?",
+        type=Path,
+        default=DEFAULT_ARTIFACT,
+        help="artifact path (default: .aicodermap-agent-out.json)",
+    )
+    artifact_path = parser.parse_args().artifact
 
     try:
         schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
@@ -46,9 +52,7 @@ def main() -> int:
     try:
         artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
     except FileNotFoundError:
-        print(
-            f"validate-agent-out: artifact not found: {artifact_path}", file=sys.stderr
-        )
+        print(f"validate-agent-out: artifact not found: {artifact_path}", file=sys.stderr)
         return 2
     except json.JSONDecodeError as exc:
         print(
@@ -82,9 +86,7 @@ def main() -> int:
     if flat_key_errors:
         errors = (errors or []) + [f"FLAT_BENCH_KEY: {e}" for e in flat_key_errors]
     if bench_prefix_src_errors:
-        errors = (errors or []) + [
-            f"LEGACY_BENCH_PREFIX: {e}" for e in bench_prefix_src_errors
-        ]
+        errors = (errors or []) + [f"LEGACY_BENCH_PREFIX: {e}" for e in bench_prefix_src_errors]
 
     if errors:
         print(f"✗ Agent output INVALID — {len(errors)} error(s):", file=sys.stderr)
@@ -97,9 +99,7 @@ def main() -> int:
     cycles = artifact.get("cycleDate", "?")
     models_n = len(artifact.get("models", []))
     gaps_n = len(artifact.get("gaps", []))
-    print(
-        f"✓ Agent output valid  (cycleDate={cycles}, models={models_n}, gaps={gaps_n})"
-    )
+    print(f"✓ Agent output valid  (cycleDate={cycles}, models={models_n}, gaps={gaps_n})")
     return 0
 
 

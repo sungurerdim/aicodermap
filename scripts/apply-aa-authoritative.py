@@ -18,15 +18,16 @@ Report-only by default; pass --apply to write. Rotates .bak. Stdlib-only.
 
 from __future__ import annotations
 
+import argparse
 import json
 import shutil
 import sys
-from datetime import date
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "scripts"))
 from lib.constants import AA_COMPOSITE_KEYS, AA_MEASURED_KEYS  # noqa: E402
+from lib.util import configure_utf8_output, today_iso  # noqa: E402
 
 AA_ROWS = REPO / "data" / ".leaderboard-snapshots" / "_aa-rows.json"
 MODELS = REPO / "data" / "models.json"
@@ -49,8 +50,19 @@ I_TIER_TRUST = 0.5  # I-tier, 1 verification, fresh (tierWeight 1.0 × verif 0.5
 
 
 def main() -> int:
-    apply = "--apply" in sys.argv
-    today = date.today().isoformat()
+    parser = argparse.ArgumentParser(
+        description="Apply AA-authoritative composite overrides to data/*.json."
+    )
+    parser.add_argument(
+        "--apply", action="store_true",
+        help="write fixes to data/*.json (default: dry-run report)",
+    )
+    parser.add_argument(
+        "--verbose", action="store_true", help="print per-fix detail"
+    )
+    args = parser.parse_args()
+    apply = args.apply
+    today = today_iso()
     if not AA_ROWS.is_file():
         print("no _aa-rows.json; run extract-aa-rsc.py first")
         return 1
@@ -128,7 +140,7 @@ def main() -> int:
         f"=== AA-AUTHORITATIVE === composite: overrides={len(overrides)} fills={len(fills)} "
         f"| measured-impossible-fixes={len(impossible)} | models touched={len(touched)} apply={apply}"
     )
-    if "--verbose" in sys.argv or not apply:
+    if args.verbose or not apply:
         big = [r for r in overrides if abs((r["from"] or 0) - r["to"]) > 2]
         print(
             f"  -- composite misfile fixes (Δ>2): {len(big)} (rest are precision updates) --"
@@ -157,9 +169,5 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    if hasattr(sys.stdout, "reconfigure"):
-        try:
-            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-        except Exception:
-            pass
+    configure_utf8_output()
     raise SystemExit(main())

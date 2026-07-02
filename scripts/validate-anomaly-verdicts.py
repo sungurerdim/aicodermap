@@ -42,7 +42,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
-from lib.util import normalize_anomaly_verdict  # noqa: E402
+from lib.constants import GATHER_BATCH_GLOB  # noqa: E402
+from lib.util import configure_utf8_output, normalize_anomaly_verdict  # noqa: E402
 
 VERDICTS_PATH = ROOT / ".aicodermap-anomaly-verdicts.json"
 MODELS_PATH = ROOT / "data" / "models.json"
@@ -66,7 +67,7 @@ from lib.whitelist import bench_band as _band  # noqa: E402  (SSOT)
 def _gather_observations() -> dict[tuple[str, str], list[float]]:
     """Fresh observations from this cycle's gather artifacts (stale excluded by glob)."""
     obs: dict[tuple[str, str], list[float]] = defaultdict(list)
-    for p in sorted(ROOT.glob(".aicodermap-agent-out-batch*.gather.json")):
+    for p in sorted(ROOT.glob(GATHER_BATCH_GLOB)):
         try:
             with open(p, encoding="utf-8") as _f:
                 art = json.load(_f)
@@ -312,9 +313,5 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    if hasattr(sys.stdout, "reconfigure"):
-        try:
-            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-        except Exception:
-            pass
+    configure_utf8_output()
     raise SystemExit(main())

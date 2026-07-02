@@ -34,13 +34,10 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-for _stream in (sys.stdout, sys.stderr):
-    _reconf = getattr(_stream, "reconfigure", None)
-    if callable(_reconf):
-        try:
-            _reconf(encoding="utf-8", errors="replace")
-        except (OSError, ValueError):
-            pass
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lib.util import configure_utf8_output  # noqa: E402
+
+configure_utf8_output()
 
 PROJECT = Path(__file__).resolve().parents[1]
 GH_REPO = "sungurerdim/aicodermap"

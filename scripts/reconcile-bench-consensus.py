@@ -31,9 +31,6 @@ import sys
 from pathlib import Path
 from typing import Any
 
-if hasattr(sys.stdout, "reconfigure"):
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
-
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
@@ -52,6 +49,9 @@ from lib.whitelist import (  # noqa: E402  - runtime path
 # reconcile could overwrite a value the canonical engine would have kept.
 from lib.winner import _i_tier_cluster, filter_pseudo_sources  # noqa: E402
 from lib.tiers import tier_weight as _tier_weight  # noqa: E402  (SSOT)
+from lib.util import configure_utf8_output  # noqa: E402
+
+configure_utf8_output()
 
 SOURCES_PATH = ROOT / "data" / "sources.json"
 MODELS_PATH = ROOT / "data" / "models.json"

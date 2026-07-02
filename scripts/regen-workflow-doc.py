@@ -18,6 +18,7 @@ Stdlib-only.
 
 from __future__ import annotations
 
+import argparse
 import re
 import sys
 from pathlib import Path
@@ -90,7 +91,13 @@ def _ensure_marker(text: str) -> str:
 
 
 def main() -> int:
-    check_only = "--check" in sys.argv
+    parser = argparse.ArgumentParser(
+        description="Regenerate the SKILL.md-derived sections of docs/WORKFLOW.md."
+    )
+    parser.add_argument(
+        "--check", action="store_true", help="exit 1 if drift detected (no writes)"
+    )
+    check_only = parser.parse_args().check
 
     if not WORKFLOW_MD.exists():
         print(f"ERROR: {WORKFLOW_MD} not found", file=sys.stderr)

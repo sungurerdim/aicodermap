@@ -22,16 +22,17 @@ Stdlib only. Two modes:
 
 from __future__ import annotations
 
+import argparse
 import json
 import re
 import sys
 import urllib.request
-from datetime import date
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "scripts"))
 from lib.util import slug_norm as _norm  # noqa: E402  (SSOT)
+from lib.util import configure_utf8_output, today_iso  # noqa: E402
 
 AA_URL = "https://artificialanalysis.ai/leaderboards/models"
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
@@ -114,6 +115,17 @@ def parse_models(rsc_text: str) -> list[dict]:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Decode the AA leaderboard RSC payload into _aa-rows.json."
+    )
+    parser.add_argument(
+        "--dump-fields", action="store_true",
+        help="print numeric field union + a sample and exit",
+    )
+    parser.add_argument(
+        "--verbose", action="store_true", help="print per-bench observation counts"
+    )
+    args = parser.parse_args()
     html = fetch(AA_URL)
     rsc = decode_rsc_chunks(html)
     models = parse_models(rsc)
@@ -121,7 +133,7 @@ def main() -> int:
         print("=== AA-RSC === parsed 0 models (format may have changed)")
         return 1
 
-    if "--dump-fields" in sys.argv:
+    if args.dump_fields:
         numeric: dict[str, int] = {}
         for o in models:
             for k, v in o.items():
@@ -159,7 +171,7 @@ def main() -> int:
     for n in collisions:
         by_norm.pop(n, None)
 
-    today = date.today().isoformat()
+    today = today_iso()
     observations: list[dict] = []
     matched_ids: set[str] = set()
     unmatched: list[str] = []
@@ -241,7 +253,7 @@ def main() -> int:
         f"=== AA-RSC === parsed={len(models)} matched_our={len(matched_ids)}/"
         f"{len(our)} observations={len(observations)} -> {OUT_PATH.name}"
     )
-    if "--verbose" in sys.argv:
+    if args.verbose:
         import collections
 
         perbench = collections.Counter(o["benchKey"] for o in observations)
@@ -251,9 +263,5 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    if hasattr(sys.stdout, "reconfigure"):
-        try:
-            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-        except Exception:
-            pass
+    configure_utf8_output()
     raise SystemExit(main())

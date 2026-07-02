@@ -9,7 +9,6 @@ from __future__ import annotations
 import json
 import os
 import sys
-from datetime import date
 from pathlib import Path
 from collections import defaultdict
 
@@ -28,14 +27,14 @@ from lib import reliability as _reliability  # type: ignore  # noqa: E402
 # compatible with the old local trust_score (source_type defaults to the
 # pre-R5 curve; is_pseudo defaults to False — gather entries are real).
 from lib.tiers import effective_trust_score as trust_score, is_pseudo_source  # type: ignore  # noqa: E402  (SSOT)
-from lib.constants import ELO_BENCH_KEYS  # type: ignore  # noqa: E402  (SSOT)
-from lib.util import extract_domain  # type: ignore  # noqa: E402  (SSOT)
+from lib.constants import ELO_BENCH_KEYS, GATHER_BATCH_GLOB  # type: ignore  # noqa: E402  (SSOT)
+from lib.util import extract_domain, today_iso  # type: ignore  # noqa: E402  (SSOT)
 
 LEDGER_PATH = ROOT / "data" / "source-reliability.json"
 
 
 def find_batch_artifacts() -> list[Path]:
-    return sorted(ROOT.glob(".aicodermap-agent-out-batch*.gather.json"))
+    return sorted(ROOT.glob(GATHER_BATCH_GLOB))
 
 
 _ELO_SIBLINGS = ELO_BENCH_KEYS  # SSOT: lib.constants.ELO_BENCH_KEYS
@@ -211,7 +210,7 @@ def main() -> int:
                     "value": val,
                     "sourceUrl": obs.get("sourceUrl") or "",
                     "tier": obs.get("tier") or "C",
-                    "fetched": obs.get("fetched") or date.today().isoformat(),
+                    "fetched": obs.get("fetched") or today_iso(),
                     "source": obs.get("source") or "",
                 }
             )

@@ -111,6 +111,7 @@ FORMAT_WEIGHTS: dict[str, float] = {
 # ── File paths (gitignored artifacts) ──────────────────────────────────────
 VERIFICATION_MAP_PATH = ".aicodermap-verification-map.json"
 SINGLE_ARTIFACT_PATH = ".aicodermap-agent-out.json"
+GATHER_BATCH_GLOB = ".aicodermap-agent-out-batch*.gather.json"
 LEADERBOARD_SNAPSHOTS_DIR = "data/.leaderboard-snapshots/"
 LEADERBOARD_INDEX_PATH = "data/.leaderboard-snapshots/_index.json"
 TELEMETRY_DIR = "data/_telemetry/"

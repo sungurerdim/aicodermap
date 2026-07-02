@@ -20,12 +20,12 @@ extract bench tables from images that vendor blogs ship as PNG.
 Usage: python scripts/extract-images.py <url1> [<url2> ...]
 """
 
+import argparse
 import hashlib
 import json
 import os
 import re
 import ssl
-import sys
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -129,7 +129,8 @@ def main(urls):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("usage: extract-images.py <url1> [<url2> ...]", file=sys.stderr)
-        sys.exit(2)
-    main(sys.argv[1:])
+    parser = argparse.ArgumentParser(
+        description="Download bench-bearing images referenced by the given pages."
+    )
+    parser.add_argument("urls", nargs="+", help="page URLs to scan")
+    main(parser.parse_args().urls)

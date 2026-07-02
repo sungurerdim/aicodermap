@@ -13,6 +13,7 @@ Usage:
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -93,7 +94,20 @@ def _promote_leaderboard(entry: dict, whitelist: dict):
 
 
 def main() -> int:
-    args = sys.argv[1:]
+    parser = argparse.ArgumentParser(
+        description="Promote or reject review-queue discoveries."
+    )
+    parser.add_argument(
+        "--list", action="store_true", dest="list_pending",
+        help="show pending discoveries (default when no action given)",
+    )
+    parser.add_argument(
+        "--type", dest="kind",
+        help="discovery category: vendors|benchmarks|leaderboards (default vendors)",
+    )
+    parser.add_argument("--accept", metavar="ID", help="accept the discovery with this id")
+    parser.add_argument("--reject", metavar="ID", help="reject the discovery with this id")
+    cli = parser.parse_args()
 
     if not DISCOVERIES_PATH.exists():
         print("discoveries.json not found — nothing to promote.")
@@ -101,21 +115,14 @@ def main() -> int:
 
     discoveries = _load(DISCOVERIES_PATH)
 
-    if "--list" in args or not args:
+    if cli.list_pending or not (cli.accept or cli.reject):
         _list_pending(discoveries)
         return 0
 
-    kind_arg = None
-    if "--type" in args:
-        idx = args.index("--type")
-        kind_arg = args[idx + 1] if idx + 1 < len(args) else None
+    kind_arg = cli.kind
 
-    if "--accept" in args:
-        idx = args.index("--accept")
-        eid = args[idx + 1] if idx + 1 < len(args) else None
-        if not eid:
-            print("--accept requires an id", file=sys.stderr)
-            return 2
+    if cli.accept:
+        eid = cli.accept
         kind = kind_arg or "vendors"
         if not _set_status(discoveries, kind, eid, "accepted"):
             print(f"  ✗ '{eid}' not found in {kind}", file=sys.stderr)
@@ -144,12 +151,8 @@ def main() -> int:
         print(f"✓ Accepted '{eid}' from {kind}.")
         return 0
 
-    if "--reject" in args:
-        idx = args.index("--reject")
-        eid = args[idx + 1] if idx + 1 < len(args) else None
-        if not eid:
-            print("--reject requires an id", file=sys.stderr)
-            return 2
+    if cli.reject:
+        eid = cli.reject
         kind = kind_arg or "vendors"
         if not _set_status(discoveries, kind, eid, "rejected"):
             print(f"  ✗ '{eid}' not found in {kind}", file=sys.stderr)
@@ -157,9 +160,6 @@ def main() -> int:
         _save(DISCOVERIES_PATH, discoveries)
         print(f"✓ Rejected '{eid}' from {kind}.")
         return 0
-
-    _list_pending(discoveries)
-    return 0
 
 
 if __name__ == "__main__":

@@ -61,6 +61,7 @@ from urllib.request import Request, urlopen
 
 PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT / "scripts"))
+from lib.util import configure_utf8_output  # noqa: E402
 from lib.util import utc_now_iso as _utc_now_iso  # noqa: E402  (SSOT)
 
 SNAPSHOTS_DIR = PROJECT / "data" / ".leaderboard-snapshots"
@@ -305,13 +306,7 @@ def _main() -> int:
     sys.path.insert(0, str(PROJECT / "scripts"))
     from lib.whitelist import load_whitelist  # noqa: E402 — runtime path injection
 
-    for stream in (sys.stdout, sys.stderr):
-        reconf = getattr(stream, "reconfigure", None)
-        if callable(reconf):
-            try:
-                reconf(encoding="utf-8", errors="replace")
-            except (OSError, ValueError):
-                pass
+    configure_utf8_output()
 
     wl = load_whitelist()
     targets = _gather_targets(wl)

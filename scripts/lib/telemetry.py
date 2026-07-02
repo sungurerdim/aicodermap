@@ -18,6 +18,9 @@ import json
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
+
+from .util import safe_json_load as _read_json
+from .util import utc_now_iso as _utc_iso
 from typing import Any
 
 PROJECT = Path(__file__).resolve().parents[2]
@@ -42,10 +45,6 @@ def _git_head_short() -> str:
         return "unknown"
 
 
-def _utc_iso() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-
 def _norm_ts(value: Any) -> str | None:
     """Normalize a runtime timestamp to an ISO-8601 UTC string.
 
@@ -65,15 +64,6 @@ def _norm_ts(value: Any) -> str | None:
     if isinstance(value, str):
         return value
     return None
-
-
-def _read_json(path: Path, default: Any) -> Any:
-    if not path.is_file():
-        return default
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return default
 
 
 def build_meta(

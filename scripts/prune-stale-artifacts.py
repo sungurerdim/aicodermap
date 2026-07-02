@@ -39,12 +39,16 @@ import sys
 import time
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lib.constants import GATHER_BATCH_GLOB, SINGLE_ARTIFACT_PATH  # noqa: E402
+from lib.util import configure_utf8_output  # noqa: E402
+
 # Canonical pattern first; hyphen variant kept for backwards-compat with pre-F1.2 artifacts.
 PATTERNS = [
-    ".aicodermap-agent-out-batch*.gather.json",
+    GATHER_BATCH_GLOB,
     ".aicodermap-agent-out-batch*-gather.json",  # pre-F1.2 compat only
     ".aicodermap-agent-out-synth.json",
-    ".aicodermap-agent-out.json",
+    SINGLE_ARTIFACT_PATH,
     # Per-batch idea_context files. The dispatch plan can split providers into a
     # DIFFERENT set of batchIds cycle-to-cycle (e.g. mistral 1×6 → 2×{6,2}); a
     # prior-cycle ctx whose batchId no longer exists in the fresh plan is never
@@ -161,9 +165,5 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    if hasattr(sys.stdout, "reconfigure"):
-        try:
-            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-        except Exception:
-            pass
+    configure_utf8_output()
     raise SystemExit(main())

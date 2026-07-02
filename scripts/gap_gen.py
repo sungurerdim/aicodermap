@@ -18,19 +18,18 @@ import sys
 import datetime as dt
 from pathlib import Path
 
-if hasattr(sys.stdout, "reconfigure"):
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-if hasattr(sys.stderr, "reconfigure"):
-    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
-
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 from lib.matrix import active_models as _active_models  # noqa: E402
 from lib.whitelist import core_bench_keys  # noqa: E402  (SSOT)
+from lib.util import configure_utf8_output, utc_now_iso  # noqa: E402
+from lib.constants import SINGLE_ARTIFACT_PATH  # noqa: E402
+
+configure_utf8_output()
 
 TODAY = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d")
-NOW_ISO = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-ARTIFACT_PATH = ROOT / ".aicodermap-agent-out.json"
+NOW_ISO = utc_now_iso()
+ARTIFACT_PATH = ROOT / SINGLE_ARTIFACT_PATH
 
 try:
     models_data = json.loads((ROOT / "data/models.json").read_text(encoding="utf-8"))

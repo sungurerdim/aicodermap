@@ -17,25 +17,24 @@ Run after every wave returns, before gap-gen + merge.py.
 
 from __future__ import annotations
 
-import datetime
 import glob
 import json
 import sys
 from pathlib import Path
 from typing import Any
 
-if hasattr(sys.stdout, "reconfigure"):
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-if hasattr(sys.stderr, "reconfigure"):
-    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
-
 ROOT = Path(__file__).resolve().parent.parent
-OUT_PATH = ROOT / ".aicodermap-agent-out.json"
+sys.path.insert(0, str(ROOT / "scripts"))
+from lib.util import configure_utf8_output, today_iso, utc_now_iso  # noqa: E402
+from lib.constants import SINGLE_ARTIFACT_PATH  # noqa: E402
+
+configure_utf8_output()
+OUT_PATH = ROOT / SINGLE_ARTIFACT_PATH
 SYNTH_PATH = ROOT / ".aicodermap-agent-out-synth.json"  # FAZ 4.C
 BATCH_GLOB = str(ROOT / ".aicodermap-agent-out-batch*.json")
 
-NOW_ISO = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-TODAY = datetime.date.today().isoformat()
+NOW_ISO = utc_now_iso()
+TODAY = today_iso()
 
 
 def _load_batch_artifacts() -> list[tuple[str, dict[str, Any]]]:

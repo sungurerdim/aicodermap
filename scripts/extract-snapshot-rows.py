@@ -39,7 +39,7 @@ from typing import Any
 
 PROJECT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT / "scripts"))
-from lib.util import extract_domain, parse_locale_decimal  # noqa: E402
+from lib.util import configure_utf8_output, extract_domain, parse_locale_decimal  # noqa: E402
 
 SNAP_DIR = PROJECT / "data" / ".leaderboard-snapshots"
 ROWS_OUT = SNAP_DIR / "_rows.json"
@@ -374,9 +374,5 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    if hasattr(sys.stdout, "reconfigure"):
-        try:
-            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-        except Exception:
-            pass
+    configure_utf8_output()
     raise SystemExit(main())

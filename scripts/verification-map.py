@@ -47,9 +47,9 @@ Map shape (canonical, mirrored in agent.md DATA_CONTRACT):
   }
 """
 
+import argparse
 import json
 import sys
-from datetime import date
 from pathlib import Path
 
 PROJECT = Path(__file__).resolve().parent.parent
@@ -59,16 +59,18 @@ from lib.constants import (  # noqa: E402
 )
 from lib.constants import VERIFICATION_AGREEMENT_PP  # noqa: E402  (SSOT)
 from lib.whitelist import all_bench_keys, load_whitelist  # noqa: E402
+from lib.util import today_iso  # noqa: E402
+from lib.constants import SINGLE_ARTIFACT_PATH, VERIFICATION_MAP_PATH  # noqa: E402
 
 # Cap the gapHistory ledger so a perma-empty cell does not grow it unbounded
 # across years of cycles. Only the trailing-run length matters to lib.matrix's
 # starvation queue (>=2), so keeping the most-recent dates is sufficient.
 _GAP_HISTORY_CAP = 8
 
-ARTIFACT = PROJECT / ".aicodermap-agent-out.json"
-MAP_PATH = PROJECT / ".aicodermap-verification-map.json"
+ARTIFACT = PROJECT / SINGLE_ARTIFACT_PATH
+MAP_PATH = PROJECT / VERIFICATION_MAP_PATH
 
-TODAY = date.today().isoformat()
+TODAY = today_iso()
 
 
 def parse_cell_key(source_added_key: str):
@@ -370,15 +372,20 @@ def bootstrap_from_sources():
 
 
 def main():
-    op = sys.argv[1] if len(sys.argv) > 1 else "update"
+    parser = argparse.ArgumentParser(
+        description="Maintain the confirmed-cell verification map."
+    )
+    parser.add_argument(
+        "op", nargs="?", default="update",
+        choices=("update", "read", "bootstrap"),
+        help="operation (default: update)",
+    )
+    op = parser.parse_args().op
     if op == "update":
         return update_map()
     if op == "read":
         return read_map()
-    if op == "bootstrap":
-        return bootstrap_from_sources()
-    print("usage: verification-map.py [update|read|bootstrap]", file=sys.stderr)
-    return 2
+    return bootstrap_from_sources()
 
 
 if __name__ == "__main__":

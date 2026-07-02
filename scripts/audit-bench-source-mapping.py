@@ -43,13 +43,9 @@ from lib.whitelist import (  # noqa: E402
     load_whitelist,
 )
 
-for _stream in (sys.stdout, sys.stderr):
-    _reconf = getattr(_stream, "reconfigure", None)
-    if callable(_reconf):
-        try:
-            _reconf(encoding="utf-8", errors="replace")
-        except (OSError, ValueError):
-            pass
+from lib.util import configure_utf8_output  # noqa: E402
+
+configure_utf8_output()
 
 LIVENESS_DAYS = 60
 AC8_GRACE_DAYS = 14

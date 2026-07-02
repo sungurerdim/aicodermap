@@ -358,13 +358,14 @@ if __name__ == "__main__":
     import sys
     import glob
 
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     from lib.dispatch import compute_dispatch_plan  # noqa: E402
     from lib.matrix import active_models  # noqa: E402
+    from lib.constants import GATHER_BATCH_GLOB  # noqa: E402
+    from lib.util import configure_utf8_output  # noqa: E402
     from lib.whitelist import core_bench_keys, load_whitelist  # noqa: E402
+
+    configure_utf8_output()
 
     parser = argparse.ArgumentParser(description="Validate gather artifacts.")
     parser.add_argument(
@@ -397,7 +398,7 @@ if __name__ == "__main__":
     stale_count = 0
     valid_count = 0
     for path in sorted(
-        glob.glob(str(project / ".aicodermap-agent-out-batch*.gather.json"))
+        glob.glob(str(project / GATHER_BATCH_GLOB))
     ):
         bid = (
             Path(path)

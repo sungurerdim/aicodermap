@@ -29,7 +29,6 @@ Used as a CI-style gate by:
   - skill workflow before git commit (loud warning if dirty)
 """
 
-import json
 import os
 import re
 import sys
@@ -38,22 +37,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lib.matrix import active_models as _active_models  # noqa: E402
 from lib.util import canonical_display_name as _canonical_name  # noqa: E402
+from lib.util import configure_utf8_output  # noqa: E402
+from lib.util import read_json as load_json  # noqa: E402
 from lib.whitelist import build_domain_publishes, elo_swe_misfile  # noqa: E402
 
-for _stream in (sys.stdout, sys.stderr):
-    _reconf = getattr(_stream, "reconfigure", None)
-    if callable(_reconf):
-        try:
-            _reconf(encoding="utf-8", errors="replace")
-        except (OSError, ValueError):
-            pass
+configure_utf8_output()
 
 PROJECT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-
-
-def load_json(path):
-    with open(path, encoding="utf-8") as fp:
-        return json.load(fp)
 
 
 def parse_bench_keys_from_core(core_src):

@@ -5,8 +5,8 @@ persisted tool-result file. Writes the slice to OUT_PATH.
 Usage: python scripts/extract-agent-output.py <persisted_path> <out_path>
 """
 
+import argparse
 import json
-import sys
 from pathlib import Path
 
 
@@ -97,14 +97,14 @@ def text_from_subagent_jsonl(path: Path) -> str:
 
 
 def main() -> int:
-    if len(sys.argv) != 3:
-        print(
-            "usage: extract-agent-output.py <persisted_path|subagent_jsonl> <out_path>",
-            file=sys.stderr,
-        )
-        return 2
-    persisted = Path(sys.argv[1])
-    out = Path(sys.argv[2])
+    parser = argparse.ArgumentParser(
+        description="Extract the agent artifact JSON from a persisted transcript."
+    )
+    parser.add_argument("persisted_path", type=Path, help="persisted array or subagent .jsonl")
+    parser.add_argument("out_path", type=Path, help="artifact JSON destination")
+    args = parser.parse_args()
+    persisted = args.persisted_path
+    out = args.out_path
     if persisted.suffix == ".jsonl":
         text = text_from_subagent_jsonl(persisted)
     else:

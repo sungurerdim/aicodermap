@@ -35,6 +35,7 @@ from urllib.request import Request, urlopen
 
 PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT / "scripts"))
+from lib.util import configure_utf8_output  # noqa: E402
 from lib.util import utc_now_iso as _utc_now_iso  # noqa: E402  (SSOT)
 
 WHITELIST = PROJECT / "data" / "sources-whitelist.json"
@@ -311,9 +312,5 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    if hasattr(sys.stdout, "reconfigure"):
-        try:
-            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-        except Exception:
-            pass
+    configure_utf8_output()
     raise SystemExit(main())

@@ -23,6 +23,7 @@ each stage stays independently verifiable.
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -31,6 +32,7 @@ REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "scripts"))
 from lib.constants import AA_COMPOSITE_KEYS, AA_MEASURED_KEYS  # noqa: E402
 from lib.whitelist import bench_band as _band  # noqa: E402  (SSOT)
+from lib.util import configure_utf8_output  # noqa: E402
 
 AA_ROWS = REPO / "data" / ".leaderboard-snapshots" / "_aa-rows.json"
 
@@ -45,6 +47,13 @@ MEASURED_TOL = 8.0  # pp disagreement that flags an AA-measured candidate
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Advisory sweep for agent bench-cell misfiles."
+    )
+    parser.add_argument(
+        "--verbose", action="store_true", help="print per-finding detail"
+    )
+    args = parser.parse_args()
     models = json.loads((REPO / "data" / "models.json").read_text(encoding="utf-8"))
     schema = json.loads(
         (REPO / "data" / "sources-whitelist.json").read_text(encoding="utf-8")
@@ -138,7 +147,7 @@ def main() -> int:
         f"measured-candidates={s['measuredCandidates']} band-violations={s['bandViolations']} "
         f"cross-bench-dups={s['crossBenchDups']} (aa_rows={s['aaRowsLoaded']})"
     )
-    if "--verbose" in sys.argv:
+    if args.verbose:
         print("\n-- AA-COMPOSITE MISFILES (AA authoritative; will be corrected) --")
         for r in report["compositeMisfiles"]:
             print(
@@ -160,9 +169,5 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    if hasattr(sys.stdout, "reconfigure"):
-        try:
-            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-        except Exception:
-            pass
+    configure_utf8_output()
     raise SystemExit(main())

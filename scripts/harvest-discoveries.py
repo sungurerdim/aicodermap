@@ -27,6 +27,7 @@ Idempotent. Non-fatal in harvest mode. Stdlib only.
 
 from __future__ import annotations
 
+import argparse
 import glob
 import json
 import os
@@ -37,10 +38,12 @@ from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
+from lib.constants import SINGLE_ARTIFACT_PATH  # noqa: E402
 from lib.whitelist import all_bench_keys, load_whitelist  # noqa: E402
 
-if hasattr(sys.stdout, "reconfigure"):
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+from lib.util import configure_utf8_output  # noqa: E402
+
+configure_utf8_output()
 
 DISCOVERIES_PATH = ROOT / "data" / "discoveries.json"
 WHITELIST_PATH = ROOT / "data" / "sources-whitelist.json"
@@ -91,7 +94,7 @@ def _artifact_paths() -> list[str]:
     paths = glob.glob(str(ROOT / ".aicodermap-agent-out-*.gather.json"))
     for extra in (
         ".aicodermap-agent-out-synth.json",
-        ".aicodermap-agent-out.json",
+        SINGLE_ARTIFACT_PATH,
         ".aicodermap-lineup.json",
     ):
         p = ROOT / extra
@@ -342,8 +345,16 @@ def promote_ac6() -> int:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Harvest lineup discoveries into the review queue."
+    )
+    parser.add_argument(
+        "--promote", action="store_true",
+        help="auto-promote discoveries when the AC6 audit gate is green",
+    )
+    args = parser.parse_args()
     summary = harvest()
-    if "--promote" in sys.argv[1:] and summary["ac6Ready"]:
+    if args.promote and summary["ac6Ready"]:
         return promote_ac6()
     return 0
 

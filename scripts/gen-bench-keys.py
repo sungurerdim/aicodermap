@@ -18,25 +18,20 @@ Stdlib-only.
 
 from __future__ import annotations
 
+import argparse
 import json
 import re
 import sys
 from pathlib import Path
 
-# Never crash on a console/pipe whose locale (e.g. Windows cp1254) can't encode
-# the status lines' arrow glyph — the script writes core.js BEFORE printing, so a
-# UnicodeEncodeError here would falsely signal failure to any subprocess caller.
-for _stream in (sys.stdout, sys.stderr):
-    _reconf = getattr(_stream, "reconfigure", None)
-    if callable(_reconf):
-        try:
-            _reconf(encoding="utf-8", errors="replace")
-        except (OSError, ValueError):
-            pass
-
 PROJECT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT / "scripts"))
 from lib.util import slug_norm as _norm  # noqa: E402  (SSOT)
+from lib.util import configure_utf8_output  # noqa: E402
+
+# Never crash on a console/pipe whose locale (e.g. Windows cp1254) can't encode
+# the status lines' arrow glyph — the script writes core.js BEFORE printing.
+configure_utf8_output()
 
 WHITELIST = PROJECT / "data" / "sources-whitelist.json"
 CORE_JS = PROJECT / "assets" / "js" / "core.js"
@@ -224,9 +219,21 @@ def check_regex_drift() -> int:
 
 
 def main() -> int:
-    if "--check-regex-drift" in sys.argv:
+    parser = argparse.ArgumentParser(
+        description="Sync core.js BENCH_KEYS from the whitelist bench categories."
+    )
+    parser.add_argument(
+        "--check", action="store_true",
+        help="exit 1 if core.js is out of sync (for pre-commit/CI)",
+    )
+    parser.add_argument(
+        "--check-regex-drift", action="store_true",
+        help="exit 1 if the whitelist extraction regexes drifted",
+    )
+    args = parser.parse_args()
+    if args.check_regex_drift:
         return check_regex_drift()
-    check_only = "--check" in sys.argv
+    check_only = args.check
 
     keys = load_keys_from_whitelist()
     if not keys:

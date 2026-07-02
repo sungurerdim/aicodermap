@@ -57,15 +57,15 @@ import json
 import re
 import sys
 from collections import Counter
-from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "scripts"))
-from lib.util import canonical_display_name  # noqa: E402
+from lib.constants import SINGLE_ARTIFACT_PATH  # noqa: E402
+from lib.util import canonical_display_name, configure_utf8_output, utc_now_iso  # noqa: E402
 
-NOW = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+NOW = utc_now_iso()
 
 # Optional rich-copy overrides (id -> dict with provider/tier/open/license/context/
 # released/api + tr_s/tr_w/en_s/en_w). Absence falls back to generic derivation.
@@ -221,7 +221,7 @@ def _artifact_paths() -> list[str]:
     paths = glob.glob(str(REPO / ".aicodermap-agent-out-*.gather.json"))
     for extra in (
         ".aicodermap-agent-out-synth.json",
-        ".aicodermap-agent-out.json",
+        SINGLE_ARTIFACT_PATH,
         ".aicodermap-agent-out-lineup.json",
     ):
         p = REPO / extra
@@ -516,10 +516,5 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    reconf = getattr(sys.stdout, "reconfigure", None)
-    if callable(reconf):
-        try:
-            reconf(encoding="utf-8", errors="replace")
-        except (OSError, ValueError):
-            pass
+    configure_utf8_output()
     raise SystemExit(main())

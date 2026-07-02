@@ -21,6 +21,8 @@ from lib.dispatch import compute_dispatch_plan, slow_families_from_telemetry  # 
 from lib.freshness import compute_skip_cells  # noqa: E402
 from lib.idea_context import build_per_batch_ctx  # noqa: E402
 from lib.matrix import active_models, matrix_snapshot, priority_cells  # noqa: E402
+from lib.constants import VERIFICATION_MAP_PATH  # noqa: E402
+from lib.util import safe_json_load as _read_json  # noqa: E402
 from lib.whitelist import (  # noqa: E402
     banned_fetch_patterns,
     contracts,
@@ -28,19 +30,10 @@ from lib.whitelist import (  # noqa: E402
 )
 
 
-def _read_json(path: Path, default):
-    if not path.exists():
-        return default
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
-        return default
-
-
 def main() -> int:
     models = _read_json(REPO / "data" / "models.json", [])
     wl = _read_json(REPO / "data" / "sources-whitelist.json", {})
-    vmap = _read_json(REPO / ".aicodermap-verification-map.json", {"cells": {}})
+    vmap = _read_json(REPO / VERIFICATION_MAP_PATH, {"cells": {}})
     snap_index = _read_json(
         REPO / "data" / ".leaderboard-snapshots" / "_index.json", {}
     )
