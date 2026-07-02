@@ -2,7 +2,10 @@
 // its own builder function so individual concerns stay <50 lines and brace
 // nesting stays ≤3.
 
-import { State } from './core.js';
+import { State, DEFAULT_PRESET, DEFAULT_SCORE_FN } from './core.js';
+import {
+  buildContradictionFlag, uncertaintySpan, coverageClass, lastUpdatedNode,
+} from './render-shared.js';
 import {
   disputedCount, contradictionFor, isCellStale, getCellFreshness,
   sourceReliabilityBadge,
@@ -13,28 +16,13 @@ import {
 } from './scoring.js';
 import {
   fmtScore, pricingView, fmtPriceMoney, fmtPriceRange, fmtPriceCell,
-  fmtContext, fmtLastUpdated, fmtTimeAgo, formatBenchValue, orderedBenchKeys,
+  fmtContext, formatBenchValue, orderedBenchKeys,
 } from './format.js';
 import { gpuCompat, getActiveVram } from './gpu.js';
 import { el, cameraIconButton, docIconButton } from './dom.js';
 import { t, tierLabel } from './i18n.js';
-import { showContradictionTooltip, hideTooltip, exportElement } from './overlay.js';
+import { exportElement } from './overlay.js';
 import { modelSourcesSummary, exportSourcesMarkdown } from './sources.js';
-
-function lastUpdatedNode(iso) {
-  const wrap = el('span', { class: 'last-updated' });
-  const dateStr = fmtLastUpdated(iso);
-  if (!dateStr) {
-    wrap.textContent = '—';
-    return wrap;
-  }
-  wrap.appendChild(el('strong', { class: 'last-updated-date' }, dateStr));
-  const ago = fmtTimeAgo(iso, t);
-  if (ago) {
-    wrap.appendChild(el('span', { class: 'last-updated-ago' }, ` · ${ago}`));
-  }
-  return wrap;
-}
 
 function metaCell(label, value) {
   const cell = el('div', { class: 'meta-cell' });
@@ -103,22 +91,7 @@ export function buildBenchCell(model, key) {
   const c = contradictionFor(model.id, key);
   if (c) {
     cell.classList.add(c.severity === 'danger' ? 'flag-danger' : 'flag-warn');
-    // FE-03: fold the delta + source-count the tooltip shows into the label
-    // itself so screen-reader users get the detail without hover/focus reveal.
-    const flagLabel = `${t('ui.contradiction.title')}: ${t('ui.contradiction.delta')} ${c.delta.toFixed(1)} pp (${c.sources.length})`;
-    const flag = el('span', {
-      class: 'flag',
-      tabindex: '0',
-      role: 'button',
-      'aria-label': flagLabel,
-    }, c.severity === 'danger' ? '🚨' : '⚠');
-    flag.dataset.modelId = model.id;
-    flag.dataset.benchKey = key;
-    flag.addEventListener('mouseenter', (e) => showContradictionTooltip(e.currentTarget, c));
-    flag.addEventListener('focus', (e) => showContradictionTooltip(e.currentTarget, c));
-    flag.addEventListener('mouseleave', hideTooltip);
-    flag.addEventListener('blur', hideTooltip);
-    cell.appendChild(flag);
+    cell.appendChild(buildContradictionFlag(c, model.id, key));
   }
   return cell;
 }
@@ -174,16 +147,11 @@ function compositeBlock(composite, coverage, disputed, unc) {
     el('span', { class: 'label' }, t('ui.table.composite')),
     valueEl,
   );
-  // Uncertainty range (±σ) — honest precision. Labelled, not a 95% CI;
-  // flagged when backed mostly by a single source.
   if (unc && Number.isFinite(unc.sigma) && composite != null) {
-    score.appendChild(el('span', {
-      class: unc.hasCI ? 'composite-unc' : 'composite-unc single-src',
-      title: t(unc.hasCI ? 'ui.uncertaintyTip' : 'ui.uncertaintySingleTip'),
-    }, `±${unc.sigma.toFixed(1)}`));
+    score.appendChild(uncertaintySpan(unc.sigma, unc.hasCI));
   }
   if (pct != null) {
-    const covClass = `coverage cov-${pct >= 75 ? 'full' : pct >= 40 ? 'partial' : 'low'}`;
+    const covClass = `coverage cov-${coverageClass(pct)}`;
     score.appendChild(el('span', { class: covClass, title: t('ui.coverageTip') },
       `${t('ui.coverage')} ${pct}%`));
   }
@@ -420,7 +388,7 @@ function sourcesFooter(model) {
 // of their componentBenches). Shown as a small badge row + an agreement
 // indicator vs AICoderMap composite rank.
 function vendorPanelBlock(model) {
-  const presetName = State.activePresetName || 'balanced';
+  const presetName = State.activePresetName || DEFAULT_PRESET;
   const vc = vendorComposites(model, presetName);
   if (!vc.length) return null;
   // F6 (2026-05-18): wrapped in a visually distinct group with header label,
@@ -447,7 +415,7 @@ function vendorPanelBlock(model) {
   block.appendChild(list);
   // Agreement indicator — only meaningful for non-consensus presets that
   // have a separate AICM composite to compare against.
-  if ((State.scoreFn || 'aicm') !== 'vendorConsensus') {
+  if ((State.scoreFn || DEFAULT_SCORE_FN) !== 'vendorConsensus') {
     const agreement = crossValidationAgreement(model, State.models, State.weights, presetName);
     if (agreement && agreement.flag) {
       const dot = ({ 'consensus': '🟢', 'mild-disagreement': '🟡', 'controversy': '🔴' })[agreement.flag] || '';
@@ -469,7 +437,7 @@ function vendorPanelBlock(model) {
 // (required bench missing) and "limited coverage" (≥2 critical benches
 // missing) under the current preset. Returns null when no tier issues.
 function limitedDataBadge(model) {
-  const presetName = State.activePresetName || 'balanced';
+  const presetName = State.activePresetName || DEFAULT_PRESET;
   const tiers = presetTiersFor(model, presetName);
   if (!tiers.isLimitedData && !tiers.isLimitedCoverage) return null;
   const cls = tiers.isLimitedCoverage ? 'limited-coverage' : 'limited-data';
@@ -484,14 +452,22 @@ function limitedDataBadge(model) {
 export function buildModelCard(model, rank, opts = {}) {
   // F1+F2 (2026-05-18): effectiveScore dispatches based on State.scoreFn.
   // 'consensus' preset → vendorConsensusScore; otherwise → compositeScore.
-  const composite = effectiveScore(model, State.weights, State.activePresetName);
+  // renderModelCards passes the score/band it already computed via rankedModels
+  // (opts.score / opts.band) so a full render does the scoring work once;
+  // direct callers without opts still compute locally.
+  const composite = opts.score !== undefined
+    ? opts.score
+    : effectiveScore(model, State.weights, State.activePresetName);
   const coverage = coverageOf(model, State.weights);
   const disputed = disputedCount(model, State.weights);
   // CI-overlap uncertainty (2026-05-27) — AICM atomic path only; vendor
-  // consensus scores on a different basis so a band would mislead.
-  const unc = (State.scoreFn || 'aicm') !== 'vendorConsensus'
-    ? compositeUncertainty(model, State.weights, State.models, State.activePresetName)
-    : null;
+  // consensus scores on a different basis so a band would mislead. The rank
+  // band row carries the same sigma/hasCI fields compositeUncertainty returns.
+  const unc = opts.band !== undefined
+    ? opts.band
+    : ((State.scoreFn || DEFAULT_SCORE_FN) !== 'vendorConsensus'
+      ? compositeUncertainty(model, State.weights, State.models, State.activePresetName)
+      : null);
   const status = model.status || 'active';
   const statusClass = status === 'active' ? '' : ` is-${status}`;
   // Rank-gated cards (limited coverage — missing a required bench for the active

@@ -3,8 +3,8 @@
 // drive control surfaces.
 
 import {
-  State, BENCH_KEYS, DEFAULT_WEIGHTS, PRESETS, STORAGE, writeStorage, readStorage,
-  getPresets, shortEtagHash,
+  State, BENCH_KEYS, PRESETS, STORAGE, writeStorage,
+  getPresets, shortEtagHash, detectMatchingPreset,
 } from './core.js';
 import { el, clear } from './dom.js';
 import { t } from './i18n.js';
@@ -103,21 +103,6 @@ export function applyPreset(name, onChange) {
   writeStorage(STORAGE.preset, name);
   renderWeightsEditor(onChange);
   if (typeof onChange === 'function') onChange();
-}
-
-export function detectMatchingPreset(weights) {
-  // Walk schema-driven presets first (the authoritative source — the literal
-  // PRESETS map drifts when the schema is retuned), fall back to literal.
-  const sources = [getPresets(), PRESETS];
-  for (const src of sources) {
-    if (!src) continue;
-    for (const [name, preset] of Object.entries(src)) {
-      if (name.startsWith('_')) continue;
-      if (preset && preset.__kind === 'vendorConsensus') continue;
-      if (BENCH_KEYS.every(k => (weights[k] || 0) === (preset[k] || 0))) return name;
-    }
-  }
-  return 'custom';
 }
 
 export function syncPresetSelect() {

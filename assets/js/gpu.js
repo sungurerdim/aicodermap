@@ -11,13 +11,18 @@ const MIN_OFFLOAD_LIMIT_GB = 8;
 // budget 6 + (8-4) = 10GB, so a 14GB model is correctly "too large".
 const RAM_OS_RESERVE_GB = 4;
 
+// System RAM realistically available for weight spill (OS reserve deducted).
+function availableRam() {
+  return Math.max(State.ram - RAM_OS_RESERVE_GB, 0);
+}
+
 // Spill budget beyond VRAM. Known system RAM (dropdown pick, else the
 // navigator.deviceMemory floor — browsers cap it at 8, which only ever
 // UNDER-estimates) → usable = ram - OS reserve. Unknown → the legacy
 // 2×VRAM heuristic.
 function offloadBudget(vram) {
   if (Number.isFinite(State.ram) && State.ram > 0) {
-    return Math.max(State.ram - RAM_OS_RESERVE_GB, 0);
+    return availableRam();
   }
   return Math.max(vram * RAM_OFFLOAD_FACTOR, MIN_OFFLOAD_LIMIT_GB);
 }
@@ -419,7 +424,7 @@ export function updateGpuStatus() {
   const vramKnown = Number.isFinite(State.vram) && State.vram > 0;
   const ramKnown  = Number.isFinite(State.ram)  && State.ram  > 0;
   const budget = vramKnown && ramKnown
-    ? State.vram + Math.max(State.ram - RAM_OS_RESERVE_GB, 0)
+    ? State.vram + availableRam()
     : null;
   const totalSuffix = budget != null
     ? ` + RAM → ~${budget} GB ${t('ui.filter.totalBudget') || 'total'}`
@@ -427,7 +432,7 @@ export function updateGpuStatus() {
 
   if (!vramKnown) {
     if (ramKnown) {
-      const offload = Math.max(State.ram - RAM_OS_RESERVE_GB, 0);
+      const offload = availableRam();
       status.textContent = `RAM: ~${offload} GB ${t('ui.filter.ramOffload') || 'offload budget'}`;
     } else {
       status.textContent = autoOpt && autoOpt.disabled

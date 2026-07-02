@@ -44,7 +44,7 @@
   <script type="module">
     import {
       State, BENCH_KEYS, DEFAULT_WEIGHTS, PRESETS, STORAGE, getPresets,
-      validateModels, validateWeights, isValidModel,
+      validateModels, validateWeights, isValidModel, detectMatchingPreset,
     } from '../js/core.js';
     import { disputedCount, contradictionFor, loadData, INTERVAL_DECAY_CURVES } from '../js/data.js';
     import {
@@ -62,8 +62,9 @@
     import { renderAll } from '../js/render-table.js';
     import { renderPrivacyTable } from '../js/render-privacy.js';
     import {
-      renderWeightsEditor, applyPreset, detectMatchingPreset, syncPresetSelect, updateWeightsTotal,
+      renderWeightsEditor, applyPreset, syncPresetSelect, updateWeightsTotal,
     } from '../js/render-controls.js';
+    import { coverageClass, lastUpdatedNode } from '../js/render-shared.js';
     import { wireEvents } from '../js/events.js';
 
     const tbody = document.getElementById('results');
@@ -643,6 +644,15 @@
       applyPreset('swe-focused');
       assertEq('applyPreset(swe-focused) installs matching weights',
         detectMatchingPreset(State.weights), 'swe-focused');
+
+      // 18e². render-shared: coverage thresholds (75/40 SSOT) + last-updated node.
+      assertEq('coverageClass ≥75 is full', coverageClass(75), 'full');
+      assertEq('coverageClass 40..74 is partial', coverageClass(74), 'partial');
+      assertEq('coverageClass <40 is low', coverageClass(39), 'low');
+      assertEq('lastUpdatedNode empty iso renders em-dash',
+        lastUpdatedNode(null).textContent, '—');
+      assertEq('lastUpdatedNode renders a bold date part',
+        lastUpdatedNode('2026-06-30').querySelector('.last-updated-date') != null, true);
       assertEq('applyPreset persists the preset NAME',
         JSON.parse(localStorage.getItem(STORAGE.preset)), 'swe-focused');
       syncPresetSelect();

@@ -1,17 +1,21 @@
 // Comparison table + model list render. Columns are split into helper builders;
 // renderAll wires both surfaces together.
 
-import { State, TIER_ORDER, STORAGE, writeStorage } from './core.js';
+import {
+  State, TIER_ORDER, STORAGE, writeStorage, DEFAULT_PRESET, DEFAULT_SCORE_FN,
+} from './core.js';
+import {
+  buildContradictionFlag, uncertaintySpan, coverageClass, lastUpdatedNode,
+} from './render-shared.js';
 import { contradictionFor } from './data.js';
 import { coverageOf, effectiveScore, rankBands, presetTiersFor } from './scoring.js';
 import {
   fmtScore, scoreClass, pricingView, fmtPriceRange, fmtContext,
-  fmtLastUpdated, fmtTimeAgo, orderedBenchKeys,
+  orderedBenchKeys,
 } from './format.js';
 import { gpuCompat, getActiveVram, passesFilters } from './gpu.js';
 import { el, clear } from './dom.js';
 import { t, tierLabel } from './i18n.js';
-import { showContradictionTooltip, hideTooltip } from './overlay.js';
 import { buildModelCard } from './render-card.js';
 
 function staticColumns() {
@@ -57,7 +61,7 @@ function staticColumns() {
       // count marker's tooltip lists the missing benches by short label.
       renderExtra: (m, ctx) => {
         if (!ctx.band || !ctx.band.gated) return null;
-        const tiers = presetTiersFor(m, State.activePresetName || 'balanced');
+        const tiers = presetTiersFor(m, State.activePresetName || DEFAULT_PRESET);
         const missing = [...new Set([...tiers.missingRequired, ...tiers.missingCritical])];
         if (!missing.length) return null;
         const labels = missing.map(k => t(`benchmarks.${k}.short`) || k).join(', ');
@@ -85,19 +89,13 @@ function staticColumns() {
         span.className = scoreClass(ctx.score);
         span.textContent = fmtScore(ctx.score);
         wrap.appendChild(span);
-        // Uncertainty range (±σ) — honest precision. Labelled "uncertainty
-        // range", not a 95% CI; flagged when backed by a single source.
         if (ctx.band && Number.isFinite(ctx.band.sigma) && ctx.score != null) {
-          const u = document.createElement('span');
-          u.className = ctx.band.hasCI ? 'composite-unc' : 'composite-unc single-src';
-          u.textContent = `±${Math.round(ctx.band.sigma)}`;
-          u.title = t(ctx.band.hasCI ? 'ui.uncertaintyTip' : 'ui.uncertaintySingleTip');
-          wrap.appendChild(u);
+          wrap.appendChild(uncertaintySpan(ctx.band.sigma, ctx.band.hasCI));
         }
         const cov = coverageOf(m, State.weights);
         if (cov != null) {
           const pct = Math.round(cov * 100);
-          const cls = `coverage-mini ${pct >= 75 ? 'cov-full' : pct >= 40 ? 'cov-partial' : 'cov-low'}`;
+          const cls = `coverage-mini cov-${coverageClass(pct)}`;
           const covSpan = document.createElement('span');
           covSpan.className = cls;
           covSpan.textContent = `${pct}%`;
@@ -138,20 +136,7 @@ function renderBenchValue(m, k) {
   // the number flush-right and aligned across all rows.
   const c = contradictionFor(m.id, k);
   if (c) {
-    const flag = document.createElement('span');
-    flag.className = 'flag';
-    flag.textContent = c.severity === 'danger' ? '🚨' : '⚠';
-    flag.tabIndex = 0;
-    flag.setAttribute('role', 'button');
-    // FE-03: fold the delta + source-count the tooltip shows into the label
-    // itself so screen-reader users get the detail without hover/focus reveal.
-    flag.setAttribute('aria-label',
-      `${t('ui.contradiction.title')}: ${t('ui.contradiction.delta')} ${c.delta.toFixed(1)} pp (${c.sources.length})`);
-    flag.addEventListener('mouseenter', (e) => showContradictionTooltip(e.currentTarget, c));
-    flag.addEventListener('focus', (e) => showContradictionTooltip(e.currentTarget, c));
-    flag.addEventListener('mouseleave', hideTooltip);
-    flag.addEventListener('blur', hideTooltip);
-    wrap.appendChild(flag);
+    wrap.appendChild(buildContradictionFlag(c, m.id, k));
   }
   const span = document.createElement('span');
   span.className = scoreClass(v);
@@ -192,15 +177,7 @@ function tailColumns() {
       } },
     { key: 'lastUpdated', i18n: 'ui.table.lastUpdated', sortable: true,
       get: (m) => m.lastUpdated || '',
-      render: (m) => {
-        const dateStr = fmtLastUpdated(m.lastUpdated);
-        if (!dateStr) return '—';
-        const wrap = el('span', { class: 'last-updated' });
-        wrap.appendChild(el('strong', { class: 'last-updated-date' }, dateStr));
-        const ago = fmtTimeAgo(m.lastUpdated, t);
-        if (ago) wrap.appendChild(el('span', { class: 'last-updated-ago' }, ` · ${ago}`));
-        return wrap;
-      } },
+      render: (m) => lastUpdatedNode(m.lastUpdated) },
   ];
 }
 
@@ -309,7 +286,7 @@ function rankedModels() {
   // gives each row its composite tier + uncertainty (sigma) regardless of which
   // column the table is sorted by.
   let bandById = null;
-  if ((State.scoreFn || 'aicm') !== 'vendorConsensus') {
+  if ((State.scoreFn || DEFAULT_SCORE_FN) !== 'vendorConsensus') {
     const bands = rankBands(filtered, State.weights, State.activePresetName);
     bandById = new Map(bands.map(b => [b.id, b]));
   }
@@ -398,7 +375,7 @@ function renderTableBody(tbody, ranked, cols) {
   });
 }
 
-export function renderTable() {
+export function renderTable(precomputed) {
   const table = document.getElementById('comparison-table');
   if (!table) return;
   const thead = table.querySelector('thead tr');
@@ -406,7 +383,9 @@ export function renderTable() {
   const cols = buildTableColumns();
 
   renderTableHeader(thead, cols);
-  const ranked = rankedModels();
+  // renderAll passes the ranked rows it already computed (sortRanked sorts in
+  // place, so it hands over a copy); direct callers still compute locally.
+  const ranked = precomputed || rankedModels();
   sortRanked(ranked, cols);
   renderTableBody(tbody, ranked, cols);
 
@@ -414,12 +393,12 @@ export function renderTable() {
   if (count) count.textContent = `${ranked.length} / ${State.models.length}`;
 }
 
-export function renderModelCards() {
+export function renderModelCards(precomputed) {
   const list = document.getElementById('models-list');
   if (!list) return;
   clear(list);
 
-  const ranked = rankedModels().sort((a, b) => {
+  const ranked = (precomputed || rankedModels()).sort((a, b) => {
     // Rank-gated cards (limited coverage) sink to the bottom, matching the table
     // band ordering. Within each group: score desc, then tier, then name.
     const ag = a.band && a.band.gated ? 1 : 0;
@@ -438,7 +417,11 @@ export function renderModelCards() {
     list.appendChild(el('p', { class: 'loading' }, t('ui.noData')));
   } else {
     ranked.forEach((entry, i) => list.appendChild(
-      buildModelCard(entry.model, i + 1, { gated: !!(entry.band && entry.band.gated) })));
+      buildModelCard(entry.model, i + 1, {
+        gated: !!(entry.band && entry.band.gated),
+        score: entry.score,
+        band: entry.band,
+      })));
   }
 
   const count = document.getElementById('models-count');
@@ -446,6 +429,9 @@ export function renderModelCards() {
 }
 
 export function renderAll() {
-  renderTable();
-  renderModelCards();
+  // Compute the ranked rows (rankBands + effectiveScore over all models) ONCE
+  // and hand copies to both surfaces — each sorts its copy in place.
+  const ranked = rankedModels();
+  renderTable(ranked.slice());
+  renderModelCards(ranked.slice());
 }

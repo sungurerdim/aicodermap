@@ -6,7 +6,15 @@
 import {
   State, BENCH_KEYS, normalizeBenchScore, isVendorComposite,
   getVendorCompositeMeta, getCompositePolicy, getPresetTiers,
+  DEFAULT_PRESET, DEFAULT_SCORE_FN,
 } from './core.js';
+
+// Coverage-shrinkage exponent with the shared >0 guard (default 2 = sqrt).
+// Was inlined at 4 call sites with drifting guard strictness.
+function shrinkExponent(policy) {
+  const e = policy.coverageShrinkageExponent;
+  return (Number.isFinite(e) && e > 0) ? e : 2;
+}
 import { cellConfidence, contradictionFor, quarantinedBenches } from './data.js';
 
 // Weighted composite combining three honesty mechanisms:
@@ -38,8 +46,7 @@ export function compositeScore(model, weights) {
   let weightedSum = 0;
   const quarantined = quarantinedBenches(model);
   const policy = getCompositePolicy();
-  const expo = Number.isFinite(policy.coverageShrinkageExponent) && policy.coverageShrinkageExponent > 0
-    ? policy.coverageShrinkageExponent : 2;
+  const expo = shrinkExponent(policy);
   for (const k of BENCH_KEYS) {
     const w = weights[k];
     if (!w) continue;
@@ -134,7 +141,7 @@ export function vendorConsensusScore(model, presetName) {
   const raw = vals.reduce((a, b) => a + b, 0) / vals.length;
   const coverage = vals.length / expected;
   const policy = getCompositePolicy();
-  const expo = policy.coverageShrinkageExponent > 0 ? policy.coverageShrinkageExponent : 2;
+  const expo = shrinkExponent(policy);
   return raw * Math.pow(coverage, 1 / expo);
 }
 
@@ -191,7 +198,7 @@ export function crossValidationAgreement(model, allModels, weights, presetName) 
 // compositeScoreImputed (EB shrinkage for missing imputable cells,
 // capped by maxImputedWeightShare). Vendor consensus path unaffected.
 export function effectiveScore(model, weights, presetName) {
-  const fn = State.scoreFn || 'aicm';
+  const fn = State.scoreFn || DEFAULT_SCORE_FN;
   if (fn === 'vendorConsensus') return vendorConsensusScore(model, presetName || State.activePresetName);
   const policy = getCompositePolicy();
   if (policy.imputationEnabled) {
@@ -329,8 +336,8 @@ function ebTransform(realMean, observedWeight, activeWeight, priorMean, ebCfg) {
 // were imputed (so UI can show the "estimated" badge).
 export function compositeScoreImputed(model, weights, allModels, presetName) {
   const policy = getCompositePolicy();
-  const tiers = getPresetTiers(presetName || State.activePresetName || 'balanced');
-  const expo = policy.coverageShrinkageExponent > 0 ? policy.coverageShrinkageExponent : 2;
+  const tiers = getPresetTiers(presetName || State.activePresetName || DEFAULT_PRESET);
+  const expo = shrinkExponent(policy);
   const quarantined = quarantinedBenches(model);
   let observedWeight = 0, activeWeight = 0, weightedSum = 0;
   const imputedKeys = [];
@@ -370,7 +377,7 @@ export function compositeScoreImputed(model, weights, allModels, presetName) {
 export function compositeUncertainty(model, weights, allModels, presetName) {
   const policy = getCompositePolicy();
   const u = policy.uncertainty;
-  const expo = policy.coverageShrinkageExponent > 0 ? policy.coverageShrinkageExponent : 2;
+  const expo = shrinkExponent(policy);
   const quarantined = quarantinedBenches(model);
   let observedWeight = 0, activeWeight = 0, weightedSum = 0;
   let varAccum = 0, coveredCells = 0, sourcedCells = 0;

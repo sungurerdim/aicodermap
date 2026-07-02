@@ -191,13 +191,41 @@ export function getPresets() {
   return PRESETS;
 }
 
-export function getDefaultWeights() {
-  // Default weights = balanced preset's atomic weights when schema present.
-  const sp = State.schema && State.schema.presets;
-  if (sp && sp.balanced && sp.balanced.atomicWeights) {
-    return { ...sp.balanced.atomicWeights };
+// Fallback identity constants — the "no explicit choice yet" defaults every
+// consumer previously spelled as inline `|| 'balanced'` / `|| 'aicm'` literals.
+export const DEFAULT_PRESET = 'balanced';
+export const DEFAULT_SCORE_FN = 'aicm';
+
+// Canonical preset detector: returns the registered preset name whose atomic
+// weights exactly match `weights`, else 'custom'. Walks schema-driven presets
+// first (authoritative), then the literal PRESETS fallback. The sum≈100 check
+// is a fast-path only — every registered preset sums to 100 by contract.
+// SSOT — was duplicated in render-controls.js + url-state.js (presetOf).
+export function detectMatchingPreset(weights) {
+  if (!weights) return 'custom';
+  const sum = Object.values(weights).reduce((a, b) => a + (b || 0), 0);
+  if (Math.abs(sum - 100) > 0.01) return 'custom';
+  for (const src of [getPresets(), PRESETS]) {
+    if (!src) continue;
+    for (const [name, preset] of Object.entries(src)) {
+      if (name.startsWith('_')) continue;
+      if (preset && preset.__kind === 'vendorConsensus') continue;
+      if (BENCH_KEYS.every((k) => (weights[k] || 0) === (preset[k] || 0))) return name;
+    }
   }
-  return { ...DEFAULT_WEIGHTS };
+  return 'custom';
+}
+
+// Page-load cache-bust token. GitHub Pages CDN respects Cache-Control no-cache
+// inconsistently; appending ?v=<token> guarantees a fresh asset each load even
+// when the CDN holds a long-TTL copy. main.js sets window.__ACM_CACHE_BUST__
+// before data fetch; if missing (e.g. smoke.html harness), fall back to module
+// import time. SSOT — was duplicated in data.js + i18n.js.
+const FALLBACK_BUST = String(Date.now());
+export function cacheBustUrl(name, base) {
+  const bust = (typeof window !== 'undefined' && window.__ACM_CACHE_BUST__)
+    || FALLBACK_BUST;
+  return new URL(`${name}?v=${encodeURIComponent(bust)}`, base);
 }
 
 export function getContradictionThresholds() {
@@ -220,7 +248,6 @@ export function getBenchKind(key) {
   return 'atomic';
 }
 
-export function isAtomicBench(key) { return getBenchKind(key) === 'atomic'; }
 export function isVendorComposite(key) { return getBenchKind(key) === 'vendorComposite'; }
 
 export function getVendorCompositeMeta(key) {
@@ -292,9 +319,6 @@ export function getPresetTiers(presetName) {
     vendorView: Array.isArray(def?.vendorCompositeView) ? def.vendorCompositeView : [],
   };
 }
-
-export const CONTRADICTION_WARN = 3.0;
-export const CONTRADICTION_BLOCK = 5.0;
 
 export const TIER_ORDER = { 'frontier': 0, 'open-flagship': 1, 'coder-specialized': 2, 'gemma': 3, 'ollama-local': 4 };
 

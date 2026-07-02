@@ -19,15 +19,14 @@
 //   theme       — dark | light
 
 import {
-  State, BENCH_KEYS, PRESETS, getPresets, validateWeights,
+  State, BENCH_KEYS, PRESETS, TIER_ORDER, validateWeights, detectMatchingPreset,
 } from './core.js';
 
-const VALID_PRESETS = new Set([
-  'consensus', 'balanced', 'swe-focused', 'agentic-focused', 'reasoning-focused', 'benchmark-only', 'custom',
-]);
-const VALID_TIERS = new Set([
-  'all', 'frontier', 'open-flagship', 'coder-specialized', 'gemma', 'ollama-local',
-]);
+// Derived from the core registries so a new preset/tier is shareable without
+// touching this codec. 'consensus' is schema-only (no literal atomic weights)
+// and 'custom' is the detector's fallback — both stay explicit.
+const VALID_PRESETS = new Set(['consensus', 'custom', ...Object.keys(PRESETS)]);
+const VALID_TIERS = new Set(['all', ...Object.keys(TIER_ORDER)]);
 const VALID_DEPLOY = new Set(['all', 'cloud', 'local']);
 const VALID_THEME = new Set(['dark', 'light']);
 const VALID_LANG = new Set(['tr', 'en']);
@@ -133,25 +132,6 @@ export function applyUrlState(urlState) {
   // preset requires the preset registry; both happen in main.js after this).
 }
 
-function presetOf(weights) {
-  // Returns the preset name when current weights exactly match a registered
-  // preset; otherwise 'custom'. Walks schema-driven presets first (the
-  // authoritative source), then the literal PRESETS fallback — mirrors
-  // render-controls.js:detectMatchingPreset without importing the render layer.
-  if (!weights) return 'custom';
-  const sum = Object.values(weights).reduce((a, b) => a + (b || 0), 0);
-  if (Math.abs(sum - 100) > 0.01) return 'custom';
-  for (const src of [getPresets(), PRESETS]) {
-    if (!src) continue;
-    for (const [name, preset] of Object.entries(src)) {
-      if (name.startsWith('_')) continue;
-      if (preset && preset.__kind === 'vendorConsensus') continue;
-      if (BENCH_KEYS.every((k) => (weights[k] || 0) === (preset[k] || 0))) return name;
-    }
-  }
-  return 'custom';
-}
-
 export function buildShareUrl({ theme } = {}) {
   // theme: optional explicit theme to embed (defaults to current document theme)
   const params = new URLSearchParams();
@@ -162,7 +142,7 @@ export function buildShareUrl({ theme } = {}) {
   // can't detect it — branch on the active score function instead.
   const presetName = (State.scoreFn === 'vendorConsensus' && State.activePresetName)
     ? State.activePresetName
-    : presetOf(State.weights);
+    : detectMatchingPreset(State.weights);
   params.set('preset', presetName);
   if (presetName === 'custom') {
     const wStr = serializeWeights(State.weights);

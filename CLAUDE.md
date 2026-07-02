@@ -24,7 +24,7 @@
 aicodermap/
 ├── index.html              # Main page (structure + interactive UI)
 ├── assets/
-│   ├── js/                 # ES modules (browser-loaded, no build) — 17 files
+│   ├── js/                 # ES modules (browser-loaded, no build) — 18 files
 │   │   ├── main.js         # bootstrap entry (split-phase init)
 │   │   ├── core.js         # State + constants + STORAGE + schema validation
 │   │   ├── i18n.js         # t() + applyI18n + loadI18n
@@ -38,6 +38,7 @@ aicodermap/
 │   │   ├── sources.js      # provenance lookup + contradiction tier hand-off
 │   │   ├── url-state.js    # URL ⇄ state codec (deep-link share + restore)
 │   │   ├── render-controls.js  # weights editor + theme/lang sync
+│   │   ├── render-shared.js    # builders shared by card + table (flag, ±σ, coverage, last-updated)
 │   │   ├── render-card.js  # buildModelCard (split into 9 sub-builders)
 │   │   ├── render-table.js # comparison table + model list + renderAll
 │   │   ├── render-privacy.js   # privacy & compliance section table
@@ -150,7 +151,7 @@ Data: public model data + localStorage prefs (no PII) | Regulations: none
 Audience: public | Deploy: GitHub Pages (main branch)
 
 Entry: index.html + assets/js/main.js (split-phase bootstrap)
-Modules: assets/js=UI/scoring/data(17); scripts=data pipeline + lib(SSOT); ds/tune=eval harness
+Modules: assets/js=UI/scoring/data(18); scripts=data pipeline + lib(SSOT); ds/tune=eval harness
 Data Flow: /aicodermap → research-agent → gather/synth → merge.py → data/*.json → GitHub Pages → browser
 External: html2canvas(vendored, SRI); api.github.com(staleness banner); WebGPU(GPU detect)
 Toolchain: node --check + ruff + regex-lint | CI: none (manual discipline) | Container: none

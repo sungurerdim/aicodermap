@@ -2,7 +2,9 @@
 // freshness, contradiction, per-cell confidence). Pure scoring math lives in
 // scoring.js; display formatters live in format.js.
 
-import { State, BENCH_KEYS, getContradictionThresholds, validateModels } from './core.js';
+import {
+  State, BENCH_KEYS, getContradictionThresholds, validateModels, cacheBustUrl,
+} from './core.js';
 
 // Resolve data URLs against this module's location so loadData() works whether
 // the caller is index.html (project root) or assets/test/smoke.html (deeper).
@@ -10,16 +12,8 @@ import { State, BENCH_KEYS, getContradictionThresholds, validateModels } from '.
 // .../data/.
 const DATA_BASE = new URL('../../data/', import.meta.url);
 
-// Page-load cache-bust token. GitHub Pages CDN respects Cache-Control no-cache
-// inconsistently; appending ?v=<timestamp> guarantees a fresh asset each load
-// even when the CDN holds a long-TTL copy. main.js sets State.cacheBust before
-// data fetch; if missing (e.g. smoke.html harness), fall back to import time.
-const FALLBACK_BUST = String(Date.now());
-
 export async function fetchJson(name) {
-  const bust = (typeof window !== 'undefined' && window.__ACM_CACHE_BUST__)
-    || FALLBACK_BUST;
-  const url = new URL(`${name}?v=${encodeURIComponent(bust)}`, DATA_BASE);
+  const url = cacheBustUrl(name, DATA_BASE);
   const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error(`${name} ${res.status}`);
   // models.json's response headers fingerprint the served deploy:
