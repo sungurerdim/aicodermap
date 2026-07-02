@@ -151,6 +151,14 @@ function cardHead(model, rank) {
     head.appendChild(el('span', { class: 'archived-badge', title: 'Archived' },
       t('ui.archived') || 'ARCHIVED'));
   }
+  if (model.benchMirroredFrom) {
+    // Serving-speed variant: identical weights + precision to the base, so its
+    // benchmark scores are the base's (mirrored, not independently measured).
+    const tip = (t('ui.benchMirror.tip') || 'Identical weights to {base} — a serving-speed variant; benchmark scores are mirrored from it.')
+      .replace('{base}', model.benchMirroredFrom);
+    head.appendChild(el('span', { class: 'mirror-badge', title: tip },
+      t('ui.benchMirror.badge') || 'MIRRORED SCORES'));
+  }
   return head;
 }
 

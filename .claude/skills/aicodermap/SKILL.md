@@ -130,6 +130,17 @@ PRELIM-G. AA_STRUCTURED_EXTRACT (2026-05-31) — deterministic Artificial Analys
          like an agent's gather output, deterministic + I-tier.
    - Why FIRST (before gather): agents read `_aa-rows.json` as confirmed I-tier
      rows; synth consumes the gather artifact. Cuts wasted AA WebFetch budget.
+   - **RE-RUN after Step 0 new-model admission (HARD, 2026-07-02).** The extractor
+     resolves AA slugs → our ids by exact match against `data/models.json`. A model
+     admitted THIS cycle in Step 0 is NOT in models.json when PRELIM-G first runs,
+     so its AA rows (`aaCoding`/`aaAgentic` — the indices AA is the sole publisher
+     of, hence unfindable elsewhere) are silently skipped and the fresh model ships
+     its first cycle without them (observed: claude-sonnet-5, 2026-07-02). Therefore
+     the orchestrator runs `extract-aa-rsc.py` a SECOND time immediately after
+     `add-new-lineup-stubs.py` (PRE-GATHER admission), before the gather dispatch,
+     so newly-admitted ids are matched and their AA sub-indices flow through
+     `apply-aa-authoritative` the same run. Idempotent + cheap (re-parses the same
+     cached RSC); a no-new-model cycle re-runs it to the same result.
    - Non-fatal. Opt-out via `AICODERMAP_NO_AA=1`. If AA changes its RSC format
      the script emits `parsed 0` + exits 1 (logged, CONTINUE — agents fall back
      to live WebFetch as before).

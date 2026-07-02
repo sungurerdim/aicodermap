@@ -70,6 +70,27 @@ export async function loadData() {
     fetchJson('sources-whitelist.json').catch(() => null),
   ]);
   State.models = validateModels(models);
+  // Serving-speed variants (byte-for-byte identical weights + precision to a
+  // base model, e.g. kimi-k2-7-code-highspeed) carry NO independent bench
+  // measurements in storage (SSOT). Their benchmark QUALITY scores are the
+  // base's by construction, so mirror them at load. State.benchMirror lets
+  // cellConfidence()/contradiction lookups redirect to the base id so a mirror
+  // scores identically to its base instead of falling back to the neutral
+  // no-provenance confidence. matrix.active_models excludes them from research.
+  State.benchMirror = {};
+  {
+    const byId = new Map(State.models.map((m) => [m.id, m]));
+    for (const m of State.models) {
+      const baseId = m.benchMirrorOf;
+      if (!baseId) continue;
+      const base = byId.get(baseId);
+      if (!base || !base.bench || typeof base.bench !== 'object') continue;
+      m.bench = { ...base.bench };
+      if (m.benchUpdated == null && base.benchUpdated) m.benchUpdated = base.benchUpdated;
+      m.benchMirroredFrom = baseId;
+      State.benchMirror[m.id] = baseId;
+    }
+  }
   if (gpu && typeof gpu === 'object') State.gpu = { ...State.gpu, ...gpu };
   if (meta && typeof meta === 'object') State.meta = meta;
   State.reliability = (reliability && typeof reliability === 'object')
@@ -260,7 +281,11 @@ function intraTierMaxDelta(contradiction) {
 // F1+F2 (2026-05-18): schema-driven. State.schema.confidence overrides
 // hardcoded constants when present; fallback values match prior behavior.
 export function cellConfidence(modelId, benchKey) {
-  const entries = State.sources[`${modelId}.${benchKey}`];
+  // A bench-mirror (serving-speed variant) has no provenance under its own id;
+  // resolve to the base model so it inherits the base's confidence + any
+  // contradiction penalty rather than defaulting to neutral 1.0.
+  const realId = (State.benchMirror && State.benchMirror[modelId]) || modelId;
+  const entries = State.sources[`${realId}.${benchKey}`];
   if (!Array.isArray(entries) || !entries.length) return 1.0;
   const cfg = (State.schema && State.schema.confidence) || {};
   const verifDivisor = Number(cfg.verifDivisor) || 3;
@@ -286,7 +311,7 @@ export function cellConfidence(modelId, benchKey) {
   }
   const verif = Math.min((urls.size || 1) / verifDivisor, 1);
   const trust = maxTrust > 0 ? maxTrust : fallbackTrust;
-  const c = contradictionFor(modelId, benchKey);
+  const c = contradictionFor(realId, benchKey);
   const thr = getContradictionThresholds();
   let penalty = 0;
   if (c) {

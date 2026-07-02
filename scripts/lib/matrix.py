@@ -19,8 +19,19 @@ def active_models(models: list[dict[str, Any]]) -> list[dict[str, Any]]:
     but NEVER stripped. The frontend still RENDERS them (faded via .is-deprecated /
     .is-archived) from their last-known data; the matrix/dispatch/gap pipeline just
     stops surveying them so a retired model can't reopen gaps or consume fetch
-    budget. Storage retention vs. research universe are deliberately separate."""
-    return [m for m in models if (m.get("status") or "active") == "active"]
+    budget. Storage retention vs. research universe are deliberately separate.
+
+    Also EXCLUDED: `benchMirrorOf` models — a serving-speed variant with byte-for-byte
+    identical weights + precision to a base model (e.g. kimi-k2-7-code-highspeed).
+    Its benchmark QUALITY scores are identical to the base by construction, so the
+    frontend mirrors them at load; researching it separately would waste fetch
+    budget re-finding numbers that are definitionally the base's. Its own bench map
+    stays empty in storage (SSOT: it has no independent measurements)."""
+    return [
+        m
+        for m in models
+        if (m.get("status") or "active") == "active" and not m.get("benchMirrorOf")
+    ]
 
 
 def total_universe(
