@@ -178,9 +178,12 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    if hasattr(sys.stdout, "reconfigure"):
+    # Force UTF-8 stdout on Windows (cp1254 default mangles ✓/⚠). Accessed via
+    # getattr so the type checker doesn't flag reconfigure on the TextIO stub.
+    _reconfigure = getattr(sys.stdout, "reconfigure", None)
+    if callable(_reconfigure):
         try:
-            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+            _reconfigure(encoding="utf-8", errors="replace")
         except Exception:
             pass
     raise SystemExit(main())
