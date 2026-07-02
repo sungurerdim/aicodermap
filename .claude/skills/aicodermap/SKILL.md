@@ -742,7 +742,7 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10; TTL removed 2026-06-
     // into the existing artifact and adding gaps[] for all remaining unfilled cells.
     // This ensures merge.py MX1 invariant (filled+gaps+na == totalCells) always holds.
 
-    // gap-gen merge policy (in .aicodermap-gap-gen.py):
+    // gap-gen merge policy (in scripts/gap_gen.py):
     //   1. Read .aicodermap-agent-out.json (agent artifact, may not exist if agent looped)
     //   2. For each (active_model, bench_key):
     //      - If artifact has a fill for this cell → keep fill
@@ -968,7 +968,7 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10; TTL removed 2026-06-
     ```
     python scripts/refresh-finalize.py
     ```
-    Combines the previously-separate `gen_unified_artifact.py` + `.aicodermap-gap-gen.py` + `merge.py` calls into ONE process invocation, then runs `add-new-lineup-stubs.py` AFTER merge as the **SAFETY-NET** new-model admission (the PRIMARY admission already ran PRE-GATHER in Step 0 — see ORDERING CONTRACT; this post-merge pass only catches models first sighted mid-gather via `lineupHints`, and is idempotent on already-admitted ids). Each underlying script is unchanged (idempotent + same logic); the wrapper saves 2 redundant Python interpreter spawns + 2 file load/parse cycles. Failure of gen_unified/merge propagates exit code; merge.py's audit (SSOT coherence + MX1 invariant) still gates the commit. The stub-add step is non-fatal (a good merge is never undone). A model admitted PRE-GATHER (Step 0) is filled THIS run by Stage A; only a mid-gather-sighted model admitted by this safety-net pass lands with null bench cells (those fill next refresh — the no-defer contract covers lineup-discovered models, not models that surface only as an incidental gather sighting after dispatch). Use `--skip-merge` for dry-run preview (also skips stub-add).
+    Combines the previously-separate `gen_unified_artifact.py` + `scripts/gap_gen.py` + `merge.py` calls into ONE process invocation, then runs `add-new-lineup-stubs.py` AFTER merge as the **SAFETY-NET** new-model admission (the PRIMARY admission already ran PRE-GATHER in Step 0 — see ORDERING CONTRACT; this post-merge pass only catches models first sighted mid-gather via `lineupHints`, and is idempotent on already-admitted ids). Each underlying script is unchanged (idempotent + same logic); the wrapper saves 2 redundant Python interpreter spawns + 2 file load/parse cycles. Failure of gen_unified/merge propagates exit code; merge.py's audit (SSOT coherence + MX1 invariant) still gates the commit. The stub-add step is non-fatal (a good merge is never undone). A model admitted PRE-GATHER (Step 0) is filled THIS run by Stage A; only a mid-gather-sighted model admitted by this safety-net pass lands with null bench cells (those fill next refresh — the no-defer contract covers lineup-discovered models, not models that surface only as an incidental gather sighting after dispatch). Use `--skip-merge` for dry-run preview (also skips stub-add).
 
     Outputs (unchanged from per-script behavior):
     - data/models.json (multi-provider pricing array, subscription array, status field, full bench, ollama, unslothVariants, etc.)

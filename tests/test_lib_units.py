@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Unit tests for the previously-uncovered scripts/lib modules (TEST-01,
 2026-06-10): util, cluster, whitelist, matrix, dispatch, freshness,
-contracts, telemetry, idea_context.
+telemetry, idea_context.
 
 Stdlib unittest only (matches the rest of the project's test convention).
 
@@ -28,7 +28,6 @@ from lib import whitelist as wl  # noqa: E402
 from lib import matrix  # noqa: E402
 from lib import dispatch  # noqa: E402
 from lib.freshness import classify_cell, compute_skip_cells  # noqa: E402
-from lib.contracts import bench_delta_thresholds  # noqa: E402
 from lib.telemetry import aggregate_per_batch_telemetry  # noqa: E402
 from lib import idea_context  # noqa: E402
 
@@ -60,28 +59,8 @@ class TestUtil(unittest.TestCase):
         self.assertEqual(util.extract_domain("https://ollama.com"), "ollama.com")
         self.assertEqual(util.extract_domain(""), "")
 
-    def test_normalize_url_strips_trailing_slash_and_lowers_host(self):
-        self.assertEqual(
-            util.normalize_url("HTTPS://Example.COM/Path/"),
-            "https://example.com/Path",
-        )
-        self.assertEqual(util.normalize_url(""), "")
-
     def test_safe_json_load_default_on_missing(self):
         self.assertEqual(util.safe_json_load("Z:/nope/missing.json", default={}), {})
-
-    def test_ensure_list(self):
-        self.assertEqual(util.ensure_list(None), [])
-        self.assertEqual(util.ensure_list("x"), ["x"])
-        same = [1, 2]
-        self.assertIs(util.ensure_list(same), same)
-
-    def test_deep_merge_nested_and_non_mutating(self):
-        base = {"a": {"x": 1, "y": 2}, "b": 1}
-        override = {"a": {"y": 99}, "c": 3}
-        merged = util.deep_merge(base, override)
-        self.assertEqual(merged, {"a": {"x": 1, "y": 99}, "b": 1, "c": 3})
-        self.assertEqual(base["a"]["y"], 2)  # input untouched
 
     def test_parse_locale_decimal_variants(self):
         self.assertEqual(util.parse_locale_decimal("87.6"), 87.6)
@@ -452,28 +431,6 @@ class TestFreshness(unittest.TestCase):
         )
         self.assertIn("swePro", skip["alpha"])
         self.assertNotIn("cfElo", skip.get("alpha", {}))
-
-
-# ── contracts ────────────────────────────────────────────────────────────────
-
-
-class TestContracts(unittest.TestCase):
-    def test_schema_entry_overrides(self):
-        bt = {"swePro": {"scale": "percent", "warnDelta": 1.0, "blockDelta": 2.0}}
-        out = bench_delta_thresholds("swePro", bench_types=bt)
-        self.assertEqual((out["warnDelta"], out["blockDelta"]), (1.0, 2.0))
-        self.assertEqual(out["agreementPP"], 0.5)  # warn/2 heuristic
-
-    def test_builtin_elo_defaults(self):
-        out = bench_delta_thresholds("cfElo", bench_types={})
-        self.assertEqual(out["scale"], "elo")
-        self.assertEqual((out["warnDelta"], out["blockDelta"]), (25.0, 50.0))
-        self.assertIsNone(out["range"])
-
-    def test_global_fallback_for_unknown_key(self):
-        out = bench_delta_thresholds("totallyNewBench", bench_types={})
-        self.assertEqual((out["warnDelta"], out["blockDelta"]), (3.0, 5.0))
-        self.assertEqual(out["scale"], "percent")
 
 
 # ── telemetry ────────────────────────────────────────────────────────────────

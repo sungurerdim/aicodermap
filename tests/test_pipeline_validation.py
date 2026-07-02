@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Unit tests for the artifact-validation + merge-helper layer (TEST-01,
-2026-06-10): lib/gather_validator, lib/escalation, and merge.py's pure
-helpers (merge_pricing, append_source, apply_model_update, validate_gaps).
+2026-06-10): lib/gather_validator and merge.py's pure helpers
+(merge_pricing, append_source, apply_model_update, validate_gaps).
 
 Stdlib unittest only.
 
@@ -23,7 +23,6 @@ from pathlib import Path
 PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT / "scripts"))
 
-from lib.escalation import EscalationAction, classify_batch, classify_wave  # noqa: E402
 from lib.gather_validator import validate_gather, validate_gather_file  # noqa: E402
 
 # merge.py is a script, not a package module — load it by path once.
@@ -152,46 +151,6 @@ class TestValidateGather(unittest.TestCase):
                 p, self.TARGETS, cycle_started_unix=time.time() - 60
             )
             self.assertTrue(fresh["valid"], fresh["errors"])
-
-
-# ── escalation ───────────────────────────────────────────────────────────────
-
-
-class TestEscalation(unittest.TestCase):
-    SPEC = {"batchId": "batch00-acme", "modelIds": ["m1", "m2"]}
-
-    def test_zero_fill_escalates(self):
-        art = {"runtime": {"fills": 0, "cellsAttempted": 40}, "observations": []}
-        r = classify_batch(art, self.SPEC)
-        self.assertEqual(r["action"], EscalationAction.RETRY_SONNET)
-        self.assertIn("0-fill", r["reason"])
-
-    def test_weak_gather_escalates(self):
-        art = {"runtime": {"fills": 3}, "observations": [{}] * 3}  # avg 1.5 < 3
-        r = classify_batch(art, self.SPEC)
-        self.assertEqual(r["action"], EscalationAction.RETRY_SONNET)
-        self.assertIn("weak-gather", r["reason"])
-
-    def test_healthy_batch_passes(self):
-        art = {"runtime": {"fills": 8}, "observations": [{}] * 8}  # avg 4 ≥ 3
-        r = classify_batch(art, self.SPEC)
-        self.assertEqual(r["action"], EscalationAction.NONE)
-
-    def test_already_retried_never_loops(self):
-        art = {"_retry_attempted": True, "runtime": {"fills": 0}, "observations": []}
-        r = classify_batch(art, self.SPEC)
-        self.assertEqual(r["action"], EscalationAction.NONE)
-        self.assertIn("already retried", r["reason"])
-
-    def test_classify_wave_returns_only_escalations(self):
-        good = ({"runtime": {"fills": 8}, "observations": [{}] * 8}, self.SPEC)
-        bad = (
-            {"runtime": {"fills": 0, "cellsAttempted": 10}, "observations": []},
-            self.SPEC,
-        )
-        out = classify_wave([good, bad])
-        self.assertEqual(len(out), 1)
-        self.assertEqual(out[0]["action"], EscalationAction.RETRY_SONNET)
 
 
 # ── merge.py helpers ─────────────────────────────────────────────────────────

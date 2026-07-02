@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Unit tests for zero-coverage lib modules (TEST-02 B7, 2026-06-14):
-changelog, jsonschema_min, id_remap.
+changelog, jsonschema_min.
 
 Stdlib unittest only (matches the rest of the project's test convention).
 
@@ -11,9 +11,7 @@ Run:
 
 from __future__ import annotations
 
-import json
 import sys
-import tempfile
 import unittest
 from pathlib import Path
 
@@ -22,7 +20,6 @@ sys.path.insert(0, str(PROJECT / "scripts"))
 
 from lib.changelog import render_changelog_markdown  # noqa: E402
 from lib.jsonschema_min import validate  # noqa: E402
-from lib.id_remap import build_remap_table, fix_id, apply_remap_to_observations  # noqa: E402
 
 
 # ── changelog ────────────────────────────────────────────────────────────────
@@ -324,128 +321,6 @@ class TestJsonSchemaMinValidator(unittest.TestCase):
         }
         errors = validate({"meta": {"version": "not-an-int"}}, schema)
         self.assertTrue(any("expected type 'integer'" in e for e in errors))
-
-
-# ── id_remap ─────────────────────────────────────────────────────────────────
-
-
-class TestBuildRemapTable(unittest.TestCase):
-    def _write_cache(self, data: dict) -> Path:
-        """Write a JSON lineup cache to a temp file and return its Path."""
-        tmp = tempfile.NamedTemporaryFile(
-            mode="w", suffix=".json", delete=False, encoding="utf-8"
-        )
-        json.dump(data, tmp)
-        tmp.close()
-        return Path(tmp.name)
-
-    def test_empty_cache_returns_empty_table(self):
-        p = self._write_cache({})
-        remap = build_remap_table(cache_path=p)
-        self.assertEqual(remap, {})
-
-    def test_vendor_shape_renamed_entry(self):
-        data = {
-            "anthropic": {
-                "renamed": [{"from": "claude-opus-4-5", "to": "claude-opus-4"}],
-                "discarded": [],
-            }
-        }
-        p = self._write_cache(data)
-        remap = build_remap_table(cache_path=p)
-        self.assertEqual(remap.get("claude-opus-4-5"), "claude-opus-4")
-
-    def test_vendor_shape_discarded_entry(self):
-        data = {
-            "openai": {
-                "renamed": [],
-                "discarded": ["gpt-5-rumour"],
-            }
-        }
-        p = self._write_cache(data)
-        remap = build_remap_table(cache_path=p)
-        self.assertIsNone(remap.get("gpt-5-rumour"))
-        self.assertIn("gpt-5-rumour", remap)
-
-    def test_flat_renamed_array_shape(self):
-        data = {
-            "renamed": [
-                {"from": "kimi-k2", "to": "kimi-k2-6"},
-            ]
-        }
-        p = self._write_cache(data)
-        remap = build_remap_table(cache_path=p)
-        self.assertEqual(remap.get("kimi-k2"), "kimi-k2-6")
-
-    def test_missing_cache_returns_empty_table(self):
-        remap = build_remap_table(cache_path="/nonexistent/path/lineup.json")
-        self.assertEqual(remap, {})
-
-    def test_malformed_cache_returns_empty_table(self):
-        tmp = tempfile.NamedTemporaryFile(
-            mode="w", suffix=".json", delete=False, encoding="utf-8"
-        )
-        tmp.write("not valid json {{{{")
-        tmp.close()
-        remap = build_remap_table(cache_path=Path(tmp.name))
-        self.assertEqual(remap, {})
-
-
-class TestFixId(unittest.TestCase):
-    def test_unknown_id_returned_unchanged(self):
-        remap = {"kimi-k2": "kimi-k2-6"}
-        self.assertEqual(fix_id("qwen3-235b-a22b", remap), "qwen3-235b-a22b")
-
-    def test_renamed_id_resolved(self):
-        remap = {"kimi-k2": "kimi-k2-6"}
-        self.assertEqual(fix_id("kimi-k2", remap), "kimi-k2-6")
-
-    def test_discarded_id_returns_none(self):
-        remap = {"gpt-5-rumour": None}
-        self.assertIsNone(fix_id("gpt-5-rumour", remap))
-
-    def test_no_remap_table_uses_empty_fallback(self):
-        # build_remap_table() returns {} when no cache exists on disk;
-        # fix_id with remap={} must return the id unchanged.
-        result = fix_id("claude-sonnet-4-6", {})
-        self.assertEqual(result, "claude-sonnet-4-6")
-
-
-class TestApplyRemapToObservations(unittest.TestCase):
-    def test_renamed_id_rewritten_in_obs(self):
-        remap = {"kimi-k2": "kimi-k2-6"}
-        obs = [{"modelId": "kimi-k2", "value": 72.3}]
-        out = apply_remap_to_observations(obs, remap)
-        self.assertEqual(len(out), 1)
-        self.assertEqual(out[0]["modelId"], "kimi-k2-6")
-
-    def test_discarded_id_dropped(self):
-        remap = {"gpt-5-rumour": None}
-        obs = [
-            {"modelId": "gpt-5-rumour", "value": 90.0},
-            {"modelId": "claude-opus-4", "value": 80.0},
-        ]
-        out = apply_remap_to_observations(obs, remap)
-        self.assertEqual(len(out), 1)
-        self.assertEqual(out[0]["modelId"], "claude-opus-4")
-
-    def test_unchanged_ids_pass_through(self):
-        remap: dict = {}
-        obs = [
-            {"modelId": "deepseek-v4-pro", "value": 65.1},
-            {"modelId": "gemini-2-5-pro", "value": 71.4},
-        ]
-        out = apply_remap_to_observations(obs, remap)
-        self.assertEqual(len(out), 2)
-        self.assertEqual(out[0]["modelId"], "deepseek-v4-pro")
-
-    def test_original_obs_dict_not_mutated(self):
-        remap = {"kimi-k2": "kimi-k2-6"}
-        original = {"modelId": "kimi-k2", "value": 72.3}
-        obs = [original]
-        apply_remap_to_observations(obs, remap)
-        # The original dict must be unchanged
-        self.assertEqual(original["modelId"], "kimi-k2")
 
 
 if __name__ == "__main__":

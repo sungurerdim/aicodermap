@@ -899,7 +899,7 @@
         "auto-resolution candidate",
         "synth-backfill"
       ],
-      "_pseudoSourcesNote": "These source names are non-evidentiary (extraction hints, not real provenance). Excluded from urls.size + trustScore aggregation. Same list also used by scripts/purge-pseudo-sources.py."
+      "_pseudoSourcesNote": "These source names are non-evidentiary (extraction hints, not real provenance). Excluded from urls.size + trustScore aggregation."
     },
     "benchKind": {
       "_purpose": "Classify each bench key. Atomic = single-test methodology, single publisher. VendorComposite = aggregate-of-benches by external publisher (their own weighting). AICoderMap composite uses ONLY atomic; vendor composites surface in cross-validation panel.",
