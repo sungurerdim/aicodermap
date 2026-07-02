@@ -22,21 +22,11 @@ import os
 import re
 import shutil
 import sys
-from datetime import date, datetime, timezone
 from pathlib import Path
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
-# Force UTF-8 stdout so non-ASCII chars (✗, —, ×, →, Δ) don't crash on Windows cp1254.
-if hasattr(sys.stdout, "reconfigure"):
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-if hasattr(sys.stderr, "reconfigure"):
-    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
-
 PROJECT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-TODAY = date.today().isoformat()
-NOW = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-ARTIFACT = f"{PROJECT}/.aicodermap-agent-out.json"
 WHITELIST = f"{PROJECT}/data/sources-whitelist.json"
 
 # Allow `from lib.whitelist import ...` when invoked from any cwd.
@@ -55,9 +45,12 @@ from lib.whitelist import hostname_index as _wl_hostname_index  # noqa: E402
 from lib.whitelist import load_whitelist as _wl_load  # noqa: E402
 from lib.constants import FORMAT_WEIGHTS as _FORMAT_WEIGHTS  # noqa: E402
 from lib.constants import VERIFICATION_AGREEMENT_PP as _AGREEMENT_PP  # noqa: E402
+from lib.constants import SINGLE_ARTIFACT_PATH, VERIFICATION_MAP_PATH  # noqa: E402
 from lib.tiers import TIER_RANK as _TIER_RANK  # noqa: E402
 from lib.tiers import TIER_WEIGHT as _TIER_WEIGHT  # noqa: E402
 from lib.util import canonical_display_name as _canonical_name  # noqa: E402
+from lib.cluster import _cluster_observations  # noqa: E402
+from lib.util import configure_utf8_output, today_iso, utc_now_iso, write_json  # noqa: E402
 from lib.util import extract_domain as _extract_domain  # noqa: E402
 from lib.changelog import render_changelog_markdown as _render_changelog  # noqa: E402
 from lib.telemetry import build_meta as _telemetry_build_meta  # noqa: E402
@@ -68,6 +61,12 @@ from lib.telemetry import (  # noqa: E402
     write_meta_and_history as _telemetry_write,
 )
 from lib import reliability as _reliability  # type: ignore  # noqa: E402
+
+configure_utf8_output()
+
+TODAY = today_iso()
+NOW = utc_now_iso()
+ARTIFACT = f"{PROJECT}/{SINGLE_ARTIFACT_PATH}"
 
 
 LEDGER_PATH = Path(PROJECT) / "data" / "source-reliability.json"
@@ -215,7 +214,7 @@ def _load_vmap(project: str) -> dict:
     or corrupt file returns a fresh `{"cells": {}}` so callers always get a
     consistent shape.
     """
-    vmap_path = Path(project) / ".aicodermap-verification-map.json"
+    vmap_path = Path(project) / VERIFICATION_MAP_PATH
     if vmap_path.exists():
         try:
             vmap = json.loads(vmap_path.read_text(encoding="utf-8"))
@@ -1101,6 +1100,209 @@ def _apply_model_updates(out, sources, models_by_id, wl_idx, unhealthy_urls, log
     # applies the evidence gate, and writes schema-complete stubs + i18n parity.
 
 
+# FAZ 6.B consensus-cluster gates: a cluster overrides the agent's argmax
+# winner only when it has ≥3 distinct sources, or ≥2 with enough summed trust.
+MIN_DISTINCT_SAFE = 3
+MIN_DISTINCT_PAIRED = 2
+MIN_SUM_TRUST_PAIRED = 1.5
+
+
+def _candidates_to_observations(candidates_list: list[dict]) -> list[dict]:
+    """Normalize contradiction candidates into lib.cluster observation shape,
+    deriving a tier×verifications trustScore when the agent omitted one."""
+    obs = []
+    tier_w = _TIER_WEIGHT  # SSOT: lib.tiers
+    for c_ in candidates_list:
+        if c_.get("value") is None:
+            continue
+        ts = c_.get("trustScore")
+        if ts is None:
+            tw = tier_w.get((c_.get("tier") or "C").upper(), 0.4)
+            v = max(1, min(int(c_.get("verifications") or 1), 3))
+            ts = round(tw * (v / 3), 3)
+        obs.append(
+            {
+                "value": float(c_["value"]),
+                "trustScore": float(ts),
+                "sourceUrl": c_.get("url") or "",
+                "tier": (c_.get("tier") or "C").upper(),
+                "fetched": c_.get("fetched") or c_.get("date") or "",
+                "_orig": c_,
+            }
+        )
+    return obs
+
+
+def _consensus_winner(
+    candidates_list: list[dict], fallback: dict | None
+) -> tuple[dict | None, str]:
+    """Return (winner, reason). When candidates form a stronger
+    cluster than `fallback` is part of, return cluster's winner.
+    Otherwise return fallback unchanged."""
+    obs = _candidates_to_observations(candidates_list)
+    if not obs:
+        return fallback, "no observations"
+    clusters = _cluster_observations(obs, _AGREEMENT_PP)
+    if not clusters:
+        return fallback, "no clusters"
+    best = clusters[0]
+    d = best["distinct_sources"]
+    s = best["sum_trust"]
+    gate_passed = d >= MIN_DISTINCT_SAFE or (
+        d >= MIN_DISTINCT_PAIRED and s >= MIN_SUM_TRUST_PAIRED
+    )
+    if not gate_passed:
+        return fallback, f"weak cluster d={d} s={s} — keep fallback"
+    cluster_winner = max(
+        best["members"],
+        key=lambda m: (m["trustScore"], m.get("fetched") or ""),
+    )
+    # If fallback's value is in this winning cluster, keep fallback.
+    if fallback is not None and fallback.get("value") is not None:
+        try:
+            if abs(float(fallback["value"]) - float(best["centroid"])) <= _AGREEMENT_PP:
+                return fallback, f"fallback in winning cluster (d={d}, s={s})"
+        except (TypeError, ValueError):
+            pass
+    return cluster_winner["_orig"], f"cluster d={d} s={s} overrode fallback"
+
+
+def _healthy_winner_for(c, unhealthy_urls, log):
+    """SPA-guard the candidate pool + agent winner for one contradiction entry,
+    then apply the FAZ 6.B consensus override. Returns
+    (winner, healthy_candidates, all_candidates); winner=None means skip."""
+    mid, bench_field = c["modelId"], c["field"]
+    winner = c.get("autoResolveWinner")
+    if winner is None:
+        return None, [], []
+    all_candidates = c.get("candidates") or []
+    # FAZ 6.A: drop unhealthy SPA-shell URLs from candidate pool.
+    healthy_candidates = [
+        cand
+        for cand in all_candidates
+        if not _is_unhealthy_source(cand, unhealthy_urls)
+        and cand.get("value") is not None
+    ]
+    if _is_unhealthy_source(winner, unhealthy_urls):
+        log["spa_guard_rejections"] += 1
+        if not healthy_candidates:
+            log["format_warnings"].append(
+                f"{mid}.{bench_field}: SPA-guard dropped winner; no healthy candidate — skipping"
+            )
+            return None, [], []
+        # Provisional fallback if cluster doesn't override.
+        tier_rank = _TIER_RANK  # SSOT: lib.tiers
+        winner = max(
+            healthy_candidates,
+            key=lambda x: (
+                float(x.get("trustScore") or 0),
+                tier_rank.get(x.get("tier") or "", 0),
+                str(x.get("fetched") or x.get("date") or ""),
+            ),
+        )
+    # FAZ 6.B: re-cluster + prefer multi-source consensus.
+    new_winner, reason = _consensus_winner(healthy_candidates, winner)
+    if new_winner is not winner and new_winner is not None:
+        log["format_warnings"].append(
+            f"{mid}.{bench_field}: consensus override — {reason}"
+        )
+        winner = new_winner
+    return winner, healthy_candidates, all_candidates
+
+
+def _store_winner_and_provenance(
+    c,
+    winner_value,
+    all_candidates,
+    models_by_id,
+    sources,
+    unhealthy_urls,
+    log,
+    bench_keys,
+):
+    """Write the resolved winner value to models[].bench and append every
+    healthy candidate to sources.json provenance (winner/loser tagged)."""
+    mid, bench_field = c["modelId"], c["field"]
+    m = models_by_id.get(mid)
+    if m is not None and bench_field in bench_keys:
+        if "bench" not in m:
+            m["bench"] = {}
+        if "benchUpdated" not in m or not isinstance(m.get("benchUpdated"), dict):
+            m["benchUpdated"] = {}
+        prev_value = m["bench"].get(bench_field)
+        m["bench"][bench_field] = winner_value
+        m["benchUpdated"][bench_field] = TODAY
+        if prev_value != winner_value:
+            m["lastUpdated"] = NOW
+    key = f"{mid}.{bench_field}"
+    for cand in all_candidates:
+        if _is_unhealthy_source(cand, unhealthy_urls):
+            # Drop unhealthy candidates entirely from provenance — keeps
+            # sources.json from re-accumulating SPA-shell entries.
+            log["spa_guard_rejections"] += 1
+            continue
+        append_source(
+            sources,
+            key,
+            {
+                "value": cand.get("value"),
+                "source": cand.get("source") or "auto-resolution candidate",
+                "url": cand.get("url"),
+                "date": cand.get("fetched") or TODAY,
+                "tier": cand.get("tier"),
+                "verifications": cand.get("verifications", 1),
+                "trustScore": cand.get("trustScore"),
+                "contradictionRole": "winner"
+                if cand.get("value") == winner_value
+                else "loser",
+            },
+        )
+        log["sources_appended"] += 1
+
+
+def _credit_candidate_reliability(
+    c, winner, healthy_candidates, reliability_ledger, contradicted_cells
+):
+    """R1: credit healthy candidates' reliability based on agreement with the
+    resolved winner. Only healthy (SPA-guard-filtered) candidates contribute
+    to the Beta-Binomial posterior."""
+    mid, bench_field = c["modelId"], c["field"]
+    winner_val_raw = winner.get("value") if isinstance(winner, dict) else None
+    if winner_val_raw is None:
+        return
+    try:
+        winner_val = float(winner_val_raw)
+    except (TypeError, ValueError):
+        return
+    contradicted_cells.add((mid, bench_field))
+    for cand in healthy_candidates:
+        cand_url = cand.get("url")
+        if not cand_url:
+            continue
+        try:
+            cand_val = float(cand.get("value"))
+        except (TypeError, ValueError):
+            continue
+        agreed = abs(cand_val - winner_val) <= _AGREEMENT_PP
+        _reliability.update_reliability(
+            reliability_ledger,
+            cand_url,
+            bench_field,
+            agreed,
+            TODAY,
+        )
+
+
+def _load_decayed_reliability_ledger():
+    """R1 (Source Reliability v2): load + decay the per-(source, bench) ledger
+    at cycle start. Phase R1 is BEHAVIOR-NEUTRAL — the multiplier is not yet
+    wired into trust_score (that happens in Phase R3); we only populate the
+    ledger here so the Bayesian posterior accumulates across cycles."""
+    reliability_ledger = _reliability.load_ledger(LEDGER_PATH)
+    _reliability.decay_counters(reliability_ledger, TODAY)
+    return reliability_ledger
+
+
 def _resolve_contradictions(out, models, sources, models_by_id, unhealthy_urls, log):
     """FAZ 6.B contradiction auto-resolution + R1 source-reliability crediting.
 
@@ -1109,190 +1311,37 @@ def _resolve_contradictions(out, models, sources, models_by_id, unhealthy_urls, 
     sources.json provenance, and accumulates the Beta-Binomial reliability
     posterior (contradictions loop + GREEN-cell sweep). Returns the loaded +
     decayed reliability ledger so the caller can persist it after writes."""
-    BENCH_KEYS = _load_bench_key_universe()
-    # FAZ 6.B (2026-05-10): cluster-consensus winner override. The agent
-    # may emit autoResolveWinner per single-argmax trustScore, which lets
-    # a high-tier outlier override multi-source consensus. Re-cluster the
-    # candidates here and prefer the cluster with max sum(trustScore).
-    sys.path.insert(0, f"{PROJECT}/scripts")
-    from lib.cluster import _cluster_observations  # noqa: E402
-
-    AGREEMENT_PP = _AGREEMENT_PP  # SSOT: lib.constants
-    MIN_DISTINCT_SAFE = 3
-    MIN_DISTINCT_PAIRED = 2
-    MIN_SUM_TRUST_PAIRED = 1.5
-
-    def _consensus_winner(
-        candidates_list: list[dict], fallback: dict | None
-    ) -> tuple[dict | None, str]:
-        """Return (winner, reason). When candidates form a stronger
-        cluster than `fallback` is part of, return cluster's winner.
-        Otherwise return fallback unchanged."""
-        obs = []
-        tier_w = _TIER_WEIGHT  # SSOT: lib.tiers
-        for c_ in candidates_list:
-            if c_.get("value") is None:
-                continue
-            ts = c_.get("trustScore")
-            if ts is None:
-                tw = tier_w.get((c_.get("tier") or "C").upper(), 0.4)
-                v = max(1, min(int(c_.get("verifications") or 1), 3))
-                ts = round(tw * (v / 3), 3)
-            obs.append(
-                {
-                    "value": float(c_["value"]),
-                    "trustScore": float(ts),
-                    "sourceUrl": c_.get("url") or "",
-                    "tier": (c_.get("tier") or "C").upper(),
-                    "fetched": c_.get("fetched") or c_.get("date") or "",
-                    "_orig": c_,
-                }
-            )
-        if not obs:
-            return fallback, "no observations"
-        clusters = _cluster_observations(obs, AGREEMENT_PP)
-        if not clusters:
-            return fallback, "no clusters"
-        best = clusters[0]
-        d = best["distinct_sources"]
-        s = best["sum_trust"]
-        gate_passed = d >= MIN_DISTINCT_SAFE or (
-            d >= MIN_DISTINCT_PAIRED and s >= MIN_SUM_TRUST_PAIRED
-        )
-        if not gate_passed:
-            return fallback, f"weak cluster d={d} s={s} — keep fallback"
-        cluster_winner = max(
-            best["members"],
-            key=lambda m: (m["trustScore"], m.get("fetched") or ""),
-        )
-        # If fallback's value is in this winning cluster, keep fallback.
-        if fallback is not None and fallback.get("value") is not None:
-            try:
-                if (
-                    abs(float(fallback["value"]) - float(best["centroid"]))
-                    <= AGREEMENT_PP
-                ):
-                    return fallback, f"fallback in winning cluster (d={d}, s={s})"
-            except (TypeError, ValueError):
-                pass
-        return cluster_winner["_orig"], f"cluster d={d} s={s} overrode fallback"
-
-    # R1 (Source Reliability v2): load + decay the per-(source, bench) ledger
-    # at cycle start. Phase R1 is BEHAVIOR-NEUTRAL — the multiplier is not yet
-    # wired into trust_score (that happens in Phase R3); we only populate the
-    # ledger here so the Bayesian posterior accumulates across cycles.
-    reliability_ledger = _reliability.load_ledger(LEDGER_PATH)
-    _reliability.decay_counters(reliability_ledger, TODAY)
+    bench_keys = _load_bench_key_universe()
+    reliability_ledger = _load_decayed_reliability_ledger()
     # Track (modelId, benchKey) pairs processed by the contradictions loop so
     # the GREEN-cell sweep below does not double-credit the same observations.
-    _contradicted_cells: set[tuple[str, str]] = set()
+    contradicted_cells: set[tuple[str, str]] = set()
 
     for c in out.get("contradictions", []) or []:
-        mid = c["modelId"]
         # Agent contract: `field` is the bare bench key, `autoResolveWinner` is
         # the wrapped {value, trustScore, sourceUrl, tier} dict — Storage extracts
         # `.value` for models.json, full dict goes into sources.json provenance.
-        bench_field = c["field"]
-        winner = c.get("autoResolveWinner")
+        winner, healthy_candidates, all_candidates = _healthy_winner_for(
+            c, unhealthy_urls, log
+        )
         if winner is None:
             continue
-        all_candidates = c.get("candidates") or []
-        # FAZ 6.A: drop unhealthy SPA-shell URLs from candidate pool.
-        healthy_candidates = [
-            cand
-            for cand in all_candidates
-            if not _is_unhealthy_source(cand, unhealthy_urls)
-            and cand.get("value") is not None
-        ]
-        if _is_unhealthy_source(winner, unhealthy_urls):
-            log["spa_guard_rejections"] += 1
-            if not healthy_candidates:
-                log["format_warnings"].append(
-                    f"{mid}.{bench_field}: SPA-guard dropped winner; no healthy candidate — skipping"
-                )
-                continue
-            # Provisional fallback if cluster doesn't override.
-            tier_rank = _TIER_RANK  # SSOT: lib.tiers
-            winner = max(
-                healthy_candidates,
-                key=lambda x: (
-                    float(x.get("trustScore") or 0),
-                    tier_rank.get(x.get("tier") or "", 0),
-                    str(x.get("fetched") or x.get("date") or ""),
-                ),
-            )
-        # FAZ 6.B: re-cluster + prefer multi-source consensus.
-        new_winner, reason = _consensus_winner(healthy_candidates, winner)
-        if new_winner is not winner and new_winner is not None:
-            log["format_warnings"].append(
-                f"{mid}.{bench_field}: consensus override — {reason}"
-            )
-            winner = new_winner
-        winner_value = winner["value"]
-        m = models_by_id.get(mid)
-        if m is not None and bench_field in BENCH_KEYS:
-            if "bench" not in m:
-                m["bench"] = {}
-            if "benchUpdated" not in m or not isinstance(m.get("benchUpdated"), dict):
-                m["benchUpdated"] = {}
-            prev_value = m["bench"].get(bench_field)
-            m["bench"][bench_field] = winner_value
-            m["benchUpdated"][bench_field] = TODAY
-            if prev_value != winner_value:
-                m["lastUpdated"] = NOW
-        key = f"{mid}.{bench_field}"
-        for cand in all_candidates:
-            if _is_unhealthy_source(cand, unhealthy_urls):
-                # Drop unhealthy candidates entirely from provenance — keeps
-                # sources.json from re-accumulating SPA-shell entries.
-                log["spa_guard_rejections"] += 1
-                continue
-            append_source(
-                sources,
-                key,
-                {
-                    "value": cand.get("value"),
-                    "source": cand.get("source") or "auto-resolution candidate",
-                    "url": cand.get("url"),
-                    "date": cand.get("fetched") or TODAY,
-                    "tier": cand.get("tier"),
-                    "verifications": cand.get("verifications", 1),
-                    "trustScore": cand.get("trustScore"),
-                    "contradictionRole": "winner"
-                    if cand.get("value") == winner_value
-                    else "loser",
-                },
-            )
-            log["sources_appended"] += 1
-        # R1: credit healthy candidates' reliability based on agreement with
-        # the resolved winner. Only healthy_candidates (SPA-guard-filtered)
-        # contribute to the Beta-Binomial posterior.
-        _winner_val_raw = winner.get("value") if isinstance(winner, dict) else None
-        if _winner_val_raw is not None:
-            try:
-                _winner_val = float(_winner_val_raw)
-            except (TypeError, ValueError):
-                _winner_val = None
-            if _winner_val is not None:
-                _contradicted_cells.add((mid, bench_field))
-                for cand in healthy_candidates:
-                    cand_url = cand.get("url")
-                    if not cand_url:
-                        continue
-                    try:
-                        cand_val = float(cand.get("value"))
-                    except (TypeError, ValueError):
-                        continue
-                    agreed = abs(cand_val - _winner_val) <= AGREEMENT_PP
-                    _reliability.update_reliability(
-                        reliability_ledger,
-                        cand_url,
-                        bench_field,
-                        agreed,
-                        TODAY,
-                    )
+        _store_winner_and_provenance(
+            c,
+            winner["value"],
+            all_candidates,
+            models_by_id,
+            sources,
+            unhealthy_urls,
+            log,
+            bench_keys,
+        )
+        _credit_candidate_reliability(
+            c, winner, healthy_candidates, reliability_ledger, contradicted_cells
+        )
         log["contradictions"].append(
-            f"{key}: winner={winner} (severity={c.get('severity') or 'GREEN'}, Δ{c.get('delta')})"
+            f"{c['modelId']}.{c['field']}: winner={winner} "
+            f"(severity={c.get('severity') or 'GREEN'}, Δ{c.get('delta')})"
         )
 
     # R1: GREEN-cell sweep — credit non-contradicted cells where >=2 fresh
@@ -1300,7 +1349,7 @@ def _resolve_contradictions(out, models, sources, models_by_id, unhealthy_urls, 
     # processed by the contradictions loop. Historical entries (date != TODAY)
     # never get re-credited; they were tallied in their original cycle.
     _green_cell_reliability_sweep(
-        sources, _contradicted_cells, AGREEMENT_PP, reliability_ledger, TODAY
+        sources, contradicted_cells, _AGREEMENT_PP, reliability_ledger, TODAY
     )
     return reliability_ledger
 
@@ -1329,7 +1378,7 @@ def _finalize_and_write(
         cycle_id=TODAY,
         reliability_ledger=reliability_ledger,
     )
-    vmap_path = Path(PROJECT) / ".aicodermap-verification-map.json"
+    vmap_path = Path(PROJECT) / VERIFICATION_MAP_PATH
     vmap_path.write_text(
         json.dumps(vmap_updated, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
@@ -1359,22 +1408,15 @@ def _finalize_and_write(
         if m.get("status") not in (None, "active", "deprecated", "archived"):
             issues.append(f"{m['id']}: invalid status {m.get('status')}")
 
-    with open(models_path, "w", encoding="utf-8") as fp:
-        json.dump(models, fp, indent=2, ensure_ascii=False)
-        fp.write("\n")
-    with open(sources_path, "w", encoding="utf-8") as fp:
-        json.dump(sources, fp, indent=2, ensure_ascii=False)
-        fp.write("\n")
+    write_json(models_path, models)
+    write_json(sources_path, sources)
     # R1: persist the source-reliability ledger after sources.json is on disk.
     _reliability.save_ledger(LEDGER_PATH, reliability_ledger)
     return issues
 
 
-def _run_post_write_gates_and_changelog(
-    out, models, models_path, sources_path, log, issues
-):
-    """Coverage warnings + MX1/MX2 invariant gates + post-write audits +
-    telemetry + CHANGELOG write + final summary print."""
+def _coverage_warning(out):
+    """Cumulative provenance coverage advisory. Returns (warn_str, cov_pct)."""
     coverage = out.get("validationCoverage", 0)
     cov_pct = round(coverage * 100, 1)
     coverage_warn = ""
@@ -1384,13 +1426,12 @@ def _run_post_write_gates_and_changelog(
         coverage_warn = (
             f" [WARN: cumulative provenance coverage {cov_pct}% below 85% target]"
         )
+    return coverage_warn, cov_pct
 
-    # MX1 — Cell-level matrix invariant (HARD BLOCK, no override).
-    # Every (active_modelId, coreBenchKey) cell must end up in exactly one
-    # of FILLED | GAP | NOT_APPLICABLE. Silent omission = contract violation.
-    contracts_block = _wl_contracts(_wl_cached())
+
+def _matrix_warning(invariant_ok, mx_diag, matrix):
+    """Build the MX1 warn string + the missing-coverageMatrix advisory."""
     matrix_warn = ""
-    invariant_ok, mx_diag = _verify_matrix_invariant(models, out)
     if not invariant_ok:
         missing = mx_diag.get("missing") or []
         overlap = mx_diag.get("overlap") or {}
@@ -1405,116 +1446,106 @@ def _run_post_write_gates_and_changelog(
             if items:
                 msg_parts.append(f"{okey}={len(items)}")
         matrix_warn = " [MX1: matrix invariant violated — " + "; ".join(msg_parts) + "]"
-
     # Surface the agent's self-reported coverageMatrix (informational; the
     # canonical truth is the recomputed mx_diag above).
-    matrix = out.get("coverageMatrix")
     if not isinstance(matrix, dict):
         matrix_warn = (
             (matrix_warn + " [WARN: artifact missing coverageMatrix]")
             if matrix_warn
             else " [WARN: artifact missing coverageMatrix; agent skipped self-audit]"
         )
+    return matrix_warn
 
-    if matrix_warn:
-        coverage_warn = (coverage_warn + matrix_warn) if coverage_warn else matrix_warn
 
-    # MX1 HARD BLOCK gate.
-    if not invariant_ok:
-        rolled = restore_from_bak([models_path, sources_path])
-        print("\n" + "=" * 72, file=sys.stderr)
-        print("✗ MERGE ABORTED — MX1 matrix invariant violated", file=sys.stderr)
-        print("=" * 72, file=sys.stderr)
+def _abort_mx1(mx_diag, models_path, sources_path):
+    """MX1 HARD BLOCK: roll back the write, print the abort block, exit 1."""
+    rolled = restore_from_bak([models_path, sources_path])
+    print("\n" + "=" * 72, file=sys.stderr)
+    print("✗ MERGE ABORTED — MX1 matrix invariant violated", file=sys.stderr)
+    print("=" * 72, file=sys.stderr)
+    print(
+        "  filled+gaps does NOT cover the (active × core_bench) "
+        "universe. Silent omission is a contract violation.",
+        file=sys.stderr,
+    )
+    print(
+        f"  totalCells={mx_diag.get('totalCells')} "
+        f"filled={mx_diag.get('filled')} "
+        f"gaps={mx_diag.get('gaps')} "
+        f"missing={len(mx_diag.get('missing') or [])}",
+        file=sys.stderr,
+    )
+    if mx_diag.get("missing"):
+        print("  missing cells (first 10):", file=sys.stderr)
+        for m, b in (mx_diag.get("missing") or [])[:10]:
+            print(f"    - {m}.{b}", file=sys.stderr)
+    if rolled:
+        print(f"  rolled back {len(rolled)} file(s) from .bak", file=sys.stderr)
+    print(
+        "  fix the artifact: every missing cell must land in models[].bench "
+        "or gaps[] (with triedSources/triedQueries/triedFormats).",
+        file=sys.stderr,
+    )
+    print("=" * 72, file=sys.stderr)
+    sys.exit(1)
+
+
+def _abort_mx2(ratio, floor, mx_diag, models_path, sources_path):
+    """MX2 HARD BLOCK: roll back the write, print the abort block, exit 1."""
+    rolled = restore_from_bak([models_path, sources_path])
+    print("\n" + "=" * 72, file=sys.stderr)
+    print(
+        "✗ MERGE ABORTED — MX2 absolute coverage floor breached",
+        file=sys.stderr,
+    )
+    print("=" * 72, file=sys.stderr)
+    print(
+        f"  fill ratio {round(ratio * 100, 1)}% < floor "
+        f"{int(floor * 100)}% (filled={mx_diag.get('filled')}, "
+        f"total={mx_diag.get('totalCells')})",
+        file=sys.stderr,
+    )
+    if rolled:
         print(
-            "  filled+gaps does NOT cover the (active × core_bench) "
-            "universe. Silent omission is a contract violation.",
+            f"  rolled back {len(rolled)} file(s) from .bak",
             file=sys.stderr,
         )
-        print(
-            f"  totalCells={mx_diag.get('totalCells')} "
-            f"filled={mx_diag.get('filled')} "
-            f"gaps={mx_diag.get('gaps')} "
-            f"missing={len(mx_diag.get('missing') or [])}",
-            file=sys.stderr,
-        )
-        if mx_diag.get("missing"):
-            print("  missing cells (first 10):", file=sys.stderr)
-            for m, b in (mx_diag.get("missing") or [])[:10]:
-                print(f"    - {m}.{b}", file=sys.stderr)
-        if rolled:
-            print(f"  rolled back {len(rolled)} file(s) from .bak", file=sys.stderr)
-        print(
-            "  fix the artifact: every missing cell must land in models[].bench "
-            "or gaps[] (with triedSources/triedQueries/triedFormats).",
-            file=sys.stderr,
-        )
-        print("=" * 72, file=sys.stderr)
-        sys.exit(1)
+    print(
+        "  override paths: AICODERMAP_MX2_WARN_ONLY=1 env "
+        "(logs warning, continues) or --bypass-floor-check CLI flag.",
+        file=sys.stderr,
+    )
+    print("=" * 72, file=sys.stderr)
+    sys.exit(1)
 
-    # MX2 — Absolute coverage floor (HARD BLOCK by default; regression guard).
-    # Override: AICODERMAP_MX2_WARN_ONLY=1 (transition periods only) or the
-    # documented one-shot --bypass-floor-check CLI flag.
+
+def _mx2_floor_gate(mx_diag, contracts_block, models_path, sources_path):
+    """MX2 — Absolute coverage floor (HARD BLOCK by default; regression guard).
+    Override: AICODERMAP_MX2_WARN_ONLY=1 (transition periods only) or the
+    documented one-shot --bypass-floor-check CLI flag. Returns the warn
+    suffix ('' when the floor holds)."""
     floor = float(contracts_block.get("ABSOLUTE_COVERAGE_FLOOR") or 0.30)
-    if mx_diag.get("totalCells"):
-        ratio = mx_diag.get("filled", 0) / max(mx_diag["totalCells"], 1)
-        if ratio < floor:
-            floor_msg = (
-                f" [MX2: coverage {round(ratio * 100, 1)}% < absolute floor "
-                f"{int(floor * 100)}%]"
-            )
-            coverage_warn = (coverage_warn or "") + floor_msg
-            mx2_warn_only = os.environ.get("AICODERMAP_MX2_WARN_ONLY") == "1"
-            if not mx2_warn_only and not BYPASS_FLOOR_CHECK:
-                rolled = restore_from_bak([models_path, sources_path])
-                print("\n" + "=" * 72, file=sys.stderr)
-                print(
-                    "✗ MERGE ABORTED — MX2 absolute coverage floor breached",
-                    file=sys.stderr,
-                )
-                print("=" * 72, file=sys.stderr)
-                print(
-                    f"  fill ratio {round(ratio * 100, 1)}% < floor "
-                    f"{int(floor * 100)}% (filled={mx_diag.get('filled')}, "
-                    f"total={mx_diag.get('totalCells')})",
-                    file=sys.stderr,
-                )
-                if rolled:
-                    print(
-                        f"  rolled back {len(rolled)} file(s) from .bak",
-                        file=sys.stderr,
-                    )
-                print(
-                    "  override paths: AICODERMAP_MX2_WARN_ONLY=1 env "
-                    "(logs warning, continues) or --bypass-floor-check CLI flag.",
-                    file=sys.stderr,
-                )
-                print("=" * 72, file=sys.stderr)
-                sys.exit(1)
+    if not mx_diag.get("totalCells"):
+        return ""
+    ratio = mx_diag.get("filled", 0) / max(mx_diag["totalCells"], 1)
+    if ratio >= floor:
+        return ""
+    floor_msg = (
+        f" [MX2: coverage {round(ratio * 100, 1)}% < absolute floor "
+        f"{int(floor * 100)}%]"
+    )
+    mx2_warn_only = os.environ.get("AICODERMAP_MX2_WARN_ONLY") == "1"
+    if not mx2_warn_only and not BYPASS_FLOOR_CHECK:
+        _abort_mx2(ratio, floor, mx_diag, models_path, sources_path)
+    return floor_msg
 
-    # Post-write HARD-BLOCK audits (SSOT coherence + bench-source mapping).
-    # The helper runs both against the just-written data files, rolls back to
-    # .bak + prints the loud abort block on drift, and returns False. No
-    # CHANGELOG entry, no commit-eligible state — drift never reaches main.
-    if not run_post_write_audits(models_path, sources_path, PROJECT):
-        sys.exit(1)
 
-    # FAZ C audit — research-pipeline telemetry from runMetadata.
-    # MANDATORY fields (toolCallCount, fetchAttemptCount, batchCount). Missing
-    # fields are surfaced as a CHANGELOG warning so the next cycle's prelude
-    # picks them up; the merge is NOT rolled back (legacy artifacts may
-    # predate FAZ C).
-    rm_warn = _audit_run_metadata(out)
-    if rm_warn:
-        coverage_warn = (coverage_warn or "") + rm_warn
-
-    # F8: Emit structured partialReason telemetry to CHANGELOG for root-cause analysis.
-    partial_info = _format_partial_reason(out)
-
-    # FAZ D — write data/_meta.json + append data/refresh-history.json
-    # ring-buffer. The browser's freshness.js + verify-deploy.py both consume
-    # data/_meta.json; the ring buffer is human-review fodder.
+def _write_meta_telemetry(out, models, mx_diag, log):
+    """FAZ D — write data/_meta.json + append data/refresh-history.json
+    ring-buffer. The browser's freshness.js + verify-deploy.py both consume
+    data/_meta.json; the ring buffer is human-review fodder. Returns the
+    CHANGELOG metadata row."""
     contradictions_resolved = len(log.get("contradictions") or [])
-    prev_etag = None
     try:
         existing_meta = json.loads(
             (Path(f"{PROJECT}/data/_meta.json")).read_text(encoding="utf-8")
@@ -1534,8 +1565,11 @@ def _run_post_write_gates_and_changelog(
         _telemetry_write(meta_row)
     except OSError as exc:  # never abort the merge on telemetry I/O
         print(f"WARN: telemetry write failed: {exc}", file=sys.stderr)
-    metadata_row = _telemetry_changelog_row(meta_row)
+    return _telemetry_changelog_row(meta_row)
 
+
+def _write_changelog(log, out, metadata_row, coverage_warn, partial_info):
+    """Prepend today's CHANGELOG entry, consolidating same-day re-runs."""
     cl_path = f"{PROJECT}/CHANGELOG.md"
     cl_blob = _render_changelog(
         log, out, metadata_row, coverage_warn, partial_info, TODAY
@@ -1559,6 +1593,51 @@ def _run_post_write_gates_and_changelog(
         with open(cl_path, "w", encoding="utf-8") as fp:
             fp.write("# Changelog\n\n" + cl_blob)
 
+
+def _run_post_write_gates_and_changelog(
+    out, models, models_path, sources_path, log, issues
+):
+    """Coverage warnings + MX1/MX2 invariant gates + post-write audits +
+    telemetry + CHANGELOG write + final summary print."""
+    coverage_warn, cov_pct = _coverage_warning(out)
+
+    # MX1 — Cell-level matrix invariant (HARD BLOCK, no override).
+    # Every (active_modelId, coreBenchKey) cell must end up in exactly one
+    # of FILLED | GAP | NOT_APPLICABLE. Silent omission = contract violation.
+    contracts_block = _wl_contracts(_wl_cached())
+    invariant_ok, mx_diag = _verify_matrix_invariant(models, out)
+    matrix = out.get("coverageMatrix")
+    matrix_warn = _matrix_warning(invariant_ok, mx_diag, matrix)
+    if matrix_warn:
+        coverage_warn = (coverage_warn + matrix_warn) if coverage_warn else matrix_warn
+    if not invariant_ok:
+        _abort_mx1(mx_diag, models_path, sources_path)
+
+    coverage_warn = (coverage_warn or "") + _mx2_floor_gate(
+        mx_diag, contracts_block, models_path, sources_path
+    )
+
+    # Post-write HARD-BLOCK audits (SSOT coherence + bench-source mapping).
+    # The helper runs both against the just-written data files, rolls back to
+    # .bak + prints the loud abort block on drift, and returns False. No
+    # CHANGELOG entry, no commit-eligible state — drift never reaches main.
+    if not run_post_write_audits(models_path, sources_path, PROJECT):
+        sys.exit(1)
+
+    # FAZ C audit — research-pipeline telemetry from runMetadata.
+    # MANDATORY fields (toolCallCount, fetchAttemptCount, batchCount). Missing
+    # fields are surfaced as a CHANGELOG warning so the next cycle's prelude
+    # picks them up; the merge is NOT rolled back (legacy artifacts may
+    # predate FAZ C).
+    rm_warn = _audit_run_metadata(out)
+    if rm_warn:
+        coverage_warn = (coverage_warn or "") + rm_warn
+
+    # F8: Emit structured partialReason telemetry to CHANGELOG for root-cause analysis.
+    partial_info = _format_partial_reason(out)
+
+    metadata_row = _write_meta_telemetry(out, models, mx_diag, log)
+    _write_changelog(log, out, metadata_row, coverage_warn, partial_info)
     _print_merge_summary(log, matrix, matrix_warn, cov_pct, issues, models)
 
 
