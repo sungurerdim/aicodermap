@@ -20,18 +20,27 @@ table#comparison-table thead {
 }
 table#comparison-table th,
 table#comparison-table td {
-  padding: 5px 8px;
+  padding: 5px 7px;
   border-bottom: 1px solid var(--border);
+  /* Very subtle dashed column separator — keeps the now-wide bench matrix
+   * (29 benchmarks) readable by grouping each column without the visual
+   * weight of a solid grid. --border-dim is low-opacity in both themes. */
+  border-right: 1px dashed var(--border-dim);
   white-space: nowrap;
   text-align: left;
   vertical-align: middle;
+}
+table#comparison-table th:last-child,
+table#comparison-table td:last-child {
+  border-right: none;
 }
 table#comparison-table th {
   background: var(--surface-2);
   color: var(--muted);
   font-weight: 600;
-  font-size: 0.7rem;
-  padding: 6px 8px;
+  font-size: 0.66rem;
+  letter-spacing: 0.01em;
+  padding: 6px 7px;
   user-select: none;
   border-bottom: 1px solid var(--border-strong);
 }
@@ -52,10 +61,10 @@ table#comparison-table th.sorted.asc::after { content: ' ▲'; }
  * a glance which columns the active preset is and isn't ranking on. */
 table#comparison-table th .th-weight {
   display: inline-block;
-  margin-left: 4px;
-  padding: 0 5px;
+  margin-left: 3px;
+  padding: 0 4px;
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: 0.58rem;
   font-weight: 700;
   color: var(--accent);
   background: var(--accent-tint);
@@ -86,6 +95,9 @@ table#comparison-table .col-name {
   z-index: 1;
   min-width: 140px;
   font-weight: 600;
+  /* Anchor the frozen name column with a solid edge (overrides the dashed
+   * separator) so it reads as distinct from the scrolling bench matrix. */
+  border-right: 1px solid var(--border-strong);
 }
 table#comparison-table thead .col-name {
   background: var(--surface-2);
