@@ -1,10 +1,10 @@
 {
   "_summary": {
     "compositeMisfiles": 0,
-    "measuredCandidates": 40,
+    "measuredCandidates": 41,
     "bandViolations": 0,
     "crossBenchDups": 7,
-    "aaRowsLoaded": 406
+    "aaRowsLoaded": 429
   },
   "compositeMisfiles": [],
   "measuredCandidates": [
@@ -35,6 +35,13 @@
       "current": 78.18,
       "aa": 46.49,
       "delta": 31.69
+    },
+    {
+      "modelId": "qwen3-6-35b-moe",
+      "benchKey": "tau2",
+      "current": 67.2,
+      "aa": 95.32,
+      "delta": 28.12
     },
     {
       "modelId": "step-3-7-flash",

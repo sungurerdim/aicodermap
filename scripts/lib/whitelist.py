@@ -83,9 +83,7 @@ def bench_band(whitelist: dict[str, Any], key: str) -> tuple[float, float]:
     return float(entry.get("hardMin", 0)), float(entry.get("hardMax", 100))
 
 
-def bench_hard_max(
-    whitelist: dict[str, Any], key: str, default: float = 100.0
-) -> float:
+def bench_hard_max(whitelist: dict[str, Any], key: str, default: float = 100.0) -> float:
     """SSOT upper bound for a bench value, from `_schema.benchRanges[key].hardMax`.
     Used to drop mis-scaled observations (e.g. an Elo 1753 filed as a 0-100 index).
     benchRanges is the single source — local-synth/merge/audit must not hardcode
@@ -207,9 +205,7 @@ def _load_unhealthy_urls(root: Path, wl: dict[str, Any] | None = None) -> set[st
             return set()
     runtime = (wl or {}).get("_runtime") or {}
     unhealthy = runtime.get("unhealthy") or {}
-    return {
-        (u or "").strip().rstrip("/").lower() for u, flag in unhealthy.items() if flag
-    }
+    return {(u or "").strip().rstrip("/").lower() for u, flag in unhealthy.items() if flag}
 
 
 def _load_low_confidence_urls(
@@ -272,9 +268,7 @@ def banned_fetch_patterns(whitelist: dict[str, Any]) -> list[str]:
 
     ft = schema(whitelist).get("formatTaxonomy") or {}
     banned_formats = {
-        k
-        for k, v in ft.items()
-        if isinstance(v, dict) and v.get("skipWebFetch") is True
+        k for k, v in ft.items() if isinstance(v, dict) and v.get("skipWebFetch") is True
     }
 
     # D (2026-06-07): immediate dead-URL ban. A host the source-health-probe
@@ -337,12 +331,7 @@ def banned_fetch_patterns(whitelist: dict[str, Any]) -> list[str]:
             fmt = e.get("format")
             unhealthy = (e.get("_runtime") or {}).get("unhealthy") is True
             override = e.get("skipWebFetch") is True
-            if (
-                fmt in banned_formats
-                or unhealthy
-                or override
-                or _dead_now(e.get("url"))
-            ):
+            if fmt in banned_formats or unhealthy or override or _dead_now(e.get("url")):
                 _add(e.get("url"))
 
     # Vendor URL bundles — every per-vendor URL whose format mirrors one
@@ -404,8 +393,15 @@ def filter_for_batch(
                 continue
             if p in kn or kn in p:
                 return True
-            for token in p.replace("_", " ").replace("-", " ").split():
-                if token and token in kn:
+            # Drop '.' (fuse "z.ai" -> "zai") and turn '(', ')' into separators
+            # before tokenizing, so display names like "Z.ai (Zhipu AI)" yield
+            # "zai"/"zhipu"/"ai" tokens instead of "z.ai"/"(zhipu"/"ai)" — the
+            # latter never substring-matched vendor key "zai_glm", silently
+            # emptying that vendor's whitelist bundle for every zai_glm batch
+            # (found 2026-07-11).
+            cleaned = p.replace(".", "").replace("(", " ").replace(")", " ")
+            for token in cleaned.replace("_", " ").replace("-", " ").split():
+                if token and len(token) > 2 and token in kn:
                     return True
         return False
 

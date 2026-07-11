@@ -1,12 +1,12 @@
 {
-  "probedAt": "2026-07-02T17:46:22Z",
+  "probedAt": "2026-07-11T10:06:17Z",
   "total": 139,
   "counts": {
-    "format-drift": 14,
-    "redirect": 9,
+    "format-drift": 13,
+    "redirect": 10,
     "spa": 12,
-    "bot-block": 3,
-    "dead": 7
+    "bot-block": 2,
+    "dead": 8
   },
   "formatDrift": [
     {
@@ -70,17 +70,16 @@
       "observed": "spa_full"
     },
     {
-      "url": "https://www.iso.org/standard/27001",
-      "declared": "static_html_article",
-      "observed": "bot_blocked"
-    },
-    {
       "url": "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html",
       "declared": "static_html_article",
       "observed": "bot_blocked"
     }
   ],
   "redirects": [
+    {
+      "url": "https://terminal-bench.io/",
+      "to": "https://genteactual.com.co/"
+    },
     {
       "url": "https://lmarena.ai/leaderboard/webdev",
       "to": "https://arena.ai/leaderboard/webdev"
@@ -107,7 +106,7 @@
     },
     {
       "url": "https://compliance.microsoft.com/compliancemanager",
-      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3D7vM4BreqX_N8ZG-UpgW9ZfrtOP6vn7_cwchVb8ZVAFjuadLijwNWjcYlTDQgro8f17k1O6StrqBPSzJQi3Zsdcw2t-40Xv7EkYfKkyb-Z0CwW1Rzn0qsb2Ppf_NnI2sYZyeiBiWCqlmcp5suhG2OlpOUz6nC1WM_Ld5kvtqxft4&response_mode=form_post&nonce=639186111662161880.YjA1YjQwMWYtMDQ0ZC00MWU0LWE2ZGQtOTEyNWQ2MDFiOWRhMjJiMWJjMzQtMWJkNi00NmI4LTljZTQtODRjMDU0M2Y0MDcx&client-request-id=cb24b4f5-46d4-4b9a-a707-ada454dc07f3&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
+      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DcrxF1yebXWY53vLU2XITGLvlmE9gT4r71ymLWoBEBoB-CYciCb-X2Do1sXZ6uB2apjJF582vPBH_Tpzfh2GfSCsJLrus5L1qOXAUndDItICFSrT1lCEdPY9v4XBPsbK2feRt4-A_IsyDH5_WSvwxztVQz0NfBj3JQugeIte0iz4&response_mode=form_post&nonce=639193610537305355.YjYyY2UwMGYtZWM4Yi00OWVjLWEzNjEtYTI0OTBhOWI5MTNkMWE2NWI1ZGItZTZiZC00NjMxLWE1OWYtN2MyOGY5YWRjNDQ5&client-request-id=11b20366-0d2f-43a6-b2d6-f301a028409c&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
     },
     {
       "url": "https://edpb.europa.eu/our-work-tools/consistency-findings/register-for-decisions_en",
@@ -134,10 +133,13 @@
   ],
   "botBlocked": [
     "https://klu.ai/llm-leaderboard",
-    "https://www.iso.org/standard/27001",
     "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
   ],
   "dead": [
+    {
+      "url": "https://mcp-atlas.dev",
+      "error": "URLError: <urlopen error [Errno 11001] getaddrinfo failed>"
+    },
     {
       "url": "https://klu.ai/llm-leaderboard",
       "error": "HTTP 403 Forbidden"
@@ -155,16 +157,16 @@
       "error": "HTTP 404 Not Found"
     },
     {
-      "url": "https://siliconflow.cn/models",
-      "error": "URLError: <urlopen error _ssl.c:1015: The handshake operation timed out>"
-    },
-    {
-      "url": "https://www.iso.org/standard/27001",
-      "error": "HTTP 403 Forbidden"
+      "url": "https://github.com/AlexsJones/llmfit/blob/main/data/hf_models.json",
+      "error": "HTTP 404 Not Found"
     },
     {
       "url": "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html",
       "error": "HTTP 403 Forbidden"
+    },
+    {
+      "url": "https://www.zhipuai.cn",
+      "error": "URLError: <urlopen error timed out>"
     }
   ]
 }

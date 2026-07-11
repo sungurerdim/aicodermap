@@ -58,9 +58,7 @@ def build_host_publishes(wl: dict) -> dict:
     return out
 
 
-def is_elo_sibling_misfile(
-    bk: str, val: float, source_url: str, host_pub: dict
-) -> bool:
+def is_elo_sibling_misfile(bk: str, val: float, source_url: str, host_pub: dict) -> bool:
     """C1 (2026-05-31): drop an Elo observation that is almost certainly a
     sibling-metric misfile — the source host publishes a DIFFERENT Elo
     (cfElo/webDevElo/lmArenaElo) but not this one, AND the value itself sits in
@@ -161,6 +159,15 @@ def main() -> int:
     all_unsloth: dict[str, list] = defaultdict(list)
     all_raw_gaps: list = []
     all_lineup_hints: list = []
+    # deprecated/renamed/removed have no other channel into merge.py's
+    # _process_lineup_changes (unlike "new", which add-new-lineup-stubs.py
+    # reads directly from the artifacts) — synth previously hardcoded these
+    # to [] every cycle, silently dropping Step 0's vendor-confirmed
+    # deprecations (found 2026-07-11: 3 mimo-v2-* deprecations never reached
+    # merge). Aggregated + deduped by id below, "new" intentionally excluded.
+    all_lineup_deprecated: dict[str, dict] = {}
+    all_lineup_renamed: dict[str, dict] = {}
+    all_lineup_removed: dict[str, dict] = {}
     runtime_total = {
         "batchesMerged": 0,
         "observationsTotal": 0,
@@ -224,8 +231,7 @@ def main() -> int:
         for h in historical.get((mid, bk), []):
             # Skip exact-URL dupes already in new_obs
             already = any(
-                no["sourceUrl"] == h["sourceUrl"] and no["value"] == h["value"]
-                for no in new_obs
+                no["sourceUrl"] == h["sourceUrl"] and no["value"] == h["value"] for no in new_obs
             )
             if not already:
                 cells[(mid, bk)].append(h)
@@ -255,6 +261,16 @@ def main() -> int:
             runtime_total["rawGapsTotal"] += 1
         for lh in art.get("lineupHints") or []:
             all_lineup_hints.append(lh)
+        lc = art.get("lineupChanges") or {}
+        for d in lc.get("deprecated") or []:
+            if d.get("id"):
+                all_lineup_deprecated[d["id"]] = d
+        for r in lc.get("renamed") or []:
+            if r.get("from"):
+                all_lineup_renamed[r["from"]] = r
+        for rm in lc.get("removed") or []:
+            if rm.get("id"):
+                all_lineup_removed[rm["id"]] = rm
 
     print(
         f"Aggregated: {len(cells)} cells, "
@@ -485,9 +501,7 @@ def main() -> int:
     # Coverage computation
     total_cells = len(active) * len(core_keys)
     covered = fills_count
-    validation_coverage = (
-        round(covered / max(total_cells, 1), 4) if total_cells else 0.0
-    )
+    validation_coverage = round(covered / max(total_cells, 1), 4) if total_cells else 0.0
 
     # Canonicalize raw gather gaps to the schema-valid `key` shape
     # ("<modelId>.<benchKey>", Branch A of agent-out.schema.json gaps[]).
@@ -526,9 +540,9 @@ def main() -> int:
         "contradictions": contradictions,
         "lineupChanges": {
             "new": [],
-            "deprecated": [],
-            "renamed": [],
-            "removed": [],
+            "deprecated": list(all_lineup_deprecated.values()),
+            "renamed": list(all_lineup_renamed.values()),
+            "removed": list(all_lineup_removed.values()),
             "hints": all_lineup_hints,
         },
         "gaps": gap_entries,

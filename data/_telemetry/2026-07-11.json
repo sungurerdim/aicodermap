@@ -1,0 +1,183 @@
+{
+  "cycleEndedAt": "2026-07-11T10:41:47Z",
+  "cycleStartedAt": "2026-07-11T00:00:00Z",
+  "perBatch": [
+    {
+      "agentGaps": 17,
+      "batchId": "batch00-openai",
+      "fills": 5,
+      "gaps": 17,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 45,
+      "wallclockSec": 401.4
+    },
+    {
+      "agentGaps": 37,
+      "batchId": "batch01-openai",
+      "fills": 29,
+      "gaps": 37,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 48,
+      "wallclockSec": 518.3
+    },
+    {
+      "agentGaps": 83,
+      "batchId": "batch02-anthropic",
+      "fills": 24,
+      "gaps": 83,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "tool_call_budget",
+      "toolCallCount": 62,
+      "wallclockSec": 510.3
+    },
+    {
+      "agentGaps": 15,
+      "batchId": "batch03-google_deepm",
+      "fills": 44,
+      "gaps": 15,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "budget_ceiling",
+      "toolCallCount": 69,
+      "wallclockSec": 521.1
+    },
+    {
+      "agentGaps": 18,
+      "batchId": "batch04-mistral_ai",
+      "fills": 12,
+      "gaps": 18,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "wallclock",
+      "toolCallCount": 41,
+      "wallclockSec": 290.1
+    },
+    {
+      "agentGaps": 29,
+      "batchId": "batch05-alibaba_qwen",
+      "fills": 78,
+      "gaps": 29,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "wallclock",
+      "toolCallCount": 46,
+      "wallclockSec": 365.6
+    },
+    {
+      "agentGaps": 29,
+      "batchId": "batch06-alibaba_qwen",
+      "fills": 18,
+      "gaps": 29,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 42,
+      "wallclockSec": 447.8
+    },
+    {
+      "agentGaps": 82,
+      "batchId": "batch07-deepseek",
+      "fills": 28,
+      "gaps": 82,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "wallclock_time_pressure — tight 615s deadline forced early termination of Phase 3 per-model cascade after priority frontier-model coverage (deepseek-v3-2/v4-pro/v4-flash) was reached; deepseek-coder-v2-16b, deepseek-r1-14b and ministral-3-3b got a lighter pass.",
+      "toolCallCount": 42,
+      "wallclockSec": 356.2
+    },
+    {
+      "agentGaps": 22,
+      "batchId": "batch08-z_ai__zhipu_",
+      "fills": 23,
+      "gaps": 22,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "tool_call_budget",
+      "toolCallCount": 64,
+      "wallclockSec": 524.4
+    },
+    {
+      "agentGaps": 69,
+      "batchId": "batch09-anthropic",
+      "fills": 42,
+      "gaps": 69,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "wallclock_budget: prioritized priorityCells + skipCells corroboration + primary WebSearch cascade for all 6 models; remaining unfilled cells emitted as rawGaps rather than exhausting full per-model URL expansion (Step 2/3 vendor-slug + HF chain) to stay within the ~615s wallclock window.",
+      "toolCallCount": 31,
+      "wallclockSec": 447.1
+    },
+    {
+      "agentGaps": 20,
+      "batchId": "batch10-minimax",
+      "fills": 4,
+      "gaps": 20,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 56,
+      "wallclockSec": 494.6
+    },
+    {
+      "agentGaps": 70,
+      "batchId": "batch11-nvidia",
+      "fills": 38,
+      "gaps": 70,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 50,
+      "wallclockSec": 498.2
+    },
+    {
+      "agentGaps": 80,
+      "batchId": "batch12-alibaba_qwen",
+      "fills": 24,
+      "gaps": 80,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 43,
+      "wallclockSec": 485.0
+    },
+    {
+      "agentGaps": 40,
+      "batchId": "batch13-xai",
+      "fills": 17,
+      "gaps": 40,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 77,
+      "wallclockSec": 566.4
+    },
+    {
+      "agentGaps": 22,
+      "batchId": "batch14-meta",
+      "fills": 17,
+      "gaps": 22,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 54,
+      "wallclockSec": 468.2
+    }
+  ],
+  "totalBatches": 15,
+  "totals": {
+    "agentGaps": 633,
+    "fills": 403,
+    "gaps": 633,
+    "na": 0,
+    "orchestratorGaps": 0,
+    "toolCallSum": 770,
+    "wallclockSecMax": 566.4,
+    "wallclockSecP95": 566.4
+  },
+  "zeroFillBatches": []
+}
