@@ -63,7 +63,14 @@ from urllib.parse import urlparse
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "scripts"))
 from lib.constants import SINGLE_ARTIFACT_PATH  # noqa: E402
-from lib.util import canonical_display_name, configure_utf8_output, utc_now_iso  # noqa: E402
+from lib.util import (  # noqa: E402
+    canonical_display_name,
+    configure_utf8_output,
+    safe_json_load,
+    today_iso,
+    utc_now_iso,
+    write_json,
+)
 
 NOW = utc_now_iso()
 
@@ -202,12 +209,7 @@ def is_official_evidence(nm: dict, vendors: dict) -> bool:
         # in gate_admit still admit these candidates via their own logic.
         return False
     hosts = vendor_hostnames(vendors[vid] or {})
-    return any(
-        h == vh or h.endswith("." + vh)
-        for u in urls
-        if (h := _hostname(u))
-        for vh in hosts
-    )
+    return any(h == vh or h.endswith("." + vh) for u in urls if (h := _hostname(u)) for vh in hosts)
 
 
 def _artifact_paths() -> list[str]:
@@ -486,20 +488,28 @@ def main() -> int:
         tr["models"][mid] = {"strengths": meta["tr_s"], "weaknesses": meta["tr_w"]}
         en["models"][mid] = {"strengths": meta["en_s"], "weaknesses": meta["en_w"]}
         added.append(mid)
-        print(
-            f"  + stub: {mid} ({meta['provider']}, {meta['tier']}, open={meta['open']})"
-        )
+        print(f"  + stub: {mid} ({meta['provider']}, {meta['tier']}, open={meta['open']})")
 
     if added:
-        models_path.write_text(
-            json.dumps(models, ensure_ascii=False, indent=1), encoding="utf-8"
-        )
+        models_path.write_text(json.dumps(models, ensure_ascii=False, indent=1), encoding="utf-8")
         (REPO / "i18n" / "tr.json").write_text(
             json.dumps(tr, ensure_ascii=False, indent=1), encoding="utf-8"
         )
         (REPO / "i18n" / "en.json").write_text(
             json.dumps(en, ensure_ascii=False, indent=1), encoding="utf-8"
         )
+        # Fable-5 R5 (2026-07-11): record ids admitted TODAY so
+        # check-new-model-coverage.py (run post-merge by refresh-finalize.py)
+        # can verify Stage A actually filled them, instead of a freshly-
+        # admitted model silently sitting at near-zero coverage for cycles
+        # (new models are the likeliest 0-fills — leaderboards/AA lag launches
+        # by days-to-weeks). ADDITIVE + deduped: this script runs twice per
+        # cycle (pre-gather + post-merge safety net); a same-day file already
+        # present is unioned, never overwritten, so the pre-gather pass's ids
+        # survive the post-merge pass's (usually empty) second call.
+        cycle_file = REPO / f".aicodermap-new-models-{today_iso()}.json"
+        prior_ids = set(safe_json_load(cycle_file, []) or [])
+        write_json(cycle_file, sorted(prior_ids | set(added)))
 
     # Loud gate (feedback_no_silent_fails): detection ran this cycle (fresh
     # artifacts present) but admitted nothing → INFO, not a silent pass.

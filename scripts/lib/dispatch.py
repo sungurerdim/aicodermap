@@ -288,15 +288,9 @@ def compute_dispatch_plan(
     # buckets still split at mpb, THEN FFD-pack together (each agent's ~15-20-tool-
     # call fixed overhead is paid once per BATCH). merge_small=False keeps the
     # unpacked family layout for callers that want vendor-pure batches.
-    dense_buckets = [
-        b for b in buckets if b and family_of(b[0].get("provider")) in dense
-    ]
-    normal_buckets = [
-        b for b in buckets if not (b and family_of(b[0].get("provider")) in dense)
-    ]
-    dense_sliced = split_oversize_batches(
-        dense_buckets, max(1, min(dense_max_models, mpb))
-    )
+    dense_buckets = [b for b in buckets if b and family_of(b[0].get("provider")) in dense]
+    normal_buckets = [b for b in buckets if not (b and family_of(b[0].get("provider")) in dense)]
+    dense_sliced = split_oversize_batches(dense_buckets, max(1, min(dense_max_models, mpb)))
     normal_sliced = split_oversize_batches(normal_buckets, mpb)
     if merge_small:
         normal_sliced = pack_batches(normal_sliced, mpb)
@@ -306,18 +300,25 @@ def compute_dispatch_plan(
 
     batches = []
     for i, bucket in enumerate(sliced):
-        providers = sorted(
-            p for p in {m.get("provider") for m in bucket} if isinstance(p, str)
-        )
-        # Use first provider name as a hint in the batchId so logs are readable.
+        providers = sorted(p for p in {m.get("provider") for m in bucket} if isinstance(p, str))
+        # Fable-5 R4 (2026-07-11): a bucket can legitimately span MULTIPLE
+        # vendor families (overflow packing of sparse-vendor leftovers, e.g.
+        # a batch containing both Google DeepMind and Anthropic models —
+        # observed batch09-anthropic silently mislabeling its Google models,
+        # 2026-07-11 investigation). Labeling it after only `providers[0]`
+        # is misleading — a human scanning batch names assumes single-vendor
+        # and can waste time investigating the "wrong" vendor's whitelist.
+        # `mixed-<fam1>-<fam2>` names EVERY distinct family present (sorted,
+        # deduped via family_of so "Google DeepMind"/"Google" don't double-count).
+        families = sorted({family_of(p) for p in providers})
+        if len(families) > 1:
+            family_hint = "mixed-" + "-".join(families)
+        else:
+            family_hint = providers[0] if providers else "other"
         # FAZ 8.A (2026-05-18): filename-unsafe chars (parens, dots, slashes)
         # broke artifact file resolution for batches like
         # `batch10-z.ai_(zhipu_*`. Sanitize to [a-z0-9_-] only.
-        family_hint = re.sub(
-            r"[^a-z0-9_-]",
-            "_",
-            (providers[0] if providers else "other").lower(),
-        )[:12]
+        family_hint = re.sub(r"[^a-z0-9_-]", "_", family_hint.lower())[:24]
         batch_id = f"batch{i:02d}-{family_hint}"
         batches.append(
             {

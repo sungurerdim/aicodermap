@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -402,14 +403,18 @@ def filter_for_batch(
     Returns a NEW dict; does not mutate the input.
     """
     pset_lower = {str(p).lower() for p in providers}
+    matched_providers: set[str] = set()
 
     def vendor_matches(vendor_key: str) -> bool:
         kn = vendor_key.lower()
+        matched = False
         for p in pset_lower:
             if not p:
                 continue
             if p in kn or kn in p:
-                return True
+                matched_providers.add(p)
+                matched = True
+                continue
             # Drop '.' (fuse "z.ai" -> "zai") and turn '(', ')' into separators
             # before tokenizing, so display names like "Z.ai (Zhipu AI)" yield
             # "zai"/"zhipu"/"ai" tokens instead of "z.ai"/"(zhipu"/"ai)" — the
@@ -419,8 +424,10 @@ def filter_for_batch(
             cleaned = p.replace(".", "").replace("(", " ").replace(")", " ")
             for token in cleaned.replace("_", " ").replace("-", " ").split():
                 if token and len(token) > 2 and token in kn:
-                    return True
-        return False
+                    matched_providers.add(p)
+                    matched = True
+                    break
+        return matched
 
     out: dict[str, Any] = {}
     for k, v in whitelist.items():
@@ -457,6 +464,23 @@ def filter_for_batch(
     # Filter vendors to matching providers only.
     vendors = whitelist.get("vendors") or {}
     out["vendors"] = {k: v for k, v in vendors.items() if vendor_matches(k)}
+
+    # Fable-5 R4 (2026-07-11): LOUD guard against a repeat of the zai_glm
+    # class of bug — a provider string that matches ZERO vendor keys
+    # silently ships an empty vendor whitelist bundle to that batch's agent
+    # (no source URLs for that vendor at all), and nothing before this printed
+    # a signal. Every provider in `providers` should match >=1 vendor key;
+    # a miss is either a genuine whitelist gap (new vendor, not yet added) or
+    # a normalization bug in `vendor_matches` — both need a human to look.
+    unmatched = pset_lower - matched_providers
+    if unmatched and vendors:
+        print(
+            f"WARN: filter_for_batch — provider(s) {sorted(unmatched)} matched "
+            "ZERO whitelist vendor key(s); this batch's agent will receive an "
+            "empty vendor source bundle for them. Check data/sources-whitelist.json "
+            "vendors.* keys or lib.whitelist.vendor_matches normalization.",
+            file=sys.stderr,
+        )
 
     # Optional: filter publishes[] inside kept categories to bench_keys universe.
     if bench_keys:

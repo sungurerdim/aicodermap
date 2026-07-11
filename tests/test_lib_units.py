@@ -12,6 +12,8 @@ Run:
 
 from __future__ import annotations
 
+import contextlib
+import io
 import json
 import sys
 import tempfile
@@ -265,6 +267,29 @@ class TestWhitelist(unittest.TestCase):
             with self.assertRaises(FileNotFoundError):
                 wl.load_whitelist(Path(td) / "missing.json")
 
+    def test_filter_for_batch_warns_loudly_on_zero_vendor_match(self):
+        # Regression for the "Z.ai (Zhipu AI)" -> zai_glm silent-empty-bundle
+        # bug (2026-07-11): a provider with no vendor-key match must print a
+        # loud warning, not silently ship an empty vendors{} bundle.
+        whitelist = {
+            "_schema": {"coreBenchKeys": ["swePro"]},
+            "vendors": {"zai_glm": {"name": "Z.ai (Zhipu AI)"}},
+            "leaderboards": [],
+            "aggregators": [],
+        }
+        buf = io.StringIO()
+        with contextlib.redirect_stderr(buf):
+            out = wl.filter_for_batch(whitelist, {"Z.ai (Zhipu AI)"})
+        self.assertIn("zai_glm", out["vendors"])
+        self.assertEqual(buf.getvalue(), "")  # matched -> no warning
+
+        buf2 = io.StringIO()
+        with contextlib.redirect_stderr(buf2):
+            out2 = wl.filter_for_batch(whitelist, {"Totally Unknown Vendor Inc"})
+        self.assertEqual(out2["vendors"], {})
+        self.assertIn("WARN", buf2.getvalue())
+        self.assertIn("totally unknown vendor inc", buf2.getvalue())
+
 
 # ── matrix ───────────────────────────────────────────────────────────────────
 
@@ -364,6 +389,49 @@ class TestMatrix(unittest.TestCase):
         self.assertEqual((pc[1]["modelId"], pc[1]["benchKey"]), ("fresh-model", "lcb"))
         self.assertTrue(pc[1].get("rankCritical"))
 
+    def test_gap_source_by_cell_defaults_untagged_to_agent(self):
+        artifact = {
+            "gaps": [
+                {"key": "alpha.swePro", "source": "orchestrator"},
+                {"key": "alpha.lcb", "source": "agent"},
+                {"key": "beta.gpqa"},  # no explicit source -> defaults to agent
+            ]
+        }
+        self.assertEqual(
+            matrix.gap_source_by_cell(artifact),
+            {
+                ("alpha", "swePro"): "orchestrator",
+                ("alpha", "lcb"): "agent",
+                ("beta", "gpqa"): "agent",
+            },
+        )
+
+    def test_priority_cells_chronic_flag_requires_agent_sourced_history(self):
+        # CHRONIC_AGENT_CYCLES (3) consecutive AGENT-sourced attempts -> chronic.
+        # A cell with the same total gapHistory length but sourced from the
+        # orchestrator placeholder (never actually researched) is NOT chronic.
+        keys = ["swePro"]
+        active = [
+            {"id": "chronic-model", "bench": {"swePro": None}},
+            {"id": "unreached-model", "bench": {"swePro": None}},
+        ]
+        vmap = {
+            "cells": {
+                "chronic-model.swePro": {
+                    "gapHistory": ["2026-06-15", "2026-06-27", "2026-07-11"],
+                    "gapHistoryAgent": ["2026-06-15", "2026-06-27", "2026-07-11"],
+                },
+                "unreached-model.swePro": {
+                    "gapHistory": ["2026-06-15", "2026-06-27", "2026-07-11"],
+                    "gapHistoryAgent": [],
+                },
+            }
+        }
+        pc = matrix.priority_cells(active, keys, limit=10, verification_map=vmap)
+        by_model = {c["modelId"]: c for c in pc}
+        self.assertTrue(by_model["chronic-model"].get("chronic"))
+        self.assertFalse(by_model["unreached-model"].get("chronic"))
+
 
 # ── dispatch ─────────────────────────────────────────────────────────────────
 
@@ -417,6 +485,30 @@ class TestDispatch(unittest.TestCase):
         self.assertTrue(openai_batches, "expected vendor-pure openai batches")
         for b in openai_batches:
             self.assertLessEqual(b["modelCount"], 4)
+
+    def test_mixed_family_batch_gets_mixed_label(self):
+        # Fable-5 R4 (2026-07-11): a batch spanning multiple vendor families
+        # (sparse-leftover FFD packing) must self-label as `mixed-<fam>-<fam>`
+        # instead of a single-vendor name that hides the other family present
+        # (observed: `batch09-anthropic` silently containing Google DeepMind
+        # models too — see scripts/lib/whitelist.filter_for_batch guard).
+        active = _models(1, "Google DeepMind") + _models(1, "Anthropic")
+        plan = dispatch.compute_dispatch_plan(
+            active, [f"k{i}" for i in range(5)], max_models_override=10
+        )
+        self.assertEqual(len(plan["batches"]), 1)
+        batch_id = plan["batches"][0]["batchId"]
+        self.assertIn("mixed-", batch_id)
+        self.assertIn("google", batch_id)
+        self.assertIn("anthropic", batch_id)
+
+    def test_single_family_batch_keeps_plain_label(self):
+        active = _models(2, "Anthropic")
+        plan = dispatch.compute_dispatch_plan(
+            active, [f"k{i}" for i in range(5)], max_models_override=10
+        )
+        self.assertNotIn("mixed-", plan["batches"][0]["batchId"])
+        self.assertRegex(plan["batches"][0]["batchId"], r"^batch00-anthropic")
 
 
 # ── freshness ────────────────────────────────────────────────────────────────

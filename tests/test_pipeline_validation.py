@@ -23,14 +23,22 @@ from pathlib import Path
 PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT / "scripts"))
 
-from lib.gather_validator import validate_gather, validate_gather_file  # noqa: E402
+from lib.gather_validator import (  # noqa: E402
+    validate_gather,
+    validate_gather_file,
+    zero_obs_models,
+)
 
 # merge.py is a script, not a package module — load it by path once.
-_spec = importlib.util.spec_from_file_location(
-    "merge_module", PROJECT / "scripts" / "merge.py"
-)
+_spec = importlib.util.spec_from_file_location("merge_module", PROJECT / "scripts" / "merge.py")
 merge = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(merge)
+
+_cov_spec = importlib.util.spec_from_file_location(
+    "check_new_model_coverage_module", PROJECT / "scripts" / "check-new-model-coverage.py"
+)
+new_model_coverage = importlib.util.module_from_spec(_cov_spec)
+_cov_spec.loader.exec_module(new_model_coverage)
 
 
 # ── gather_validator ─────────────────────────────────────────────────────────
@@ -141,16 +149,72 @@ class TestValidateGather(unittest.TestCase):
             mtime = p.stat().st_mtime
             # Cycle started 400s AFTER the file was written (> 300s grace) →
             # prior-cycle leftover, must be rejected as STALE.
-            stale = validate_gather_file(
-                p, self.TARGETS, cycle_started_unix=mtime + 400
-            )
+            stale = validate_gather_file(p, self.TARGETS, cycle_started_unix=mtime + 400)
             self.assertFalse(stale["valid"])
             self.assertTrue(stale["stats"].get("stale"))
             # Fresh mtime + clock-less placeholder startedAt → advisory only.
-            fresh = validate_gather_file(
-                p, self.TARGETS, cycle_started_unix=time.time() - 60
-            )
+            fresh = validate_gather_file(p, self.TARGETS, cycle_started_unix=time.time() - 60)
             self.assertTrue(fresh["valid"], fresh["errors"])
+
+
+class TestZeroObsModels(unittest.TestCase):
+    """Fable-5 R1 (2026-07-11): cross-batch union of models with 0 total
+    observations, feeding the SKILL.md Stage A rescue-batch dispatch."""
+
+    def test_unions_zero_obs_models_across_batches(self):
+        v1 = validate_gather(
+            _gather_artifact(), ["acme-coder-1", "acme-coder-2"]
+        )  # acme-coder-2 gets 0 (no observations for it in the fixture)
+        v2 = validate_gather(
+            _gather_artifact(observations=[]), ["beta-model-1"]
+        )  # whole batch 0-obs
+        self.assertEqual(zero_obs_models([v1, v2]), ["acme-coder-2", "beta-model-1"])
+
+    def test_model_present_in_original_and_retry_only_zero_if_both_zero(self):
+        original = validate_gather(_gather_artifact(observations=[]), ["acme-coder-1"])
+        retry_recovered = validate_gather(_gather_artifact(), ["acme-coder-1"])
+        self.assertEqual(zero_obs_models([original, retry_recovered]), [])
+        retry_still_empty = validate_gather(_gather_artifact(observations=[]), ["acme-coder-1"])
+        self.assertEqual(zero_obs_models([original, retry_still_empty]), ["acme-coder-1"])
+
+    def test_empty_input_yields_empty_list(self):
+        self.assertEqual(zero_obs_models([]), [])
+
+
+class TestNewModelCoverageFloor(unittest.TestCase):
+    """Fable-5 R5 (2026-07-11): a model admitted this cycle should surface a
+    loud, distinct warning when it's still under the coverage floor after
+    Stage A/B — not silently indistinguishable from a chronic gap."""
+
+    CORE = ["swePro", "lcb", "tb2", "gpqa"]
+
+    def test_coverage_of_counts_only_core_keys(self):
+        m = {"bench": {"swePro": 50.0, "lcb": None, "extraKey": 99.0}}
+        # 1 of 4 core keys filled (extraKey isn't in CORE) -> 0.25.
+        self.assertEqual(new_model_coverage.coverage_of(m, self.CORE), 0.25)
+
+    def test_coverage_of_empty_core_keys_is_full(self):
+        self.assertEqual(new_model_coverage.coverage_of({"bench": {}}, []), 1.0)
+
+    def test_under_covered_new_models_filters_by_floor(self):
+        models = [
+            {"id": "fresh-a", "bench": {"swePro": None, "lcb": None, "tb2": None, "gpqa": None}},
+            {"id": "fresh-b", "bench": {"swePro": 1.0, "lcb": 2.0, "tb2": 3.0, "gpqa": 4.0}},
+            {"id": "fresh-c", "bench": {"swePro": 1.0, "lcb": None, "tb2": None, "gpqa": None}},
+        ]
+        under = new_model_coverage.under_covered_new_models(
+            models, ["fresh-a", "fresh-b", "fresh-c"], self.CORE, floor=0.3
+        )
+        self.assertEqual([mid for mid, _ in under], ["fresh-a", "fresh-c"])
+
+    def test_under_covered_new_models_skips_bench_mirror_and_missing(self):
+        models = [
+            {"id": "mirror-variant", "bench": {}, "benchMirrorOf": "base-model"},
+        ]
+        under = new_model_coverage.under_covered_new_models(
+            models, ["mirror-variant", "never-admitted-id"], self.CORE, floor=0.3
+        )
+        self.assertEqual(under, [])
 
 
 # ── merge.py helpers ─────────────────────────────────────────────────────────
@@ -158,11 +222,7 @@ class TestValidateGather(unittest.TestCase):
 
 class TestMergePricing(unittest.TestCase):
     def test_dedupe_by_provider_newest_fetched_wins(self):
-        dst = {
-            "api": [
-                {"provider": "Acme", "in": 3.0, "out": 15.0, "fetched": "2026-05-01"}
-            ]
-        }
+        dst = {"api": [{"provider": "Acme", "in": 3.0, "out": 15.0, "fetched": "2026-05-01"}]}
         merge.merge_pricing(
             dst,
             {
@@ -189,11 +249,7 @@ class TestMergePricing(unittest.TestCase):
         self.assertEqual(dst["range"]["out"], [1.6, 12.0])
 
     def test_older_fetched_does_not_evict(self):
-        dst = {
-            "api": [
-                {"provider": "Acme", "in": 2.5, "out": 12.0, "fetched": "2026-06-01"}
-            ]
-        }
+        dst = {"api": [{"provider": "Acme", "in": 2.5, "out": 12.0, "fetched": "2026-06-01"}]}
         merge.merge_pricing(
             dst,
             {
@@ -226,9 +282,7 @@ class TestAppendSource(unittest.TestCase):
 
     def test_appends_then_dedupes_by_url_value(self):
         sources = {}
-        self.assertTrue(
-            merge.append_source(sources, "acme-coder-1.swePro", dict(self.ENTRY))
-        )
+        self.assertTrue(merge.append_source(sources, "acme-coder-1.swePro", dict(self.ENTRY)))
         updated = dict(self.ENTRY, trustScore=0.95)
         # Same (url, value) → no second row, but fresher fields are applied.
         self.assertFalse(merge.append_source(sources, "acme-coder-1.swePro", updated))
@@ -239,9 +293,7 @@ class TestAppendSource(unittest.TestCase):
 class TestApplyModelUpdate(unittest.TestCase):
     def test_bench_update_stamps_per_cell_date(self):
         model = {"id": "acme-coder-1", "bench": {"swePro": 60.0}}
-        touched = merge.apply_model_update(
-            model, {"bench": {"swePro": 71.5, "lcb": None}}
-        )
+        touched = merge.apply_model_update(model, {"bench": {"swePro": 71.5, "lcb": None}})
         self.assertTrue(touched)
         self.assertEqual(model["bench"]["swePro"], 71.5)
         self.assertNotIn("lcb", model["bench"])  # null returns leave cell alone
@@ -262,19 +314,13 @@ class TestApplyModelUpdate(unittest.TestCase):
 
 class TestValidateGaps(unittest.TestCase):
     def test_malformed_gap_repaired_in_place_not_stripped(self):
-        out = {
-            "gaps": [
-                {"modelId": "acme-coder-1", "field": "tbHard", "reason": "not found"}
-            ]
-        }
+        out = {"gaps": [{"modelId": "acme-coder-1", "field": "tbHard", "reason": "not found"}]}
         suspicions = merge.validate_gaps(out)
         g = out["gaps"][0]
         self.assertEqual(len(out["gaps"]), 1)  # repaired, NOT stripped (MX1 guard)
         self.assertEqual(g["triedSources"], [merge.GAP_REPAIR_STUB_SOURCE])
         self.assertEqual(len(g["triedQueries"]), 2)
-        self.assertEqual(
-            set(g["_repaired"]), {"triedSources", "triedQueries", "triedFormats"}
-        )
+        self.assertEqual(set(g["_repaired"]), {"triedSources", "triedQueries", "triedFormats"})
         self.assertEqual(out["runtime"]["repairedGaps"][0]["field"], "tbHard")
         self.assertTrue(suspicions and suspicions[0]["repairedFields"])
 
@@ -301,6 +347,39 @@ class TestValidateGaps(unittest.TestCase):
         # pass just leaves it without repair/suspicion records.
         self.assertNotIn("repairedGaps", out.get("runtime", {}))
         self.assertNotIn("fabricatedSuspicions", out.get("runtime", {}))
+
+
+class TestStampGapHistory(unittest.TestCase):
+    """Fable-5 R2 (2026-07-11): gapHistoryAgent tracks only agent-sourced gap
+    cycles, a subset of gapHistory (which tracks every gap regardless of
+    source) — this is what lib.matrix's `chronic` classification reads."""
+
+    def _entry(self):
+        return {"gapHistory": [], "gapSince": None}
+
+    def test_agent_source_appends_both_ledgers(self):
+        entry = self._entry()
+        merge._stamp_gap_history(entry, "2026-07-11", "agent")
+        self.assertEqual(entry["gapHistory"], ["2026-07-11"])
+        self.assertEqual(entry["gapHistoryAgent"], ["2026-07-11"])
+
+    def test_orchestrator_source_only_appends_general_ledger(self):
+        entry = self._entry()
+        merge._stamp_gap_history(entry, "2026-07-11", "orchestrator")
+        self.assertEqual(entry["gapHistory"], ["2026-07-11"])
+        self.assertNotIn("gapHistoryAgent", entry)
+
+    def test_default_source_is_agent(self):
+        entry = self._entry()
+        merge._stamp_gap_history(entry, "2026-07-11")
+        self.assertEqual(entry.get("gapHistoryAgent"), ["2026-07-11"])
+
+    def test_same_cycle_id_not_duplicated_in_either_ledger(self):
+        entry = self._entry()
+        merge._stamp_gap_history(entry, "2026-07-11", "agent")
+        merge._stamp_gap_history(entry, "2026-07-11", "agent")
+        self.assertEqual(entry["gapHistory"], ["2026-07-11"])
+        self.assertEqual(entry["gapHistoryAgent"], ["2026-07-11"])
 
 
 if __name__ == "__main__":

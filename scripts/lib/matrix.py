@@ -12,6 +12,11 @@ from __future__ import annotations
 
 from typing import Any, Iterable
 
+# Fable-5 R2 (2026-07-11): consecutive AGENT-sourced (not orchestrator
+# auto-gap) research cycles before a cell is classified "chronic" — see
+# priority_cells `chronic` flag + gap_source_by_cell.
+CHRONIC_AGENT_CYCLES = 3
+
 
 def active_models(models: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Models in the RESEARCH universe = status 'active' only. `deprecated` and
@@ -78,6 +83,24 @@ def gap_cells_from_artifact(
         cell = parse_gap_cell(g)
         if cell and cell[1] in keys:
             out.add(cell)
+    return out
+
+
+def gap_source_by_cell(artifact: dict[str, Any]) -> dict[tuple[str, str], str]:
+    """(modelId, benchKey) -> 'agent' | 'orchestrator' from `artifact["gaps"]`.
+
+    `gap_gen.py` tags every gap with its origin (FAZ 4.B, 2026-05-08):
+    'agent' = the agent actively surveyed this cell and found nothing;
+    'orchestrator' = never reached this cycle (auto-gap placeholder). A gap
+    entry without an explicit `source` defaults to 'agent' (gap_gen.py's own
+    `_normalize_existing_gap` convention). Used to distinguish a
+    chronically-researched-but-unpublished cell from one that's simply never
+    been attempted — see lib.matrix.priority_cells `chronic` flag."""
+    out: dict[tuple[str, str], str] = {}
+    for g in artifact.get("gaps", []) or []:
+        cell = parse_gap_cell(g)
+        if cell:
+            out[cell] = g.get("source") or "agent"
     return out
 
 
@@ -187,6 +210,18 @@ def priority_cells(
             entry["starved"] = True
         elif starve_key <= -0.5:
             entry["rankCritical"] = True
+        # 2026-07-11 (Fable-5 R2): CHRONIC = >=CHRONIC_AGENT_CYCLES cycles where
+        # an AGENT (not just the orchestrator auto-gap placeholder) actively
+        # surveyed this cell and found nothing. Distinct from `starved`, which
+        # counts ANY gap source — a cell can be starved (never-touched by
+        # anyone) without being chronic (never a real research attempt), and
+        # vice versa. Advisory-only: does not change starve_key ordering,
+        # surfaced for CHANGELOG "chronically unfilled" reporting so a
+        # genuinely-hard cell (agent tried repeatedly, evidence doesn't exist
+        # yet) is distinguishable from a merely-unreached one.
+        vm_entry = vm_cells.get(f"{mid}.{k}") or {} if vm_cells else {}
+        if len(vm_entry.get("gapHistoryAgent") or []) >= CHRONIC_AGENT_CYCLES:
+            entry["chronic"] = True
         out.append(entry)
     return out
 

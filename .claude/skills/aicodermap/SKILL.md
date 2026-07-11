@@ -541,12 +541,13 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10; TTL removed 2026-06-
    // gaps[]/priorityCells for the next cycle). coverageMatrix stays OUT of the
    // gather schema (flat-schema discipline — it's a FULL_SCHEMA_BLEED_KEY); the
    // per-batch coverage signal is derived here from perModelObs instead.
-   kept_paths, dropped = [], []
+   kept_paths, dropped, all_verdicts = [], [], []
    for a in per_batch_artifacts:
      if not a._source_path:
        continue
      v = validate_gather_file(a._source_path, batch_model_ids_of(a),
                               cycle_started_unix=idea_context.cycleStartedUnix)
+     all_verdicts.append(v)                  // feeds 3.6b RESCUE_BATCH below
      if v["stats"].get("observations", 0) == 0:
        dropped.append(a._source_path)        // zero-obs (already retried via FAZ 2.4)
      else:
@@ -558,6 +559,46 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10; TTL removed 2026-06-
    if dropped:
      log("ℹ dropped " + str(len(dropped)) + " zero-obs gather(s) from synth input: " + str(dropped))
    gather_paths = kept_paths
+
+   // 3.6b RESCUE_BATCH (Fable-5 R1, 2026-07-11) — per-MODEL zero-obs net.
+   // FAZ 2.4 above only retries a batch that returned 0 fills TOTAL. A batch
+   // that filled 5/6 models still leaves its 1 zero-obs model stuck with no
+   // retry AT ALL — silent until a human notices (observed: `gemini-omni-flash`
+   // inside a productive 6-model `batch09-anthropic`, 2026-07-11 investigation;
+   // it took a manual supplementary research pass to catch). Union the
+   // per-model zero-obs set across EVERY batch this cycle (including retries —
+   // a model recovered by its batch's own retry is correctly excluded) via
+   // `lib.gather_validator.zero_obs_models(all_verdicts)`, and if non-empty,
+   // dispatch ONE additional agent for all of them together.
+   rescue_ids = zero_obs_models(all_verdicts)
+   if rescue_ids:
+     log(f"⚠ {len(rescue_ids)} model(s) zero-obs across ALL their batches this "
+         f"cycle — dispatching rescue batch: {rescue_ids}")
+     rescue_result = Agent({
+       subagent_type: "aicodermap-research-agent", model: "sonnet",
+       prompt: structured(
+         scope, query, mode: "gather",
+         // UNFILTERED whitelist (skip lib.whitelist.filter_for_batch's per-
+         // vendor slice) — rescue_ids can span multiple vendor families and
+         // the whole point is to look BEYOND each vendor's usual leaderboard
+         // set (technical reports, HF cards, GitHub, press — see the
+         // 2026-07-11 supplementary-pass prompt template for the instruction
+         // shape that found 24 new cells this way).
+         idea_context: {**idea_context, sourcesWhitelist: full_whitelist},
+         target_model_ids: rescue_ids,
+         batch_id: "rescue",
+         agent_budget_buffer: plan.agentBudgetBuffer * 2,  // generous — this is a small, hard list
+         wallclock_deadline_unix: now() + BATCH_WALLCLOCK_SEC * 2,
+         require_full_matrix: true,
+       ),
+       output_path: ".aicodermap-agent-out-batch-rescue.gather.json"
+     })
+     if rescue_result and Path(".aicodermap-agent-out-batch-rescue.gather.json").exists():
+       gather_paths.append(".aicodermap-agent-out-batch-rescue.gather.json")
+   // Non-fatal either way: a model that STILL comes back zero-obs after the
+   // rescue pass is a genuine finding (no independent data exists yet), not a
+   // pipeline failure — its cells persist as gaps[]/priorityCells as usual.
+
    // ─── Stage B: LOCAL-SYNTH PRIMARY (deterministic — 2026-05-31, A3) ─────────
    // The sonnet synth agent is RETIRED as the primary path. Empirical result
    // across 2026-05-28 → 2026-05-30: the sonnet synth FABRICATED bench values

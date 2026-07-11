@@ -53,9 +53,7 @@ def render_changelog_markdown(
         agent_gaps = [g for g in out["gaps"] if g.get("source") == "agent"]
         orch_gaps = [g for g in out["gaps"] if g.get("source") == "orchestrator"]
         # Legacy entries without source field default to 'agent'.
-        unknown_gaps = [
-            g for g in out["gaps"] if g.get("source") not in ("agent", "orchestrator")
-        ]
+        unknown_gaps = [g for g in out["gaps"] if g.get("source") not in ("agent", "orchestrator")]
         agent_gaps.extend(unknown_gaps)
         cl_lines.append(
             f"\n### Gaps ({len(out['gaps'])} entries — agent:{len(agent_gaps)} "
@@ -66,11 +64,29 @@ def render_changelog_markdown(
             cl_lines.append(f"- `{g.get('key')}` *(agent)*: {g.get('reason')}\n")
         if orch_gaps:
             for g in orch_gaps[:2]:
-                cl_lines.append(
-                    f"- `{g.get('key')}` *(orchestrator)*: {g.get('reason')}\n"
-                )
+                cl_lines.append(f"- `{g.get('key')}` *(orchestrator)*: {g.get('reason')}\n")
         total_shown = min(6, len(agent_gaps)) + min(2, len(orch_gaps))
         if len(out["gaps"]) > total_shown:
             cl_lines.append(f"- ... and {len(out['gaps']) - total_shown} more\n")
+
+    # Fable-5 R2 (2026-07-11): chronic cells — >=N consecutive cycles where an
+    # AGENT (not the orchestrator auto-gap placeholder) actively researched
+    # this cell and found nothing. A short, model-grouped list distinct from
+    # the (often 400+ entry) raw Gaps dump above — this is the "keeps
+    # failing despite real effort" signal an operator should actually read.
+    # See lib.matrix.CHRONIC_AGENT_CYCLES / gap_source_by_cell / priority_cells.
+    if log.get("chronic"):
+        by_model: dict[str, list[str]] = {}
+        for cell_key in log["chronic"]:
+            mid, _, bk = cell_key.partition(".")
+            by_model.setdefault(mid, []).append(bk)
+        cl_lines.append(
+            f"\n### Chronically unfilled ({len(log['chronic'])} cells across "
+            f"{len(by_model)} models — agent has actively researched these "
+            "for 3+ consecutive cycles with no result)\n"
+        )
+        for mid in sorted(by_model):
+            keys = ", ".join(f"`{k}`" for k in sorted(by_model[mid]))
+            cl_lines.append(f"- `{mid}`: {keys}\n")
 
     return "".join(cl_lines)

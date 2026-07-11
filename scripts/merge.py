@@ -35,8 +35,10 @@ from lib.matrix import active_models as _matrix_active  # noqa: E402
 from lib.matrix import expected_total as _matrix_expected_total  # noqa: E402
 from lib.matrix import filled_cells_from_models as _matrix_filled  # noqa: E402
 from lib.matrix import gap_cells_from_artifact as _matrix_gaps  # noqa: E402
+from lib.matrix import gap_source_by_cell as _matrix_gap_source  # noqa: E402
 from lib.matrix import total_universe as _matrix_universe  # noqa: E402
 from lib.matrix import verify_matrix_invariant as _matrix_verify  # noqa: E402
+from lib.matrix import CHRONIC_AGENT_CYCLES as _CHRONIC_AGENT_CYCLES  # noqa: E402
 from lib.whitelist import _load_unhealthy_urls as _wl_load_unhealthy  # noqa: E402
 from lib.whitelist import all_bench_keys as _wl_all_bench_keys  # noqa: E402
 from lib.whitelist import contracts as _wl_contracts  # noqa: E402
@@ -228,7 +230,7 @@ def _load_vmap(project: str) -> dict:
     return vmap
 
 
-def _stamp_gap_history(cell_entry: dict, cycle_id: str) -> int:
+def _stamp_gap_history(cell_entry: dict, cycle_id: str, source: str = "agent") -> int:
     """Stamp the gap ledger on cell_entry in place for lib.matrix starvation queue.
 
     Returns 1 when gapSince is freshly set this call (used to accumulate
@@ -240,6 +242,14 @@ def _stamp_gap_history(cell_entry: dict, cycle_id: str) -> int:
     hist = cell_entry["gapHistory"]
     if not hist or hist[-1] != cycle_id:
         hist.append(cycle_id)
+    # Fable-5 R2 (2026-07-11): parallel AGENT-only ledger — a subset of
+    # gapHistory's dates where an agent actively surveyed and failed (not an
+    # orchestrator auto-gap placeholder for a cell nobody reached this cycle).
+    # Drives lib.matrix.priority_cells `chronic` classification.
+    if source == "agent":
+        agent_hist = cell_entry.setdefault("gapHistoryAgent", [])
+        if not agent_hist or agent_hist[-1] != cycle_id:
+            agent_hist.append(cycle_id)
     if not cell_entry.get("gapSince"):
         cell_entry["gapSince"] = cycle_id
         return 1
@@ -395,12 +405,20 @@ def _stamp_quarantine_and_gaps(
     pick_winner,
     compute_cell_confidence,
     reliability_ledger,
+    gap_source=None,
 ) -> tuple[int, int]:
     """Walk every (active model, benchKey) cell: stamp gap ledger + apply the
     pick_winner quarantine/reconciliation verdict in place. Returns
-    (quarantined_count, gap_stamps)."""
+    (quarantined_count, gap_stamps).
+
+    `gap_source` (optional): {(modelId, benchKey): 'agent'|'orchestrator'}
+    from lib.matrix.gap_source_by_cell(out) — drives the chronic-gap ledger
+    (Fable-5 R2, 2026-07-11). Defaults every cell to 'agent' when absent,
+    matching gap_gen.py's own default (a cell with no explicit source tag
+    was actively surveyed)."""
     quarantined_count = 0
     gap_stamps = 0
+    gap_source = gap_source or {}
 
     for m in models:
         mid = m.get("id")
@@ -413,10 +431,12 @@ def _stamp_quarantine_and_gaps(
 
             is_gap = val is None
             if is_gap:
-                gap_stamps += _stamp_gap_history(cell_entry, cycle_id)
+                source = gap_source.get((mid, bk), "agent")
+                gap_stamps += _stamp_gap_history(cell_entry, cycle_id, source)
             else:
                 # Cell filled this cycle — clear the gap run.
                 cell_entry["gapHistory"] = []
+                cell_entry["gapHistoryAgent"] = []
                 cell_entry["gapSince"] = None
 
             quarantined_count += _apply_cell_verdict(
@@ -436,7 +456,9 @@ def _stamp_quarantine_and_gaps(
     return quarantined_count, gap_stamps
 
 
-def apply_quarantine_and_gap_policy(models, sources, cycle_id, *, reliability_ledger=None):
+def apply_quarantine_and_gap_policy(
+    models, sources, cycle_id, *, reliability_ledger=None, gap_source=None
+):
     """FAZ 8.A.3d (2026-05-18): merge-time quarantine + gap policy.
 
     Read .aicodermap-verification-map.json (additive fields, safe on
@@ -451,6 +473,9 @@ def apply_quarantine_and_gap_policy(models, sources, cycle_id, *, reliability_le
     retired 2026-06-07: a cell being empty for N cycles is a coverage gap to
     re-query, not evidence of bad data.) gapHistory/gapSince are still stamped
     for the starvation-queue prioritization in lib.matrix.
+
+    `gap_source` (optional, Fable-5 R2): {(modelId, benchKey): 'agent'|
+    'orchestrator'} — see _stamp_quarantine_and_gaps.
 
     Returns the mutated verification map dict so the caller can write it
     back to disk.
@@ -469,6 +494,7 @@ def apply_quarantine_and_gap_policy(models, sources, cycle_id, *, reliability_le
         pick_winner,
         compute_cell_confidence,
         reliability_ledger,
+        gap_source,
     )
 
     print(f"quarantine + gap policy: quarantined={quarantined_count} new_gap_stamps={gap_stamps}")
@@ -1400,12 +1426,26 @@ def _finalize_and_write(
         sources,
         cycle_id=TODAY,
         reliability_ledger=reliability_ledger,
+        gap_source=_matrix_gap_source(out),
     )
     vmap_path = Path(PROJECT) / VERIFICATION_MAP_PATH
     vmap_path.write_text(
         json.dumps(vmap_updated, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
+
+    # Fable-5 R2 (2026-07-11): surface CHRONIC cells (>=N consecutive agent-
+    # sourced research attempts, still unfilled) for the CHANGELOG — distinct
+    # from the 446-entry raw gap dump, this is the short "keeps failing
+    # despite real effort" list an operator should actually look at.
+    active_ids = {m["id"] for m in models if (m.get("status") or "active") == "active"}
+    chronic_cells = sorted(
+        cell_key
+        for cell_key, entry in vmap_updated.get("cells", {}).items()
+        if cell_key.split(".", 1)[0] in active_ids
+        and len(entry.get("gapHistoryAgent") or []) >= _CHRONIC_AGENT_CYCLES
+    )
+    log["chronic"] = chronic_cells
 
     # Model-agnostic display-name canonicalization: fix version-dot anomalies
     # ("Qwen3 7 Max" -> "Qwen3.7 Max") AND repair raw id-slug names that leaked

@@ -134,9 +134,7 @@ def main() -> int:
             rc_total |= rc
         else:
             print("\n=== gap-gen ===", flush=True)
-            print(
-                "  ! gap-gen script missing at scripts/gap_gen.py; skipping", flush=True
-            )
+            print("  ! gap-gen script missing at scripts/gap_gen.py; skipping", flush=True)
 
     # 3. merge.py
     if not args.skip_merge:
@@ -181,6 +179,23 @@ def main() -> int:
             print(
                 "  ⚠ reconcile-winners exit non-zero — continuing (merge already "
                 "wrote coherent data; invariant re-enforced next cycle)",
+                flush=True,
+            )
+
+        # 6. check-new-model-coverage.py (Fable-5 R5, 2026-07-11) — loud warning
+        # when a model admitted THIS cycle (either admission pass, step 4 above
+        # or the pre-gather primary pass) still sits below the coverage floor
+        # after Stage A/B + merge. New models are the likeliest 0-fills
+        # (leaderboards/AA lag a launch); this distinguishes "expected, still
+        # early" from a silent pipeline miss. Non-fatal, advisory-only.
+        rc_cov = _run_subprocess(
+            [sys.executable, str(SCRIPTS / "check-new-model-coverage.py")],
+            name="new-model-coverage",
+        )
+        if rc_cov != 0:
+            print(
+                "  ⚠ new-model-coverage-check exit non-zero — continuing "
+                "(advisory only, does not affect written data)",
                 flush=True,
             )
 

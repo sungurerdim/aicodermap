@@ -147,9 +147,7 @@ def validate_gather(
             warnings.append(f"observations[{i}] missing fields: {sorted(missing)}")
             continue
         if o.get("tier") not in ALLOWED_TIERS:
-            warnings.append(
-                f"observations[{i}].tier='{o.get('tier')}' invalid (need I|S|C)"
-            )
+            warnings.append(f"observations[{i}].tier='{o.get('tier')}' invalid (need I|S|C)")
         if o.get("modelId") not in target_set:
             warnings.append(
                 f"observations[{i}].modelId='{o.get('modelId')}' not in target_model_ids"
@@ -169,16 +167,10 @@ def validate_gather(
         per_model[mid] = per_model.get(mid, 0) + 1
     weak_models = [mid for mid, c in per_model.items() if c < min_avg]
 
-    avg_obs = (
-        sum(per_model.values()) / max(len(target_model_ids), 1)
-        if target_model_ids
-        else 0
-    )
+    avg_obs = sum(per_model.values()) / max(len(target_model_ids), 1) if target_model_ids else 0
 
     if avg_obs < min_avg:
-        warnings.append(
-            f"avg observations/model = {avg_obs:.1f} < {min_avg} (weak gather)"
-        )
+        warnings.append(f"avg observations/model = {avg_obs:.1f} < {min_avg} (weak gather)")
     if len(valid_observations) == 0:
         errors.append("zero valid observations — gather is empty")
 
@@ -202,9 +194,30 @@ def validate_gather(
     }
 
 
-def feedback_message(
-    verdict: dict[str, Any], target_model_ids: list[str], output_path: str
-) -> str:
+def zero_obs_models(verdicts: list[dict[str, Any]]) -> list[str]:
+    """Union of models with EXACTLY ZERO observations across a set of already-
+    validated gather verdicts (`validate_gather`/`validate_gather_file` output).
+
+    Fable-5 R1 (2026-07-11): the existing FAZ 2.4 zero-fill retry only fires
+    when an ENTIRE BATCH returns 0 fills — a batch that filled 5/6 of its
+    models still leaves its 1 zero-obs model stuck with no retry, silently,
+    until a human notices (observed: `gemini-omni-flash` inside a productive
+    6-model batch, 2026-07-11). `perModelObs` is already computed per batch
+    by `validate_gather`; this just unions the `== 0` models across every
+    batch in the cycle so the orchestrator can dispatch ONE rescue batch for
+    all of them — see SKILL.md Stage A "3.6b RESCUE_BATCH".
+
+    Deduplicated + sorted for a deterministic dispatch list. A model that
+    appears in multiple verdicts (e.g. an original batch + its retry) counts
+    as zero-obs only if EVERY verdict it appears in shows 0."""
+    seen: dict[str, int] = {}
+    for v in verdicts:
+        for mid, count in (v.get("stats", {}).get("perModelObs") or {}).items():
+            seen[mid] = seen.get(mid, 0) + count
+    return sorted(mid for mid, total in seen.items() if total == 0)
+
+
+def feedback_message(verdict: dict[str, Any], target_model_ids: list[str], output_path: str) -> str:
     """Generate concise retry feedback for an invalid artifact.
 
     Used to inject corrective guidance into the next dispatch prompt
@@ -332,9 +345,7 @@ def validate_gather_file(
             started_age = cycle_started_unix - started
             if started_age > STALE_GRACE_SEC:
                 if mtime_fresh:
-                    stats["startedAtWarn"] = (
-                        f"old by {started_age:.0f}s (mtime fresh → trusted)"
-                    )
+                    stats["startedAtWarn"] = f"old by {started_age:.0f}s (mtime fresh → trusted)"
                     verdict.setdefault("warnings", []).append(
                         f"runtime.startedAt predates cycle start by {started_age:.0f}s "
                         f"but mtime is fresh (likely an agent clock-less placeholder); "
@@ -397,14 +408,8 @@ if __name__ == "__main__":
     weak_count = 0
     stale_count = 0
     valid_count = 0
-    for path in sorted(
-        glob.glob(str(project / GATHER_BATCH_GLOB))
-    ):
-        bid = (
-            Path(path)
-            .name.replace(".aicodermap-agent-out-", "")
-            .replace(".gather.json", "")
-        )
+    for path in sorted(glob.glob(str(project / GATHER_BATCH_GLOB))):
+        bid = Path(path).name.replace(".aicodermap-agent-out-", "").replace(".gather.json", "")
         targets = target_by_batch.get(bid)
         if targets is None:
             print(f"[?] {bid}: no target_model_ids found in plan, skipping")
