@@ -45,7 +45,11 @@ from lib.whitelist import hostname_index as _wl_hostname_index  # noqa: E402
 from lib.whitelist import load_whitelist as _wl_load  # noqa: E402
 from lib.constants import FORMAT_WEIGHTS as _FORMAT_WEIGHTS  # noqa: E402
 from lib.constants import VERIFICATION_AGREEMENT_PP as _AGREEMENT_PP  # noqa: E402
-from lib.constants import SINGLE_ARTIFACT_PATH, VERIFICATION_MAP_PATH  # noqa: E402
+from lib.constants import (  # noqa: E402
+    SINGLE_ARTIFACT_PATH,
+    SYNTH_ARTIFACT_PATH,
+    VERIFICATION_MAP_PATH,
+)
 from lib.tiers import TIER_RANK as _TIER_RANK  # noqa: E402
 from lib.tiers import TIER_WEIGHT as _TIER_WEIGHT  # noqa: E402
 from lib.util import canonical_display_name as _canonical_name  # noqa: E402
@@ -71,6 +75,7 @@ ARTIFACT = f"{PROJECT}/{SINGLE_ARTIFACT_PATH}"
 
 LEDGER_PATH = Path(PROJECT) / "data" / "source-reliability.json"
 BYPASS_FLOOR_CHECK = "--bypass-floor-check" in sys.argv
+ALLOW_STALE_ARTIFACT = "--allow-stale-artifact" in sys.argv
 
 # Formats whose primary fetch is "skip" — fetching their canonical URL directly
 # should be rare. A sourcesAdded entry that points at one of these formats and
@@ -190,10 +195,7 @@ def merge_pricing(dst_pricing, src_pricing):
                 merged_by_provider[prov] = entry
         dst_pricing["api"] = list(merged_by_provider.values())
     if "subscription" in src_pricing:
-        if (
-            isinstance(src_pricing["subscription"], list)
-            or src_pricing["subscription"] is None
-        ):
+        if isinstance(src_pricing["subscription"], list) or src_pricing["subscription"] is None:
             dst_pricing["subscription"] = src_pricing["subscription"]
     api = dst_pricing.get("api") or []
     if isinstance(api, list) and api:
@@ -356,9 +358,9 @@ def _apply_cell_verdict(
                 (result.get("winning_cluster") or {}).get("sum_trust", 0.0),
                 3,
             ),
-            "winning_cluster_distinct_sources": (
-                result.get("winning_cluster") or {}
-            ).get("distinct_sources", 0),
+            "winning_cluster_distinct_sources": (result.get("winning_cluster") or {}).get(
+                "distinct_sources", 0
+            ),
         }
     return 0
 
@@ -434,9 +436,7 @@ def _stamp_quarantine_and_gaps(
     return quarantined_count, gap_stamps
 
 
-def apply_quarantine_and_gap_policy(
-    models, sources, cycle_id, *, reliability_ledger=None
-):
+def apply_quarantine_and_gap_policy(models, sources, cycle_id, *, reliability_ledger=None):
     """FAZ 8.A.3d (2026-05-18): merge-time quarantine + gap policy.
 
     Read .aicodermap-verification-map.json (additive fields, safe on
@@ -471,10 +471,7 @@ def apply_quarantine_and_gap_policy(
         reliability_ledger,
     )
 
-    print(
-        f"quarantine + gap policy: quarantined={quarantined_count} "
-        f"new_gap_stamps={gap_stamps}"
-    )
+    print(f"quarantine + gap policy: quarantined={quarantined_count} new_gap_stamps={gap_stamps}")
     return vmap
 
 
@@ -489,9 +486,7 @@ def apply_model_update(model, updates):
         elif k == "bench" and isinstance(v, dict):
             if "bench" not in model:
                 model["bench"] = {}
-            if "benchUpdated" not in model or not isinstance(
-                model.get("benchUpdated"), dict
-            ):
+            if "benchUpdated" not in model or not isinstance(model.get("benchUpdated"), dict):
                 model["benchUpdated"] = {}
             for bk, bv in v.items():
                 if isinstance(bv, dict) and "value" in bv:
@@ -509,9 +504,7 @@ def apply_model_update(model, updates):
             # FAZ 8.A.3d (2026-05-18): dict-merge quarantine flags. Never
             # silently clear existing flags — only the explicit setter (or
             # apply_quarantine_and_gap_policy) clears them by setting False.
-            if "benchQuarantine" not in model or not isinstance(
-                model.get("benchQuarantine"), dict
-            ):
+            if "benchQuarantine" not in model or not isinstance(model.get("benchQuarantine"), dict):
                 model["benchQuarantine"] = {}
             for bk, flag in v.items():
                 if model["benchQuarantine"].get(bk) != bool(flag):
@@ -811,9 +804,7 @@ def _green_cell_reliability_sweep(
         fresh = [
             e
             for e in (entries or [])
-            if isinstance(e, dict)
-            and (e.get("date") or "") == today
-            and e.get("value") is not None
+            if isinstance(e, dict) and (e.get("date") or "") == today and e.get("value") is not None
         ]
         if len(fresh) < 2:
             continue
@@ -872,7 +863,9 @@ def _audit_run_metadata(out: dict) -> str:
     bc = rm.get("batchCount", 0)
     # Heuristic alarms — surface to CHANGELOG without blocking merge.
     if isinstance(tc, int) and tc >= 80:
-        rm_warn += f" [WARN: toolCallCount={tc} near agent ceiling — priority cascade likely starved]"
+        rm_warn += (
+            f" [WARN: toolCallCount={tc} near agent ceiling — priority cascade likely starved]"
+        )
     if isinstance(bc, int) and bc < 5:
         rm_warn += f" [WARN: batchCount={bc}<5 — multi-agent fan-out collapsed]"
     return rm_warn
@@ -890,11 +883,7 @@ def _format_partial_reason(out: dict) -> str:
         blockers: list = partial_reason.get("topBlockingSources") or []
         parts = [f"code={code}"]
         if attempted is not None:
-            fill_ratio = (
-                round(filled / attempted, 2)
-                if (attempted and filled is not None)
-                else "?"
-            )
+            fill_ratio = round(filled / attempted, 2) if (attempted and filled is not None) else "?"
             parts.append(f"attempted={attempted} filled={filled} ({fill_ratio})")
         if blockers:
             parts.append(f"blockers=[{', '.join(blockers[:3])}]")
@@ -959,10 +948,57 @@ def _print_merge_summary(
     print(f"total models: {len(models)}")
 
 
+def _check_artifact_freshness():
+    """Guard against merge.py silently merging a STALE `.aicodermap-agent-out.json`.
+
+    The unified artifact (ARTIFACT) is meant to be regenerated from
+    `.aicodermap-agent-out-synth.json` by `gen_unified_artifact.py` (+
+    `gap_gen.py`) every cycle — see `scripts/refresh-finalize.py`, which
+    chains gen_unified_artifact -> validate-artifact-keys -> gap_gen -> merge
+    -> reconcile-stored-winners as ONE pass. Running `local-synth.py` again
+    and then invoking `merge.py` directly — skipping gen_unified_artifact.py
+    — leaves ARTIFACT holding an OLDER synth's data with zero error signal:
+    merge.py reads it successfully, schema-validates clean, and silently
+    merges stale content while every fresh finding is dropped (observed
+    2026-07-11: a supplementary research pass produced zero promoted fills
+    for two full merge attempts before this was traced to a stale artifact).
+
+    Compares mtimes; a synth artifact newer than ARTIFACT means ARTIFACT was
+    never regenerated from it. Non-fatal by design when SYNTH_ARTIFACT_PATH
+    is absent (the normal single-stage/full mode never writes it).
+    """
+    if ALLOW_STALE_ARTIFACT:
+        return
+    synth_path = Path(PROJECT) / SYNTH_ARTIFACT_PATH
+    artifact_path = Path(ARTIFACT)
+    if not synth_path.is_file() or not artifact_path.is_file():
+        return
+    if synth_path.stat().st_mtime <= artifact_path.stat().st_mtime:
+        return
+    print("\n" + "=" * 72, file=sys.stderr)
+    print("✗ MERGE ABORTED — .aicodermap-agent-out.json is STALE", file=sys.stderr)
+    print("=" * 72, file=sys.stderr)
+    print(
+        f"  {SYNTH_ARTIFACT_PATH} is newer than {SINGLE_ARTIFACT_PATH} — the unified\n"
+        "  artifact was never regenerated from the latest synth output, so this\n"
+        "  merge would silently drop every fresh finding with no error.\n\n"
+        "  Fix: run the full chain in order, e.g.:\n"
+        "    python scripts/refresh-finalize.py\n"
+        "  (or manually: gen_unified_artifact.py -> gap_gen.py -> merge.py)\n\n"
+        "  Bypass (only if ARTIFACT was intentionally hand-edited after synth):\n"
+        "    python scripts/merge.py --allow-stale-artifact",
+        file=sys.stderr,
+    )
+    print("=" * 72, file=sys.stderr)
+    sys.exit(1)
+
+
 def _validate_and_load_artifact():
     """Schema-validate the agent artifact (HARD BLOCK on failure), load it, and
     run gap validation. Returns (out, fabricated_suspicions)."""
     import subprocess as _sp
+
+    _check_artifact_freshness()
 
     # Schema validation — HARD BLOCK before any file writes.
     _val = _sp.run(
@@ -974,9 +1010,7 @@ def _validate_and_load_artifact():
     )
     if _val.returncode != 0:
         print("\n" + "=" * 72, file=sys.stderr)
-        print(
-            "✗ MERGE ABORTED — agent artifact fails schema validation", file=sys.stderr
-        )
+        print("✗ MERGE ABORTED — agent artifact fails schema validation", file=sys.stderr)
         print("=" * 72, file=sys.stderr)
         for line in (_val.stderr or _val.stdout or "").strip().splitlines():
             print(f"  {line}", file=sys.stderr)
@@ -1086,9 +1120,7 @@ def _apply_model_updates(out, sources, models_by_id, wl_idx, unhealthy_urls, log
             }
             if _ambiguous:
                 _entry["_variantAmbiguous"] = True
-                out.setdefault("runtime", {}).setdefault("variantAmbiguous", []).append(
-                    s["key"]
-                )
+                out.setdefault("runtime", {}).setdefault("variantAmbiguous", []).append(s["key"])
             if append_source(sources, s["key"], _entry):
                 log["sources_appended"] += 1
 
@@ -1148,9 +1180,7 @@ def _consensus_winner(
     best = clusters[0]
     d = best["distinct_sources"]
     s = best["sum_trust"]
-    gate_passed = d >= MIN_DISTINCT_SAFE or (
-        d >= MIN_DISTINCT_PAIRED and s >= MIN_SUM_TRUST_PAIRED
-    )
+    gate_passed = d >= MIN_DISTINCT_SAFE or (d >= MIN_DISTINCT_PAIRED and s >= MIN_SUM_TRUST_PAIRED)
     if not gate_passed:
         return fallback, f"weak cluster d={d} s={s} — keep fallback"
     cluster_winner = max(
@@ -1180,8 +1210,7 @@ def _healthy_winner_for(c, unhealthy_urls, log):
     healthy_candidates = [
         cand
         for cand in all_candidates
-        if not _is_unhealthy_source(cand, unhealthy_urls)
-        and cand.get("value") is not None
+        if not _is_unhealthy_source(cand, unhealthy_urls) and cand.get("value") is not None
     ]
     if _is_unhealthy_source(winner, unhealthy_urls):
         log["spa_guard_rejections"] += 1
@@ -1203,9 +1232,7 @@ def _healthy_winner_for(c, unhealthy_urls, log):
     # FAZ 6.B: re-cluster + prefer multi-source consensus.
     new_winner, reason = _consensus_winner(healthy_candidates, winner)
     if new_winner is not winner and new_winner is not None:
-        log["format_warnings"].append(
-            f"{mid}.{bench_field}: consensus override — {reason}"
-        )
+        log["format_warnings"].append(f"{mid}.{bench_field}: consensus override — {reason}")
         winner = new_winner
     return winner, healthy_candidates, all_candidates
 
@@ -1252,9 +1279,7 @@ def _store_winner_and_provenance(
                 "tier": cand.get("tier"),
                 "verifications": cand.get("verifications", 1),
                 "trustScore": cand.get("trustScore"),
-                "contradictionRole": "winner"
-                if cand.get("value") == winner_value
-                else "loser",
+                "contradictionRole": "winner" if cand.get("value") == winner_value else "loser",
             },
         )
         log["sources_appended"] += 1
@@ -1321,9 +1346,7 @@ def _resolve_contradictions(out, models, sources, models_by_id, unhealthy_urls, 
         # Agent contract: `field` is the bare bench key, `autoResolveWinner` is
         # the wrapped {value, trustScore, sourceUrl, tier} dict — Storage extracts
         # `.value` for models.json, full dict goes into sources.json provenance.
-        winner, healthy_candidates, all_candidates = _healthy_winner_for(
-            c, unhealthy_urls, log
-        )
+        winner, healthy_candidates, all_candidates = _healthy_winner_for(c, unhealthy_urls, log)
         if winner is None:
             continue
         _store_winner_and_provenance(
@@ -1423,9 +1446,7 @@ def _coverage_warning(out):
     if coverage < 0.50:
         coverage_warn = f" [WARN: very low cumulative provenance coverage {cov_pct}%]"
     elif coverage < 0.85:
-        coverage_warn = (
-            f" [WARN: cumulative provenance coverage {cov_pct}% below 85% target]"
-        )
+        coverage_warn = f" [WARN: cumulative provenance coverage {cov_pct}% below 85% target]"
     return coverage_warn, cov_pct
 
 
@@ -1439,9 +1460,7 @@ def _matrix_warning(invariant_ok, mx_diag, matrix):
         if missing:
             sample = ", ".join(f"{m}.{b}" for m, b in missing[:5])
             extra = f" ...+{len(missing) - 5}" if len(missing) > 5 else ""
-            msg_parts.append(
-                f"{len(missing)} cell(s) silently missing ({sample}{extra})"
-            )
+            msg_parts.append(f"{len(missing)} cell(s) silently missing ({sample}{extra})")
         for okey, items in overlap.items():
             if items:
                 msg_parts.append(f"{okey}={len(items)}")
@@ -1530,10 +1549,7 @@ def _mx2_floor_gate(mx_diag, contracts_block, models_path, sources_path):
     ratio = mx_diag.get("filled", 0) / max(mx_diag["totalCells"], 1)
     if ratio >= floor:
         return ""
-    floor_msg = (
-        f" [MX2: coverage {round(ratio * 100, 1)}% < absolute floor "
-        f"{int(floor * 100)}%]"
-    )
+    floor_msg = f" [MX2: coverage {round(ratio * 100, 1)}% < absolute floor {int(floor * 100)}%]"
     mx2_warn_only = os.environ.get("AICODERMAP_MX2_WARN_ONLY") == "1"
     if not mx2_warn_only and not BYPASS_FLOOR_CHECK:
         _abort_mx2(ratio, floor, mx_diag, models_path, sources_path)
@@ -1547,9 +1563,7 @@ def _write_meta_telemetry(out, models, mx_diag, log):
     CHANGELOG metadata row."""
     contradictions_resolved = len(log.get("contradictions") or [])
     try:
-        existing_meta = json.loads(
-            (Path(f"{PROJECT}/data/_meta.json")).read_text(encoding="utf-8")
-        )
+        existing_meta = json.loads((Path(f"{PROJECT}/data/_meta.json")).read_text(encoding="utf-8"))
         prev_etag = existing_meta.get("etag") or existing_meta.get("prevPushEtag")
     except (FileNotFoundError, json.JSONDecodeError, OSError):
         prev_etag = None
@@ -1568,12 +1582,20 @@ def _write_meta_telemetry(out, models, mx_diag, log):
     return _telemetry_changelog_row(meta_row)
 
 
+def _extract_subsections(block: str) -> dict[str, str]:
+    """Split a `## [date] ...` CHANGELOG block into {heading: full section text}
+    keyed by `### Heading` line (first line of each section, verbatim)."""
+    sections: dict[str, str] = {}
+    for m in re.finditer(r"(?m)^(### .+)$([\s\S]*?)(?=^### |\Z)", block):
+        heading, body = m.group(1), m.group(2)
+        sections[heading.strip()] = (heading + body).rstrip("\n")
+    return sections
+
+
 def _write_changelog(log, out, metadata_row, coverage_warn, partial_info):
     """Prepend today's CHANGELOG entry, consolidating same-day re-runs."""
     cl_path = f"{PROJECT}/CHANGELOG.md"
-    cl_blob = _render_changelog(
-        log, out, metadata_row, coverage_warn, partial_info, TODAY
-    )
+    cl_blob = _render_changelog(log, out, metadata_row, coverage_warn, partial_info, TODAY)
     if os.path.exists(cl_path):
         with open(cl_path, encoding="utf-8") as fp:
             existing = fp.read()
@@ -1584,9 +1606,28 @@ def _write_changelog(log, out, metadata_row, coverage_warn, partial_info):
         # leading `## [TODAY]` block(s) before prepending the freshest one: the
         # last merge of a cycle is authoritative. SoC: only same-day blocks are
         # touched; prior dates are immutable history.
-        existing = re.sub(
-            r"(?ms)^## \[" + re.escape(TODAY) + r"\].*?(?=^## \[|\Z)", "", existing
-        )
+        today_re = re.compile(r"(?ms)^## \[" + re.escape(TODAY) + r"\].*?(?=^## \[|\Z)")
+        prior_today_match = today_re.search(existing)
+        # PRESERVE-UNKNOWN-SUBSECTIONS (2026-07-11): `cl_blob` is always
+        # regenerated purely from THIS process's `out` — a scoped/partial run
+        # (e.g. local-synth.py -> merge.py without the full lineup/AA-extract/
+        # anomaly-verify steps a complete `/aicodermap` cycle runs) produces a
+        # thinner `out` than the original cycle's, so a naive strip-and-replace
+        # silently drops sections the partial run never populates (`### Lineup`,
+        # `### Post-merge corrections`, `### Pipeline fixes`, or any manually
+        # authored subsection) — observed 2026-07-11 losing real cycle history
+        # to a same-day supplementary research pass. Re-append any `###`
+        # subsection present in the block being replaced but absent from the
+        # fresh blob, so a thinner regeneration only ADDS to the day's record.
+        if prior_today_match:
+            old_sections = _extract_subsections(prior_today_match.group(0))
+            new_sections = _extract_subsections(cl_blob)
+            carried = [
+                text for heading, text in old_sections.items() if heading not in new_sections
+            ]
+            if carried:
+                cl_blob = cl_blob.rstrip("\n") + "\n\n" + "\n\n".join(carried) + "\n"
+        existing = today_re.sub("", existing)
         with open(cl_path, "w", encoding="utf-8") as fp:
             fp.write(cl_blob + "\n" + existing.lstrip("\n"))
     else:
@@ -1594,9 +1635,7 @@ def _write_changelog(log, out, metadata_row, coverage_warn, partial_info):
             fp.write("# Changelog\n\n" + cl_blob)
 
 
-def _run_post_write_gates_and_changelog(
-    out, models, models_path, sources_path, log, issues
-):
+def _run_post_write_gates_and_changelog(out, models, models_path, sources_path, log, issues):
     """Coverage warnings + MX1/MX2 invariant gates + post-write audits +
     telemetry + CHANGELOG write + final summary print."""
     coverage_warn, cov_pct = _coverage_warning(out)
@@ -1671,9 +1710,7 @@ def main():
         reliability_ledger,
     )
 
-    _run_post_write_gates_and_changelog(
-        out, models, models_path, sources_path, log, issues
-    )
+    _run_post_write_gates_and_changelog(out, models, models_path, sources_path, log, issues)
 
 
 if __name__ == "__main__":

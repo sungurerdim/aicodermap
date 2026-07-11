@@ -92,6 +92,7 @@ def priority_cells(
     core_keys: list[str],
     limit: int = 200,
     verification_map: dict[str, Any] | None = None,
+    required_keys: set[str] | None = None,
 ) -> list[dict[str, Any]]:
     """Top-N most starved (modelId, benchKey) cells — ORDERING (advisory).
 
@@ -106,9 +107,16 @@ def priority_cells(
     independently prevent runaway sweep.
 
     Ranking heuristic (descending priority):
-      1. cells where the bench has fewer total filled hits → starve-the-bench bias
-      2. cells in models with fewer total filled hits → starve-the-model bias
-      3. lex order on (modelId, benchKey) for deterministic tie-break
+      1. cells whose gapHistory shows ≥2 consecutive un-filled cycles (starved)
+      2. cells that are a ranking-required bench (`required_keys`, from
+         `_schema.presets.*.requiredBenches`) for a model missing at most one
+         other required bench — filling this ONE cell would flip the model
+         from rank-gated to ranked (2026-07-11: raw starvation buried these
+         behind high-coverage models missing many low-value cells, e.g. a
+         flagship missing only `lcb` sorted near the back of a 446-cell queue)
+      3. cells where the bench has fewer total filled hits → starve-the-bench bias
+      4. cells in models with fewer total filled hits → starve-the-model bias
+      5. lex order on (modelId, benchKey) for deterministic tie-break
 
     `verification_map` (optional) drives ONLY the starvation re-ordering below
     (gapHistory). There is no time-based confirmed-cell skip here: this function
@@ -119,14 +127,18 @@ def priority_cells(
     Returns: [{modelId, benchKey, benchFillRatio, modelFillRatio}], capped at limit.
     """
     keys = list(core_keys)
+    req_keys = required_keys or set()
     bench_filled = {k: 0 for k in keys}
     model_filled = {m["id"]: 0 for m in active}
+    model_missing_required: dict[str, int] = {}
     for m in active:
+        bench = m.get("bench") or {}
         for k in keys:
-            v = (m.get("bench") or {}).get(k)
+            v = bench.get(k)
             if v is not None:
                 bench_filled[k] += 1
                 model_filled[m["id"]] += 1
+        model_missing_required[m["id"]] = sum(1 for rk in req_keys if bench.get(rk) is None)
 
     vm_cells: dict[str, Any] = {}
     if verification_map and isinstance(verification_map, dict):
@@ -137,6 +149,10 @@ def priority_cells(
     # front of the queue with a -1.0 priority key, so they're always
     # researched FIRST regardless of bench/model fill ratios. Prevents
     # the same 90-cell auto-gap cluster from recurring cycle after cycle.
+    #
+    # 2026-07-11: a -0.5 tier sits between starved and normal — a
+    # ranking-required cell whose model is missing at most 1 required bench
+    # TOTAL (i.e. this fill would be the last one needed to become ranked).
     # Tuple shape: (starve_key, bench_ratio, model_ratio, modelId, benchKey).
     candidates: list[tuple[float, float, float, str, str]] = []
     n_models = max(len(active), 1)
@@ -149,7 +165,12 @@ def priority_cells(
             vm_entry = vm_cells.get(cell_key) or {} if vm_cells else {}
             # Starvation flag: ≥2 consecutive gap cycles -> -1.0 (front).
             gap_hist = vm_entry.get("gapHistory") or []
-            starve_key = -1.0 if len(gap_hist) >= 2 else 0.0
+            if len(gap_hist) >= 2:
+                starve_key = -1.0
+            elif k in req_keys and model_missing_required[m["id"]] <= 1:
+                starve_key = -0.5
+            else:
+                starve_key = 0.0
             bench_ratio = bench_filled[k] / n_models
             model_ratio = model_filled[m["id"]] / max(len(keys), 1)
             candidates.append((starve_key, bench_ratio, model_ratio, m["id"], k))
@@ -162,15 +183,15 @@ def priority_cells(
             "benchFillRatio": round(bench_ratio, 3),
             "modelFillRatio": round(model_ratio, 3),
         }
-        if starve_key < 0:
+        if starve_key <= -1.0:
             entry["starved"] = True
+        elif starve_key <= -0.5:
+            entry["rankCritical"] = True
         out.append(entry)
     return out
 
 
-def matrix_snapshot(
-    active: list[dict[str, Any]], core_keys: list[str]
-) -> dict[str, Any]:
+def matrix_snapshot(active: list[dict[str, Any]], core_keys: list[str]) -> dict[str, Any]:
     """Pre-agent snapshot: counts + per-bench / per-model fill, plus expected total."""
     keys = list(core_keys)
     filled = filled_cells_from_models(active, keys)

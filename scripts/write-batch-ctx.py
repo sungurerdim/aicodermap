@@ -27,6 +27,7 @@ from lib.whitelist import (  # noqa: E402
     banned_fetch_patterns,
     contracts,
     core_bench_keys,
+    required_bench_keys,
 )
 
 
@@ -34,9 +35,7 @@ def main() -> int:
     models = _read_json(REPO / "data" / "models.json", [])
     wl = _read_json(REPO / "data" / "sources-whitelist.json", {})
     vmap = _read_json(REPO / VERIFICATION_MAP_PATH, {"cells": {}})
-    snap_index = _read_json(
-        REPO / "data" / ".leaderboard-snapshots" / "_index.json", {}
-    )
+    snap_index = _read_json(REPO / "data" / ".leaderboard-snapshots" / "_index.json", {})
     # Index is written by prefetch-leaderboards.py under "snapshots" (NOT
     # "byUrl"). Reading the wrong key silently produced an EMPTY snapshot map in
     # every batch ctx, so agents WebFetched leaderboards they could have Read
@@ -44,9 +43,7 @@ def main() -> int:
     snapshots = snap_index.get("snapshots") or {}
     # Layer-3 anomaly verification queue (PRELIM-F). Sliced per batch below so
     # each agent resolves its flagged cells FIRST (agent.md OUTLIERS->INVESTIGATE).
-    anomalies = (_read_json(REPO / "data" / "_anomalies.json", {}) or {}).get(
-        "anomalies"
-    ) or []
+    anomalies = (_read_json(REPO / "data" / "_anomalies.json", {}) or {}).get("anomalies") or []
 
     ctr = contracts(wl)
     keys = core_bench_keys(wl)
@@ -54,7 +51,13 @@ def main() -> int:
     today = date.today()
 
     ms = matrix_snapshot(active, keys)
-    pc = priority_cells(active, keys, limit=200, verification_map=vmap)
+    pc = priority_cells(
+        active,
+        keys,
+        limit=200,
+        verification_map=vmap,
+        required_keys=required_bench_keys(wl),
+    )
     sk = compute_skip_cells(vmap, today, [m["id"] for m in active], keys)
     bp = banned_fetch_patterns(wl)
 
@@ -66,9 +69,7 @@ def main() -> int:
         batch_wallclock_sec=int(ctr.get("BATCH_WALLCLOCK_SEC", 600)),
     )
     if slow_families:
-        print(
-            f"  [dense-shrink] slow families from last cycle: {sorted(slow_families)}"
-        )
+        print(f"  [dense-shrink] slow families from last cycle: {sorted(slow_families)}")
     plan = compute_dispatch_plan(active, keys, dense_families=slow_families)
     cycle_started = time.time()
 

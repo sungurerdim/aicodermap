@@ -52,9 +52,7 @@ class TestUtil(unittest.TestCase):
 
     def test_extract_domain_strips_www_prefix_only(self):
         """Regression: lstrip('www.') mangled openrouter.ai → penrouter.ai."""
-        self.assertEqual(
-            util.extract_domain("https://www.openrouter.ai/models"), "openrouter.ai"
-        )
+        self.assertEqual(util.extract_domain("https://www.openrouter.ai/models"), "openrouter.ai")
         self.assertEqual(util.extract_domain("https://openai.com/blog"), "openai.com")
         self.assertEqual(util.extract_domain("https://ollama.com"), "ollama.com")
         self.assertEqual(util.extract_domain(""), "")
@@ -80,16 +78,10 @@ class TestUtil(unittest.TestCase):
         self.assertEqual(util.canonical_display_name("GPT-5.5"), "GPT-5.5")
 
     def test_canonical_display_name_slug_repair(self):
-        self.assertEqual(
-            util.canonical_display_name("minimax-m3", "MiniMax"), "MiniMax M3"
-        )
-        self.assertEqual(
-            util.canonical_display_name("minimax-m2-7", "MiniMax"), "MiniMax M2.7"
-        )
+        self.assertEqual(util.canonical_display_name("minimax-m3", "MiniMax"), "MiniMax M3")
+        self.assertEqual(util.canonical_display_name("minimax-m2-7", "MiniMax"), "MiniMax M2.7")
         # Already-formatted names never re-enter the slug path.
-        self.assertEqual(
-            util.canonical_display_name("MiniMax M2.7", "MiniMax"), "MiniMax M2.7"
-        )
+        self.assertEqual(util.canonical_display_name("MiniMax M2.7", "MiniMax"), "MiniMax M2.7")
 
     def test_normalize_anomaly_verdict_mapping_and_idempotence(self):
         raw = {
@@ -210,6 +202,19 @@ class TestWhitelist(unittest.TestCase):
     def test_all_bench_keys_is_core_union_emerging(self):
         self.assertEqual(wl.all_bench_keys(SYNTH_WL), ["swePro", "cfElo", "mcpA"])
 
+    def test_required_bench_keys_unions_presets(self):
+        schema_wl = {
+            "_schema": {
+                "presets": {
+                    "swe-focused": {"requiredBenches": ["swePro", "lcb"]},
+                    "agentic-focused": {"requiredBenches": ["tau2", "tb2"]},
+                    "consensus": {"kind": "vendorConsensus"},  # no requiredBenches
+                }
+            }
+        }
+        self.assertEqual(wl.required_bench_keys(schema_wl), {"swePro", "lcb", "tau2", "tb2"})
+        self.assertEqual(wl.required_bench_keys(SYNTH_WL), set())
+
     def test_hostname_index_maps_format_and_tier(self):
         idx = wl.hostname_index(SYNTH_WL)
         self.assertEqual(idx["swebench.example"], ("static_html_table", "I"))
@@ -250,19 +255,13 @@ class TestWhitelist(unittest.TestCase):
         self.assertIsNotNone(hit2)
         self.assertFalse(hard2)
         # Non-confusable bench → never a misfile.
-        self.assertEqual(
-            wl.elo_swe_misfile("gpqa", ["https://x.example"], dp), (None, False)
-        )
+        self.assertEqual(wl.elo_swe_misfile("gpqa", ["https://x.example"], dp), (None, False))
 
     def test_load_whitelist_reads_file_and_raises_on_missing(self):
         with tempfile.TemporaryDirectory() as td:
             p = Path(td) / "wl.json"
-            p.write_text(
-                json.dumps({"_schema": {"coreBenchKeys": ["swePro"]}}), encoding="utf-8"
-            )
-            self.assertEqual(
-                wl.load_whitelist(p)["_schema"]["coreBenchKeys"], ["swePro"]
-            )
+            p.write_text(json.dumps({"_schema": {"coreBenchKeys": ["swePro"]}}), encoding="utf-8")
+            self.assertEqual(wl.load_whitelist(p)["_schema"]["coreBenchKeys"], ["swePro"])
             with self.assertRaises(FileNotFoundError):
                 wl.load_whitelist(Path(td) / "missing.json")
 
@@ -301,9 +300,7 @@ class TestMatrix(unittest.TestCase):
         )
 
     def test_parse_gap_cell_both_shapes(self):
-        self.assertEqual(
-            matrix.parse_gap_cell({"key": "alpha.cfElo"}), ("alpha", "cfElo")
-        )
+        self.assertEqual(matrix.parse_gap_cell({"key": "alpha.cfElo"}), ("alpha", "cfElo"))
         self.assertEqual(
             matrix.parse_gap_cell({"modelId": "alpha", "field": "cfElo"}),
             ("alpha", "cfElo"),
@@ -324,6 +321,49 @@ class TestMatrix(unittest.TestCase):
         self.assertFalse(overlap["ok"])
         self.assertEqual(overlap["overlap"]["filled_gap"], [("a", "k2")])
 
+    def test_priority_cells_boosts_rank_critical_over_raw_starvation(self):
+        # 2026-07-11: a model missing only its LAST required bench (flagship,
+        # already well-covered) must outrank a barely-covered model's cells
+        # that aren't required by any preset, even though raw starve ratios
+        # would sort the barely-covered model's cells first.
+        keys = ["swePro", "lcb", "other"]
+        active = [
+            {"id": "flagship", "bench": {"swePro": 90.0, "lcb": None, "other": 50.0}},
+            {"id": "poor", "bench": {"swePro": None, "lcb": None, "other": None}},
+        ]
+        pc = matrix.priority_cells(active, keys, limit=10, required_keys={"swePro", "lcb"})
+        order = [(c["modelId"], c["benchKey"]) for c in pc]
+        self.assertEqual(order[0], ("flagship", "lcb"))
+        flagship_entry = next(c for c in pc if c["modelId"] == "flagship")
+        self.assertTrue(flagship_entry.get("rankCritical"))
+        poor_entries = [c for c in pc if c["modelId"] == "poor"]
+        self.assertTrue(all(not c.get("rankCritical") for c in poor_entries))
+
+    def test_priority_cells_starved_still_beats_rank_critical(self):
+        # gapHistory-starved cells (-1.0) stay strictly ahead of the new
+        # rank-critical tier (-0.5) — starvation is a stronger signal than
+        # "would unlock ranking" (a starved cell has already failed repeatedly).
+        # Each model is missing exactly ONE required bench (the qualifying
+        # condition for the rank-critical boost); "starved" additionally has
+        # gapHistory on its one missing cell.
+        keys = ["swePro", "lcb"]
+        active = [
+            {"id": "starved-model", "bench": {"swePro": None, "lcb": 80.0}},
+            {"id": "fresh-model", "bench": {"swePro": 70.0, "lcb": None}},
+        ]
+        vmap = {"cells": {"starved-model.swePro": {"gapHistory": ["2026-07-02", "2026-07-11"]}}}
+        pc = matrix.priority_cells(
+            active,
+            keys,
+            limit=10,
+            verification_map=vmap,
+            required_keys={"swePro", "lcb"},
+        )
+        self.assertEqual((pc[0]["modelId"], pc[0]["benchKey"]), ("starved-model", "swePro"))
+        self.assertTrue(pc[0]["starved"])
+        self.assertEqual((pc[1]["modelId"], pc[1]["benchKey"]), ("fresh-model", "lcb"))
+        self.assertTrue(pc[1].get("rankCritical"))
+
 
 # ── dispatch ─────────────────────────────────────────────────────────────────
 
@@ -342,12 +382,8 @@ class TestDispatch(unittest.TestCase):
     def test_models_per_batch_budget_derivation(self):
         # 150-cell budget: 26 keys → 5; tiny key count caps at the absolute max.
         self.assertEqual(dispatch.models_per_batch(26), 5)
-        self.assertEqual(
-            dispatch.models_per_batch(10), dispatch.ABSOLUTE_MAX_BATCH_MODELS
-        )
-        self.assertEqual(
-            dispatch.models_per_batch(0), dispatch.ABSOLUTE_MAX_BATCH_MODELS
-        )
+        self.assertEqual(dispatch.models_per_batch(10), dispatch.ABSOLUTE_MAX_BATCH_MODELS)
+        self.assertEqual(dispatch.models_per_batch(0), dispatch.ABSOLUTE_MAX_BATCH_MODELS)
 
     def test_split_oversize_batches(self):
         out = dispatch.split_oversize_batches([_models(7, "Acme")], 3)
@@ -377,9 +413,7 @@ class TestDispatch(unittest.TestCase):
             dense_families={"openai"},
             dense_max_models=4,
         )
-        openai_batches = [
-            b for b in plan["batches"] if all("openai-" in m for m in b["modelIds"])
-        ]
+        openai_batches = [b for b in plan["batches"] if all("openai-" in m for m in b["modelIds"])]
         self.assertTrue(openai_batches, "expected vendor-pure openai batches")
         for b in openai_batches:
             self.assertLessEqual(b["modelCount"], 4)
@@ -415,20 +449,14 @@ class TestFreshness(unittest.TestCase):
 
     def test_t1_disqualifiers(self):
         self.assertEqual(classify_cell(None, self.TODAY)["reason"], "no-map-entry")
-        self.assertEqual(
-            classify_cell(self._cell(confirmed=False), self.TODAY)["tier"], "T1"
-        )
+        self.assertEqual(classify_cell(self._cell(confirmed=False), self.TODAY)["tier"], "T1")
         # contradiction is the SOLE event that re-opens a confirmed cell.
-        self.assertEqual(
-            classify_cell(self._cell(contradicted=True), self.TODAY)["tier"], "T1"
-        )
+        self.assertEqual(classify_cell(self._cell(contradicted=True), self.TODAY)["tier"], "T1")
 
     def test_compute_skip_cells_meta_counts(self):
         vm = {"cells": {"alpha.swePro": self._cell()}}
         skip = compute_skip_cells(vm, self.TODAY, ["alpha"], ["swePro", "cfElo"])
-        self.assertEqual(
-            skip["_meta"], {"t1Count": 1, "t2Count": 1, "totalConsidered": 2}
-        )
+        self.assertEqual(skip["_meta"], {"t1Count": 1, "t2Count": 1, "totalConsidered": 2})
         self.assertIn("swePro", skip["alpha"])
         self.assertNotIn("cfElo", skip.get("alpha", {}))
 
@@ -542,9 +570,7 @@ class TestIdeaContextSlims(unittest.TestCase):
 
     def test_slim_priority_cells(self):
         cells = [{"modelId": "alpha"}, {"modelId": "beta"}]
-        self.assertEqual(
-            idea_context.slim_priority_cells(cells, ["beta"]), [{"modelId": "beta"}]
-        )
+        self.assertEqual(idea_context.slim_priority_cells(cells, ["beta"]), [{"modelId": "beta"}])
 
 
 # ── new-model admission gate (2026-06-27 consolidation regression) ────────────
@@ -621,13 +647,9 @@ class TestNewModelGate(unittest.TestCase):
         # short-circuited to None (fails OPEN) — a re-listed older sibling was
         # admitted as a fresh stub even though a newer one was already tracked.
         existing = [{"id": "kimi-k2-7-code", "name": "Kimi K2.7 Code"}]
-        self.assertEqual(
-            add_stubs.parse_name("Kimi K2.7 Code"), (("kimi", "k", "code"), (2, 7))
-        )
+        self.assertEqual(add_stubs.parse_name("Kimi K2.7 Code"), (("kimi", "k", "code"), (2, 7)))
         # A re-listed older sibling IS recognized as superseded.
-        self.assertEqual(
-            add_stubs.is_superseded("Kimi K2.6 Code", existing), "Kimi K2.7 Code"
-        )
+        self.assertEqual(add_stubs.is_superseded("Kimi K2.6 Code", existing), "Kimi K2.7 Code")
         # A genuinely-new, higher version in the same family is NOT flagged.
         self.assertIsNone(add_stubs.is_superseded("Kimi K3 Code", existing))
 

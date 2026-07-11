@@ -121,6 +121,23 @@ def all_bench_keys(whitelist: dict[str, Any]) -> list[str]:
     return core_bench_keys(whitelist) + emerging_bench_keys(whitelist)
 
 
+def required_bench_keys(whitelist: dict[str, Any]) -> set[str]:
+    """Union of every preset's `requiredBenches` (`_schema.presets.*`).
+
+    A cell in this set gates a model out of the "Limited Coverage" band for
+    at least one ranking preset (assets/js/scoring.js `rankGateStatus`) when
+    missing — see `_schema.presets.<name>.requiredBenches`. Used to boost a
+    cell's research priority when filling it would flip a model from gated
+    to ranked, which raw starvation ordering (fewest total filled hits)
+    otherwise buries under high-coverage models missing only 1-2 cells."""
+    presets = schema(whitelist).get("presets") or {}
+    out: set[str] = set()
+    for preset in presets.values():
+        if isinstance(preset, dict):
+            out.update(preset.get("requiredBenches") or [])
+    return out
+
+
 def _publishes_keys(entry: dict[str, Any]) -> list[str]:
     """publishes[] shape may be ["key", ...] (legacy) or [{key, priority}, ...]
     (P10.4 reform). This helper normalizes both into a flat list of keys."""

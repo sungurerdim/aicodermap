@@ -24,9 +24,7 @@ CONTRADICTION_WARN_PP = 3.0  # pp delta → YELLOW (auto-resolve via trustScore)
 CONTRADICTION_BLOCK_PP = 5.0  # pp delta → RED (auto-resolve, log loudly)
 COVERAGE_TARGET = 0.85  # ADVISORY. Cumulative provenance coverage; never blocks commit.
 COVERAGE_HARD_BLOCK = 0.50  # ADVISORY. Below → louder CHANGELOG warning, still commits.
-ABSOLUTE_COVERAGE_FLOOR = (
-    0.30  # HARD BLOCK after AICODERMAP_MX2_BLOCK=1; .bak rollback below.
-)
+ABSOLUTE_COVERAGE_FLOOR = 0.30  # HARD BLOCK after AICODERMAP_MX2_BLOCK=1; .bak rollback below.
 MIN_SOURCES_PER_FILLED_CELL = 2  # MX5: <2 distinct URLs → benchQuarantine[key]=true.
 COMPLETENESS_RETRY_LIMIT = 1  # Single retry per refresh.
 
@@ -111,6 +109,7 @@ FORMAT_WEIGHTS: dict[str, float] = {
 # ── File paths (gitignored artifacts) ──────────────────────────────────────
 VERIFICATION_MAP_PATH = ".aicodermap-verification-map.json"
 SINGLE_ARTIFACT_PATH = ".aicodermap-agent-out.json"
+SYNTH_ARTIFACT_PATH = ".aicodermap-agent-out-synth.json"
 GATHER_BATCH_GLOB = ".aicodermap-agent-out-batch*.gather.json"
 LEADERBOARD_SNAPSHOTS_DIR = "data/.leaderboard-snapshots/"
 LEADERBOARD_INDEX_PATH = "data/.leaderboard-snapshots/_index.json"
