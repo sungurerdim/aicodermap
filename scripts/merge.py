@@ -1462,6 +1462,16 @@ def _finalize_and_write(
 
     issues = []
     for m in models:
+        # G11 (2026-07-15): strip legacy flat "bench.X" top-level keys — stale
+        # duplicates from a pre-F3-guard merge path. Nested m["bench"] is the
+        # only shape the frontend reads; flat keys carried outdated values.
+        legacy_flat = [k for k in m if k.startswith("bench.")]
+        for k in legacy_flat:
+            del m[k]
+        if legacy_flat:
+            log.setdefault("legacy_flat_bench_stripped", []).append(
+                f"{m['id']}: {len(legacy_flat)} keys"
+            )
         p = m.get("pricing")
         if isinstance(p, dict):
             if "api" in p and not isinstance(p["api"], list):
@@ -1606,6 +1616,7 @@ def _write_meta_telemetry(out, models, mx_diag, log):
         existing_meta = json.loads((Path(f"{PROJECT}/data/_meta.json")).read_text(encoding="utf-8"))
         prev_etag = existing_meta.get("etag") or existing_meta.get("prevPushEtag")
     except (FileNotFoundError, json.JSONDecodeError, OSError):
+        existing_meta = None
         prev_etag = None
     meta_row = _telemetry_build_meta(
         models=models,
@@ -1614,6 +1625,7 @@ def _write_meta_telemetry(out, models, mx_diag, log):
         artifact=out,
         contradictions_resolved=contradictions_resolved,
         prev_push_etag=prev_etag,
+        prev_meta=existing_meta,
     )
     try:
         _telemetry_write(meta_row)

@@ -44,6 +44,10 @@ it is optional — bare `/aicodermap` runs the full refresh.
 
 **Full-refresh baseline:** Agent's `SCOPE_CATEGORIES` taxonomy is non-negotiable — every category must be surveyed, missing ones emit a `gaps[]` entry. Skill rejects returns whose `models[]` + `newModels[]` cardinality < 30 unless agent explains via `gaps[]`.
 
+**NEW_MODEL_CORE_SET (G2, 2026-07-15):** a freshly-admitted model (≤3 core keys filled — lineup stub, possibly with official-bench extractions) has its ENTIRE core-cell set pulled to the front of `priorityCells` (tier −0.75 in `lib/matrix.py::priority_cells`, between starved and rank-critical). A new model must reach a rankable profile in its first cycle; its cells never queue behind older models' popular-bench gaps.
+
+**RELEASE_RADAR (G1, 2026-07-15):** `registries` now includes the OpenRouter newest-models page (`openrouter.ai/models?order=newest`) — live-serving additions are a same-day cross-vendor discovery signal. Radar hits are lineup **candidates only** (same ≥2-source confirmation rule as `newReleaseProbe`); they feed `lineupChanges.new[]`, never auto-add.
+
 ## WORKFLOW
 ```
 PRELIM. SOURCE_HEALTH_CHECK (auto, every refresh — now format-aware):

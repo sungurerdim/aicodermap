@@ -131,6 +131,9 @@ def priority_cells(
 
     Ranking heuristic (descending priority):
       1. cells whose gapHistory shows ≥2 consecutive un-filled cycles (starved)
+      1b. G2 (2026-07-15): every core cell of a freshly-admitted model (≤3
+         core keys filled) — a new model must reach a rankable profile in its
+         first cycle, not queue behind old models' popular-bench gaps
       2. cells that are a ranking-required bench (`required_keys`, from
          `_schema.presets.*.requiredBenches`) for a model missing at most one
          other required bench — filling this ONE cell would flip the model
@@ -190,6 +193,13 @@ def priority_cells(
             gap_hist = vm_entry.get("gapHistory") or []
             if len(gap_hist) >= 2:
                 starve_key = -1.0
+            elif model_filled[m["id"]] <= 3:
+                # G2 (2026-07-15): freshly-admitted model (≤3 of the core keys
+                # filled — a lineup stub, possibly with a few official-bench
+                # extractions). Its whole core set jumps the queue so a new
+                # model gets a rankable profile in its FIRST cycle instead of
+                # its cells sorting behind popular-bench gaps of old models.
+                starve_key = -0.75
             elif k in req_keys and model_missing_required[m["id"]] <= 1:
                 starve_key = -0.5
             else:
@@ -208,6 +218,8 @@ def priority_cells(
         }
         if starve_key <= -1.0:
             entry["starved"] = True
+        elif starve_key <= -0.75:
+            entry["newModelCore"] = True
         elif starve_key <= -0.5:
             entry["rankCritical"] = True
         # 2026-07-11 (Fable-5 R2): CHRONIC = >=CHRONIC_AGENT_CYCLES cycles where

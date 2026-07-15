@@ -74,9 +74,22 @@ def build_meta(
     artifact: dict,
     contradictions_resolved: int,
     prev_push_etag: str | None = None,
+    prev_meta: dict | None = None,
 ) -> dict:
-    """Compose the single-row snapshot. Pure: no I/O."""
+    """Compose the single-row snapshot. Pure: no I/O.
+
+    G13 (2026-07-15): scoped/partial merges (anomaly verdicts, stub
+    re-finalize, local-synth) run with a thin artifact whose runMetadata has
+    no telemetry — the last merge of a cycle is authoritative for _meta.json,
+    so those re-runs were clobbering the real cycle telemetry with nulls.
+    When the current artifact lacks a lastCycle* value, keep the previous one.
+    """
     rm = artifact.get("runMetadata") or {}
+    prev = prev_meta or {}
+
+    def _tele(rm_key: str, meta_key: str):
+        v = rm.get(rm_key)
+        return v if v is not None else prev.get(meta_key)
     total = matrix_diag.get("totalCells", 0)
     filled = matrix_diag.get("filled", 0)
     gaps = matrix_diag.get("gaps", 0)
@@ -94,10 +107,10 @@ def build_meta(
         "naCells": na,
         "fillRatio": round(filled / total, 4) if total else 0.0,
         "contradictionsResolved": int(contradictions_resolved or 0),
-        "lastCycleToolCallCount": rm.get("toolCallCount"),
-        "lastCycleFetchAttemptCount": rm.get("fetchAttemptCount"),
-        "lastCycleBatchCount": rm.get("batchCount"),
-        "lastCycleElapsedMs": rm.get("elapsedMs"),
+        "lastCycleToolCallCount": _tele("toolCallCount", "lastCycleToolCallCount"),
+        "lastCycleFetchAttemptCount": _tele("fetchAttemptCount", "lastCycleFetchAttemptCount"),
+        "lastCycleBatchCount": _tele("batchCount", "lastCycleBatchCount"),
+        "lastCycleElapsedMs": _tele("elapsedMs", "lastCycleElapsedMs"),
         "prevPushEtag": prev_push_etag,
     }
 

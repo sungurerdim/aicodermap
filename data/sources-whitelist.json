@@ -1499,6 +1499,38 @@
         ],
         "definition": "not_logged=zero retention; opt_out=user can disable; default_off=off by default; default_on=on by default"
       }
+    },
+    "benchTypes": {
+      "_purpose": "G5 (2026-07-15): contamination-risk taxonomy per bench. rotating = pool refreshes continuously (live votes / re-runs / monthly rotation); temporal = tasks filtered by date cutoff (post-training-cutoff only); static = frozen split, contamination risk grows with age (2026 SWE-bench Verified controversy). Surfaced in the site glossary; informs preset weight retunes (e.g. sweV demotion).",
+      "swePro": "static",
+      "sweV": "static",
+      "sweMulti": "static",
+      "nl2Repo": "static",
+      "lcb": "temporal",
+      "tb2": "static",
+      "tbHard": "static",
+      "cfElo": "rotating",
+      "webDevElo": "rotating",
+      "aaCoding": "rotating",
+      "tau2": "static",
+      "mcpA": "static",
+      "bfcl": "static",
+      "browseComp": "static",
+      "aaAgentic": "rotating",
+      "gpqa": "static",
+      "aime26": "temporal",
+      "hle": "static",
+      "arcAgi2": "static",
+      "mmluPro": "static",
+      "mrcr": "static",
+      "aaIdx": "rotating",
+      "aaOmni": "rotating",
+      "llmStatsIdx": "rotating",
+      "vellumRank": "rotating",
+      "benchlmIdx": "rotating",
+      "lmArenaElo": "rotating",
+      "hfOpenAvg": "rotating",
+      "kluRank": "rotating"
     }
   },
   "vendors": {
@@ -3956,6 +3988,22 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
+      "consecutiveFailures": 0,
+      "lastVerifiedDate": null
+    },
+    {
+      "name": "OpenRouter new-model radar",
+      "url": "https://openrouter.ai/models?order=newest",
+      "tier": "I",
+      "extracts": "G1 (2026-07-15) release radar: newest cross-vendor serving additions — a model appearing here is live API traffic, same-day signal for lineupChanges.new[] candidates (emit as candidate only, never auto-add; ≥2-source confirmation rule unchanged)",
+      "format": "spa_full",
+      "extractor": "spa_text",
+      "fallbacks": [
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-07-15",
       "consecutiveFailures": 0,
       "lastVerifiedDate": null
     }
