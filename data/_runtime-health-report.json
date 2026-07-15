@@ -1,12 +1,12 @@
 {
-  "probedAt": "2026-07-11T10:06:17Z",
-  "total": 139,
+  "probedAt": "2026-07-15T20:38:59Z",
+  "total": 140,
   "counts": {
-    "format-drift": 13,
+    "format-drift": 12,
     "redirect": 10,
-    "spa": 12,
+    "spa": 11,
     "bot-block": 2,
-    "dead": 8
+    "dead": 7
   },
   "formatDrift": [
     {
@@ -50,11 +50,6 @@
       "observed": "spa_full"
     },
     {
-      "url": "https://benchlm.ai/models/gemini-3-1-pro",
-      "declared": "static_html_article",
-      "observed": "spa_full"
-    },
-    {
       "url": "https://www.datacamp.com/blog",
       "declared": "static_html_table",
       "observed": "spa_full"
@@ -78,7 +73,7 @@
   "redirects": [
     {
       "url": "https://terminal-bench.io/",
-      "to": "https://genteactual.com.co/"
+      "to": "https://shoppingwheel.in/"
     },
     {
       "url": "https://lmarena.ai/leaderboard/webdev",
@@ -106,7 +101,7 @@
     },
     {
       "url": "https://compliance.microsoft.com/compliancemanager",
-      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DcrxF1yebXWY53vLU2XITGLvlmE9gT4r71ymLWoBEBoB-CYciCb-X2Do1sXZ6uB2apjJF582vPBH_Tpzfh2GfSCsJLrus5L1qOXAUndDItICFSrT1lCEdPY9v4XBPsbK2feRt4-A_IsyDH5_WSvwxztVQz0NfBj3JQugeIte0iz4&response_mode=form_post&nonce=639193610537305355.YjYyY2UwMGYtZWM4Yi00OWVjLWEzNjEtYTI0OTBhOWI5MTNkMWE2NWI1ZGItZTZiZC00NjMxLWE1OWYtN2MyOGY5YWRjNDQ5&client-request-id=11b20366-0d2f-43a6-b2d6-f301a028409c&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
+      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3D-3zO6zuGzTFZBzhGXcdF8TAL6yvOlRZtwVt-i0W5d26o2WQunM6A4uWtF9gNeCDoa0gg9p9p0Kgo4tBErojUcWYnSHomzR6vf40-NVrJYJK--LdjI41j86tuZ37nrFC5mrCTomDxHcCq2YpQxK0P2JpFICj6i6jnAOrJCEEgVvI&response_mode=form_post&nonce=639197447218516917.MDc3YzE1NDktOWI4YS00YmEzLWE0MDYtOGYyNGIwYTMyOTE3MmQ1OGM2MmQtNzAxYi00MTliLThiY2QtMGQwY2IxZmUzMTVi&client-request-id=24cbc2fa-c842-4574-90f9-51e75e1b6d53&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
     },
     {
       "url": "https://edpb.europa.eu/our-work-tools/consistency-findings/register-for-decisions_en",
@@ -124,7 +119,6 @@
     "https://novita.ai/model-api",
     "https://www.anyscale.com/endpoints",
     "https://ai.azure.com/explore/models",
-    "https://benchlm.ai/models/gemini-3-1-pro",
     "https://www.datacamp.com/blog",
     "https://tokenmix.ai/blog/",
     "https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-for-service-organizations",
@@ -138,7 +132,7 @@
   "dead": [
     {
       "url": "https://mcp-atlas.dev",
-      "error": "URLError: <urlopen error [Errno 11001] getaddrinfo failed>"
+      "error": "URLError: <urlopen error [Errno 8] nodename nor servname provided, or not known>"
     },
     {
       "url": "https://klu.ai/llm-leaderboard",
@@ -163,10 +157,6 @@
     {
       "url": "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html",
       "error": "HTTP 403 Forbidden"
-    },
-    {
-      "url": "https://www.zhipuai.cn",
-      "error": "URLError: <urlopen error timed out>"
     }
   ]
 }

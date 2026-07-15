@@ -659,9 +659,18 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10; TTL removed 2026-06-
      <modelId>.<benchKey>  (bench fill <ratio>, model fill <ratio>)
      ...
 
-   EMISSION RULES (HARD, see agent.md SUCCESS_CRITERIA):
-     - every cell ends as: bench[k]=value | gaps[].entry (N/A retired 2026-05-26)
-     - gaps[] entries: triedSources[]>=1, triedQueries[]>=2, triedFormats[]>=1
+   EMISSION RULES (HARD, see agent.md "Mode `gather`" FLAT SCHEMA — NOT
+   SUCCESS_CRITERIA, which describes the older full/legacy shape):
+     - top-level keys EXACTLY: batchId (string, MANDATORY — 2026-07-16: a
+       batch that omits this fails gather_validator.py's schema check even
+       when its observations are otherwise valid), mode, observations,
+       modelMeta, pricingObs, ollamaObs, unslothObs, lineupHints, rawGaps,
+       runtime, partialReason. NEVER models[]/updates/sourcesAdded/gaps[] —
+       those are FULL/SYNTH-mode keys; gather_validator.py's
+       FULL_SCHEMA_BLEED_KEYS hard-rejects them.
+     - every cell ends as: an observations[] entry
+       {modelId,benchKey,value,sourceUrl,tier,fetched} | a rawGaps[] entry
+       {modelId,benchKey,triedSources[]>=1,triedQueries[]>=2}
      - silent omission triggers MX1 rollback in merge.py
    ```
 5. Parse return:

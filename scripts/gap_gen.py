@@ -234,6 +234,7 @@ artifact = {
     "models": list(artifact_models_by_id.values()),
     "newModels": existing_artifact.get("newModels", []),
     "lineup": existing_artifact.get("lineup", {}),
+    "lineupChanges": existing_artifact.get("lineupChanges", {}),
     "contradictions": existing_artifact.get("contradictions", []),
     "gaps": existing_gaps,
     "whitelistAdditions": existing_artifact.get("whitelistAdditions", []),

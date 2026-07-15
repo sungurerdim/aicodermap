@@ -1,0 +1,213 @@
+{
+  "cycleEndedAt": "2026-07-15T21:44:51Z",
+  "cycleStartedAt": "2026-07-15T00:00:00Z",
+  "perBatch": [
+    {
+      "agentGaps": 106,
+      "batchId": "batch-rescue",
+      "fills": 30,
+      "gaps": 106,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 44,
+      "wallclockSec": 900.0
+    },
+    {
+      "agentGaps": 9,
+      "batchId": "batch00-anthropic",
+      "fills": 9,
+      "gaps": 9,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "agent_budget_buffer reached (~50 tool-call ceiling) during context-loading + snapshot-extraction phase before the full 102-cell slice (6 models x 17 core bench keys) could be swept; priority cells (tau2, nl2Repo, cfElo, arcAgi2 for this slice) and remaining core keys (gpqa, aaIdx, hle, swePro, mmluPro, aime26, tbHard, aaCoding, aaAgentic, mrcr) were not attempted this cycle and are left for the orchestrator gap-gen step / next cycle. Filled cells: sweV (all 6 models, via llm-stats.com SWE-bench Verified snapshot) and tb2 (opus-4-7, sonnet-4-6, claude-haiku-4-5, via tbench.ai snapshot, single-model-agent rows only).",
+      "toolCallCount": 0,
+      "wallclockSec": 0.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch00-lineup",
+      "fills": 3,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 0,
+      "wallclockSec": 0.0
+    },
+    {
+      "agentGaps": 99,
+      "batchId": "batch01-google_deepmind",
+      "fills": 3,
+      "gaps": 99,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "tool_call_budget_exceeded: exceeded the 50-call ceiling during Phase-1 snapshot sweep before the WebSearch/per-model fallback cascade could run; 3/102 slice cells filled with confirmed sources, 99/102 emitted as rawGaps for next-cycle WebSearch follow-up (queries pre-populated but not executed).",
+      "toolCallCount": 58,
+      "wallclockSec": 900.0
+    },
+    {
+      "agentGaps": 46,
+      "batchId": "batch02-mistral_ai",
+      "fills": 5,
+      "gaps": 46,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "tool_call_budget: reached agent_budget_buffer ceiling (~47/50 calls) after Phase-1 leaderboard sweep (Scale SEAL, Scale SWE-bench Pro public, llm-stats.com, AA per-model pages x6) + 3 WebSearch fallback queries covering priority cells (cfElo, arcAgi2, nl2Repo, mrcr, swePro/sweV, tb2, aime26) across all 6 models. AA's per-model pages are spa_partial (client-rendered detail tables) so only the composite aaIdx surfaced statically - corroborated as sourcesAdded for 5/6 models (codestral AA slug 404'd). All 46 genuinely-empty core cells across the 6-model slice emitted as gaps with real triedSources/triedQueries/triedFormats from this session. The ~56 already-filled cells in this slice were left untouched (not re-verified) to prioritize closing empty cells within budget; they remain valid from prior cycles.",
+      "toolCallCount": 0,
+      "wallclockSec": 0.0
+    },
+    {
+      "agentGaps": 18,
+      "batchId": "batch03-openai",
+      "fills": 29,
+      "gaps": 18,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "budget: exhausted useful WebSearch avenues within tool-call ceiling before completing full 102-cell slice sweep; large leaderboard snapshots (artificialanalysis.ai, llm-stats.com, swebench.com, vellum.ai) exceeded the Read tool's 256KB size cap and were not grep-chunked further this cycle to conserve remaining tool calls for Write. Remaining unattempted cells (gpt-5-5-pro's hle/mmluPro/tbHard/mrcr/aaAgentic/sweV/aaIdx/aaCoding/tau2/aime26; gpt-5-6-sol's hle/mmluPro/tbHard/mrcr/aaAgentic/lcb/tau2/aime26/mrcr; and most of gpt-5-4/gpt-5-5/mini/nano's less-prioritized keys) were not reached this cycle and should resurface in the next cycle's priority queue.",
+      "toolCallCount": 0,
+      "wallclockSec": 0.0
+    },
+    {
+      "agentGaps": 23,
+      "batchId": "batch04-alibaba_qwen",
+      "fills": 6,
+      "gaps": 23,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "budget: ~41/50 tool calls consumed (context-file navigation on a single-line 87KB JSON cost ~24 calls; remaining ~15 spent on WebSearch/WebFetch). All 7 priorityCells + the full 23-cell gap set (cfElo x4, mrcr x6, arcAgi2 x5, aaCoding/aaAgentic/tbHard x2 models, nl2Repo x2) were exhaustively chased via 2+ independent leaderboards/queries each and confirmed genuine gaps (benchmark not published for these checkpoints) or version-ambiguous (mrcr/arcAgi2 v1-vs-v2 mismatches). 4 already-filled nl2Repo cells (qwen3-6-27b/max/moe/plus) were re-verified with fresh 2nd/3rd-source corroboration. The remaining ~71 already-filled, non-anomalous cells in the 102-cell slice were not re-fetched this cycle to preserve budget for gap-closing; they carry forward unchanged from data/models.json.",
+      "toolCallCount": 0,
+      "wallclockSec": 0.0
+    },
+    {
+      "agentGaps": 97,
+      "batchId": "batch05-alibaba_qwen",
+      "fills": 32,
+      "gaps": 97,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "budget: agent_budget_buffer (50 tool calls) reached during Phase 3 per-model cascade; leaderboard snapshot archaeology (artificialanalysis.ai/llm-stats.com per-model JSON blobs, no lookbehind support in grep) consumed disproportionate budget with low yield for small coder-specialized models (niche keys tau2/nl2Repo/cfElo/arcAgi2/mrcr are not typically evaluated for code-specialized open models this size). Remaining un-swept avenues for next cycle: Ollama library pages (VRAM/quant tags + unslothVariants), qwenlm.github.io/blog per-model announcement posts, and direct primary-source confirmation of qwen3-coder-480b sweV/swePro (HF discussion #33 + X post found but not fetched).",
+      "toolCallCount": 0,
+      "wallclockSec": 0.0
+    },
+    {
+      "agentGaps": 32,
+      "batchId": "batch06-mixed-deepseek-mistral",
+      "fills": 14,
+      "gaps": 32,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 0,
+      "wallclockSec": 0.0
+    },
+    {
+      "agentGaps": 51,
+      "batchId": "batch07-z_ai__zhipu_ai_",
+      "fills": 40,
+      "gaps": 51,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "tool_call_budget_near_ceiling: exhausted snapshot-based extraction (artificialanalysis.ai, llm-stats.com, swebench.com, tbench.ai, vellum.ai) for all 5 models before agent_budget_buffer limit; no live WebSearch/WebFetch fallback executed for residual gaps (cfElo, lcb, swePro, mmluPro, aime26, nl2Repo, arcAgi2, mrcr, and sparse aaCoding/aaAgentic/tb2/sweV cells) — these remain open gaps for next cycle or a deep-fetch follow-up.",
+      "toolCallCount": 0,
+      "wallclockSec": 0.0
+    },
+    {
+      "agentGaps": 69,
+      "batchId": "batch08-mixed-anthropic-google",
+      "fills": 40,
+      "gaps": 69,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 0,
+      "wallclockSec": 0.0
+    },
+    {
+      "agentGaps": 78,
+      "batchId": "batch09-mixed-minimax-moonshot",
+      "fills": 22,
+      "gaps": 78,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 0,
+      "wallclockSec": 0.0
+    },
+    {
+      "agentGaps": 65,
+      "batchId": "batch10-mixed-nvidia-openai",
+      "fills": 50,
+      "gaps": 65,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 0,
+      "wallclockSec": 0.0
+    },
+    {
+      "agentGaps": 26,
+      "batchId": "batch11-mixed-qwen-stepfun",
+      "fills": 14,
+      "gaps": 26,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": {
+        "cellsAttempted": 33,
+        "cellsFilled": 7,
+        "code": "tool_budget",
+        "note": "Context/whitelist exploration (priorityCells, vendor URLs, leaderboardSnapshots map, batchSpec, anomalies) consumed the majority of the 50-tool-call budget before per-cell fetches began, due to the single-line ctx JSON requiring many chunked Grep reads. Snapshot cross-checks for scale.com, llm-stats.com, vellum.ai, tbench.ai, swebench.com, tau-bench GitHub were completed for all 6 models (mostly no qwen/step matches beyond llm-stats.com). Two targeted WebSearches covered Qwen3.7-Max/Qwen3.6-Flash Codeforces-Elo and Step-3.7-Flash ARC-AGI-2/NL2Repo. Remaining 26 missing core cells (mostly cfElo, arcAgi2, nl2Repo, mrcr across all 6 models plus qwen3-6-flash's tau2/aaCoding/aaAgentic/tbHard and qwen3-7-plus's aime26) were not individually re-searched before the budget ceiling; each is emitted as a gaps[] entry with the broad leaderboard checks + best-available WebSearch as provenance. No new-model or lineup signals were surfaced for this vendor pair in the sources actually reached.",
+        "topBlockingSources": [
+          "single-line .aicodermap-ctx JSON requiring 25+ chunked Grep reads to extract priorityCells/vendors/snapshots map"
+        ]
+      },
+      "toolCallCount": 0,
+      "wallclockSec": 0.0
+    },
+    {
+      "agentGaps": 26,
+      "batchId": "batch12-mixed-xai-xiaomi",
+      "fills": 8,
+      "gaps": 26,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "budget_ceiling: context-extraction from the oversized (91KB, single-line, non-paginable) dispatch ctx file and 4.6MB/1.5MB/550KB/300KB leaderboard snapshot files (all over the 256KB Read cap, requiring incremental Grep-based extraction) consumed the large majority of the 50-tool-call budget before active per-cell research could begin. Priority model grok-build-0-1 (14 gap cells) and grok-4-20-multi-agent (6 gap cells) were actively searched via WebSearch and gapped with full provenance; mimo-v2-5 (2 filled, 5 gapped) and mimo-v2-5-pro (1 gap + 4 corroboration observations) were covered via Vals AI + automatio.ai; grok-4-20 got one bonus tb2 corroboration from the Terminal-Bench 2.0 snapshot; grok-4-3's 4 remaining gap cells (mrcr, arcAgi2, nl2Repo, cfElo) and grok-4-20's 2 remaining gap cells (mrcr, nl2Repo) were not actively attempted this cycle and are left for orchestrator gap-gen supplement rather than being falsely claimed as attempted.",
+      "toolCallCount": 0,
+      "wallclockSec": 0.0
+    },
+    {
+      "agentGaps": 14,
+      "batchId": "batch13-meta",
+      "fills": 5,
+      "gaps": 14,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": "tool_call_budget_50 — resolved all 8 priorityCells plus the full 15-cell gap set across the 51-cell slice (3 models x 17 coreBenchKeys); the 36 already-filled cells were not individually re-verified this cycle (no fresh contradicting evidence surfaced for them either) due to the 50 tool-call ceiling. Large leaderboard snapshot files (AA/Vellum/llm-stats/tbench.ai, 300KB-4.6MB) exceeded the Read tool's 256KB cap and had to be substituted with targeted WebSearch instead of full-page mining.",
+      "toolCallCount": 0,
+      "wallclockSec": 0.0
+    },
+    {
+      "agentGaps": 0,
+      "batchId": "batch90-aa-rsc",
+      "fills": 162,
+      "gaps": 0,
+      "naCount": 0,
+      "orchestratorGaps": 0,
+      "partialReason": null,
+      "toolCallCount": 0,
+      "wallclockSec": 0.0
+    }
+  ],
+  "totalBatches": 17,
+  "totals": {
+    "agentGaps": 759,
+    "fills": 472,
+    "gaps": 759,
+    "na": 0,
+    "orchestratorGaps": 0,
+    "toolCallSum": 102,
+    "wallclockSecMax": 900.0,
+    "wallclockSecP95": 900.0
+  },
+  "zeroFillBatches": []
+}

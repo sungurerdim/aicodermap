@@ -104,6 +104,10 @@
     },
     "newModels":        { "type": "array" },
     "lineup":           { "type": "object" },
+    "lineupChanges":    {
+      "type": "object",
+      "description": "Diff-shaped Step-0 lineup output {new[],deprecated[],renamed[],removed[]} consumed by merge.py's _process_lineup_changes(). Distinct from `lineup` (raw per-vendor active/deprecated/renamed dict). Produced by gen_unified_artifact.py's batch union and local-synth.py; must survive gap_gen.py's artifact reconstruction (2026-07-16: gap_gen previously dropped this key, silently disabling all lineup-driven deprecations)."
+    },
     "contradictions":   { "type": "array" },
     "whitelistAdditions": { "type": "array" },
     "i18nUpdates":      { "type": "object" },

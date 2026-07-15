@@ -3,7 +3,7 @@
     "compositeMisfiles": 0,
     "measuredCandidates": 41,
     "bandViolations": 0,
-    "crossBenchDups": 7,
+    "crossBenchDups": 8,
     "aaRowsLoaded": 429
   },
   "compositeMisfiles": [],
@@ -351,6 +351,14 @@
       "value": 56.4,
       "benchKeys": [
         "tb2",
+        "tbHard"
+      ]
+    },
+    {
+      "modelId": "ministral-3-8b",
+      "value": 4.3,
+      "benchKeys": [
+        "hle",
         "tbHard"
       ]
     }
