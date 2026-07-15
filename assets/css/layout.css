@@ -197,3 +197,43 @@ body.exporting { background: var(--bg); }
 #filters-reset {
   margin-left: 0;
 }
+
+/* G4+G7 (2026-07-15): methodology section + benchmark glossary. */
+.methodology-points {
+  margin: var(--space-3) 0;
+  padding-left: 1.2em;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+.methodology-points li { margin-bottom: var(--space-2); }
+.glossary-heading { margin: var(--space-5) 0 var(--space-3); font-size: 1rem; }
+.bench-glossary {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2) var(--space-4);
+}
+.glossary-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 200px) 1fr;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border-dim);
+  font-size: 0.84rem;
+}
+.glossary-term { font-weight: 600; color: var(--text); }
+.glossary-desc { color: var(--muted); }
+.benchtype-chip {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 6px;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  border-radius: 999px;
+  vertical-align: 1px;
+  cursor: help;
+}
+.benchtype-chip.is-rotating { color: var(--ok); background: var(--ok-tint); border: 1px solid var(--accent-soft); }
+.benchtype-chip.is-temporal { color: var(--accent-2); background: transparent; border: 1px solid var(--accent-2-soft); }
+.benchtype-chip.is-static   { color: var(--warn); background: var(--warn-tint); border: 1px solid var(--warn-soft); }

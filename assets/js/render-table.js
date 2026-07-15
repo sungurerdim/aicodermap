@@ -60,8 +60,19 @@ function staticColumns() {
       // alone read as "one missing test" even when a model lacks four). The
       // count marker's tooltip lists the missing benches by short label.
       renderExtra: (m, ctx) => {
-        if (!ctx.band || !ctx.band.gated) return null;
         const tiers = presetTiersFor(m, State.activePresetName || DEFAULT_PRESET);
+        if (!ctx.band || !ctx.band.gated) {
+          // G3 (2026-07-15): LMArena-style "Preliminary" chip — model ranks
+          // normally but its evidence base is thin (missing critical benches
+          // or <50% profile coverage). Distinct from the gated band below.
+          const cov = ctx.band ? ctx.band.coverage : null;
+          const thin = tiers.isLimitedCoverage || (Number.isFinite(cov) && cov < 0.5);
+          if (!thin) return null;
+          return el('span', {
+            class: 'prelim-chip',
+            'data-tip': t('ui.badge.preliminaryTip'),
+          }, t('ui.badge.preliminary'));
+        }
         const missing = [...new Set([...tiers.missingRequired, ...tiers.missingCritical])];
         if (!missing.length) return null;
         const labels = missing.map(k => t(`benchmarks.${k}.short`) || k).join(', ');
@@ -416,12 +427,32 @@ export function renderModelCards(precomputed) {
   if (ranked.length === 0) {
     list.appendChild(el('p', { class: 'loading' }, t('ui.noData')));
   } else {
-    ranked.forEach((entry, i) => list.appendChild(
-      buildModelCard(entry.model, i + 1, {
-        gated: !!(entry.band && entry.band.gated),
-        score: entry.score,
-        band: entry.band,
-      })));
+    // G10 (2026-07-15): progressive render. Building all ~96 cards up front
+    // made the initial DOM ~87k px tall and dominated first-render cost. The
+    // first chunk renders synchronously; the rest append when the sentinel
+    // scrolls near the viewport (single rAF chunk per intersection).
+    const CHUNK = 12;
+    const buildCard = (entry, i) => buildModelCard(entry.model, i + 1, {
+      gated: !!(entry.band && entry.band.gated),
+      score: entry.score,
+      band: entry.band,
+    });
+    ranked.slice(0, CHUNK).forEach((entry, i) => list.appendChild(buildCard(entry, i)));
+    if (ranked.length > CHUNK && 'IntersectionObserver' in window) {
+      let next = CHUNK;
+      const sentinel = el('div', { class: 'cards-sentinel', 'aria-hidden': 'true' });
+      list.appendChild(sentinel);
+      const io = new IntersectionObserver((entries) => {
+        if (!entries.some(e => e.isIntersecting)) return;
+        const end = Math.min(next + CHUNK, ranked.length);
+        for (let i = next; i < end; i++) list.insertBefore(buildCard(ranked[i], i), sentinel);
+        next = end;
+        if (next >= ranked.length) { io.disconnect(); sentinel.remove(); }
+      }, { rootMargin: '1200px 0px' });
+      io.observe(sentinel);
+    } else {
+      ranked.slice(CHUNK).forEach((entry, i) => list.appendChild(buildCard(entry, CHUNK + i)));
+    }
   }
 
   const count = document.getElementById('models-count');

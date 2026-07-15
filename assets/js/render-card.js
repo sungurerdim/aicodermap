@@ -2,7 +2,7 @@
 // its own builder function so individual concerns stay <50 lines and brace
 // nesting stays ≤3.
 
-import { State, DEFAULT_PRESET, DEFAULT_SCORE_FN } from './core.js';
+import { State, DEFAULT_PRESET, DEFAULT_SCORE_FN, getCompositePolicy } from './core.js';
 import {
   buildContradictionFlag, uncertaintySpan, coverageClass, lastUpdatedNode,
 } from './render-shared.js';
@@ -13,6 +13,7 @@ import {
 import {
   coverageOf, effectiveScore, vendorComposites,
   crossValidationAgreement, presetTiersFor, compositeUncertainty,
+  compositeScoreImputed,
 } from './scoring.js';
 import {
   fmtScore, pricingView, fmtPriceMoney, fmtPriceRange, fmtPriceCell,
@@ -135,7 +136,7 @@ function cardHead(model, rank) {
   return head;
 }
 
-function compositeBlock(composite, coverage, disputed, unc) {
+function compositeBlock(composite, coverage, disputed, unc, imputedKeys) {
   const pct = coverage != null ? Math.round(coverage * 100) : null;
   const isLowCov = pct != null && pct < 40;
   const valueText = fmtScore(composite, 1);
@@ -161,6 +162,16 @@ function compositeBlock(composite, coverage, disputed, unc) {
   if (disputed > 0) {
     score.appendChild(el('span', { class: 'disputed', title: t('ui.disputedTip') },
       `${disputed} ${t('ui.disputed')}`));
+  }
+  // G3 (2026-07-15): disclosed imputation. When EB fills missing imputable
+  // benches into the composite, say so on the score itself — silent
+  // imputation is the one pattern every surveyed T1 leaderboard avoids.
+  if (Array.isArray(imputedKeys) && imputedKeys.length) {
+    const labels = imputedKeys.map(k => t(`benchmarks.${k}.short`) || k).join(', ');
+    score.appendChild(el('span', {
+      class: 'estimated-note',
+      'data-tip': `${t('ui.estimatedTip')}: ${labels}`,
+    }, `${imputedKeys.length} ${t('ui.estimated')}`));
   }
   return score;
 }
@@ -486,8 +497,15 @@ export function buildModelCard(model, rank, opts = {}) {
   // sidebar), main (everything else stacked). Score sits at align-self:
   // start so its small height never pushes main content down; main flows
   // freely from the top of the card alongside the score column.
+  // G3 (2026-07-15): which benches EB imputed into this composite (AICM path
+  // only — vendor consensus never imputes). Disclosed on the score block.
+  const imputedKeys = ((State.scoreFn || DEFAULT_SCORE_FN) !== 'vendorConsensus'
+    && getCompositePolicy().imputationEnabled)
+    ? compositeScoreImputed(model, State.weights, State.models, State.activePresetName).imputedKeys
+    : [];
+
   card.appendChild(cardHead(model, rank));
-  card.appendChild(compositeBlock(composite, coverage, disputed, unc));
+  card.appendChild(compositeBlock(composite, coverage, disputed, unc, imputedKeys));
 
   const main = el('div', { class: 'model-card-main' });
   main.appendChild(cardMeta(model, compat));

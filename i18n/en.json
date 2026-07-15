@@ -1,803 +1,837 @@
 {
- "ui": {
-  "appTitle": "AICoderMap",
-  "appTagline": "Decide which coding model to use, in seconds. Ranked by your priorities, source contradictions surfaced, GPU-fitting options labeled with the exact quant that runs.",
-  "loading": "Loading...",
-  "noData": "No data",
-  "section": {
-   "weights": "Weights Editor",
-   "filters": "Filters",
-   "table": "Comparison Table",
-   "models": "Model Cards",
-   "export": "Export",
-   "privacy": "Privacy"
-  },
-  "weights": {
-   "total": "Total",
-   "totalWarn": "Total must equal 100",
-   "preset": "PRESET",
-   "reset": "Reset to default",
-   "editor": "Weights Editor",
-   "weightLabel": "Weight",
-   "excluded": "Excluded by active preset",
-   "inPresetGroup": "IN ACTIVE PRESET",
-   "notInPresetGroup": "NOT IN PRESET"
-  },
-  "filter": {
-   "gpu": "Show models that fit my GPU",
-   "gpuLabel": "GPU",
-   "vramLabel": "VRAM (GB)",
-   "gpuAuto": "Auto detect",
-   "gpuAutoUnavailable": "Auto-detect not available — pick a GPU or set Manual VRAM",
-   "gpuApproximate": "approx.",
-   "gpuPrivacyStripped": "GPU detected — browser hides device info, select GPU manually",
-   "reset": "Reset filters",
-   "gpuManual": "Manual select",
-   "gpuOverride": "MANUAL VRAM",
-   "tier": "TIER",
-   "openOnly": "Open models only",
-   "all": "All",
-   "deployment": "VIEW",
-   "deploymentAll": "All models",
-   "cloudOnly": "Cloud / subscription only",
-   "localFit": "Local models that fit my GPU",
-   "search": "Search",
-   "searchPlaceholder": "model name, provider...",
-   "provider": "VENDOR",
-   "providerAll": "All vendors",
-   "gpuPopular": "Popular hardware",
-   "showFitting": "Show models that fit my GPU",
-   "showAllDeploy": "Show all models",
-   "ramLabel": "RAM",
-   "ramAuto": "Auto",
-   "totalBudget": "total"
-  },
-  "lang": {
-   "toggle": "TR"
-  },
-  "theme": {
-   "light": "Light theme",
-   "dark": "Dark theme",
-   "auto": "System theme"
-  },
-  "export": {
-   "section": "Save section as PNG",
-   "weights": "Save weights as PNG",
-   "model": "Save model details as PNG",
-   "table": "Save comparison table as PNG",
-   "full": "Full page PNG",
-   "fullTooltip": "Save the full page as PNG",
-   "sources": "Download sources as Markdown"
-  },
-  "table": {
-   "rank": "#",
-   "name": "MODEL",
-   "provider": "PROVIDER",
-   "released": "RELEASED",
-   "tier": "TIER",
-   "license": "LICENSE",
-   "context": "CONTEXT",
-   "pricingApi": "API ($/1M TOK)",
-   "pricingSub": "SUBSCRIPTION",
-   "priceIn": "API IN $",
-   "priceOut": "API OUT $",
-   "composite": "COMPOSITE",
-   "bench": "BENCHMARK SCORES",
-   "gpu": "GPU FIT",
-   "vram": "VRAM",
-   "lastUpdated": "UPDATED",
-   "strengths": "STRENGTHS",
-   "weaknesses": "WEAKNESSES",
-   "cacheHit": "Cache hit",
-   "providers": "Providers",
-   "ollamaSize": "Ollama size",
-   "limitedCoverageBand": "Limited coverage — missing required benchmarks for this profile"
-  },
-  "footer": {
-   "about": "About",
-   "repo": "GitHub Repo",
-   "license": "MIT License",
-   "privacy": "No cookies, no accounts, free. Anonymous traffic via GitHub Insights only.",
-   "deployed": "Deployed"
-  },
-  "freshness": {
-   "refresh": "Refresh",
-   "stale": "Newer build is live (commit {liveSha} · serving {servedShort} · {ageMin} min ago). Will reflect on refresh."
-  },
-  "timeAgo": {
-   "justNow": "just now",
-   "suffix": "ago",
-   "d": "d",
-   "h": "h",
-   "m": "m"
-  },
-  "tier": {
-   "frontier": "FRONTIER",
-   "open-flagship": "OPEN FLAGSHIP",
-   "coder-specialized": "CODER-SPECIALIZED",
-   "gemma": "GEMMA",
-   "ollama-local": "OLLAMA LOCAL"
-  },
-  "compat": {
-   "fits": "Fits",
-   "offload": "Offload",
-   "tooLarge": "Too large",
-   "cloud": "Cloud"
-  },
-  "contradiction": {
-   "title": "Contradiction detected",
-   "delta": "Delta",
-   "values": "Values",
-   "tier": {
-    "S": "Self-reported",
-    "I": "Independent",
-    "C": "Community"
-   }
-  },
-  "errors": {
-   "fetchFailed": "Failed to load data, please refresh.",
-   "weightsInvalid": "Weights total must be 100.",
-   "schemaInvalid": "Data schema invalid. Reset to default.",
-   "i18nFallback": "Language file failed to load, falling back to Turkish.",
-   "exportFailed": "PNG export failed. Refresh and retry.",
-   "webgpuUnsupported": "Your browser does not support WebGPU. Select GPU manually."
-  },
-  "ollama": {
-   "title": "Local (Ollama)",
-   "copy": "Copy command",
-   "viewOn": "View on Ollama"
-  },
-  "openShort": "OPEN",
-  "closedShort": "CLOSED",
-  "openWeights": "Open weights",
-  "closedWeights": "Closed weights",
-  "optOut": {
-   "vendor-opt-out": "Vendor opt-out",
-   "not-applicable": "Not applicable",
-   "out-of-scope": "Out-of-scope variant"
-  },
-  "coverage": "Coverage",
-  "coverageTip": "How much of the active profile weight is backed by available bench scores. Composite is reduced by sqrt(coverage) so cherry-picked single-test scores cannot outrank broader, verified ones.",
-  "uncertaintyTip": "Uncertainty range (±1σ) of the composite, propagated from each cell's source agreement, contradiction spread, coverage and imputation. Not a frequentist 95% confidence interval — it reflects evidential quality. Wider band = weaker evidence.",
-  "uncertaintySingleTip": "Uncertainty range (±1σ). Most cells here rest on a single source, so treat the band as a rough estimate, not a confidence interval — more independent sources will tighten it.",
-  "rankTip": "Composite rank by score (stable across sort). The ±range on each score shows uncertainty — models with overlapping ranges are statistically close. A divider line marks a significance break: a real gap to the group below.",
-  "disputed": "disputed",
-  "disputedTip": "Cells in the active preset that have same-tier source disagreement (≥3pp inside one tier on top of the ≥5pp BLOCK threshold). The composite carries a confidence haircut for these — capped at 5pp per cell so a single extreme outlier cannot dominate. Cross-tier disputes (e.g. I-tier vs S-tier) are not counted because autoResolveWinner already picked the higher-trust source.",
-  "sources": "SOURCES",
-  "sourcesUnique": "unique",
-  "sourcesDatapoints": "datapoints",
-  "lowConfidence": "low confidence",
-  "lowConfidenceTip": "Composite computed from fewer than 40% of active profile weight. Score reliability is limited.",
-  "a11y": {
-   "skipToContent": "Skip to content",
-   "themeGroup": "Theme",
-   "langGroup": "Language",
-   "dismiss": "Dismiss",
-   "sections": "Sections"
-  },
-  "share": {
-   "tooltip": "Copy a link that captures your current weights and filters",
-   "button": "Copy share link",
-   "copied": "Link copied",
-   "failed": "Could not copy link"
+  "ui": {
+    "appTitle": "AICoderMap",
+    "appTagline": "Decide which coding model to use, in seconds. Ranked by your priorities, source contradictions surfaced, GPU-fitting options labeled with the exact quant that runs.",
+    "loading": "Loading...",
+    "noData": "No data",
+    "section": {
+      "weights": "Weights Editor",
+      "filters": "Filters",
+      "table": "Comparison Table",
+      "models": "Model Cards",
+      "export": "Export",
+      "privacy": "Privacy"
+    },
+    "weights": {
+      "total": "Total",
+      "totalWarn": "Total must equal 100",
+      "preset": "PRESET",
+      "reset": "Reset to default",
+      "editor": "Weights Editor",
+      "weightLabel": "Weight",
+      "excluded": "Excluded by active preset",
+      "inPresetGroup": "IN ACTIVE PRESET",
+      "notInPresetGroup": "NOT IN PRESET",
+      "showAll": "Show unweighted",
+      "expand": "Edit weights",
+      "collapse": "Collapse editor"
+    },
+    "filter": {
+      "gpu": "Show models that fit my GPU",
+      "gpuLabel": "GPU",
+      "vramLabel": "VRAM (GB)",
+      "gpuAuto": "Auto detect",
+      "gpuAutoUnavailable": "Auto-detect not available — pick a GPU or set Manual VRAM",
+      "gpuApproximate": "approx.",
+      "gpuPrivacyStripped": "GPU detected — browser hides device info, select GPU manually",
+      "reset": "Reset filters",
+      "gpuManual": "Manual select",
+      "gpuOverride": "MANUAL VRAM",
+      "tier": "TIER",
+      "openOnly": "Open models only",
+      "all": "All",
+      "deployment": "VIEW",
+      "deploymentAll": "All models",
+      "cloudOnly": "Cloud / subscription only",
+      "localFit": "Local models that fit my GPU",
+      "search": "Search",
+      "searchPlaceholder": "model name, provider...",
+      "provider": "VENDOR",
+      "providerAll": "All vendors",
+      "gpuPopular": "Popular hardware",
+      "showFitting": "Show models that fit my GPU",
+      "showAllDeploy": "Show all models",
+      "ramLabel": "RAM",
+      "ramAuto": "Auto",
+      "totalBudget": "total"
+    },
+    "lang": {
+      "toggle": "TR"
+    },
+    "theme": {
+      "light": "Light theme",
+      "dark": "Dark theme",
+      "auto": "System theme"
+    },
+    "export": {
+      "section": "Save section as PNG",
+      "weights": "Save weights as PNG",
+      "model": "Save model details as PNG",
+      "table": "Save comparison table as PNG",
+      "full": "Full page PNG",
+      "fullTooltip": "Save the full page as PNG",
+      "sources": "Download sources as Markdown"
+    },
+    "table": {
+      "rank": "#",
+      "name": "MODEL",
+      "provider": "PROVIDER",
+      "released": "RELEASED",
+      "tier": "TIER",
+      "license": "LICENSE",
+      "context": "CONTEXT",
+      "pricingApi": "API ($/1M TOK)",
+      "pricingSub": "SUBSCRIPTION",
+      "priceIn": "API IN $",
+      "priceOut": "API OUT $",
+      "composite": "COMPOSITE",
+      "bench": "BENCHMARK SCORES",
+      "gpu": "GPU FIT",
+      "vram": "VRAM",
+      "lastUpdated": "UPDATED",
+      "strengths": "STRENGTHS",
+      "weaknesses": "WEAKNESSES",
+      "cacheHit": "Cache hit",
+      "providers": "Providers",
+      "ollamaSize": "Ollama size",
+      "limitedCoverageBand": "Limited coverage — missing required benchmarks for this profile",
+      "showExcluded": "Show unweighted columns"
+    },
+    "footer": {
+      "about": "About",
+      "repo": "GitHub Repo",
+      "license": "MIT License",
+      "privacy": "No cookies, no accounts, free. Anonymous traffic via GitHub Insights only.",
+      "deployed": "Deployed"
+    },
+    "freshness": {
+      "refresh": "Refresh",
+      "stale": "Newer build is live (commit {liveSha} · serving {servedShort} · {ageMin} min ago). Will reflect on refresh."
+    },
+    "timeAgo": {
+      "justNow": "just now",
+      "suffix": "ago",
+      "d": "d",
+      "h": "h",
+      "m": "m"
+    },
+    "tier": {
+      "frontier": "FRONTIER",
+      "open-flagship": "OPEN FLAGSHIP",
+      "coder-specialized": "CODER-SPECIALIZED",
+      "gemma": "GEMMA",
+      "ollama-local": "OLLAMA LOCAL"
+    },
+    "compat": {
+      "fits": "Fits",
+      "offload": "Offload",
+      "tooLarge": "Too large",
+      "cloud": "Cloud"
+    },
+    "contradiction": {
+      "title": "Contradiction detected",
+      "delta": "Delta",
+      "values": "Values",
+      "tier": {
+        "S": "Self-reported",
+        "I": "Independent",
+        "C": "Community"
+      }
+    },
+    "errors": {
+      "fetchFailed": "Failed to load data, please refresh.",
+      "weightsInvalid": "Weights total must be 100.",
+      "schemaInvalid": "Data schema invalid. Reset to default.",
+      "i18nFallback": "Language file failed to load, falling back to Turkish.",
+      "exportFailed": "PNG export failed. Refresh and retry.",
+      "webgpuUnsupported": "Your browser does not support WebGPU. Select GPU manually."
+    },
+    "ollama": {
+      "title": "Local (Ollama)",
+      "copy": "Copy command",
+      "viewOn": "View on Ollama"
+    },
+    "openShort": "OPEN",
+    "closedShort": "CLOSED",
+    "openWeights": "Open weights",
+    "closedWeights": "Closed weights",
+    "optOut": {
+      "vendor-opt-out": "Vendor opt-out",
+      "not-applicable": "Not applicable",
+      "out-of-scope": "Out-of-scope variant"
+    },
+    "coverage": "Coverage",
+    "coverageTip": "How much of the active profile weight is backed by available bench scores. Composite is reduced by sqrt(coverage) so cherry-picked single-test scores cannot outrank broader, verified ones.",
+    "uncertaintyTip": "Uncertainty range (±1σ) of the composite, propagated from each cell's source agreement, contradiction spread, coverage and imputation. Not a frequentist 95% confidence interval — it reflects evidential quality. Wider band = weaker evidence.",
+    "uncertaintySingleTip": "Uncertainty range (±1σ). Most cells here rest on a single source, so treat the band as a rough estimate, not a confidence interval — more independent sources will tighten it.",
+    "rankTip": "Composite rank by score (stable across sort). The ±range on each score shows uncertainty — models with overlapping ranges are statistically close. A divider line marks a significance break: a real gap to the group below.",
+    "disputed": "disputed",
+    "disputedTip": "Cells in the active preset that have same-tier source disagreement (≥3pp inside one tier on top of the ≥5pp BLOCK threshold). The composite carries a confidence haircut for these — capped at 5pp per cell so a single extreme outlier cannot dominate. Cross-tier disputes (e.g. I-tier vs S-tier) are not counted because autoResolveWinner already picked the higher-trust source.",
+    "sources": "SOURCES",
+    "sourcesUnique": "unique",
+    "sourcesDatapoints": "datapoints",
+    "lowConfidence": "low confidence",
+    "lowConfidenceTip": "Composite computed from fewer than 40% of active profile weight. Score reliability is limited.",
+    "a11y": {
+      "skipToContent": "Skip to content",
+      "themeGroup": "Theme",
+      "langGroup": "Language",
+      "dismiss": "Dismiss",
+      "sections": "Sections"
+    },
+    "share": {
+      "tooltip": "Copy a link that captures your current weights and filters",
+      "button": "Copy share link",
+      "copied": "Link copied",
+      "failed": "Could not copy link"
+    },
+    "pricing": {
+      "byProvider": "Pricing by provider"
+    },
+    "deprecated": "DEPRECATED",
+    "archived": "ARCHIVED",
+    "benchMirror": {
+      "badge": "MIRRORED SCORES",
+      "tip": "Identical weights to {base} — a serving-speed variant; benchmark scores are mirrored from it."
+    },
+    "badge": {
+      "preliminary": "PRELIM",
+      "preliminaryTip": "Thin evidence: a critical bench is missing or profile coverage is below 50%. Score is provisional and updates as data lands."
+    },
+    "estimated": "estimated",
+    "estimatedTip": "These bench values are missing; the composite fills them via empirical-Bayes shrinkage toward the field median"
   },
   "pricing": {
-   "byProvider": "Pricing by provider"
+    "blended": "BLENDED $/1M",
+    "blendedTip": "Blended price per 1M tokens assuming 3:1 input:output ratio. Formula: (in×3 + out) / 4."
   },
-  "deprecated": "DEPRECATED",
-  "archived": "ARCHIVED",
-  "benchMirror": {
-   "badge": "MIRRORED SCORES",
-   "tip": "Identical weights to {base} — a serving-speed variant; benchmark scores are mirrored from it."
+  "privacy": {
+    "heading": "Privacy & Compliance",
+    "subheading": "Training opt-out policies, data residency, and certification status. Verify with your compliance team.",
+    "col": {
+      "model": "MODEL",
+      "trainingOptOut": "TRAINING OPT-OUT",
+      "dataResidency": "DATA RESIDENCY",
+      "soc2": "SOC 2",
+      "gdpr": "GDPR",
+      "apiLogging": "API LOGGING"
+    },
+    "val": {
+      "available": "Available",
+      "none": "None",
+      "unknown": "—",
+      "yes": "Yes",
+      "no": "No",
+      "defaultOn": "On by default",
+      "defaultOff": "Off by default",
+      "optOut": "Opt-out available",
+      "notLogged": "Not logged"
+    },
+    "note": "Source: vendor documentation & terms of service. Last verified: 2026-04-30."
+  },
+  "models": {
+    "opus-4-7": {
+      "strengths": "SWE-bench Pro leader (64.3%), top MCP-Atlas tool use (77.3%), 1M context, highest vision resolution (3.75MP), 70% on CursorBench",
+      "weaknesses": "Premium price ($5/$25 per MTok), aaIdx (54) matches GPT-5.5 at roughly 2-3x the cost"
+    },
+    "sonnet-4-6": {
+      "strengths": "Office productivity leader (1633 Elo), 98% of Opus 4.7 performance at 20% of the cost, major ARC-AGI-2 leap (58.3%), 1M context, context compaction",
+      "weaknesses": "Trails Opus 4.7 on deep scientific reasoning (GPQA: 74.1% vs 94.2%), SWE-bench Pro score not published"
+    },
+    "qwen3-6-27b": {
+      "strengths": "27B dense model in same family as 35B MoE variant. 262K context. Good local alternative to 35B A3B. Strong coding and general reasoning.",
+      "weaknesses": "Insufficient independent benchmark data. 35B A3B MoE variant generally preferred for same use case. Pricing not disclosed."
+    },
+    "kimi-k2-6": {
+      "strengths": "SWE-Pro 58.6 highest among open-weight models. HLE-Full with Tools 54.0 surpasses GPT-5.4 and Claude. 300 concurrent sub-agents, 4000-step coordinated agent swarm. LiveCodeBench v6 89.6% leading.",
+      "weaknesses": "Modified MIT license imposes some commercial restrictions. Lags frontier on math and GPQA reasoning. Benchmark harness choice can shift scores by several points."
+    },
+    "deepseek-v4-flash": {
+      "strengths": "284B total / 13B active MoE, MIT license. $0.14 input — cheapest frontier-class model available. SWE-Verified 79.0% only 1.6pts behind Pro. 1M token context with 10% less KV cache.",
+      "weaknesses": "Negligible gap vs Pro for most dev workloads but falls behind on tasks requiring maximum reasoning. Local deployment still needs substantial hardware. Text-only."
+    },
+    "deepseek-v3-2": {
+      "strengths": "671B total MoE at extremely competitive price ($0.28 input). SWE-Verified consistent 72-74% validated across multiple frameworks. Open-weight, long-context optimized with DeepSeek Sparse Attention.",
+      "weaknesses": "V4-Pro displaced it April 2026. Context window only 128K vs V4's 1M. Score inconsistency between Speciale variant and standard model."
+    },
+    "qwen3-coder-30b": {
+      "strengths": "30B total / 3.3B active MoE at $0.07/M input — extremely cheap. 262K context window, 107 t/s. Easy local setup with Ollama/LMStudio/llama.cpp support.",
+      "weaknesses": "AA Intelligence Index 20 below average for current competitive field. SWE-Bench score not independently verified. Superseded by newer Qwen3.6-35B-A3B for most use cases."
+    },
+    "devstral-2": {
+      "strengths": "SOTA open-weight coding agent, SWE-Verified 72.2%. 256K context, available on Ollama. Companion Devstral Small 2 (24B) runs single-GPU. Mistral Vibe CLI integration.",
+      "weaknesses": "123B dense model requires minimum 4x H100-class GPUs. SWE-bench Verified score not yet verified on official leaderboard. Commercial license required for revenue >$20M."
+    },
+    "glm-5-1": {
+      "strengths": "SWE-Pro 58.4 surpasses GPT-5.4 and Claude Opus 4.6. NL2Repo 42.7% leads full-repo generation. Up to 8-hour autonomous task execution. Trained 100% on Huawei Ascend 910B domestic chips. MIT license open-weight.",
+      "weaknesses": "GPQA Diamond 86.2% lags frontier (Claude 94.3%). No SWE-Bench Verified independent AA score. 744B total / 40B active — local deployment practically impossible."
+    },
+    "llama-4-scout": {
+      "strengths": "10M token context (largest open-weight Apr 2026); MoE 17B/109B; lcbV6=32.8; open weights; GPQA 57.2%",
+      "weaknesses": "Reliable context ~5-6.5M per NVIDIA RULER; no SWE-bench score; aaIdx=14 low; below Maverick across all benchmarks"
+    },
+    "llama-4-maverick": {
+      "strengths": "MoE architecture (17B active / 400B total); 1M token context; lcbV6=43.4 outperforms GPT-4o (32.3); GPQA 69.8%; open weights",
+      "weaknesses": "No SWE-bench Verified score on Tier-I sources; experimental chat version vs public release controversy; aaIdx=18 below frontier median"
+    },
+    "qwen3-coder-next": {
+      "strengths": "80B total / 3B active hybrid attention+MoE architecture. Runs locally on single RTX 5090. 256K context, 370+ languages. SWE-Verified 58.7% beats models with 10-20x more active params.",
+      "weaknesses": "API pricing not finalized. No SWE-Pro independent measurement. Overshadowed by Qwen3-Coder-480B. Not optimized for FIM/autocomplete."
+    },
+    "minimax-m2-7": {
+      "strengths": "Frontier-class quality at the lowest price among open-weight peers ($0.30 input). Strong agentic coding on SWE-Bench and Terminal-Bench. Top AA Intelligence Index at half median market price.",
+      "weaknesses": "Output throughput below class at 45.7 t/s. High TTFT (2.18s). Limited provider diversity outside MiniMax platform."
+    },
+    "minimax-m2-5": {
+      "strengths": "80.2% on SWE-Bench Verified matches top closed-source models. Output speed 105 t/s — double class median. 230B total / 10B active MoE runs efficiently.",
+      "weaknesses": "AA Intelligence Index 42 lags M2.7's 50. SWE-Pro and Terminal-Bench independent verification missing. Superseded by M2.7; now secondary option."
+    },
+    "mimo-v2-flash": {
+      "strengths": "Open-source MIT, 309B total / 15B active MoE. 1M token context. 73.4% SWE-Bench Verified surpasses Claude Sonnet 4.5. 94.1% AIME 2025 math.",
+      "weaknesses": "API pricing not publicly confirmed. No SWE-Pro independent measure. Quickly overshadowed by V2-Pro and V2.5 families."
+    },
+    "mimo-v2-pro": {
+      "strengths": "1T total / 42B active MoE, 78% SWE-Bench Verified surpasses Claude Sonnet 4.6. 1M token context ideal for agentic workflows. Well below frontier pricing. Viral 'Hunter Alpha' stealth launch.",
+      "weaknesses": "Weights not released (API only). Price doubles above 256K context. SWE-Pro independent measurement missing. V2.5-Pro began superseding it April 2026."
+    },
+    "mimo-v2-5-pro": {
+      "strengths": "Matches frontier models at 40-60% fewer tokens per trajectory. SWE-Pro 57.2, ClawEval 63.8, τ³-Bench 72.9. Multimodal (image/audio/video+text) in one model. Perfect compiler task in 4.3h / 672 tool calls.",
+      "weaknesses": "Weights not yet open-source ('soon' promised). Public beta first, full API scaling in progress. SWE-Pro score self-reported."
+    },
+    "mimo-v2-5": {
+      "strengths": "Fast everyday model at 100-150 t/s. 50% fewer tokens vs Muse Spark. All modalities at $0.40 input competitive price. Consolidates V2-Pro + V2-Omni into one.",
+      "weaknesses": "Exact parameter count not separately disclosed (may share with Pro). Benchmark scores not independently verified. Weights not yet open-source."
+    },
+    "step-3-5-flash": {
+      "strengths": "Open-source 196B total / 11B active MoE. 100-350 t/s generation throughput. SWE-Verified 74.4%, τ²-Bench 88.2 strong agentic coding. $0.10/$0.30 among cheapest available.",
+      "weaknesses": "All benchmarks self-reported (StepFun). High VRAM for local run via vLLM/llama.cpp. Limited independent platform verification."
+    },
+    "deepseek-v4-pro": {
+      "strengths": "1.6T total / 49B active MoE, open-weight MIT. SWE-Verified 80.6% (0.2pts from Claude Opus 4.6), LiveCodeBench 93.5%. 73% fewer FLOPs vs V3.2, 1M token context, well below frontier pricing.",
+      "weaknesses": "Minimum 8x H100 80GB GPUs to run locally. Throughput-limited at preview launch. HLE 37.7% lags frontier. Text-only — no image/audio support."
+    },
+    "qwen3-coder-480b": {
+      "strengths": "SOTA among open weights on agentic coding. Aider Polyglot 61.8% matches Claude Sonnet 4. 7.5T token (70% code) training, 358 programming languages. QwenCode CLI open-sourced.",
+      "weaknesses": "480B total parameters makes local deployment impractical (multiple H100 nodes required). 256K context window restricted vs rivals offering 1M. No thinking mode."
+    },
+    "devstral-medium": {
+      "strengths": "24B params, Apache 2.0, runs on 32GB RAM laptop. SWE-Verified 68% strong local coding. Multimodal (image input supported). $0.10/$0.30 affordable pricing.",
+      "weaknesses": "4.2pts behind Devstral 2 123B. No image output. Local performance requires 32GB+ RAM for full precision."
+    },
+    "codestral-22b": {
+      "strengths": "HumanEval 86.6%, MBPP 91.2%. 256K context ideal for repo-scale code completion. Runs full-precision on RTX 4090 at 22B params. FIM support excellent for IDE integration.",
+      "weaknesses": "Non-commercial license restricts startup adoption. No SWE-Bench Verified independent score. Overshadowed by newer agentic models like Devstral and Qwen3-Coder."
+    },
+    "nemotron-3-super": {
+      "strengths": "Hybrid Mamba-Transformer (LatentMoE) delivers 5x throughput. NVFP4 runs on 64GB VRAM (single H100 SXM). SWE-Verified 60.5% open-weight record at launch. 91.75% RULER at 1M tokens. Free on Cloudflare Workers AI.",
+      "weaknesses": "SWE-Verified 60.5% superseded by April 2026 by DeepSeek V4-Pro (80.6%) and Kimi K2.6 (80.2%). Significant 45.8% drop on non-English coding. Full BF16 weights require 3-4x H100."
+    },
+    "gemma-4-e2b": {
+      "strengths": "2.3B effective params (5.1B total via PLE); native multimodal (text/image/audio); offline-capable; 48 tok/s on mobile; Apache 2.0",
+      "weaknesses": "Edge model — not benchmarked on SWE-bench/agentic; lcbV6=44.0 single C-tier source; aaIdx=15 low; vLLM FlashAttention fallback slowdown"
+    },
+    "gemma-4-e4b": {
+      "strengths": "4.5B effective; native multimodal with audio ASR; M-series Mac 40+ tok/s; T4-GPU deployable; Apache 2.0; lcbV6=52.0 strong for size",
+      "weaknesses": "Edge model — not benchmarked on SWE-bench; lcbV6=52.0 single C-tier source; aaIdx=15 shared with E2B; ~9 tok/s on RTX 4090 via vLLM"
+    },
+    "gemma-4-26b-moe": {
+      "strengths": "26B total / 3.8B active MoE, runs on RTX 4090 with 24GB (Q4). Arena AI global #6. AIME 2026 88.3% impressive for efficiency. Delivers 97% of 31B Dense quality at 1/8 compute.",
+      "weaknesses": "SWE-Verified 64% lags GLM-5.1 (78%) and Claude (87.6%). Still requires ~26GB to load (despite only 3.8B active). Not preferred over 31B Dense for coding agent scenarios."
+    },
+    "gemma-4-31b": {
+      "strengths": "Best US open model under Apache 2.0. Arena AI #3 (Elo 1452). AIME 2026 89.2% strong math. τ²-Bench 86.4 impressive agent performance. 256K context. Full multimodal.",
+      "weaknesses": "SWE-Verified 64% lags Chinese models like GLM-5.1 and Kimi K2.6. Full precision requires 80GB H100. Pricing not yet disclosed (Google AI Studio free preview)."
+    },
+    "gemma-3-27b": {
+      "strengths": "27B dense model runs single-GPU full precision. Extremely cheap at $0.10/1M input on DeepInfra. 140+ languages, image+text multimodal. Good fine-tuning base.",
+      "weaknesses": "LiveCodeBench v6 29.1% far too low by current coding standards. Gemma 4 dramatically superseded it April 2026 (Codeforces ELO: 110 vs 2150). Agentic tool use 6.6% unacceptably low."
+    },
+    "qwen25-coder-32b": {
+      "strengths": "14.7M Ollama downloads — #1 choice for local coding. HumanEval 92.7%, Aider 73.7%. Best FIM autocomplete model. Runs on RTX 4090 with Q4_K_M at 22GB VRAM.",
+      "weaknesses": "32K context window limited by modern standards (Unsloth 128K version exists). Weak on agentic coding vs Qwen3.6 family. Text-only, not multimodal."
+    },
+    "qwen25-coder-14b": {
+      "strengths": "9GB file size — strong coding on 12GB VRAM GPUs (RTX 3060/4060). FIM support ideal for IDE autocomplete. Apache 2.0 license allows free commercial use.",
+      "weaknesses": "32K context window limited. Benchmark performance drops vs 32B variant. 32B or higher preferred for agentic coding."
+    },
+    "qwen25-coder-7b": {
+      "strengths": "4.7GB size runs on 8GB VRAM GPUs (RX 580, GTX 1070). FIM support for lightweight IDE integration. Apache 2.0. Best choice for entry-level local coding.",
+      "weaknesses": "32K context and 7B params can't handle serious agentic tasks. Upgrade to 14B or 32B on stronger hardware. Benchmark figures significantly below 32B."
+    },
+    "deepseek-coder-v2-16b": {
+      "strengths": "16B MoE variant 8.9GB runs on 12GB VRAM. 160K context window quite wide for local models. GPT4-Turbo-comparable performance at release. 2.4M Ollama downloads.",
+      "weaknesses": "Significantly superseded by 2024+ newer models. 236B variant impractical to run locally (133GB). License is DeepSeek-specific, not Apache/MIT."
+    },
+    "deepseek-r1-14b": {
+      "strengths": "Distilled from Qwen2.5, strong reasoning with 128K context. MIT license. 9GB size comfortable on 12GB VRAM GPUs. Popular for local mathematical reasoning.",
+      "weaknesses": "Distilled model — not at full R1 671B capability. Coding benchmark scores not independently reported. Superseded by DeepSeek V4 family."
+    },
+    "qwen3-6-max": {
+      "strengths": "AA Intelligence Index 52 strong ranking. #1 on 6 benchmarks: SWE-Pro, Terminal-Bench 2.0, SkillsBench, QwenClawBench, QwenWebBench, SciCode. preserve_thinking for agentic workflows.",
+      "weaknesses": "Closed-weight (first time in Qwen history). SWE-Bench Verified independent score not published. Pricing not finalized during preview. Text-only — no image/audio."
+    },
+    "gpt-5-4": {
+      "strengths": "Foundation of GPT-5.4 series, wide context (1M token), accessible pricing, ChatGPT Plus access",
+      "weaknesses": "Superseded by GPT-5.4 and o3 in OpenAI's lineup, limited independent benchmark data available"
+    },
+    "qwen3-6-35b-moe": {
+      "strengths": "35B total / 3B active MoE, Apache 2.0. SWE-Verified 73.4% exceptional among open-weights. Runs on 24GB Apple Silicon Mac with Unsloth 4-bit. GPQA Diamond 86.0 strong multi-discipline performance.",
+      "weaknesses": "API pricing not yet disclosed. No SWE-Pro independent measurement. Full F16 model ~72GB (beyond consumer hardware)."
+    },
+    "o4-mini": {
+      "strengths": "Top-tier reasoning at 10x lower cost than o3; SWE-bench Verified 58.6% (Vellum independent) / 68.1% (OpenAI scaffold); GPQA Diamond 81.4%; LiveCodeBench 80.2%; Codeforces ELO 2719",
+      "weaknesses": "SWE-bench score varies by scaffold (OpenAI 68.1 vs Vellum 58.6 — RED, conservative 58.6 chosen); no aaIdx entry on Artificial Analysis; closed-weight, no local deployment"
+    },
+    "grok-3-mini": {
+      "strengths": "aaIdx=32 (well above price-tier median); GPQA Diamond 79.1%; LiveCodeBench 69.6% (conservative baseline); 183 tok/s; $0.30/$0.50 per 1M — strong cost-efficiency",
+      "weaknesses": "No SWE-bench Verified score on any Tier-I source; lcbV6 single-source xAI (RED — 69.6 vs 80.4 same-source conflict); xAI does not submit to SWE-bench / SEAL"
+    },
+    "gemini-3-1-flash": {
+      "strengths": "1M token context, $0.15-$0.30/M input — 4x cheaper than Pro. GPQA 86.9% strong science reasoning. Fastest Google model for high-volume production; free tier on AI Studio.",
+      "weaknesses": "No SWE-bench Verified or LiveCodeBench independent score found. Proprietary, closed-weight. Trails Pro by ~5pp on most reasoning benchmarks."
+    },
+    "gemini-3-1-pro": {
+      "strengths": "1M context, SWE-V 80.6% matches DeepSeek V4-Pro, GPQA 94.3% world-class, LCB 88.49%, SWE-Pro 46.1%, MCP-Atlas 73.9%. $2/$12 per 1M — best Google value at frontier.",
+      "weaknesses": "HLE 44.4% lags Claude Opus 4.7 (46.9%) and MiMo-V2.5-Pro (48.0%). No aaAgentic, tb2, tau2 independent scores. Proprietary closed-weight, no local deployment."
+    },
+    "gpt-4-1": {
+      "strengths": "SWE-V 54.6% strong for its tier, 1M context, $2/$8 per 1M with $0.50 cache hits. Multimodal (video+text). 83% cost reduction vs GPT-4o. ChatGPT Plus accessible.",
+      "weaknesses": "No GPQA, LCB, or SWE-Pro independent scores found. Superseded by o3 and o4-mini on reasoning tasks. Proprietary, closed-weight. Video-MME 72% is baseline not SOTA."
+    },
+    "grok-3": {
+      "strengths": "GPQA 84.6% strong science reasoning, LCB 79.4% coding, 1M token context (8x prior), AIME 2025 93.3%. Chatbot Arena Elo ~1402 at launch. $3/$15 per 1M.",
+      "weaknesses": "No SWE-bench Verified or SWE-Pro score on any Tier-I source. Benchmark controversy: multi-attempt averages inflate scores vs single-attempt peers. xAI does not submit to SEAL."
+    },
+    "mistral-large-3": {
+      "strengths": "675B total / 41B active MoE, LCB 82.8% strong coding, HumanEval 92.0%, AIME 2025 88.0%, MATH-500 93.6%. Self-hostable open-weight. $0.50/$1.50 affordable pricing.",
+      "weaknesses": "GPQA 43.9% significantly below peer open-weight models (DeepSeek 77%+, Kimi 80%+). No SWE-bench Verified independent score. Trails frontier on agentic and scientific reasoning."
+    },
+    "o3": {
+      "strengths": "SWE-V 71.7%, GPQA 87.7%, AIME 96.7%, Codeforces Elo 2727, ARC-AGI 87.5%. $2/$8 per 1M after 80% price cut March 2026. Best-in-class reasoning track model from OpenAI.",
+      "weaknesses": "Reasoning tokens billed as output (hidden cost: 500 visible tokens may consume 2000+ billed). ARC-AGI-2 only 2.9%. No SWE-Pro Tier-I score. Closed-weight, no local deployment."
+    },
+    "qwen3-235b": {
+      "strengths": "235B total / 22B active MoE, Apache 2.0. LCB 74.8%, GPQA 81.1%, AIME 2025 92.3%, AIME 2024 85.7%. Rivals Gemini 2.5 Pro. $0.20/$1.00 per 1M — 70% below GPT-5 price.",
+      "weaknesses": "LCB 74.8% trails newer frontier models (Gemini 3.1 Pro 88.5%, DeepSeek V4-Pro 93.5%). No SWE-bench Verified independent score. Local deployment requires multiple H100 nodes."
+    },
+    "qwen3-32b": {
+      "strengths": "32B dense, Apache 2.0. $0.15/$0.75 per 1M — cheapest frontier-grade dense model. 119 languages, strong multilingual coding. Fits single A100 or high-end consumer GPU at Q4.",
+      "weaknesses": "SWE-bench Pro only 3.4% (trails even GPT-4o 4.9%). No GPQA or LCB independent Tier-I score found. Smaller than 235B MoE sibling — lower ceiling on complex reasoning tasks."
+    },
+    "qwen3-6-plus": {
+      "strengths": "Rebuilt reasoning layer uses always-on chain-of-thought. 515 fewer reasoning tokens vs Qwen 3.5 Plus while producing more output. Improved consistency and production reliability over predecessor.",
+      "weaknesses": "No independent GPQA, SWE-bench, or LiveCodeBench scores found. Weaker than 3.5 Plus on multimodal audio/video tasks. Pricing not officially disclosed on major provider APIs."
+    },
+    "devstral-small-2": {
+      "strengths": "24B params, SWE-V 68.0% — strongest open-weight at size class. 256K context, Apache 2.0, multimodal image input. Runs on RTX 4090 (24GB) or 32GB Mac. 75 tok/s, TTFT 1.18s. $0.10/$0.30.",
+      "weaknesses": "4.2pp behind Devstral 2 (123B). No SWE-Pro or LCB independent score. Limited provider availability vs larger Devstral 2. Image output not supported."
+    },
+    "gpt-5-5": {
+      "strengths": "Leads Terminal-Bench 2.0 at 82.7%; GPQA 93.6%; 1M token context; natively omnimodal; MCP-Atlas 75.3%; SWE-bench Pro 58.6%.",
+      "weaknesses": "5.7 points behind Opus 4.7 on SWE-bench Pro; HLE 41.4% (vs Opus 4.7 46.9%); expensive at $5/$30 per 1M tokens; closed weights."
+    },
+    "glm-4-5-air": {
+      "strengths": "MoE with 12B active parameters; balanced cost-vs-capability for self-host; MIT-licensed.",
+      "weaknesses": "Bench coverage pending; agentic columns largely untested at publish time."
+    },
+    "glm-4-7": {
+      "strengths": "Open-weight coding leader within the GLM series; targets frontier-class SWE behavior under MIT.",
+      "weaknesses": "Requires 40GB+ VRAM at usable quants; not realistic for consumer GPUs."
+    },
+    "mistral-medium-3-5": {
+      "strengths": "Mid-tier Mistral with strong European-language support and predictable pricing.",
+      "weaknesses": "Modified-MIT licensing restricts commercial redistribution; cloud-only."
+    },
+    "qwen3-5-9b": {
+      "strengths": "Compact 9B Qwen suitable for 6-8GB consumer GPUs; Apache 2.0 unrestricted.",
+      "weaknesses": "Smaller capacity than 27B/35B siblings on multi-file refactor; agentic gaps expected."
+    },
+    "minimax-m2-1": {
+      "strengths": "1M-token context window at sub-$1/M tokens; useful for long-document and multi-file context tasks.",
+      "weaknesses": "Local execution is impractical at full precision; cloud-first deployment."
+    },
+    "claude-haiku-4-5": {
+      "strengths": "",
+      "weaknesses": ""
+    },
+    "codestral": {
+      "strengths": "",
+      "weaknesses": ""
+    },
+    "grok-4-1-fast": {
+      "strengths": "",
+      "weaknesses": ""
+    },
+    "grok-4-20": {
+      "strengths": "",
+      "weaknesses": ""
+    },
+    "grok-4-3": {
+      "strengths": "",
+      "weaknesses": ""
+    },
+    "gemini-3-5-flash": {
+      "strengths": "Fast, low-cost Gemini tier optimized for agentic and coding workloads; 1M-token context.",
+      "weaknesses": "Benchmark coverage pending verification; proprietary, cloud-only."
+    },
+    "qwen3-7-max": {
+      "strengths": "Qwen flagship reasoning-agent model with 1M-token context; strong coding and agentic performance.",
+      "weaknesses": "Closed-weight preview; independent bench coverage pending; priced above mid-tier Qwen."
+    },
+    "qwen3-7-plus": {
+      "strengths": "Multimodal Qwen3.7 variant with 1M-token context for combined vision and code tasks.",
+      "weaknesses": "Closed-weight preview; limited independent benchmarks at launch."
+    },
+    "claude-opus-4-8": {
+      "strengths": "Anthropic frontier flagship; strongest Claude on SWE-bench and agentic coding at release.",
+      "weaknesses": "Premium API pricing; closed weights; full benchmark coverage pending this cycle's survey."
+    },
+    "gpt-5-4-mini": {
+      "strengths": "Cost-efficient GPT-5.4 tier with 400K context; balances latency and capability for coding agents.",
+      "weaknesses": "Smaller than full GPT-5.4 on hard reasoning; closed weights; bench coverage pending survey."
+    },
+    "gpt-5-4-nano": {
+      "strengths": "Smallest GPT-5.4 variant; cheapest OpenAI option for high-throughput, low-latency coding calls.",
+      "weaknesses": "Lowest capacity in the GPT-5.4 family on multi-file tasks; closed weights; bench coverage pending."
+    },
+    "mistral-small-4": {
+      "strengths": "Apache-2.0 small Mistral with 256K context; self-hostable on a single mid-range GPU.",
+      "weaknesses": "Below frontier on agentic benchmarks; full bench coverage pending this cycle's survey."
+    },
+    "nemotron-3-nano-omni": {
+      "strengths": "Open-weight multimodal NVIDIA Nemotron nano; compact footprint for agentic, multimodal tasks.",
+      "weaknesses": "Nano scale limits hard-coding capability; bench coverage pending this cycle's survey."
+    },
+    "nemotron-3-ultra": {
+      "strengths": "550B total / 55B active Hybrid Mamba-Transformer MoE, open weights (Linux Foundation OpenMDW-1.1). aaIdx=48, strongest US open-weight. Distributed via HF + OpenRouter + NVIDIA NIM + AWS SageMaker.",
+      "weaknesses": "Just announced at Computex 2026 (June 4 2026); independent benchmark verification still limited. Pricing varies by provider."
+    },
+    "muse-spark": {
+      "strengths": "First model in Meta Superintelligence Labs' Muse family; multimodal reasoning, 262K context. aaIdx=52. Free at meta.ai.",
+      "weaknesses": "Meta's first closed-weight model; API in private preview only. Parameter count undisclosed; independent benchmarks limited."
+    },
+    "step-3-7-flash": {
+      "strengths": "198B MoE (11B active) + 1.8B vision encoder, Apache 2.0, 256K context. For coding agents and search workflows. Cheap $0.20/$1.15. OpenRouter + NVIDIA NIM.",
+      "weaknesses": "Released May 29 2026; bench cells not yet filled (next cycle). Independent verification limited."
+    },
+    "glm-5": {
+      "strengths": "744B MoE (40B active), 200K context, MIT license. Z.ai frontier model; SWE-Verified ~77.8%, GPQA ~86%, AIME26 ~92.7% (lineup source). Successor glm-5-1 tracked separately.",
+      "weaknesses": "Missed in a prior refresh (released Feb 11 2026); bench cells will be filled with multi-source provenance next full sweep."
+    },
+    "minimax-m3": {
+      "strengths": "1M context, multimodal (text/image/video input), MSA sparse attention. SWE-Pro ~59.0%, SWE-Verified ~80.5% (lineup source). Cheap $0.30/$1.20. Released June 1 2026.",
+      "weaknesses": "Caught via gather lineup-hint in the prior full sweep but missed by the dedicated lineup fetch (now resolved by harvest-new-models.py). Bench cells fill with multi-source provenance next cycle."
+    },
+    "grok-build-0-1": {
+      "strengths": "Grok Build 0.1 detected via lineup discovery (released 2026-05-29). Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "gemma-4-12b": {
+      "strengths": "Gemma 4 12B detected via lineup discovery (released 2026-06-03). Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "glm-5-turbo": {
+      "strengths": "GLM-5 Turbo detected via lineup discovery (released 2026-03). Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "claude-fable-5": {
+      "strengths": "Claude Fable 5 detected via lineup discovery (released 2026-06-09). Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "claude-mythos-5": {
+      "strengths": "Claude Mythos 5 detected via lineup discovery (released 2026-06-09). Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "gpt-5-5-pro": {
+      "strengths": "GPT-5.5 Pro detected via lineup discovery (released 2026-04-23). Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "glm-5-2": {
+      "strengths": "GLM-5.2 detected via lineup discovery (released 2026-06-13). Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "mimo-v2-omni": {
+      "strengths": "MiMo-V2-Omni detected via lineup discovery. Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "kimi-k2-7-code": {
+      "strengths": "kimi-k2-7-code detected via lineup discovery (released 2026-06-12). Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "grok-4-20-multi-agent": {
+      "strengths": "grok-4-20-multi-agent detected via lineup discovery (released 2026-03-31). Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "kimi-k2-7-code-highspeed": {
+      "strengths": "kimi-k2-7-code-highspeed detected via lineup discovery. Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "qwen3-6-flash": {
+      "strengths": "qwen3-6-flash detected via lineup discovery. Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "nemotron-3-nano": {
+      "strengths": "nemotron-3-nano detected via lineup discovery. Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "claude-sonnet-5": {
+      "strengths": "Claude Sonnet 5 detected via lineup discovery (released 2026-06-30). Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "claude-mythos-preview": {
+      "strengths": "Claude Mythos Preview detected via lineup discovery (released 2026-04-07). Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "gpt-5-6-sol": {
+      "strengths": "GPT-5.6 Sol detected via lineup discovery (released 2026-06-26). Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "gpt-5-6-terra": {
+      "strengths": "GPT-5.6 Terra detected via lineup discovery (released 2026-06-26). Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "gpt-5-6-luna": {
+      "strengths": "GPT-5.6 Luna detected via lineup discovery (released 2026-06-26). Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "gemini-omni-flash": {
+      "strengths": "Gemini Omni Flash detected via lineup discovery (released 2026-05-19). Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "ministral-3-14b": {
+      "strengths": "Ministral 3 14B detected via lineup discovery (released 2025-12-23). Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "ministral-3-8b": {
+      "strengths": "Ministral 3 8B detected via lineup discovery (released 2025-12-23). Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "ministral-3-3b": {
+      "strengths": "Ministral 3 3B detected via lineup discovery (released 2025-12-23). Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "minimax-m2-7-highspeed": {
+      "strengths": "MiniMax-M2.7-highspeed detected via lineup discovery (released 2026-03-18). Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    }
+  },
+  "benchmarks": {
+    "swePro": {
+      "name": "SWE-bench Pro",
+      "short": "SWE-PRO",
+      "desc": "Contamination-resistant gold standard; 1865 tasks, 41 repos, multi-language."
+    },
+    "sweV": {
+      "name": "SWE-bench Verified",
+      "short": "SWE-V",
+      "desc": "Human-verified 500 tasks. Often contradicts Pro."
+    },
+    "sweMulti": {
+      "name": "SWE-bench Multilingual",
+      "short": "SWE-M",
+      "desc": "Multilingual software bug-fixing across 9 languages."
+    },
+    "tb2": {
+      "name": "TerminalBench 2",
+      "short": "TB2",
+      "desc": "Terminal CLI agentic execution; tool-use quality."
+    },
+    "tbHard": {
+      "name": "Terminal-Bench Hard",
+      "short": "TB-HARD",
+      "desc": "Hardest 44-task subset of Terminal-Bench; AA Index v4 component."
+    },
+    "lcb": {
+      "name": "LiveCodeBench",
+      "short": "LCB",
+      "desc": "Rolling contamination-free competitive programming leaderboard (May 2023→present)."
+    },
+    "tau2": {
+      "name": "τ²-bench",
+      "short": "τ²",
+      "desc": "Multi-turn tool calling + plan execution (telecom track)."
+    },
+    "mcpA": {
+      "name": "MCP-Atlas",
+      "short": "MCP-A",
+      "desc": "Model Context Protocol tool-chain quality."
+    },
+    "bfcl": {
+      "name": "BFCL v3/v4",
+      "short": "BFCL",
+      "desc": "Berkeley Function-Calling Leaderboard. Function/tool selection accuracy."
+    },
+    "browseComp": {
+      "name": "BrowseComp",
+      "short": "BROWSE",
+      "desc": "Web research agent benchmark; multi-hop browsing + synthesis."
+    },
+    "aaCoding": {
+      "name": "AA Coding",
+      "short": "AA-CODE",
+      "desc": "Artificial Analysis composite coding score."
+    },
+    "aaAgentic": {
+      "name": "AA Agentic",
+      "short": "AA-AGT",
+      "desc": "Artificial Analysis agentic-use score."
+    },
+    "aaIdx": {
+      "name": "AA Index",
+      "short": "AA-IDX",
+      "desc": "Artificial Analysis general composite (reference; not used in weighting)."
+    },
+    "aaOmni": {
+      "name": "AA-Omniscience",
+      "short": "AA-OMNI",
+      "desc": "Artificial Analysis omniscience / misaligned-behavior score (lower is better)."
+    },
+    "cfElo": {
+      "name": "Codeforces ELO",
+      "short": "CF-ELO",
+      "desc": "Codeforces competitive-programming ELO rating; 1000-3500 raw scale."
+    },
+    "webDevElo": {
+      "name": "LMArena WebDev Elo",
+      "short": "WD-ELO",
+      "desc": "LMArena WebDev Arena Elo from blind human preference voting on front-end code outputs (React/HTML/CSS/JS); raw 950-1300 typical range."
+    },
+    "mmluPro": {
+      "name": "MMLU-Pro",
+      "short": "MMLU-PRO",
+      "desc": "Multi-discipline reasoning across 57 subjects with hard distractors."
+    },
+    "mrcr": {
+      "name": "MRCR 1M",
+      "short": "MRCR",
+      "desc": "Long-context retrieval at 1M tokens; multi-needle in haystack."
+    },
+    "arcAgi2": {
+      "name": "ARC-AGI-2",
+      "short": "ARC-2",
+      "desc": "Abstract reasoning; the only frontier benchmark below human baseline."
+    },
+    "gpqa": {
+      "name": "GPQA Diamond",
+      "short": "GPQA",
+      "desc": "Graduate-level general reasoning (188 hard questions)."
+    },
+    "aime26": {
+      "name": "AIME 2026",
+      "short": "AIME26",
+      "desc": "American Invitational Mathematics Examination 2026; advanced math reasoning."
+    },
+    "hle": {
+      "name": "Humanity's Last Exam",
+      "short": "HLE",
+      "desc": "Comprehensive advanced multi-discipline test."
+    },
+    "nl2Repo": {
+      "name": "NL2Repo",
+      "short": "NL2REPO",
+      "desc": "Natural-language → full repository generation; multi-file structure + dependency resolution."
+    },
+    "llmStatsIdx": {
+      "name": "LLM-Stats Composite",
+      "short": "LLM-Stats",
+      "desc": "llm-stats.com TrueSkill-style composite across published benchmarks. Vendor aggregate — independent reference, not part of AICoderMap composite."
+    },
+    "vellumRank": {
+      "name": "Vellum Rank",
+      "short": "Vellum",
+      "desc": "Vellum LLM Leaderboard rank position (1=best). Normalized via inverse-rank. Vendor aggregate."
+    },
+    "benchlmIdx": {
+      "name": "BenchLM Composite",
+      "short": "BenchLM",
+      "desc": "BenchLM.ai composite score across many benchmarks. Vendor aggregate."
+    },
+    "lmArenaElo": {
+      "name": "LMArena Elo",
+      "short": "LMArena",
+      "desc": "LMArena head-to-head Elo rating (general chat). Normalized linear 1000-1500 → 0-100. Vendor aggregate."
+    },
+    "hfOpenAvg": {
+      "name": "HF Open LLM Avg",
+      "short": "HF Open",
+      "desc": "HuggingFace Open LLM Leaderboard average score. Open-weights models only. Vendor aggregate."
+    },
+    "kluRank": {
+      "name": "Klu Rank",
+      "short": "Klu",
+      "desc": "Klu.ai LLM leaderboard rank. Normalized via inverse-rank. Vendor aggregate."
+    }
+  },
+  "benchCategories": {
+    "coding": {
+      "label": "Coding"
+    },
+    "agentic": {
+      "label": "Agentic"
+    },
+    "reasoning": {
+      "label": "Reasoning"
+    },
+    "general": {
+      "label": "General"
+    }
+  },
+  "verdicts": {
+    "preset": {
+      "balanced": "Balanced",
+      "sweFocused": "SWE-focused",
+      "agenticFocused": "Agentic-focused",
+      "reasoningFocused": "Reasoning-focused",
+      "benchmarkOnly": "Benchmark-only",
+      "consensus": "Vendor Consensus"
+    }
+  },
+  "reliability": {
+    "label": "Reliability",
+    "exceptional": "exceptional source",
+    "lowConfidence": "low confidence",
+    "coldStart": "insufficient data"
+  },
+  "vendorPanel": {
+    "title": "VENDOR VIEW",
+    "consensus": "consensus",
+    "mild": "mild gap",
+    "controversy": "controversy",
+    "agreementTip": "AICM rank",
+    "consensusRank": "consensus rank",
+    "limitedData": "limited data",
+    "limitedCoverage": "limited coverage",
+    "missingTip": "missing benches",
+    "notInScoreTag": "not in score",
+    "notInScore": "Independent reference — NOT part of AICoderMap composite score"
+  },
+  "compat": {
+    "errors": {
+      "webgpuUnsupported": "WebGPU not supported in this browser"
+    }
+  },
+  "methodology": {
+    "heading": "Methodology",
+    "navLabel": "Methodology",
+    "version": "v1.0 · 2026-07-15",
+    "intro": "Scores come from a single published, versioned formula. Every mechanism below — with formulas and academic references — is open source.",
+    "point": {
+      "atomic": "Atomic-only composite: only primary benchmark scores enter the weighted average; vendor aggregate indexes (AA Index etc.) appear in a separate \"Vendor View\" panel to avoid double counting.",
+      "eb": "Missing-data policy: missing cells are never silently filled. The composite shrinks toward the field median via empirical Bayes, and every filled bench is explicitly labeled \"estimated\" on the score.",
+      "gate": "Rank gate: models missing a required bench for the active preset, or under 40% coverage, are demoted below the main ranking into a \"Limited Coverage\" band; thin-evidence models carry a PRELIM chip.",
+      "bands": "Uncertainty bands: every score ships with a ±σ band derived from source quality + contradiction spread + sparsity; models with overlapping bands are statistically indistinguishable (the LMArena rule).",
+      "xval": "Cross-validation: the gap between our composite and the vendor-consensus ranking is flagged 🟢/🟡/🔴 on every card — suspicious rankings surface automatically.",
+      "provenance": "Evidence discipline: every cell targets ≥2 independent sources; >3pp cross-source delta raises ⚠, >5pp raises 🚨; single-source/dispersed cells are quarantined and cannot enter the score at full weight."
+    },
+    "fullLink": "Full methodology (formulas & references)",
+    "glossaryHeading": "Benchmark glossary",
+    "benchType": {
+      "rotating": "ROTATING",
+      "rotatingTip": "Question pool refreshes continuously (live votes / periodic rotation) — structurally contamination-resistant.",
+      "temporal": "DATE-FILTERED",
+      "temporalTip": "Only tasks published after the model's training cutoff are scored — memorization is excluded by construction.",
+      "static": "STATIC",
+      "staticTip": "Frozen task set: contamination risk grows as it ages into training corpora. Factored into weight decisions."
+    }
   }
- },
- "pricing": {
-  "blended": "BLENDED $/1M",
-  "blendedTip": "Blended price per 1M tokens assuming 3:1 input:output ratio. Formula: (in×3 + out) / 4."
- },
- "privacy": {
-  "heading": "Privacy & Compliance",
-  "subheading": "Training opt-out policies, data residency, and certification status. Verify with your compliance team.",
-  "col": {
-   "model": "MODEL",
-   "trainingOptOut": "TRAINING OPT-OUT",
-   "dataResidency": "DATA RESIDENCY",
-   "soc2": "SOC 2",
-   "gdpr": "GDPR",
-   "apiLogging": "API LOGGING"
-  },
-  "val": {
-   "available": "Available",
-   "none": "None",
-   "unknown": "—",
-   "yes": "Yes",
-   "no": "No",
-   "defaultOn": "On by default",
-   "defaultOff": "Off by default",
-   "optOut": "Opt-out available",
-   "notLogged": "Not logged"
-  },
-  "note": "Source: vendor documentation & terms of service. Last verified: 2026-04-30."
- },
- "models": {
-  "opus-4-7": {
-   "strengths": "SWE-bench Pro leader (64.3%), top MCP-Atlas tool use (77.3%), 1M context, highest vision resolution (3.75MP), 70% on CursorBench",
-   "weaknesses": "Premium price ($5/$25 per MTok), aaIdx (54) matches GPT-5.5 at roughly 2-3x the cost"
-  },
-  "sonnet-4-6": {
-   "strengths": "Office productivity leader (1633 Elo), 98% of Opus 4.7 performance at 20% of the cost, major ARC-AGI-2 leap (58.3%), 1M context, context compaction",
-   "weaknesses": "Trails Opus 4.7 on deep scientific reasoning (GPQA: 74.1% vs 94.2%), SWE-bench Pro score not published"
-  },
-  "qwen3-6-27b": {
-   "strengths": "27B dense model in same family as 35B MoE variant. 262K context. Good local alternative to 35B A3B. Strong coding and general reasoning.",
-   "weaknesses": "Insufficient independent benchmark data. 35B A3B MoE variant generally preferred for same use case. Pricing not disclosed."
-  },
-  "kimi-k2-6": {
-   "strengths": "SWE-Pro 58.6 highest among open-weight models. HLE-Full with Tools 54.0 surpasses GPT-5.4 and Claude. 300 concurrent sub-agents, 4000-step coordinated agent swarm. LiveCodeBench v6 89.6% leading.",
-   "weaknesses": "Modified MIT license imposes some commercial restrictions. Lags frontier on math and GPQA reasoning. Benchmark harness choice can shift scores by several points."
-  },
-  "deepseek-v4-flash": {
-   "strengths": "284B total / 13B active MoE, MIT license. $0.14 input — cheapest frontier-class model available. SWE-Verified 79.0% only 1.6pts behind Pro. 1M token context with 10% less KV cache.",
-   "weaknesses": "Negligible gap vs Pro for most dev workloads but falls behind on tasks requiring maximum reasoning. Local deployment still needs substantial hardware. Text-only."
-  },
-  "deepseek-v3-2": {
-   "strengths": "671B total MoE at extremely competitive price ($0.28 input). SWE-Verified consistent 72-74% validated across multiple frameworks. Open-weight, long-context optimized with DeepSeek Sparse Attention.",
-   "weaknesses": "V4-Pro displaced it April 2026. Context window only 128K vs V4's 1M. Score inconsistency between Speciale variant and standard model."
-  },
-  "qwen3-coder-30b": {
-   "strengths": "30B total / 3.3B active MoE at $0.07/M input — extremely cheap. 262K context window, 107 t/s. Easy local setup with Ollama/LMStudio/llama.cpp support.",
-   "weaknesses": "AA Intelligence Index 20 below average for current competitive field. SWE-Bench score not independently verified. Superseded by newer Qwen3.6-35B-A3B for most use cases."
-  },
-  "devstral-2": {
-   "strengths": "SOTA open-weight coding agent, SWE-Verified 72.2%. 256K context, available on Ollama. Companion Devstral Small 2 (24B) runs single-GPU. Mistral Vibe CLI integration.",
-   "weaknesses": "123B dense model requires minimum 4x H100-class GPUs. SWE-bench Verified score not yet verified on official leaderboard. Commercial license required for revenue >$20M."
-  },
-  "glm-5-1": {
-   "strengths": "SWE-Pro 58.4 surpasses GPT-5.4 and Claude Opus 4.6. NL2Repo 42.7% leads full-repo generation. Up to 8-hour autonomous task execution. Trained 100% on Huawei Ascend 910B domestic chips. MIT license open-weight.",
-   "weaknesses": "GPQA Diamond 86.2% lags frontier (Claude 94.3%). No SWE-Bench Verified independent AA score. 744B total / 40B active — local deployment practically impossible."
-  },
-  "llama-4-scout": {
-   "strengths": "10M token context (largest open-weight Apr 2026); MoE 17B/109B; lcbV6=32.8; open weights; GPQA 57.2%",
-   "weaknesses": "Reliable context ~5-6.5M per NVIDIA RULER; no SWE-bench score; aaIdx=14 low; below Maverick across all benchmarks"
-  },
-  "llama-4-maverick": {
-   "strengths": "MoE architecture (17B active / 400B total); 1M token context; lcbV6=43.4 outperforms GPT-4o (32.3); GPQA 69.8%; open weights",
-   "weaknesses": "No SWE-bench Verified score on Tier-I sources; experimental chat version vs public release controversy; aaIdx=18 below frontier median"
-  },
-  "qwen3-coder-next": {
-   "strengths": "80B total / 3B active hybrid attention+MoE architecture. Runs locally on single RTX 5090. 256K context, 370+ languages. SWE-Verified 58.7% beats models with 10-20x more active params.",
-   "weaknesses": "API pricing not finalized. No SWE-Pro independent measurement. Overshadowed by Qwen3-Coder-480B. Not optimized for FIM/autocomplete."
-  },
-  "minimax-m2-7": {
-   "strengths": "Frontier-class quality at the lowest price among open-weight peers ($0.30 input). Strong agentic coding on SWE-Bench and Terminal-Bench. Top AA Intelligence Index at half median market price.",
-   "weaknesses": "Output throughput below class at 45.7 t/s. High TTFT (2.18s). Limited provider diversity outside MiniMax platform."
-  },
-  "minimax-m2-5": {
-   "strengths": "80.2% on SWE-Bench Verified matches top closed-source models. Output speed 105 t/s — double class median. 230B total / 10B active MoE runs efficiently.",
-   "weaknesses": "AA Intelligence Index 42 lags M2.7's 50. SWE-Pro and Terminal-Bench independent verification missing. Superseded by M2.7; now secondary option."
-  },
-  "mimo-v2-flash": {
-   "strengths": "Open-source MIT, 309B total / 15B active MoE. 1M token context. 73.4% SWE-Bench Verified surpasses Claude Sonnet 4.5. 94.1% AIME 2025 math.",
-   "weaknesses": "API pricing not publicly confirmed. No SWE-Pro independent measure. Quickly overshadowed by V2-Pro and V2.5 families."
-  },
-  "mimo-v2-pro": {
-   "strengths": "1T total / 42B active MoE, 78% SWE-Bench Verified surpasses Claude Sonnet 4.6. 1M token context ideal for agentic workflows. Well below frontier pricing. Viral 'Hunter Alpha' stealth launch.",
-   "weaknesses": "Weights not released (API only). Price doubles above 256K context. SWE-Pro independent measurement missing. V2.5-Pro began superseding it April 2026."
-  },
-  "mimo-v2-5-pro": {
-   "strengths": "Matches frontier models at 40-60% fewer tokens per trajectory. SWE-Pro 57.2, ClawEval 63.8, τ³-Bench 72.9. Multimodal (image/audio/video+text) in one model. Perfect compiler task in 4.3h / 672 tool calls.",
-   "weaknesses": "Weights not yet open-source ('soon' promised). Public beta first, full API scaling in progress. SWE-Pro score self-reported."
-  },
-  "mimo-v2-5": {
-   "strengths": "Fast everyday model at 100-150 t/s. 50% fewer tokens vs Muse Spark. All modalities at $0.40 input competitive price. Consolidates V2-Pro + V2-Omni into one.",
-   "weaknesses": "Exact parameter count not separately disclosed (may share with Pro). Benchmark scores not independently verified. Weights not yet open-source."
-  },
-  "step-3-5-flash": {
-   "strengths": "Open-source 196B total / 11B active MoE. 100-350 t/s generation throughput. SWE-Verified 74.4%, τ²-Bench 88.2 strong agentic coding. $0.10/$0.30 among cheapest available.",
-   "weaknesses": "All benchmarks self-reported (StepFun). High VRAM for local run via vLLM/llama.cpp. Limited independent platform verification."
-  },
-  "deepseek-v4-pro": {
-   "strengths": "1.6T total / 49B active MoE, open-weight MIT. SWE-Verified 80.6% (0.2pts from Claude Opus 4.6), LiveCodeBench 93.5%. 73% fewer FLOPs vs V3.2, 1M token context, well below frontier pricing.",
-   "weaknesses": "Minimum 8x H100 80GB GPUs to run locally. Throughput-limited at preview launch. HLE 37.7% lags frontier. Text-only — no image/audio support."
-  },
-  "qwen3-coder-480b": {
-   "strengths": "SOTA among open weights on agentic coding. Aider Polyglot 61.8% matches Claude Sonnet 4. 7.5T token (70% code) training, 358 programming languages. QwenCode CLI open-sourced.",
-   "weaknesses": "480B total parameters makes local deployment impractical (multiple H100 nodes required). 256K context window restricted vs rivals offering 1M. No thinking mode."
-  },
-  "devstral-medium": {
-   "strengths": "24B params, Apache 2.0, runs on 32GB RAM laptop. SWE-Verified 68% strong local coding. Multimodal (image input supported). $0.10/$0.30 affordable pricing.",
-   "weaknesses": "4.2pts behind Devstral 2 123B. No image output. Local performance requires 32GB+ RAM for full precision."
-  },
-  "codestral-22b": {
-   "strengths": "HumanEval 86.6%, MBPP 91.2%. 256K context ideal for repo-scale code completion. Runs full-precision on RTX 4090 at 22B params. FIM support excellent for IDE integration.",
-   "weaknesses": "Non-commercial license restricts startup adoption. No SWE-Bench Verified independent score. Overshadowed by newer agentic models like Devstral and Qwen3-Coder."
-  },
-  "nemotron-3-super": {
-   "strengths": "Hybrid Mamba-Transformer (LatentMoE) delivers 5x throughput. NVFP4 runs on 64GB VRAM (single H100 SXM). SWE-Verified 60.5% open-weight record at launch. 91.75% RULER at 1M tokens. Free on Cloudflare Workers AI.",
-   "weaknesses": "SWE-Verified 60.5% superseded by April 2026 by DeepSeek V4-Pro (80.6%) and Kimi K2.6 (80.2%). Significant 45.8% drop on non-English coding. Full BF16 weights require 3-4x H100."
-  },
-  "gemma-4-e2b": {
-   "strengths": "2.3B effective params (5.1B total via PLE); native multimodal (text/image/audio); offline-capable; 48 tok/s on mobile; Apache 2.0",
-   "weaknesses": "Edge model — not benchmarked on SWE-bench/agentic; lcbV6=44.0 single C-tier source; aaIdx=15 low; vLLM FlashAttention fallback slowdown"
-  },
-  "gemma-4-e4b": {
-   "strengths": "4.5B effective; native multimodal with audio ASR; M-series Mac 40+ tok/s; T4-GPU deployable; Apache 2.0; lcbV6=52.0 strong for size",
-   "weaknesses": "Edge model — not benchmarked on SWE-bench; lcbV6=52.0 single C-tier source; aaIdx=15 shared with E2B; ~9 tok/s on RTX 4090 via vLLM"
-  },
-  "gemma-4-26b-moe": {
-   "strengths": "26B total / 3.8B active MoE, runs on RTX 4090 with 24GB (Q4). Arena AI global #6. AIME 2026 88.3% impressive for efficiency. Delivers 97% of 31B Dense quality at 1/8 compute.",
-   "weaknesses": "SWE-Verified 64% lags GLM-5.1 (78%) and Claude (87.6%). Still requires ~26GB to load (despite only 3.8B active). Not preferred over 31B Dense for coding agent scenarios."
-  },
-  "gemma-4-31b": {
-   "strengths": "Best US open model under Apache 2.0. Arena AI #3 (Elo 1452). AIME 2026 89.2% strong math. τ²-Bench 86.4 impressive agent performance. 256K context. Full multimodal.",
-   "weaknesses": "SWE-Verified 64% lags Chinese models like GLM-5.1 and Kimi K2.6. Full precision requires 80GB H100. Pricing not yet disclosed (Google AI Studio free preview)."
-  },
-  "gemma-3-27b": {
-   "strengths": "27B dense model runs single-GPU full precision. Extremely cheap at $0.10/1M input on DeepInfra. 140+ languages, image+text multimodal. Good fine-tuning base.",
-   "weaknesses": "LiveCodeBench v6 29.1% far too low by current coding standards. Gemma 4 dramatically superseded it April 2026 (Codeforces ELO: 110 vs 2150). Agentic tool use 6.6% unacceptably low."
-  },
-  "qwen25-coder-32b": {
-   "strengths": "14.7M Ollama downloads — #1 choice for local coding. HumanEval 92.7%, Aider 73.7%. Best FIM autocomplete model. Runs on RTX 4090 with Q4_K_M at 22GB VRAM.",
-   "weaknesses": "32K context window limited by modern standards (Unsloth 128K version exists). Weak on agentic coding vs Qwen3.6 family. Text-only, not multimodal."
-  },
-  "qwen25-coder-14b": {
-   "strengths": "9GB file size — strong coding on 12GB VRAM GPUs (RTX 3060/4060). FIM support ideal for IDE autocomplete. Apache 2.0 license allows free commercial use.",
-   "weaknesses": "32K context window limited. Benchmark performance drops vs 32B variant. 32B or higher preferred for agentic coding."
-  },
-  "qwen25-coder-7b": {
-   "strengths": "4.7GB size runs on 8GB VRAM GPUs (RX 580, GTX 1070). FIM support for lightweight IDE integration. Apache 2.0. Best choice for entry-level local coding.",
-   "weaknesses": "32K context and 7B params can't handle serious agentic tasks. Upgrade to 14B or 32B on stronger hardware. Benchmark figures significantly below 32B."
-  },
-  "deepseek-coder-v2-16b": {
-   "strengths": "16B MoE variant 8.9GB runs on 12GB VRAM. 160K context window quite wide for local models. GPT4-Turbo-comparable performance at release. 2.4M Ollama downloads.",
-   "weaknesses": "Significantly superseded by 2024+ newer models. 236B variant impractical to run locally (133GB). License is DeepSeek-specific, not Apache/MIT."
-  },
-  "deepseek-r1-14b": {
-   "strengths": "Distilled from Qwen2.5, strong reasoning with 128K context. MIT license. 9GB size comfortable on 12GB VRAM GPUs. Popular for local mathematical reasoning.",
-   "weaknesses": "Distilled model — not at full R1 671B capability. Coding benchmark scores not independently reported. Superseded by DeepSeek V4 family."
-  },
-  "qwen3-6-max": {
-   "strengths": "AA Intelligence Index 52 strong ranking. #1 on 6 benchmarks: SWE-Pro, Terminal-Bench 2.0, SkillsBench, QwenClawBench, QwenWebBench, SciCode. preserve_thinking for agentic workflows.",
-   "weaknesses": "Closed-weight (first time in Qwen history). SWE-Bench Verified independent score not published. Pricing not finalized during preview. Text-only — no image/audio."
-  },
-  "gpt-5-4": {
-   "strengths": "Foundation of GPT-5.4 series, wide context (1M token), accessible pricing, ChatGPT Plus access",
-   "weaknesses": "Superseded by GPT-5.4 and o3 in OpenAI's lineup, limited independent benchmark data available"
-  },
-  "qwen3-6-35b-moe": {
-   "strengths": "35B total / 3B active MoE, Apache 2.0. SWE-Verified 73.4% exceptional among open-weights. Runs on 24GB Apple Silicon Mac with Unsloth 4-bit. GPQA Diamond 86.0 strong multi-discipline performance.",
-   "weaknesses": "API pricing not yet disclosed. No SWE-Pro independent measurement. Full F16 model ~72GB (beyond consumer hardware)."
-  },
-  "o4-mini": {
-   "strengths": "Top-tier reasoning at 10x lower cost than o3; SWE-bench Verified 58.6% (Vellum independent) / 68.1% (OpenAI scaffold); GPQA Diamond 81.4%; LiveCodeBench 80.2%; Codeforces ELO 2719",
-   "weaknesses": "SWE-bench score varies by scaffold (OpenAI 68.1 vs Vellum 58.6 — RED, conservative 58.6 chosen); no aaIdx entry on Artificial Analysis; closed-weight, no local deployment"
-  },
-  "grok-3-mini": {
-   "strengths": "aaIdx=32 (well above price-tier median); GPQA Diamond 79.1%; LiveCodeBench 69.6% (conservative baseline); 183 tok/s; $0.30/$0.50 per 1M — strong cost-efficiency",
-   "weaknesses": "No SWE-bench Verified score on any Tier-I source; lcbV6 single-source xAI (RED — 69.6 vs 80.4 same-source conflict); xAI does not submit to SWE-bench / SEAL"
-  },
-  "gemini-3-1-flash": {
-   "strengths": "1M token context, $0.15-$0.30/M input — 4x cheaper than Pro. GPQA 86.9% strong science reasoning. Fastest Google model for high-volume production; free tier on AI Studio.",
-   "weaknesses": "No SWE-bench Verified or LiveCodeBench independent score found. Proprietary, closed-weight. Trails Pro by ~5pp on most reasoning benchmarks."
-  },
-  "gemini-3-1-pro": {
-   "strengths": "1M context, SWE-V 80.6% matches DeepSeek V4-Pro, GPQA 94.3% world-class, LCB 88.49%, SWE-Pro 46.1%, MCP-Atlas 73.9%. $2/$12 per 1M — best Google value at frontier.",
-   "weaknesses": "HLE 44.4% lags Claude Opus 4.7 (46.9%) and MiMo-V2.5-Pro (48.0%). No aaAgentic, tb2, tau2 independent scores. Proprietary closed-weight, no local deployment."
-  },
-  "gpt-4-1": {
-   "strengths": "SWE-V 54.6% strong for its tier, 1M context, $2/$8 per 1M with $0.50 cache hits. Multimodal (video+text). 83% cost reduction vs GPT-4o. ChatGPT Plus accessible.",
-   "weaknesses": "No GPQA, LCB, or SWE-Pro independent scores found. Superseded by o3 and o4-mini on reasoning tasks. Proprietary, closed-weight. Video-MME 72% is baseline not SOTA."
-  },
-  "grok-3": {
-   "strengths": "GPQA 84.6% strong science reasoning, LCB 79.4% coding, 1M token context (8x prior), AIME 2025 93.3%. Chatbot Arena Elo ~1402 at launch. $3/$15 per 1M.",
-   "weaknesses": "No SWE-bench Verified or SWE-Pro score on any Tier-I source. Benchmark controversy: multi-attempt averages inflate scores vs single-attempt peers. xAI does not submit to SEAL."
-  },
-  "mistral-large-3": {
-   "strengths": "675B total / 41B active MoE, LCB 82.8% strong coding, HumanEval 92.0%, AIME 2025 88.0%, MATH-500 93.6%. Self-hostable open-weight. $0.50/$1.50 affordable pricing.",
-   "weaknesses": "GPQA 43.9% significantly below peer open-weight models (DeepSeek 77%+, Kimi 80%+). No SWE-bench Verified independent score. Trails frontier on agentic and scientific reasoning."
-  },
-  "o3": {
-   "strengths": "SWE-V 71.7%, GPQA 87.7%, AIME 96.7%, Codeforces Elo 2727, ARC-AGI 87.5%. $2/$8 per 1M after 80% price cut March 2026. Best-in-class reasoning track model from OpenAI.",
-   "weaknesses": "Reasoning tokens billed as output (hidden cost: 500 visible tokens may consume 2000+ billed). ARC-AGI-2 only 2.9%. No SWE-Pro Tier-I score. Closed-weight, no local deployment."
-  },
-  "qwen3-235b": {
-   "strengths": "235B total / 22B active MoE, Apache 2.0. LCB 74.8%, GPQA 81.1%, AIME 2025 92.3%, AIME 2024 85.7%. Rivals Gemini 2.5 Pro. $0.20/$1.00 per 1M — 70% below GPT-5 price.",
-   "weaknesses": "LCB 74.8% trails newer frontier models (Gemini 3.1 Pro 88.5%, DeepSeek V4-Pro 93.5%). No SWE-bench Verified independent score. Local deployment requires multiple H100 nodes."
-  },
-  "qwen3-32b": {
-   "strengths": "32B dense, Apache 2.0. $0.15/$0.75 per 1M — cheapest frontier-grade dense model. 119 languages, strong multilingual coding. Fits single A100 or high-end consumer GPU at Q4.",
-   "weaknesses": "SWE-bench Pro only 3.4% (trails even GPT-4o 4.9%). No GPQA or LCB independent Tier-I score found. Smaller than 235B MoE sibling — lower ceiling on complex reasoning tasks."
-  },
-  "qwen3-6-plus": {
-   "strengths": "Rebuilt reasoning layer uses always-on chain-of-thought. 515 fewer reasoning tokens vs Qwen 3.5 Plus while producing more output. Improved consistency and production reliability over predecessor.",
-   "weaknesses": "No independent GPQA, SWE-bench, or LiveCodeBench scores found. Weaker than 3.5 Plus on multimodal audio/video tasks. Pricing not officially disclosed on major provider APIs."
-  },
-  "devstral-small-2": {
-   "strengths": "24B params, SWE-V 68.0% — strongest open-weight at size class. 256K context, Apache 2.0, multimodal image input. Runs on RTX 4090 (24GB) or 32GB Mac. 75 tok/s, TTFT 1.18s. $0.10/$0.30.",
-   "weaknesses": "4.2pp behind Devstral 2 (123B). No SWE-Pro or LCB independent score. Limited provider availability vs larger Devstral 2. Image output not supported."
-  },
-  "gpt-5-5": {
-   "strengths": "Leads Terminal-Bench 2.0 at 82.7%; GPQA 93.6%; 1M token context; natively omnimodal; MCP-Atlas 75.3%; SWE-bench Pro 58.6%.",
-   "weaknesses": "5.7 points behind Opus 4.7 on SWE-bench Pro; HLE 41.4% (vs Opus 4.7 46.9%); expensive at $5/$30 per 1M tokens; closed weights."
-  },
-  "glm-4-5-air": {
-   "strengths": "MoE with 12B active parameters; balanced cost-vs-capability for self-host; MIT-licensed.",
-   "weaknesses": "Bench coverage pending; agentic columns largely untested at publish time."
-  },
-  "glm-4-7": {
-   "strengths": "Open-weight coding leader within the GLM series; targets frontier-class SWE behavior under MIT.",
-   "weaknesses": "Requires 40GB+ VRAM at usable quants; not realistic for consumer GPUs."
-  },
-  "mistral-medium-3-5": {
-   "strengths": "Mid-tier Mistral with strong European-language support and predictable pricing.",
-   "weaknesses": "Modified-MIT licensing restricts commercial redistribution; cloud-only."
-  },
-  "qwen3-5-9b": {
-   "strengths": "Compact 9B Qwen suitable for 6-8GB consumer GPUs; Apache 2.0 unrestricted.",
-   "weaknesses": "Smaller capacity than 27B/35B siblings on multi-file refactor; agentic gaps expected."
-  },
-  "minimax-m2-1": {
-   "strengths": "1M-token context window at sub-$1/M tokens; useful for long-document and multi-file context tasks.",
-   "weaknesses": "Local execution is impractical at full precision; cloud-first deployment."
-  },
-  "claude-haiku-4-5": {
-   "strengths": "",
-   "weaknesses": ""
-  },
-  "codestral": {
-   "strengths": "",
-   "weaknesses": ""
-  },
-  "grok-4-1-fast": {
-   "strengths": "",
-   "weaknesses": ""
-  },
-  "grok-4-20": {
-   "strengths": "",
-   "weaknesses": ""
-  },
-  "grok-4-3": {
-   "strengths": "",
-   "weaknesses": ""
-  },
-  "gemini-3-5-flash": {
-   "strengths": "Fast, low-cost Gemini tier optimized for agentic and coding workloads; 1M-token context.",
-   "weaknesses": "Benchmark coverage pending verification; proprietary, cloud-only."
-  },
-  "qwen3-7-max": {
-   "strengths": "Qwen flagship reasoning-agent model with 1M-token context; strong coding and agentic performance.",
-   "weaknesses": "Closed-weight preview; independent bench coverage pending; priced above mid-tier Qwen."
-  },
-  "qwen3-7-plus": {
-   "strengths": "Multimodal Qwen3.7 variant with 1M-token context for combined vision and code tasks.",
-   "weaknesses": "Closed-weight preview; limited independent benchmarks at launch."
-  },
-  "claude-opus-4-8": {
-   "strengths": "Anthropic frontier flagship; strongest Claude on SWE-bench and agentic coding at release.",
-   "weaknesses": "Premium API pricing; closed weights; full benchmark coverage pending this cycle's survey."
-  },
-  "gpt-5-4-mini": {
-   "strengths": "Cost-efficient GPT-5.4 tier with 400K context; balances latency and capability for coding agents.",
-   "weaknesses": "Smaller than full GPT-5.4 on hard reasoning; closed weights; bench coverage pending survey."
-  },
-  "gpt-5-4-nano": {
-   "strengths": "Smallest GPT-5.4 variant; cheapest OpenAI option for high-throughput, low-latency coding calls.",
-   "weaknesses": "Lowest capacity in the GPT-5.4 family on multi-file tasks; closed weights; bench coverage pending."
-  },
-  "mistral-small-4": {
-   "strengths": "Apache-2.0 small Mistral with 256K context; self-hostable on a single mid-range GPU.",
-   "weaknesses": "Below frontier on agentic benchmarks; full bench coverage pending this cycle's survey."
-  },
-  "nemotron-3-nano-omni": {
-   "strengths": "Open-weight multimodal NVIDIA Nemotron nano; compact footprint for agentic, multimodal tasks.",
-   "weaknesses": "Nano scale limits hard-coding capability; bench coverage pending this cycle's survey."
-  },
-  "nemotron-3-ultra": {
-   "strengths": "550B total / 55B active Hybrid Mamba-Transformer MoE, open weights (Linux Foundation OpenMDW-1.1). aaIdx=48, strongest US open-weight. Distributed via HF + OpenRouter + NVIDIA NIM + AWS SageMaker.",
-   "weaknesses": "Just announced at Computex 2026 (June 4 2026); independent benchmark verification still limited. Pricing varies by provider."
-  },
-  "muse-spark": {
-   "strengths": "First model in Meta Superintelligence Labs' Muse family; multimodal reasoning, 262K context. aaIdx=52. Free at meta.ai.",
-   "weaknesses": "Meta's first closed-weight model; API in private preview only. Parameter count undisclosed; independent benchmarks limited."
-  },
-  "step-3-7-flash": {
-   "strengths": "198B MoE (11B active) + 1.8B vision encoder, Apache 2.0, 256K context. For coding agents and search workflows. Cheap $0.20/$1.15. OpenRouter + NVIDIA NIM.",
-   "weaknesses": "Released May 29 2026; bench cells not yet filled (next cycle). Independent verification limited."
-  },
-  "glm-5": {
-   "strengths": "744B MoE (40B active), 200K context, MIT license. Z.ai frontier model; SWE-Verified ~77.8%, GPQA ~86%, AIME26 ~92.7% (lineup source). Successor glm-5-1 tracked separately.",
-   "weaknesses": "Missed in a prior refresh (released Feb 11 2026); bench cells will be filled with multi-source provenance next full sweep."
-  },
-  "minimax-m3": {
-   "strengths": "1M context, multimodal (text/image/video input), MSA sparse attention. SWE-Pro ~59.0%, SWE-Verified ~80.5% (lineup source). Cheap $0.30/$1.20. Released June 1 2026.",
-   "weaknesses": "Caught via gather lineup-hint in the prior full sweep but missed by the dedicated lineup fetch (now resolved by harvest-new-models.py). Bench cells fill with multi-source provenance next cycle."
-  },
-  "grok-build-0-1": {
-   "strengths": "Grok Build 0.1 detected via lineup discovery (released 2026-05-29). Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "gemma-4-12b": {
-   "strengths": "Gemma 4 12B detected via lineup discovery (released 2026-06-03). Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "glm-5-turbo": {
-   "strengths": "GLM-5 Turbo detected via lineup discovery (released 2026-03). Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "claude-fable-5": {
-   "strengths": "Claude Fable 5 detected via lineup discovery (released 2026-06-09). Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "claude-mythos-5": {
-   "strengths": "Claude Mythos 5 detected via lineup discovery (released 2026-06-09). Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "gpt-5-5-pro": {
-   "strengths": "GPT-5.5 Pro detected via lineup discovery (released 2026-04-23). Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "glm-5-2": {
-   "strengths": "GLM-5.2 detected via lineup discovery (released 2026-06-13). Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "mimo-v2-omni": {
-   "strengths": "MiMo-V2-Omni detected via lineup discovery. Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "kimi-k2-7-code": {
-   "strengths": "kimi-k2-7-code detected via lineup discovery (released 2026-06-12). Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "grok-4-20-multi-agent": {
-   "strengths": "grok-4-20-multi-agent detected via lineup discovery (released 2026-03-31). Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "kimi-k2-7-code-highspeed": {
-   "strengths": "kimi-k2-7-code-highspeed detected via lineup discovery. Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "qwen3-6-flash": {
-   "strengths": "qwen3-6-flash detected via lineup discovery. Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "nemotron-3-nano": {
-   "strengths": "nemotron-3-nano detected via lineup discovery. Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "claude-sonnet-5": {
-   "strengths": "Claude Sonnet 5 detected via lineup discovery (released 2026-06-30). Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "claude-mythos-preview": {
-   "strengths": "Claude Mythos Preview detected via lineup discovery (released 2026-04-07). Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "gpt-5-6-sol": {
-   "strengths": "GPT-5.6 Sol detected via lineup discovery (released 2026-06-26). Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "gpt-5-6-terra": {
-   "strengths": "GPT-5.6 Terra detected via lineup discovery (released 2026-06-26). Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "gpt-5-6-luna": {
-   "strengths": "GPT-5.6 Luna detected via lineup discovery (released 2026-06-26). Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "gemini-omni-flash": {
-   "strengths": "Gemini Omni Flash detected via lineup discovery (released 2026-05-19). Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "ministral-3-14b": {
-   "strengths": "Ministral 3 14B detected via lineup discovery (released 2025-12-23). Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "ministral-3-8b": {
-   "strengths": "Ministral 3 8B detected via lineup discovery (released 2025-12-23). Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "ministral-3-3b": {
-   "strengths": "Ministral 3 3B detected via lineup discovery (released 2025-12-23). Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  },
-  "minimax-m2-7-highspeed": {
-   "strengths": "MiniMax-M2.7-highspeed detected via lineup discovery (released 2026-03-18). Benchmark data will be filled with multi-source provenance next refresh.",
-   "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
-  }
- },
- "benchmarks": {
-  "swePro": {
-   "name": "SWE-bench Pro",
-   "short": "SWE-PRO",
-   "desc": "Contamination-resistant gold standard; 1865 tasks, 41 repos, multi-language."
-  },
-  "sweV": {
-   "name": "SWE-bench Verified",
-   "short": "SWE-V",
-   "desc": "Human-verified 500 tasks. Often contradicts Pro."
-  },
-  "sweMulti": {
-   "name": "SWE-bench Multilingual",
-   "short": "SWE-M",
-   "desc": "Multilingual software bug-fixing across 9 languages."
-  },
-  "tb2": {
-   "name": "TerminalBench 2",
-   "short": "TB2",
-   "desc": "Terminal CLI agentic execution; tool-use quality."
-  },
-  "tbHard": {
-   "name": "Terminal-Bench Hard",
-   "short": "TB-HARD",
-   "desc": "Hardest 44-task subset of Terminal-Bench; AA Index v4 component."
-  },
-  "lcb": {
-   "name": "LiveCodeBench",
-   "short": "LCB",
-   "desc": "Rolling contamination-free competitive programming leaderboard (May 2023→present)."
-  },
-  "tau2": {
-   "name": "τ²-bench",
-   "short": "τ²",
-   "desc": "Multi-turn tool calling + plan execution (telecom track)."
-  },
-  "mcpA": {
-   "name": "MCP-Atlas",
-   "short": "MCP-A",
-   "desc": "Model Context Protocol tool-chain quality."
-  },
-  "bfcl": {
-   "name": "BFCL v3/v4",
-   "short": "BFCL",
-   "desc": "Berkeley Function-Calling Leaderboard. Function/tool selection accuracy."
-  },
-  "browseComp": {
-   "name": "BrowseComp",
-   "short": "BROWSE",
-   "desc": "Web research agent benchmark; multi-hop browsing + synthesis."
-  },
-  "aaCoding": {
-   "name": "AA Coding",
-   "short": "AA-CODE",
-   "desc": "Artificial Analysis composite coding score."
-  },
-  "aaAgentic": {
-   "name": "AA Agentic",
-   "short": "AA-AGT",
-   "desc": "Artificial Analysis agentic-use score."
-  },
-  "aaIdx": {
-   "name": "AA Index",
-   "short": "AA-IDX",
-   "desc": "Artificial Analysis general composite (reference; not used in weighting)."
-  },
-  "aaOmni": {
-   "name": "AA-Omniscience",
-   "short": "AA-OMNI",
-   "desc": "Artificial Analysis omniscience / misaligned-behavior score (lower is better)."
-  },
-  "cfElo": {
-   "name": "Codeforces ELO",
-   "short": "CF-ELO",
-   "desc": "Codeforces competitive-programming ELO rating; 1000-3500 raw scale."
-  },
-  "webDevElo": {
-   "name": "LMArena WebDev Elo",
-   "short": "WD-ELO",
-   "desc": "LMArena WebDev Arena Elo from blind human preference voting on front-end code outputs (React/HTML/CSS/JS); raw 950-1300 typical range."
-  },
-  "mmluPro": {
-   "name": "MMLU-Pro",
-   "short": "MMLU-PRO",
-   "desc": "Multi-discipline reasoning across 57 subjects with hard distractors."
-  },
-  "mrcr": {
-   "name": "MRCR 1M",
-   "short": "MRCR",
-   "desc": "Long-context retrieval at 1M tokens; multi-needle in haystack."
-  },
-  "arcAgi2": {
-   "name": "ARC-AGI-2",
-   "short": "ARC-2",
-   "desc": "Abstract reasoning; the only frontier benchmark below human baseline."
-  },
-  "gpqa": {
-   "name": "GPQA Diamond",
-   "short": "GPQA",
-   "desc": "Graduate-level general reasoning (188 hard questions)."
-  },
-  "aime26": {
-   "name": "AIME 2026",
-   "short": "AIME26",
-   "desc": "American Invitational Mathematics Examination 2026; advanced math reasoning."
-  },
-  "hle": {
-   "name": "Humanity's Last Exam",
-   "short": "HLE",
-   "desc": "Comprehensive advanced multi-discipline test."
-  },
-  "nl2Repo": {
-   "name": "NL2Repo",
-   "short": "NL2REPO",
-   "desc": "Natural-language → full repository generation; multi-file structure + dependency resolution."
-  },
-  "llmStatsIdx": {
-   "name": "LLM-Stats Composite",
-   "short": "LLM-Stats",
-   "desc": "llm-stats.com TrueSkill-style composite across published benchmarks. Vendor aggregate — independent reference, not part of AICoderMap composite."
-  },
-  "vellumRank": {
-   "name": "Vellum Rank",
-   "short": "Vellum",
-   "desc": "Vellum LLM Leaderboard rank position (1=best). Normalized via inverse-rank. Vendor aggregate."
-  },
-  "benchlmIdx": {
-   "name": "BenchLM Composite",
-   "short": "BenchLM",
-   "desc": "BenchLM.ai composite score across many benchmarks. Vendor aggregate."
-  },
-  "lmArenaElo": {
-   "name": "LMArena Elo",
-   "short": "LMArena",
-   "desc": "LMArena head-to-head Elo rating (general chat). Normalized linear 1000-1500 → 0-100. Vendor aggregate."
-  },
-  "hfOpenAvg": {
-   "name": "HF Open LLM Avg",
-   "short": "HF Open",
-   "desc": "HuggingFace Open LLM Leaderboard average score. Open-weights models only. Vendor aggregate."
-  },
-  "kluRank": {
-   "name": "Klu Rank",
-   "short": "Klu",
-   "desc": "Klu.ai LLM leaderboard rank. Normalized via inverse-rank. Vendor aggregate."
-  }
- },
- "benchCategories": {
-  "coding": {
-   "label": "Coding"
-  },
-  "agentic": {
-   "label": "Agentic"
-  },
-  "reasoning": {
-   "label": "Reasoning"
-  },
-  "general": {
-   "label": "General"
-  }
- },
- "verdicts": {
-  "preset": {
-   "balanced": "Balanced",
-   "sweFocused": "SWE-focused",
-   "agenticFocused": "Agentic-focused",
-   "reasoningFocused": "Reasoning-focused",
-   "benchmarkOnly": "Benchmark-only",
-   "consensus": "Vendor Consensus"
-  }
- },
- "reliability": {
-  "label": "Reliability",
-  "exceptional": "exceptional source",
-  "lowConfidence": "low confidence",
-  "coldStart": "insufficient data"
- },
- "vendorPanel": {
-  "title": "VENDOR VIEW",
-  "consensus": "consensus",
-  "mild": "mild gap",
-  "controversy": "controversy",
-  "agreementTip": "AICM rank",
-  "consensusRank": "consensus rank",
-  "limitedData": "limited data",
-  "limitedCoverage": "limited coverage",
-  "missingTip": "missing benches",
-  "notInScoreTag": "not in score",
-  "notInScore": "Independent reference — NOT part of AICoderMap composite score"
- },
- "compat": {
-  "errors": {
-   "webgpuUnsupported": "WebGPU not supported in this browser"
-  }
- }
 }

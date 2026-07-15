@@ -4,7 +4,7 @@
 
 import {
   State, BENCH_KEYS, PRESETS, STORAGE, writeStorage,
-  getPresets, shortEtagHash, detectMatchingPreset,
+  getPresets, shortEtagHash, detectMatchingPreset, DEFAULT_PRESET,
 } from './core.js';
 import { el, clear } from './dom.js';
 import { t } from './i18n.js';
@@ -116,14 +116,18 @@ export function syncPresetSelect() {
 }
 
 export function resetWeights(onChange) {
-  // Reset = default preset = swe-focused (product decision 2026-06-10; the
-  // vendor-consensus preset remains available in the dropdown).
-  applyPreset('swe-focused', onChange);
+  // Reset = DEFAULT_PRESET (SSOT in core.js; product decision 2026-06-10,
+  // reaffirmed 2026-07-15 G12). Vendor-consensus stays in the dropdown.
+  applyPreset(DEFAULT_PRESET, onChange);
 }
 
 export function applyTheme(theme) {
   const t2 = (theme === 'light' || theme === 'dark') ? theme : 'dark';
   document.documentElement.setAttribute('data-theme', t2);
+  // Keep the browser chrome color in sync with the active palette's --bg
+  // (G9 2026-07-15: static meta was #0b0d10, matching neither theme).
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if (metaTheme) metaTheme.setAttribute('content', t2 === 'light' ? '#f7f9fc' : '#181c22');
   document.querySelectorAll('.theme-toggle button[data-theme]').forEach((btn) => {
     const active = btn.dataset.theme === t2;
     btn.classList.toggle('active', active);
@@ -196,13 +200,15 @@ export function renderDeployStamp() {
   const fillRatioPct = (meta && Number.isFinite(meta.fillRatio))
     ? Math.round(meta.fillRatio * 100)
     : null;
-  const cellLine = (meta && Number.isFinite(meta.filledCells) && Number.isFinite(meta.totalCells))
-    ? ` · ${meta.filledCells}/${meta.totalCells}`
-    : '';
-  const ratioLine = (fillRatioPct != null) ? ` · ${fillRatioPct}%` : '';
-  const buildLine = sha ? ` · build ${sha}` : '';
-  node.textContent = `${label}: ${formatted}${buildLine}${ratioLine}${cellLine}`;
+  // G8 (2026-07-15): the visible stamp carries only what a visitor needs —
+  // freshness. Build SHA / fill-ratio / cell counts move to the hover title
+  // (operator detail, was cryptic "build 4d9d650 · 69% · 936/1360" chrome).
+  node.textContent = `${label}: ${formatted}`;
   const titleParts = [State.dataDeployedAt];
+  if (sha) titleParts.push(`build ${sha}`);
+  if (fillRatioPct != null && meta) {
+    titleParts.push(`coverage ${fillRatioPct}% (${meta.filledCells}/${meta.totalCells})`);
+  }
   if (State.dataEtag) titleParts.push(`etag ${State.dataEtag}`);
   if (meta && meta.cycleId) titleParts.push(`cycle ${meta.cycleId}`);
   if (meta && meta.lastCycleToolCallCount != null) {

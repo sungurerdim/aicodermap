@@ -2,7 +2,7 @@
 // at <50 lines.
 
 import {
-  State, STORAGE, DEFAULT_WEIGHTS, PRESETS, readStorage, validateWeights,
+  State, STORAGE, DEFAULT_WEIGHTS, DEFAULT_PRESET, PRESETS, readStorage, validateWeights,
 } from './core.js';
 import { loadI18n, applyI18n } from './i18n.js';
 import { loadData } from './data.js';
@@ -15,7 +15,7 @@ import {
   renderDeployStamp, populateProviderFilter, applyPreset,
 } from './render-controls.js';
 import { renderAll } from './render-table.js';
-import { renderPrivacyTable } from './render-privacy.js';
+import { renderPrivacyTable, renderBenchGlossary } from './render-privacy.js';
 import { wireEvents } from './events.js';
 import { startFreshnessWatch } from './freshness.js';
 import { readUrlState, applyUrlState, pushUrlState } from './url-state.js';
@@ -222,11 +222,12 @@ async function bootstrap() {
   } else if (!urlPreset && storedPreset === 'consensus') {
     applyPreset('consensus');
   } else if (!urlPreset && State._weightsAreDefault) {
-    applyPreset('swe-focused');
+    applyPreset(DEFAULT_PRESET);
   }
   syncPresetSelect();
   renderAll();
   renderPrivacyTable();
+  renderBenchGlossary();
   wireEvents();
   // Push the resolved state back into the URL so that the address bar always
   // reflects what the page is showing — including localStorage-driven defaults.

@@ -16,7 +16,10 @@ html[data-theme="dark"] {
   --accent-strong: #58d59d;
   --accent-2: #5dd4f0;
   --warn: #fbbf6b;
-  --danger: #f47b8b;
+  /* Serious tier (between warn and danger) — status ladder validated
+     2026-07-15 with dataviz validate_palette.js against #242a32. */
+  --warn-2: #f0863c;
+  --danger: #f98da6;
   --ok: #6ee7b3;
   --on-accent: #0a0e12;
   --shadow: 0 4px 20px rgba(0, 0, 0, 0.55);
@@ -25,13 +28,15 @@ html[data-theme="dark"] {
   --accent-soft: rgba(110, 231, 179, 0.50);
   --accent-2-soft: rgba(93, 212, 240, 0.50);
   --warn-soft: rgba(251, 191, 107, 0.55);
-  --danger-soft: rgba(244, 123, 139, 0.60);
+  --warn-2-soft: rgba(240, 134, 60, 0.55);
+  --danger-soft: rgba(249, 141, 166, 0.60);
   --bg-glass: rgba(24, 28, 34, 0.92);
   --border-dim: rgba(61, 70, 81, 0.45);
   --muted-dim: rgba(168, 179, 194, 0.60);
   --ok-tint: rgba(110, 231, 179, 0.18);
-  --danger-tint: rgba(244, 123, 139, 0.18);
+  --danger-tint: rgba(249, 141, 166, 0.18);
   --warn-tint: rgba(251, 191, 107, 0.18);
+  --warn-2-tint: rgba(240, 134, 60, 0.18);
   /* Limited-coverage band (rank-gated rows/cards): a warm desaturated tone,
      clearly distinct from --surface/--bg yet readable in dark theme. */
   --surface-limited: #3a3328;
@@ -49,26 +54,29 @@ html[data-theme="light"] {
   --track: #d2d9e2;
   --text: #1a1f26;
   --muted: #5a6573;
-  --accent: #14a05a;
-  --accent-strong: #0e8447;
-  --accent-2: #1f6fce;
-  --warn: #c2630c;
-  --danger: #dc2626;
-  --ok: #14a05a;
+  --accent: #0b6e3b;
+  --accent-strong: #0a6437;
+  --accent-2: #1a63bd;
+  --warn: #7d5700;
+  --warn-2: #b03e07;
+  --danger: #b3123a;
+  --ok: #0b6e3b;
   --on-accent: #ffffff;
   --shadow: 0 4px 20px rgba(15, 25, 40, 0.10);
   --shadow-soft: 0 1px 3px rgba(15, 25, 40, 0.08);
-  --accent-tint: rgba(20, 160, 90, 0.10);
-  --accent-soft: rgba(20, 160, 90, 0.45);
-  --accent-2-soft: rgba(31, 111, 206, 0.45);
-  --warn-soft: rgba(194, 99, 12, 0.45);
-  --danger-soft: rgba(220, 38, 38, 0.45);
+  --accent-tint: rgba(11, 110, 59, 0.10);
+  --accent-soft: rgba(11, 110, 59, 0.45);
+  --accent-2-soft: rgba(26, 99, 189, 0.45);
+  --warn-soft: rgba(125, 87, 0, 0.45);
+  --warn-2-soft: rgba(176, 62, 7, 0.45);
+  --danger-soft: rgba(179, 18, 58, 0.45);
   --bg-glass: rgba(247, 249, 252, 0.90);
   --border-dim: rgba(216, 222, 229, 0.55);
   --muted-dim: rgba(90, 101, 115, 0.60);
-  --ok-tint: rgba(20, 160, 90, 0.14);
-  --danger-tint: rgba(220, 38, 38, 0.12);
-  --warn-tint: rgba(194, 99, 12, 0.14);
+  --ok-tint: rgba(11, 110, 59, 0.14);
+  --danger-tint: rgba(179, 18, 58, 0.12);
+  --warn-tint: rgba(125, 87, 0, 0.14);
+  --warn-2-tint: rgba(176, 62, 7, 0.14);
   /* Limited-coverage band (rank-gated rows/cards) — warm parchment tint. */
   --surface-limited: #fbf2dd;
   --bg-limited: #f5e9cc;

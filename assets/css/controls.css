@@ -255,3 +255,8 @@
   color: var(--muted);
   font-style: italic;
 }
+
+/* G8 (2026-07-15) leaderboard-first: zero-weight rows hidden by default;
+   the "Show unweighted" checkbox lifts the class. */
+.weights-grid.hide-excluded .weight-row.excluded { display: none; }
+.inline-compact { font-size: 0.8rem; }

@@ -143,10 +143,10 @@
   color: var(--muted);
   cursor: help;
 }
-.composite-score .composite-unc.single-src { color: var(--warn-2, #e07320); font-style: italic; }
+.composite-score .composite-unc.single-src { color: var(--warn-2); font-style: italic; }
 .composite-score .coverage.cov-full { color: var(--ok); border-color: var(--accent-soft); }
 .composite-score .coverage.cov-partial { color: var(--warn); border-color: var(--warn-soft); }
-.composite-score .coverage.cov-low { color: var(--warn-2, #e07320); border-color: var(--warn-2-soft, #e0732040); }
+.composite-score .coverage.cov-low { color: var(--warn-2); border-color: var(--warn-2-soft); }
 /* B1: low-confidence composite — italic value + inline note */
 .composite-score .value.value-low-confidence { font-style: italic; opacity: 0.82; }
 .composite-score .low-confidence-note {
@@ -157,9 +157,9 @@
   font-size: 0.62rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-  border: 1px solid var(--warn-2-soft, #e0732040);
+  border: 1px solid var(--warn-2-soft);
   background: var(--surface-2);
-  color: var(--warn-2, #e07320);
+  color: var(--warn-2);
 }
 .composite-score .disputed {
   display: inline-block;
@@ -188,7 +188,7 @@ table#comparison-table .coverage-mini {
 }
 table#comparison-table .coverage-mini.cov-full { color: var(--ok); border-color: var(--accent-soft); }
 table#comparison-table .coverage-mini.cov-partial { color: var(--warn); border-color: var(--warn-soft); }
-table#comparison-table .coverage-mini.cov-low { color: var(--warn-2, #e07320); border-color: var(--warn-2-soft, #e0732040); }
+table#comparison-table .coverage-mini.cov-low { color: var(--warn-2); border-color: var(--warn-2-soft); }
 
 /* CI-overlap rank bands (2026-05-27): composite uncertainty + tier display. */
 table#comparison-table .composite-unc {
@@ -198,7 +198,7 @@ table#comparison-table .composite-unc {
   color: var(--muted);
   cursor: help;
 }
-table#comparison-table .composite-unc.single-src { color: var(--warn-2, #e07320); font-style: italic; }
+table#comparison-table .composite-unc.single-src { color: var(--warn-2); font-style: italic; }
 table#comparison-table .rank-num { cursor: help; }
 /* Significance break: a thin divider where the composite gap to the group below
    is statistically real (uncertainty bands no longer overlap). */
@@ -222,7 +222,7 @@ table#comparison-table td.bench-group-divider {
 .meta-cell .label { color: var(--muted); font-size: 0.68rem; font-weight: 600; line-height: 1.2; }
 .meta-cell .value { color: var(--text); font-family: var(--font-mono); line-height: 1.25; }
 .last-updated .last-updated-date { color: var(--text); font-weight: 700; }
-.last-updated .last-updated-ago { color: var(--muted); font-weight: 400; opacity: 0.85; }
+.last-updated .last-updated-ago { color: var(--muted); font-weight: 400; }
 
 .bench-grid {
   display: grid;
@@ -259,7 +259,7 @@ table#comparison-table td.bench-group-divider {
   white-space: nowrap;
   line-height: 1.15;
 }
-.bench-cell.empty .value { color: var(--muted); opacity: 0.6; }
+.bench-cell.empty .value { color: var(--muted); }
 .bench-cell .flag {
   position: absolute;
   top: 4px;
@@ -278,8 +278,10 @@ table#comparison-table td.bench-group-divider {
  * visible because the underlying data is real; the dim signals the preset
  * isn't ranking on it. Weight overlay sits next to the bench label. */
 .bench-cell.excluded {
-  opacity: 0.45;
-  filter: grayscale(0.55);
+  /* Dim via grayscale + dashed border, NOT opacity — flattened text opacity
+     drops small labels below the 4.5:1 AA floor (axe 2026-07-15). */
+  filter: grayscale(0.55) contrast(0.92);
+  border-style: dashed;
 }
 .bench-cell.excluded .name { font-style: italic; }
 .bench-cell .bench-weight {
@@ -298,30 +300,30 @@ table#comparison-table td.bench-group-divider {
 }
 /* Provenance tier badges on bench cells */
 .bench-cell.tier-c .value {
-  color: var(--muted, #8a8d92);
+  color: var(--muted);
   font-style: italic;
 }
 .bench-cell.tier-c::after {
   content: 'C';
   font-size: 0.6rem;
   vertical-align: super;
-  color: var(--muted, #8a8d92);
+  color: var(--muted);
   margin-left: 2px;
 }
 .bench-cell.tier-unknown .value {
-  color: var(--warn, #f0b04a);
+  color: var(--warn);
 }
 .bench-cell.tier-unknown::before {
   content: '?';
   font-size: 0.7rem;
-  color: var(--warn, #f0b04a);
+  color: var(--warn);
   margin-right: 2px;
 }
 .bench-cell.gap-pending {
-  opacity: 0.45;
+  filter: grayscale(0.4);
 }
 .bench-cell.gap-pending .value {
-  color: var(--muted, #8a8d92);
+  color: var(--muted);
   font-size: 0.85em;
 }
 
@@ -330,7 +332,7 @@ table#comparison-table td.bench-group-divider {
   content: '↻';
   font-size: 0.65rem;
   vertical-align: super;
-  color: var(--muted, #8a8d92);
+  color: var(--muted);
   margin-left: 2px;
   cursor: help;
 }
@@ -343,12 +345,12 @@ table#comparison-table td.bench-group-divider {
   content: '60d+';
   font-size: 0.6rem;
   vertical-align: super;
-  color: var(--warn-2, #e07320);
+  color: var(--warn-2);
   margin-left: 2px;
   cursor: help;
 }
 .bench-cell.cell-very-stale {
-  border-color: var(--warn-2-soft, #e0732040);
+  border-color: var(--warn-2-soft);
 }
 
 /* Preset-weighted group headers in bench grid: "in active preset" (weight
@@ -359,14 +361,13 @@ table#comparison-table td.bench-group-divider {
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.06em;
-  color: var(--muted, #8a8d92);
+  color: var(--muted);
   padding: 6px 4px 2px;
   border-bottom: 1px solid var(--border, rgba(255,255,255,0.08));
   margin-top: 4px;
 }
 .bench-group-header.is-excluded {
-  color: var(--muted, #8a8d92);
-  opacity: 0.7;
+  color: var(--muted);
   border-bottom-style: dashed;
 }
 
@@ -412,7 +413,7 @@ table#comparison-table td.bench-group-divider {
   margin-top: 2px;
   padding: 6px var(--space-2);
   background: var(--surface, rgba(255, 255, 255, 0.03));
-  border-left: 3px solid var(--accent-soft, var(--accent, #67e8a4));
+  border-left: 3px solid var(--accent-soft);
   border-radius: 4px;
   display: flex;
   flex-direction: column;
@@ -482,13 +483,13 @@ table#comparison-table td.bench-group-divider {
   vertical-align: middle;
 }
 .open-badge {
-  background: var(--ok, #67e8a4);
-  color: var(--bg, #0b0d10);
+  background: var(--ok);
+  color: var(--on-accent);
 }
 .closed-badge {
-  background: var(--surface, rgba(255, 255, 255, 0.06));
-  color: var(--muted, #8a8d92);
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  background: var(--surface);
+  color: var(--muted);
+  border: 1px solid var(--border);
 }
 
 .notes {
@@ -639,9 +640,9 @@ table#comparison-table td.bench-group-divider {
   cursor: help;
 }
 .deprecated-badge {
-  background: rgba(255, 175, 80, 0.15);
-  color: #ffaf50;
-  border: 1px solid rgba(255, 175, 80, 0.45);
+  background: var(--warn-tint);
+  color: var(--warn);
+  border: 1px solid var(--warn-soft);
 }
 .archived-badge {
   background: rgba(180, 180, 180, 0.18);
@@ -720,7 +721,7 @@ table#comparison-table td.bench-group-divider {
 .vendor-composite-group {
   margin-top: var(--space-2);
   padding: var(--space-2);
-  border-left: 3px solid var(--accent-2, #0a8);
+  border-left: 3px solid var(--accent-2);
   background: rgba(0, 180, 180, 0.04);
   border-radius: 0 6px 6px 0;
 }
@@ -771,7 +772,7 @@ table#comparison-table td.bench-group-divider {
   font-size: 0.85em;
   cursor: help;
 }
-.vendor-badge.is-missing { opacity: 0.45; border-style: dashed; }
+.vendor-badge.is-missing { border-style: dashed; }
 .vendor-badge-label { color: var(--muted); font-size: 0.9em; }
 .vendor-badge-value { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--accent); }
 .vendor-agreement {
@@ -781,9 +782,9 @@ table#comparison-table td.bench-group-divider {
   font-size: 0.85em;
   cursor: help;
 }
-.vendor-agreement.is-consensus         { background: rgba(0, 200, 100, 0.10); }
-.vendor-agreement.is-mild-disagreement { background: rgba(255, 180, 0, 0.12); }
-.vendor-agreement.is-controversy       { background: rgba(255, 70, 70, 0.12); }
+.vendor-agreement.is-consensus         { background: var(--ok-tint); }
+.vendor-agreement.is-mild-disagreement { background: var(--warn-tint); }
+.vendor-agreement.is-controversy       { background: var(--danger-tint); }
 
 .bench-tier-badge {
   display: inline-flex;
@@ -796,5 +797,18 @@ table#comparison-table td.bench-group-divider {
   cursor: help;
   width: fit-content;
 }
-.bench-tier-badge.is-limited-data     { background: rgba(255, 180, 0, 0.15); color: var(--accent); }
-.bench-tier-badge.is-limited-coverage { background: rgba(255, 70, 70, 0.15); color: var(--danger, #c33); }
+.bench-tier-badge.is-limited-data     { background: var(--warn-tint); color: var(--warn); }
+.bench-tier-badge.is-limited-coverage { background: var(--danger-tint); color: var(--danger); }
+
+/* G3 (2026-07-15): disclosed-imputation note on the composite block. */
+.composite-score .estimated-note {
+  display: inline-block;
+  padding: 1px 8px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--accent-2);
+  background: transparent;
+  border: 1px dashed var(--accent-2-soft);
+  border-radius: 999px;
+  cursor: help;
+}

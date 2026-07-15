@@ -2,14 +2,14 @@
 // once at bootstrap. switchLanguage lives here because it bridges language
 // state into all visible surfaces.
 
-import { State, STORAGE, writeStorage } from './core.js';
-import { applyI18n, loadI18n } from './i18n.js';
+import { State, STORAGE, writeStorage, readStorage } from './core.js';
+import { applyI18n, loadI18n, t } from './i18n.js';
 import {
   applyPreset, resetWeights, syncPresetSelect, switchTheme, syncLangToggleUi,
   renderWeightsEditor, renderDeployStamp, populateProviderFilter,
 } from './render-controls.js';
 import { renderAll } from './render-table.js';
-import { renderPrivacyTable } from './render-privacy.js';
+import { renderPrivacyTable, renderBenchGlossary } from './render-privacy.js';
 import { resolveGpuVram, resolveSystemRam, updateGpuStatus, populateGpuSelect } from './gpu.js';
 import { exportElement, hideTooltip } from './overlay.js';
 import { pushUrlState, buildShareUrl } from './url-state.js';
@@ -27,6 +27,7 @@ export async function switchLanguage(lang) {
   renderWeightsEditor(renderAll);
   renderAll();
   renderPrivacyTable();
+  renderBenchGlossary();
   populateGpuSelect();
   populateProviderFilter();
   syncPresetSelect();
@@ -299,11 +300,54 @@ function wireTooltipClamp() {
   });
 }
 
+// G8 (2026-07-15) leaderboard-first: collapse/expand the weights grid, show/
+// hide zero-weight sliders and table columns. All three persist to STORAGE.
+function wireLayoutToggles() {
+  const grid = document.getElementById('weights-grid');
+  const toggle = document.getElementById('weights-toggle');
+  if (grid && toggle) {
+    const setOpen = (open) => {
+      grid.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('data-i18n-key', open ? 'ui.weights.collapse' : 'ui.weights.expand');
+      toggle.textContent = t(open ? 'ui.weights.collapse' : 'ui.weights.expand');
+    };
+    setOpen(readStorage(STORAGE.weightsOpen, false) === true);
+    toggle.addEventListener('click', () => {
+      const open = grid.hidden;
+      setOpen(open);
+      writeStorage(STORAGE.weightsOpen, open);
+    });
+  }
+  const showAll = document.getElementById('weights-show-all');
+  if (grid && showAll) {
+    const apply = (on) => grid.classList.toggle('hide-excluded', !on);
+    showAll.checked = readStorage(STORAGE.weightsShowAll, false) === true;
+    apply(showAll.checked);
+    showAll.addEventListener('change', () => {
+      apply(showAll.checked);
+      writeStorage(STORAGE.weightsShowAll, showAll.checked);
+    });
+  }
+  const tblExcluded = document.getElementById('table-show-excluded');
+  const tbl = document.getElementById('comparison-table');
+  if (tbl && tblExcluded) {
+    const apply = (on) => tbl.classList.toggle('hide-excluded', !on);
+    tblExcluded.checked = readStorage(STORAGE.tableShowExcluded, false) === true;
+    apply(tblExcluded.checked);
+    tblExcluded.addEventListener('change', () => {
+      apply(tblExcluded.checked);
+      writeStorage(STORAGE.tableShowExcluded, tblExcluded.checked);
+    });
+  }
+}
+
 export function wireEvents() {
   wireLangToggle();
   wireThemeToggle();
   wirePresetSelect();
   wireWeightsReset();
+  wireLayoutToggles();
   wireFiltersReset();
   wireSearchInput();
   wireFilterControls();

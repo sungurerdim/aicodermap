@@ -1,6 +1,35 @@
-import { State } from './core.js';
-import { clear } from './dom.js';
+import { State, BENCH_KEYS } from './core.js';
+import { clear, el } from './dom.js';
 import { t } from './i18n.js';
+
+// G7 (2026-07-15): plain-language benchmark glossary (Vellum pattern) — one
+// row per bench key with its full name and one-line description from i18n.
+// Lives here with the other static informational section renderers.
+export function renderBenchGlossary() {
+  const host = document.getElementById('bench-glossary');
+  if (!host) return;
+  clear(host);
+  const benchTypes = (State.schema && State.schema.benchTypes) || {};
+  for (const k of BENCH_KEYS) {
+    const name = t(`benchmarks.${k}.name`);
+    const desc = t(`benchmarks.${k}.desc`);
+    if (!name || !desc) continue;
+    const term = el('span', { class: 'glossary-term' }, name);
+    // G5: contamination-risk taxonomy chip — static splits age into
+    // contamination risk; rotating/temporal are resistant by construction.
+    const bt = benchTypes[k];
+    if (bt === 'rotating' || bt === 'temporal' || bt === 'static') {
+      term.appendChild(el('span', {
+        class: `benchtype-chip is-${bt}`,
+        'data-tip': t(`methodology.benchType.${bt}Tip`),
+      }, t(`methodology.benchType.${bt}`)));
+    }
+    host.appendChild(el('div', { class: 'glossary-row' },
+      term,
+      el('span', { class: 'glossary-desc' }, desc),
+    ));
+  }
+}
 
 const COLS = [
   { key: 'model',           i18n: 'privacy.col.model' },

@@ -151,7 +151,7 @@ table#comparison-table tbody tr.is-rank-gated .col-name {
   margin-left: 6px;
   font-size: 0.68rem;
   font-weight: 700;
-  color: var(--warn, #b45309);
+  color: var(--warn);
   cursor: help;
   white-space: nowrap;
 }
@@ -209,4 +209,28 @@ table.privacy-table td.priv-model {
   margin-top: 0.75rem;
   font-size: 0.72rem;
   color: var(--muted);
+}
+
+/* G8 (2026-07-15): zero-weight bench columns hidden by default — the active
+   preset's ranking surface is the whole story above the fold. Checkbox
+   #table-show-excluded lifts the class. */
+table#comparison-table.hide-excluded th.th-excluded,
+table#comparison-table.hide-excluded td.excluded { display: none; }
+
+/* G3 (2026-07-15): Preliminary chip — thin-evidence model ranked normally. */
+table#comparison-table .prelim-chip {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 6px;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--warn);
+  background: var(--warn-tint);
+  border: 1px solid var(--warn-soft);
+  border-radius: 999px;
+  vertical-align: 1px;
+  cursor: help;
 }
