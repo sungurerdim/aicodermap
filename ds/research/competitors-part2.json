@@ -1,0 +1,353 @@
+{
+  "topic": "AICoderMap competitor/comparable landscape - FACET 1 (part 2 of 2)",
+  "subAspect": "competitors H-P (SWE-bench-Live, SWE-rebench, Vellum, LLM-Stats, OpenRouter, Scale SEAL, EvalPlus/BigCode, LiveCodeBench, Terminal-Bench)",
+  "confidence": "MEDIUM",
+  "generatedAt": "2026-07-15T19:45:00Z",
+  "accessDate": "2026-07-15",
+  "plan": [
+    "Same question set as part 1, applied to the remaining discovered comparables plus additional 2025-2026 coding-focused leaderboards"
+  ],
+  "competitors": [
+    {
+      "name": "SWE-bench-Live",
+      "url": "https://swe-bench-live.github.io/",
+      "tier": "T2",
+      "craapReasoning": "Same academic lineage as SWE-bench but explicitly designed as a contamination-control response; younger project with less independent scrutiny to date. Score 74/100.",
+      "whatItDoesWell": [
+        "Automated dataset-curation pipeline draws fresh GitHub issues/PRs on a rolling cadence rather than a frozen split",
+        "Multi-language and multi-OS task coverage, extending beyond SWE-bench's original Python-only scope",
+        "Explicit stated motivation: reduce pretraining-contamination risk by restricting to a recent issue window"
+      ],
+      "whereItFallsShort": [
+        "Rolling/fresh task selection introduces higher week-to-week variance than frozen splits (Verified/Pro), per secondary-source analysis -- less stable for headline comparisons",
+        "Monthly update commitment is a stated intention, not independently confirmed as consistently met in this pass"
+      ],
+      "methodologySignal": {
+        "newModelDiscovery": "Not disclosed in the fetched page content in this pass; task-set is what updates on a cadence, not necessarily model coverage.",
+        "benchmarkCoverage": "Self-run, dynamically sourced task set. Founding paper: initial release of 1,319 task instances from real-world issues/PRs across 93 open-source Python repositories (secondary-source paraphrase; not independently fetched from the primary arXiv paper in this pass).",
+        "sparseDataHandling": "unknown -- not found in this pass.",
+        "scoringAggregation": "Binary pass/fail per task instance, aggregated presumably to a resolve-rate percentage analogous to SWE-bench's '% Resolved' (inferred from shared lineage, not independently confirmed for SWE-bench-Live specifically in this pass).",
+        "presetsWeights": "No user-adjustable weights found.",
+        "updateCadence": "Stated intent: monthly dataset updates to reflect the evolving software landscape (secondary-source paraphrase of the founding paper, single-source in this pass)."
+      },
+      "uxSignal": {
+        "decisionSupport": "not verified in this pass (primary leaderboard page not fetched directly)",
+        "visualDesign": "not verified in this pass",
+        "tableVsCards": "unknown",
+        "mobileHandling": "unknown"
+      },
+      "sources": [
+        {"citationId": 0, "url": "https://swe-bench-live.github.io/", "title": "SWE-bench-Live Leaderboard", "domain": "swe-bench-live.github.io", "tier": "T2", "chip": "secondary", "craap": 74, "verbatimQuote": "the first automatically-updating, multi-language and multi-os SWE task set designed for agentic benchmarking and training", "accessedAt": "2026-07-15", "originatingQuery": "SWE-bench-Live SWE-rebench leaderboard methodology monthly refresh contamination 2026"}
+      ]
+    },
+    {
+      "name": "SWE-rebench",
+      "url": "https://swe-rebench.com/",
+      "tier": "T2",
+      "craapReasoning": "Nebius-run, continuously decontaminated, backed by an arXiv paper (2505.20411); actively maintained with visible model churn. Score 76/100.",
+      "whatItDoesWell": [
+        "Sources GitHub issues specifically dated after each evaluated model's training cutoff to directly measure/avoid memorization effects",
+        "5 runs per problem under a fixed ReAct scaffold -- reports 'Resolved Rate (best pass@1)' with explicit repeat-run methodology",
+        "Actively maintained: new frontier models (e.g., GPT-5.5 variants, Claude Opus 4.7, Kimi K2.6) added and older models periodically deprecated, per secondary-source tracking"
+      ],
+      "whereItFallsShort": [
+        "Top-tier models cluster within ~2-3 points of each other per secondary-source snapshot, suggesting the benchmark itself may be approaching saturation for frontier models",
+        "Primary swe-rebench.com page content indexed in this pass was mostly navigation/News chrome; deeper methodology text not fully captured from the primary site directly"
+      ],
+      "methodologySignal": {
+        "newModelDiscovery": "Continuously updated leaderboard with visible model additions/deprecations over time (secondary-source observation of specific model names added/removed).",
+        "benchmarkCoverage": "Self-run, continuously sourced fresh GitHub issues (decontaminated by construction) rather than aggregated from other leaderboards.",
+        "sparseDataHandling": "unknown -- not found in the primary-page content indexed in this pass.",
+        "scoringAggregation": "'models are evaluated 5 times per problem under a fixed ReAct scaffolding, with the Resolved Rate (best pass@1) reported' (secondary-source paraphrase, single-source confirmation only in this pass -- not independently verified verbatim on the primary site).",
+        "presetsWeights": "No user-adjustable weights found.",
+        "updateCadence": "Continuous / frequent -- 'SWE-rebench v2' banner visible on the live site indicating an active versioned refresh cycle."
+      },
+      "uxSignal": {
+        "decisionSupport": "Links to Paper, Data (Hugging Face dataset), About, and Discord alongside the leaderboard -- transparency-forward navigation",
+        "visualDesign": "Minimal research-project site with a banner-style version announcement",
+        "tableVsCards": "table (inferred)",
+        "mobileHandling": "not verified in this pass"
+      },
+      "sources": [
+        {"citationId": 1, "url": "https://swe-rebench.com/", "title": "SWE-rebench Leaderboard", "domain": "swe-rebench.com", "tier": "T2", "chip": "official", "craap": 76, "verbatimQuote": "SWE-rebench v2", "accessedAt": "2026-07-15", "originatingQuery": "SWE-rebench fresh GitHub issues decontamination ReAct scaffold"}
+      ]
+    },
+    {
+      "name": "Vellum LLM Leaderboard",
+      "url": "https://www.vellum.ai/llm-leaderboard",
+      "tier": "T2",
+      "craapReasoning": "Vendor-run (Vellum sells an LLM eval/ops product) but transparent about non-saturated-benchmark curation philosophy and updates dated on-page. Score 72/100 (docked for commercial-tool conflict of interest).",
+      "whatItDoesWell": [
+        "Explicit curation philosophy: excludes saturated/outdated benchmarks (e.g., MMLU) in favor of harder, less-contaminated ones (Humanity's Last Exam, GPQA Diamond)",
+        "Separate coding-specific leaderboard combining SWE-Bench, LiveCodeBench, Aider Polyglot, and BFCL tool-use in one comparative view",
+        "Page carries an explicit 'updated' date, giving a directly visible freshness signal"
+      ],
+      "whereItFallsShort": [
+        "No single unified composite score -- category-wise rankings plus a 'Best Overall' view anchored on one exam (HLE) rather than a true blended index, per secondary-source characterization",
+        "Vellum's core business is a competing LLM-ops/eval product, a directly relevant conflict-of-interest to flag"
+      ],
+      "methodologySignal": {
+        "newModelDiscovery": "Not disclosed in detail; leaderboard is scoped to 'SOTA model versions released after April 2024' as an explicit recency cutoff policy.",
+        "benchmarkCoverage": "Mixed: 'data comes from model providers as well as independently run evaluations by Vellum or the open-source community' -- both self-run and aggregated/vendor-reported, explicitly stated.",
+        "sparseDataHandling": "unknown -- not found in the fetched page content in this pass.",
+        "scoringAggregation": "unknown for a single unified score -- primary page shows a benchmark glossary and category results rather than a disclosed weighted-composite formula in the content indexed.",
+        "presetsWeights": "No user-adjustable weights found on the primary leaderboard page.",
+        "updateCadence": "Page-level 'updated' date shown; coding leaderboard specifically noted as last updated 23 Mar 2026 per secondary-source citation, main LLM leaderboard shows 'updated 1 Jul 2026' per primary fetch."
+      },
+      "uxSignal": {
+        "decisionSupport": "Benchmark glossary panel explaining each metric in plain language; separate leaderboards for general, open-source, and coding use cases; speed/cost/context columns alongside capability",
+        "visualDesign": "Consumer-product polish (Vellum is a funded eval-tooling startup), illustrated character graphics, clean SaaS aesthetic",
+        "tableVsCards": "table with glossary sidebar",
+        "mobileHandling": "not verified in this pass"
+      },
+      "sources": [
+        {"citationId": 2, "url": "https://www.vellum.ai/llm-leaderboard", "title": "LLM Leaderboard 2026 - Vellum", "domain": "vellum.ai", "tier": "T2", "chip": "official", "craap": 72, "verbatimQuote": "This LLM leaderboard displays the latest public benchmark performance for SOTA model versions released after April 2024. The data comes from model providers as well as independently run evaluations by Vellum or the open-source community. We feature results from non-saturated benchmarks, excluding outdated benchmarks (e.g. MMLU).", "accessedAt": "2026-07-15", "originatingQuery": "Vellum LLM leaderboard vellum.ai methodology 2026"}
+      ]
+    },
+    {
+      "name": "LLM-Stats",
+      "url": "https://llm-stats.com/",
+      "tier": "T3",
+      "craapReasoning": "Third-party aggregator, transparent methodology page distinguishing verified vs self-reported scores, but not an original benchmark author. Score 65/100.",
+      "whatItDoesWell": [
+        "Explicitly flags unverified/self-reported scores in the UI and excludes them from composite indexes -- a directly useful provenance pattern",
+        "621+ benchmarks indexed across reasoning, coding, math, vision, tool use, domain knowledge -- very broad aggregation surface",
+        "Live/near-real-time pricing (hourly) and performance metrics (7-day rolling throughput/TTFT average)"
+      ],
+      "whereItFallsShort": [
+        "TrueSkill-based 'LLM Stats Score' composite methodology page (llm-stats.com/methodology/llm-stats-score) was not independently fetched in this pass -- exact formula unverified",
+        "As an aggregator rather than a primary evaluator for most benchmarks, independence from the underlying sources it aggregates is inherently lower"
+      ],
+      "methodologySignal": {
+        "newModelDiscovery": "unknown -- not disclosed in the fetched methodology index page.",
+        "benchmarkCoverage": "Aggregated: 'Provider API price lists... Verified benchmark releases (lab-published or independently replicated)... Live throughput and time-to-first-token... Community arenas with vote-quality controls.'",
+        "sparseDataHandling": "'Unverified scores are flagged in the UI and excluded from composite indexes' -- explicit flag-and-exclude policy, one of the clearer disclosures found across all competitors reviewed.",
+        "scoringAggregation": "'A TrueSkill-based intelligence rating computed from model rankings across every tracked general-capability benchmark. Versioned, dated, and reproducible.' (from the methodology index; the dedicated formula sub-page was not independently fetched in this pass).",
+        "presetsWeights": "No user-adjustable weights found on the fetched page.",
+        "updateCadence": "Pricing/metadata revalidated hourly; live performance on a 7-day rolling average; rankings refresh continuously as new benchmark results land (secondary-source paraphrase)."
+      },
+      "uxSignal": {
+        "decisionSupport": "300+ model comparison, dedicated per-benchmark leaderboard pages, open vs general LLM leaderboard split",
+        "visualDesign": "Dense comparison-table SaaS style similar to Vellum/Artificial Analysis pattern",
+        "tableVsCards": "table",
+        "mobileHandling": "not verified in this pass"
+      },
+      "sources": [
+        {"citationId": 3, "url": "https://llm-stats.com/methodology", "title": "Methodology - How LLM Stats Measures AI Models", "domain": "llm-stats.com", "tier": "T3", "chip": "secondary", "craap": 65, "verbatimQuote": "Verified benchmark releases (lab-published or independently replicated). Unverified scores are flagged in the UI and excluded from composite indexes.", "accessedAt": "2026-07-15", "originatingQuery": "llm-stats.com leaderboard methodology data sources 2026"}
+      ]
+    },
+    {
+      "name": "OpenRouter Rankings",
+      "url": "https://openrouter.ai/rankings",
+      "tier": "T2",
+      "craapReasoning": "Primary-record usage data (not a quality benchmark) directly from a major inference router; high authority for 'what developers actually run' but a fundamentally different signal type than the others. Score 75/100 for its stated purpose.",
+      "whatItDoesWell": [
+        "Real revealed-preference usage data (token throughput/spend) rather than a self-reported or synthetic benchmark -- a genuinely distinct and valuable signal type",
+        "'Top models by task' view ranks by share-of-spend per task category, directly relevant to a decision-support UI",
+        "Massive scale: 300+ models from 60+ providers, tens of trillions of tokens/week, gives real market-adoption signal AICoderMap's benchmark-only competitors lack"
+      ],
+      "whereItFallsShort": [
+        "Explicitly not a quality/capability signal: usage/spend leadership can diverge sharply from benchmark leadership (e.g., token-volume leaders are not always revenue leaders per secondary-source analysis)",
+        "The rankings page in this pass was heavily client-side-rendered; underlying exact ranking algorithm/methodology text was not captured beyond section headers",
+        "Geographic/traffic-source skew not disclosed on the primary page itself"
+      ],
+      "methodologySignal": {
+        "newModelDiscovery": "Automatic by construction -- any model routed through OpenRouter accrues usage data immediately; no separate 'add a model' step needed since it mirrors live API traffic.",
+        "benchmarkCoverage": "Not a benchmark at all -- usage/spend telemetry only ('Live LLM rankings based on benchmarks and real data from millions of people using models through OpenRouter' -- the site does surface some benchmark context but the core ranking signal is usage).",
+        "sparseDataHandling": "Not applicable -- a model with zero routed traffic simply shows zero usage rather than being imputed or flagged.",
+        "scoringAggregation": "Token throughput / share-of-spend over a rolling window (weekly usage shown on primary page; secondary sources describe a 7-day rolling token-throughput window including both input and output tokens).",
+        "presetsWeights": "Task-based filtering ('Top models by task') acts as an implicit preset switcher, but no user-adjustable numeric weighting found.",
+        "updateCadence": "Live/rolling, reflecting data through the most recent complete day per secondary-source description; primary page shows 'Weekly usage' as the default view."
+      },
+      "uxSignal": {
+        "decisionSupport": "Task-based top-models view, share-of-spend visualization -- a market-adoption lens complementary to pure capability leaderboards",
+        "visualDesign": "Clean, minimal, chart-forward (bar/share visualizations rather than dense tables)",
+        "tableVsCards": "chart-primary, not a traditional table",
+        "mobileHandling": "not verified in this pass"
+      },
+      "sources": [
+        {"citationId": 4, "url": "https://openrouter.ai/rankings", "title": "LLM Rankings | OpenRouter", "domain": "openrouter.ai", "tier": "T2", "chip": "official", "craap": 75, "verbatimQuote": "Live LLM rankings based on benchmarks and real data from millions of people using models through OpenRouter.", "accessedAt": "2026-07-15", "originatingQuery": "OpenRouter rankings openrouter.ai methodology token usage leaderboard 2026"}
+      ]
+    },
+    {
+      "name": "Scale AI SEAL Leaderboards",
+      "url": "https://scale.com/leaderboard",
+      "tier": "T2",
+      "craapReasoning": "Primary-record private-dataset evaluator with domain-expert human annotators; strong anti-gaming design but the core methodology blog post is dated May 2024 (currency concern for a 2026 review). Score 70/100.",
+      "whatItDoesWell": [
+        "Private, unpublished prompt sets specifically designed to resist training-data leakage/gaming -- a structurally different integrity model than public benchmarks",
+        "Domain-specialized expert evaluators who must pass domain-specific interviews/tests (golden-task accuracy checks) before rating",
+        "Multi-round QA on both prompts and ratings before publication; SEAL Showdown (newer public arm) explicitly commits to a 60-day no-resale window on live-distribution data to prevent gaming"
+      ],
+      "whereItFallsShort": [
+        "Core methodology blog post is dated May 29, 2024 -- 2026-specific updates (e.g., new benchmark additions like SWE-Bench Pro, MCP Atlas) are only confirmed via secondary sources (deeplearning.ai, Scale's own 2026 reflection post), not re-verified on the original methodology page itself",
+        "Private-dataset approach is inherently less externally auditable than open leaderboards -- users must trust Scale's internal QA rather than inspect the eval set"
+      ],
+      "methodologySignal": {
+        "newModelDiscovery": "'By default, models are only eligible for inclusion the first time their developers have one of their models prompted on the evaluation prompts' with exceptions for major launches with low overfitting risk (secondary-source paraphrase).",
+        "benchmarkCoverage": "Self-run only, on curated private datasets (~1,000 examples per domain per secondary-source detail): 'The SEAL Leaderboards cover a range domains including coding, instruction following, math, and multilinguality. For each domain, experts create prompt sets from scratch.'",
+        "sparseDataHandling": "unknown -- not disclosed in the fetched primary content in this pass.",
+        "scoringAggregation": "Pairwise human comparison: 'models are grouped and pitted against each other... rate responses on a scale of 1 to 7' per secondary-source detail, with annotators asked to compile/run nontrivial code snippets to catch compilation/runtime issues -- pairwise-comparison-based, not a single self-run pass-rate metric.",
+        "presetsWeights": "No user-adjustable weights found; each domain leaderboard reported separately rather than blended into one composite.",
+        "updateCadence": "'Regularly updated to include new models and capabilities' (primary source, May 2024); secondary 2026 source states 15 new benchmarks and 450+ evaluations across 50+ models were published through the 2025-2026 period."
+      },
+      "uxSignal": {
+        "decisionSupport": "Domain-specific leaderboards (coding, instruction-following, math, multilinguality); SEAL Showdown adds geographic/professional-domain diversity framing",
+        "visualDesign": "Corporate blog-style presentation for methodology; separate labs.scale.com leaderboard product for the actual rankings UI",
+        "tableVsCards": "unknown for the live leaderboard UI (not independently fetched in this pass)",
+        "mobileHandling": "not verified in this pass"
+      },
+      "sources": [
+        {"citationId": 5, "url": "https://scale.com/blog/leaderboard", "title": "Scale's SEAL Research Lab Launches Expert-Evaluated LLM Leaderboards", "domain": "scale.com", "tier": "T2", "chip": "official", "craap": 70, "verbatimQuote": "Scale's proprietary datasets will remain private and unpublished, ensuring they cannot be exploited or incorporated into model training data.", "accessedAt": "2026-07-15", "originatingQuery": "Scale SEAL private dataset expert evaluators methodology"},
+        {"citationId": 6, "url": "https://scale.com/blog/leaderboard", "title": "Scale's SEAL Research Lab Launches Expert-Evaluated LLM Leaderboards - domains", "domain": "scale.com", "tier": "T2", "chip": "official", "craap": 70, "verbatimQuote": "For each domain, experts create prompt sets from scratch, and tailor the evaluation methods to what we believe works best for that specific area.", "accessedAt": "2026-07-15", "originatingQuery": "Scale AI SEAL leaderboards scale.com methodology 2026"}
+      ]
+    },
+    {
+      "name": "EvalPlus / BigCode ecosystem (HumanEval+/MBPP+)",
+      "url": "https://evalplus.github.io/leaderboard.html",
+      "tier": "T2",
+      "craapReasoning": "NeurIPS 2023 / COLM 2024 peer-reviewed methodology, but direct page fetch failed twice in this pass (rendering error + HF auth wall) so all detail is single-source (WebSearch synthesis) -- downgraded to partial confidence. Score 68/100.",
+      "whatItDoesWell": [
+        "Rigorizes classic HumanEval/MBPP with 80x/35x more test cases specifically to catch models that pass weak original suites but fail edge cases",
+        "Transparent open/closed-data labeling system (color-coded badges) disclosing whether a model's training data is open, rather than claiming to police contamination directly",
+        "Integrated into the broader bigcode-evaluation-harness, functioning as shared community infrastructure rather than a single-vendor silo"
+      ],
+      "whereItFallsShort": [
+        "INACCESSIBLE in this research pass: direct fetch of evalplus.github.io/leaderboard.html failed (markdown-conversion crash on the results table); the Hugging Face mirror space returned HTTP 401. All claims here rely on WebSearch-synthesized secondary text, not a directly extracted verbatim quote -- flag as single-source/partial",
+        "Explicitly does not detect contamination itself -- 'model providers have the responsibility to avoid data contamination' -- a disclosed limitation, not a strength"
+      ],
+      "methodologySignal": {
+        "newModelDiscovery": "unknown -- not independently confirmed; likely community PR/submission based on shared BigCode ecosystem norms (inference, not confirmed).",
+        "benchmarkCoverage": "Self-run rigorized suites: HumanEval+ (80x more tests), MBPP+ (399-task hand-verified subset, 35x more tests than original MBPP) (secondary-source paraphrase only in this pass).",
+        "sparseDataHandling": "unknown -- not independently confirmed in this pass.",
+        "scoringAggregation": "pass@1 under greedy decoding, per secondary-source paraphrase; no composite blending across HumanEval+/MBPP+ independently confirmed.",
+        "presetsWeights": "unknown -- not independently confirmed.",
+        "updateCadence": "unknown -- most recent independently-confirmed version references found were 0.1.10 (HumanEval+) / 0.2.0 (MBPP+), no 2026-dated update independently confirmed in this pass."
+      },
+      "uxSignal": {
+        "decisionSupport": "unknown -- primary page not successfully rendered in this pass",
+        "visualDesign": "unknown",
+        "tableVsCards": "unknown",
+        "mobileHandling": "unknown"
+      },
+      "sources": [
+        {"citationId": 7, "url": "https://github.com/evalplus/evalplus", "title": "EvalPlus GitHub", "domain": "github.com", "tier": "T2", "chip": "secondary", "craap": 68, "verbatimQuote": "Rigourous evaluation of LLM-synthesized code - NeurIPS 2023 & COLM 2024", "accessedAt": "2026-07-15", "originatingQuery": "EvalPlus BigCode leaderboard methodology 2026 HumanEval+ MBPP+"}
+      ]
+    },
+    {
+      "name": "LiveCodeBench",
+      "url": "https://livecodebench.github.io/leaderboard.html",
+      "tier": "T1",
+      "craapReasoning": "Academic origin (UC Berkeley/MIT/Cornell), contamination-resistant by construction via release-date filtering. Score 82/100 (docked slightly since the live leaderboard page was JS-rendered and not directly readable in this pass).",
+      "whatItDoesWell": [
+        "Contamination-resistant by construction, not just mitigation: every problem carries a release date, and only problems released after a model's training cutoff are scored for that model",
+        "Four evaluation scenarios (code generation, self-repair, code execution, test output prediction) -- broader than single-shot code-gen accuracy",
+        "Real competitive-programming problems (LeetCode, AtCoder, CodeForces) vetted by thousands of contest participants for clarity/correctness"
+      ],
+      "whereItFallsShort": [
+        "Primary leaderboard page was JS-rendered ('Loading...' placeholder only) in this pass -- exact current scores/methodology prose not directly extractable without a headless browser; relies on HF blog + WebSearch synthesis",
+        "Nearing saturation at the frontier per secondary-source snapshot (top models clustered within ~2 points on v6)"
+      ],
+      "methodologySignal": {
+        "newModelDiscovery": "Community PR-based submission process per the official repo: 'creating a pull request on GitHub -- copying model generations folder from output to the submissions folder' (secondary-source paraphrase).",
+        "benchmarkCoverage": "Self-run, continuously sourced live contest problems (not aggregated from other leaderboards).",
+        "sparseDataHandling": "By construction, contamination avoidance itself functions as a temporal-window filter rather than an imputation strategy -- 'only problems released after that model's training cutoff are scored' for a given model.",
+        "scoringAggregation": "Pass@1 style scoring per scenario (generation/repair/execution/prediction); no single blended composite across scenarios independently confirmed in this pass.",
+        "presetsWeights": "unknown -- not independently confirmed; no user-adjustable weighting found.",
+        "updateCadence": "Continuous -- problems collected on an ongoing basis from live contests as they occur."
+      },
+      "uxSignal": {
+        "decisionSupport": "Rank / Model / Pass@1 / Easy / Medium / Hard difficulty breakdown columns visible in the (unrendered) table schema fetched",
+        "visualDesign": "Minimal academic-project page, JS-loaded data table",
+        "tableVsCards": "table",
+        "mobileHandling": "not verified in this pass"
+      },
+      "sources": [
+        {"citationId": 8, "url": "https://livecodebench.github.io/leaderboard.html", "title": "LiveCodeBench Leaderboard - Holistic and Contamination Free Evaluation", "domain": "livecodebench.github.io", "tier": "T1", "chip": "official", "craap": 82, "verbatimQuote": "| Rank | Model | Pass@1 | Easy | Medium | Hard |", "accessedAt": "2026-07-15", "originatingQuery": "LiveCodeBench leaderboard methodology 2026 contamination-free live competitive programming"}
+      ]
+    },
+    {
+      "name": "Terminal-Bench",
+      "url": "https://www.tbench.ai/",
+      "tier": "T2",
+      "craapReasoning": "Stanford x Laude Institute collaboration, agentic terminal-task benchmark increasingly used inside other T1 hubs (Artificial Analysis) as a component evaluation. Score 73/100.",
+      "whatItDoesWell": [
+        "Real command-line/sysadmin/debugging task realism via containerized Docker environments with programmatic verification suites (not LLM-judge-based)",
+        "89 curated tasks spanning 16 categories (software engineering, security, scientific computing, data science, games, debugging, etc.) at multiple difficulty tiers",
+        "Version-2.1 refresh specifically patched Dockerfile/environment bugs so scores reflect actual agent capability rather than environment flakiness -- an explicit data-quality iteration"
+      ],
+      "whereItFallsShort": [
+        "Scores are NOT comparable across versions (2.0 vs 2.1) -- a real interpretation trap for anyone screenshotting a number without checking version, per secondary-source caution",
+        "Distinguishing officially-verified (tbench.ai/Anthropic-verified) scores from vendor-self-reported model-card scores requires careful sourcing discipline that not every downstream tracker applies consistently"
+      ],
+      "methodologySignal": {
+        "newModelDiscovery": "unknown -- not independently confirmed in this pass; inferred to be submission/run-based similar to other agent benchmarks.",
+        "benchmarkCoverage": "Self-run by the benchmark team and independently re-run by third parties (e.g., Artificial Analysis runs it with the Terminus 2 agent harness in an e2b sandbox, pass@1 averaged over 3 repeats) -- both a primary benchmark and a widely-adopted component eval inside other hubs.",
+        "sparseDataHandling": "unknown -- not independently confirmed in this pass.",
+        "scoringAggregation": "Task-level programmatic pass/fail via verification scripts, aggregated to a pass rate; repeat-run averaging used by at least one independent evaluator (Artificial Analysis: 3 repeats, pass@1 average).",
+        "presetsWeights": "unknown -- not independently confirmed; not a composite index itself, functions as one input benchmark inside others' composites (e.g., part of Artificial Analysis's Intelligence Index v4.1).",
+        "updateCadence": "Versioned releases (2.0 to 2.1 as a 'verified refresh') rather than continuous rolling updates; cadence between major versions not independently confirmed in this pass."
+      },
+      "uxSignal": {
+        "decisionSupport": "unknown -- primary tbench.ai leaderboard page not independently fetched in this pass; only cross-referenced via Artificial Analysis's evaluation page and secondary trackers",
+        "visualDesign": "unknown",
+        "tableVsCards": "unknown",
+        "mobileHandling": "unknown"
+      },
+      "sources": [
+        {"citationId": 9, "url": "https://artificialanalysis.ai/methodology/intelligence-benchmarking", "title": "Artificial Analysis Intelligence Benchmarking Methodology - Terminal-Bench inclusion", "domain": "artificialanalysis.ai", "tier": "T1", "chip": "official", "craap": 73, "verbatimQuote": "Replaced Terminal-Bench Hard with Terminal-Bench v2.1 (higher turn limits, no token limits)", "accessedAt": "2026-07-15", "originatingQuery": "Terminal-Bench leaderboard methodology 2026 agentic terminal tasks"}
+      ]
+    }
+  ],
+  "contradictions": [
+    {
+      "field": "SWE-bench Verified current frontier-model leader and score",
+      "candidates": [
+        {"source": "localaimaster.com (secondary tracker)", "claim": "Claude Opus 4.6 leads at 80.8%"},
+        {"source": "Vellum-adjacent / other secondary trackers", "claim": "Claude Fable 5 leads at 95.0%"},
+        {"source": "swebench.com (primary)", "claim": "Reports % Resolved out of 500 Verified instances but does not itself assert a single global 'leader' figure that was captured verbatim in this pass"}
+      ],
+      "delta": "Roughly 14+ percentage points between secondary aggregator claims for 'the leader', reflecting different snapshot dates and possibly different task-count/scaffold conditions rather than a true methodology conflict",
+      "winner": "swebench.com is the authoritative single source of truth for SWE-bench Verified scores; secondary aggregator disagreement reflects publication-date drift in a fast-moving field, not a genuine data conflict -- AICoderMap should always cite swebench.com directly, never a secondary aggregator's restated number, for this benchmark"
+    },
+    {
+      "field": "Bradley-Terry vs. plain Elo superiority under sparse comparison data",
+      "candidates": [
+        {"source": "LMArena/general MCDA literature", "claim": "Bradley-Terry MLE is presented as the superior successor to classic Elo for leaderboard ranking generally"},
+        {"source": "Recent sparse-comparison research (WebSearch-surfaced arXiv summary)", "claim": "'in very sparse regimes (few matches per player), vanilla scalar Elo exhibits lower regret and outperforms richer models (Elo2k, fully pairwise), despite model misspecification'"}
+      ],
+      "delta": "Directionally opposite recommendations depending on data density",
+      "winner": "context-dependent, not a true contradiction: both are correct in their respective regimes -- Bradley-Terry needs enough comparisons per item to estimate reliably, and simple Elo is more robust exactly when data is thin. Practical implication for AICoderMap: if a preset/weighting scheme ever needs pairwise comparative ranking with few observations per model (e.g., a newly-added model), prefer simpler shrinkage/Elo-style estimators over a full Bradley-Terry fit until enough data accrues"
+    }
+  ],
+  "knownUnknowns": [
+    {
+      "question": "What is EvalPlus/BigCode's exact current (2026) leaderboard content, update cadence, and UX pattern?",
+      "why": "Direct fetch of evalplus.github.io/leaderboard.html failed with a markdown-table-conversion crash; the Hugging Face mirror space returned HTTP 401 (auth wall). All EvalPlus claims in this artifact rely on WebSearch-synthesized secondary text only.",
+      "triedSources": ["https://evalplus.github.io/leaderboard.html", "https://huggingface.co/spaces/evalplus/evalplus_leaderboard", "https://github.com/evalplus/evalplus"],
+      "triedQueries": ["EvalPlus BigCode leaderboard methodology 2026 HumanEval+ MBPP+"]
+    },
+    {
+      "question": "What is Terminal-Bench's (tbench.ai) own UX/decision-support pattern on its primary leaderboard page?",
+      "why": "Budget/turn constraints meant only cross-referenced mentions inside Artificial Analysis's evaluation page and secondary trackers were captured; the primary tbench.ai site itself was not directly fetched in this pass.",
+      "triedSources": ["https://artificialanalysis.ai/evaluations/terminalbench-v2-1", "https://codingfleet.com/blog/terminal-bench-leaderboard-2026/"],
+      "triedQueries": ["Terminal-Bench leaderboard methodology 2026 agentic terminal tasks"]
+    },
+    {
+      "question": "What exact scoring-aggregation formula does SWE-bench-Live use to turn per-task pass/fail into a headline percentage, and does it differ from SWE-bench's plain % Resolved?",
+      "why": "The primary swe-bench-live.github.io page content indexed in this pass was limited to an introductory tagline; the founding arXiv paper (2505.23419) was not independently fetched.",
+      "triedSources": ["https://swe-bench-live.github.io/"],
+      "triedQueries": ["SWE-bench-Live SWE-rebench leaderboard methodology monthly refresh contamination 2026"]
+    }
+  ],
+  "validationCoverage": 0.42,
+  "runMetadata": {
+    "toolMode": "index",
+    "toolCallCount": 20,
+    "startedAt": "2026-07-15T19:30:00Z",
+    "finishedAt": "2026-07-15T19:45:00Z",
+    "workers": 1
+  },
+  "partial": true,
+  "error": null
+}

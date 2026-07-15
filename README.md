@@ -194,6 +194,10 @@ canonical JSON files.
 curl -s "$BASE/" | grep -oP 'application/ld\+json[^<]*<[^>]*>([\s\S]+?)</script>' | head -200
 ```
 
+## 🔬 Methodology
+
+The ranking comes from a single published, versioned formula — atomic-only weighted composite with empirical-Bayes shrinkage, a rank gate, ±σ uncertainty bands (LMArena-style CI-overlap clusters), disclosed imputation ("estimated" labels), and vendor-consensus cross-validation. Full formulas + academic references: [docs/METHODOLOGY.md](docs/METHODOLOGY.md) (v1.0, also summarized in the site's Methodology section with a plain-language benchmark glossary).
+
 ## 📚 Data Sources
 
 Every value the tracker shows comes from one of the sources below. Each value carries a `trustScore` based on its tier (I > S > C > U), the number of confirming sources, and recency. Independent sources outweigh vendor self-reports; community sources are used only when no independent or official source exists; forum/social signals are never written into the data.

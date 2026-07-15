@@ -62,7 +62,7 @@ aicodermap/
 ├── i18n/
 │   ├── tr.json
 │   └── en.json
-├── docs/                   # PRD, TechSpec, ImplGuide, Tasks, Workflow, Pitch, TestPlan
+├── docs/                   # PRD, TechSpec, ImplGuide, Tasks, Workflow, Pitch, TestPlan, Methodology
 ├── README.md
 ├── CHANGELOG.md
 ├── LICENSE
@@ -142,6 +142,7 @@ MIT — code and data are public. Attribution appreciated.
 - `docs/IMPLGUIDE.md` — ⭐ Coding-ready implementation guide (for Claude Code sessions)
 - `docs/TASKS.md` — 23-task / 5-milestone breakdown
 - `docs/WORKFLOW.md` — Update workflow (14 happy-path + 5 exception steps)
+- `docs/METHODOLOGY.md` — ⭐ Published, versioned scoring methodology (formulas + academic references; linked from the site's Methodology section)
 
 ## Blueprint Profile
 

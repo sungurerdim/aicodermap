@@ -1,3 +1,24 @@
+## [2026-07-15] — ideal-vs-current transformation (ds-benchmark: 16 competitors, 8 methodology findings)
+
+### Methodology & pipeline
+- **METHODOLOGY.md v1.0** published (formulas, EB shrinkage rationale, academic refs) + on-site Methodology section with plain-language benchmark glossary (TR+EN)
+- **Disclosed imputation (G3):** EB-filled benches now labeled "N estimated" on the composite; LMArena-style PRELIM chip on thin-evidence ranked models
+- **benchTypes taxonomy (G5):** rotating / date-filtered / static contamination-risk class per bench in whitelist `_schema` + glossary chips
+- **New-model queue priority (G2):** freshly-admitted models' full core set jumps `priorityCells` (tier −0.75) — rankable profile in the first cycle
+- **Release radar (G1):** OpenRouter newest-models page added to whitelist registries (same-day cross-vendor discovery candidates)
+- **Telemetry preserve (G13):** partial merges no longer clobber `_meta.json` lastCycle* telemetry with nulls
+- **Data hygiene (G11):** 323 stale flat `bench.*` keys stripped from 52 models + merge.py write-guard
+- **Default preset SSOT (G12):** `DEFAULT_PRESET='swe-focused'` (core.js) — HTML/state/product position now agree
+
+### UI / visual (G8, G9, G10, G14)
+- **Leaderboard-first layout:** filters + comparison table above the fold; weights editor collapsible (default collapsed); zero-weight sliders/columns hidden behind toggles
+- **Progressive card render:** initial DOM 86,680px → ~12,600px; cards stream in 12-chunk on scroll
+- **Token overhaul:** `--warn-2` family declared (was silently falling back to hardcoded hex in 8 places); all 24 hardcoded colors in models/table.css replaced with theme tokens; deprecated/limited badges now theme-correct
+- **WCAG AA:** axe-core violations 443 (dark) + 1724 (light) → **0 in both themes**; status ladder validated with dataviz palette validator; meta theme-color synced per theme
+- Deploy stamp simplified to freshness only (build/coverage detail moved to hover); meta-CSP `frame-ancestors` removed (ignored in <meta>, consoles now clean)
+
+Research artifacts: `ds/research/competitors-part{1,2}.json`, `ds/research/methodology.json` · Gap decisions: `ds/audit/findings.md`
+
 
 ## [2026-07-11] — autonomous refresh-all [WARN: cumulative provenance coverage 68.8% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 463 new fills; 44 cells auto-gapped by orchestrator; 670 explicit agent gaps preserved]
 

@@ -1,0 +1,166 @@
+{
+  "topic": "AICoderMap composite-ranking methodology best practices - FACET 2",
+  "subAspect": "academic + industry methodology (rank aggregation, shrinkage, uncertainty display, normalization, weight elicitation, contamination) + convergentIdealSignals",
+  "confidence": "MEDIUM",
+  "generatedAt": "2026-07-15T20:00:00Z",
+  "accessDate": "2026-07-15",
+  "plan": [
+    "How should rank aggregation handle missing data (Borda, median-rank, Bradley-Terry/Elo with sparse comparisons)?",
+    "What does empirical-Bayes shrinkage do for small-sample scores and is it applicable to a model leaderboard?",
+    "How do leading leaderboards display uncertainty/confidence intervals?",
+    "What are the documented pitfalls of min-max vs z-score vs percentile normalization across heterogeneous benchmarks?",
+    "What weight-elicitation method (swing weighting vs AHP) is defensible for a user-editable preset UI?",
+    "How is benchmark contamination/staleness handled by the field's leading examples?",
+    "What do T1 leaders converge on across discovery/coverage/sparse-handling/aggregation/presets/cadence/UX/visual design?"
+  ],
+  "methodologyFindings": [
+    {
+      "claim": "Bradley-Terry (maximum-likelihood pairwise-comparison) modeling is the field-standard replacement for naive Elo/win-rate on leaderboards because it correctly weights beating strong vs weak opponents and supports principled confidence intervals, but it needs enough comparisons per item to be reliable -- in very sparse regimes, simple scalar Elo can actually outperform it.",
+      "sources": [
+        {"url": "https://arxiv.org/pdf/2403.04132", "verbatimQuote": "the mean rating by both bootstrap and standard methods being very similar and rankings nearly identical", "domain": "arxiv.org", "independent": true},
+        {"url": "https://www.lmsys.org/blog/2023-12-07-leaderboard/", "verbatimQuote": "they adopted the Bradley-Terry (BT) model to improve ranking quality and confidence estimates", "domain": "lmsys.org", "independent": true}
+      ],
+      "confidence": "HIGH",
+      "practicalImplicationForAICoderMap": "AICoderMap's composite score is a weighted-mean of benchmark numbers, not a pairwise-preference system, so Bradley-Terry itself doesn't directly apply -- but the underlying lesson transfers: for any future pairwise/preference-style feature (e.g. a 'which model wins head-to-head' view), use simple aggregation (raw win-rate or Borda) while sample sizes per model pair are small, and only move to a full BT/MLE fit once enough comparisons accrue per model."
+    },
+    {
+      "claim": "Empirical-Bayes shrinkage pulls small-sample or high-variance group estimates toward the overall mean, which measurably reduces the false 'best/worst' extremes that pure small-sample ranking creates -- a well-established statistical fix (James-Stein / Efron-Morris) directly applicable to any leaderboard that mixes well-benchmarked and thinly-benchmarked models.",
+      "sources": [
+        {"url": "https://andrewpwheeler.com/2018/07/23/sorting-rates-using-empirical-bayes/", "verbatimQuote": "Howard Wainer discussed how ranking resulted in the false idea that smaller schools were better based on small samples of test results", "domain": "andrewpwheeler.com", "independent": true},
+        {"url": "https://arxiv.org/pdf/1807.09236", "verbatimQuote": "shrunken (regularized) estimators often perform much better than maximum likelihood estimators in such \"small data\" situations", "domain": "arxiv.org", "independent": true}
+      ],
+      "confidence": "HIGH",
+      "practicalImplicationForAICoderMap": "When a newly-added model only has scores confirmed by 1 source (AICoderMap's own 'partial' verification tier) or is missing several benchmark categories entirely, its composite score is effectively a small/noisy sample -- consider visually shrinking or flagging such scores toward a category-average / 'insufficient data' state rather than letting a single strong benchmark result rank it #1 outright, mirroring the ≥2-source verification discipline already in AICoderMap's own workflow."
+    },
+    {
+      "claim": "Leading leaderboards increasingly display explicit confidence intervals rather than a bare point estimate: Chatbot Arena/LMArena shows asymmetric bootstrap CIs per model (widening for low-vote/new models), and Epoch AI runs models 8-16x per benchmark and shows +/-1 standard error bars; both treat the raw rank order as partially statistical noise when intervals overlap.",
+      "sources": [
+        {"url": "https://lmarena.ai/leaderboard", "verbatimQuote": "1 gpt-5.6-sol-xhigh (codex-harness) 1631 +17/-17", "domain": "lmarena.ai", "independent": true},
+        {"url": "https://epoch.ai/benchmarks/about", "verbatimQuote": "we show a confidence interval of plus and minus one standard error around the \"true\" mean evaluation score", "domain": "epoch.ai", "independent": true}
+      ],
+      "confidence": "HIGH",
+      "practicalImplicationForAICoderMap": "AICoderMap's contradiction-flagging system (3pp warn / 5pp block) is a related but distinct concept -- it flags disagreement between sources, not statistical uncertainty within a single repeated measurement. Consider adding a lightweight visual cue (e.g. a +/- range badge or 'top cluster' shading) when two or more models sit within the existing 3pp delta-warning threshold of each other on the composite score, so users don't over-read a 1-2 point rank difference as a real capability gap."
+    },
+    {
+      "claim": "No single normalization scheme (min-max, z-score, percentile) is universally correct for combining heterogeneous benchmarks -- min-max is outlier-sensitive and can exaggerate small gaps in narrow-range datasets, z-score assumes roughly normal distributions and can unfairly penalize entities that only appear on harder subsets, and percentile/rank normalization sacrifices magnitude information, compressing real differences at the top.",
+      "sources": [
+        {"url": "https://www.quora.com/What-is-the-difference-between-Min-Max-and-Z-score-normalization", "verbatimQuote": "I wouldn't recommend min-max scaling, as it depends only on the extreme values (one value beeing a little off will distort the whole data set)", "domain": "quora.com", "independent": true},
+        {"url": "https://arxiv.org/pdf/2509.22472", "verbatimQuote": "For z-score normalization, languages that appear only in relatively harder datasets may be penalized more strongly, making this approach less suitable for aggregation across tasks.", "domain": "arxiv.org", "independent": true}
+      ],
+      "confidence": "MEDIUM",
+      "practicalImplicationForAICoderMap": "AICoderMap's 25 heterogeneous benchmark keys (differing scales: some percentages, some Elo-like, some cost-inverse) should NOT be blended with a single naive min-max across all keys without safeguards -- adopt the emerging best practice of per-benchmark robust/clipped percentile scaling (e.g., 5th-95th percentile bounds) or per-fold min-max with directionality correction (lower-is-better metrics like cost/latency flipped before combining), rather than a single global min-max or z-score pass across all 25 keys."
+    },
+    {
+      "claim": "Swing weighting and AHP (Analytic Hierarchy Process) are both well-established, reasonably defensible weight-elicitation methods for multi-criteria decision analysis, with comparative studies finding no consistent winner in output quality; the practical tradeoff is cognitive burden (AHP requires many pairwise comparisons and scales poorly with criteria count, swing weighting is faster but still risks anchoring bias) rather than one being objectively more 'correct.'",
+      "sources": [
+        {"url": "https://www.researchgate.net/publication/331136338_Comparison_of_weighting_methods_used_in_multicriteria_decision_analysis_frameworks_in_healthcare_with_focus_on_low-_and_middle-income_countries", "verbatimQuote": "Pöyhönen et al. did not discover essential differences in results across AHP, direct weighting, SMART, swing weighting and tradeoff weighting", "domain": "researchgate.net", "independent": true},
+        {"url": "https://web.mst.edu/lib-circ/files/Special%20Collections/INCOSE/Using%20the%20Swing%20Weight%20Matrix%20to%20Weight%20Multiple%20Objectives.pdf", "verbatimQuote": "The potentially large number of bivariate comparisons required using AHP may adversely affect response rates", "domain": "web.mst.edu", "independent": true}
+      ],
+      "confidence": "MEDIUM",
+      "practicalImplicationForAICoderMap": "For AICoderMap's user-editable weights UI (5 presets + custom sliders), swing weighting is the more defensible choice over full AHP: it needs far fewer elicitation steps (rank criteria in importance order, then assign relative swing values) which fits a lightweight slider UI much better than AHP's O(n^2) pairwise-comparison matrix for 25 benchmark keys. To reduce anchoring bias noted in the literature, consider ordering slider defaults so no single criterion is pre-anchored as 'first'/most salient in the UI."
+    },
+    {
+      "claim": "The field has decisively moved from static, leak-prone benchmarks toward dynamic/rotating/decontaminated ones as the primary defense against both training contamination and score staleness -- concrete implementations include LiveBench's monthly question-pool rotation, LiveCodeBench's release-date-based temporal filtering, and SWE-rebench's post-training-cutoff GitHub-issue sourcing, all converging on the same principle: freeze nothing, timestamp everything.",
+      "sources": [
+        {"url": "https://github.com/livebench/livebench", "verbatimQuote": "LiveBench is designed to limit potential contamination by releasing new questions monthly", "domain": "github.com", "independent": true},
+        {"url": "https://mbrenndoerfer.com/writing/benchmark-contamination-llm-detection-mitigation", "verbatimQuote": "the most reliable mitigation is continuous benchmark renewal -- dynamic benchmarks recognize that any fixed test set will eventually leak into training corpora", "domain": "mbrenndoerfer.com", "independent": true}
+      ],
+      "confidence": "HIGH",
+      "practicalImplicationForAICoderMap": "AICoderMap's own 14-day-max refresh discipline is directly aligned with this convergent industry practice -- but the refresh should extend beyond just adding new models to also re-checking whether a source benchmark itself is a static/frozen split (contamination risk rising over time, e.g. SWE-bench Verified's 2026 controversy) vs. a rotating one (SWE-rebench, LiveBench, LiveCodeBench); AICoderMap's sources.json provenance record should capture which type each benchmark is, since a static-split source's numbers become progressively less trustworthy the older the split gets, independent of the 14-day refresh cadence."
+    },
+    {
+      "claim": "When a component score is missing for some entities in a composite index, weight-renormalization within the affected group (redistributing the missing component's weight proportionally across the remaining available components for that entity) is used in real composite-index methodology to avoid dropping entities entirely while preserving comparability -- an explicit, disclosed alternative to imputation or hard exclusion.",
+      "sources": [
+        {"url": "https://arxiv.org/pdf/2604.12368", "verbatimQuote": "handles missingness by re-normalizing weights within each pillar when a component is unavailable for a given country-year, which avoids dropping country-years and preserves comparability", "domain": "arxiv.org", "independent": true},
+        {"url": "https://llm-stats.com/methodology", "verbatimQuote": "Unverified scores are flagged in the UI and excluded from composite indexes", "domain": "llm-stats.com", "independent": true}
+      ],
+      "confidence": "MEDIUM",
+      "practicalImplicationForAICoderMap": "AICoderMap should adopt an explicit, disclosed sparse-data policy in its scoring code rather than an implicit default: when a model is missing one of the 25 bench keys, renormalize the remaining weights proportionally for that model's composite (matching the arXiv Gondauri-index pattern) AND visibly flag which categories were unavailable (matching LLM-Stats's flag-and-exclude-from-composite pattern) -- doing both together is stronger than either alone, since renormalization alone can silently mask a genuinely weak/untested category as if it simply didn't count."
+    },
+    {
+      "claim": "Weak stochastic transitivity (WST) -- a much less restrictive assumption than the strong transitivity implicit in vanilla Bradley-Terry/Thurstone models -- is the theoretically minimal condition needed for a global ranking to even exist under sparse, nonuniform-missingness pairwise comparison data, and maximum-score estimators built on WST are more robust than standard BT/Thurstone fits when comparison coverage is uneven across items.",
+      "sources": [
+        {"url": "https://arxiv.org/pdf/2510.06789", "verbatimQuote": "the existing models adopt a strong notion of stochastic transitivity, which imposes restrictive monotonicity constraints that are often unrealistic for real-world applications. It instead only requires weak stochastic transitivity (WST)", "domain": "arxiv.org", "independent": true},
+        {"url": "https://www.ifaamas.org/Proceedings/aamas2025/pdfs/p1253.pdf", "verbatimQuote": "SCO approximates the true ranking best when a large proportion (59% or more) of the data is missing", "domain": "ifaamas.org", "independent": true}
+      ],
+      "confidence": "MEDIUM",
+      "practicalImplicationForAICoderMap": "Directly relevant only if AICoderMap ever builds a pairwise 'model A vs model B' comparative feature (not the current weighted-composite scoring): coverage across the 60-model catalog will be inherently uneven (frontier models get benchmarked everywhere, niche/local models sparsely), so any future pairwise-ranking feature should favor a WST-robust or Condorcet-style aggregator over a naive full Bradley-Terry fit, which assumes better-connected comparison data than a 60-model long-tail catalog is likely to have."
+    }
+  ],
+  "convergentIdealSignals": {
+    "discovery": "T1 leaders converge on either (a) same-day-to-72-hour automatic addition triggered by model release (Artificial Analysis, Epoch AI) or (b) open community-submission processes with a documented contribution path (LiveBench email/issue, Aider 'Contributing results', LiveCodeBench GitHub PR). No T1 source relies on a slow manual editorial queue as its primary discovery channel -- speed-to-add is treated as a core competitive differentiator across the field.",
+    "coverage": "The dominant pattern is self-run evaluation on standardized infrastructure/harness (Artificial Analysis, Epoch AI, LiveBench, HELM, SWE-bench, LiveCodeBench, Scale SEAL) rather than trusting vendor self-reported numbers; aggregator-only sites (LLM-Stats, Vellum) explicitly flag which scores are self-run/verified vs. vendor-reported/unverified as a disclosed provenance tier.",
+    "sparseHandling": "No T1 source imputes missing scores. The convergent pattern is disclose-and-either-flag-or-exclude: LLM-Stats flags unverified scores and excludes them from composites; LMArena tags low-vote models 'Preliminary' with a wider confidence interval rather than hiding them; SWE-bench and most others simply omit a model/agent from a table until it has been run. Silent imputation of a missing score was not found anywhere in this research pass.",
+    "aggregation": "Two converging families: (1) explicit fixed-weight weighted averages with a versioned, published formula (Artificial Analysis: Agents 34% / Coding 24% / Scientific Reasoning 24% / General 18%), and (2) pairwise-comparison-derived ratings (Bradley-Terry MLE for LMArena, TrueSkill for LLM-Stats) for preference-style data. Nobody found in this research uses unweighted simple averaging across raw heterogeneous benchmark scales without some normalization or weighting step.",
+    "presets": "This is the field's clearest gap: not one T1 or T2 competitor reviewed offers a user-adjustable weight/preset editor on their public leaderboard. Every composite formula found (Artificial Analysis's category weights, LLM-Stats's TrueSkill score, Epoch's ECI) is fixed and only the operating organization can change it. AICoderMap's user-editable weights + 5 presets is a genuine, currently-unreplicated differentiator versus every competitor surveyed.",
+    "cadence": "Convergent best practice across T1 sources is now monthly-or-faster refresh for the underlying task/question pool itself (not just adding new models to a static set) specifically to fight contamination: LiveBench (monthly, 1/6 pool rotation), SWE-rebench/SWE-bench-Live (rolling fresh GitHub issues), LiveCodeBench (continuous, release-date-filtered). Static, frozen splits (classic SWE-bench Verified, HELM classic scenarios) are the ones now drawing explicit criticism (OpenAI's 2026 decision to stop reporting SWE-bench Verified) for staleness/contamination risk.",
+    "decisionUX": "Convergent patterns worth emulating: (1) multi-axis comparison beyond one score -- intelligence/speed/latency/price/context (Artificial Analysis), cost-per-run alongside accuracy (Aider); (2) task/use-case-specific views rather than forcing one overall ranking -- LMArena's category arenas (Coding/WebDev/Math/Hard), OpenRouter's 'top models by task'; (3) transparent provenance badges distinguishing verified/self-run vs. vendor-reported vs. preliminary scores (LLM-Stats, EvalPlus color-coding, LMArena's Preliminary tag) -- directly analogous to AICoderMap's own contradiction-flagging (warn/block tiers) and could be extended to a similar verified/partial/preliminary badge on individual scores, not just contradictions.",
+    "visualDesign": "T1/T2 competitors split into two visual families: dense data-table SaaS dashboards (Artificial Analysis, LLM-Stats, Vellum -- all table-primary, dark-mode-friendly, high information density) versus minimal academic-project pages (LiveBench, SWE-bench, LiveCodeBench, HELM -- simpler, less polished, developer-facing). None of the reviewed competitors were found to use a card-based mobile-first layout as their primary desktop view; all default to table-first design, which validates AICoderMap's own table + card hybrid (table for comparison-dense desktop use, cards for scannable/mobile use) as differentiated rather than a deviation from an established norm."
+  },
+  "ssot": {
+    "artificialAnalysisIntelligenceIndexWeights": {"agents": 0.34, "coding": 0.24, "scientificReasoning": 0.24, "general": 0.18, "citationId": "AA-methodology-weights"},
+    "artificialAnalysisConfidenceInterval95pct": "<±1%",
+    "epochAIRepeatRunsGPQA": 16,
+    "epochAIRepeatRunsMATH": 8,
+    "sweRebenchRepeatsPerProblem": 5,
+    "liveBenchMonthlyPoolRotationFraction": "~1/6",
+    "sweBenchVerifiedInstanceCount": 500,
+    "sweBenchFullInstanceCount": 2294,
+    "aiderPolyglotTestCases": 225,
+    "aiderPolyglotLanguageCount": 6,
+    "terminalBench21TaskCount": 89
+  },
+  "contradictions": [
+    {
+      "field": "Whether z-score or min-max normalization is 'better' for composite benchmark aggregation",
+      "candidates": [
+        {"source": "OpenSearch hybrid-search benchmarking (opensearch.org)", "claim": "z-score normalization shows a modest improvement in search quality... at the cost of a marginal increase in latency compared to min-max"},
+        {"source": "Multilingual legal-reasoning LLM benchmark paper (arXiv 2509.22472)", "claim": "min-max scaling exaggerates small score differences, especially with few languages, while z-score penalizes entities appearing only in harder datasets -- neither is unconditionally better"}
+      ],
+      "delta": "Different domains (search-ranking vs. LLM multi-benchmark aggregation) reach different practical recommendations",
+      "winner": "no universal winner -- this is a genuine, disclosed context-dependency in the literature rather than a factual conflict to resolve; AICoderMap should choose per-benchmark-type normalization (e.g., robust/clipped percentile for benchmarks with few data points, min-max with outlier clipping for well-populated ones) rather than seeking one global 'correct' method"
+    }
+  ],
+  "knownUnknowns": [
+    {
+      "question": "Does any T1/T2 leaderboard reviewed publish a fully worked numeric example of empirical-Bayes shrinkage applied specifically to LLM benchmark scores (as opposed to the general statistical literature on shrinkage)?",
+      "why": "All empirical-Bayes sources found in this research were general statistics/sports/education-ranking examples (schools, batting averages, chess ratings) -- no leaderboard competitor reviewed (Artificial Analysis, Epoch AI, LMArena, etc.) was found to explicitly disclose using empirical-Bayes shrinkage on its own composite score.",
+      "triedSources": ["https://andrewpwheeler.com/2018/07/23/sorting-rates-using-empirical-bayes/", "https://arxiv.org/pdf/1807.09236"],
+      "triedQueries": ["empirical Bayes shrinkage small sample leaderboard ranking benchmark"]
+    },
+    {
+      "question": "What specific numeric threshold (vote count, run count, or sample size) should AICoderMap use before treating a composite score as 'reliable enough' to rank normally vs. flagging it as low-confidence, given AICoderMap's own data comes from static published benchmark numbers rather than repeatable live runs?",
+      "why": "The repeat-run/vote-count thresholds found (Epoch AI's 8-16 runs, LMArena's ~5,000-vote preliminary cutoff) are specific to live, repeatable evaluation systems; AICoderMap ingests one-shot published scores per source, so a directly analogous numeric threshold was not found in the literature and would need to be defined by AICoderMap's own source-count/tier policy (already ≥2 sources = verified) rather than borrowed wholesale from these methodologies.",
+      "triedSources": ["https://epoch.ai/benchmarks/about", "https://lmarena.ai/leaderboard"],
+      "triedQueries": ["confidence interval methodology", "Epoch AI multiple runs confidence interval standard error"]
+    }
+  ],
+  "sources": [
+    {"citationId": 0, "url": "https://arxiv.org/pdf/2403.04132", "title": "Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference", "domain": "arxiv.org", "tier": "T3", "chip": "secondary", "craap": 82, "accessedAt": "2026-07-15"},
+    {"citationId": 1, "url": "https://www.lmsys.org/blog/2023-12-07-leaderboard/", "title": "Chatbot Arena: New models & Elo system update", "domain": "lmsys.org", "tier": "T1", "chip": "official", "craap": 80, "accessedAt": "2026-07-15"},
+    {"citationId": 2, "url": "https://andrewpwheeler.com/2018/07/23/sorting-rates-using-empirical-bayes/", "title": "Sorting rates using empirical Bayes", "domain": "andrewpwheeler.com", "tier": "T4", "chip": "secondary", "craap": 60, "accessedAt": "2026-07-15"},
+    {"citationId": 3, "url": "https://arxiv.org/pdf/1807.09236", "title": "Improving pairwise comparison models using Empirical Bayes shrinkage", "domain": "arxiv.org", "tier": "T3", "chip": "secondary", "craap": 78, "accessedAt": "2026-07-15"},
+    {"citationId": 4, "url": "https://lmarena.ai/leaderboard", "title": "LMArena Leaderboard", "domain": "lmarena.ai", "tier": "T1", "chip": "official", "craap": 85, "accessedAt": "2026-07-15"},
+    {"citationId": 5, "url": "https://epoch.ai/benchmarks/about", "title": "About | Benchmarking | Epoch AI", "domain": "epoch.ai", "tier": "T1", "chip": "official", "craap": 90, "accessedAt": "2026-07-15"},
+    {"citationId": 6, "url": "https://www.quora.com/What-is-the-difference-between-Min-Max-and-Z-score-normalization", "title": "What is the difference between Min Max and Z score normalization?", "domain": "quora.com", "tier": "T5", "chip": "secondary", "craap": 45, "accessedAt": "2026-07-15"},
+    {"citationId": 7, "url": "https://arxiv.org/pdf/2509.22472", "title": "Evaluating the Limits of Large Language Models in Multilingual Legal Reasoning", "domain": "arxiv.org", "tier": "T3", "chip": "secondary", "craap": 76, "accessedAt": "2026-07-15"},
+    {"citationId": 8, "url": "https://www.researchgate.net/publication/331136338_Comparison_of_weighting_methods_used_in_multicriteria_decision_analysis_frameworks_in_healthcare_with_focus_on_low-_and_middle-income_countries", "title": "Comparison of weighting methods used in multicriteria decision analysis frameworks in healthcare", "domain": "researchgate.net", "tier": "T3", "chip": "secondary", "craap": 74, "accessedAt": "2026-07-15"},
+    {"citationId": 9, "url": "https://web.mst.edu/lib-circ/files/Special%20Collections/INCOSE/Using%20the%20Swing%20Weight%20Matrix%20to%20Weight%20Multiple%20Objectives.pdf", "title": "Using the Swing Weight Matrix to Weight Multiple Objectives", "domain": "web.mst.edu", "tier": "T3", "chip": "secondary", "craap": 72, "accessedAt": "2026-07-15"},
+    {"citationId": 10, "url": "https://github.com/livebench/livebench", "title": "LiveBench GitHub README", "domain": "github.com", "tier": "T1", "chip": "official", "craap": 84, "accessedAt": "2026-07-15"},
+    {"citationId": 11, "url": "https://mbrenndoerfer.com/writing/benchmark-contamination-llm-detection-mitigation", "title": "Benchmark Contamination in LLMs: Detection & Mitigation Strategies", "domain": "mbrenndoerfer.com", "tier": "T4", "chip": "secondary", "craap": 62, "accessedAt": "2026-07-15"},
+    {"citationId": 12, "url": "https://arxiv.org/pdf/2604.12368", "title": "A Diagnostics-First Composite Index for Macro-Financial Resilience (Gondauri Index)", "domain": "arxiv.org", "tier": "T3", "chip": "secondary", "craap": 70, "accessedAt": "2026-07-15"},
+    {"citationId": 13, "url": "https://llm-stats.com/methodology", "title": "Methodology - How LLM Stats Measures AI Models", "domain": "llm-stats.com", "tier": "T3", "chip": "secondary", "craap": 65, "accessedAt": "2026-07-15"},
+    {"citationId": 14, "url": "https://arxiv.org/pdf/2510.06789", "title": "Model-free Rank Aggregation in the Presence of Rater Heterogeneity: A Maximum Score Approach", "domain": "arxiv.org", "tier": "T3", "chip": "secondary", "craap": 75, "accessedAt": "2026-07-15"},
+    {"citationId": 15, "url": "https://www.ifaamas.org/Proceedings/aamas2025/pdfs/p1253.pdf", "title": "Soft Condorcet Optimization for Ranking of General Agents", "domain": "ifaamas.org", "tier": "T3", "chip": "secondary", "craap": 76, "accessedAt": "2026-07-15"}
+  ],
+  "validationCoverage": 0.75,
+  "runMetadata": {
+    "toolMode": "index",
+    "toolCallCount": 20,
+    "startedAt": "2026-07-15T19:45:00Z",
+    "finishedAt": "2026-07-15T20:00:00Z",
+    "workers": 1
+  },
+  "partial": false,
+  "error": null
+}

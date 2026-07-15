@@ -1,0 +1,290 @@
+{
+  "topic": "AICoderMap competitor/comparable landscape - FACET 1 (part 1 of 2)",
+  "subAspect": "competitors A-G (Artificial Analysis, LMArena, LiveBench, Aider, SWE-bench official, Epoch AI, HELM)",
+  "confidence": "MEDIUM",
+  "generatedAt": "2026-07-15T19:30:00Z",
+  "accessDate": "2026-07-15",
+  "plan": [
+    "For each T1 leaderboard: how are new models discovered/added and how fast?",
+    "What benchmarks do they cover and is scoring self-run or aggregated?",
+    "How is missing/sparse data handled (exclude/impute/flag/provisional)?",
+    "What is the exact public aggregation method (weighted mean, Elo/BT, median rank, CI)?",
+    "Do they offer user-adjustable weights/presets?",
+    "What UX patterns (filters, GPU-fit, pricing, table vs cards) are worth emulating?"
+  ],
+  "competitors": [
+    {
+      "name": "Artificial Analysis",
+      "url": "https://artificialanalysis.ai",
+      "tier": "T1",
+      "craapReasoning": "Independently runs every evaluation on own infra rather than trusting vendor self-reports; publishes a versioned methodology page with exact category weights and CI figures; updated within days of new releases. Score 88/100 (Currency 20, Relevance 25, Authority 22, Accuracy 21, Purpose 10 minus 2 for commercial API upsell bias).",
+      "whatItDoesWell": [
+        "Runs all evaluations independently on standardized hardware/conditions rather than trusting lab-reported numbers",
+        "Publishes an exact, versioned aggregation formula with category weights (rare among competitors)",
+        "Tracks 5 orthogonal axes (intelligence, speed, latency, price, context) not just one score",
+        "Fast model-addition cadence (72-hour update cycle claimed)"
+      ],
+      "whereItFallsShort": [
+        "Intelligence Index is text-only English; multilingual/vision handled as separate suites, easy to overlook",
+        "Methodology has churned through 4+ major versions in ~18 months (v4.0 to v4.1), making historical score comparisons unstable",
+        "Commercial incentive: also sells API access/analytics, a soft conflict-of-interest flag"
+      ],
+      "methodologySignal": {
+        "newModelDiscovery": "Not fully disclosed publicly; observed cadence is very fast (major frontier models appear within ~72 hours per third-party trackers). Not independently confirmed on the primary site itself.",
+        "benchmarkCoverage": "Self-run only, not aggregated. Intelligence Index v4.1 = 9 evaluations (GDPval-AA v2, Tau3-Banking, Terminal-Bench v2.1, SciCode, AA-LCR, AA-Omniscience, Humanity's Last Exam, GPQA Diamond, CritPt); broader corpus per academic audit spans 62 benchmark families.",
+        "sparseDataHandling": "unknown/not disclosed on methodology page for the Index itself; individual standalone evals (e.g. ITBench-AA) show partial-split averaging (public + private task splits combined) as a template.",
+        "scoringAggregation": "Explicit weighted average: 'Intelligence Index is calculated as a weighted average across four categories: Agents (34%), Coding (24%), Scientific Reasoning (24%), General (18%)', with AA-Omniscience itself split into Accuracy (8%) and Non-Hallucination (4%) sub-components. 95% CI stated as <±1% for the composite Index based on >10 repeats.",
+        "presetsWeights": "No user-adjustable weights found; the 4-category weighting is fixed and only Artificial Analysis can change it (they have changed it 4+ times across versions).",
+        "updateCadence": "Stated 72-hour live update cycle (secondary source); methodology itself versioned roughly monthly to quarterly (v4.0 Jan 2026, v4.0.4 Mar-Jun 2026, v4.1 current)."
+      },
+      "uxSignal": {
+        "decisionSupport": "5-axis comparison (intelligence/speed/latency/price/context), per-evaluation drill-down pages, model comparison tool",
+        "visualDesign": "Dense data-table + scatter-plot dashboard, dark-mode-first, heavy use of small multiples per benchmark",
+        "tableVsCards": "table-primary with expandable per-model detail",
+        "mobileHandling": "not verified in this pass (JS-heavy site, not fully rendered without headless browser)"
+      },
+      "sources": [
+        {"citationId": 0, "url": "https://artificialanalysis.ai/methodology/intelligence-benchmarking", "title": "Artificial Analysis Intelligence Benchmarking Methodology", "domain": "artificialanalysis.ai", "tier": "T1", "chip": "official", "craap": 88, "verbatimQuote": "Intelligence Index is calculated as a weighted average across four categories: Agents (34%), Coding (24%), Scientific Reasoning (24%), General (18%)", "accessedAt": "2026-07-15", "originatingQuery": "Artificial Analysis leaderboard methodology"},
+        {"citationId": 1, "url": "https://artificialanalysis.ai/methodology/intelligence-benchmarking", "title": "Artificial Analysis Intelligence Benchmarking Methodology - CI", "domain": "artificialanalysis.ai", "tier": "T1", "chip": "official", "craap": 88, "verbatimQuote": "We estimate a 95% confidence interval for Artificial Analysis Intelligence Index of less than ±1%", "accessedAt": "2026-07-15", "originatingQuery": "confidence interval methodology"}
+      ]
+    },
+    {
+      "name": "LMArena (Chatbot Arena)",
+      "url": "https://lmarena.ai",
+      "tier": "T1",
+      "craapReasoning": "Largest public blind-preference dataset with a peer-reviewed methodology paper (arXiv 2403.04132); Bradley-Terry + bootstrap CIs are academically vetted. Score 85/100 (loses points on prompt-distribution bias and gaming history).",
+      "whatItDoesWell": [
+        "Largest blind human-preference dataset in public AI eval; task-specific arenas (WebDev, Coding, Hard, Math, Vision) beyond one overall score",
+        "Displays asymmetric 95% CIs per model directly on the leaderboard (e.g. +17/-17 Elo)",
+        "Style Control variant strips length/markdown/formatting bias for a closer capability signal",
+        "Peer-reviewed statistical methodology (Bradley-Terry MLE + bootstrap, published at arXiv 2403.04132)"
+      ],
+      "whereItFallsShort": [
+        "Prompt distribution skews English/technical-user; not representative of all coding workloads",
+        "Top-3 models often sit within overlapping CIs -- rank order is partially statistical noise, easy to over-read",
+        "History of vote-gaming/community brigading despite anti-gaming measures",
+        "No ground-truth signal -- confidently wrong answers can beat hedged-correct ones"
+      ],
+      "methodologySignal": {
+        "newModelDiscovery": "New models enter via direct vendor/community submission into blind battles; a 'Preliminary' tag with wider CI (±10-15 Elo) applies until ~5,000 votes accumulate, then CI tightens to ±4-7 Elo (secondary-source figure, not independently confirmed on primary site in this pass).",
+        "benchmarkCoverage": "Self-run pairwise human voting, not aggregated benchmark scores; category arenas include Overall, Hard, Coding, WebDev, Math, Vision.",
+        "sparseDataHandling": "Provisional/flagged: low-vote models get a preliminary label and wider confidence interval rather than exclusion or imputation.",
+        "scoringAggregation": "Bradley-Terry maximum-likelihood model (migrated from classic online Elo in late 2023); ties counted as half-win/half-loss; bootstrap resampling produces the displayed confidence intervals.",
+        "presetsWeights": "No user-adjustable composite weights -- LMArena reports raw category-specific Elo per arena rather than one blended score, so the 'weighting' decision is left entirely to the viewer picking which arena to look at.",
+        "updateCadence": "Continuous/live as votes accrue; leaderboard re-ranks in real time."
+      },
+      "uxSignal": {
+        "decisionSupport": "Category-arena switcher (Overall/Coding/WebDev/etc.), per-model CI shown inline, model-vs-model direct battle mode",
+        "visualDesign": "Ranked table with rank, model, Elo, and asymmetric +/- CI columns; light table density, org logos as visual anchors",
+        "tableVsCards": "table-primary, minimal card usage",
+        "mobileHandling": "not verified in this pass"
+      },
+      "sources": [
+        {"citationId": 2, "url": "https://lmarena.ai/leaderboard", "title": "LMArena Leaderboard - WebDev", "domain": "lmarena.ai", "tier": "T1", "chip": "official", "craap": 85, "verbatimQuote": "1 gpt-5.6-sol-xhigh (codex-harness) 1631 +17/-17", "accessedAt": "2026-07-15", "originatingQuery": "LMArena confidence interval category leaderboard webdev"},
+        {"citationId": 3, "url": "https://arxiv.org/pdf/2403.04132", "title": "Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference", "domain": "arxiv.org", "tier": "T3", "chip": "secondary", "craap": 82, "verbatimQuote": "the mean rating by both bootstrap and standard methods being very similar and rankings nearly identical", "accessedAt": "2026-07-15", "originatingQuery": "Chatbot Arena arxiv bootstrap confidence interval Bradley-Terry"}
+      ]
+    },
+    {
+      "name": "LiveBench",
+      "url": "https://livebench.ai",
+      "tier": "T1",
+      "craapReasoning": "ICLR 2025 Spotlight paper, objective ground-truth scoring (no LLM judge), monthly contamination-resistant refresh. Score 84/100.",
+      "whatItDoesWell": [
+        "Objective, verifiable ground-truth answers scored automatically without an LLM judge",
+        "Monthly rotation replaces ~1/6 of the dataset (full refresh every 6 months) specifically to fight contamination",
+        "ICLR 2025 Spotlight academic validation of methodology",
+        "7 categories / 21 tasks spanning reasoning, coding, agentic coding, math, data analysis, language, instruction following"
+      ],
+      "whereItFallsShort": [
+        "Score has an implicit timestamp -- scores from different months are not directly comparable since the underlying question set changed",
+        "Open community submission process (GitHub issue / email) means coverage of very new models can lag until someone requests evaluation",
+        "Narrower model coverage than aggregator sites (38 models in a recent snapshot vs 100s elsewhere)"
+      ],
+      "methodologySignal": {
+        "newModelDiscovery": "Community/maintainer-driven: 'Open an issue or email us at livebench@livebench.ai' and 'We will evaluate your model!' -- reactive, not automatic scraping.",
+        "benchmarkCoverage": "Self-run only. 'LiveBench currently contains a set of 18 diverse tasks across 6 categories' at initial release, expanded to 21 tasks / 7 categories by 2026 per secondary sources.",
+        "sparseDataHandling": "Not applicable in the traditional sense -- every evaluated model gets every task in a release window; models simply aren't listed until run.",
+        "scoringAggregation": "Category-average scores per task category; no single public weighted-composite formula disclosed on the primary GitHub page in this pass.",
+        "presetsWeights": "No user-adjustable weights found on primary source.",
+        "updateCadence": "Monthly release cadence, replacing oldest/easiest questions; full dataset refresh every 6 months (secondary-source detail, not found verbatim on primary GitHub README)."
+      },
+      "uxSignal": {
+        "decisionSupport": "Category breakdown per model, downloadable question/answer/judgment datasets for transparency",
+        "visualDesign": "Minimal, developer-facing (GitHub + simple leaderboard site), not consumer-polished",
+        "tableVsCards": "table",
+        "mobileHandling": "not verified in this pass"
+      },
+      "sources": [
+        {"citationId": 4, "url": "https://github.com/livebench/livebench", "title": "LiveBench GitHub README", "domain": "github.com", "tier": "T1", "chip": "official", "craap": 84, "verbatimQuote": "LiveBench is designed to limit potential contamination by releasing new questions monthly, as well as having questions based on recently-released datasets, arXiv papers, news articles, and IMDb movie synopses.", "accessedAt": "2026-07-15", "originatingQuery": "LiveBench monthly refresh contamination questions"},
+        {"citationId": 5, "url": "https://github.com/livebench/livebench", "title": "LiveBench GitHub README - eval your model", "domain": "github.com", "tier": "T1", "chip": "official", "craap": 84, "verbatimQuote": "We will evaluate your model! Open an issue or email us at livebench@livebench.ai!", "accessedAt": "2026-07-15", "originatingQuery": "how models added new model release testing"}
+      ]
+    },
+    {
+      "name": "Aider LLM Leaderboards (Polyglot)",
+      "url": "https://aider.chat/docs/leaderboards/",
+      "tier": "T1",
+      "craapReasoning": "Tool-maker-run, fully transparent per-run metadata (cost, edit format, malformed-response counts) published alongside every score. Score 83/100 (scaffold-specific, so relevance capped for general-purpose comparison).",
+      "whatItDoesWell": [
+        "Scores models inside a real, production edit loop (Aider itself) rather than an isolated code-gen harness",
+        "Publishes exhaustive per-run metadata: cost, seconds/case, malformed-response count, edit format used",
+        "225-exercise, 6-language (C++, Go, Java, JS, Python, Rust) benchmark deliberately curated to keep frontier models in a 5-50% differentiating band",
+        "Reports cost-per-run alongside accuracy -- an explicit price/performance view"
+      ],
+      "whereItFallsShort": [
+        "Scaffold-specific: results reflect Aider's own prompting/edit-format choices, not a model's intrinsic ceiling",
+        "Architect-mode rows blend two models (planner+editor) as one 'result', complicating apples-to-apples comparison",
+        "No confidence intervals or repeat-run variance reporting found"
+      ],
+      "methodologySignal": {
+        "newModelDiscovery": "Maintainer/community-run benchmark submissions; a documented 'Contributing results' page exists but exact latency-to-add is not disclosed on the primary page.",
+        "benchmarkCoverage": "Self-run only, using Aider's own harness. 'Aider's polyglot benchmark tests LLMs on 225 challenging Exercism coding exercises across C++, Go, Java, JavaScript, Python, and Rust.'",
+        "sparseDataHandling": "Models simply absent from the table until benchmarked; no imputation. Some rows are explicitly system-level (architect + editor pair) rather than single-model, which the leaderboard labels rather than hides.",
+        "scoringAggregation": "Simple percent-correct (pass rate) across 225 test cases, with two attempts per problem (first attempt, then a second attempt shown the failing unit-test output) -- 'pass rate 1' and 'pass rate 2' columns published separately.",
+        "presetsWeights": "No composite weighting; single scalar (percent correct) is the ranking key. Cost is shown as a separate column, not blended in.",
+        "updateCadence": "Irregular, tied to new model releases and community-run submissions -- observed multiple entries per month in 2025-2026 based on dated result folders."
+      },
+      "uxSignal": {
+        "decisionSupport": "Expandable per-model row exposing full run metadata (cost, command, edit format, malformed responses)",
+        "visualDesign": "Simple sortable HTML table, developer-doc aesthetic (part of aider.chat docs site)",
+        "tableVsCards": "table",
+        "mobileHandling": "not verified in this pass"
+      },
+      "sources": [
+        {"citationId": 6, "url": "https://aider.chat/docs/leaderboards/", "title": "Aider LLM Leaderboards", "domain": "aider.chat", "tier": "T1", "chip": "official", "craap": 83, "verbatimQuote": "Aider excels with LLMs skilled at writing and editing code, and uses benchmarks to evaluate an LLM's ability to follow instructions and edit code successfully without human intervention.", "accessedAt": "2026-07-15", "originatingQuery": "Aider LLM leaderboard polyglot benchmark methodology"},
+        {"citationId": 7, "url": "https://aider.chat/2024/12/21/polyglot.html", "title": "Aider polyglot benchmark announcement", "domain": "aider.chat", "tier": "T1", "chip": "official", "craap": 83, "verbatimQuote": "tests LLMs on 225 challenging Exercism coding exercises across C++, Go, Java, JavaScript, Python, and Rust", "accessedAt": "2026-07-15", "originatingQuery": "Aider polyglot benchmark methodology"}
+      ]
+    },
+    {
+      "name": "SWE-bench (official, swebench.com)",
+      "url": "https://www.swebench.com/",
+      "tier": "T1",
+      "craapReasoning": "Originating academic benchmark (Princeton/UChicago), the de-facto industry reference despite 2026 saturation critique. Score 80/100 (docked for the well-documented 2026 memorization/contamination controversy).",
+      "whatItDoesWell": [
+        "Multiple curated splits for different rigor/cost tradeoffs: Verified (500 human-filtered), Multilingual (300, 9 languages), Lite, Full (2294), Multimodal (517)",
+        "Agent-scaffold filter lets users compare models under a fixed harness (e.g. mini-SWE-agent) to isolate model capability from scaffold effects",
+        "Real GitHub issues as tasks -- high face validity for 'can this model do real SWE work'"
+      ],
+      "whereItFallsShort": [
+        "2026 controversy: OpenAI's Frontier Evals team stopped reporting SWE-bench Verified, stating models can reproduce gold patches verbatim from just the task ID, undermining score meaning",
+        "Task-count inconsistency across model runs historically (e.g., GPT-5 evaluated on 477 of 500 tasks, Sonnet-3.7 on 489) though largely fixed over time",
+        "Frontier models now cluster 80-95%, prompting the harder SWE-bench Pro / SWE-bench-Live / SWE-rebench spinoffs as replacements"
+      ],
+      "methodologySignal": {
+        "newModelDiscovery": "Submission-based via agent/model runs against the fixed task set; site supports comparing many agents (mini-SWE-agent v2, v0-v2, 'All OSS agents', 'All agents') against models.",
+        "benchmarkCoverage": "Self-hosted, fixed static task sets sourced from real GitHub issues/PRs, not aggregated from elsewhere. 'SWE-bench Verified is a human-filtered subset of 500 instances.'",
+        "sparseDataHandling": "Filterable by 'Open Scaffold' and tags; models/agents not yet run simply don't appear -- no imputation, straightforward exclusion until submitted.",
+        "scoringAggregation": "Single scalar metric: '% Resolved' -- percentage of task instances solved out of the split's total (2294 Full / 500 Verified / 300 Lite & Multilingual / 517 Multimodal). No composite blending across splits.",
+        "presetsWeights": "None -- each split reports its own single pass-rate number; no user-adjustable weighting.",
+        "updateCadence": "Rolling as new agent/model submissions arrive; underlying task set itself is static/frozen per split (which is the root of the 2026 contamination controversy)."
+      },
+      "uxSignal": {
+        "decisionSupport": "Split selector (Verified/Multilingual/Lite/Full/Multimodal), agent-harness filter, open-vs-proprietary model filter, multi-model compare view",
+        "visualDesign": "Simple ranked table with logo, minimalist academic-project aesthetic",
+        "tableVsCards": "table",
+        "mobileHandling": "not verified in this pass"
+      },
+      "sources": [
+        {"citationId": 8, "url": "https://www.swebench.com/", "title": "SWE-bench Leaderboards", "domain": "swebench.com", "tier": "T1", "chip": "official", "craap": 80, "verbatimQuote": "SWE-bench Verified is a human-filtered subset of 500 instances; use the Agent dropdown to compare LMs with mini-SWE-agent or view all agents", "accessedAt": "2026-07-15", "originatingQuery": "SWE-bench official leaderboard methodology"},
+        {"citationId": 9, "url": "https://www.swebench.com/", "title": "SWE-bench Leaderboards - metric", "domain": "swebench.com", "tier": "T1", "chip": "official", "craap": 80, "verbatimQuote": "Each entry reports the % Resolved metric, the percentage of instances solved (out of 2294 Full, 500 Verified, 300 Lite & Multilingual, 517 Multimodal).", "accessedAt": "2026-07-15", "originatingQuery": "SWE-bench Verified 500 human validated tasks"}
+      ]
+    },
+    {
+      "name": "Epoch AI Benchmarking Hub",
+      "url": "https://epoch.ai/benchmarks",
+      "tier": "T1",
+      "craapReasoning": "UK AI Security Institute-funded, most statistically rigorous public hub (explicit repeat-run confidence intervals), transparent about own limitations. Score 90/100.",
+      "whatItDoesWell": [
+        "Runs most models 16x on GPQA Diamond/Mock AIME and 8x on MATH Level 5, publishing +/-1 standard error CIs per model per benchmark -- most rigorous public repeat-run methodology found",
+        "Explicitly transparent when its own scores diverge from vendor-claimed scores, and explains why (evaluation-setting differences)",
+        "Epoch Capabilities Index (ECI) stitches 50+ benchmarks into one capability scale using cross-model difficulty calibration, with domain-specific variants (software engineering, math, cybersecurity)",
+        "Covers both open and proprietary models systematically, not just recent frontier releases"
+      ],
+      "whereItFallsShort": [
+        "For externally-sourced (non-self-run) benchmarks, Epoch has less insight into methodology/settings and says so directly",
+        "ECI methodology (cross-benchmark difficulty calibration) is genuinely complex -- may be hard for a non-technical audience to interpret at a glance"
+      ],
+      "methodologySignal": {
+        "newModelDiscovery": "'They have the capability to add results for new models to their database quickly after they are released (in many cases, results will be added the day a model is released.)' -- fastest disclosed same-day capability among T1 sources reviewed.",
+        "benchmarkCoverage": "Both self-run and externally-sourced: 'featuring the performance of leading AI models on challenging tasks, including results evaluated internally by Epoch AI as well as data collected from external sources.' 66 distinct benchmarks tracked as of the review period.",
+        "sparseDataHandling": "Not fully disclosed for the general hub; for the ECI composite specifically, missing benchmark coverage per model is handled via the cross-model difficulty-calibration approach described in the 'Rosetta Stone for AI Benchmarks' paper (title/existence confirmed, full missing-data mechanics not independently verified in this pass) -- partial.",
+        "scoringAggregation": "For self-run evals: mean score with +/-1 standard error CI from repeat runs. For the composite ECI: 'a composite metric using scores from over 50 distinct benchmarks... it stitches together component benchmarks by determining relative difficulty through cross-model comparisons, and models get higher scores for performing better on harder benchmarks' (secondary-source paraphrase of Epoch's own description, not found verbatim on the primary About page in this pass -- partial confirmation).",
+        "presetsWeights": "No user-adjustable weights found on primary source; ECI weighting is determined by Epoch's difficulty-calibration methodology, not user-editable.",
+        "updateCadence": "Continuous/near-real-time for new model releases (same-day capability claimed); benchmark set itself expanded periodically (e.g., '13 new evals' added in a recent update)."
+      },
+      "uxSignal": {
+        "decisionSupport": "Per-model, per-benchmark CI visualization; searchable benchmark database; Python client library (pip install epochai) for programmatic access",
+        "visualDesign": "Scientific/dashboard style with explicit error-bar plots, research-lab aesthetic rather than consumer product",
+        "tableVsCards": "mixed -- plots plus searchable tables",
+        "mobileHandling": "not verified in this pass"
+      },
+      "sources": [
+        {"citationId": 10, "url": "https://epoch.ai/benchmarks/about", "title": "About | Benchmarking | Epoch AI", "domain": "epoch.ai", "tier": "T1", "chip": "official", "craap": 90, "verbatimQuote": "we run most models multiple times on each benchmark (for most models, 16 times on GPQA Diamond and Mock AIME 2024-2025, 8 times on MATH Level 5)... we show a confidence interval of plus and minus one standard error around the “true” mean evaluation score", "accessedAt": "2026-07-15", "originatingQuery": "Epoch AI multiple runs confidence interval standard error"},
+        {"citationId": 11, "url": "https://epoch.ai/benchmarks/about", "title": "About | Benchmarking | Epoch AI - discrepancy transparency", "domain": "epoch.ai", "tier": "T1", "chip": "official", "craap": 90, "verbatimQuote": "the new Claude 3.5 Sonnet released on 2024-10-22 claims an accuracy of 65% on GPQA Diamond. In contrast, across our 16 runs we obtained a mean score of 0.55 ± 0.03.", "accessedAt": "2026-07-15", "originatingQuery": "confidence interval methodology"}
+      ]
+    },
+    {
+      "name": "Stanford HELM (CRFM)",
+      "url": "https://crfm.stanford.edu/helm/",
+      "tier": "T1",
+      "craapReasoning": "Academic gold-standard for multi-metric holistic evaluation (accuracy + efficiency + bias + toxicity), but entered maintenance mode June 2026, capping currency. Score 78/100 (docked 10+ pts for maintenance-mode status).",
+      "whatItDoesWell": [
+        "Multi-metric philosophy: evaluates 'metrics for measuring various aspects beyond accuracy (e.g. efficiency, bias, toxicity)', not just a single capability number",
+        "Standardized scenario format lets many models be run through identical prompts/scenarios for true apples-to-apples comparison",
+        "Domain-specific spinoffs (MedHELM, VHELM, HEIM, HELM Arabic) show the framework generalizes beyond general capability"
+      ],
+      "whereItFallsShort": [
+        "Entered maintenance mode June 1, 2026 -- active development/updates have slowed significantly, a major currency concern for a coding-model tracker needing <=14-day freshness",
+        "Coding-specific coverage is comparatively thin versus dedicated coding leaderboards (SWE-bench, LiveCodeBench, Aider)",
+        "Framework complexity (research-grade Python harness) makes it less approachable for quick consumer-facing comparisons"
+      ],
+      "methodologySignal": {
+        "newModelDiscovery": "Not disclosed in the fetched README; models are added via the HELM team/community running the framework against new model APIs.",
+        "benchmarkCoverage": "Both standardized-format datasets/benchmarks (e.g., MMLU-Pro, GPQA, IFEval, WildBench) and Epoch/self-run style execution via a unified model-provider interface; self-run through the HELM harness rather than aggregated from other leaderboards.",
+        "sparseDataHandling": "unknown -- not found in the fetched README in this pass.",
+        "scoringAggregation": "unknown/not disclosed verbatim in the fetched README; HELM's academic paper describes per-scenario multi-metric reporting rather than one blended composite score (secondary-source characterization).",
+        "presetsWeights": "No user-adjustable weights found.",
+        "updateCadence": "Maintenance mode as of June 1, 2026 -- 'HELM entered maintenance mode on June 1, 2026' per secondary-source summary of the Maintenance Mode Policy; leaderboards remain accessible but active updates have slowed."
+      },
+      "uxSignal": {
+        "decisionSupport": "Web UI for inspecting individual prompts/responses plus a comparison leaderboard; domain-specific leaderboard variants (medicine, finance, multilinguality)",
+        "visualDesign": "Academic dashboard, dense scenario x metric matrices",
+        "tableVsCards": "table (scenario x metric grid)",
+        "mobileHandling": "not verified in this pass"
+      },
+      "sources": [
+        {"citationId": 12, "url": "https://raw.githubusercontent.com/stanford-crfm/helm/main/README.md", "title": "Holistic Evaluation of Language Models (HELM) README", "domain": "github.com", "tier": "T1", "chip": "official", "craap": 78, "verbatimQuote": "Metrics for measuring various aspects beyond accuracy (e.g. efficiency, bias, toxicity)", "accessedAt": "2026-07-15", "originatingQuery": "HELM holistic scenario metric standardized evaluation multi-metric"},
+        {"citationId": 13, "url": "https://crfm-helm.readthedocs.io/", "title": "Holistic Evaluation of Language Models (HELM) - CRFM HELM docs", "domain": "crfm-helm.readthedocs.io", "tier": "T1", "chip": "official", "craap": 78, "verbatimQuote": "HELM entered maintenance mode on June 1, 2026, and further information can be found in the Maintenance Mode Policy.", "accessedAt": "2026-07-15", "originatingQuery": "Stanford HELM methodology leaderboard 2026 maintenance"}
+      ]
+    }
+  ],
+  "knownUnknowns": [
+    {
+      "question": "What is LMArena's exact vote-count threshold and CI-narrowing formula for the Preliminary tag?",
+      "why": "Only found in secondary aggregator/blog sources (agileleadershipdayindia.org, productleadersdayindia.org), not confirmed verbatim on lmarena.ai's own methodology/FAQ page in this pass.",
+      "triedSources": ["https://lmarena.ai/leaderboard", "https://agileleadershipdayindia.org/blogs/lmsys-chatbot-arena-rankings/lmarena-methodology-elo-explained.html"],
+      "triedQueries": ["LMArena Chatbot Arena methodology 2026 Bradley-Terry confidence interval WebDev arena", "LMArena confidence interval style control category leaderboard coding webdev"]
+    },
+    {
+      "question": "Does HELM disclose a composite/weighted scoring formula anywhere, or is it strictly per-scenario multi-metric reporting with no blended score?",
+      "why": "README fetched successfully but did not surface an aggregation formula section within the sections indexed; HELM's classic leaderboard UI itself is JS-rendered and wasn't directly fetched.",
+      "triedSources": ["https://raw.githubusercontent.com/stanford-crfm/helm/main/README.md"],
+      "triedQueries": ["HELM scenarios metrics evaluate holistic accuracy calibration robustness fairness efficiency"]
+    },
+    {
+      "question": "What exactly is Epoch AI's ECI missing-data/imputation mechanic when a model lacks scores on some of the 50+ component benchmarks?",
+      "why": "The 'Rosetta Stone for AI Benchmarks' paper is referenced but not fetched directly in this pass; About page content indexed did not surface an explicit missing-data policy for ECI specifically.",
+      "triedSources": ["https://epoch.ai/benchmarks/about"],
+      "triedQueries": ["sparse missing benchmark score handling exclude"]
+    }
+  ],
+  "validationCoverage": 0.64,
+  "runMetadata": {
+    "toolMode": "index",
+    "toolCallCount": 20,
+    "startedAt": "2026-07-15T18:00:00Z",
+    "finishedAt": "2026-07-15T19:30:00Z",
+    "workers": 1
+  },
+  "partial": true,
+  "error": null
+}

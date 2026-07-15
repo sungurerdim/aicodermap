@@ -1,0 +1,175 @@
+# AICoderMap Scoring Methodology
+
+**Version 1.0 — 2026-07-15.** This document is the published, versioned reference
+for how AICoderMap turns raw benchmark evidence into the ranking on the site.
+Any change to a formula, threshold, or weight vector bumps this version and is
+recorded in CHANGELOG.md. (Field precedent: Artificial Analysis publishes and
+versions its Intelligence Index weights; we hold ourselves to the same bar.)
+
+## 1. Data model
+
+- **Atomic benches** (SWE-bench Pro, LiveCodeBench, τ²-Bench, GPQA, …) are
+  primary measurements. Only these enter the composite.
+- **Vendor composites** (AA Index, AA Coding, AA Agentic, AA Omniscience) are
+  themselves aggregates of atomic benches. They are **excluded** from our
+  composite (double-counting) and surface separately in the per-model
+  "Vendor View" panel and the cross-validation flag (§7).
+- Every `(model, bench)` cell carries provenance in `data/sources.json`:
+  source URL, tier, trustScore, fetch date. Target: **≥2 independent sources
+  per cell**; single-source or high-dispersion cells are quarantined (§6).
+
+## 2. Normalization
+
+Heterogeneous scales (percentages, Elo, inverse ranks) are mapped to a common
+0–100 scale per bench via schema-driven rules in
+`data/sources-whitelist.json → _schema.normalization` (piecewise for Elo-like
+scales, linear for percentages, inverted for lower-is-better metrics).
+There is no single universally-correct normalization for heterogeneous
+benchmarks (min-max is outlier-sensitive; z-scores penalize models measured
+only on harder subsets — see arXiv 2509.22472); per-bench-type rules with
+explicit directionality correction are the defensible middle ground, so that
+is what we use, and each rule is data (reviewable, versioned), not code.
+
+## 3. Composite score (empirical-Bayes path — the default)
+
+For a model with observed normalized scores `s_k` and preset weights `w_k`:
+
+```
+realMean       = Σ(w_k · s_k) / Σ(w_k)            over observed cells
+priorMean      = Σ(w_k · median_k) / Σ(w_k)       global per-bench medians
+eb             = (W_obs · realMean + P · priorMean) / (W_obs + P)
+confidence     = W_obs / W_active
+deficit        = max(0, (T − confidence) / T)
+score          = max(0, eb − S · deficit²)
+```
+
+with `P = priorWeight` (default 30), `T = confThreshold` (default 0.65),
+`S = sigmaPenaltyMax` (default 18) — all in
+`sources-whitelist.json → _schema.composite.eb`.
+
+**Why shrinkage instead of a raw coverage haircut:** small-sample estimates
+produce false extremes; shrinking toward the population mean is the
+century-tested fix (James-Stein / Efron-Morris; regularized estimators
+outperform MLE in small-data regimes — arXiv 1807.09236). The prior is the
+**global median profile**, deliberately tier-agnostic: a sparse model shrinks
+toward the *average* model, not the average frontier model, so cherry-picked
+sparse results cannot coast to the top.
+
+**Disclosed imputation:** no surveyed T1 leaderboard silently imputes missing
+scores (LMArena tags low-vote models "Preliminary"; LLM-Stats flags unverified
+scores and excludes them from composites). We keep EB fill — it is
+statistically stronger than dropping cells — but every imputed bench is
+labeled **"estimated"** directly on the score block, and only benches the
+active preset declares `imputable` may be filled, capped by
+`maxImputedWeightShare` (default 0.30).
+
+## 4. Rank gate and Preliminary status
+
+EB alone would let a model missing its preset's heaviest **required** bench
+float on extreme scores elsewhere. Therefore:
+
+- Missing any `requiredBenches` of the active preset, **or** coverage below
+  `rankGate.coverageFloor` (default 0.40) → the model is **gated**: demoted
+  into the contiguous "Limited Coverage" band below the main ranking, with a
+  ⚠N marker listing what is missing.
+- Ranked normally but thin evidence (≥2 missing critical benches, or coverage
+  < 50%) → **PRELIM** chip (LMArena's "Preliminary" pattern): the rank is
+  real but provisional.
+
+## 5. Uncertainty bands
+
+Every composite ships with an epistemic ±σ band
+(`compositeUncertainty` in `assets/js/scoring.js`):
+
+- per-cell σ from evidence quality (`cellConfidence`) and contradiction
+  spread, propagated through the same weighted mean;
+- a sparsity term `score · α · (1 − coverage)`;
+- displayed as `±x.x` next to the score. Models whose bands overlap are
+  **statistically indistinguishable** — the cluster divider in the table marks
+  significance breaks (`upper < leaderLower`), the same CI-overlap rule
+  LMArena uses for its rank column and Epoch AI's ±1 SE error bars express.
+  The band is epistemic (evidence quality), not a frequentist 95% CI, and the
+  UI labels it "uncertainty range" accordingly.
+
+## 6. Evidence discipline (provenance, contradictions, quarantine)
+
+- **≥2 independent sources** per filled cell is the target contract
+  (`MIN_SOURCES_PER_FILLED_CELL: 2`).
+- Cross-source delta **> 3pp raises ⚠** (contradiction flag on the cell),
+  **> 5pp raises 🚨** (release-blocking review).
+- `merge.py` quarantines cells that are single-source, high-dispersion, or
+  low-confidence; quarantined cells are treated as missing by the composite
+  (EB shrinks them toward the median instead of trusting them at full weight).
+- Source trustScores decay via the reliability ledger
+  (`data/source-reliability.json`) when a source's values keep losing
+  contradiction resolutions.
+- **Benchmark staleness** (v1.0, G5): each bench carries a `benchType` in
+  `sources-whitelist.json → _schema.benchTypes` — `rotating` (LiveBench-style
+  pool refresh), `temporal` (LiveCodeBench-style cutoff filtering), or
+  `static` (frozen split). Static splits accumulate contamination risk as
+  they age (the 2026 SWE-bench Verified controversy is the canonical
+  example). The taxonomy is disclosed as a chip in the site glossary and is
+  a standing input to preset weight retunes (sweV's demotion to weight 9 is
+  the precedent); it is deliberately *not* a trustScore multiplier, because
+  all sources of one cell share the bench and a flat per-bench factor cannot
+  change winner selection within that cell.
+
+## 7. Cross-validation against vendor consensus
+
+Because our composite deliberately excludes vendor aggregates, they form an
+independent second opinion. Per model we compute a vendor-consensus rank
+(coverage-shrunk mean of normalized vendor composites) and compare:
+
+| rank gap | flag |
+|---|---|
+| ≤ 5 | 🟢 consensus |
+| ≤ 15 | 🟡 mild disagreement |
+| > 15 | 🔴 controversy |
+
+A 🔴 does not mean we are wrong — it means *look at the provenance footer
+before trusting either number*.
+
+## 8. Presets and weights
+
+Preset weight vectors live in `data/sources-whitelist.json → _schema.presets`
+(schema-driven; `assets/js/core.js` carries fallback literals). Each sums
+to 100. Rationale follows **swing-weighting** logic (rank criteria by
+importance for the persona, then assign relative swings) — chosen over AHP
+because AHP's O(n²) pairwise matrix is infeasible for 25+ criteria in a
+slider UI, and comparative MCDA studies find no consistent output-quality
+winner between the two (Pöyhönen et al.).
+
+| Preset | Anchor rationale (2026-05-18 retune, 2026-05-28 rebalance) |
+|---|---|
+| **swe-focused** (default) | SWE-bench Pro 32 (contamination-resistant gold standard) + TB2 17 + SWE-Multilingual 14 + LCB 13; sweV demoted to 9 (saturated, <1.3pp frontier spread + 2026 contamination findings) |
+| **agentic-focused** | τ²-Bench 21 (top multi-turn reliability) + TB2 18 + MCP-Atlas 17 + browsing/tool-use |
+| **reasoning-focused** | HLE 27 (non-saturated frontier) + GPQA 16 + AIME 13 + ARC-AGI-2 9 |
+| **balanced** | The site-wide default blend across coding/agentic/reasoning |
+| **benchmark-only** | Spread over every active bench, skewed to ≥70%-coverage benches to limit coverage-penalty distortion |
+| **consensus** | No atomic weights — pure vendor-composite median as an honest second opinion |
+
+Weights are user-editable; the published vectors are our editorial defaults,
+not ground truth. **No surveyed competitor (16 products, 2026-07) offers
+user-adjustable weights — this is AICoderMap's differentiator, kept.**
+
+## 9. Known limitations
+
+- We aggregate published numbers; we do not run benchmarks ourselves
+  ($0-infrastructure constraint). Provenance tiering is the mitigation.
+- Amber/orange/red status tiers cannot clear CVD ΔE floors between
+  themselves; every status therefore ships with an icon + label, never
+  color alone.
+- The ±σ band is epistemic (evidence quality), not a sampling CI.
+- Coverage currently ~69% of the active cell matrix vs the 85% target;
+  gap cells are re-queried every refresh cycle and never silently skipped.
+
+## References
+
+- Chatbot Arena / Bradley-Terry + bootstrap CIs: arXiv 2403.04132; lmsys.org blog 2023-12-07
+- Empirical-Bayes shrinkage: arXiv 1807.09236; Efron & Morris (1977)
+- Epoch AI repeat-run ±1 SE methodology: epoch.ai/benchmarks/about
+- Normalization pitfalls across heterogeneous benchmarks: arXiv 2509.22472
+- Swing weighting vs AHP in MCDA: Pöyhönen et al.; INCOSE swing-weight matrix
+- Contamination and rotating benchmarks: LiveBench (ICLR 2025); LiveCodeBench release-date filtering; SWE-rebench post-cutoff sourcing
+- Weight renormalization for missing components in composite indexes: arXiv 2604.12368
+- Research artifacts backing this document: `ds/research/competitors-part{1,2}.json`, `ds/research/methodology.json`
