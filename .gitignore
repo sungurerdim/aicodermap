@@ -58,9 +58,6 @@ data/.leaderboard-snapshots/
 .gather-*.py
 .gather-extract*.py
 
-# Discovery review queue (human-gated; not committed until promoted)
-data/discoveries.json
-
 # ds-tune state + pre-push audit trail
 .audit/*
 !.audit/.gitkeep

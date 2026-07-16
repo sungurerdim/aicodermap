@@ -1,0 +1,76 @@
+{
+  "_note": "Discovery review queue.",
+  "vendors": [
+    {
+      "id": "thinking_machines",
+      "observedAt": "2026-07-16",
+      "modelCount": 2,
+      "latestRelease": "Inkling (975B/41B-active MoE, 2026-07-15) + Inkling-Small (276B/12B-active, weights pending)",
+      "suggestedTier": "open-flagship",
+      "status": "accepted"
+    },
+    {
+      "id": "inclusionai",
+      "observedAt": "2026-07-16",
+      "modelCount": 4,
+      "latestRelease": "Ling-2.6-1T / Ling-2.6-flash (trillion-param MoE flagship + 104B/7.4B-active fast variant)",
+      "suggestedTier": "coder-specialized",
+      "status": "accepted"
+    },
+    {
+      "id": "prismml",
+      "observedAt": "2026-07-16",
+      "modelCount": 4,
+      "latestRelease": "Ternary-Bonsai-27B (built on a Qwen3.6-27B base, 2026-07)",
+      "suggestedTier": "ollama-local",
+      "status": "accepted"
+    },
+    {
+      "id": "tencent",
+      "observedAt": "2026-07-16",
+      "modelCount": null,
+      "latestRelease": "unspecified (Hunyuan family) -- surfaced only via aggregate OpenRouter usage-ranking commentary",
+      "suggestedTier": "open-flagship",
+      "status": "pending"
+    }
+  ],
+  "benchmarks": [
+    {
+      "key": "kimiCodeBenchV2",
+      "label": "Kimi Code Bench v2",
+      "sourceUrl": "https://www.digitalapplied.com/blog/kimi-k2-7-code-release-open-source-coding-model",
+      "firstObserved": "2026-06-12",
+      "publisherDomains": [
+        "digitalapplied.com"
+      ],
+      "publisherCount": 1,
+      "ac6Pass": false,
+      "status": "pending"
+    },
+    {
+      "key": "mlsBenchLite",
+      "label": "MLS Bench Lite",
+      "sourceUrl": "https://nerova.ai/news/moonshot-kimi-k2-7-code-release-june-2026",
+      "firstObserved": "2026-06-12",
+      "publisherDomains": [
+        "nerova.ai"
+      ],
+      "publisherCount": 1,
+      "ac6Pass": false,
+      "status": "pending"
+    },
+    {
+      "key": "mcpMarkVerified",
+      "label": "MCP Mark Verified",
+      "sourceUrl": "https://www.digitalapplied.com/blog/kimi-k2-7-code-release-open-source-coding-model",
+      "firstObserved": "2026-06-12",
+      "publisherDomains": [
+        "digitalapplied.com"
+      ],
+      "publisherCount": 1,
+      "ac6Pass": false,
+      "status": "pending"
+    }
+  ],
+  "leaderboards": []
+}

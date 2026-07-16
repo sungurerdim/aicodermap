@@ -491,12 +491,12 @@ def main() -> int:
         print(f"  + stub: {mid} ({meta['provider']}, {meta['tier']}, open={meta['open']})")
 
     if added:
-        models_path.write_text(json.dumps(models, ensure_ascii=False, indent=1), encoding="utf-8")
+        models_path.write_text(json.dumps(models, ensure_ascii=False, indent=2), encoding="utf-8")
         (REPO / "i18n" / "tr.json").write_text(
-            json.dumps(tr, ensure_ascii=False, indent=1), encoding="utf-8"
+            json.dumps(tr, ensure_ascii=False, indent=2), encoding="utf-8"
         )
         (REPO / "i18n" / "en.json").write_text(
-            json.dumps(en, ensure_ascii=False, indent=1), encoding="utf-8"
+            json.dumps(en, ensure_ascii=False, indent=2), encoding="utf-8"
         )
         # Fable-5 R5 (2026-07-11): record ids admitted TODAY so
         # check-new-model-coverage.py (run post-merge by refresh-finalize.py)

@@ -160,7 +160,7 @@ def main() -> int:
             shutil.copy2(b1, b2)
         shutil.copy2(mp, b1)
         mp.write_text(
-            json.dumps(models, ensure_ascii=False, indent=1), encoding="utf-8"
+            json.dumps(models, ensure_ascii=False, indent=2), encoding="utf-8"
         )
         print(
             f"  wrote data/models.json ({len(corrections)} cells corrected; .bak rotated)"

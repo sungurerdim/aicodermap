@@ -79,8 +79,10 @@ def _load(path: Path):
 
 
 def _save(path: Path, data, indent: int = 2):
-    # Preserve each file's native indent — i18n/*.json use indent=1, data/*.json
-    # use indent=2. Reformatting untouched lines is a scope violation + noisy diff.
+    # 2026-07-16: every JSON file in this repo (i18n/*.json included) uses
+    # indent=2 — verified against git history (cb04a1f added i18n entries with
+    # indent=2). The prior "i18n uses indent=1" claim here was wrong and caused
+    # a full-file reformat (824 changed lines) the next time this ran.
     path.write_text(
         json.dumps(data, ensure_ascii=False, indent=indent) + "\n", encoding="utf-8"
     )
@@ -89,13 +91,19 @@ def _save(path: Path, data, indent: int = 2):
 def _artifact_paths() -> list[str]:
     # Broad glob (`-*.gather.json`) catches the gather batches AND any dedicated
     # lineup/Phase-0 gather artifact. Plus the synth + final unified outputs and
-    # the consolidated lineup file — wherever a Phase-0 sub-probe's discoveries
+    # the dedicated lineup artifact — wherever a Phase-0 sub-probe's discoveries
     # land, they're harvested (source-agnostic).
     paths = glob.glob(str(ROOT / ".aicodermap-agent-out-*.gather.json"))
     for extra in (
         ".aicodermap-agent-out-synth.json",
         SINGLE_ARTIFACT_PATH,
-        ".aicodermap-lineup.json",
+        # 2026-07-16: was ".aicodermap-lineup.json" — that name was retired
+        # 2026-06-27 with the old two-script split (see module docstring); the
+        # dedicated Step-0 lineup dispatch now writes
+        # ".aicodermap-agent-out-lineup.json" (same name add-new-lineup-stubs.py
+        # scans). The stale name meant a lineup-only cycle's discoveries[]
+        # (new vendors/benchmarks) were silently never harvested.
+        ".aicodermap-agent-out-lineup.json",
     ):
         p = ROOT / extra
         if p.exists():
@@ -288,8 +296,8 @@ def _commit_promote_surfaces_or_rollback(
     """Save all mutated surfaces, run gen-bench-keys + audit. On failure, restore
     snapshots and re-run gen-bench-keys. Returns 0 on success, 1 on rollback."""
     _save(WHITELIST_PATH, wl)
-    _save(EN_PATH, en, indent=1)
-    _save(TR_PATH, tr, indent=1)
+    _save(EN_PATH, en, indent=2)
+    _save(TR_PATH, tr, indent=2)
     _save(DISCOVERIES_PATH, disc)
 
     # Sync core.js BENCH_KEYS from the (now-updated) benchCategories, then
