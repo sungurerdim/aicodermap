@@ -144,10 +144,17 @@ official pages — NO extra fetch, just read what's already loaded. This gives a
 freshly-discovered model its official-announcement benchmarks in the SAME run.
 Rationale: avoid fetching the official page twice (once for lineup, once in Stage
 A). The independent-leaderboard I-tier pass + cross-validation STILL run in Stage
-A for every model (the contradiction/quarantine moat needs ≥2 distinct sources —
-an official-only S-tier cell stays single-source/quarantined until Stage A adds
-an I-tier corroboration). The pure `lineup-sync` fast-path (PRELIM-E) keeps
-`extract_official_bench` OFF and gathers no benches.
+A for every model (the contradiction moat still wants ≥2 distinct sources) — an
+official-only S-tier cell stays flagged single-source/pending-corroboration until
+Stage A adds an I-tier confirmation. It is NOT automatically hard-quarantined
+from the composite anymore: `should_quarantine`'s exceptional-source override
+(see `scripts/lib/winner.py`, docs/METHODOLOGY.md §6) lets it through when that
+vendor's domain has an earned reliability-ledger track record clearing the
+S-tier bar (≥40 samples, posterior ≥0.97, recency ≥0.90) — deliberately stricter
+than the I-tier bar, since self-reports carry inflation risk. A vendor with no
+track record yet (e.g. a brand-new domain) still quarantines until it earns one.
+The pure `lineup-sync` fast-path (PRELIM-E) keeps `extract_official_bench` OFF
+and gathers no benches.
 
 Output shape:
 ```jsonc

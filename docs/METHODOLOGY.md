@@ -100,6 +100,19 @@ Every composite ships with an epistemic ±σ band
 - `merge.py` quarantines cells that are single-source, high-dispersion, or
   low-confidence; quarantined cells are treated as missing by the composite
   (EB shrinks them toward the median instead of trusting them at full weight).
+- **Exceptional-source override (reliability, not count):** a single-source
+  cell is not automatically quarantined for low confidence when the sole
+  source has an earned Beta-Binomial track record on the reliability ledger.
+  I-tier (independent leaderboard) singletons need ≥20 prior samples,
+  posterior accuracy ≥0.90, and recency ≥0.85 (≲90 days old). S-tier
+  (vendor self-report) singletons face a materially stricter bar — ≥40
+  samples, posterior ≥0.97, recency ≥0.90 — because self-reports carry
+  inflation/cherry-picking risk independent leaderboards don't. This is
+  what lets a brand-new model whose only launch-day source is the vendor's
+  own announcement surface with a "single-source, pending corroboration"
+  badge instead of being hard-excluded, while still catching the ordinary
+  hype-blog/inflated-number case the confidence floor exists for.
+  (`scripts/lib/winner.py::should_quarantine`, `_exceptional_source_override`.)
 - Source trustScores decay via the reliability ledger
   (`data/source-reliability.json`) when a source's values keep losing
   contradiction resolutions.

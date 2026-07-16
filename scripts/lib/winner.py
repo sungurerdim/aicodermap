@@ -51,6 +51,18 @@ EXCEPTIONAL_RELIABILITY_THRESHOLD: float = 0.90
 EXCEPTIONAL_SAMPLE_MIN: int = 20
 EXCEPTIONAL_RECENCY_MIN: float = 0.85
 
+# Stricter twin of the thresholds above, for S-tier (official vendor
+# self-report) singletons. Self-reports carry real inflation/cherry-picking
+# risk that independent leaderboards don't, so the bar is materially
+# higher: double the sample size, a tighter accuracy floor, and a shorter
+# freshness window (forces re-verification against an independent source
+# sooner). This is what lets a brand-new model's only-source-at-launch
+# (the vendor's own announcement) avoid the confidence-floor quarantine
+# without opening the door to unverified self-reports in general.
+EXCEPTIONAL_S_TIER_RELIABILITY_THRESHOLD: float = 0.97
+EXCEPTIONAL_S_TIER_SAMPLE_MIN: int = 40
+EXCEPTIONAL_S_TIER_RECENCY_MIN: float = 0.90
+
 # Global fallback thresholds (overridden per-bench via benchTypes)
 DEFAULT_AGREEMENT_PP: float = 1.5
 DEFAULT_WARN_PP: float = 3.0
@@ -285,7 +297,8 @@ def should_quarantine(
     - distinct value CLUSTERS > 5  → extreme dispersion (no agreed value)
     - any scaffold-variant obs     → different eval contexts must not share a cell
     - confidence < 0.2             → low-confidence floor, EXCEPT a clean I-tier
-      winner (see below)
+      winner, or an S-tier winner that cleared the stricter
+      exceptional-source-override-s-tier bar (see below)
 
     DISPERSION COUNTS CLUSTERS, NOT RAW VALUES (2026-06-06): the trigger groups
     observations within agreement_pp first, so a strong consensus reported with
@@ -326,8 +339,21 @@ def should_quarantine(
     if conf < 0.2:
         winner_tier = str((result.get("winner_obs") or {}).get("tier") or "").upper()
         severity = result.get("severity", "GREEN")
+        override_mode = result.get("override_mode")
         # Clean canonical-leaderboard evidence is trusted, not quarantined.
         if winner_tier == "I" and severity != "RED":
+            return False
+        # A single official (S-tier) source is trusted ONLY when it has
+        # earned the stricter S-tier reliability bar (see
+        # _exceptional_source_override) — this is what unblocks brand-new
+        # models whose sole source at launch is the vendor's own
+        # announcement, without opening the door to unverified self-reports
+        # in general (the hype-blog/inflation case this floor exists for).
+        if (
+            winner_tier == "S"
+            and override_mode == "exceptional-source-override-s-tier"
+            and severity != "RED"
+        ):
             return False
         return True
     return False
@@ -356,12 +382,18 @@ def _exceptional_source_override(
     reliability_ledger: dict[str, Any] | None,
     bench_key: str,
 ) -> tuple[dict[str, Any] | None, str | None]:
-    """Phase R4: bypass _single_outlier_guard for highly trusted singletons.
+    """Phase R4 (+ S-tier extension): bypass _single_outlier_guard for highly
+    trusted singletons.
 
-    Returns (cluster, override_mode) when a single-source I-tier cluster meets
-    every gate: ≥20 prior samples, Beta-Binomial posterior ≥0.90 on this
-    bench, and recency_decay ≥0.85 (roughly: < 90 days old). Otherwise
-    returns (None, None). Every threshold is data-derived; no source allowlist.
+    Returns (cluster, override_mode) when a single-source cluster meets every
+    gate for its tier:
+      I-tier: ≥20 prior samples, Beta-Binomial posterior ≥0.90 on this bench,
+              recency_decay ≥0.85 (roughly: < 90 days old)
+      S-tier: ≥40 prior samples, posterior ≥0.97, recency_decay ≥0.90 —
+              stricter because official self-reports carry inflation risk
+              independent leaderboards don't.
+    Otherwise returns (None, None). Every threshold is data-derived; no
+    source allowlist.
     """
     if not reliability_ledger or not clusters:
         return None, None
@@ -375,7 +407,18 @@ def _exceptional_source_override(
         if not members:
             continue
         member = members[0]
-        if (member.get("tier") or "C").upper() != "I":
+        tier = (member.get("tier") or "C").upper()
+        if tier == "I":
+            sample_min = EXCEPTIONAL_SAMPLE_MIN
+            reliability_threshold = EXCEPTIONAL_RELIABILITY_THRESHOLD
+            recency_min = EXCEPTIONAL_RECENCY_MIN
+            mode = "exceptional-source-override"
+        elif tier == "S":
+            sample_min = EXCEPTIONAL_S_TIER_SAMPLE_MIN
+            reliability_threshold = EXCEPTIONAL_S_TIER_RELIABILITY_THRESHOLD
+            recency_min = EXCEPTIONAL_S_TIER_RECENCY_MIN
+            mode = "exceptional-source-override-s-tier"
+        else:
             continue
         url = member.get("sourceUrl") or ""
         if not url:
@@ -389,14 +432,14 @@ def _exceptional_source_override(
         agree = float(bench_data.get("agree", 0.0))
         disagree = float(bench_data.get("disagree", 0.0))
         n = agree + disagree
-        if n < EXCEPTIONAL_SAMPLE_MIN:
+        if n < sample_min:
             continue
         accuracy = posterior_accuracy(agree, disagree)
-        if accuracy < EXCEPTIONAL_RELIABILITY_THRESHOLD:
+        if accuracy < reliability_threshold:
             continue
-        if recency_decay(member.get("fetched")) < EXCEPTIONAL_RECENCY_MIN:
+        if recency_decay(member.get("fetched")) < recency_min:
             continue
-        return cl, "exceptional-source-override"
+        return cl, mode
     return None, None
 
 

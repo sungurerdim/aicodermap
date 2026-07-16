@@ -345,6 +345,7 @@ def _apply_cell_verdict(
     multi_source = wc.get("distinct_sources", 0) >= 2
     is_override = result.get("override_mode") in (
         "exceptional-source-override",
+        "exceptional-source-override-s-tier",
         "independent-override",
     )
     if (

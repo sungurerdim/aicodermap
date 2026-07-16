@@ -332,6 +332,77 @@ class TestExceptionalOverrideGates(unittest.TestCase):
         self.assertNotEqual(result["override_mode"], "exceptional-source-override")
 
 
+class TestSTierExceptionalOverride(unittest.TestCase):
+    """S-tier twin of TestExceptionalOverrideGates — a single official
+    vendor self-report must clear a STRICTER bar than an I-tier singleton
+    (n>=40, posterior>=0.97, fresh) before should_quarantine() exempts it
+    from the confidence<0.2 floor. This is what lets a brand-new model's
+    only-source-at-launch (vendor announcement) surface instead of being
+    hard-excluded, without opening the door to ordinary self-reports."""
+
+    @staticmethod
+    def _solo_s_tier_obs(fetched: str = "2026-07-10") -> list[dict]:
+        return [
+            {
+                "value": 88.0,
+                "tier": "S",
+                "sourceUrl": "https://vendor.com/announce",
+                "fetched": fetched,
+                "verifications": 1,
+            }
+        ]
+
+    @staticmethod
+    def _ledger(agree: float, disagree: float, bench_key: str = "swePro") -> dict:
+        return {
+            "sources": {
+                "vendor.com": {
+                    "global": {"agree": agree, "disagree": disagree},
+                    "byBench": {bench_key: {"agree": agree, "disagree": disagree}},
+                }
+            }
+        }
+
+    def test_override_lets_trusted_solo_s_tier_escape_quarantine(self):
+        """n=40, posterior~0.976 (40 agree / 0 disagree), fresh -> exempted."""
+        ledger = self._ledger(40.0, 0.0)
+        result = pick_winner(
+            self._solo_s_tier_obs(), bench_key="swePro", reliability_ledger=ledger
+        )
+        self.assertLess(result["confidence"], 0.2)
+        self.assertFalse(result["quarantine"])
+        self.assertEqual(result["override_mode"], "exceptional-source-override-s-tier")
+
+    def test_override_blocks_when_n_below_s_tier_min(self):
+        """n=18 clears the I-tier bar (>=20 would) but not S-tier's >=40."""
+        ledger = self._ledger(18.0, 0.0)
+        result = pick_winner(
+            self._solo_s_tier_obs(), bench_key="swePro", reliability_ledger=ledger
+        )
+        self.assertTrue(result["quarantine"])
+        self.assertIsNone(result["override_mode"])
+
+    def test_override_blocks_when_accuracy_below_s_tier_bar(self):
+        """n=40 but posterior~0.878 (35/5) clears I-tier's 0.90 not S-tier's 0.97."""
+        ledger = self._ledger(35.0, 5.0)
+        result = pick_winner(
+            self._solo_s_tier_obs(), bench_key="swePro", reliability_ledger=ledger
+        )
+        self.assertTrue(result["quarantine"])
+        self.assertIsNone(result["override_mode"])
+
+    def test_override_blocks_when_stale(self):
+        """Trusted S-tier source fetched >90 days ago -> no override."""
+        ledger = self._ledger(40.0, 0.0)
+        result = pick_winner(
+            self._solo_s_tier_obs(fetched="2026-01-10"),
+            bench_key="swePro",
+            reliability_ledger=ledger,
+        )
+        self.assertTrue(result["quarantine"])
+        self.assertIsNone(result["override_mode"])
+
+
 class TestColdStartIsNeutral(unittest.TestCase):
     def test_sparse_source_keeps_full_trust(self):
         """A source with n=2 < 10 cold-start must not be penalized."""
