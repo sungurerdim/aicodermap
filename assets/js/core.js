@@ -288,15 +288,20 @@ export function getCompositePolicy() {
         sigmaPenaltyMax: Number.isFinite(e.sigmaPenaltyMax) ? e.sigmaPenaltyMax : 18,
       };
     })(),
-    // Leaderboard rank gate (2026-06-07): models missing a required bench for the
-    // active preset (or below coverageFloor of preset weight) are demoted out of
-    // the main ranking into a "Limited Coverage" band. enabled:false → no gate.
+    // Leaderboard rank gate (2026-06-07, coverage-aware missing-required
+    // 2026-07-16): models below coverageFloor overall, OR missing a required
+    // bench for the active preset WHILE ALSO below missingRequiredCoverageFloor,
+    // are demoted out of the main ranking into a "Limited Coverage" band. A
+    // well-covered model missing just one required bench (e.g. a vendor that
+    // genuinely never published it) stays ranked on its EB-shrunk score instead.
+    // enabled:false → no gate.
     rankGate: (() => {
       const r = (cp && cp.rankGate) || {};
       return {
         enabled: r.enabled !== false,
         demoteMissingRequired: r.demoteMissingRequired !== false,
         coverageFloor: (Number.isFinite(r.coverageFloor) && r.coverageFloor >= 0) ? r.coverageFloor : 0.4,
+        missingRequiredCoverageFloor: (Number.isFinite(r.missingRequiredCoverageFloor) && r.missingRequiredCoverageFloor >= 0) ? r.missingRequiredCoverageFloor : 0.5,
       };
     })(),
     uncertainty: (() => {

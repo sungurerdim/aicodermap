@@ -247,12 +247,23 @@ export function presetTiersFor(model, presetName) {
 // a missing heaviest-weighted required bench (e.g. swePro in swe-focused) can
 // float into the top. The gate enforces the preset's already-declared
 // requiredBenches policy that the EB score alone ignores.
+//
+// Coverage-aware missing-required (2026-07-16): that gaming risk only applies
+// when the model is ALSO sparse overall — a handful of real cells plus EB fill
+// on the rest. A model with solid coverage (>= missingRequiredCoverageFloor)
+// missing just one required bench isn't gaming anything (e.g. a vendor that
+// genuinely never published that one metric at launch) — it competes on its
+// EB-shrunk score instead of being hidden in the bottom band. Below that floor,
+// missing-required still gates regardless of which specific bench is absent.
 export function rankGateStatus(model, presetName, coverage) {
   const gate = getCompositePolicy().rankGate;
   if (!gate.enabled) return { gated: false, reason: null };
   if (gate.demoteMissingRequired) {
     const tiers = presetTiersFor(model, presetName);
-    if (tiers.missingRequired.length > 0) return { gated: true, reason: 'missing-required' };
+    const belowMissingRequiredFloor = !Number.isFinite(coverage) || coverage < gate.missingRequiredCoverageFloor;
+    if (tiers.missingRequired.length > 0 && belowMissingRequiredFloor) {
+      return { gated: true, reason: 'missing-required' };
+    }
   }
   if (Number.isFinite(coverage) && coverage < gate.coverageFloor) {
     return { gated: true, reason: 'low-coverage' };

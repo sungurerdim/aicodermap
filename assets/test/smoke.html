@@ -398,11 +398,19 @@
         badPricing.length === 0, badPricing.length ? badPricing.slice(0, 5).join(',') : '');
 
       // 14f. rankGateStatus (schema loaded → requiredBenches populated). A model
-      // missing a required bench for the preset is gated; a fully-covered one is
-      // not. Exercises the SSOT requiredBenches path that drives the demotion.
-      const gMissing = { id: '__t_gate', tier: 'frontier', bench: { tb2: 80, cfElo: 1500 } }; // swePro & lcb missing
-      assertTrue('rankGateStatus gates a model missing required swePro/lcb (swe-focused)',
-        rankGateStatus(gMissing, 'swe-focused', 0.5).gated === true);
+      // missing a required bench for the preset is gated ONLY when its overall
+      // coverage is also thin (< missingRequiredCoverageFloor, default 0.5) — a
+      // well-covered model missing just one required bench (e.g. a vendor that
+      // genuinely never published that one metric) ranks normally instead
+      // (2026-07-16, coverage-aware missing-required — see docs/METHODOLOGY.md §4).
+      // Exercises the SSOT requiredBenches path that drives the demotion.
+      const gSparseMissing = { id: '__t_gate_sparse', tier: 'frontier', bench: { tb2: 80, cfElo: 1500 } }; // swePro & lcb missing, thin overall
+      assertTrue('rankGateStatus gates a SPARSE model missing required swePro/lcb (swe-focused)',
+        rankGateStatus(gSparseMissing, 'swe-focused', 0.3).gated === true);
+      const gCoveredMissing = { id: '__t_gate_covered', tier: 'frontier', bench: {
+        tb2: 80, sweMulti: 70, sweV: 70, cfElo: 1500, mcpA: 70 } }; // swePro & lcb missing, but otherwise well-covered
+      assertTrue('rankGateStatus does NOT gate a WELL-COVERED model missing only required swePro/lcb (swe-focused)',
+        rankGateStatus(gCoveredMissing, 'swe-focused', 0.65).gated === false);
       const gFull = { id: '__t_full', tier: 'frontier', bench: {
         swePro: 70, tb2: 70, lcb: 70, sweMulti: 70, sweV: 70, cfElo: 1500, mcpA: 70 } };
       assertTrue('rankGateStatus does NOT gate a fully-covered model (swe-focused)',

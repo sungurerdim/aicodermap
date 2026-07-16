@@ -65,13 +65,21 @@ active preset declares `imputable` may be filled, capped by
 
 ## 4. Rank gate and Preliminary status
 
-EB alone would let a model missing its preset's heaviest **required** bench
-float on extreme scores elsewhere. Therefore:
+EB alone would let a sparse model missing its preset's heaviest **required**
+bench float on a few extreme scores elsewhere. That risk is real only when the
+model is *also* thin on overall evidence — a well-covered model missing one
+required bench (e.g. a vendor that genuinely never published that one metric)
+isn't gaming anything. So the gate is coverage-aware (2026-07-16):
 
-- Missing any `requiredBenches` of the active preset, **or** coverage below
-  `rankGate.coverageFloor` (default 0.40) → the model is **gated**: demoted
-  into the contiguous "Limited Coverage" band below the main ranking, with a
-  ⚠N marker listing what is missing.
+- Coverage below `rankGate.coverageFloor` (default 0.40) → **gated**,
+  regardless of which benches are missing.
+- Missing any `requiredBenches` of the active preset **and** coverage below
+  `rankGate.missingRequiredCoverageFloor` (default 0.50) → **gated**.
+- Missing a required bench but coverage at or above that floor → **not**
+  gated on that basis alone; the model ranks normally on its EB-shrunk score,
+  with a ⚠N marker on the card still listing what is missing.
+- Gated → demoted into the contiguous "Limited Coverage" band below the main
+  ranking (never hidden), with a ⚠N marker listing what is missing.
 - Ranked normally but thin evidence (≥2 missing critical benches, or coverage
   < 50%) → **PRELIM** chip (LMArena's "Preliminary" pattern): the rank is
   real but provisional.
