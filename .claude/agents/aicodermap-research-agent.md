@@ -40,12 +40,22 @@ Walks `sourcesWhitelist.vendors.*.urls.lineup` URLs in parallel.
    current + prior calendar year. Run the expanded WebSearch queries in parallel.
    For every surfaced model name whose canonical id is NOT in `currentIds`, append to
    `lineupChanges.new[] = {suggestedId, vendor, evidenceUrl, observedVersion,
-   source:'newReleaseProbe', evidenceConfidence}`. A surfaced id already in
+   released, source:'newReleaseProbe', evidenceConfidence}`. A surfaced id already in
    `currentIds` is a no-op. Single-snippet-only hits with no corroboration →
    `gaps[]` `newrelease:<vendor>: unconfirmed` instead of `lineupChanges.new`.
    This net is what catches a new model when the vendor's lineup page is
    404/SPA/redirect-broken — a broken lineup fetch (step 1 failure) MUST NOT
    suppress this probe.
+   `released` (ISO date, best-effort from the announcement/evidence page) is
+   REQUIRED whenever determinable — never omit it to save a tool call.
+   Confirmed 2026-07-16: `add-new-lineup-stubs.py`'s supersession guard treats a
+   numerically "higher" version as replacing a candidate ONLY when both sides'
+   release dates agree; some vendors use marketing/meme version numbers that
+   don't track a real minor-version sequence (xAI's "Grok 4.20" shipped
+   Feb-Mar 2026, then the much newer "Grok 4.5" shipped July 2026 — numerically
+   4.20 > 4.5, but 4.5 is NOT older). Without a `released` date on the
+   candidate, that guard can't fire and a genuinely new model can be silently
+   discarded as "superseded" by an older sibling with a bigger-looking number.
 4. Emit lineup diff in `lineupChanges`:
    - `NEW`: in vendor lineup OR surfaced by the new-release net, not in data → mark for Phase 2 survey.
    - `DEPRECATED`: in data, vendor marks deprecated → `lineupChanges.deprecated[]`.
@@ -167,7 +177,7 @@ Output shape:
 ```jsonc
 {
   "lineupChanges": {
-    "new":       [{ "suggestedId","vendor","evidenceUrl","observedVersion","source","evidenceConfidence" }],
+    "new":       [{ "suggestedId","vendor","evidenceUrl","observedVersion","released","source","evidenceConfidence" }],
     "deprecated":[ ... ], "renamed":[ ... ], "removed":[ ... ]
   },
   "newModels": [ /* minimal stub {id, vendor, evidenceUrl} per lineupChanges.new entry — NO bench/pricing */ ],

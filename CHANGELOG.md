@@ -1,4 +1,16 @@
 
+## [2026-07-16] — fix(pipeline): new-model admission silently blocked by marketing-number versioning (Grok 4.5)
+
+Root-cause fix for a real model being permanently, silently dropped from every refresh cycle because its vendor's version numbering isn't a true semver sequence.
+
+### Fixed
+- `scripts/add-new-lineup-stubs.py`'s `is_superseded()` compared candidate vs. tracked model names purely as numeric version tuples. xAI shipped "Grok 4.20" in Feb–Mar 2026 and the much newer, higher-capability "Grok 4.5" in July 2026 — numerically `(4,20) > (4,5)`, so every cycle silently discarded Grok 4.5 as "superseded by Grok 4.20", even though 4.20 is the older model and "4.20" is a marketing/meme number, not a semver minor version.
+- Added a corroborating check: a numerically "higher" version only counts as superseding when the *existing* tracked model's own release date is not earlier than the candidate's. When either date is unknown it falls back to the original numeric-only check, unweakened — this is an added safety net, not a loosened gate (verified: GLM-5.1 vs GLM-5.2 and other real supersessions in the current candidate queue are unaffected).
+- `.claude/agents/aicodermap-research-agent.md`: `lineupChanges.new[]` now requires a best-effort `released` date per candidate — without it, the new date-corroboration guard has nothing to check against. This was the actual reason today's gathered Grok 4.5 signal had no date; verified its real release date (2026-07-08, via x.ai's own announcement) and admitted it as a stub this cycle.
+
+### Added
+- `grok-4-5` (Grok 4.5, xAI) — admitted as a stub; bench cells empty, filled next refresh cycle.
+
 ## [2026-07-16] — fix(pipeline): SPA-blocked benchmark sources (AA eval sub-page + whitelist correction + SWE-bench fallback)
 
 Root-cause fix for `lcb` (LiveCodeBench) showing as a gap on models a human browser can see the score for: `livecodebench.github.io` is a client-rendered SPA our fetcher can't execute, and its checked-in JSON build artifacts are stale (~28-36 models, mid-2025-era) — not a viable source.

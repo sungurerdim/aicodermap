@@ -57,6 +57,7 @@ import json
 import re
 import sys
 from collections import Counter
+from datetime import date
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -158,16 +159,52 @@ def line_token(name: str) -> str | None:
     return fam[0] if fam else None
 
 
-def is_superseded(cand_name: str, existing: list[dict]) -> str | None:
+def _parse_partial_date(s) -> date | None:
+    """YYYY-MM-DD / YYYY-MM / YYYY -> date (missing month/day padded to the
+    1st/January) for supersession date corroboration. None if unparseable."""
+    if not isinstance(s, str):
+        return None
+    m = re.fullmatch(r"(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?", s.strip())
+    if not m:
+        return None
+    y, mo, d = m.group(1), m.group(2) or "01", m.group(3) or "01"
+    try:
+        return date(int(y), int(mo), int(d))
+    except ValueError:
+        return None
+
+
+def is_superseded(
+    cand_name: str, existing: list[dict], cand_released: str | None = None
+) -> str | None:
     """Return the superseding model's name if the candidate is an older snapshot of
-    an already-tracked line, else None."""
+    an already-tracked line, else None.
+
+    Numeric-version comparison alone is unsafe: some vendors use marketing/meme
+    numbers that don't track a semver-style minor-version sequence. Confirmed
+    2026-07-16: xAI shipped "Grok 4.20" Feb-Mar 2026 and the much newer, more
+    capable "Grok 4.5" in July 2026 -- numerically (4,20) > (4,5), so this check
+    silently skipped every Grok 4.5 admission attempt as "superseded by Grok
+    4.20", even though Grok 4.5 is xAI's newest flagship. When both release
+    dates are known, require the existing model's OWN date to NOT be earlier
+    than the candidate's: a numerically "higher" version whose tracked sibling
+    actually released BEFORE the candidate contradicts the calendar, so the
+    version-number reading isn't trusted and the candidate falls through to
+    normal gate_admit() evidence checks instead of being silently discarded.
+    Missing dates on either side fall back to the original numeric-only check
+    (unweakened) — this is a corroborating guard, not a replacement."""
     fam, ver = parse_name(cand_name)
     if not ver:
         return None
+    cand_date = _parse_partial_date(cand_released)
     for m in existing:
         efam, ever = parse_name(m.get("name", ""))
-        if efam == fam and ever is not None and ever > ver:
-            return m.get("name") or m.get("id")
+        if efam != fam or ever is None or ever <= ver:
+            continue
+        exist_date = _parse_partial_date(m.get("released"))
+        if cand_date and exist_date and exist_date < cand_date:
+            continue  # calendar contradicts the version-number reading
+        return m.get("name") or m.get("id")
     return None
 
 
@@ -482,7 +519,7 @@ def main() -> int:
             skipped.append((mid, f"duplicate spelling of tracked id {dup_of!r}"))
             print(f"  skip (spelling variant of already-tracked {dup_of!r}): {mid}")
             continue
-        sup = is_superseded(name, ms)
+        sup = is_superseded(name, ms, nm.get("released"))
         if sup:
             skipped.append((mid, sup))
             print(f"  skip (superseded by '{sup}'): {mid}")

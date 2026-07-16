@@ -13340,5 +13340,56 @@
       "aaIdx": "2026-07-16",
       "tau2": "2026-07-16"
     }
+  },
+  {
+    "id": "grok-4-5",
+    "name": "Grok 4.5",
+    "provider": "xAI",
+    "released": "2026-07-08",
+    "tier": "frontier",
+    "open": false,
+    "license": "proprietary",
+    "context": null,
+    "pricing": {
+      "api": [],
+      "range": {
+        "in": null,
+        "out": null,
+        "cacheHit": null
+      }
+    },
+    "bench": {
+      "swePro": null,
+      "sweV": null,
+      "tb2": null,
+      "tau2": null,
+      "aaCoding": null,
+      "aaAgentic": null,
+      "mcpA": null,
+      "gpqa": null,
+      "sweMulti": null,
+      "hle": null,
+      "aaIdx": null,
+      "bfcl": null,
+      "aime26": null,
+      "aaOmni": null,
+      "lcb": null,
+      "tbHard": null,
+      "cfElo": null,
+      "browseComp": null,
+      "mmluPro": null,
+      "mrcr": null,
+      "arcAgi2": null,
+      "nl2Repo": null
+    },
+    "providers": null,
+    "uptime": null,
+    "ollamaSize": null,
+    "unslothVariants": [],
+    "vramRequirement": null,
+    "strengthsKey": "grok-4-5.strengths",
+    "weaknessesKey": "grok-4-5.weaknesses",
+    "lastUpdated": "2026-07-16T10:43:00Z",
+    "status": "active"
   }
 ]
