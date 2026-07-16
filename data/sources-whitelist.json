@@ -1531,6 +1531,37 @@
       "lmArenaElo": "rotating",
       "hfOpenAvg": "rotating",
       "kluRank": "rotating"
+    },
+    "unknownVendorProbe": {
+      "_purpose": "Phase 0 unknown-vendor/unknown-model discovery sub-probe SSOT (2026-07-16). Concrete, data-driven source list so the agent scans a repeatable set every full cycle instead of ad-hoc web search alone -- procedure stays in agent.md, URLs live here per the project's data-vs-procedure invariant.",
+      "huggingfaceListings": [
+        {
+          "url": "https://huggingface.co/models?pipeline_tag=text-generation&sort=trending",
+          "label": "HF trending text-generation models",
+          "format": "static_html_table",
+          "extract": "repo ids from href=\"/<org>/<model>\" anchors on the listing page"
+        },
+        {
+          "url": "https://huggingface.co/models?pipeline_tag=text-generation&sort=downloads",
+          "label": "HF most-downloaded text-generation models",
+          "format": "static_html_table",
+          "extract": "repo ids from href=\"/<org>/<model>\" anchors on the listing page"
+        },
+        {
+          "url": "https://huggingface.co/models?sort=trending",
+          "label": "HF trending models (all tasks)",
+          "format": "static_html_table",
+          "extract": "repo ids from href=\"/<org>/<model>\" anchors on the listing page"
+        }
+      ],
+      "aggregatorIndexes": [
+        "https://openrouter.ai/models?order=newest",
+        "https://artificialanalysis.ai/leaderboards/models",
+        "https://paperswithcode.com/area/computer-code"
+      ],
+      "procedure": "For each huggingfaceListings[].url: fetch, extract every repo id (org/model). For each org not already a key in sourcesWhitelist.vendors AND not a known non-vendor (dataset host, quantizer/GGUF-repacker, community finetuner with no distinct model family), and for each model whose family looks coding-relevant (name/README mentions code/SWE-bench/coding, or the org is already known to publish coding models), emit a discoveries.vendors[] candidate per the existing schema shape ({id, observedAt, modelCount, latestRelease, suggestedTier}). Cross-check the same org/model name against aggregatorIndexes[] for corroboration -- 2 distinct signals (e.g. HF trending + OpenRouter newest) raises evidenceConfidence. Never auto-add; discoveries.vendors[] stays a human-reviewed queue (scripts/promote-discovery.py).",
+      "runEvery": "full",
+      "addedDate": "2026-07-16"
     }
   },
   "vendors": {
