@@ -4282,10 +4282,7 @@
         "status": "static_html_table",
         "observedFormat": "static_html_table",
         "lastProbedAt": "2026-07-16",
-        "consecutiveFailures": 0,
-        "problems": [
-          "repromotable"
-        ]
+        "consecutiveFailures": 0
       },
       "livebench.ai": {
         "status": "spa_full",
@@ -4414,14 +4411,10 @@
         "lastProbedAt": "2026-04-27"
       },
       "huggingface.co": {
-        "status": "dead",
-        "observedFormat": "dead",
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
         "lastProbedAt": "2026-07-16",
-        "consecutiveFailures": 1,
-        "problems": [
-          "format-drift",
-          "http-504"
-        ]
+        "consecutiveFailures": 0
       },
       "tbench.ai": {
         "status": "static_html_table",
@@ -4430,8 +4423,8 @@
         "note": "sub-path /leaderboard/terminal-bench/2.0 server-rendered"
       },
       "labs.scale.com/leaderboard": {
-        "status": "static_html_article",
-        "observedFormat": "static_html_article",
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
         "lastProbedAt": "2026-07-16",
         "consecutiveFailures": 0
       },
@@ -4495,13 +4488,10 @@
         "consecutiveFailures": 0
       },
       "huggingface.co/spaces": {
-        "status": "unreachable",
-        "observedFormat": "unreachable",
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
         "lastProbedAt": "2026-07-16",
-        "consecutiveFailures": 5,
-        "problems": [
-          "unreachable"
-        ]
+        "consecutiveFailures": 0
       },
       "evalplus.github.io/leaderboard.html": {
         "status": "static_html_table",
@@ -4513,10 +4503,9 @@
         "status": "bot_blocked",
         "observedFormat": "bot_blocked",
         "lastProbedAt": "2026-07-16",
-        "consecutiveFailures": 23,
+        "consecutiveFailures": 24,
         "problems": [
-          "bot-block",
-          "format-drift"
+          "bot-block"
         ]
       },
       "paperswithcode.com/area": {
@@ -4703,7 +4692,6 @@
         "lastProbedAt": "2026-07-16",
         "consecutiveFailures": 0,
         "problems": [
-          "format-drift",
           "spa"
         ]
       },
@@ -4742,40 +4730,28 @@
         "consecutiveFailures": 0
       },
       "huggingface.co/unsloth": {
-        "status": "unreachable",
-        "observedFormat": "unreachable",
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
         "lastProbedAt": "2026-07-16",
-        "consecutiveFailures": 1,
-        "problems": [
-          "unreachable"
-        ]
+        "consecutiveFailures": 0
       },
       "huggingface.co/bartowski": {
-        "status": "unreachable",
-        "observedFormat": "unreachable",
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
         "lastProbedAt": "2026-07-16",
-        "consecutiveFailures": 1,
-        "problems": [
-          "unreachable"
-        ]
+        "consecutiveFailures": 0
       },
       "huggingface.co/mradermacher": {
-        "status": "unreachable",
-        "observedFormat": "unreachable",
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
         "lastProbedAt": "2026-07-16",
-        "consecutiveFailures": 1,
-        "problems": [
-          "unreachable"
-        ]
+        "consecutiveFailures": 0
       },
       "huggingface.co/lmstudio-community": {
-        "status": "unreachable",
-        "observedFormat": "unreachable",
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
         "lastProbedAt": "2026-07-16",
-        "consecutiveFailures": 1,
-        "problems": [
-          "unreachable"
-        ]
+        "consecutiveFailures": 0
       },
       "lmstudio.ai/models": {
         "status": "static_html_article",
@@ -4790,13 +4766,10 @@
         "consecutiveFailures": 0
       },
       "huggingface.co/mlx-community": {
-        "status": "unreachable",
-        "observedFormat": "unreachable",
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
         "lastProbedAt": "2026-07-16",
-        "consecutiveFailures": 1,
-        "problems": [
-          "unreachable"
-        ]
+        "consecutiveFailures": 0
       },
       "docs.vllm.ai/en": {
         "status": "static_html_article",
@@ -4820,13 +4793,10 @@
         ]
       },
       "huggingface.co/models": {
-        "status": "unreachable",
-        "observedFormat": "unreachable",
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
         "lastProbedAt": "2026-07-16",
-        "consecutiveFailures": 1,
-        "problems": [
-          "unreachable"
-        ]
+        "consecutiveFailures": 0
       },
       "apidog.com/blog": {
         "status": "static_html_article",
@@ -4846,7 +4816,6 @@
         "lastProbedAt": "2026-07-16",
         "consecutiveFailures": 0,
         "problems": [
-          "format-drift",
           "spa"
         ]
       },
@@ -5008,7 +4977,7 @@
         "problems": [
           "redirect"
         ],
-        "redirectedTo": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3D08C1MWDbxVng-PEapVoLNZIGoG7rtNLWvF-hXT5Au78fXn0SokOZ6uybcCtlBb8kFhF02lmmzuLMO6w0VPCTfmQyHXrptg9eZjQe137uV_eQLzQhHk02Nyigi69iAcPyb5O4Tvxvc828q0RX17z-9wAyL7JyRvhNNMESevyAeOA&response_mode=form_post&nonce=639197863684497759.ODk1ZWQ3M2EtMWM2MC00YjM1LWI3MGUtNWJkM2M5NTNkMjhiYjljYWYzNWUtODQxYi00OTM0LWJkOTYtOTBlOTJkOGQ1NzZm&client-request-id=bdd18ad7-27ea-4a87-bf66-f7b20e884ff1&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
+        "redirectedTo": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DqFiC_WlHIaBlrzXgHE44Itp30epqlO_g0CdlEVPCeSKH5yRnEQhJvOpfdOKggjVfuNmjQJ626kTCmpNv-mOO5VbXLsaltD9HCNAu-8NvCkaKMzz_9MzRLO8bvjvGr02xrBDGqbP2gaEq5ZYSB4nS-QM3xMLieb2oswnKrDDYlao&response_mode=form_post&nonce=639198092045374091.NTdiMWM4MjUtNDZiYy00NDZmLWIwZGUtYTI1N2RmNWZmN2RmMDQ4MjMwOTktZGM1ZS00ZjFlLTljZjctNWQ1Nzc2MmE3NmNh&client-request-id=f31e5d2e-5c81-46f6-9698-86e3ae83931f&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
       },
       "aicpa-cima.com/topic": {
         "status": "spa_full",
@@ -5046,7 +5015,7 @@
         "status": "bot_blocked",
         "observedFormat": "bot_blocked",
         "lastProbedAt": "2026-07-16",
-        "consecutiveFailures": 23,
+        "consecutiveFailures": 24,
         "problems": [
           "bot-block",
           "format-drift"
@@ -5216,13 +5185,10 @@
         "consecutiveFailures": 0
       },
       "huggingface.co/meta-llama": {
-        "status": "unreachable",
-        "observedFormat": "unreachable",
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
         "lastProbedAt": "2026-07-16",
-        "consecutiveFailures": 1,
-        "problems": [
-          "unreachable"
-        ]
+        "consecutiveFailures": 0
       },
       "ai.meta.com/blog": {
         "status": "static_html_article",
@@ -5268,10 +5234,13 @@
         "consecutiveFailures": 0
       },
       "openai.com/news": {
-        "status": "static_html_article",
-        "observedFormat": "static_html_article",
+        "status": "bot_blocked",
+        "observedFormat": "bot_blocked",
         "lastProbedAt": "2026-07-16",
-        "consecutiveFailures": 0
+        "consecutiveFailures": 1,
+        "problems": [
+          "bot-block"
+        ]
       },
       "deepseek.com": {
         "status": "static_html_article",
@@ -5332,10 +5301,13 @@
         "consecutiveFailures": 0
       },
       "alibabacloud.com/help": {
-        "status": "static_html_article",
-        "observedFormat": "static_html_article",
+        "status": "unreachable",
+        "observedFormat": "unreachable",
         "lastProbedAt": "2026-07-16",
-        "consecutiveFailures": 0
+        "consecutiveFailures": 1,
+        "problems": [
+          "unreachable"
+        ]
       },
       "platform.kimi.ai/docs": {
         "status": "static_html_table",
@@ -5362,6 +5334,51 @@
         "consecutiveFailures": 0
       },
       "openrouter.ai/models": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-07-16",
+        "consecutiveFailures": 0
+      },
+      "fireworks.ai/pricing": {
+        "status": "static_html_table",
+        "observedFormat": "static_html_table",
+        "lastProbedAt": "2026-07-16",
+        "consecutiveFailures": 0
+      },
+      "cerebras.ai/pricing": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-07-16",
+        "consecutiveFailures": 0
+      },
+      "api.sambanova.ai/v1": {
+        "status": "spa_full",
+        "observedFormat": "spa_full",
+        "lastProbedAt": "2026-07-16",
+        "consecutiveFailures": 0,
+        "problems": [
+          "spa"
+        ]
+      },
+      "pricing.us-east-1.amazonaws.com/offers": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-07-16",
+        "consecutiveFailures": 0
+      },
+      "tensorx.ai": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-07-16",
+        "consecutiveFailures": 0
+      },
+      "github.com/ggml-org": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-07-16",
+        "consecutiveFailures": 0
+      },
+      "raw.githubusercontent.com/AlexsJones": {
         "status": "static_html_article",
         "observedFormat": "static_html_article",
         "lastProbedAt": "2026-07-16",

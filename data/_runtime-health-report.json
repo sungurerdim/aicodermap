@@ -1,19 +1,14 @@
 {
-  "probedAt": "2026-07-16T08:13:06Z",
-  "total": 140,
+  "probedAt": "2026-07-16T14:33:42Z",
+  "total": 134,
   "counts": {
-    "format-drift": 13,
-    "redirect": 9,
-    "spa": 11,
-    "bot-block": 2,
-    "dead": 21
+    "format-drift": 7,
+    "redirect": 6,
+    "spa": 12,
+    "bot-block": 3,
+    "dead": 4
   },
   "formatDrift": [
-    {
-      "url": "https://klu.ai/llm-leaderboard",
-      "declared": "static_html_table",
-      "observed": "bot_blocked"
-    },
     {
       "url": "https://benchlm.ai/benchmarks/programBench",
       "declared": "static_html_table",
@@ -25,37 +20,12 @@
       "observed": "spa_full"
     },
     {
-      "url": "https://cloud.sambanova.ai/models",
-      "declared": "static_html_table",
-      "observed": "dead"
-    },
-    {
-      "url": "https://www.lepton.ai/pricing",
-      "declared": "static_html_table",
-      "observed": "dead"
-    },
-    {
       "url": "https://novita.ai/model-api",
       "declared": "static_html_table",
       "observed": "spa_full"
     },
     {
       "url": "https://www.anyscale.com/endpoints",
-      "declared": "static_html_table",
-      "observed": "spa_full"
-    },
-    {
-      "url": "https://ai.azure.com/explore/models",
-      "declared": "static_html_table",
-      "observed": "spa_full"
-    },
-    {
-      "url": "https://huggingface.co/",
-      "declared": "static_html_table",
-      "observed": "dead"
-    },
-    {
-      "url": "https://www.datacamp.com/blog",
       "declared": "static_html_table",
       "observed": "spa_full"
     },
@@ -77,20 +47,8 @@
   ],
   "redirects": [
     {
-      "url": "https://terminal-bench.io/",
-      "to": "https://shoppingwheel.in/"
-    },
-    {
       "url": "https://lmarena.ai/leaderboard/webdev",
       "to": "https://arena.ai/leaderboard/webdev"
-    },
-    {
-      "url": "https://cerebras.ai/inference",
-      "to": "https://www.cerebras.ai/inference"
-    },
-    {
-      "url": "https://tensorix.ai/",
-      "to": "https://tensorx.ai/"
     },
     {
       "url": "https://www.swyx.io/",
@@ -102,7 +60,7 @@
     },
     {
       "url": "https://compliance.microsoft.com/compliancemanager",
-      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3D08C1MWDbxVng-PEapVoLNZIGoG7rtNLWvF-hXT5Au78fXn0SokOZ6uybcCtlBb8kFhF02lmmzuLMO6w0VPCTfmQyHXrptg9eZjQe137uV_eQLzQhHk02Nyigi69iAcPyb5O4Tvxvc828q0RX17z-9wAyL7JyRvhNNMESevyAeOA&response_mode=form_post&nonce=639197863684497759.ODk1ZWQ3M2EtMWM2MC00YjM1LWI3MGUtNWJkM2M5NTNkMjhiYjljYWYzNWUtODQxYi00OTM0LWJkOTYtOTBlOTJkOGQ1NzZm&client-request-id=bdd18ad7-27ea-4a87-bf66-f7b20e884ff1&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
+      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DqFiC_WlHIaBlrzXgHE44Itp30epqlO_g0CdlEVPCeSKH5yRnEQhJvOpfdOKggjVfuNmjQJ626kTCmpNv-mOO5VbXLsaltD9HCNAu-8NvCkaKMzz_9MzRLO8bvjvGr02xrBDGqbP2gaEq5ZYSB4nS-QM3xMLieb2oswnKrDDYlao&response_mode=form_post&nonce=639198092045374091.NTdiMWM4MjUtNDZiYy00NDZmLWIwZGUtYTI1N2RmNWZmN2RmMDQ4MjMwOTktZGM1ZS00ZjFlLTljZjctNWQ1Nzc2MmE3NmNh&client-request-id=f31e5d2e-5c81-46f6-9698-86e3ae83931f&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
     },
     {
       "url": "https://edpb.europa.eu/our-work-tools/consistency-findings/register-for-decisions_en",
@@ -117,6 +75,7 @@
     "https://livebench.ai/",
     "https://benchlm.ai/benchmarks/programBench",
     "https://deepinfra.com/models",
+    "https://api.sambanova.ai/v1/models",
     "https://novita.ai/model-api",
     "https://www.anyscale.com/endpoints",
     "https://ai.azure.com/explore/models",
@@ -128,92 +87,25 @@
   ],
   "botBlocked": [
     "https://klu.ai/llm-leaderboard",
-    "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
+    "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html",
+    "https://openai.com/news/"
   ],
   "dead": [
     {
-      "url": "https://mcp-atlas.dev",
-      "error": "URLError: <urlopen error [Errno 8] nodename nor servname provided, or not known>"
-    },
-    {
-      "url": "https://huggingface.co/spaces/bigcode/bigcode-models-leaderboard",
-      "error": "TimeoutError: The read operation timed out"
-    },
-    {
-      "url": "https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard",
-      "error": "TimeoutError: The read operation timed out"
-    },
-    {
       "url": "https://klu.ai/llm-leaderboard",
       "error": "HTTP 403 Forbidden"
-    },
-    {
-      "url": "https://paperswithcode.com/area/code-generation",
-      "error": "TimeoutError: The read operation timed out"
-    },
-    {
-      "url": "https://agentbench.ai",
-      "error": "URLError: <urlopen error timed out>"
-    },
-    {
-      "url": "https://huggingface.co/spaces/lmsys/chatbot-arena-leaderboard",
-      "error": "TimeoutError: The read operation timed out"
-    },
-    {
-      "url": "https://huggingface.co/spaces/livecodebench/leaderboard",
-      "error": "TimeoutError: The read operation timed out"
-    },
-    {
-      "url": "https://huggingface.co/spaces/gorilla-llm/berkeley-function-calling-leaderboard",
-      "error": "TimeoutError: The read operation timed out"
-    },
-    {
-      "url": "https://cloud.sambanova.ai/models",
-      "error": "HTTP 404 Not Found"
-    },
-    {
-      "url": "https://www.lepton.ai/pricing",
-      "error": "HTTP 404 Not Found"
-    },
-    {
-      "url": "https://huggingface.co/",
-      "error": "HTTP 504 Gateway Time-out"
-    },
-    {
-      "url": "https://huggingface.co/unsloth",
-      "error": "TimeoutError: The read operation timed out"
-    },
-    {
-      "url": "https://huggingface.co/bartowski",
-      "error": "TimeoutError: The read operation timed out"
-    },
-    {
-      "url": "https://huggingface.co/mradermacher",
-      "error": "TimeoutError: The read operation timed out"
-    },
-    {
-      "url": "https://huggingface.co/lmstudio-community",
-      "error": "TimeoutError: The read operation timed out"
-    },
-    {
-      "url": "https://huggingface.co/mlx-community",
-      "error": "TimeoutError: The read operation timed out"
-    },
-    {
-      "url": "https://github.com/AlexsJones/llmfit/blob/main/data/hf_models.json",
-      "error": "HTTP 404 Not Found"
-    },
-    {
-      "url": "https://huggingface.co/models?sort=trending",
-      "error": "TimeoutError: The read operation timed out"
     },
     {
       "url": "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html",
       "error": "HTTP 403 Forbidden"
     },
     {
-      "url": "https://huggingface.co/meta-llama",
-      "error": "TimeoutError: The read operation timed out"
+      "url": "https://openai.com/news/",
+      "error": "HTTP 403 Forbidden"
+    },
+    {
+      "url": "https://www.alibabacloud.com/help/en/model-studio/models",
+      "error": "URLError: <urlopen error [Errno 54] Connection reset by peer>"
     }
   ]
 }

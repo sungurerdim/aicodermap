@@ -37,7 +37,7 @@
       "id": "kt_midm",
       "observedAt": "2026-07-16",
       "modelCount": 3,
-      "latestRelease": "Mi:dm K 2.5 Pro (2026-03, unveiled MWC26; preview 2025-12-11)",
+      "latestRelease": "Mi:dm K 2.5 Pro (2026-03, unveiled MWC26)",
       "suggestedTier": "open-flagship",
       "status": "pending"
     },
@@ -47,6 +47,14 @@
       "modelCount": 2,
       "latestRelease": "HyperNova 60B 2605 (2026-05-26, compressed gpt-oss-120b derivative)",
       "suggestedTier": "ollama-local",
+      "status": "pending"
+    },
+    {
+      "id": "tencent_hunyuan",
+      "observedAt": "2026-07-16",
+      "modelCount": 1,
+      "latestRelease": "Hy3",
+      "suggestedTier": "open-flagship",
       "status": "pending"
     }
   ],
@@ -94,6 +102,18 @@
       "firstObserved": "2026-07-16",
       "publisherDomains": [
         "arxiv.org"
+      ],
+      "publisherCount": 1,
+      "ac6Pass": false,
+      "status": "pending"
+    },
+    {
+      "key": "lcbPro",
+      "label": "LiveCodeBench Pro (Olympiad-medalist-built, Codeforces/ICPC/IOI virtual-contestant Elo)",
+      "sourceUrl": "https://www.codesota.com/llm",
+      "firstObserved": "2026-07-16",
+      "publisherDomains": [
+        "codesota.com"
       ],
       "publisherCount": 1,
       "ac6Pass": false,
