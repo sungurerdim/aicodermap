@@ -1930,6 +1930,21 @@
       "lastVerifiedDate": "2026-04-27",
       "vendorUpdateInterval": "quarterly",
       "_note": "lineup-N/A: platform, not a model publisher; Devstral weights tracked under mistral vendor"
+    },
+    "thinking_machines": {
+      "tier": "open-flagship",
+      "urls": {},
+      "_note": "promoted from discovery queue 2026-07-16"
+    },
+    "inclusionai": {
+      "tier": "coder-specialized",
+      "urls": {},
+      "_note": "promoted from discovery queue 2026-07-16"
+    },
+    "prismml": {
+      "tier": "ollama-local",
+      "urls": {},
+      "_note": "promoted from discovery queue 2026-07-16"
     }
   },
   "leaderboards": [
@@ -4666,7 +4681,7 @@
         "status": "unreachable",
         "observedFormat": "unreachable",
         "lastProbedAt": "2026-07-15",
-        "consecutiveFailures": 3,
+        "consecutiveFailures": 4,
         "problems": [
           "unreachable"
         ]
@@ -4703,7 +4718,7 @@
         "status": "bot_blocked",
         "observedFormat": "bot_blocked",
         "lastProbedAt": "2026-07-15",
-        "consecutiveFailures": 21,
+        "consecutiveFailures": 22,
         "problems": [
           "bot-block",
           "format-drift"
@@ -4723,7 +4738,7 @@
         "status": "unreachable",
         "observedFormat": "unreachable",
         "lastProbedAt": "2026-07-15",
-        "consecutiveFailures": 21,
+        "consecutiveFailures": 22,
         "problems": [
           "unreachable"
         ]
@@ -4828,7 +4843,7 @@
         "status": "dead",
         "observedFormat": "dead",
         "lastProbedAt": "2026-07-15",
-        "consecutiveFailures": 21,
+        "consecutiveFailures": 22,
         "problems": [
           "format-drift",
           "http-404"
@@ -4844,7 +4859,7 @@
         "status": "dead",
         "observedFormat": "dead",
         "lastProbedAt": "2026-07-15",
-        "consecutiveFailures": 21,
+        "consecutiveFailures": 22,
         "problems": [
           "format-drift",
           "http-404"
@@ -4990,7 +5005,7 @@
         "status": "dead",
         "observedFormat": "dead",
         "lastProbedAt": "2026-07-15",
-        "consecutiveFailures": 3,
+        "consecutiveFailures": 4,
         "problems": [
           "http-404"
         ]
@@ -5181,7 +5196,7 @@
         "problems": [
           "redirect"
         ],
-        "redirectedTo": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3D-3zO6zuGzTFZBzhGXcdF8TAL6yvOlRZtwVt-i0W5d26o2WQunM6A4uWtF9gNeCDoa0gg9p9p0Kgo4tBErojUcWYnSHomzR6vf40-NVrJYJK--LdjI41j86tuZ37nrFC5mrCTomDxHcCq2YpQxK0P2JpFICj6i6jnAOrJCEEgVvI&response_mode=form_post&nonce=639197447218516917.MDc3YzE1NDktOWI4YS00YmEzLWE0MDYtOGYyNGIwYTMyOTE3MmQ1OGM2MmQtNzAxYi00MTliLThiY2QtMGQwY2IxZmUzMTVi&client-request-id=24cbc2fa-c842-4574-90f9-51e75e1b6d53&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
+        "redirectedTo": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DzB8BHCamp036SipGZ5ng3MrksvlBBBk_11BOmse947Vtx6C_D0OUUpemJFvsdU07XwvnAGLVQVNqgHb4cvla3kzFhsUKduCkV4IHsb5KxP5nL1iYAMtjQuzRrINYRpEl1CzH69l143ak9-JTaWFcXKETB4o80-feCaVJgGv3zzw&response_mode=form_post&nonce=639197539781826058.YTY4ZDBhNDktMmMxNi00ZThiLTg4ZTgtZDM4ZGQ4MmJkZDA2NGE5OTYxYTgtMjkxOC00N2JkLTg2M2QtOWJjODY0MTIxNWU0&client-request-id=9391ed5b-f3d9-4ec8-a2f8-776a96bd2024&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
       },
       "aicpa-cima.com/topic": {
         "status": "spa_full",
@@ -5219,7 +5234,7 @@
         "status": "bot_blocked",
         "observedFormat": "bot_blocked",
         "lastProbedAt": "2026-07-15",
-        "consecutiveFailures": 21,
+        "consecutiveFailures": 22,
         "problems": [
           "bot-block",
           "format-drift"
