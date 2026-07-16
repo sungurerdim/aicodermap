@@ -1,4 +1,21 @@
 
+## [2026-07-16] — fix(pipeline): SPA-blocked benchmark sources (AA eval sub-page + whitelist correction + SWE-bench fallback)
+
+Root-cause fix for `lcb` (LiveCodeBench) showing as a gap on models a human browser can see the score for: `livecodebench.github.io` is a client-rendered SPA our fetcher can't execute, and its checked-in JSON build artifacts are stale (~28-36 models, mid-2025-era) — not a viable source.
+
+### Fixed
+- `scripts/extract-aa-rsc.py` now also decodes Artificial Analysis's `/evaluations/livecodebench` sub-page, which carries `livecodebench`/`mmlu_pro` fields never present on the main leaderboard page (0 occurrences there, confirmed live). Required a depth-tracked brace scan (`_find_enclosing_brace`) instead of the main page's naive `rfind("{")`, since the sub-page nests sibling objects before the target field.
+- `tb2` (Terminal-Bench 2.1) turned out to already be on the main AA page (`terminalbenchV21`, verified identical to the sub-page's `terminalbench_v2_1` across 54 models, 0.0 delta) — read from there instead of adding a second fetch for it. Classified as an `AA_MEASURED_KEYS` bench (`scripts/lib/constants.py`): only corrects stored values outside AA's observed envelope, never blind-fills.
+- `data/sources-whitelist.json`: trimmed the Artificial Analysis `publishes[]` list to the 10 fields verified to exist in AA's ~140-key per-model object (`aaIdx, aaCoding, aaAgentic, gpqa, hle, lcb, mmluPro, tau2, tb2, tbHard`) — removed 11 fields (`aaOmni, aime26, arcAgi2, browseComp, cfElo, mcpA, mrcr, sweMulti, swePro, sweV`) that don't exist anywhere in AA's data model and were wasting agent fetch budget.
+- Added a `github_raw_json` fallback for "SWE-bench (canonical)" pointing at `raw.githubusercontent.com/SWE-bench/swe-bench.github.io/master/data/leaderboards.json` (verified 200 OK, non-SPA), with a scaffold-variance note for agents: the same model legitimately shows several different real scores under different agent harnesses.
+
+### Verified (this run)
+- New/corrected observations from the AA eval sub-page: 22 `lcb`, 22 `mmluPro`, 47 `tb2` across 33 models touched.
+- `audit-data-coherence.py`: exit 0 (no SSOT drift). The publishes[] trim correctly surfaces 9 additional pre-existing `aaOmni`-sourced-from-AA misfiles that were previously masked by the wrong whitelist entry (not introduced by this fix; left for a future cleanup pass).
+- **Known limitation, not a regression:** the specific `gpt-5-6-sol/-terra/-luna` `.lcb` cells that originally prompted this investigation are still gaps — confirmed live that AA itself has not published a LiveCodeBench score for GPT-5.6 yet (`"livecodebench":null` on AA's own per-model pages). The LiveCodeBench SPA remains the only source with that number today; still unsolved (see Context below), tracked as an open gap, not a pipeline defect.
+- Checked BFCL (`gorilla.cs.berkeley.edu`) and LiveBench (`livebench.ai`): their repos only expose raw eval questions, no precomputed score table — no safe shortcut found, left as-is.
+- Kimi K2.7-Code `swePro`=58.6 (user question): confirmed this is a vendor-reported/unverified figure that Scale AI's own SWE-bench Pro leaderboard shows under Kimi-K2.6, not K2.7 — the pipeline's WRONG_ID/contamination guard correctly left this a gap rather than filing a mixed-up value. No fix needed.
+
 ## [2026-07-16] — autonomous refresh-all [WARN: cumulative provenance coverage 68.4% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 523 new fills; 5 cells auto-gapped by orchestrator; 728 explicit agent gaps preserved]
 
 [fillRatio:0.68 cells:919/1343 contradictions:184 fetch:0.0min tools:None batches:None build:2668077]

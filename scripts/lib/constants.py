@@ -74,7 +74,7 @@ ELO_BENCH_KEYS = frozenset({"cfElo", "webDevElo", "lmArenaElo"})
 AA_COMPOSITE_KEYS = frozenset({"aaIdx", "aaCoding", "aaAgentic"})
 # Benches AA MEASURES (independent variance allowed; only corrected when outside
 # AA's observed envelope). Same two scripts duplicated this.
-AA_MEASURED_KEYS = frozenset({"gpqa", "hle", "tau2", "tbHard"})
+AA_MEASURED_KEYS = frozenset({"gpqa", "hle", "tau2", "tbHard", "tb2"})
 
 # ── Quality rules (correctness, NOT effort caps) ───────────────────────────
 VERIFICATION_AGREEMENT_PP = 1.5  # Within 1.5pp = agreement; otherwise contradiction.

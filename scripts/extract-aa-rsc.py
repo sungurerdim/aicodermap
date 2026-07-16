@@ -35,6 +35,10 @@ from lib.util import slug_norm as _norm  # noqa: E402  (SSOT)
 from lib.util import configure_utf8_output, today_iso  # noqa: E402
 
 AA_URL = "https://artificialanalysis.ai/leaderboards/models"
+# AA's per-eval sub-page ships a per-model object with `livecodebench` and
+# `mmlu_pro` fields that never appear anywhere in the main listing page (0
+# occurrences there, confirmed 2026-07-16) — the only way to reach them.
+AA_EVAL_URL = "https://artificialanalysis.ai/evaluations/livecodebench"
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
 OUT_PATH = REPO / "data" / ".leaderboard-snapshots" / "_aa-rows.json"
 # Gather-schema artifact so the AA data flows through synth/merge exactly like an
@@ -57,11 +61,27 @@ AA_FIELD_MAP: dict[str, tuple[str, float]] = {
     "hle": ("hle", 100.0),
     "tau2": ("tau2", 100.0),
     "terminalbenchHard": ("tbHard", 100.0),
+    # Verified 2026-07-16: identical metric to the eval sub-page's
+    # `terminalbench_v2_1` (0.0 delta across 54 models with both), so tb2 is
+    # read straight off the already-fetched main page — no 2nd fetch needed.
+    "terminalbenchV21": ("tb2", 100.0),
 }
 # AA's OWN definitional composites — AA authoritative, fed to synth. The rest of
 # AA_FIELD_MAP are external benchmarks AA only *measures* (kept in _aa-rows.json
 # for impossible-value detection, NOT injected as synth sources). See gather-write.
 AA_COMPOSITE_KEYS = {"aaIdx", "aaCoding", "aaAgentic"}
+
+# Eval sub-page (AA_EVAL_URL) field map — fields absent from the main listing.
+# Both are single-turn, non-agentic evals (unlike gpqa/hle/tau2/tbHard, which
+# AA measures under a standardized protocol that legitimately diverges from
+# vendor numbers) — low divergence risk, so these flow into GATHER_PATH as
+# normal competing I-tier observations (see AA_EVAL_GATHER_KEYS below), not as
+# AA-authoritative overrides.
+AA_EVAL_FIELD_MAP: dict[str, tuple[str, float]] = {
+    "livecodebench": ("lcb", 100.0),
+    "mmlu_pro": ("mmluPro", 100.0),
+}
+AA_EVAL_GATHER_KEYS = {"lcb", "mmluPro"}
 
 
 def fetch(url: str, timeout: int = 40) -> str:
@@ -110,6 +130,50 @@ def parse_models(rsc_text: str) -> list[dict]:
             continue
         slug = obj.get("slug")
         if slug and "intelligenceIndex" in obj:
+            by_slug[slug] = obj
+    return list(by_slug.values())
+
+
+def _find_enclosing_brace(s: str, pos: int) -> int:
+    """Backward brace-depth scan to the '{' that ENCLOSES position `pos`.
+    A naive rfind("{") (as parse_models() uses) picks up the nearest '{'
+    textually, which is wrong here: the eval sub-page's per-model object
+    nests sibling objects (pricing, multilingual_aa, ...) before the
+    `livecodebench` key, so the nearest '{' belongs to one of those, not the
+    model object. Depth tracking finds the real enclosing brace instead."""
+    depth = 0
+    i = pos
+    while i >= 0:
+        c = s[i]
+        if c == "}":
+            depth += 1
+        elif c == "{":
+            if depth == 0:
+                return i
+            depth -= 1
+        i -= 1
+    return -1
+
+
+def parse_models_snake(rsc_text: str) -> list[dict]:
+    """Find every per-model object on the eval sub-page via the snake_case
+    `livecodebench` field (numeric-valued occurrences only — null ones carry
+    no model object worth decoding). `mmlu_pro` is a strict subset of models
+    with a `livecodebench` value (verified 2026-07-16: 0 models have mmlu_pro
+    without livecodebench), so anchoring on livecodebench alone loses nothing.
+    Dedupe by slug, last wins."""
+    dec = json.JSONDecoder()
+    by_slug: dict[str, dict] = {}
+    for m in re.finditer(r'"livecodebench":[0-9.]', rsc_text):
+        start = _find_enclosing_brace(rsc_text, m.start())
+        if start < 0:
+            continue
+        try:
+            obj, _ = dec.raw_decode(rsc_text, start)
+        except ValueError:
+            continue
+        slug = obj.get("slug")
+        if slug:
             by_slug[slug] = obj
     return list(by_slug.values())
 
@@ -171,6 +235,10 @@ def main() -> int:
     for n in collisions:
         by_norm.pop(n, None)
 
+    eval_html = fetch(AA_EVAL_URL)
+    eval_rsc = decode_rsc_chunks(eval_html)
+    eval_models = parse_models_snake(eval_rsc)
+
     today = today_iso()
     observations: list[dict] = []
     matched_ids: set[str] = set()
@@ -204,6 +272,34 @@ def main() -> int:
                     "_aaSlug": slug,
                 }
             )
+    for o in eval_models:
+        slug = o.get("slug") or ""
+        name = o.get("name") or o.get("model_name") or ""
+        mid = by_norm.get(_norm(slug)) or by_norm.get(_norm(name))
+        if not mid:
+            if any(AA_EVAL_FIELD_MAP.get(k) for k in o):
+                unmatched.append(slug or name)
+            continue
+        matched_ids.add(mid)
+        for field, (bk, scale) in AA_EVAL_FIELD_MAP.items():
+            v = o.get(field)
+            if not isinstance(v, (int, float)) or isinstance(v, bool):
+                continue
+            val = round(v * scale, 2)
+            if not (0 <= val <= 100):
+                continue
+            observations.append(
+                {
+                    "modelId": mid,
+                    "benchKey": bk,
+                    "value": val,
+                    "sourceUrl": AA_EVAL_URL,
+                    "tier": "I",
+                    "fetched": today,
+                    "_aaField": field,
+                    "_aaSlug": slug,
+                }
+            )
 
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(
@@ -219,18 +315,22 @@ def main() -> int:
         ),
         encoding="utf-8",
     )
-    # Gather artifact for the synth/merge pipeline carries ONLY the AA-COMPOSITE
+    # Gather artifact for the synth/merge pipeline carries the AA-COMPOSITE
     # benches (aaIdx/aaCoding/aaAgentic) — AA's definitional indices, where AA is
-    # authoritative. The AA-MEASURED externals (gpqa/hle/tau2/tbHard) are
-    # DELIBERATELY excluded from synth: verification 2026-05-31 showed AA measures
-    # them under a standardized (often no-tools) protocol that legitimately
-    # disagrees with widely-reported vendor (tooled) numbers — e.g. sonnet-4-6.hle
-    # is 51 across 8 sources incl. Anthropic, but AA's standardized score is 13.
-    # Injecting AA's externals as I-tier sources would manufacture spurious
-    # contradictions against well-corroborated data. They stay in _aa-rows.json
-    # only, used by apply-aa-authoritative.py / audit-agent-misfiles.py to flag
+    # authoritative — PLUS lcb/mmluPro (AA_EVAL_GATHER_KEYS): single-turn evals
+    # with low tooled-vs-untooled divergence risk, so they compete as normal
+    # I-tier observations rather than AA-authoritative overrides. tb2 and the
+    # AA-MEASURED externals (gpqa/hle/tau2/tbHard) are DELIBERATELY excluded from
+    # synth: verification 2026-05-31 showed AA measures them under a
+    # standardized (often no-tools) protocol that legitimately disagrees with
+    # widely-reported vendor (tooled) numbers — e.g. sonnet-4-6.hle is 51 across
+    # 8 sources incl. Anthropic, but AA's standardized score is 13. Injecting
+    # AA's externals as I-tier sources would manufacture spurious contradictions
+    # against well-corroborated data. They stay in _aa-rows.json only, used by
+    # apply-aa-authoritative.py / audit-agent-misfiles.py to flag
     # physically-IMPOSSIBLE stored values (outside AA's observed envelope).
-    composite_obs = [o for o in observations if o["benchKey"] in AA_COMPOSITE_KEYS]
+    gather_keys = AA_COMPOSITE_KEYS | AA_EVAL_GATHER_KEYS
+    gather_obs = [o for o in observations if o["benchKey"] in gather_keys]
     import time as _time
 
     GATHER_PATH.write_text(
@@ -238,11 +338,11 @@ def main() -> int:
             {
                 "batchId": "batch90-aa-rsc",
                 "mode": "gather",
-                "observations": composite_obs,
+                "observations": gather_obs,
                 "runtime": {
                     "startedAt": int(_time.time()),
                     "source": "aa-rsc-deterministic",
-                    "fills": len(composite_obs),
+                    "fills": len(gather_obs),
                 },
             },
             ensure_ascii=False,
@@ -250,8 +350,9 @@ def main() -> int:
         encoding="utf-8",
     )
     print(
-        f"=== AA-RSC === parsed={len(models)} matched_our={len(matched_ids)}/"
-        f"{len(our)} observations={len(observations)} -> {OUT_PATH.name}"
+        f"=== AA-RSC === parsed={len(models)}+{len(eval_models)}(eval) "
+        f"matched_our={len(matched_ids)}/{len(our)} observations={len(observations)} "
+        f"-> {OUT_PATH.name}"
     )
     if args.verbose:
         import collections

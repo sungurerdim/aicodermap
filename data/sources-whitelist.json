@@ -2038,13 +2038,18 @@
       "name": "SWE-bench (canonical)",
       "url": "https://www.swebench.com/",
       "tier": "I",
-      "authority": "SWE-bench Verified, full SWE-bench",
+      "authority": "SWE-bench Verified, full SWE-bench, multilingual, multimodal, bash-only, pro — scaffold-variance caveat: the same model legitimately shows several different real scores under different agent harnesses (e.g. \"live-SWE-agent + Claude 4.5 Opus\" = 79.2%). Treat the current best demonstrated result as the observation, per evaluationContext.scaffold — same multi-source handling as elsewhere, not a rigid deterministic auto-fill.",
       "phase": "leaderboard",
       "format": "spa_partial",
       "lastVerifiedDate": null,
       "consecutiveFailures": 0,
       "extractor": "regex_extract",
       "fallbacks": [
+        {
+          "format": "github_raw_json",
+          "url": "https://raw.githubusercontent.com/SWE-bench/swe-bench.github.io/master/data/leaderboards.json",
+          "note": "Verified 2026-07-16: 200 OK, non-SPA raw JSON. Shape: {leaderboards: [{name: \"Verified\"|\"Multilingual\"|..., results: [{name, resolved, tags: [\"Model: <exact-id>\", ...], date, ...}]}]}. `tags` carries a safe, non-fuzzy \"Model: <id>\" match key (present on 145/180 Verified entries) — prefer it over fuzzy name matching."
+        },
         {
           "format": "meta_tag_extract"
         },
@@ -2281,6 +2286,8 @@
       "lastVerifiedDate": "2026-04-27",
       "consecutiveFailures": 0,
       "extractor": "regex_extract",
+      "evalSubpageUrl": "https://artificialanalysis.ai/evaluations/livecodebench",
+      "evalSubpageNote": "Per-model object here carries `livecodebench`/`mmlu_pro` fields absent from the main listing page (0 occurrences there, verified 2026-07-16) — the only route to lcb/mmluPro. scripts/extract-aa-rsc.py hardcodes this as AA_EVAL_URL; kept here for maintainer/agent reference, matching the existing AA_URL pattern.",
       "fallbacks": [
         {
           "format": "meta_tag_extract"
@@ -2319,25 +2326,15 @@
         "aaAgentic",
         "aaCoding",
         "aaIdx",
-        "aaOmni",
-        "aime26",
-        "arcAgi2",
-        "browseComp",
-        "cfElo",
         "gpqa",
         "hle",
         "lcb",
-        "mcpA",
         "mmluPro",
-        "mrcr",
-        "sweMulti",
-        "swePro",
-        "sweV",
         "tau2",
         "tb2",
-        "tbHard",
-        "webDevElo"
-      ]
+        "tbHard"
+      ],
+      "publishesNote": "Trimmed 2026-07-16: aaOmni/aime26/arcAgi2/browseComp/cfElo/mcpA/mrcr/sweMulti/swePro/sweV do NOT exist anywhere in AA's per-model data model — exhaustive key-scan of the ~140-key object on both the main page and the eval sub-page, twice. Listing them wasted agent fetch budget chasing data that isn't there."
     },
     {
       "name": "Vellum LLM Leaderboard",
