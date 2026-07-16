@@ -1,4 +1,58 @@
 
+## [2026-07-16] — fix(pipeline): close the gpt-5-6-sol/-terra `.lcb` gap via vals.ai (root cause of the original investigation)
+
+Direct follow-up: the `gpt-5-6-sol/-terra/-luna` `.lcb` gaps that started this
+whole investigation (see the two entries below) are a genuine misclassification,
+not a missing source. `Vals.ai` was already whitelisted with `lcb` correctly in
+`publishes[]`, but tagged `format: "static_html_table"` — its actual per-model
+data lives inside a `<astro-island component-url=".../BenchmarkView...">`
+element's HTML-entity-encoded `props` JSON attribute, not in visible `<table>`
+markup, so a generic HTML-table extractor finds nothing. Verified live: values
+cross-checked against a web search of vals.ai's own published LCB leaderboard
+(Claude Fable 5 89.78%, Gemini 3.1 Pro 88.48%, GPT-5.2 Codex 87.99%, DeepSeek V4
+87.48% — all match exactly) and each model carries exactly one score (vals.ai's
+own harness already picked a single reasoning-effort setting per model — no
+effort-variant disambiguation needed on our side).
+
+### Added
+- `scripts/extract-vals-lcb.py`: decodes the astro-island `props` JSON directly
+  (`[typeTag, value]` tuple-unwrap, same "read the embedded JSON, skip the JS
+  render" approach as `extract-aa-rsc.py`, applied to Astro's serialization
+  format instead of Next.js RSC chunks). Reads `tasks.overall` — one score per
+  model — and matches the last path segment of each `<org>/<slug>` key to our
+  ids via the same exact-normalized discipline as every other deterministic
+  extractor this cycle.
+- `scripts/apply-vals-lcb.py`: fill-only apply (never overrides an existing
+  `lcb` value — `lcb` is a `coreBenchKeys` entry with pre-existing multi-source
+  data on many models; adjudicating a disagreement is the normal
+  verification/contradiction pipeline's job, not a single-source patch script's).
+  Same direct-write-bypassing-`merge.py`'s-MX1-gate pattern as
+  `apply-livebench.py`, for the same reason (narrow single-key patch, not a
+  full-cycle artifact).
+
+### Fixed
+- `data/sources-whitelist.json` `Vals.ai` entry: `format` `static_html_table`
+  → `spa_partial`, `extractor` `html_table` → `regex_extract` (matches
+  `formatTaxonomy.spa_partial`'s own description: "SPA shell with extractable
+  static sub-pages or embedded JSON-LD"). `lastVerifiedDate`/`format_lastVerified`
+  refreshed to 2026-07-16.
+
+### Verified (this run)
+- `extract-vals-lcb.py --verbose`: 127 rows parsed, 28/127 matched to our
+  model ids.
+- `apply-vals-lcb.py --apply`: 6 genuine `lcb` fills (`grok-4-5`,
+  `gpt-5-6-terra`=85.93, `gemini-3-flash-preview`, `gpt-5-6-sol`=82.6,
+  `claude-sonnet-5`, `glm-5-2`); 22 already-filled cells correctly left
+  untouched.
+- `audit-data-coherence.py`, `audit-bench-source-mapping.py`,
+  `audit-agent-misfiles.py`: all exit 0; no `.lcb`/vals.ai flags raised.
+- Browser check: `gpt-5-6-sol`/`gpt-5-6-terra` rows now show real `lcb` values
+  (82.6 / 85.9) in the comparison table, single-source marker (`①`) correctly
+  displayed, no console errors.
+- `gpt-5-6-luna` remains a genuine gap — not present in vals.ai's dataset
+  either (confirmed: no `openai/gpt-5.6-luna` key on the page at all). Not a
+  pipeline defect; no source has tested that specific model yet.
+
 ## [2026-07-16] — feat(pipeline): wire LiveBench Coding (`lbCoding`) as a new bench key + fix 3 confusable-name misfiles
 
 Follow-up to the same-day `lcb` SPA investigation: `livebench.ai` IS a real,

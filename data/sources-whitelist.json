@@ -2843,11 +2843,11 @@
       "name": "Vals.ai",
       "url": "https://www.vals.ai/benchmarks/",
       "tier": "I",
-      "authority": "enterprise-gated benchmark sets",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "authority": "enterprise-gated benchmark sets — Astro-hydrated: per-benchmark data lives in a <astro-island component-url=\"/_astro/BenchmarkView...\"> element's HTML-entity-encoded `props` JSON attribute (tasks.overall{'<org>/<slug>': {accuracy, reasoning_effort, ...}}), not in visible <table> markup — verified live 2026-07-16 (scripts/extract-vals-lcb.py decodes it directly, same embedded-JSON-not-JS-render approach as extract-aa-rsc.py).",
+      "format": "spa_partial",
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
-      "extractor": "html_table",
+      "extractor": "regex_extract",
       "fallbacks": [
         {
           "format": "static_html_article"
@@ -2856,7 +2856,7 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-07-16",
       "publishes": [
         "aime26",
         "browseComp",
