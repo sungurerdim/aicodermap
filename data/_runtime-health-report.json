@@ -1,12 +1,12 @@
 {
-  "probedAt": "2026-07-15T23:13:14Z",
+  "probedAt": "2026-07-16T08:13:06Z",
   "total": 140,
   "counts": {
-    "format-drift": 12,
-    "redirect": 10,
+    "format-drift": 13,
+    "redirect": 9,
     "spa": 11,
     "bot-block": 2,
-    "dead": 7
+    "dead": 21
   },
   "formatDrift": [
     {
@@ -50,6 +50,11 @@
       "observed": "spa_full"
     },
     {
+      "url": "https://huggingface.co/",
+      "declared": "static_html_table",
+      "observed": "dead"
+    },
+    {
       "url": "https://www.datacamp.com/blog",
       "declared": "static_html_table",
       "observed": "spa_full"
@@ -80,10 +85,6 @@
       "to": "https://arena.ai/leaderboard/webdev"
     },
     {
-      "url": "https://paperswithcode.com/area/code-generation",
-      "to": "https://huggingface.co/papers/trending"
-    },
-    {
       "url": "https://cerebras.ai/inference",
       "to": "https://www.cerebras.ai/inference"
     },
@@ -101,7 +102,7 @@
     },
     {
       "url": "https://compliance.microsoft.com/compliancemanager",
-      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DzB8BHCamp036SipGZ5ng3MrksvlBBBk_11BOmse947Vtx6C_D0OUUpemJFvsdU07XwvnAGLVQVNqgHb4cvla3kzFhsUKduCkV4IHsb5KxP5nL1iYAMtjQuzRrINYRpEl1CzH69l143ak9-JTaWFcXKETB4o80-feCaVJgGv3zzw&response_mode=form_post&nonce=639197539781826058.YTY4ZDBhNDktMmMxNi00ZThiLTg4ZTgtZDM4ZGQ4MmJkZDA2NGE5OTYxYTgtMjkxOC00N2JkLTg2M2QtOWJjODY0MTIxNWU0&client-request-id=9391ed5b-f3d9-4ec8-a2f8-776a96bd2024&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
+      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3D08C1MWDbxVng-PEapVoLNZIGoG7rtNLWvF-hXT5Au78fXn0SokOZ6uybcCtlBb8kFhF02lmmzuLMO6w0VPCTfmQyHXrptg9eZjQe137uV_eQLzQhHk02Nyigi69iAcPyb5O4Tvxvc828q0RX17z-9wAyL7JyRvhNNMESevyAeOA&response_mode=form_post&nonce=639197863684497759.ODk1ZWQ3M2EtMWM2MC00YjM1LWI3MGUtNWJkM2M5NTNkMjhiYjljYWYzNWUtODQxYi00OTM0LWJkOTYtOTBlOTJkOGQ1NzZm&client-request-id=bdd18ad7-27ea-4a87-bf66-f7b20e884ff1&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
     },
     {
       "url": "https://edpb.europa.eu/our-work-tools/consistency-findings/register-for-decisions_en",
@@ -135,12 +136,36 @@
       "error": "URLError: <urlopen error [Errno 8] nodename nor servname provided, or not known>"
     },
     {
+      "url": "https://huggingface.co/spaces/bigcode/bigcode-models-leaderboard",
+      "error": "TimeoutError: The read operation timed out"
+    },
+    {
+      "url": "https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard",
+      "error": "TimeoutError: The read operation timed out"
+    },
+    {
       "url": "https://klu.ai/llm-leaderboard",
       "error": "HTTP 403 Forbidden"
     },
     {
+      "url": "https://paperswithcode.com/area/code-generation",
+      "error": "TimeoutError: The read operation timed out"
+    },
+    {
       "url": "https://agentbench.ai",
       "error": "URLError: <urlopen error timed out>"
+    },
+    {
+      "url": "https://huggingface.co/spaces/lmsys/chatbot-arena-leaderboard",
+      "error": "TimeoutError: The read operation timed out"
+    },
+    {
+      "url": "https://huggingface.co/spaces/livecodebench/leaderboard",
+      "error": "TimeoutError: The read operation timed out"
+    },
+    {
+      "url": "https://huggingface.co/spaces/gorilla-llm/berkeley-function-calling-leaderboard",
+      "error": "TimeoutError: The read operation timed out"
     },
     {
       "url": "https://cloud.sambanova.ai/models",
@@ -151,12 +176,44 @@
       "error": "HTTP 404 Not Found"
     },
     {
+      "url": "https://huggingface.co/",
+      "error": "HTTP 504 Gateway Time-out"
+    },
+    {
+      "url": "https://huggingface.co/unsloth",
+      "error": "TimeoutError: The read operation timed out"
+    },
+    {
+      "url": "https://huggingface.co/bartowski",
+      "error": "TimeoutError: The read operation timed out"
+    },
+    {
+      "url": "https://huggingface.co/mradermacher",
+      "error": "TimeoutError: The read operation timed out"
+    },
+    {
+      "url": "https://huggingface.co/lmstudio-community",
+      "error": "TimeoutError: The read operation timed out"
+    },
+    {
+      "url": "https://huggingface.co/mlx-community",
+      "error": "TimeoutError: The read operation timed out"
+    },
+    {
       "url": "https://github.com/AlexsJones/llmfit/blob/main/data/hf_models.json",
       "error": "HTTP 404 Not Found"
     },
     {
+      "url": "https://huggingface.co/models?sort=trending",
+      "error": "TimeoutError: The read operation timed out"
+    },
+    {
       "url": "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html",
       "error": "HTTP 403 Forbidden"
+    },
+    {
+      "url": "https://huggingface.co/meta-llama",
+      "error": "TimeoutError: The read operation timed out"
     }
   ]
 }

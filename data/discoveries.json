@@ -32,6 +32,22 @@
       "latestRelease": "unspecified (Hunyuan family) -- surfaced only via aggregate OpenRouter usage-ranking commentary",
       "suggestedTier": "open-flagship",
       "status": "pending"
+    },
+    {
+      "id": "kt_midm",
+      "observedAt": "2026-07-16",
+      "modelCount": 3,
+      "latestRelease": "Mi:dm K 2.5 Pro (2026-03, unveiled MWC26; preview 2025-12-11)",
+      "suggestedTier": "open-flagship",
+      "status": "pending"
+    },
+    {
+      "id": "multiverse_computing",
+      "observedAt": "2026-07-16",
+      "modelCount": 2,
+      "latestRelease": "HyperNova 60B 2605 (2026-05-26, compressed gpt-oss-120b derivative)",
+      "suggestedTier": "ollama-local",
+      "status": "pending"
     }
   ],
   "benchmarks": [
@@ -66,6 +82,18 @@
       "firstObserved": "2026-06-12",
       "publisherDomains": [
         "digitalapplied.com"
+      ],
+      "publisherCount": 1,
+      "ac6Pass": false,
+      "status": "pending"
+    },
+    {
+      "key": "pinchBench",
+      "label": "PinchBench (agent-mode task-execution benchmark)",
+      "sourceUrl": "https://arxiv.org/pdf/2606.15079",
+      "firstObserved": "2026-07-16",
+      "publisherDomains": [
+        "arxiv.org"
       ],
       "publisherCount": 1,
       "ac6Pass": false,
