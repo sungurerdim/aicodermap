@@ -544,9 +544,7 @@ def main() -> int:
         )
 
     artifact = {
-        "scope": "full",
-        "mode": "synth-local",
-        "confidence": "medium" if fills_count > 100 else "low",
+        "cycleDate": today_iso(),
         "models": final_models,
         "newModels": [],
         "contradictions": contradictions,

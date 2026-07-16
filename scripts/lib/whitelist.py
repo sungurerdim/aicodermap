@@ -523,6 +523,7 @@ CONFUSABLE_FAMILIES: list[set[str]] = [
     {"tb2", "tbHard"},  # Terminal-Bench
     {"tau2", "tau3"},  # tau-bench
     {"aaIdx", "aaCoding", "aaAgentic", "aaOmni"},  # AA composites
+    {"lcb", "lbCoding"},  # LiveCodeBench vs LiveBench Coding — confusable names
 ]
 # The two families whose misfile most corrupts the composite (distinct scales /
 # difficulty) → a cell supported ONLY by sibling-publishers is merge-BLOCKING.

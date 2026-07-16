@@ -1,10 +1,10 @@
 {
   "_summary": {
     "compositeMisfiles": 0,
-    "measuredCandidates": 38,
+    "measuredCandidates": 47,
     "bandViolations": 0,
     "crossBenchDups": 7,
-    "aaRowsLoaded": 441
+    "aaRowsLoaded": 532
   },
   "compositeMisfiles": [],
   "measuredCandidates": [
@@ -37,6 +37,20 @@
       "delta": 31.41
     },
     {
+      "modelId": "mistral-large-3",
+      "benchKey": "tb2",
+      "current": 42.8,
+      "aa": 11.99,
+      "delta": 30.81
+    },
+    {
+      "modelId": "grok-4-3",
+      "benchKey": "tb2",
+      "current": 68.5,
+      "aa": 39.7,
+      "delta": 28.8
+    },
+    {
       "modelId": "step-3-7-flash",
       "benchKey": "hle",
       "current": 47.2,
@@ -63,6 +77,13 @@
       "current": 52.3,
       "aa": 28.04,
       "delta": 24.26
+    },
+    {
+      "modelId": "mimo-v2-flash",
+      "benchKey": "tb2",
+      "current": 38.5,
+      "aa": 61.8,
+      "delta": 23.3
     },
     {
       "modelId": "qwen3-6-max",
@@ -98,6 +119,20 @@
       "current": 76.8,
       "aa": 97.66,
       "delta": 20.86
+    },
+    {
+      "modelId": "step-3-7-flash",
+      "benchKey": "tb2",
+      "current": 59.5,
+      "aa": 39.33,
+      "delta": 20.17
+    },
+    {
+      "modelId": "qwen3-5-9b",
+      "benchKey": "tb2",
+      "current": 9.2,
+      "aa": 29.21,
+      "delta": 20.01
     },
     {
       "modelId": "ministral-3-8b",
@@ -184,6 +219,13 @@
       "delta": 14.6
     },
     {
+      "modelId": "gpt-5-4-nano",
+      "benchKey": "tb2",
+      "current": 46.3,
+      "aa": 60.67,
+      "delta": 14.37
+    },
+    {
       "modelId": "deepseek-v3-2",
       "benchKey": "hle",
       "current": 24.86,
@@ -196,6 +238,13 @@
       "current": 22.1,
       "aa": 8.02,
       "delta": 14.08
+    },
+    {
+      "modelId": "opus-4-7",
+      "benchKey": "tb2",
+      "current": 69.1,
+      "aa": 83.15,
+      "delta": 14.05
     },
     {
       "modelId": "ministral-3-14b",
@@ -219,13 +268,6 @@
       "delta": 12.88
     },
     {
-      "modelId": "sonnet-4-6",
-      "benchKey": "tau2",
-      "current": 91.7,
-      "aa": 79.53,
-      "delta": 12.17
-    },
-    {
       "modelId": "claude-fable-5",
       "benchKey": "hle",
       "current": 64.5,
@@ -240,6 +282,13 @@
       "delta": 10.34
     },
     {
+      "modelId": "devstral-2",
+      "benchKey": "tb2",
+      "current": 40.5,
+      "aa": 30.34,
+      "delta": 10.16
+    },
+    {
       "modelId": "gpt-5-4-mini",
       "benchKey": "tau2",
       "current": 93.4,
@@ -247,11 +296,25 @@
       "delta": 10.07
     },
     {
+      "modelId": "claude-opus-4-8",
+      "benchKey": "tb2",
+      "current": 74.6,
+      "aa": 84.64,
+      "delta": 10.04
+    },
+    {
       "modelId": "gemma-4-12b",
       "benchKey": "hle",
       "current": 5.2,
       "aa": 14.78,
       "delta": 9.58
+    },
+    {
+      "modelId": "qwen3-7-plus",
+      "benchKey": "tb2",
+      "current": 70.3,
+      "aa": 61.05,
+      "delta": 9.25
     },
     {
       "modelId": "qwen3-6-35b-moe",

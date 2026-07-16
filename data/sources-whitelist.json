@@ -51,6 +51,7 @@
           "sweMulti",
           "nl2Repo",
           "lcb",
+          "lbCoding",
           "tb2",
           "tbHard",
           "cfElo",
@@ -663,6 +664,11 @@
         "LCB v6",
         "LCBv6"
       ],
+      "lbCoding": [
+        "LiveBench Coding",
+        "LiveBench",
+        "LiveBench Coding Average"
+      ],
       "tb2": [
         "Terminal-Bench 2",
         "TB2",
@@ -826,7 +832,8 @@
       "benchlmIdx",
       "lmArenaElo",
       "hfOpenAvg",
-      "kluRank"
+      "kluRank",
+      "lbCoding"
     ],
     "_recognizedNotTrackedNote": "4.5/2026-05-29 — `tau3` (tau-bench v3) is in benchAliases + the confusable Elo/tau family for MISFILE DETECTION ONLY (so a tau3 value is never silently filed as tau2). It is deliberately NEITHER core NOR emerging: promoting it to a tracked, scored bench requires a frontend PR (assets/js/core.js BENCH_KEYS + i18n tr/en labels), which is out of scope for the data pipeline. Until tau-bench v3 has real cross-model adoption, a genuine tau3 observation is recognized-but-not-stored; the agent emits a discoveries.benchmarks[] candidate instead.",
     "_deprecatedBenchKeysNote": "FAZ 5.B/C 2026-05-09 split bench universe from 26 → 10 core keys. These 16 legacy keys still hold values in data/models.json (preserved for historical accuracy) but are no longer refreshed by gather agents and not surfaced in priorityCells. Audit accepts them as 'deprecated' rather than 'unknown'. Front-end may render them in a 'historical' section or hide entirely.",
@@ -910,6 +917,7 @@
         "sweMulti",
         "nl2Repo",
         "lcb",
+        "lbCoding",
         "tb2",
         "tbHard",
         "cfElo",
@@ -1507,6 +1515,7 @@
       "sweMulti": "static",
       "nl2Repo": "static",
       "lcb": "temporal",
+      "lbCoding": "rotating",
       "tb2": "static",
       "tbHard": "static",
       "cfElo": "rotating",
@@ -2488,7 +2497,7 @@
       "format_lastVerified": "2026-04-26",
       "publishes": [
         "gpqa",
-        "lcb"
+        "lbCoding"
       ],
       "phase": "leaderboard"
     },
@@ -2546,10 +2555,7 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "publishes": [
-        "bfcl",
-        "lcb"
-      ],
+      "publishes": [],
       "phase": "leaderboard"
     },
     {
@@ -2603,9 +2609,7 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "publishes": [
-        "lcb"
-      ],
+      "publishes": [],
       "phase": "leaderboard"
     },
     {

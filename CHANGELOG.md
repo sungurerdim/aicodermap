@@ -1,4 +1,87 @@
 
+## [2026-07-16] — feat(pipeline): wire LiveBench Coding (`lbCoding`) as a new bench key + fix 3 confusable-name misfiles
+
+Follow-up to the same-day `lcb` SPA investigation: `livebench.ai` IS a real,
+fetchable, non-SPA source after all — the earlier "only raw eval questions,
+no score table" finding (previous entry, and the 2026-07-16 refresh-all note)
+was checking the wrong artifact, the sibling GitHub *code* repo instead of the
+site's own checked-in dated snapshot files (`LiveBench/livebench.github.io`
+`public/table_<date>.csv` + `categories_<date>.json`, discovered via the
+GitHub Contents API). But LiveBench and LiveCodeBench are different
+benchmarks with confusingly similar names, and the whitelist already
+conflated them — `LiveBench`'s entry claimed `publishes: ["gpqa", "lcb"]`,
+i.e. its own "Coding" category score was being filed as LiveCodeBench.
+
+### Added
+- `scripts/extract-livebench.py`: deterministic extractor, same shape as
+  `extract-aa-rsc.py` — discovers the latest dated snapshot via the GitHub
+  Contents API (no hardcoded/scraped date), reads the `Coding` category's
+  task-column mapping fresh from `categories_<date>.json` each run (never
+  hardcoded), computes `lbCoding = mean(code_generation, code_completion)`
+  per model row (values are already 0-100 on this source — verified by range,
+  not assumed), and matches model names to our ids via the same
+  exact-normalized `by_norm` discipline as AA (no fuzzy matching; unresolved
+  rows are skipped, not guessed).
+- `scripts/apply-livebench.py`: applies `lbCoding` fills directly to
+  `data/models.json` + `data/sources.json`. Written because `lbCoding` is an
+  `emergingBenchKeys` entry and `scripts/merge.py`'s MX1 invariant expects a
+  full active×core-bench-matrix artifact (fill or explicit gap for every
+  cell) — routing an 11-cell single-key patch through `merge.py` would force
+  `gap_gen.py` to stamp ~440 unrelated core cells as synthetic "surveyed"
+  gaps never actually surveyed this run. Mirrors `apply-aa-authoritative.py`'s
+  report-then-`--apply` safety pattern.
+- New bench key `lbCoding` ("LiveBench Coding") wired end-to-end: `benchAliases`,
+  `benchCategories.coding`, `emergingBenchKeys` (not `coreBenchKeys` — brand
+  new single-source key, deliberately low-friction rollout, skips
+  `audit-bench-source-mapping.py`'s AC6/AC8 hard-blocks until coverage is
+  proven), `benchKind.atomic`, `benchTypes.lbCoding = "rotating"`,
+  `i18n/{en,tr}.json` `benchmarks.lbCoding`. `assets/js/core.js` `BENCH_KEYS`
+  regenerated via `scripts/gen-bench-keys.py` (auto-derived, not hand-edited).
+  Not added to any preset's `atomicWeights` in this change — promoting a
+  brand-new, single-source key to composite weight is a separate decision
+  once coverage is established over a few cycles.
+- `scripts/lib/whitelist.py` `CONFUSABLE_FAMILIES` += `{"lcb", "lbCoding"}` —
+  mechanical guard so a future agent/extractor conflating the two names gets
+  caught by `audit-data-coherence.py`/`local-synth.py`, the same protection
+  the other Elo/SWE/tau/AA families already have.
+
+### Fixed
+- `data/sources-whitelist.json` `publishes[]` — 3 confusable-name misfiles
+  found while auditing for the `LiveBench` bug above: `BigCodeBench` claimed
+  `["bfcl", "lcb"]` and `EvalPlus` claimed `["lcb"]`; neither source measures
+  BFCL (function-calling) or LiveCodeBench — both are their own
+  code-generation benchmarks with no dedicated key today. Cleared to
+  `publishes: []` (documented-but-currently-unmapped, same pattern as
+  `arXiv`/`AgentBench`/`LMMarketCap`) rather than inventing keys for them in
+  this change.
+- `scripts/local-synth.py`: its synth artifact emitted `scope`/`mode`/
+  `confidence` top-level fields and no `cycleDate` — schema drift against
+  `scripts/lib/agent-out.schema.json` (`required: ["cycleDate", ...]`,
+  `additionalProperties: false`) that hard-blocked
+  `validate-agent-out.py` on every synth-artifact-only run (found while
+  merging this cycle's `lbCoding` fills; unrelated to the `lbCoding` change
+  itself, pre-existing pipeline bug). Fixed at the source.
+
+### Verified (this run)
+- `extract-livebench.py --verbose`: date=2026-06-25, 28 rows parsed, 11/28
+  matched to our model ids (exact-norm; the rest carry effort-suffixed names
+  like `-xhigh-effort` that don't match any tracked id — expected, not a bug).
+- `apply-livebench.py --apply`: 11 `lbCoding` fills (`deepseek-v4-flash`,
+  `deepseek-v4-pro`, `glm-5-2`, `gpt-5-5`, `grok-4-3`, `grok-build-0-1`,
+  `kimi-k2-7-code`, `minimax-m3`, `qwen3-6-27b`, `qwen3-6-plus`, `qwen3-7-max`).
+- `gen-bench-keys.py --check` (before/after), `audit-data-coherence.py`,
+  `audit-bench-source-mapping.py`, `audit-agent-misfiles.py`: all exit 0; no
+  `lbCoding`/LiveBench misfile flags raised.
+- Browser check (Playwright against a local static server): `bench.lbCoding`
+  column renders `LB-CODE` header / `78.6` cell for `gpt-5-5`, distinct from
+  the adjacent `bench.lcb` column (`88.6`); `t('benchmarks.lbCoding.{name,short,desc}')`
+  resolves correctly in both EN and TR; no console errors.
+- **Known limitation, not a regression:** the `gpt-5-6-sol/-terra/-luna`
+  cells that originally motivated this investigation are still gaps —
+  LiveBench's latest published snapshot (2026-06-25, pushed 2026-07-06) does
+  not yet include any GPT-5.6 variant. Not a pipeline defect; LiveBench
+  simply hasn't tested that model yet.
+
 ## [2026-07-16] — fix(pipeline): new-model admission silently blocked by marketing-number versioning (Grok 4.5)
 
 Root-cause fix for a real model being permanently, silently dropped from every refresh cycle because its vendor's version numbering isn't a true semver sequence.
