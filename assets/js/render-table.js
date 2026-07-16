@@ -5,9 +5,9 @@ import {
   State, TIER_ORDER, STORAGE, writeStorage, DEFAULT_PRESET, DEFAULT_SCORE_FN,
 } from './core.js';
 import {
-  buildContradictionFlag, uncertaintySpan, coverageClass, lastUpdatedNode,
+  buildContradictionFlag, buildSingleSourceFlag, uncertaintySpan, coverageClass, lastUpdatedNode,
 } from './render-shared.js';
-import { contradictionFor } from './data.js';
+import { contradictionFor, isSingleSourceCell } from './data.js';
 import { coverageOf, effectiveScore, rankBands, presetTiersFor } from './scoring.js';
 import {
   fmtScore, scoreClass, pricingView, fmtPriceRange, fmtContext,
@@ -148,6 +148,8 @@ function renderBenchValue(m, k) {
   const c = contradictionFor(m.id, k);
   if (c) {
     wrap.appendChild(buildContradictionFlag(c, m.id, k));
+  } else if (v != null && isSingleSourceCell(m.id, k)) {
+    wrap.appendChild(buildSingleSourceFlag());
   }
   const span = document.createElement('span');
   span.className = scoreClass(v);

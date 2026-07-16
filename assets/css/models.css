@@ -273,6 +273,10 @@ table#comparison-table td.bench-group-divider {
 }
 .bench-cell.flag-warn { border-color: var(--warn-soft); }
 .bench-cell.flag-danger { border-color: var(--danger-soft); }
+/* Single-source pending-corroboration — informational, not a dispute, so it
+ * gets the neutral accent-2 (cyan) rather than the warn/danger palette. */
+.bench-cell.flag-single-source-cell { border-color: var(--accent-2-soft); }
+.flag-single-source { color: var(--accent-2); }
 
 /* Excluded by active preset (weight === 0) — dim + grayscale. Cell stays
  * visible because the underlying data is real; the dim signals the preset

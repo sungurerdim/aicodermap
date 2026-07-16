@@ -316,6 +316,28 @@ export function cellConfidence(modelId, benchKey) {
   return Math.max(floor, Math.min(ceiling, conf));
 }
 
+// True when a cell's value rests on exactly one distinct verified source.
+// Distinct from a contradiction flag (which needs >=2 disagreeing sources to
+// fire at all) — this surfaces the opposite case: a single official/leaderboard
+// source that cleared should_quarantine's exceptional-source-override (see
+// docs/METHODOLOGY.md §6) and now counts toward the composite, so users can
+// see the evidence is still thin even though it isn't disputed.
+export function isSingleSourceCell(modelId, benchKey) {
+  const realId = (State.benchMirror && State.benchMirror[modelId]) || modelId;
+  const entries = State.sources[`${realId}.${benchKey}`];
+  if (!Array.isArray(entries) || !entries.length) return false;
+  const cfg = (State.schema && State.schema.confidence) || {};
+  const PSEUDO = new Set(Array.isArray(cfg.pseudoSources) && cfg.pseudoSources.length
+    ? cfg.pseudoSources
+    : ['snapshot-extraction', 'auto-resolution candidate', 'synth-backfill']);
+  const urls = new Set();
+  for (const e of entries) {
+    if (!e || PSEUDO.has(e.source)) continue;
+    if (e.url) urls.add(String(e.url).toLowerCase());
+  }
+  return urls.size === 1;
+}
+
 // Returns the set of bench keys flagged as quarantined for this model.
 // merge.py stamps `model.benchQuarantine[bench] = true` whenever the
 // pick_winner.quarantine flag fires (scaffold variants, confidence<0.2,

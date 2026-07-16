@@ -4,11 +4,11 @@
 
 import { State, DEFAULT_PRESET, DEFAULT_SCORE_FN, getCompositePolicy } from './core.js';
 import {
-  buildContradictionFlag, uncertaintySpan, coverageClass, lastUpdatedNode,
+  buildContradictionFlag, buildSingleSourceFlag, uncertaintySpan, coverageClass, lastUpdatedNode,
 } from './render-shared.js';
 import {
   disputedCount, contradictionFor, isCellStale, getCellFreshness,
-  sourceReliabilityBadge,
+  sourceReliabilityBadge, isSingleSourceCell,
 } from './data.js';
 import {
   coverageOf, effectiveScore, vendorComposites,
@@ -93,6 +93,9 @@ export function buildBenchCell(model, key) {
   if (c) {
     cell.classList.add(c.severity === 'danger' ? 'flag-danger' : 'flag-warn');
     cell.appendChild(buildContradictionFlag(c, model.id, key));
+  } else if (score != null && isSingleSourceCell(model.id, key)) {
+    cell.classList.add('flag-single-source-cell');
+    cell.appendChild(buildSingleSourceFlag());
   }
   return cell;
 }

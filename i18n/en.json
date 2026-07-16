@@ -164,6 +164,9 @@
     "coverageTip": "How much of the active profile weight is backed by available bench scores. Composite is reduced by sqrt(coverage) so cherry-picked single-test scores cannot outrank broader, verified ones.",
     "uncertaintyTip": "Uncertainty range (±1σ) of the composite, propagated from each cell's source agreement, contradiction spread, coverage and imputation. Not a frequentist 95% confidence interval — it reflects evidential quality. Wider band = weaker evidence.",
     "uncertaintySingleTip": "Uncertainty range (±1σ). Most cells here rest on a single source, so treat the band as a rough estimate, not a confidence interval — more independent sources will tighten it.",
+    "singleSource": {
+      "title": "Single source, pending corroboration — this score counts toward the composite on the strength of one verified source with an earned reliability track record. Not disputed, just thin evidence; an independent confirmation will replace this badge."
+    },
     "rankTip": "Composite rank by score (stable across sort). The ±range on each score shows uncertainty — models with overlapping ranges are statistically close. A divider line marks a significance break: a real gap to the group below.",
     "disputed": "disputed",
     "disputedTip": "Cells in the active preset that have same-tier source disagreement (≥3pp inside one tier on top of the ≥5pp BLOCK threshold). The composite carries a confidence haircut for these — capped at 5pp per cell so a single extreme outlier cannot dominate. Cross-tier disputes (e.g. I-tier vs S-tier) are not counted because autoResolveWinner already picked the higher-trust source.",
@@ -612,6 +615,18 @@
     },
     "minimax-m2-7-highspeed": {
       "strengths": "MiniMax-M2.7-highspeed detected via lineup discovery (released 2026-03-18). Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "gemini-3-flash-preview": {
+      "strengths": "gemini-3-flash-preview detected via lineup discovery. Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "gemini-3-1-flash-lite": {
+      "strengths": "gemini-3-1-flash-lite detected via lineup discovery. Benchmark data will be filled with multi-source provenance next refresh.",
+      "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
+    },
+    "glm-5v-turbo": {
+      "strengths": "glm-5v-turbo detected via lineup discovery. Benchmark data will be filled with multi-source provenance next refresh.",
       "weaknesses": "Newly detected; independent benchmark verification, pricing and context window arrive next cycle."
     }
   },

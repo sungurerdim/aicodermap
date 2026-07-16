@@ -164,6 +164,9 @@
     "coverageTip": "Aktif profil ağırlığının ne kadarı mevcut benchmark skorlarıyla destekleniyor. Composite, √kapsam ile çarpılarak az test alıp yüksek skor çıkan modelleri ezmeyen ama avantajını da silen bir ceza uygular.",
     "uncertaintyTip": "Bileşik skorun belirsizlik aralığı (±1σ); her hücrenin kaynak uyumu, çelişki yayılımı, kapsam ve imputasyonundan türetilir. Frekansçı %95 güven aralığı değildir — kanıt kalitesini yansıtır. Geniş bant = zayıf kanıt.",
     "uncertaintySingleTip": "Belirsizlik aralığı (±1σ). Buradaki hücrelerin çoğu tek kaynağa dayanıyor; bandı güven aralığı değil kaba bir tahmin olarak görün — bağımsız kaynak arttıkça daralır.",
+    "singleSource": {
+      "title": "Tek kaynak, doğrulama bekliyor — bu skor, kanıtlanmış güvenilirlik geçmişine sahip tek doğrulanmış kaynağın gücüyle bileşik skora dahil ediliyor. Çelişkili değil, sadece kanıtı ince; bağımsız bir doğrulama geldiğinde bu rozet kalkar."
+    },
     "rankTip": "Skora göre bileşik sıra (sıralama sütunundan bağımsız sabit). Her skorun yanındaki ±aralık belirsizliği gösterir — aralıkları çakışan modeller istatistiksel olarak yakındır. Ayraç çizgisi anlamlı kopuşu işaret eder: alttaki gruba gerçek bir fark.",
     "disputed": "tartışmalı",
     "disputedTip": "Aktif preset'te aynı-tier kaynaklar arasında uyumsuzluk taşıyan hücre sayısı (≥5pp BLOCK eşiğinin üstünde, tek bir tier içinde ≥3pp). Composite bu hücreler için güven kesintisi içerir — hücre başına maks 5pp, böylece tek bir outlier composite'i ezemez. Cross-tier uyumsuzluklar (örn. I-tier ↔ S-tier) sayılmaz, çünkü autoResolveWinner zaten yüksek-tier kaynağı seçti.",
@@ -612,6 +615,18 @@
     },
     "minimax-m2-7-highspeed": {
       "strengths": "MiniMax-M2.7-highspeed, lineup keşfinde tespit edildi (çıkış: 2026-03-18). Benchmark verileri sonraki yenilemede çok-kaynaklı provenance ile doldurulacak.",
+      "weaknesses": "Yeni tespit edildi; bağımsız benchmark doğrulaması, fiyatlandırma ve bağlam penceresi sonraki döngüde gelecek."
+    },
+    "gemini-3-flash-preview": {
+      "strengths": "gemini-3-flash-preview, lineup keşfinde tespit edildi. Benchmark verileri sonraki yenilemede çok-kaynaklı provenance ile doldurulacak.",
+      "weaknesses": "Yeni tespit edildi; bağımsız benchmark doğrulaması, fiyatlandırma ve bağlam penceresi sonraki döngüde gelecek."
+    },
+    "gemini-3-1-flash-lite": {
+      "strengths": "gemini-3-1-flash-lite, lineup keşfinde tespit edildi. Benchmark verileri sonraki yenilemede çok-kaynaklı provenance ile doldurulacak.",
+      "weaknesses": "Yeni tespit edildi; bağımsız benchmark doğrulaması, fiyatlandırma ve bağlam penceresi sonraki döngüde gelecek."
+    },
+    "glm-5v-turbo": {
+      "strengths": "glm-5v-turbo, lineup keşfinde tespit edildi. Benchmark verileri sonraki yenilemede çok-kaynaklı provenance ile doldurulacak.",
       "weaknesses": "Yeni tespit edildi; bağımsız benchmark doğrulaması, fiyatlandırma ve bağlam penceresi sonraki döngüde gelecek."
     }
   },

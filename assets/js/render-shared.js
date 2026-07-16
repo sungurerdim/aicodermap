@@ -27,6 +27,21 @@ export function buildContradictionFlag(c, modelId, benchKey) {
   return flag;
 }
 
+// Single-source pending-corroboration badge — visually distinct from the
+// contradiction flag (⚠/🚨): this cell isn't disputed, it just has thin
+// evidence (one verified source) that counts toward the composite via the
+// exceptional-source-override. Native title tooltip only (no overlay wiring
+// needed — this is informational, not interactive detail like a contradiction).
+export function buildSingleSourceFlag() {
+  return el('span', {
+    class: 'flag flag-single-source',
+    tabindex: '0',
+    role: 'img',
+    'aria-label': t('ui.singleSource.title'),
+    title: t('ui.singleSource.title'),
+  }, '①');
+}
+
 // Uncertainty range (±σ) — honest precision. Labelled "uncertainty range",
 // not a 95% CI; flagged when backed mostly by a single source.
 export function uncertaintySpan(sigma, hasCI) {
