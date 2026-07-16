@@ -575,25 +575,57 @@ def elo_swe_misfile(
         KNOWN, scoped publisher of a SIBLING metric but NOT `bk` itself; else None.
         (The caller prepends "<modelId>.<benchKey>".)
       - is_hard: True iff `bk` is in HARD_CONFUSABLE AND no source publishes `bk`
-        by name — the merge-BLOCKING condition. Else False (advisory only).
+        by name AND no independent-domain corroboration exists (see below) — the
+        merge-BLOCKING condition. Else False (advisory only).
 
     Mirrors audit-data-coherence §6b exactly so local-synth can pre-drop hard
     misfiles before they reach (and roll back) the merge.
+
+    Independent-corroboration carve-out (2026-07-16): a cell cited by >=1
+    NEUTRAL domain — one that publishes neither `bk` nor any sibling in its
+    confusable family (includes domains entirely absent from the whitelist,
+    e.g. arxiv.org hosting the vendor's own paper, or a GitHub/HF model-repo
+    page) — alongside the sibling-flagged domain is NOT the "single
+    unverifiable citation" case this hard-block exists for. Found via 2 real
+    cells that were wrongly hard-blocked after a whitelist accuracy pass:
+    gemma-3-27b.lmArenaElo=1338 is independently confirmed in the Gemma 3
+    technical report (arxiv.org/html/2503.19786v1, verified live — "1338"
+    appears in the text) despite also being cited from ollama.com (which
+    separately, correctly, publishes cfElo — an Elo-family sibling);
+    deepseek-r1-14b.cfElo=1481 is corroborated by 6 sources across 5 domains,
+    only one of which (huggingface.co) happens to be sibling-flagged. Without
+    this carve-out, making the whitelist MORE accurate (e.g. correctly
+    recognizing a domain as a real sibling publisher) can flip a
+    well-corroborated real cell into a false-positive hard block — the
+    opposite of what this check is for. A cell with ZERO neutral-domain
+    corroboration (only sibling-flagged domains) remains hard-blocked exactly
+    as before, unweakened.
     """
     fam = confusable_family(bk)
     if not fam:
         return None, False
     has_valid = False
     sibling_hit: str | None = None
+    neutral_domains: set[str] = set()
     for u in source_urls:
         d = extract_domain(u or "")
+        if not d:
+            continue
         pub = domain_publishes.get(d)
         if not pub:
+            neutral_domains.add(d)
             continue
         if bk in pub:
             has_valid = True
-        elif (pub & fam) and sibling_hit is None:
-            sibling_hit = f"<-{d}(has {sorted(pub & fam)})"
+        elif pub & fam:
+            if sibling_hit is None:
+                sibling_hit = f"<-{d}(has {sorted(pub & fam)})"
+        else:
+            neutral_domains.add(d)
     if sibling_hit is None:
         return None, False
-    return sibling_hit, (bk in HARD_CONFUSABLE and not has_valid)
+    independent_corroboration = bool(neutral_domains)
+    is_hard = (
+        bk in HARD_CONFUSABLE and not has_valid and not independent_corroboration
+    )
+    return sibling_hit, is_hard

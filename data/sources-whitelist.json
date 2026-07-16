@@ -1992,12 +1992,12 @@
       "name": "Scale SEAL",
       "url": "https://labs.scale.com/leaderboard",
       "tier": "I",
-      "authority": "SWE-bench Pro (1865 tasks), HLE",
+      "authority": "SWE-bench Pro (1865 tasks), HLE — verified 2026-07-16: 0 <tr> table rows in raw HTML; real per-model scores (e.g. \"gpt-5.6 (sol)\"...\"score\":81.8) are in Next.js self.__next_f.push RSC streams, same mechanism as artificialanalysis.ai.",
       "phase": "leaderboard",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "format": "spa_partial",
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
-      "extractor": "html_table",
+      "extractor": "regex_extract",
       "fallbacks": [
         {
           "format": "static_html_article"
@@ -2006,7 +2006,7 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-07-16",
       "publishes": [
         "gpqa",
         "hle",
@@ -2020,12 +2020,12 @@
       "name": "Scale SEAL SWE-bench Pro public",
       "url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
       "tier": "I",
-      "authority": "swePro standardized",
+      "authority": "swePro standardized — same Next.js RSC mechanism as Scale SEAL (verified 2026-07-16).",
       "phase": "leaderboard",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "format": "spa_partial",
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
-      "extractor": "html_table",
+      "extractor": "regex_extract",
       "fallbacks": [
         {
           "format": "static_html_article"
@@ -2034,7 +2034,7 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-07-16",
       "publishes": [
         "gpqa",
         "hle",
@@ -2080,9 +2080,9 @@
       "name": "SWE-bench experiments repo",
       "url": "https://github.com/SWE-bench/experiments",
       "tier": "I",
-      "authority": "SWE-bench raw data",
+      "authority": "SWE-bench raw data — verified 2026-07-16: it's a raw-prediction-log listing, not a scored table; the 16-key publishes[] was a copy-paste-bloated template (identical shape found on 2 other entries this cycle) that didn't match what this source actually reports.",
       "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
       "extractor": "html_table",
       "fallbacks": [
@@ -2093,25 +2093,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
-      "publishes": [
-        "aaIdx",
-        "aime26",
-        "bfcl",
-        "browseComp",
-        "cfElo",
-        "gpqa",
-        "hle",
-        "lcb",
-        "mmluPro",
-        "nl2Repo",
-        "sweMulti",
-        "swePro",
-        "sweV",
-        "tau2",
-        "tb2",
-        "tbHard"
-      ],
+      "format_lastVerified": "2026-07-16",
+      "publishes": [],
       "phase": "leaderboard"
     },
     {
@@ -2153,38 +2136,16 @@
       ]
     },
     {
-      "name": "LiveCodeBench (alt)",
-      "url": "https://livecodebench.com/",
-      "tier": "I",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
-      "consecutiveFailures": 0,
-      "extractor": "html_table",
-      "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-04-26",
-      "publishes": [
-        "lcb"
-      ],
-      "phase": "leaderboard"
-    },
-    {
       "name": "Terminal-Bench",
       "url": "https://www.tbench.ai/leaderboard/terminal-bench/2.0",
       "tier": "I",
       "authority": "TB2 agentic execution",
       "phase": "leaderboard",
-      "format": "static_html_table",
+      "format": "spa_partial",
       "skipWebFetch": false,
-      "lastVerifiedDate": "2026-05-29",
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
-      "extractor": "html_table",
+      "extractor": "regex_extract",
       "fallbacks": [
         {
           "format": "static_html_article"
@@ -2193,45 +2154,22 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-05-29",
+      "format_lastVerified": "2026-07-16",
       "publishes": [
         "tb2",
         "tbHard"
       ],
-      "_demote_note": "RE-PROMOTED 2026-05-29: bare /leaderboard root was a JS SPA shell (57KB, 0 rows); the full sub-path /leaderboard/terminal-bench/2.0 is server-rendered (144 entries, model names + scores static). Verified live 2026-05-29."
-    },
-    {
-      "name": "Terminal-Bench (alt)",
-      "url": "https://terminal-bench.io/",
-      "tier": "I",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
-      "consecutiveFailures": 0,
-      "extractor": "html_table",
-      "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-04-26",
-      "publishes": [
-        "tb2",
-        "tbHard"
-      ],
-      "phase": "leaderboard"
+      "_demote_note": "RE-VERIFIED 2026-07-16: the site has since migrated to Next.js RSC rendering — 0 literal <tr> rows now (was 144 in the 2026-05-29 check), but real per-model data (modelNames arrays + scores) is present in self.__next_f.push streams. Superseding the 2026-05-29 note: reclassified static_html_table -> spa_partial, extractor -> regex_extract."
     },
     {
       "name": "tau-bench (canonical)",
       "url": "https://github.com/sierra-research/tau-bench",
       "tier": "I",
-      "authority": "tau2 agentic API-use; results in README + experiments/ folder",
+      "authority": "tau2 agentic API-use; results in README + experiments/ folder — verified 2026-07-16: the 16-key publishes[] was a copy-paste-bloated template (identical shape found on 2 other entries this cycle); narrowed to the one key this repo actually reports (airline/retail tau2 results).",
       "phase": "leaderboard",
       "note": "tau-bench.dev domain dead as of 2026-04-26; canonical results live in repo README",
       "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
       "extractor": "html_table",
       "fallbacks": [
@@ -2242,35 +2180,20 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-07-16",
       "publishes": [
-        "aaIdx",
-        "aime26",
-        "bfcl",
-        "browseComp",
-        "cfElo",
-        "gpqa",
-        "hle",
-        "lcb",
-        "mmluPro",
-        "nl2Repo",
-        "sweMulti",
-        "swePro",
-        "sweV",
-        "tau2",
-        "tb2",
-        "tbHard"
+        "tau2"
       ]
     },
     {
       "name": "MCP-Atlas",
-      "url": "https://mcp-atlas.dev",
+      "url": "https://labs.scale.com/leaderboard/mcp_atlas",
       "tier": "I",
-      "authority": "mcpA tool-chain quality",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "authority": "mcpA tool-chain quality — mcp-atlas.dev no longer resolves (verified 2026-07-16, DNS failure); MCP-Atlas is hosted on Scale SEAL instead.",
+      "format": "spa_partial",
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
-      "extractor": "html_table",
+      "extractor": "regex_extract",
       "fallbacks": [
         {
           "format": "static_html_article"
@@ -2279,7 +2202,7 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-07-16",
       "publishes": [
         "mcpA"
       ],
@@ -2438,20 +2361,17 @@
       "name": "LMArena WebDev Arena",
       "url": "https://lmarena.ai/leaderboard/webdev",
       "tier": "I",
-      "authority": "blind human preference (TrueSkill/Elo, formerly LMSYS)",
-      "format": "static_html_table",
-      "lastVerifiedDate": "2026-04-29",
+      "authority": "blind human preference (TrueSkill/Elo, formerly LMSYS) — verified 2026-07-16: raw HTML has only model-registry metadata (placeholder rank sentinel), real Elo scores load via a separate client-side API call.",
+      "format": "spa_full",
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
-      "extractor": "html_table",
+      "extractor": "websearch_snippet",
       "fallbacks": [
-        {
-          "format": "spa_full"
-        },
         {
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-29",
+      "format_lastVerified": "2026-07-16",
       "publishes": [
         "lcb",
         "lmArenaElo",
@@ -2562,8 +2482,9 @@
       "name": "BigCodeBench HF Space",
       "url": "https://huggingface.co/spaces/bigcode/bigcode-models-leaderboard",
       "tier": "I",
+      "authority": "verified 2026-07-16: this is the old \"Big Code Models Leaderboard\" (open-source code-gen models) — totally unrelated to the 12 claimed keys (gpqa/hle/lcb/mcpA/tau2/tb2/...), same conflation bug as the main BigCodeBench entry fixed earlier today. Left unmapped, matching that fix's precedent.",
       "format": "static_html_table",
-      "lastVerifiedDate": "2026-05-06",
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
       "extractor": "html_table",
       "fallbacks": [
@@ -2574,21 +2495,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-05-06",
-      "publishes": [
-        "aime26",
-        "browseComp",
-        "gpqa",
-        "hle",
-        "lcb",
-        "mcpA",
-        "mmluPro",
-        "sweMulti",
-        "swePro",
-        "sweV",
-        "tau2",
-        "tb2"
-      ],
+      "format_lastVerified": "2026-07-16",
+      "publishes": [],
       "phase": "leaderboard"
     },
     {
@@ -2616,33 +2524,25 @@
       "name": "HF Open LLM Leaderboard",
       "url": "https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard",
       "tier": "I",
-      "authority": "open-weight canonical aggregation",
-      "format": "static_html_table",
-      "lastVerifiedDate": "2026-05-06",
+      "authority": "open-weight canonical aggregation — verified 2026-07-16: 0 model names in raw HTML (Gradio SPA); real data confirmed via the backing dataset (open-llm-leaderboard/contents, 4576-row parquet) which has only 6 real columns (IFEval, BBH, MATH-Lvl5, GPQA, MUSR, MMLU-PRO) — publishes[] trimmed from 12 to the 2 that map to our keys.",
+      "format": "spa_full",
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
-      "extractor": "html_table",
+      "extractor": "websearch_snippet",
       "fallbacks": [
         {
-          "format": "static_html_article"
+          "format": "static_json_api",
+          "urlPattern": "https://datasets-server.huggingface.co/rows?dataset=open-llm-leaderboard%2Fcontents",
+          "note": "HF Datasets server rows API — the real source, confirmed live 2026-07-16."
         },
         {
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-05-06",
+      "format_lastVerified": "2026-07-16",
       "publishes": [
-        "aime26",
-        "browseComp",
         "gpqa",
-        "hle",
-        "lcb",
-        "mcpA",
-        "mmluPro",
-        "sweMulti",
-        "swePro",
-        "sweV",
-        "tau2",
-        "tb2"
+        "mmluPro"
       ],
       "phase": "leaderboard"
     },
@@ -2650,20 +2550,17 @@
       "name": "Klu.ai",
       "url": "https://klu.ai/llm-leaderboard",
       "tier": "I",
-      "authority": "broader benchmark aggregator",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "authority": "broader benchmark aggregator — verified 2026-07-16: HTTP 403 Cloudflare challenge (\"Just a moment...\") on direct fetch, genuinely not fetchable as static HTML.",
+      "format": "bot_blocked",
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
-      "extractor": "html_table",
+      "extractor": "websearch_snippet",
       "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
         {
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-07-16",
       "publishes": [
         "gpqa",
         "hle",
@@ -2672,35 +2569,6 @@
         "mmluPro",
         "sweV",
         "tb2"
-      ],
-      "phase": "leaderboard"
-    },
-    {
-      "name": "Papers with Code",
-      "url": "https://paperswithcode.com/area/code-generation",
-      "tier": "I",
-      "authority": "peer-reviewed leaderboards",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
-      "consecutiveFailures": 0,
-      "extractor": "html_table",
-      "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-04-26",
-      "publishes": [
-        "aime26",
-        "gpqa",
-        "hle",
-        "lcb",
-        "mrcr",
-        "nl2Repo",
-        "sweV"
       ],
       "phase": "leaderboard"
     },
@@ -2783,15 +2651,20 @@
       "phase": "leaderboard"
     },
     {
-      "name": "AgentBench",
-      "url": "https://agentbench.ai",
+      "name": "MathArena",
+      "url": "https://matharena.ai/",
       "tier": "I",
-      "authority": "multi-domain agentic",
+      "authority": "AIME math reasoning (auxiliary) — verified 2026-07-16: real server-rendered <table class=\"model-analysis-table\"> with model/provider/score rows present; page's own JS also calls a plain unauthenticated JSON endpoint GET /competition_tables/{competition_id} (e.g. /competition_tables/aime--aime_2026) with per-model accuracy, no JS execution needed.",
       "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
       "extractor": "html_table",
       "fallbacks": [
+        {
+          "format": "static_json_api",
+          "urlPattern": "https://matharena.ai/competition_tables/{competition_id}",
+          "note": "aime26 -> competition_id 'aime--aime_2026', confirmed live 2026-07-16."
+        },
         {
           "format": "static_html_article"
         },
@@ -2799,41 +2672,7 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
-      "publishes": [],
-      "phase": "discovery"
-    },
-    {
-      "name": "MathArena",
-      "url": "https://matharena.ai/",
-      "tier": "I",
-      "authority": "AIME math reasoning (auxiliary)",
-      "format": "spa_full",
-      "lastVerifiedDate": null,
-      "consecutiveFailures": 0,
-      "extractor": "websearch_snippet",
-      "fallbacks": [
-        {
-          "format": "github_raw_json"
-        },
-        {
-          "format": "meta_tag_extract"
-        },
-        {
-          "format": "aggregator_mirror",
-          "mirrorDomains": [
-            "pricepertoken.com",
-            "llm-stats.com",
-            "vals.ai",
-            "benchlm.ai"
-          ],
-          "note": "Resolve each publishes[] bench on a mirror domain (model+bench path) before websearch_snippet. Real cascade, not advisory."
-        },
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-07-16",
       "publishes": [
         "aime26"
       ],
@@ -2843,7 +2682,7 @@
       "name": "Vals.ai",
       "url": "https://www.vals.ai/benchmarks/",
       "tier": "I",
-      "authority": "enterprise-gated benchmark sets — Astro-hydrated: per-benchmark data lives in a <astro-island component-url=\"/_astro/BenchmarkView...\"> element's HTML-entity-encoded `props` JSON attribute (tasks.overall{'<org>/<slug>': {accuracy, reasoning_effort, ...}}), not in visible <table> markup — verified live 2026-07-16 (scripts/extract-vals-lcb.py decodes it directly, same embedded-JSON-not-JS-render approach as extract-aa-rsc.py).",
+      "authority": "enterprise-gated benchmark sets — Astro-hydrated: per-benchmark data lives in a <astro-island component-url=\"/_astro/BenchmarkView...\"> element's HTML-entity-encoded `props` JSON attribute (tasks.overall{'<org>/<slug>': {accuracy, reasoning_effort, ...}}), not in visible <table> markup — verified live 2026-07-16 (scripts/extract-vals-lcb.py decodes it directly, same embedded-JSON-not-JS-render approach as extract-aa-rsc.py). Only lcb has a working extractor today; aime26/gpqa/mmluPro/sweV/tb2 sub-pages (/benchmarks/aime, /benchmarks/gpqa, /benchmarks/mmlu_pro, /benchmarks/swebench, /benchmarks/terminal-bench-2) were confirmed 2026-07-16 to have the same real embedded data — future extractor candidates, kept in publishes[] since the data genuinely exists, just not yet mined.",
       "format": "spa_partial",
       "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
@@ -2859,7 +2698,6 @@
       "format_lastVerified": "2026-07-16",
       "publishes": [
         "aime26",
-        "browseComp",
         "gpqa",
         "lcb",
         "mmluPro",
@@ -3054,16 +2892,17 @@
       "name": "marc0.dev SWE-bench Leaderboard",
       "url": "https://www.marc0.dev/en/leaderboard",
       "tier": "I",
-      "format": "static_html_table",
+      "format": "spa_partial",
       "publishes": [
         "mrcr",
         "swePro",
         "sweV",
         "tb2"
       ],
-      "lastVerifiedDate": "2026-04-27",
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
       "rationale": "Independent community tracker — single-page cross-view for SWE-bench Verified + SWE-bench Pro + Terminal-Bench 2.0 + Aider Polyglot, 100 entries. Monthly cadence; April 2026 includes Claude Opus 4.7.",
+      "authority": "verified 2026-07-16: raw HTML only carries SEO meta/JSON-LD naming ~5 top models; the full 109-model table is client-fetched from a Supabase backend (hoirqrkdgbmvpwutwuwj.supabase.co) — only a handful of top scores are currently scrapable via static fetch.",
       "phase": "leaderboard"
     },
     {
@@ -3108,27 +2947,14 @@
       "domain": "openrouter.ai",
       "tier": "I",
       "format": "spa_full",
-      "publishes": [
-        "aaIdx",
-        "aime26",
-        "arcAgi2",
-        "gpqa",
-        "hle",
-        "lcb",
-        "mcpA",
-        "sweMulti",
-        "swePro",
-        "sweV",
-        "tau2",
-        "webDevElo"
-      ],
-      "authority": "multi-provider adoption + price signal aggregator",
+      "publishes": [],
+      "authority": "multi-provider adoption + price signal aggregator — verified 2026-07-16: this page ranks models by token-usage/popularity, not benchmark accuracy; none of the 12 previously-claimed benchmark keys are actually published here. Also fixed a pre-existing bug: extractor was set to the FORMAT value 'static_html_table' instead of a real extractor.",
       "firstSeen": "2026-05-06",
-      "lastVerifiedDate": "2026-05-06",
-      "format_lastVerified": "2026-05-29",
+      "lastVerifiedDate": "2026-07-16",
+      "format_lastVerified": "2026-07-16",
       "phase": "leaderboard",
       "consecutiveFailures": 0,
-      "extractor": "static_html_table",
+      "extractor": "websearch_snippet",
       "fallbacks": [
         {
           "format": "aggregator_mirror",
@@ -3202,22 +3028,13 @@
       "name": "LiveCodeBench (HF Space mirror)",
       "url": "https://huggingface.co/spaces/livecodebench/leaderboard",
       "tier": "I",
-      "format": "static_html_table",
+      "authority": "publishes[] was a copy-paste-bloated 12-key list (identical shape found on 2 other entries this cycle); narrowed 2026-07-16 to the one key this mirror actually is. Verified live: Gradio SPA, 0 model names in raw HTML.",
+      "format": "spa_full",
+      "extractor": "websearch_snippet",
       "publishes": [
-        "aime26",
-        "browseComp",
-        "gpqa",
-        "hle",
-        "lcb",
-        "mcpA",
-        "mmluPro",
-        "sweMulti",
-        "swePro",
-        "sweV",
-        "tau2",
-        "tb2"
+        "lcb"
       ],
-      "lastVerifiedDate": "2026-05-10",
+      "lastVerifiedDate": "2026-07-16",
       "_runtime": {
         "unhealthy": false,
         "consecutiveFailures": 0
@@ -3229,23 +3046,13 @@
       "name": "Berkeley BFCL (HF Space mirror)",
       "url": "https://huggingface.co/spaces/gorilla-llm/berkeley-function-calling-leaderboard",
       "tier": "I",
-      "format": "static_html_table",
+      "authority": "publishes[] was a copy-paste-bloated 13-key list; narrowed 2026-07-16 to the one key this mirror actually is. Verified live: Gradio SPA, 0 model names in raw HTML.",
+      "format": "spa_full",
+      "extractor": "websearch_snippet",
       "publishes": [
-        "aime26",
-        "bfcl",
-        "browseComp",
-        "gpqa",
-        "hle",
-        "lcb",
-        "mcpA",
-        "mmluPro",
-        "sweMulti",
-        "swePro",
-        "sweV",
-        "tau2",
-        "tb2"
+        "bfcl"
       ],
-      "lastVerifiedDate": "2026-05-10",
+      "lastVerifiedDate": "2026-07-16",
       "_runtime": {
         "unhealthy": false,
         "consecutiveFailures": 0
@@ -3299,12 +3106,13 @@
     },
     {
       "name": "Fireworks AI",
-      "url": "https://fireworks.ai/models",
+      "url": "https://fireworks.ai/pricing",
       "tier": "I",
       "extracts": "tier, throughput, batch pricing",
+      "authority": "verified 2026-07-16: /models had zero pricing content; real per-token pricing + model names live on /pricing.",
       "phase": "pricing",
       "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
       "extractor": "html_table",
       "fallbacks": [
@@ -3315,7 +3123,7 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-07-16",
       "publishes": []
     },
     {
@@ -3382,11 +3190,12 @@
     },
     {
       "name": "Cerebras",
-      "url": "https://inference-docs.cerebras.ai/",
+      "url": "https://www.cerebras.ai/pricing",
       "tier": "I",
       "extracts": "ultra-fast inference",
+      "authority": "verified 2026-07-16: inference-docs (API reference) and the old /inference landing page both had zero pricing content; real per-tier $ pricing lives on /pricing. Consolidated from 2 whitelist entries (was 'Cerebras' + 'Cerebras inference', both wrong, both now identical if fixed) into 1.",
       "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
       "extractor": "html_table",
       "fallbacks": [
@@ -3397,39 +3206,20 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
-      "phase": "pricing",
-      "publishes": []
-    },
-    {
-      "name": "Cerebras inference",
-      "url": "https://cerebras.ai/inference",
-      "tier": "I",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
-      "consecutiveFailures": 0,
-      "extractor": "html_table",
-      "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-07-16",
       "phase": "pricing",
       "publishes": []
     },
     {
       "name": "SambaNova Cloud",
-      "url": "https://cloud.sambanova.ai/models",
+      "url": "https://api.sambanova.ai/v1/models",
       "tier": "I",
       "extracts": "catalog, throughput",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "authority": "verified 2026-07-16: /models 404s (console now login-gated); real unauthenticated public API at api.sambanova.ai/v1/models returns per-model pricing.prompt/pricing.completion + context_length.",
+      "format": "static_json_api",
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
-      "extractor": "html_table",
+      "extractor": "json_path",
       "fallbacks": [
         {
           "format": "static_html_article"
@@ -3438,7 +3228,7 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-07-16",
       "phase": "pricing",
       "publishes": []
     },
@@ -3447,27 +3237,6 @@
       "url": "https://replicate.com/",
       "tier": "I",
       "extracts": "open-weight hosting, $/sec",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
-      "consecutiveFailures": 0,
-      "extractor": "html_table",
-      "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-04-26",
-      "phase": "pricing",
-      "publishes": []
-    },
-    {
-      "name": "Lepton AI",
-      "url": "https://www.lepton.ai/pricing",
-      "tier": "I",
-      "extracts": "enterprise pricing",
       "format": "static_html_table",
       "lastVerifiedDate": null,
       "consecutiveFailures": 0,
@@ -3552,10 +3321,11 @@
       "url": "https://developers.cloudflare.com/workers-ai/models/",
       "tier": "I",
       "extracts": "edge regions, free tier",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "authority": "verified 2026-07-16: same bug class as Vals.ai — 0 <table> elements, but the full model catalog (names, context length, pricing tier) is embedded as HTML-entity-encoded JSON inside <astro-island ... props=\"...\">.",
+      "format": "spa_partial",
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
-      "extractor": "html_table",
+      "extractor": "regex_extract",
       "fallbacks": [
         {
           "format": "static_html_article"
@@ -3564,19 +3334,20 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-07-16",
       "phase": "pricing",
       "publishes": []
     },
     {
       "name": "AWS Bedrock",
-      "url": "https://aws.amazon.com/bedrock/",
+      "url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonBedrock/current/index.json",
       "tier": "I",
       "extracts": "enterprise + region matrix",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "authority": "verified 2026-07-16: the marketing page has zero pricing content; AWS publishes an unauthenticated bulk pricing feed (14MB, per-model/per-region/per-SKU input/output pricing) at this URL — the real source, not the landing page.",
+      "format": "static_json_api",
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
-      "extractor": "html_table",
+      "extractor": "json_path",
       "fallbacks": [
         {
           "format": "static_html_article"
@@ -3585,7 +3356,7 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-07-16",
       "phase": "pricing",
       "publishes": []
     },
@@ -3594,19 +3365,17 @@
       "url": "https://ai.azure.com/explore/models",
       "tier": "I",
       "extracts": "enterprise + region",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "authority": "verified 2026-07-16: genuinely empty (4.7KB) Vite/React shell requiring MSAL auth — no embedded data of any kind.",
+      "format": "spa_full",
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
-      "extractor": "html_table",
+      "extractor": "websearch_snippet",
       "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
         {
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-07-16",
       "phase": "pricing",
       "publishes": []
     },
@@ -3615,8 +3384,9 @@
       "url": "https://huggingface.co/",
       "tier": "I",
       "extracts": "author canonical card",
+      "authority": "verified 2026-07-16: the plain HF homepage carries zero benchmark content — the 14-key publishes[] was a copy-paste error (almost certainly from a genuine leaderboard entry elsewhere in the whitelist).",
       "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
       "extractor": "html_table",
       "fallbacks": [
@@ -3627,24 +3397,9 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-07-16",
       "phase": "pricing",
-      "publishes": [
-        "aime26",
-        "browseComp",
-        "gpqa",
-        "hfOpenAvg",
-        "hle",
-        "lcb",
-        "mcpA",
-        "mmluPro",
-        "sweMulti",
-        "swePro",
-        "sweV",
-        "tau2",
-        "tau3",
-        "tb2"
-      ]
+      "publishes": []
     },
     {
       "name": "OpenCode Zen",
@@ -3710,11 +3465,12 @@
     },
     {
       "name": "Tensorix",
-      "url": "https://tensorix.ai/",
+      "url": "https://tensorx.ai/",
       "tier": "I",
       "extracts": "infrastructure / niche frontier hosting",
+      "authority": "verified 2026-07-16: tensorix.ai silently redirects to tensorx.ai (no 'i') — corrected to the canonical domain.",
       "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
       "extractor": "html_table",
       "fallbacks": [
@@ -3725,7 +3481,7 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-07-16",
       "phase": "pricing",
       "publishes": []
     },
@@ -3773,7 +3529,7 @@
       "name": "Ollama Library",
       "url": "https://ollama.com/library",
       "tier": "I",
-      "extracts": "Index page: tags, pullCount, architecture, parameters, license, releasedISO. Per-model detail page (perModelUrlTemplate): vendor-published bench scores in the model description / Tags tab metadata, plus the same metadata fields. Walk per-model for any open-weight model so detail-page bench numbers (e.g., the SWE-bench / LiveCodeBench / Aider tables on https://ollama.com/library/deepseek-v4-pro) are not missed.",
+      "extracts": "Index page: tags, pullCount, architecture, parameters, license, releasedISO. Per-model detail page (perModelUrlTemplate): vendor-published bench scores in the model description / Tags tab metadata, plus the same metadata fields. Walk per-model for any open-weight model so detail-page bench numbers are not missed — HIT OR MISS per model, not a stable table: verified 2026-07-16 that deepseek-v3's page has zero bench keywords while deepseek-v4-pro's page has a full vendor comparison table (MMLU-Pro/GPQA/HLE/LiveCodeBench/Codeforces/Terminal-Bench-2.0/SWE-Verified/SWE-Pro/SWE-Multilingual/BrowseComp/MCPAtlas/MRCR all present with real numbers) — whether a given model's README included a benchmark table entirely depends on that vendor's release announcement.",
       "phase": "local",
       "format": "static_html_table",
       "extractor": "html_table",
@@ -3785,19 +3541,17 @@
         "{family}"
       ],
       "publishes": [
-        "aaAgentic",
-        "aaCoding",
-        "aaIdx",
-        "aaOmni",
-        "aime26",
-        "bfcl",
+        "browseComp",
+        "cfElo",
         "gpqa",
         "hle",
+        "lcb",
         "mcpA",
+        "mmluPro",
+        "mrcr",
         "sweMulti",
         "swePro",
         "sweV",
-        "tau2",
         "tb2"
       ],
       "fallbacks": [
@@ -3808,9 +3562,9 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-07-16",
       "consecutiveFailures": 0,
-      "lastVerifiedDate": null
+      "lastVerifiedDate": "2026-07-16"
     },
     {
       "name": "HuggingFace Unsloth",
@@ -3894,8 +3648,9 @@
       "url": "https://lmstudio.ai/models",
       "tier": "I",
       "extracts": "desktop catalog",
+      "authority": "verified 2026-07-16: real server-rendered data present (model names, hrefs), but 0 <table>/<tr> elements — cards/anchor-list layout (href=\"/models/{slug}\" + adjacent text), so the html_table extractor silently returns nothing.",
       "format": "static_html_table",
-      "extractor": "html_table",
+      "extractor": "regex_extract",
       "fallbacks": [
         {
           "format": "static_html_article"
@@ -3904,28 +3659,26 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-07-16",
       "consecutiveFailures": 0,
-      "lastVerifiedDate": null
+      "lastVerifiedDate": "2026-07-16"
     },
     {
       "name": "llama.cpp",
-      "url": "https://github.com/ggerganov/llama.cpp/discussions",
+      "url": "https://github.com/ggml-org/llama.cpp/discussions",
       "tier": "I",
       "extracts": "empirical VRAM/throughput data",
-      "format": "static_html_table",
-      "extractor": "html_table",
+      "authority": "verified 2026-07-16: org renamed ggerganov->ggml-org (old URL redirects); GitHub Discussions listings are client-hydrated (React root, 0 threads in raw HTML) — no public unauthenticated JSON API, relies on websearch_snippet fallback.",
+      "format": "spa_full",
+      "extractor": "websearch_snippet",
       "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
         {
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-07-16",
       "consecutiveFailures": 0,
-      "lastVerifiedDate": null
+      "lastVerifiedDate": "2026-07-16"
     },
     {
       "name": "MLX (Apple Silicon)",
@@ -3970,16 +3723,17 @@
       "url": "https://github.com/sgl-project/sglang",
       "tier": "I",
       "extracts": "structured-output throughput",
-      "format": "github_raw_markdown",
-      "extractor": "html_table",
+      "authority": "verified 2026-07-16: URL is the repo landing page HTML (<article class=\"markdown-body\">), not raw.githubusercontent.com — real content either way, but the format label was inaccurate.",
+      "format": "static_html_article",
+      "extractor": "regex_extract",
       "fallbacks": [
         {
           "format": "static_markdown"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-07-16",
       "consecutiveFailures": 0,
-      "lastVerifiedDate": null
+      "lastVerifiedDate": "2026-07-16"
     }
   ],
   "registries": [
@@ -4005,9 +3759,10 @@
     },
     {
       "name": "llmfit upstream",
-      "url": "https://github.com/AlexsJones/llmfit/blob/main/data/hf_models.json",
+      "url": "https://raw.githubusercontent.com/AlexsJones/llmfit/main/llmfit-core/data/hf_models.json",
       "tier": "I",
       "extracts": "authoritative source",
+      "authority": "verified 2026-07-16: old URL was a GitHub blob (HTML wrapper) page, not a raw file, AND the repo was restructured into a monorepo (data/hf_models.json moved to llmfit-core/data/hf_models.json) — fixed both: correct raw.githubusercontent.com host + current path (5,744 models, schema-verified against the local snapshot).",
       "format": "github_raw_json",
       "extractor": "json_path",
       "fallbacks": [
@@ -4015,9 +3770,9 @@
           "format": "static_json_api"
         }
       ],
-      "format_lastVerified": "2026-04-26",
+      "format_lastVerified": "2026-07-16",
       "consecutiveFailures": 0,
-      "lastVerifiedDate": null
+      "lastVerifiedDate": "2026-07-16"
     },
     {
       "name": "HF model index",
@@ -4096,19 +3851,17 @@
       "name": "DataCamp Blog",
       "url": "https://www.datacamp.com/blog",
       "tier": "C",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "authority": "verified 2026-07-16: Cloudflare \"Just a moment...\" challenge on 2 different User-Agents (403), same class of block as r/LocalLLaMA — genuinely not fetchable.",
+      "format": "bot_blocked",
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
-      "extractor": "html_table",
+      "extractor": "websearch_snippet",
       "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
         {
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-07-16"
     },
     {
       "name": "Build Fast With AI",
@@ -4241,19 +3994,17 @@
       "url": "https://designarena.ai/leaderboard",
       "tier": "C",
       "note": "UI auxiliary",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
+      "authority": "verified 2026-07-16: real Elo/Bradley-Terry leaderboard product confirmed (UI strings reference eloRating/winRate/rank), but the RSC stream only ships i18n labels — actual per-model rows are populated by a client-side fetch after hydration, no data in raw HTML.",
+      "format": "spa_partial",
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
-      "extractor": "html_table",
+      "extractor": "websearch_snippet",
       "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
         {
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-07-16"
     },
     {
       "name": "Lushbinary",

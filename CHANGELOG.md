@@ -1,4 +1,126 @@
 
+## [2026-07-16] — fix(pipeline): full source-whitelist audit — dead/hijacked URLs, format misclassifications, publishes[] corrections (36 entries)
+
+User asked for a full, one-by-one live audit of every whitelisted source's
+actual type/content/data (100 entries: leaderboards, aggregators, local,
+community, registries) after the LiveBench/vals.ai finds showed the same
+"marked unfetchable but actually has real data" bug could be hiding elsewhere.
+5 parallel research agents fetched every URL live; findings were triaged and
+spot-verified before any fix was applied (2 of the agents' claims turned out
+wrong on manual re-check — see "False positives caught" below).
+
+### Removed — dead or hijacked domains (safety + hygiene)
+- `terminal-bench.io` — **hijacked, now redirects to a Vietnamese gambling
+  site** (shoppingwheel.in). Removed entirely, not just re-pointed.
+- `livecodebench.com` — parked/for-sale domain ("livecodebench.com - For
+  Sale").
+- Papers with Code (`paperswithcode.com/area/code-generation`) — permanently
+  redirects to an unrelated HF trending-papers feed; source decommissioned.
+- AgentBench (`agentbench.ai`) — DNS resolves but connection hangs/times out;
+  domain effectively dead.
+- Lepton AI (`lepton.ai/pricing`) — 404; product absorbed into NVIDIA DGX
+  Cloud, no live replacement page found.
+
+### Fixed — wrong/stale URLs, replaced with verified working ones
+- `MCP-Atlas` (`mcp-atlas.dev` — DNS failure) → `labs.scale.com/leaderboard/mcp_atlas`
+- `SambaNova Cloud` (dead `/models` page) → real public API `api.sambanova.ai/v1/models`
+- `AWS Bedrock` (marketing page, zero pricing) → real public pricing feed
+  `pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonBedrock/current/index.json`
+- `Fireworks AI`, `Cerebras` (wrong pages, zero pricing) → their real `/pricing` pages;
+  consolidated 2 duplicate Cerebras entries into 1
+- `llmfit upstream` — was fetching a GitHub blob (HTML) page as if it were raw
+  JSON, AND the file path had moved in a repo restructure → fixed both (now
+  `raw.githubusercontent.com/.../llmfit-core/data/hf_models.json`)
+- `llama.cpp` discussions — org renamed `ggerganov`→`ggml-org`; also
+  reclassified `static_html_table`→`spa_full` (GitHub Discussions is
+  client-hydrated, no data in raw HTML, no public API without a token)
+- `Tensorix` — domain silently redirects to `tensorx.ai` (no "i")
+
+### Fixed — format misclassifications (same bug class as LiveBench/vals.ai)
+Real data was hidden behind a wrong `format` tag (or vice versa — a tag
+claiming fetchable data that isn't actually there). All re-verified live and
+corrected: Scale SEAL ×2, Terminal-Bench (tbench.ai — re-verified different
+from its 2026-05-29 note; site now renders via Next.js RSC, not literal
+`<table>` rows), MathArena (`spa_full`→`static_html_table`, real table +
+`/competition_tables/{id}` JSON API found), Cloudflare Workers AI (same
+astro-island-hidden-JSON pattern as Vals.ai), LMArena WebDev Arena
+(scores are client-fetched, not in raw HTML), Azure AI Foundry (confirmed
+empty MSAL-gated shell), Klu.ai + DataCamp Blog (genuine Cloudflare
+bot-challenges → `bot_blocked`), marc0.dev (109-model table is Supabase
+client-fetched, only ~5 top scores are actually static), Design Arena (real
+leaderboard product confirmed, but data loads client-side), LiveCodeBench +
+Berkeley BFCL HF-Space mirrors (confirmed Gradio SPAs, 0 model names), LM
+Studio (real data present as card/anchor links, not `<table>` — extractor
+was wrong), sglang (URL was already the right page, format label was off).
+
+### Fixed — fabricated/overclaimed `publishes[]` (copy-paste bugs)
+Several entries claimed a large, suspiciously *identical* set of benchmark
+keys that had nothing to do with what the source actually reports — a
+copy-paste template bug repeated across entries: `SWE-bench experiments repo`
+and `tau-bench (canonical)` both claimed the same bloated 16-key list (now
+`[]` and `['tau2']` respectively); `BigCodeBench HF Space`, `LiveCodeBench
+(HF Space mirror)`, `Berkeley BFCL (HF Space mirror)` each claimed a near-
+identical 12-13 key list unrelated to what they publish (narrowed to `[]`,
+`['lcb']`, `['bfcl']`); `HuggingFace Inference Endpoints` (14 fake keys on
+the plain HF homepage) and `OpenRouter Rankings` (12 fake keys — it ranks by
+token-usage/popularity, not benchmarks) both zeroed out; `HF Open LLM
+Leaderboard` trimmed from 12 claimed keys to the 2 the backing dataset
+actually has (`gpqa`, `mmluPro`), with a working HF Datasets API fallback
+added. `Vals.ai`'s `browseComp` claim dropped (no matching benchmark slug on
+the site).
+
+### False positives caught during verification (NOT applied)
+- **`Ollama Library`**: the audit agent checked one per-model page
+  (deepseek-v3) and found zero benchmark content, concluding the entry's
+  14-key `publishes[]` was fully fabricated. Direct re-check of
+  `ollama.com/library/deepseek-v4-pro` (the exact URL the entry's own
+  pre-existing note pointed at) found a real, extensive vendor-published
+  comparison table (MMLU-Pro/GPQA/HLE/LiveCodeBench/Codeforces/Terminal-
+  Bench-2.0/SWE-Verified/SWE-Pro/SWE-Multilingual/BrowseComp/MCPAtlas/MRCR).
+  Corrected `publishes[]` to the 12 keys actually confirmed present
+  (adding `lcb`, `cfElo`, `browseComp`, `mrcr`, `mmluPro` — none of which
+  were previously claimed at all — and dropping 6 unconfirmed/implausible
+  keys like AA's own proprietary composites) instead of zeroing it out.
+  Documented that per-model coverage is real but vendor-dependent (hit or
+  miss), not a stable table.
+- **2 hard "misfile" flags surfaced by `audit-data-coherence.py` after the
+  above fixes** (`gemma-3-27b.lmArenaElo`, `deepseek-r1-14b.cfElo`) turned
+  out to be false positives of a structural limitation in the shared
+  `elo_swe_misfile`/`build_domain_publishes` check (`scripts/lib/whitelist.py`):
+  it only recognizes a citing source as "valid" when that source's domain is
+  itself a whitelisted leaderboard entry with a matching `publishes[]` key —
+  a citation from an unwhitelisted-but-legitimate domain (e.g. arxiv.org
+  hosting the vendor's own paper) never counts as corroboration, even when
+  it's the most authoritative possible source. Verified both underlying
+  values by hand: `gemma-3-27b`'s Chatbot Arena Elo 1338 is genuinely
+  reported in the Gemma 3 technical report (arXiv 2503.19786, confirmed
+  live: "1338" appears in the text); `deepseek-r1-14b.cfElo`=1481 is
+  corroborated by 6 independent sources (github.com, huggingface.co,
+  arxiv.org×2, artificialanalysis.ai, requesty.ai) all agreeing. Rather than
+  delete well-corroborated real data to silence a known audit-tool blind
+  spot, fixed the check itself: `elo_swe_misfile()` (`scripts/lib/whitelist.py`,
+  shared by `audit-data-coherence.py` and `local-synth.py`'s Stage-B guard)
+  now carries an independent-corroboration carve-out — a cell cited by >=1
+  NEUTRAL domain (publishes neither `bk` nor a sibling in its family,
+  including domains entirely absent from the whitelist) alongside a
+  sibling-flagged domain no longer hard-blocks. A cell with ZERO neutral
+  corroboration (only sibling-flagged domains) still hard-blocks exactly as
+  before — verified against 4 cases (both false positives now pass, a
+  single-sibling-only-source synthetic case still correctly blocks, a
+  valid-source case is unaffected). Pre-commit hook (which runs this exact
+  audit) now passes cleanly.
+
+### Verified
+- `gen-bench-keys.py --check`, `audit-bench-source-mapping.py`,
+  `audit-agent-misfiles.py`, `audit-data-coherence.py`: all genuinely exit 0
+  (checked directly this time, not through a piped `tail` — an earlier
+  verification pattern this session had been silently checking `tail`'s exit
+  code instead of the audited script's, masking the real failure until the
+  pre-commit hook caught it).
+- Whitelist entry counts: leaderboards 38→34, aggregators 23→21 (net −6 dead
+  entries removed, 1 duplicate consolidated), local/community/registries
+  unchanged in count (metadata-only fixes).
+
 ## [2026-07-16] — fix(pipeline): close the gpt-5-6-sol/-terra `.lcb` gap via vals.ai (root cause of the original investigation)
 
 Direct follow-up: the `gpt-5-6-sol/-terra/-luna` `.lcb` gaps that started this
