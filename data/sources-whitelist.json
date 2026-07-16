@@ -2425,12 +2425,17 @@
       "name": "Berkeley BFCL",
       "url": "https://gorilla.cs.berkeley.edu/leaderboard.html",
       "tier": "I",
-      "authority": "function-calling v3/v4",
+      "authority": "function-calling v3/v4 — the leaderboard.html page itself is a genuine SPA (0 model names in raw HTML), but the same dashboard checks in the exact CSV it fetches client-side at a plain, non-SPA URL: gorilla.cs.berkeley.edu/data_overall.csv (verified live 2026-07-16, scripts/extract-bfcl.py reads it directly — same approach as extract-livebench.py).",
       "format": "spa_full",
-      "lastVerifiedDate": "2026-05-06",
+      "lastVerifiedDate": "2026-07-16",
       "consecutiveFailures": 0,
       "extractor": "websearch_snippet",
       "fallbacks": [
+        {
+          "format": "static_json_api",
+          "urlPattern": "https://gorilla.cs.berkeley.edu/data_overall.csv",
+          "note": "Real cascade, not advisory — deterministic extractor (scripts/extract-bfcl.py) reads this first; confirmed live 2026-07-16."
+        },
         {
           "format": "github_raw_json"
         },

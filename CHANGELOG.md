@@ -1,4 +1,52 @@
 
+## [2026-07-16] — feat(pipeline): wire Berkeley BFCL as a deterministic extractor; LiveCodeBench's own repo investigated and rejected
+
+Third and final source-audit follow-up (after LiveBench and vals.ai):
+`gorilla.cs.berkeley.edu/leaderboard.html` is a genuine SPA (0 model names in
+raw HTML, correctly marked `spa_full`), but the dashboard checks in the exact
+CSV it fetches client-side at `data_overall.csv` — a plain, non-SPA URL, same
+"read the artifact the SPA itself reads" approach as `extract-livebench.py`.
+
+### Added
+- `scripts/extract-bfcl.py` — reads `data_overall.csv` directly. BFCL lists
+  each model once per invocation harness ("(FC)"/"(Prompt)"/"(FC thinking)"/
+  "(Prompt + Thinking)"), which can diverge sharply for the same model
+  (Claude Opus 4.5: 77.47% FC vs 33.47% Prompt) — handled by stripping the
+  harness tag + a trailing vendor-snapshot date suffix, then taking the MAX
+  across variants that resolve to the same one of our ids (the "best
+  demonstrated result" doctrine already documented on the SWE-bench
+  experiments repo whitelist entry, applied consistently here rather than
+  picking arbitrarily or treating it as an unresolvable collision).
+- `scripts/apply-bfcl.py` — fill-only apply, same direct-write pattern as
+  `apply-livebench.py`/`apply-vals-lcb.py` (bfcl is `coreBenchKeys`, so a
+  5-cell patch can't go through `merge.py`'s full-matrix MX1 gate without
+  `gap_gen.py` stamping hundreds of unrelated cells as synthetic gaps).
+- `Berkeley BFCL` whitelist entry: added the CSV as a documented, verified
+  fallback (`static_json_api`, confirmed live 2026-07-16).
+
+### Investigated and rejected — LiveCodeBench's own repo
+The audit agent's claim that `livecodebench.github.io`'s repo has a usable
+companion JSON (`build/v5.json`) was technically correct (real 7.1MB file,
+31,680 performance records, 36 models) but practically useless for us:
+verified the latest model in that dataset released 2025-03-12 — over a year
+stale relative to every model we currently track (checked directly: zero
+normalized-name matches against our full active lineup). Not wired; building
+an extractor for zero possible fills isn't worth the maintenance surface.
+`lcb` is already served by the AA eval sub-page + vals.ai (both current,
+both wired) — this source adds nothing.
+
+### Verified
+- `extract-bfcl.py --verbose`: 109 rows parsed, 5/109 matched (BFCL's model
+  set skews toward slightly older versions than our current active lineup,
+  same staleness pattern noted for BigCodeBench/EvalPlus earlier today).
+- `apply-bfcl.py --apply`: 4 genuine new fills (`claude-haiku-4-5`=68.7,
+  `o3`=63.05, `gpt-4-1`=53.96, `o4-mini`=53.24); `qwen3-32b` correctly
+  skipped (already had a `bfcl` value, no overwrite) — `bfcl` coverage
+  13/100 → 17/100.
+- `gen-bench-keys.py --check`, `audit-data-coherence.py`,
+  `audit-bench-source-mapping.py`, `audit-agent-misfiles.py`: all genuinely
+  exit 0.
+
 ## [2026-07-16] — fix(pipeline): full source-whitelist audit — dead/hijacked URLs, format misclassifications, publishes[] corrections (36 entries)
 
 User asked for a full, one-by-one live audit of every whitelisted source's
