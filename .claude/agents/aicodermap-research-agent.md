@@ -67,10 +67,17 @@ Phase 0 fetches do NOT count against per-model fetch budget — skill-level over
 
 ### Phase 0 sub-probes (optional discovery — emit candidates only, never auto-add)
 
-**Unknown-vendor probe:** scan trending HF + aggregator indexes for orgs absent
-from `sourcesWhitelist.vendors`. Emit `discoveries.vendors[] = { id,
-observedAt, modelCount, latestRelease, suggestedTier }`. Promotion requires
-`scripts/promote-discovery.py` (human review).
+**Unknown-vendor probe:** data-driven, not ad-hoc — read
+`sourcesWhitelist._schema.unknownVendorProbe` and follow its `procedure`
+verbatim: fetch every `huggingfaceListings[].url` (HF trending/most-downloaded
+text-generation + all-tasks listings — concrete, repeatable every full cycle),
+extract every org/model repo id, cross-check against `aggregatorIndexes[]`
+(OpenRouter newest, Artificial Analysis leaderboards, PapersWithCode) for a
+2nd corroborating signal, and flag orgs absent from `sourcesWhitelist.vendors`.
+Emit `discoveries.vendors[] = { id, observedAt, modelCount, latestRelease,
+suggestedTier }`. Promotion requires `scripts/promote-discovery.py` (human
+review). This is IN ADDITION to any other web search you judge useful — the
+schema list is the repeatable floor, not a ceiling.
 
 **Unknown-leaderboard probe:** scan paperswithcode.com/area/computer-code +
 artificialanalysis.ai/leaderboards for benches absent from
@@ -888,6 +895,8 @@ For each fetched table page, extract every row matching a model in `idea_context
 1. Exact `id` slug match
 2. Fuzzy `name` match (case-insensitive substring + version number alignment)
 3. Common alias map (e.g., "Claude Opus 4.7" → `opus-4-7`)
+
+**Spelling/format variants are a pipeline-level safety net, not a license to guess (2026-07-16).** `modelId`/`benchKey.id` you emit should always be your best-effort exact match against `idea_context.currentIds` — but if a source spells the same model differently in case, hyphen/underscore/dot, or spacing ("GLM-5.2", "glm5.2", "glm_5_2", "GLM 5.2" — all the same model as canonical `glm-5-2`), you do NOT need to hand-normalize it yourself: `scripts/lib/util.py`'s `slug_norm()`/`build_norm_id_index()`/`resolve_canonical_id()` is the pipeline-wide SSOT, wired into every id-matching site downstream (`gather_validator.py`'s target-id check, `local-synth.py`'s active-id check, `merge.py`'s update/sourcesAdded/lineup-deprecation/contradiction id resolution, `add-new-lineup-stubs.py`'s new-vs-existing dedup, and `audit-data-coherence.py`'s AC13 near-duplicate-id check). A spelling variant is canonicalized automatically and logged to `format_warnings`, never silently dropped or split into an orphaned record. This does NOT cover genuinely different names/rebrands for the same model (e.g. a marketing name vs a slug) — that class of ambiguity still needs the fuzzy-match/alias-map steps above; `slug_norm` only collapses formatting, not identity.
 
 For each match, record:
 - Numeric bench → `models[].updates.bench[<key>]` with leaderboard URL (tier=I)

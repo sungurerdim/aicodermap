@@ -39,6 +39,7 @@ from lib.matrix import active_models as _active_models  # noqa: E402
 from lib.util import canonical_display_name as _canonical_name  # noqa: E402
 from lib.util import configure_utf8_output  # noqa: E402
 from lib.util import read_json as load_json  # noqa: E402
+from lib.util import slug_norm  # noqa: E402
 from lib.whitelist import build_domain_publishes, elo_swe_misfile  # noqa: E402
 
 configure_utf8_output()
@@ -114,6 +115,23 @@ def main():
     canonical_bench = core_bench_set | emerging_bench_set
     canonical_ids = {m["id"] for m in models}
     active_ids = {m["id"] for m in _active_models(models)}
+
+    # === AC13 — near-duplicate model ids (BLOCK) ===
+    # Two ids that normalize to the same slug ("glm-5-2" / "GLM-5.2") would
+    # otherwise coexist as two separate model records — silently splitting one
+    # model's benchmark history, pricing, and provenance across two entries
+    # forever, since nothing else in the pipeline would ever notice.
+    _by_norm: dict[str, list[str]] = {}
+    for _id in canonical_ids:
+        _by_norm.setdefault(slug_norm(_id), []).append(_id)
+    dup_id_groups = {n: ids for n, ids in _by_norm.items() if len(ids) > 1}
+    if dup_id_groups:
+        sample = [sorted(ids) for ids in list(dup_id_groups.values())[:5]]
+        failures.append(
+            f"AC13 — {len(dup_id_groups)} normalized-id collision(s) in "
+            f"data/models.json (two ids are spelling variants of the same "
+            f"model): {sample}"
+        )
 
     # === 1. core.js BENCH_KEYS ===
     core_bench = set(parse_bench_keys_from_core(core_src))

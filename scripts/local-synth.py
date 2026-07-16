@@ -29,6 +29,7 @@ from lib import reliability as _reliability  # type: ignore  # noqa: E402
 from lib.tiers import effective_trust_score as trust_score, is_pseudo_source  # type: ignore  # noqa: E402  (SSOT)
 from lib.constants import ELO_BENCH_KEYS, GATHER_BATCH_GLOB  # type: ignore  # noqa: E402  (SSOT)
 from lib.util import extract_domain, today_iso  # type: ignore  # noqa: E402  (SSOT)
+from lib.util import build_norm_id_index, resolve_canonical_id  # type: ignore  # noqa: E402
 
 LEDGER_PATH = ROOT / "data" / "source-reliability.json"
 
@@ -113,6 +114,11 @@ def main() -> int:
 
     active = active_models(models)
     active_ids = {m["id"] for m in active}
+    # 2026-07-16: a gather batch spelling an id differently ("GLM-5.2" vs
+    # canonical "glm-5-2") must still land on the right model, not get
+    # silently dropped as "not active" — see build_norm_id_index/
+    # resolve_canonical_id (lib.util), the pipeline-wide SSOT for this.
+    active_norm_index = build_norm_id_index(active_ids)
 
     artifacts = find_batch_artifacts()
     print(f"Reading {len(artifacts)} gather artifacts")
@@ -188,10 +194,16 @@ def main() -> int:
         except Exception as e:
             print(f"  ! skip {p.name}: {e}")
 
+    def _canon_mid(mid):
+        """Exact match first; else normalized fallback to a real active id."""
+        if mid in active_ids:
+            return mid
+        return resolve_canonical_id(mid or "", active_norm_index)
+
     for p, art in parsed_artifacts:
         runtime_total["batchesMerged"] += 1
         for obs in art.get("observations") or []:
-            mid = obs.get("modelId")
+            mid = _canon_mid(obs.get("modelId"))
             bk = obs.get("benchKey")
             val = obs.get("value")
             if mid not in active_ids or bk not in value_keys or val is None:
@@ -240,17 +252,17 @@ def main() -> int:
 
     for p, art in parsed_artifacts:
         for po in art.get("pricingObs") or []:
-            mid = po.get("modelId")
+            mid = _canon_mid(po.get("modelId"))
             if mid in active_ids:
                 all_pricing[mid].append(po)
                 runtime_total["pricingObsTotal"] += 1
         for oo in art.get("ollamaObs") or []:
-            mid = oo.get("modelId")
+            mid = _canon_mid(oo.get("modelId"))
             if mid in active_ids:
                 all_ollama[mid].append(oo)
                 runtime_total["ollamaObsTotal"] += 1
         for uo in art.get("unslothObs") or []:
-            mid = uo.get("modelId")
+            mid = _canon_mid(uo.get("modelId"))
             if mid in active_ids:
                 all_unsloth[mid].append(uo)
                 runtime_total["unslothObsTotal"] += 1
@@ -512,7 +524,7 @@ def main() -> int:
     _gap_seen: set[tuple[str, str]] = set()
     gap_entries: list = []
     for rg in all_raw_gaps:
-        mid = rg.get("modelId")
+        mid = _canon_mid(rg.get("modelId"))
         bk = rg.get("benchKey")
         if not mid or not bk or mid not in active_ids or bk not in core_keys:
             continue

@@ -52,6 +52,28 @@ class TestUtil(unittest.TestCase):
         for variant in ("Qwen3.6-Max", "qwen3-6-max", "Qwen 3.6 Max"):
             self.assertEqual(util.slug_norm(variant), "qwen36max")
 
+    def test_build_norm_id_index_maps_every_variant(self):
+        idx = util.build_norm_id_index(["glm-5-2", "kimi-k2-7-code"])
+        self.assertEqual(idx["glm52"], "glm-5-2")
+        self.assertEqual(idx["kimik27code"], "kimi-k2-7-code")
+
+    def test_build_norm_id_index_drops_collisions(self):
+        """Two DIFFERENT canonical ids normalizing to the same slug must not
+        resolve to either candidate — collision key is dropped entirely."""
+        idx = util.build_norm_id_index(["glm-5-2", "GLM-5-2"])
+        self.assertNotIn("glm52", idx)
+
+    def test_resolve_canonical_id_matches_every_spelling(self):
+        idx = util.build_norm_id_index(["glm-5-2"])
+        for variant in ("GLM-5.2", "glm5.2", "glm_5_2", "GLM 5.2", "glm-5-2"):
+            self.assertEqual(
+                util.resolve_canonical_id(variant, idx), "glm-5-2", msg=variant
+            )
+
+    def test_resolve_canonical_id_none_for_unknown(self):
+        idx = util.build_norm_id_index(["glm-5-2"])
+        self.assertIsNone(util.resolve_canonical_id("totally-different-model", idx))
+
     def test_extract_domain_strips_www_prefix_only(self):
         """Regression: lstrip('www.') mangled openrouter.ai → penrouter.ai."""
         self.assertEqual(util.extract_domain("https://www.openrouter.ai/models"), "openrouter.ai")
@@ -744,6 +766,26 @@ class TestNewModelGate(unittest.TestCase):
         self.assertEqual(add_stubs.is_superseded("Kimi K2.6 Code", existing), "Kimi K2.7 Code")
         # A genuinely-new, higher version in the same family is NOT flagged.
         self.assertIsNone(add_stubs.is_superseded("Kimi K3 Code", existing))
+
+    def test_multi_letter_fused_spelling_parses_same_as_separated(self):
+        """2026-07-16: a fully-unseparated spelling ("glm5.2") has a
+        MULTI-letter family prefix fused to the version — distinct from the
+        single-letter FUSED_VER_RE case above (K2.7). Without
+        MULTI_FUSED_VER_RE it fell through to the plain alpha branch, which
+        strips digits entirely and loses the version (fails open in
+        is_superseded's `not ver` guard)."""
+        expected = (("glm",), (5, 2))
+        for variant in ("glm5.2", "GLM-5.2", "glm_5_2", "GLM 5.2", "glm-5-2"):
+            self.assertEqual(add_stubs.parse_name(variant), expected, msg=variant)
+        # A genuinely-older no-separator snapshot IS recognized as superseded
+        # (this is what broke before the fix: version=None on "glm5.1" made
+        # is_superseded's `if not ver: return None` guard fail open).
+        existing = [{"id": "glm-5-2", "name": "GLM-5.2"}]
+        self.assertEqual(add_stubs.is_superseded("glm5.1", existing), "GLM-5.2")
+        # An equal-version no-separator spelling is NOT "superseded" (it's the
+        # SAME release, not an older one) — that's the duplicate-id path,
+        # covered separately by the existing/existing_norm_index dedup check.
+        self.assertIsNone(add_stubs.is_superseded("glm5.2", existing))
 
     def test_restricted_held_even_if_admissible(self):
         nm = {

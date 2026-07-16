@@ -58,6 +58,7 @@ from lib.util import canonical_display_name as _canonical_name  # noqa: E402
 from lib.cluster import _cluster_observations  # noqa: E402
 from lib.util import configure_utf8_output, today_iso, utc_now_iso, write_json  # noqa: E402
 from lib.util import extract_domain as _extract_domain  # noqa: E402
+from lib.util import build_norm_id_index, resolve_canonical_id, slug_norm  # noqa: E402
 from lib.changelog import render_changelog_markdown as _render_changelog  # noqa: E402
 from lib.telemetry import build_meta as _telemetry_build_meta  # noqa: E402
 from lib.telemetry import (  # noqa: E402
@@ -859,6 +860,7 @@ def _green_cell_reliability_sweep(
 def _process_lineup_changes(
     out: dict,
     models_by_id: dict,
+    models_by_norm_id: dict,
     log: dict,
     today: str,
     now: str,
@@ -866,14 +868,24 @@ def _process_lineup_changes(
     """Apply lineup deprecations and renames from the artifact to models and log."""
     lineup = out.get("lineupChanges", {}) or {}
     for d in lineup.get("deprecated", []) or []:
-        target = models_by_id.get(d.get("id"))
+        dep_id = d.get("id")
+        target = models_by_id.get(dep_id)
+        canonical_id = dep_id
+        if target is None:
+            canonical_id = resolve_canonical_id(dep_id, models_by_norm_id)
+            target = models_by_id.get(canonical_id) if canonical_id else None
+            if target is not None:
+                log["format_warnings"].append(
+                    f"lineup deprecation carried spelling-variant id {dep_id!r} "
+                    f"-> canonicalized to {canonical_id!r}"
+                )
         if target is not None:
             target["status"] = "deprecated"
             target["deprecatedAt"] = d.get("deprecationDate") or today
             if d.get("successor"):
                 target["successor"] = d["successor"]
             target["lastUpdated"] = now
-            log["lineup_deprecated"].append(d["id"])
+            log["lineup_deprecated"].append(canonical_id)
     for r in lineup.get("renamed", []) or []:
         log["lineup_renamed"].append(f"{r.get('from')} -> {r.get('to')}")
 
@@ -1054,8 +1066,8 @@ def _validate_and_load_artifact():
 def _load_data_files(fabricated_suspicions):
     """Rotate backups, load models.json + sources.json, build the id index +
     whitelist/unhealthy lookups, and initialise the run log. Returns
-    (models_path, sources_path, models, sources, models_by_id, wl_idx,
-    unhealthy_urls, log)."""
+    (models_path, sources_path, models, sources, models_by_id,
+    models_by_norm_id, wl_idx, unhealthy_urls, log)."""
     models_path = f"{PROJECT}/data/models.json"
     sources_path = f"{PROJECT}/data/sources.json"
     rotate_backup(models_path)
@@ -1073,6 +1085,12 @@ def _load_data_files(fabricated_suspicions):
     # three loops. Kept in sync manually at the single place models grows
     # (the newModels append below).
     models_by_id = {m.get("id"): m for m in models if isinstance(m, dict)}
+    # 2026-07-16: normalized-id fallback (slug_norm collapses case/-/_/./space
+    # differences) — an artifact carrying "GLM-5.2"/"glm5.2"/"glm_5_2" for our
+    # canonical "glm-5-2" used to silently miss the exact-match lookup above
+    # and get dropped as "unknown id" (or, for sourcesAdded keys, orphaned as a
+    # brand-new top-level sources.json key never associated with the model).
+    models_by_norm_id = build_norm_id_index(models_by_id.keys())
 
     log = {
         "updated": [],
@@ -1094,13 +1112,16 @@ def _load_data_files(fabricated_suspicions):
         models,
         sources,
         models_by_id,
+        models_by_norm_id,
         wl_idx,
         unhealthy_urls,
         log,
     )
 
 
-def _apply_model_updates(out, sources, models_by_id, wl_idx, unhealthy_urls, log):
+def _apply_model_updates(
+    out, sources, models_by_id, models_by_norm_id, wl_idx, unhealthy_urls, log
+):
     """Apply per-model updates + sourcesAdded provenance.
 
     New-model admission lives in scripts/add-new-lineup-stubs.py (run by
@@ -1110,8 +1131,16 @@ def _apply_model_updates(out, sources, models_by_id, wl_idx, unhealthy_urls, log
         mid = upd["id"]
         m = models_by_id.get(mid)
         if m is None:
-            log["gaps"].append(f"unknown id in updates: {mid}")
-            continue
+            canonical = resolve_canonical_id(mid, models_by_norm_id)
+            if canonical is None:
+                log["gaps"].append(f"unknown id in updates: {mid}")
+                continue
+            log["format_warnings"].append(
+                f"updates carried spelling-variant id {mid!r} "
+                f"-> canonicalized to {canonical!r}"
+            )
+            m = models_by_id[canonical]
+            mid = canonical
         if apply_model_update(m, upd.get("updates", {})):
             log["updated"].append(mid)
         # N/A retired 2026-05-25: inline notApplicable[] is no longer promoted
@@ -1128,6 +1157,29 @@ def _apply_model_updates(out, sources, models_by_id, wl_idx, unhealthy_urls, log
             warn = format_consistency_warn(s, wl_idx)
             if warn:
                 log["format_warnings"].append(f"{mid}: {warn}")
+            # 2026-07-16: canonicalize the key's modelId segment against the
+            # enclosing model's real id. sourcesAdded[] always lives nested
+            # inside THIS upd/model object, so a key whose modelId segment is
+            # merely a spelling/format variant of `mid` (or, less safely, a
+            # flat-out mismatch) must not create an orphaned top-level entry
+            # in sources.json that never gets associated with this model's
+            # provenance — it's rebuilt from the known-correct `mid` either
+            # way, with the drift logged for audit visibility.
+            key = s.get("key") or ""
+            key_mid, _dot, key_field = key.rpartition(".")
+            if key_mid and key_field and key_mid != mid:
+                if slug_norm(key_mid) == slug_norm(mid):
+                    log["format_warnings"].append(
+                        f"{mid}: sourcesAdded key spelling variant "
+                        f"{key_mid!r} -> canonicalized"
+                    )
+                else:
+                    log["format_warnings"].append(
+                        f"{mid}: sourcesAdded key model-id mismatch "
+                        f"{key_mid!r} != {mid!r} -- canonicalized to enclosing model"
+                    )
+                key = f"{mid}.{key_field}"
+                s["key"] = key
             # 4.4 — SWE-variant ambiguity penalty. An observation the agent tagged
             # `_variantAmbiguous` (a bare "SWE-bench" with no Verified/Pro/Multi
             # qualifier) gets −0.5 trustScore (clamped ≥0) so a properly-qualified
@@ -1147,8 +1199,8 @@ def _apply_model_updates(out, sources, models_by_id, wl_idx, unhealthy_urls, log
             }
             if _ambiguous:
                 _entry["_variantAmbiguous"] = True
-                out.setdefault("runtime", {}).setdefault("variantAmbiguous", []).append(s["key"])
-            if append_source(sources, s["key"], _entry):
+                out.setdefault("runtime", {}).setdefault("variantAmbiguous", []).append(key)
+            if append_source(sources, key, _entry):
                 log["sources_appended"] += 1
 
     # New-model admission is NOT done here. The prior raw `out.newModels` append
@@ -1269,6 +1321,7 @@ def _store_winner_and_provenance(
     winner_value,
     all_candidates,
     models_by_id,
+    models_by_norm_id,
     sources,
     unhealthy_urls,
     log,
@@ -1278,6 +1331,15 @@ def _store_winner_and_provenance(
     healthy candidate to sources.json provenance (winner/loser tagged)."""
     mid, bench_field = c["modelId"], c["field"]
     m = models_by_id.get(mid)
+    if m is None:
+        canonical = resolve_canonical_id(mid, models_by_norm_id)
+        if canonical is not None:
+            log["format_warnings"].append(
+                f"contradiction carried spelling-variant id {mid!r} "
+                f"-> canonicalized to {canonical!r}"
+            )
+            mid = canonical
+            m = models_by_id.get(mid)
     if m is not None and bench_field in bench_keys:
         if "bench" not in m:
             m["bench"] = {}
@@ -1355,7 +1417,9 @@ def _load_decayed_reliability_ledger():
     return reliability_ledger
 
 
-def _resolve_contradictions(out, models, sources, models_by_id, unhealthy_urls, log):
+def _resolve_contradictions(
+    out, models, sources, models_by_id, models_by_norm_id, unhealthy_urls, log
+):
     """FAZ 6.B contradiction auto-resolution + R1 source-reliability crediting.
 
     Re-clusters candidate observations, applies multi-source consensus override,
@@ -1381,6 +1445,7 @@ def _resolve_contradictions(out, models, sources, models_by_id, unhealthy_urls, 
             winner["value"],
             all_candidates,
             models_by_id,
+            models_by_norm_id,
             sources,
             unhealthy_urls,
             log,
@@ -1411,13 +1476,14 @@ def _finalize_and_write(
     models_path,
     sources_path,
     models_by_id,
+    models_by_norm_id,
     log,
     reliability_ledger,
 ):
     """Apply lineup changes, quarantine/gap policy, name canonicalization, and
     self-check; then write models.json + sources.json + verification map +
     reliability ledger. Returns (issues, mx_diag) for the post-write gates."""
-    _process_lineup_changes(out, models_by_id, log, TODAY, NOW)
+    _process_lineup_changes(out, models_by_id, models_by_norm_id, log, TODAY, NOW)
 
     # FAZ 8.A.3d (2026-05-18): quarantine + gap policy must run BEFORE the
     # final models.json write so the stamps appear in the persisted shape
@@ -1741,15 +1807,18 @@ def main():
         models,
         sources,
         models_by_id,
+        models_by_norm_id,
         wl_idx,
         unhealthy_urls,
         log,
     ) = _load_data_files(fabricated_suspicions)
 
-    _apply_model_updates(out, sources, models_by_id, wl_idx, unhealthy_urls, log)
+    _apply_model_updates(
+        out, sources, models_by_id, models_by_norm_id, wl_idx, unhealthy_urls, log
+    )
 
     reliability_ledger = _resolve_contradictions(
-        out, models, sources, models_by_id, unhealthy_urls, log
+        out, models, sources, models_by_id, models_by_norm_id, unhealthy_urls, log
     )
 
     issues = _finalize_and_write(
@@ -1759,6 +1828,7 @@ def main():
         models_path,
         sources_path,
         models_by_id,
+        models_by_norm_id,
         log,
         reliability_ledger,
     )

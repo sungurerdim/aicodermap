@@ -128,6 +128,47 @@ class TestValidateGather(unittest.TestCase):
         self.assertEqual(v["stats"]["observations"], 3)
         self.assertEqual(len(v["warnings"]), 3)
 
+    def test_spelling_variant_of_target_id_is_canonicalized_not_dropped(self):
+        """2026-07-16: a gather agent spelling the target id differently
+        ("ACME_Coder-1" vs canonical "acme-coder-1") used to get its
+        observation dropped as "not in target_model_ids" — real data lost for
+        a pure formatting reason. It must now canonicalize and count."""
+        art = _gather_artifact()
+        variant_obs = {
+            "modelId": "ACME_Coder-1",
+            "benchKey": "mmluPro",
+            "value": 71.0,
+            "sourceUrl": "https://x.example",
+            "tier": "I",
+            "fetched": "2026-06-10",
+        }
+        art["observations"].append(variant_obs)
+        v = validate_gather(art, self.TARGETS)
+        self.assertTrue(v["valid"])
+        self.assertEqual(v["stats"]["observations"], 4)
+        self.assertTrue(any("canonicalized" in w for w in v["warnings"]))
+        self.assertEqual(variant_obs["modelId"], "acme-coder-1")
+
+    def test_true_non_target_model_still_dropped(self):
+        """A genuinely different model id (not a spelling variant) must still
+        be dropped — canonicalization must not paper over real mismatches."""
+        art = _gather_artifact()
+        art["observations"].append(
+            {
+                "modelId": "other-model",
+                "benchKey": "swePro",
+                "value": 50,
+                "sourceUrl": "https://x.example",
+                "tier": "I",
+                "fetched": "2026-06-10",
+            }
+        )
+        v = validate_gather(art, self.TARGETS)
+        self.assertEqual(v["stats"]["observations"], 3)
+        self.assertTrue(
+            any("not in target_model_ids" in w for w in v["warnings"])
+        )
+
     def test_zero_observations_is_invalid(self):
         v = validate_gather(_gather_artifact(observations=[]), self.TARGETS)
         self.assertFalse(v["valid"])
@@ -310,6 +351,95 @@ class TestApplyModelUpdate(unittest.TestCase):
         model = {"id": "x", "privacy": {"soc2": True, "gdpr": True}}
         merge.apply_model_update(model, {"privacy": {"gdpr": False}})
         self.assertEqual(model["privacy"], {"soc2": True, "gdpr": False})
+
+
+class TestApplyModelUpdatesIdCanonicalization(unittest.TestCase):
+    """2026-07-16: merge.py's per-model update loop must recognize a spelling/
+    format variant of a canonical id ("GLM-5.2" vs "glm-5-2") as the SAME
+    model — not drop it as "unknown id", and not orphan its sourcesAdded[]
+    provenance under a never-associated top-level sources.json key."""
+
+    def _models_by(self, models):
+        by_id = {m["id"]: m for m in models}
+        by_norm = merge.build_norm_id_index(by_id.keys())
+        return by_id, by_norm
+
+    def test_spelling_variant_update_id_resolves_to_canonical_model(self):
+        models = [{"id": "glm-5-2", "bench": {}}]
+        models_by_id, models_by_norm_id = self._models_by(models)
+        sources = {}
+        log = {"updated": [], "gaps": [], "format_warnings": [], "sources_appended": 0,
+               "spa_guard_rejections": 0}
+        out = {
+            "models": [
+                {
+                    "id": "GLM-5.2",
+                    "updates": {"bench": {"swePro": 71.5}},
+                    "sourcesAdded": [],
+                }
+            ]
+        }
+        merge._apply_model_updates(out, sources, models_by_id, models_by_norm_id, {}, set(), log)
+        self.assertEqual(models[0]["bench"]["swePro"], 71.5)
+        self.assertEqual(log["updated"], ["glm-5-2"])
+        self.assertNotIn("unknown id in updates: GLM-5.2", log["gaps"])
+        self.assertTrue(any("canonicalized" in w for w in log["format_warnings"]))
+
+    def test_truly_unknown_id_still_reported_as_gap(self):
+        models = [{"id": "glm-5-2", "bench": {}}]
+        models_by_id, models_by_norm_id = self._models_by(models)
+        log = {"updated": [], "gaps": [], "format_warnings": [], "sources_appended": 0,
+               "spa_guard_rejections": 0}
+        out = {"models": [{"id": "totally-different-model", "updates": {}, "sourcesAdded": []}]}
+        merge._apply_model_updates(out, {}, models_by_id, models_by_norm_id, {}, set(), log)
+        self.assertEqual(log["gaps"], ["unknown id in updates: totally-different-model"])
+
+    def test_sourcesAdded_key_spelling_variant_canonicalized_not_orphaned(self):
+        """A sourcesAdded[] entry whose key's modelId segment is spelled
+        differently than the enclosing model's real id must land under the
+        REAL canonical key, not create an orphaned top-level sources.json
+        entry that never gets associated with this model's provenance."""
+        models = [{"id": "glm-5-2", "bench": {}}]
+        models_by_id, models_by_norm_id = self._models_by(models)
+        sources = {}
+        log = {"updated": [], "gaps": [], "format_warnings": [], "sources_appended": 0,
+               "spa_guard_rejections": 0}
+        out = {
+            "models": [
+                {
+                    "id": "glm-5-2",
+                    "updates": {},
+                    "sourcesAdded": [
+                        {
+                            "key": "glm_5_2.aaIdx",  # spelling variant of the key's own model
+                            "value": 42.0,
+                            "source": "artificialanalysis.ai",
+                            "url": "https://artificialanalysis.ai/models/glm-5-2",
+                            "tier": "I",
+                        }
+                    ],
+                }
+            ]
+        }
+        merge._apply_model_updates(out, sources, models_by_id, models_by_norm_id, {}, set(), log)
+        self.assertIn("glm-5-2.aaIdx", sources)
+        self.assertNotIn("glm_5_2.aaIdx", sources)
+        self.assertEqual(sources["glm-5-2.aaIdx"][0]["value"], 42.0)
+
+
+class TestProcessLineupChangesIdCanonicalization(unittest.TestCase):
+    def test_deprecation_spelling_variant_resolves_to_canonical_model(self):
+        models = [{"id": "old-model-1", "status": "active"}]
+        models_by_id = {m["id"]: m for m in models}
+        models_by_norm_id = merge.build_norm_id_index(models_by_id.keys())
+        log = {"lineup_deprecated": [], "lineup_renamed": [], "format_warnings": []}
+        out = {"lineupChanges": {"deprecated": [{"id": "Old_Model-1", "successor": "new-model-2"}]}}
+        merge._process_lineup_changes(
+            out, models_by_id, models_by_norm_id, log, "2026-07-16", "2026-07-16T00:00:00Z"
+        )
+        self.assertEqual(models[0]["status"], "deprecated")
+        self.assertEqual(models[0]["successor"], "new-model-2")
+        self.assertEqual(log["lineup_deprecated"], ["old-model-1"])
 
 
 class TestValidateGaps(unittest.TestCase):

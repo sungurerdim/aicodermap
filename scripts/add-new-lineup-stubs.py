@@ -64,9 +64,12 @@ REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "scripts"))
 from lib.constants import SINGLE_ARTIFACT_PATH  # noqa: E402
 from lib.util import (  # noqa: E402
+    build_norm_id_index,
     canonical_display_name,
     configure_utf8_output,
+    resolve_canonical_id,
     safe_json_load,
+    slug_norm,
     today_iso,
     utc_now_iso,
     write_json,
@@ -95,6 +98,14 @@ VER_RE = re.compile(r"^\d+(?:\.\d+)*$")
 # never matches (only ONE leading letter) and keeps falling through to the plain
 # alpha branch below, unaffected.
 FUSED_VER_RE = re.compile(r"^([A-Za-z])(\d+(?:\.\d+)*)$")
+# 2026-07-16: a fully-unseparated spelling ("glm5.2", "gpt5.5") has a
+# MULTI-letter family prefix fused directly to the version digits — distinct
+# from FUSED_VER_RE's single-letter marker case (K2.7, V4). Without this, the
+# token fell through to the plain alpha branch below, which strips digits
+# entirely and silently loses the version (family=("glm",), version=None) —
+# is_superseded's `not ver` guard then fails open, so a re-listed OLDER
+# snapshot spelled this way could be wrongly admitted as a fresh stub.
+MULTI_FUSED_VER_RE = re.compile(r"^([A-Za-z]+?)(\d+(?:\.\d+)*)$")
 
 
 def parse_name(name: str) -> tuple[tuple[str, ...], tuple[int, ...] | None]:
@@ -126,6 +137,14 @@ def parse_name(name: str) -> tuple[tuple[str, ...], tuple[int, ...] | None]:
             # stub even though a newer one was already tracked.
             family.append(fused.group(1).lower())
             parts = tuple(int(x) for x in fused.group(2).split("."))
+            version = parts if version is None else version + parts
+            continue
+        multi_fused = MULTI_FUSED_VER_RE.fullmatch(t)
+        if multi_fused:
+            # A fully-unseparated spelling ("glm5.2") — see MULTI_FUSED_VER_RE
+            # comment above.
+            family.append(multi_fused.group(1).lower())
+            parts = tuple(int(x) for x in multi_fused.group(2).split("."))
             version = parts if version is None else version + parts
             continue
         alpha = re.sub(r"[\d.]+", "", t).lower()
@@ -238,6 +257,16 @@ def collect_candidates(current_ids: set[str]) -> tuple[dict[str, dict], bool]:
     ≥2-distinct-host bar. Returns (candidates_by_id, any_artifact_seen)."""
     cands: dict[str, dict] = {}
     seen_artifact = False
+    # 2026-07-16: normalize before comparing against already-tracked ids AND
+    # before keying `cands` itself, so (a) a gather hint spelling an already-
+    # tracked model differently ("GLM-5.2" when we track "glm-5-2") is not
+    # mistaken for a genuinely new model, and (b) two artifacts reporting the
+    # SAME new model under different spellings accumulate evidence into ONE
+    # candidate entry instead of splitting it across two — each half possibly
+    # failing the >=2-distinct-host evidence gate that the combined evidence
+    # would have cleared.
+    current_norm_index = build_norm_id_index(current_ids)
+    cand_norm_index: dict[str, str] = {}
 
     def _merge(
         mid: str,
@@ -249,6 +278,11 @@ def collect_candidates(current_ids: set[str]) -> tuple[dict[str, dict], bool]:
         conf=None,
         notes=None,
     ):
+        canon = cand_norm_index.get(slug_norm(mid))
+        if canon is not None:
+            mid = canon
+        else:
+            cand_norm_index[slug_norm(mid)] = mid
         c = cands.setdefault(
             mid,
             {
@@ -291,7 +325,7 @@ def collect_candidates(current_ids: set[str]) -> tuple[dict[str, dict], bool]:
             if h.get("event") != "new":
                 continue
             mid = h.get("modelId")
-            if not mid or mid in current_ids:
+            if not mid or mid in current_ids or resolve_canonical_id(mid, current_norm_index):
                 continue
             _merge(
                 mid,
@@ -304,7 +338,7 @@ def collect_candidates(current_ids: set[str]) -> tuple[dict[str, dict], bool]:
         lc = d.get("lineupChanges") or {}
         for n in lc.get("new", []) or []:
             mid = n.get("suggestedId") or n.get("id")
-            if not mid or mid in current_ids:
+            if not mid or mid in current_ids or resolve_canonical_id(mid, current_norm_index):
                 continue
             _merge(
                 mid,
@@ -424,6 +458,11 @@ def main() -> int:
     models = json.loads(models_path.read_text(encoding="utf-8"))
     ms = models["models"] if isinstance(models, dict) else models
     existing = {m["id"] for m in ms}
+    # 2026-07-16: a candidate id that's merely a spelling/format variant of an
+    # already-tracked id ("GLM-5.2" surfacing when we already track "glm-5-2")
+    # must not be admitted as a second, duplicate stub. See lib.util's
+    # build_norm_id_index/resolve_canonical_id (pipeline-wide SSOT).
+    existing_norm_index = build_norm_id_index(existing)
     vendors = json.loads(
         (REPO / "data" / "sources-whitelist.json").read_text(encoding="utf-8")
     ).get("vendors", {})
@@ -437,6 +476,11 @@ def main() -> int:
     for mid, nm in candidates.items():
         name = nm.get("name") or mid
         if mid in existing:
+            continue
+        dup_of = resolve_canonical_id(mid, existing_norm_index)
+        if dup_of is not None:
+            skipped.append((mid, f"duplicate spelling of tracked id {dup_of!r}"))
+            print(f"  skip (spelling variant of already-tracked {dup_of!r}): {mid}")
             continue
         sup = is_superseded(name, ms)
         if sup:
@@ -485,6 +529,10 @@ def main() -> int:
         }
         ms.append(stub)
         existing.add(mid)
+        # Keep the norm index in sync so a spelling-variant of THIS candidate,
+        # surfacing later in the same run, is caught too (not just variants of
+        # ids that were already tracked before this run started).
+        existing_norm_index[slug_norm(mid)] = mid
         tr["models"][mid] = {"strengths": meta["tr_s"], "weaknesses": meta["tr_w"]}
         en["models"][mid] = {"strengths": meta["en_s"], "weaknesses": meta["en_w"]}
         added.append(mid)

@@ -65,6 +65,41 @@ def slug_norm(s: str) -> str:
     return re.sub(r"[^a-z0-9]", "", (s or "").lower())
 
 
+def build_norm_id_index(ids) -> dict[str, str]:
+    """Map slug_norm(id) -> canonical id, for every id in `ids`.
+
+    Collisions (two different canonical ids normalizing to the same slug)
+    are dropped from the index entirely rather than picking one arbitrarily
+    — an ambiguous normalized key must never silently resolve to either
+    candidate. Callers should treat a collision as its own audit finding
+    (see audit-data-coherence.py's duplicate-normalized-id check).
+    """
+    by_norm: dict[str, str] = {}
+    seen_collision: set[str] = set()
+    for cid in ids:
+        if not cid:
+            continue
+        n = slug_norm(cid)
+        if n in seen_collision:
+            continue
+        if n in by_norm and by_norm[n] != cid:
+            del by_norm[n]
+            seen_collision.add(n)
+            continue
+        by_norm[n] = cid
+    return by_norm
+
+
+def resolve_canonical_id(candidate: str, norm_index: dict[str, str]) -> str | None:
+    """Resolve `candidate` to a canonical id via `norm_index`
+    (slug_norm(id) -> id, from build_norm_id_index). Returns None when no
+    normalized match exists (ambiguous/collision keys are already absent
+    from norm_index). Exact-string matches trivially resolve to themselves
+    since slug_norm(candidate) == slug_norm(canonical_id) whenever
+    candidate == canonical_id."""
+    return norm_index.get(slug_norm(candidate))
+
+
 def extract_domain(url: str | None) -> str:
     """Return hostname without the `www.` prefix. None/empty → "".
 

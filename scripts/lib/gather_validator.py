@@ -14,6 +14,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from .util import build_norm_id_index, resolve_canonical_id
+
 
 def _artifact_started_unix(artifact: dict[str, Any]) -> float | None:
     """Return the agent's self-reported start as epoch seconds, or None.
@@ -138,6 +140,11 @@ def validate_gather(
 
     valid_observations = []
     target_set = set(target_model_ids)
+    # 2026-07-16: a gather agent spelling a target id differently ("GLM-5.2"
+    # vs canonical "glm-5-2") used to get its observation dropped entirely as
+    # "not in target_model_ids" — real data lost for a pure formatting reason.
+    # Normalize and canonicalize before falling back to a hard drop.
+    target_norm_index = build_norm_id_index(target_model_ids)
     for i, o in enumerate(observations):
         if not isinstance(o, dict):
             warnings.append(f"observations[{i}] is not a dict")
@@ -149,10 +156,17 @@ def validate_gather(
         if o.get("tier") not in ALLOWED_TIERS:
             warnings.append(f"observations[{i}].tier='{o.get('tier')}' invalid (need I|S|C)")
         if o.get("modelId") not in target_set:
+            canonical = resolve_canonical_id(o.get("modelId") or "", target_norm_index)
+            if canonical is None:
+                warnings.append(
+                    f"observations[{i}].modelId='{o.get('modelId')}' not in target_model_ids"
+                )
+                continue
             warnings.append(
-                f"observations[{i}].modelId='{o.get('modelId')}' not in target_model_ids"
+                f"observations[{i}].modelId spelling variant "
+                f"'{o.get('modelId')}' -> canonicalized to '{canonical}'"
             )
-            continue
+            o["modelId"] = canonical
         try:
             float(o["value"])
         except (TypeError, ValueError):
