@@ -101,7 +101,7 @@ def main() -> int:
         _bm = set(batch["modelIds"])
         ctx["anomalies"] = [a for a in anomalies if a.get("modelId") in _bm]
         out_path = REPO / f".aicodermap-ctx-{batch['batchId']}.json"
-        out_path.write_text(json.dumps(ctx, ensure_ascii=False), encoding="utf-8")
+        out_path.write_text(json.dumps(ctx, ensure_ascii=False, indent=2), encoding="utf-8")
         size_kb = out_path.stat().st_size / 1024
         print(
             f"  [ok] {batch['batchId']:40s} wave={batch['waveIndex']} "
