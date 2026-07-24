@@ -3,7 +3,7 @@
     "compositeMisfiles": 0,
     "measuredCandidates": 51,
     "bandViolations": 0,
-    "crossBenchDups": 7,
+    "crossBenchDups": 10,
     "aaRowsLoaded": 595
   },
   "compositeMisfiles": [],
@@ -369,6 +369,14 @@
   "bandViolations": [],
   "crossBenchDups": [
     {
+      "modelId": "mistral-large-3",
+      "value": 36.2,
+      "benchKeys": [
+        "ifBench",
+        "sciCode"
+      ]
+    },
+    {
       "modelId": "devstral-medium",
       "value": 9.1,
       "benchKeys": [
@@ -387,6 +395,14 @@
     {
       "modelId": "mimo-v2-pro",
       "value": 87.0,
+      "benchKeys": [
+        "gpqa",
+        "lcb"
+      ]
+    },
+    {
+      "modelId": "qwen3-32b",
+      "value": 54.6,
       "benchKeys": [
         "gpqa",
         "lcb"
@@ -422,6 +438,14 @@
       "benchKeys": [
         "hle",
         "tbHard"
+      ]
+    },
+    {
+      "modelId": "gemini-3-flash-preview",
+      "value": 78.0,
+      "benchKeys": [
+        "ifBench",
+        "sweV"
       ]
     }
   ]

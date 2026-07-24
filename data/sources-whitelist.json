@@ -4064,8 +4064,8 @@
         "consecutiveFailures": 0
       },
       "tbench.ai/leaderboard": {
-        "status": "static_html_table",
-        "observedFormat": "static_html_table",
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
         "lastProbedAt": "2026-07-24",
         "consecutiveFailures": 0
       },
@@ -4126,7 +4126,7 @@
         "status": "bot_blocked",
         "observedFormat": "bot_blocked",
         "lastProbedAt": "2026-07-24",
-        "consecutiveFailures": 26,
+        "consecutiveFailures": 27,
         "problems": [
           "bot-block"
         ]
@@ -4177,7 +4177,7 @@
         "status": "dead",
         "observedFormat": "dead",
         "lastProbedAt": "2026-07-24",
-        "consecutiveFailures": 2,
+        "consecutiveFailures": 3,
         "problems": [
           "http-404"
         ]
@@ -4606,7 +4606,7 @@
         "problems": [
           "redirect"
         ],
-        "redirectedTo": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DBlNjV41jHAvF2WfNVY-fxGPROVgD07ofwoolS2fRNU99Gn90oMcZ9Q4eduWLom7wWzWD_lD1MlcNZKU14UPdsFNuZEejqdJUPgScG0cT8cZkvUSIl0INLNSKoKD3NZcgFxtV_f2OcwHBNyT3Btg6BR_XSJQ5faPAQxqp6M-zNQ8&response_mode=form_post&nonce=639205217545052790.Mjg3MDQxOWEtZWIzYy00MDc0LWEyNmUtMGZjYzc4MjY0MjE3NzJhYmNmYzMtNzUwNC00MzBlLWIyMzYtNjAxNjljMWI2ZWFk&client-request-id=00de26cb-1014-434c-81f1-925fc1285aec&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
+        "redirectedTo": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DzbS7DVp4sBp0BUwCxlM1oZc8Gk53IHFpsmAotDTfmapDWKvCLn07SDdBRoPQG4zrv2Gh4nFtdG7V1V-CsW47dO6_XSYalBmq9x1a4GS8WVRRLma6eCApd_RHZ8iR7RMByS71PAM6psDnVt7HHLNXq-W5Ouzdyeyr3Ujo0g_j84I&response_mode=form_post&nonce=639205287292257566.M2ZhNTQxNTAtMWU2OS00ODQ0LThmMDUtN2YwOGVmZjkxN2M1NTdiNmU4ZjUtZjJkNy00M2Y2LTk5NTItNzNjNGYxZjQyNTdh&client-request-id=b786a7f1-fcc5-44bc-992a-46092443b1e1&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
       },
       "aicpa-cima.com/topic": {
         "status": "spa_full",
@@ -4644,7 +4644,7 @@
         "status": "bot_blocked",
         "observedFormat": "bot_blocked",
         "lastProbedAt": "2026-07-24",
-        "consecutiveFailures": 26,
+        "consecutiveFailures": 27,
         "problems": [
           "bot-block",
           "format-drift"
@@ -5002,6 +5002,24 @@
         "consecutiveFailures": 0
       },
       "raw.githubusercontent.com/AlexsJones": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-07-24",
+        "consecutiveFailures": 0
+      },
+      "deepswe.datacurve.ai": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-07-24",
+        "consecutiveFailures": 0
+      },
+      "medium.com/@mlabonne": {
+        "status": "static_html_article",
+        "observedFormat": "static_html_article",
+        "lastProbedAt": "2026-07-24",
+        "consecutiveFailures": 0
+      },
+      "crafiq.ai": {
         "status": "static_html_article",
         "observedFormat": "static_html_article",
         "lastProbedAt": "2026-07-24",

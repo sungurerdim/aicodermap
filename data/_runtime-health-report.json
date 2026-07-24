@@ -1,19 +1,14 @@
 {
-  "probedAt": "2026-07-24T20:29:40Z",
-  "total": 134,
+  "probedAt": "2026-07-24T22:25:44Z",
+  "total": 120,
   "counts": {
-    "format-drift": 7,
-    "redirect": 6,
-    "spa": 13,
+    "format-drift": 6,
+    "redirect": 4,
+    "spa": 11,
     "bot-block": 2,
     "dead": 3
   },
   "formatDrift": [
-    {
-      "url": "https://benchlm.ai/benchmarks/programBench",
-      "declared": "static_html_table",
-      "observed": "spa_full"
-    },
     {
       "url": "https://deepinfra.com/models",
       "declared": "static_html_table",
@@ -51,16 +46,8 @@
       "to": "https://arena.ai/leaderboard/webdev"
     },
     {
-      "url": "https://www.swyx.io/",
-      "to": "https://swyx.io/"
-    },
-    {
-      "url": "https://designarena.ai/leaderboard",
-      "to": "https://www.designarena.ai/leaderboard"
-    },
-    {
       "url": "https://compliance.microsoft.com/compliancemanager",
-      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DBlNjV41jHAvF2WfNVY-fxGPROVgD07ofwoolS2fRNU99Gn90oMcZ9Q4eduWLom7wWzWD_lD1MlcNZKU14UPdsFNuZEejqdJUPgScG0cT8cZkvUSIl0INLNSKoKD3NZcgFxtV_f2OcwHBNyT3Btg6BR_XSJQ5faPAQxqp6M-zNQ8&response_mode=form_post&nonce=639205217545052790.Mjg3MDQxOWEtZWIzYy00MDc0LWEyNmUtMGZjYzc4MjY0MjE3NzJhYmNmYzMtNzUwNC00MzBlLWIyMzYtNjAxNjljMWI2ZWFk&client-request-id=00de26cb-1014-434c-81f1-925fc1285aec&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
+      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DzbS7DVp4sBp0BUwCxlM1oZc8Gk53IHFpsmAotDTfmapDWKvCLn07SDdBRoPQG4zrv2Gh4nFtdG7V1V-CsW47dO6_XSYalBmq9x1a4GS8WVRRLma6eCApd_RHZ8iR7RMByS71PAM6psDnVt7HHLNXq-W5Ouzdyeyr3Ujo0g_j84I&response_mode=form_post&nonce=639205287292257566.M2ZhNTQxNTAtMWU2OS00ODQ0LThmMDUtN2YwOGVmZjkxN2M1NTdiNmU4ZjUtZjJkNy00M2Y2LTk5NTItNzNjNGYxZjQyNTdh&client-request-id=b786a7f1-fcc5-44bc-992a-46092443b1e1&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
     },
     {
       "url": "https://edpb.europa.eu/our-work-tools/consistency-findings/register-for-decisions_en",
@@ -72,8 +59,6 @@
     }
   ],
   "spa": [
-    "https://livebench.ai/",
-    "https://benchlm.ai/benchmarks/programBench",
     "https://deepinfra.com/models",
     "https://api.sambanova.ai/v1/models",
     "https://novita.ai/model-api",
