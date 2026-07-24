@@ -403,6 +403,144 @@ class TestSTierExceptionalOverride(unittest.TestCase):
         self.assertIsNone(result["override_mode"])
 
 
+class TestEarnedTrustProvisionalAdmission(unittest.TestCase):
+    """Earned-trust provisional admission (2026-07-24).
+
+    The exceptional-override bar above is expressed in decay-weighted units and
+    is unreachable for real vendors (the whole ledger's best vendor figure is
+    8.37), so every launch-day official number was quarantined. This gate judges
+    the vendor on its RAW per-bench record instead: a clean record admits the
+    cell as PROVISIONAL, a bench the vendor has been caught wrong on does not.
+    Guards the regression where a same-day flagship (claude-opus-5, 2026-07-24)
+    shipped with zero usable official cells.
+    """
+
+    @staticmethod
+    def _obs(fetched: str = "2026-07-20", url: str = "https://vendor.com/announce"):
+        return [
+            {
+                "value": 88.0,
+                "tier": "S",
+                "sourceUrl": url,
+                "fetched": fetched,
+                "verifications": 1,
+            }
+        ]
+
+    @staticmethod
+    def _ledger(
+        bench_agree: int,
+        bench_disagree: int,
+        global_agree: int,
+        global_disagree: int,
+        bench_key: str = "swePro",
+    ) -> dict:
+        """Raw-count ledger (the shape reliability.py actually writes)."""
+        return {
+            "sources": {
+                "vendor.com": {
+                    "global": {
+                        "agree": float(global_agree),
+                        "disagree": float(global_disagree),
+                        "rawAgree": global_agree,
+                        "rawDisagree": global_disagree,
+                    },
+                    "byBench": {
+                        bench_key: {
+                            "agree": float(bench_agree),
+                            "disagree": float(bench_disagree),
+                            "rawAgree": bench_agree,
+                            "rawDisagree": bench_disagree,
+                        }
+                    },
+                }
+            }
+        }
+
+    def test_clean_bench_record_admits_provisional(self):
+        """25/0 raw on this bench -> posterior 0.963 -> admitted, badged."""
+        result = pick_winner(
+            self._obs(),
+            bench_key="swePro",
+            reliability_ledger=self._ledger(25, 0, 97, 0),
+        )
+        self.assertLess(result["confidence"], 0.2)
+        self.assertFalse(result["quarantine"])
+        self.assertTrue(result["provisional"])
+
+    def test_bench_miss_record_still_quarantines(self):
+        """Clean globally (69/0) but 0/6 on THIS bench -> refused.
+
+        The openai.com x cfElo case: a good overall record can never be
+        borrowed to cover a bench the vendor has been caught wrong on.
+        """
+        result = pick_winner(
+            self._obs(),
+            bench_key="swePro",
+            reliability_ledger=self._ledger(0, 6, 69, 0),
+        )
+        self.assertTrue(result["quarantine"])
+        self.assertFalse(result["provisional"])
+
+    def test_thin_bench_falls_back_to_global_record(self):
+        """9/0 on the bench is below the 20 floor -> global 97/0 carries it."""
+        result = pick_winner(
+            self._obs(),
+            bench_key="swePro",
+            reliability_ledger=self._ledger(9, 0, 97, 0),
+        )
+        self.assertFalse(result["quarantine"])
+        self.assertTrue(result["provisional"])
+
+    def test_thin_bench_and_thin_global_refused(self):
+        """No track record anywhere (5/0 bench, 12/0 global) -> no free pass."""
+        result = pick_winner(
+            self._obs(),
+            bench_key="swePro",
+            reliability_ledger=self._ledger(5, 0, 12, 0),
+        )
+        self.assertTrue(result["quarantine"])
+        self.assertFalse(result["provisional"])
+
+    def test_two_misses_on_bench_refused(self):
+        """18/2 raw -> posterior 0.864 < 0.90 -> refused (one miss still clears)."""
+        result = pick_winner(
+            self._obs(),
+            bench_key="swePro",
+            reliability_ledger=self._ledger(18, 2, 97, 0),
+        )
+        self.assertTrue(result["quarantine"])
+        self.assertFalse(result["provisional"])
+
+    def test_stale_vendor_page_refused(self):
+        """A good record cannot rescue a months-old fetch."""
+        result = pick_winner(
+            self._obs(fetched="2026-01-10"),
+            bench_key="swePro",
+            reliability_ledger=self._ledger(25, 0, 97, 0),
+        )
+        self.assertTrue(result["quarantine"])
+        self.assertFalse(result["provisional"])
+
+    def test_multi_source_cell_is_never_provisional(self):
+        """Provisional means 'awaiting independent verification' — a corroborated
+        cell is verified, not provisional."""
+        obs = self._obs() + [
+            {
+                "value": 88.2,
+                "tier": "I",
+                "sourceUrl": "https://leaderboard.example/swe",
+                "fetched": "2026-07-20",
+                "verifications": 2,
+            }
+        ]
+        result = pick_winner(
+            obs, bench_key="swePro", reliability_ledger=self._ledger(25, 0, 97, 0)
+        )
+        self.assertFalse(result["provisional"])
+        self.assertFalse(result["quarantine"])
+
+
 class TestColdStartIsNeutral(unittest.TestCase):
     def test_sparse_source_keeps_full_trust(self):
         """A source with n=2 < 10 cold-start must not be penalized."""

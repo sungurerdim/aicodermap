@@ -816,3 +816,53 @@ table#comparison-table td.bench-group-divider {
   border-radius: 999px;
   cursor: help;
 }
+
+/* New-release badge (2026-07-24) — the only recency signal on a card/row.
+ * Uppercase forms live in the i18n values (TR keeps its diacritics), never in
+ * a text-transform. */
+.new-badge {
+  display: inline-block;
+  margin-left: var(--space-2, 8px);
+  padding: 1px 7px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: 3px;
+  vertical-align: middle;
+  background: var(--accent-2);
+  color: var(--on-accent);
+  cursor: help;
+}
+
+/* Vendor-reported (provisional) cell — earned-trust admission, one vendor
+ * source, awaiting independent corroboration. Warm hue separates it from the
+ * cool ① single-source badge. */
+.bench-cell.flag-provisional-cell { border-color: var(--warn-soft); }
+.flag-provisional { color: var(--warn); }
+
+/* New-releases strip — the site's news channel, above the comparison table. */
+.new-releases-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2, 8px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.new-release-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent-2);
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text);
+  text-decoration: none;
+}
+.new-release-chip:hover,
+.new-release-chip:focus-visible { background: var(--surface-hover); }
+.new-release-meta,
+.new-release-age { font-size: 0.78rem; color: var(--muted); }
+.new-release-age { font-family: var(--font-mono); }

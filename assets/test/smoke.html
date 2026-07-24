@@ -45,8 +45,11 @@
     import {
       State, BENCH_KEYS, DEFAULT_WEIGHTS, PRESETS, STORAGE, getPresets,
       validateModels, validateWeights, isValidModel, detectMatchingPreset,
+      isRecentRelease, daysSinceRelease, getRecencyPolicy,
     } from '../js/core.js';
-    import { disputedCount, contradictionFor, loadData, INTERVAL_DECAY_CURVES } from '../js/data.js';
+    import {
+      disputedCount, contradictionFor, loadData, INTERVAL_DECAY_CURVES, provisionalBenches,
+    } from '../js/data.js';
     import {
       compositeScore, coverageOf, compositeUncertainty, rankBands, rankGateStatus,
     } from '../js/scoring.js';
@@ -415,6 +418,42 @@
         swePro: 70, tb2: 70, lcb: 70, sweMulti: 70, sweV: 70, cfElo: 1500, mcpA: 70 } };
       assertTrue('rankGateStatus does NOT gate a fully-covered model (swe-focused)',
         rankGateStatus(gFull, 'swe-focused', 0.95).gated === false);
+
+      // 14f-2. New-release grace (2026-07-24). The gate's requiredBenches
+      // (swePro, sweMulti, cfElo) come from independent leaderboards that run
+      // WEEKS after a launch, so applying them to a days-old model measured the
+      // calendar, not the model — every fresh flagship (claude-opus-5 at 39%
+      // coverage on its launch day) was demoted into the Limited-Coverage band
+      // exactly when its news value peaked. Inside the recency window a model
+      // with real coverage ranks on its EB score, flagged newGrace.
+      const isoDaysAgo = (n) => new Date(Date.now() - n * 86400000).toISOString().slice(0, 10);
+      const recentIso = isoDaysAgo(3);
+      const staleIso = isoDaysAgo(getRecencyPolicy().newWindowDays + 45);
+      assertTrue('isRecentRelease true inside the window, false outside',
+        isRecentRelease({ released: recentIso }) === true
+        && isRecentRelease({ released: staleIso }) === false
+        && isRecentRelease({ released: null }) === false);
+      assertTrue('daysSinceRelease counts whole days and clamps future dates to 0',
+        daysSinceRelease({ released: recentIso }) === 3
+        && daysSinceRelease({ released: isoDaysAgo(-2) }) === 0
+        && daysSinceRelease({ released: 'not-a-date' }) === null);
+      const gNewSparse = { ...gSparseMissing, id: '__t_gate_new', released: recentIso };
+      const newVerdict = rankGateStatus(gNewSparse, 'swe-focused', 0.3);
+      assertTrue('rankGateStatus does NOT gate a RECENT sparse model with real coverage (grace)',
+        newVerdict.gated === false && newVerdict.newGrace === true);
+      assertTrue('rankGateStatus still gates the SAME model once it is no longer recent',
+        rankGateStatus({ ...gNewSparse, released: staleIso }, 'swe-focused', 0.3).gated === true);
+      assertTrue('rankGateStatus still gates a RECENT model below the grace coverage floor',
+        rankGateStatus({ ...gNewSparse, id: '__t_gate_new_empty' }, 'swe-focused', 0.05).gated === true);
+      assertTrue('newGrace is NOT flagged when a recent model clears the gate on its own',
+        rankGateStatus({ ...gFull, released: recentIso }, 'swe-focused', 0.95).newGrace !== true);
+
+      // 14f-3. Provisional (earned-trust vendor) cells — merge.py stamps
+      // benchProvisional when the sole source is the vendor's own page and that
+      // vendor's raw record on the bench is clean (lib/winner.py).
+      assertTrue('provisionalBenches reads the benchProvisional map, ignoring false flags',
+        [...provisionalBenches({ benchProvisional: { swePro: true, lcb: false } })].join(',') === 'swePro'
+        && provisionalBenches({}).size === 0);
 
       // 14g. Rank-anomaly sweep (2026-06-07): for every atomic preset, no
       // rank-gated model (missing a required bench / below coverage floor) may

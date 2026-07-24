@@ -319,6 +319,42 @@ export function getCompositePolicy() {
   };
 }
 
+// Release-recency policy (2026-07-24). The product promise is speed of news —
+// a model released today must be findable today. Two knobs, schema-overridable:
+//   newWindowDays     how long a model counts as a NEW RELEASE (badge + strip)
+//   graceMinCoverage  the coverage a new model needs to skip the rank gate
+// Rationale: the gate's requiredBenches (swePro, sweMulti, cfElo…) come from
+// independent leaderboards that run WEEKS after a launch, so every brand-new
+// model was structurally demoted into the Limited-Coverage band during exactly
+// the window where its news value is highest (claude-opus-5 at 39% coverage,
+// 2026-07-24). The grace floor keeps zero-evidence stubs out — a new model
+// still needs real cells to rank, it just no longer needs the ones nobody has
+// published yet.
+export function getRecencyPolicy() {
+  const rp = (State.schema && State.schema.recency) || {};
+  return {
+    newWindowDays: (Number.isFinite(rp.newWindowDays) && rp.newWindowDays > 0) ? rp.newWindowDays : 30,
+    graceMinCoverage: (Number.isFinite(rp.graceMinCoverage) && rp.graceMinCoverage >= 0) ? rp.graceMinCoverage : 0.25,
+  };
+}
+
+// Whole days since `model.released`, or null when the date is missing/invalid.
+// Negative (future-dated) values clamp to 0 so a timezone skew on launch day
+// still reads as "released today".
+export function daysSinceRelease(model, now) {
+  const iso = model && model.released;
+  if (!iso) return null;
+  const ts = Date.parse(String(iso).length <= 10 ? `${iso}T00:00:00Z` : iso);
+  if (!Number.isFinite(ts)) return null;
+  const ref = now instanceof Date ? now.getTime() : (Number.isFinite(now) ? now : Date.now());
+  return Math.max(0, Math.floor((ref - ts) / 86400000));
+}
+
+export function isRecentRelease(model, now) {
+  const days = daysSinceRelease(model, now);
+  return days != null && days <= getRecencyPolicy().newWindowDays;
+}
+
 // Per-preset tiered missing-data policy. Returns sets for fast lookup.
 export function getPresetTiers(presetName) {
   const sp = State.schema && State.schema.presets;

@@ -159,17 +159,41 @@ lineup/announcement/model-card is ALREADY in hand. In that case ALSO emit
 `observations[]` (tier `S`) for any coreBenchKey value visibly published on those
 official pages — NO extra fetch, just read what's already loaded. This gives a
 freshly-discovered model its official-announcement benchmarks in the SAME run.
+
+**MANDATORY PER NEW MODEL (hard contract, 2026-07-24):** every id you emit in
+`lineupChanges.new[]` whose `evidenceUrl` is an official vendor page MUST come
+back with either (a) ≥1 `observations[]` entry mined from that page, or (b) a
+`gaps[]` entry naming the page and stating what blocked extraction (no benchmark
+table / JS-rendered / paywalled). Silence is not an option: `claude-opus-5` was
+admitted on 2026-07-24 citing `anthropic.com/news/claude-opus-5` with ZERO
+official cells mined — the day's flagship shipped on aggregator scraps at 39%
+coverage while `inkling` got 7 official cells the same run. `scripts/check-new-model-coverage.py`
+now enforces this after merge and queues every violation for targeted
+re-extraction, so an unmined vendor page costs the cycle an extra agent round.
+Also report `runtime.officialBenchExtraction: { "<modelId>": <cellCount> }` for
+every new id so the miss is visible in the artifact itself, not only post-merge.
 Rationale: avoid fetching the official page twice (once for lineup, once in Stage
 A). The independent-leaderboard I-tier pass + cross-validation STILL run in Stage
 A for every model (the contradiction moat still wants ≥2 distinct sources) — an
 official-only S-tier cell stays flagged single-source/pending-corroboration until
 Stage A adds an I-tier confirmation. It is NOT automatically hard-quarantined
-from the composite anymore: `should_quarantine`'s exceptional-source override
-(see `scripts/lib/winner.py`, docs/METHODOLOGY.md §6) lets it through when that
-vendor's domain has an earned reliability-ledger track record clearing the
-S-tier bar (≥40 samples, posterior ≥0.97, recency ≥0.90) — deliberately stricter
-than the I-tier bar, since self-reports carry inflation risk. A vendor with no
-track record yet (e.g. a brand-new domain) still quarantines until it earns one.
+from the composite anymore. Two ladders let an official-only cell through (see
+`scripts/lib/winner.py`, docs/METHODOLOGY.md §6):
+- **exceptional-source override** — ≥40 decay-weighted samples, posterior ≥0.97,
+  recency ≥0.90. Deliberately stricter than the I-tier bar. In practice
+  unreachable: the whole ledger's best vendor figure is `anthropic.com×tb2 = 8.37`
+  weighted, so this ladder has never fired for any vendor.
+- **earned-trust provisional admission (2026-07-24, the one that actually
+  fires)** — judged on the vendor's RAW record for THAT bench: ≥20 raw prior
+  observations with posterior ≥0.90, falling back to the vendor's global record
+  (≥40 raw) only when the bench itself has no disagreement history. The cell is
+  admitted as `provisional` (badged "vendor-reported, awaiting independent
+  verification"), not as verified. A vendor caught wrong on that bench is still
+  refused — `openai.com` is 69/69 globally yet 0/6 on `cfElo`, so its cfElo
+  self-reports stay quarantined while its clean benches pass. Caution is EARNED
+  per (vendor, bench), never blanket.
+A vendor with no track record yet (e.g. a brand-new domain) still quarantines
+until it earns one.
 The pure `lineup-sync` fast-path (PRELIM-E) keeps `extract_official_bench` OFF
 and gathers no benches.
 

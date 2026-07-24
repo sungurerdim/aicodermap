@@ -63,6 +63,28 @@ EXCEPTIONAL_S_TIER_RELIABILITY_THRESHOLD: float = 0.97
 EXCEPTIONAL_S_TIER_SAMPLE_MIN: int = 40
 EXCEPTIONAL_S_TIER_RECENCY_MIN: float = 0.90
 
+# Earned-trust provisional admission (2026-07-24). The override thresholds
+# above are expressed in the ledger's DECAYED-WEIGHT units, where the highest
+# vendor figure in the whole ledger is anthropic.com×tb2 = 8.37 — so the
+# S-tier escape hatch could never fire for any vendor on any bench, and every
+# launch-day official number fell into the confidence<0.2 quarantine. That is
+# blanket caution, not earned caution: the ledger's own record says
+# anthropic.com is 97/97 agree and deepmind.google 228/228, while the real
+# misses are bench-specific (openai.com×cfElo 0/6, openai.com×hle 3/3).
+#
+# This gate therefore judges a vendor PER BENCH on its RAW track record:
+# raw counts are the honest measure of "has this source ever been wrong here",
+# whereas the decayed weights measure current influence and collapse the
+# posterior for small-but-perfect records (swePro 23/0 → 0.886 weighted vs
+# 0.960 raw). Clearing it does not make a cell verified — it makes it
+# PROVISIONAL: it counts toward the composite (with the single-source
+# confidence haircut it already earns) and carries a "vendor-reported,
+# awaiting independent verification" badge until an I-tier source lands.
+PROVISIONAL_S_TIER_BENCH_SAMPLE_MIN: int = 20
+PROVISIONAL_S_TIER_GLOBAL_SAMPLE_MIN: int = 40
+PROVISIONAL_S_TIER_POSTERIOR_MIN: float = 0.90
+PROVISIONAL_S_TIER_RECENCY_MIN: float = 0.85
+
 # Global fallback thresholds (overridden per-bench via benchTypes)
 DEFAULT_AGREEMENT_PP: float = 1.5
 DEFAULT_WARN_PP: float = 3.0
@@ -288,6 +310,58 @@ def compute_cell_confidence(result: dict[str, Any]) -> float:
     return round(max(0.0, min(1.0, conf)), 4)
 
 
+def s_tier_earned_trust(
+    winner_obs: dict[str, Any] | None,
+    reliability_ledger: dict[str, Any] | None,
+    bench_key: str,
+) -> bool:
+    """True when an official (S-tier) singleton has EARNED provisional trust.
+
+    Per-(vendor, bench) first: >= PROVISIONAL_S_TIER_BENCH_SAMPLE_MIN raw prior
+    observations and a raw Beta(1,1) posterior >= PROVISIONAL_S_TIER_POSTERIOR_MIN
+    (n=20 with zero misses → 0.955; a single miss still clears, two do not).
+    When that bench is too thin, fall back to the vendor's global record
+    (reliability.py's hierarchical doctrine) — but ONLY if the bench itself has
+    no disagreement history of its own, so a vendor with a clean overall record
+    still cannot borrow it to cover a bench it has been caught wrong on
+    (openai.com is 69/69 globally yet 0/6 on cfElo → refused).
+
+    Counts are RAW, not decay-weighted, deliberately: see the constants above.
+    Observation freshness is still required (recency_decay >= 0.85) so a stale
+    vendor page cannot ride a good track record.
+    """
+    if str((winner_obs or {}).get("tier") or "").upper() != "S":
+        return False
+    if not reliability_ledger:
+        return False
+    from .reliability import posterior_accuracy, source_identity  # type: ignore
+
+    sid = source_identity(
+        (winner_obs or {}).get("sourceUrl") or "",
+        (winner_obs or {}).get("source") or "",
+    )
+    if not sid:
+        return False
+    entry = ((reliability_ledger or {}).get("sources") or {}).get(sid) or {}
+    bench = (entry.get("byBench") or {}).get(bench_key) or {}
+    bench_agree = int(bench.get("rawAgree") or 0)
+    bench_disagree = int(bench.get("rawDisagree") or 0)
+    agree, disagree = bench_agree, bench_disagree
+    if agree + disagree < PROVISIONAL_S_TIER_BENCH_SAMPLE_MIN:
+        if bench_disagree > 0:
+            return False
+        glob = entry.get("global") or {}
+        agree = int(glob.get("rawAgree") or 0)
+        disagree = int(glob.get("rawDisagree") or 0)
+        if agree + disagree < PROVISIONAL_S_TIER_GLOBAL_SAMPLE_MIN:
+            return False
+    if posterior_accuracy(agree, disagree) < PROVISIONAL_S_TIER_POSTERIOR_MIN:
+        return False
+    return recency_decay((winner_obs or {}).get("fetched")) >= (
+        PROVISIONAL_S_TIER_RECENCY_MIN
+    )
+
+
 def should_quarantine(
     result: dict[str, Any],
     primary_obs: list[dict[str, Any]] | None = None,
@@ -354,6 +428,12 @@ def should_quarantine(
             and override_mode == "exceptional-source-override-s-tier"
             and severity != "RED"
         ):
+            return False
+        # Earned-trust provisional admission (2026-07-24): the vendor cleared
+        # the per-bench raw track-record bar in s_tier_earned_trust, so the
+        # cell is admitted as PROVISIONAL (badged in the UI) rather than
+        # dropped. A vendor with a miss record on this bench never gets here.
+        if winner_tier == "S" and result.get("provisional") and severity != "RED":
             return False
         return True
     return False
@@ -502,6 +582,7 @@ def pick_winner(
             "override_mode": None,
             "confidence": 0.0,
             "quarantine": False,
+            "provisional": False,
             "bayesianPoint": None,
         }
 
@@ -614,6 +695,15 @@ def pick_winner(
         "bayesianPoint": None,  # populated by synth_core when historical pool ≥3
     }
     result["confidence"] = compute_cell_confidence(result)
+    # Earned-trust provisional flag — computed BEFORE should_quarantine, which
+    # consumes it. Only single-source official cells can be provisional: a
+    # multi-source cell is either verified or contradicted, never "pending
+    # independent verification".
+    result["provisional"] = bool(
+        (winning_cluster.get("distinct_sources") or 0) <= 1
+        and severity != "RED"
+        and s_tier_earned_trust(winner_obs, reliability_ledger, bench_key)
+    )
     # Pass the tagged scored list so evaluationContext flags propagate.
     result["quarantine"] = should_quarantine(result, scored)
     return result

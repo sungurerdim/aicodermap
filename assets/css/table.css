@@ -234,3 +234,12 @@ table#comparison-table .prelim-chip {
   vertical-align: 1px;
   cursor: help;
 }
+
+/* New-release grace variant of the preliminary chip: the model is missing
+ * benches nobody has published for it yet, which is a different claim from
+ * "thin evidence" — accent hue instead of warn. */
+table#comparison-table .prelim-chip.is-new-grace {
+  color: var(--accent-2);
+  background: var(--accent-tint);
+  border-color: var(--accent-2-soft);
+}

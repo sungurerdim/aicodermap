@@ -3,11 +3,13 @@
 
 import {
   State, TIER_ORDER, STORAGE, writeStorage, DEFAULT_PRESET, DEFAULT_SCORE_FN,
+  isRecentRelease, daysSinceRelease,
 } from './core.js';
 import {
-  buildContradictionFlag, buildSingleSourceFlag, uncertaintySpan, coverageClass, lastUpdatedNode,
+  buildContradictionFlag, buildSingleSourceFlag, buildProvisionalFlag, buildNewBadge,
+  uncertaintySpan, coverageClass, lastUpdatedNode,
 } from './render-shared.js';
-import { contradictionFor, isSingleSourceCell } from './data.js';
+import { contradictionFor, isSingleSourceCell, provisionalBenches } from './data.js';
 import { coverageOf, effectiveScore, rankBands, presetTiersFor } from './scoring.js';
 import {
   fmtScore, scoreClass, pricingView, fmtPriceRange, fmtContext,
@@ -61,25 +63,43 @@ function staticColumns() {
       // count marker's tooltip lists the missing benches by short label.
       renderExtra: (m, ctx) => {
         const tiers = presetTiersFor(m, State.activePresetName || DEFAULT_PRESET);
+        const frag = document.createDocumentFragment();
+        // Recency first: a fresh release is the one thing a reader scanning for
+        // news needs to spot without reading the date column.
+        if (isRecentRelease(m)) frag.appendChild(buildNewBadge(m));
         if (!ctx.band || !ctx.band.gated) {
+          // A model ranking on the new-release grace says so explicitly — it is
+          // competing with cells the older models were also measured on, but
+          // the leaderboard-only benches simply don't exist for it yet.
+          if (ctx.band && ctx.band.newGrace) {
+            frag.appendChild(el('span', {
+              class: 'prelim-chip is-new-grace',
+              'data-tip': t('ui.badge.newGraceTip'),
+            }, t('ui.badge.newGrace')));
+            return frag;
+          }
           // G3 (2026-07-15): LMArena-style "Preliminary" chip — model ranks
           // normally but its evidence base is thin (missing critical benches
           // or <50% profile coverage). Distinct from the gated band below.
           const cov = ctx.band ? ctx.band.coverage : null;
           const thin = tiers.isLimitedCoverage || (Number.isFinite(cov) && cov < 0.5);
-          if (!thin) return null;
-          return el('span', {
-            class: 'prelim-chip',
-            'data-tip': t('ui.badge.preliminaryTip'),
-          }, t('ui.badge.preliminary'));
+          if (thin) {
+            frag.appendChild(el('span', {
+              class: 'prelim-chip',
+              'data-tip': t('ui.badge.preliminaryTip'),
+            }, t('ui.badge.preliminary')));
+          }
+          return frag.childNodes.length ? frag : null;
         }
         const missing = [...new Set([...tiers.missingRequired, ...tiers.missingCritical])];
-        if (!missing.length) return null;
-        const labels = missing.map(k => t(`benchmarks.${k}.short`) || k).join(', ');
-        return el('span', {
-          class: 'gated-missing-count',
-          'data-tip': `${t('vendorPanel.missingTip') || 'missing benches'}: ${labels}`,
-        }, `⚠${missing.length}`);
+        if (missing.length) {
+          const labels = missing.map(k => t(`benchmarks.${k}.short`) || k).join(', ');
+          frag.appendChild(el('span', {
+            class: 'gated-missing-count',
+            'data-tip': `${t('vendorPanel.missingTip') || 'missing benches'}: ${labels}`,
+          }, `⚠${missing.length}`));
+        }
+        return frag.childNodes.length ? frag : null;
       } },
     { key: 'provider', i18n: 'ui.table.provider', sortable: true,
       get: (m) => (m.provider || '').toLowerCase(),
@@ -148,6 +168,8 @@ function renderBenchValue(m, k) {
   const c = contradictionFor(m.id, k);
   if (c) {
     wrap.appendChild(buildContradictionFlag(c, m.id, k));
+  } else if (v != null && provisionalBenches(m).has(k)) {
+    wrap.appendChild(buildProvisionalFlag());
   } else if (v != null && isSingleSourceCell(m.id, k)) {
     wrap.appendChild(buildSingleSourceFlag());
   }
@@ -188,6 +210,12 @@ function tailColumns() {
         span.textContent = c.label;
         return span;
       } },
+    // Release date is sortable so "what shipped recently" is one click away —
+    // lastUpdated answers "when did WE refresh this", which is a different
+    // question and was previously the only date a user could sort on.
+    { key: 'released', i18n: 'ui.table.released', sortable: true,
+      get: (m) => m.released || '',
+      render: (m) => m.released || '—' },
     { key: 'lastUpdated', i18n: 'ui.table.lastUpdated', sortable: true,
       get: (m) => m.lastUpdated || '',
       render: (m) => lastUpdatedNode(m.lastUpdated) },
@@ -461,10 +489,49 @@ export function renderModelCards(precomputed) {
   if (count) count.textContent = `${ranked.length} / ${State.models.length}`;
 }
 
+// New-releases strip — the site's news channel. Deliberately reads State.models
+// rather than the filtered/ranked rows: "what shipped in the last 30 days" must
+// not disappear because the user has a VRAM filter on, and a model whose data
+// is still filling in must still be reachable from here.
+export function renderNewReleases() {
+  const section = document.getElementById('new-releases');
+  const list = document.getElementById('new-releases-list');
+  if (!section || !list) return;
+  clear(list);
+  const fresh = (State.models || [])
+    .filter(m => (m.status || 'active') === 'active' && isRecentRelease(m))
+    .sort((a, b) => String(b.released || '').localeCompare(String(a.released || '')));
+  section.hidden = fresh.length === 0;
+  if (!fresh.length) return;
+  for (const m of fresh) {
+    const link = el('a', { class: 'new-release-chip', href: `#card-${m.id}` });
+    link.appendChild(el('strong', {}, m.name));
+    link.appendChild(el('span', { class: 'new-release-meta' },
+      `${m.provider || '—'} · ${m.released || '—'}`));
+    const days = daysSinceRelease(m);
+    if (days != null) {
+      link.appendChild(el('span', { class: 'new-release-age' },
+        days === 0 ? t('ui.newReleases.today') : t('ui.newReleases.daysAgo').replace('{n}', String(days))));
+    }
+    link.addEventListener('click', (ev) => {
+      const target = document.getElementById(`card-${m.id}`);
+      if (!target) return;
+      ev.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      target.classList.remove('is-target');
+      void target.offsetWidth;
+      target.classList.add('is-target');
+      setTimeout(() => target.classList.remove('is-target'), 1800);
+    });
+    list.appendChild(el('li', {}, link));
+  }
+}
+
 export function renderAll() {
   // Compute the ranked rows (rankBands + effectiveScore over all models) ONCE
   // and hand copies to both surfaces — each sorts its copy in place.
   const ranked = rankedModels();
   renderTable(ranked.slice());
   renderModelCards(ranked.slice());
+  renderNewReleases();
 }

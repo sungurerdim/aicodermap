@@ -84,6 +84,20 @@ isn't gaming anything. So the gate is coverage-aware (2026-07-16):
   < 50%) → **PRELIM** chip (LMArena's "Preliminary" pattern): the rank is
   real but provisional.
 
+**New-release grace (2026-07-24).** Both gate arms measure evidence that only
+*exists* weeks after a launch: `swePro` comes from Scale SEAL, `sweMulti` and
+`cfElo` from independent harness runs that queue new models for days. Applied to
+a model released this week, the gate stops measuring the model and starts
+measuring the calendar — every fresh flagship was demoted into the Limited
+Coverage band during exactly the window when readers came looking for it
+(Claude Opus 5 ranked #4 on its EB score but sat in the bottom band at 39%
+coverage on launch day). So inside `recency.newWindowDays` (default 30) a model
+with at least `recency.graceMinCoverage` (default 0.25) real coverage ranks on
+its EB-shrunk score and carries a **DATA FILLING** chip stating why. Below that
+floor — a stub with nothing measured yet — the gate still applies: the grace
+exempts a model from benches *nobody has published for it*, never from having
+evidence at all. The flag is set only when the grace changed the verdict.
+
 ## 5. Uncertainty bands
 
 Every composite ships with an epistemic ±σ band
@@ -115,12 +129,31 @@ Every composite ships with an epistemic ±σ band
   posterior accuracy ≥0.90, and recency ≥0.85 (≲90 days old). S-tier
   (vendor self-report) singletons face a materially stricter bar — ≥40
   samples, posterior ≥0.97, recency ≥0.90 — because self-reports carry
-  inflation/cherry-picking risk independent leaderboards don't. This is
-  what lets a brand-new model whose only launch-day source is the vendor's
-  own announcement surface with a "single-source, pending corroboration"
-  badge instead of being hard-excluded, while still catching the ordinary
-  hype-blog/inflated-number case the confidence floor exists for.
+  inflation/cherry-picking risk independent leaderboards don't.
   (`scripts/lib/winner.py::should_quarantine`, `_exceptional_source_override`.)
+- **Earned-trust provisional admission (2026-07-24).** Those override
+  thresholds are counted in *decay-weighted* units, where the highest vendor
+  figure in the entire ledger is `anthropic.com × tb2 = 8.37` — so the S-tier
+  ladder could never fire for any vendor on any bench, and in practice every
+  launch-day official number fell into the confidence floor. That is blanket
+  caution, not earned caution, and the ledger's own record contradicts it:
+  `anthropic.com` is 97/97 agree, `deepmind.google` 228/228, while the real
+  misses are bench-specific (`openai.com × cfElo` 0/6, `× hle` 3/3). A second
+  ladder therefore judges a vendor on its **raw record for that specific
+  bench**: ≥20 raw prior observations with posterior ≥0.90, falling back to the
+  vendor's global record (≥40 raw) only when the bench itself has no
+  disagreement history, plus the same freshness requirement. Raw rather than
+  weighted counts, because decay measures current *influence* and collapses the
+  posterior for small-but-perfect records (23/0 on swePro → 0.886 weighted vs
+  0.960 raw). Clearing it does not make the cell verified — it marks it
+  **provisional**: the value counts toward the composite at the reduced
+  confidence a single source already earns, and carries a ⓥ "vendor-reported,
+  awaiting independent verification" badge that clears the moment an
+  independent source corroborates it. A vendor caught wrong on that bench is
+  still refused, so caution stays targeted at demonstrated inaccuracy rather
+  than at officialdom in general.
+  (`scripts/lib/winner.py::s_tier_earned_trust`, `merge.py` stamps
+  `model.benchProvisional`.)
 - Source trustScores decay via the reliability ledger
   (`data/source-reliability.json`) when a source's values keep losing
   contradiction resolutions.

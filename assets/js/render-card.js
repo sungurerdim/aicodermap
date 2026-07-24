@@ -2,13 +2,16 @@
 // its own builder function so individual concerns stay <50 lines and brace
 // nesting stays ≤3.
 
-import { State, DEFAULT_PRESET, DEFAULT_SCORE_FN, getCompositePolicy } from './core.js';
 import {
-  buildContradictionFlag, buildSingleSourceFlag, uncertaintySpan, coverageClass, lastUpdatedNode,
+  State, DEFAULT_PRESET, DEFAULT_SCORE_FN, getCompositePolicy, isRecentRelease,
+} from './core.js';
+import {
+  buildContradictionFlag, buildSingleSourceFlag, buildProvisionalFlag, buildNewBadge,
+  uncertaintySpan, coverageClass, lastUpdatedNode,
 } from './render-shared.js';
 import {
   disputedCount, contradictionFor, isCellStale, getCellFreshness,
-  sourceReliabilityBadge, isSingleSourceCell,
+  sourceReliabilityBadge, isSingleSourceCell, provisionalBenches,
 } from './data.js';
 import {
   coverageOf, effectiveScore, vendorComposites,
@@ -93,6 +96,9 @@ export function buildBenchCell(model, key) {
   if (c) {
     cell.classList.add(c.severity === 'danger' ? 'flag-danger' : 'flag-warn');
     cell.appendChild(buildContradictionFlag(c, model.id, key));
+  } else if (score != null && provisionalBenches(model).has(key)) {
+    cell.classList.add('flag-provisional-cell');
+    cell.appendChild(buildProvisionalFlag());
   } else if (score != null && isSingleSourceCell(model.id, key)) {
     cell.classList.add('flag-single-source-cell');
     cell.appendChild(buildSingleSourceFlag());
@@ -105,6 +111,7 @@ function cardHead(model, rank) {
   head.appendChild(el('span', { class: 'model-rank' }, `#${rank}`));
   head.appendChild(el('h3', { class: 'model-name-title' }, model.name));
   head.appendChild(el('span', { class: `tier-badge ${model.tier}` }, tierLabel(model.tier)));
+  if (isRecentRelease(model)) head.appendChild(buildNewBadge(model));
 
   // Provider line — was its own row beneath the title; now folded into the
   // head as a small separator-prefixed span. Wraps below on narrow widths

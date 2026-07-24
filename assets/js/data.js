@@ -350,6 +350,21 @@ export function quarantinedBenches(model) {
   return out;
 }
 
+// Returns the set of bench keys admitted on EARNED vendor trust — merge.py
+// stamps `model.benchProvisional[bench] = true` when the only source is the
+// vendor's own page AND that vendor's raw track record on that bench is clean
+// (lib/winner.py::s_tier_earned_trust). The value counts toward the composite
+// (already discounted by the single-source confidence haircut) but is labelled
+// "vendor-reported, awaiting independent verification" — the flag clears the
+// moment an independent source corroborates it.
+export function provisionalBenches(model) {
+  const p = model?.benchProvisional;
+  if (!p || typeof p !== 'object') return new Set();
+  const out = new Set();
+  for (const [k, v] of Object.entries(p)) if (v) out.add(k);
+  return out;
+}
+
 // Count of cells in the active preset that actually trigger a confidence
 // haircut — same-tier disputes with ≥3pp intra-tier disagreement on top of
 // the ≥5pp BLOCK threshold. Cells with cross-tier-only disagreement are

@@ -192,7 +192,20 @@ def main() -> int:
             [sys.executable, str(SCRIPTS / "check-new-model-coverage.py")],
             name="new-model-coverage",
         )
-        if rc_cov != 0:
+        if rc_cov == 2:
+            # Exit 2 = official-extraction gate fired (2026-07-24): a model was
+            # admitted from a vendor page that yielded no S-tier cell. Data
+            # already written is coherent, so this never aborts the merge — but
+            # the cycle is NOT done: the orchestrator must drain
+            # .aicodermap-official-extraction-retry.json with one targeted
+            # re-extraction per queued URL before reporting the cycle complete.
+            print(
+                "  🚨 OFFICIAL-EXTRACTION GATE FIRED — drain "
+                ".aicodermap-official-extraction-retry.json (targeted "
+                "re-extraction per queued vendor URL) before closing the cycle",
+                flush=True,
+            )
+        elif rc_cov != 0:
             print(
                 "  ⚠ new-model-coverage-check exit non-zero — continuing "
                 "(advisory only, does not affect written data)",

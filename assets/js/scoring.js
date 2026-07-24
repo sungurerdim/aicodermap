@@ -6,6 +6,7 @@
 import {
   State, BENCH_KEYS, normalizeBenchScore, isVendorComposite,
   getVendorCompositeMeta, getCompositePolicy, getPresetTiers,
+  getRecencyPolicy, isRecentRelease,
   DEFAULT_PRESET, DEFAULT_SCORE_FN,
 } from './core.js';
 
@@ -255,20 +256,41 @@ export function presetTiersFor(model, presetName) {
 // genuinely never published that one metric at launch) — it competes on its
 // EB-shrunk score instead of being hidden in the bottom band. Below that floor,
 // missing-required still gates regardless of which specific bench is absent.
+//
+// New-release grace (2026-07-24): both gate arms measure evidence that only
+// EXISTS weeks after a launch — swePro comes from Scale SEAL, sweMulti/cfElo
+// from independent harness runs. Applying them to a model released days ago
+// doesn't measure gaming, it measures the calendar, and it buried every fresh
+// flagship in the bottom band precisely when users came looking for it. Inside
+// `newWindowDays` a model with at least `graceMinCoverage` real coverage ranks
+// on its EB-shrunk score, flagged `newGrace` so the UI can say "new — data
+// still filling" instead of silently promoting thin evidence. A stub with
+// nothing measured yet still fails the floor and stays in the band. The flag is
+// only set when the grace CHANGED the verdict — a fresh model that clears the
+// gate on its own merits is not labelled as needing an exemption.
 export function rankGateStatus(model, presetName, coverage) {
   const gate = getCompositePolicy().rankGate;
   if (!gate.enabled) return { gated: false, reason: null };
+  let reason = null;
   if (gate.demoteMissingRequired) {
     const tiers = presetTiersFor(model, presetName);
     const belowMissingRequiredFloor = !Number.isFinite(coverage) || coverage < gate.missingRequiredCoverageFloor;
     if (tiers.missingRequired.length > 0 && belowMissingRequiredFloor) {
-      return { gated: true, reason: 'missing-required' };
+      reason = 'missing-required';
     }
   }
-  if (Number.isFinite(coverage) && coverage < gate.coverageFloor) {
-    return { gated: true, reason: 'low-coverage' };
+  if (!reason && Number.isFinite(coverage) && coverage < gate.coverageFloor) {
+    reason = 'low-coverage';
   }
-  return { gated: false, reason: null };
+  if (!reason) return { gated: false, reason: null };
+  if (
+    isRecentRelease(model)
+    && Number.isFinite(coverage)
+    && coverage >= getRecencyPolicy().graceMinCoverage
+  ) {
+    return { gated: false, reason: null, newGrace: true };
+  }
+  return { gated: true, reason };
 }
 
 // ── Empirical-Bayes leaderboard scoring (2026-06-06) ────────────────────────
@@ -449,6 +471,7 @@ function stampGateStatus(rows, byId, presetName) {
     const m = byId.get(r.id);
     r.gate = m ? rankGateStatus(m, presetName, r.coverage) : { gated: false, reason: null };
     r.gated = r.gate.gated;
+    r.newGrace = !!r.gate.newGrace;
   }
 }
 

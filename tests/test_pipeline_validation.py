@@ -258,6 +258,74 @@ class TestNewModelCoverageFloor(unittest.TestCase):
         self.assertEqual(under, [])
 
 
+class TestOfficialExtractionGate(unittest.TestCase):
+    """Official-extraction gate (2026-07-24): a model admitted from a vendor
+    page that produced no S-tier observation is a pipeline MISS, not "the
+    vendor published nothing". Guards the claude-opus-5 regression — admitted
+    citing anthropic.com/news/claude-opus-5 with zero official cells mined."""
+
+    WL = {
+        "vendors": {
+            "anthropic": {"tier": "S", "urls": {"news": "https://www.anthropic.com/news"}},
+        }
+    }
+    CORE = ["swePro", "lcb"]
+    ARTIFACTS = [
+        {
+            "lineupChanges": {
+                "new": [
+                    {
+                        "suggestedId": "vendor-admitted",
+                        "evidenceUrl": "https://www.anthropic.com/news/claude-opus-5",
+                    },
+                    {
+                        "suggestedId": "thirdparty-admitted",
+                        "evidenceUrl": "https://9to5google.com/2026/07/21/some-launch/",
+                    },
+                ]
+            }
+        }
+    ]
+    MODELS = [
+        {"id": "vendor-admitted", "bench": {"swePro": None, "lcb": 80.0}},
+        {"id": "thirdparty-admitted", "bench": {"swePro": None, "lcb": None}},
+        {"id": "vendor-mined", "bench": {"swePro": 60.0, "lcb": 80.0}},
+    ]
+
+    def _misses(self, sources, new_ids=("vendor-admitted", "thirdparty-admitted")):
+        return new_model_coverage.official_extraction_misses(
+            list(new_ids), sources, self.ARTIFACTS, self.WL, self.CORE, self.MODELS
+        )
+
+    def test_vendor_admission_without_official_cell_is_queued(self):
+        misses = self._misses({"vendor-admitted.lcb": [{"tier": "I", "value": 80.0}]})
+        self.assertEqual([e["modelId"] for e in misses], ["vendor-admitted"])
+        self.assertEqual(
+            misses[0]["vendorUrls"], ["https://www.anthropic.com/news/claude-opus-5"]
+        )
+        self.assertEqual(misses[0]["missingCoreKeys"], ["swePro"])
+
+    def test_official_cell_present_clears_the_gate(self):
+        misses = self._misses({"vendor-admitted.lcb": [{"tier": "S", "value": 80.0}]})
+        self.assertEqual(misses, [])
+
+    def test_third_party_discovery_is_not_a_miss(self):
+        """No official page was cited, so there was nothing to mine."""
+        misses = self._misses({}, new_ids=["thirdparty-admitted"])
+        self.assertEqual(misses, [])
+
+    def test_unknown_and_mirror_ids_are_skipped(self):
+        misses = new_model_coverage.official_extraction_misses(
+            ["never-admitted", "mirror"],
+            {},
+            self.ARTIFACTS,
+            self.WL,
+            self.CORE,
+            self.MODELS + [{"id": "mirror", "bench": {}, "benchMirrorOf": "base"}],
+        )
+        self.assertEqual(misses, [])
+
+
 # ── merge.py helpers ─────────────────────────────────────────────────────────
 
 

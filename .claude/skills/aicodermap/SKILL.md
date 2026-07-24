@@ -1030,6 +1030,31 @@ PRELIM-E. LINEUP_ONLY_MINI_CYCLE_GATE (FAZ 7.I, 2026-05-10; TTL removed 2026-06-
     - i18n/{tr,en}.json (merge i18nUpdates into models[id]={strengths,weaknesses})
     - (REMOVED models stay in data/models.json as status="deprecated" — no archive-out file; data is never stripped)
     - lastUpdated := now (ISO 8601 UTC, "YYYY-MM-DDTHH:MM:SSZ") per touched entry only — same-day reruns disambiguate by wallclock time
+
+10b. OFFICIAL-EXTRACTION GATE DRAIN (HARD, 2026-07-24) — the cycle is NOT done
+    while the queue is non-empty:
+    ```
+    cat .aicodermap-official-extraction-retry.json   # written by refresh-finalize step 6
+    ```
+    `check-new-model-coverage.py` exits **2** and fills that queue when a model
+    admitted this cycle cites an official vendor page but produced ZERO S-tier
+    observations — i.e. the lineup agent never mined the announcement it used as
+    evidence. ROOT CAUSE this closes: on 2026-07-24 `claude-opus-5` was admitted
+    from `anthropic.com/news/claude-opus-5` with no official cells extracted
+    (while `inkling` got 7 the same run), so the day's flagship shipped at 39%
+    coverage on aggregator scraps and landed in the Limited-Coverage band.
+    Drain procedure — for each queue entry:
+      1. Dispatch ONE sonnet agent, `scope=deep-fetch`, restricted to that
+         entry's `vendorUrls` + `missingCoreKeys`. It returns `observations[]`
+         (tier S) or a `gaps[]` entry naming what blocked extraction.
+      2. Re-run `python scripts/refresh-finalize.py` so the new observations
+         merge (pick_winner re-runs over the widened pool; an earned-trust
+         vendor cell lands as `benchProvisional`, not quarantined).
+      3. Re-run the gate. Exit 0 (or a queue whose remaining entries all carry a
+         `gaps[]` explanation) = drained.
+    ONE retry round per model per cycle — a second empty return is a real
+    "vendor published nothing" and is recorded as a gap, not retried again.
+
 11. Append CHANGELOG.md (Keep a Changelog):
     ## [Unreleased] / ### Updated|Added|Deprecated|Removed|Flagged
     If agent emitted Phase 0b/0c discovery candidates, append:

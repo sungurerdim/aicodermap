@@ -210,6 +210,10 @@
 - `claude-opus-4-8.mrcr` *(orchestrator)*: not reached in agent survey cycle; MRCR 1M data unavailable
 - ... and 483 more
 
+### Official-extraction gate
+- `claude-opus-5` — admitted from https://www.anthropic.com/news/claude-opus-5 but the cycle produced NO S-tier observation from it; the vendor announcement was never mined. Queued for targeted re-extraction (8 core cells still empty).
+- `kimi-k3` — admitted from https://platform.kimi.ai/docs/models but the cycle produced NO S-tier observation from it; the vendor announcement was never mined. Queued for targeted re-extraction (9 core cells still empty).
+
 ### New-model coverage warning
 - `bonsai-27b` — 18% core coverage after this cycle's Stage A/B (below the 30% floor; independent leaderboards/AA typically lag a launch by days-to-weeks — expected for a same-day admission, re-check next cycle before treating as a research gap)
 

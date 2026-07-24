@@ -314,6 +314,17 @@ def _apply_cell_verdict(
     # leaderboard cells (AA aaCoding, Scale SEAL swePro) stayed
     # quarantined here even though winner.py cleared them. One
     # quarantine decision, one source of truth.
+    # Earned-trust provisional stamp (2026-07-24). A single official source
+    # that cleared lib.winner.s_tier_earned_trust counts toward the composite
+    # but is badged "vendor-reported, awaiting independent verification" in the
+    # UI. Like quarantine this is a CURRENT-state verdict: the flag clears the
+    # moment an independent source corroborates the cell.
+    if result.get("provisional") and not result.get("quarantine"):
+        m.setdefault("benchProvisional", {})[bk] = True
+    else:
+        bp = m.get("benchProvisional")
+        if isinstance(bp, dict):
+            bp.pop(bk, None)
     if result.get("quarantine"):
         m.setdefault("benchQuarantine", {})[bk] = True
         return 1

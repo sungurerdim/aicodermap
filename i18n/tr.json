@@ -10,7 +10,8 @@
       "table": "Karşılaştırma Tablosu",
       "models": "Model Kartları",
       "export": "Dışa Aktar",
-      "privacy": "Gizlilik"
+      "privacy": "Gizlilik",
+      "newReleases": "Yeni Çıkanlar"
     },
     "weights": {
       "total": "Toplam",
@@ -199,10 +200,22 @@
     },
     "badge": {
       "preliminary": "ÖN VERİ",
-      "preliminaryTip": "Sınırlı kanıt: kritik bench eksik veya profil kapsaması %50 altında. Skor geçici — yeni veriyle güncellenir."
+      "preliminaryTip": "Sınırlı kanıt: kritik bench eksik veya profil kapsaması %50 altında. Skor geçici — yeni veriyle güncellenir.",
+      "new": "YENİ",
+      "newTip": "Yeni çıktı — bağımsız liderlik tabloları yayınladıkça benchmark kapsamı dolmaya devam ediyor.",
+      "newGrace": "VERİ DOLUYOR",
+      "newGraceTip": "Yeni çıkış muafiyetiyle sıralanıyor: eksik olan testler başarısız olduğu değil, bağımsız liderlik tablolarının henüz koşmadığı testler. Sonuçlar geldikçe skor güncellenir."
     },
     "estimated": "tahminî",
-    "estimatedTip": "Bu bench değerleri eksik; skor, benzer modellerin medyanına doğru istatistiksel daraltma (EB) ile tamamlandı"
+    "estimatedTip": "Bu bench değerleri eksik; skor, benzer modellerin medyanına doğru istatistiksel daraltma (EB) ile tamamlandı",
+    "provisional": {
+      "title": "Üretici beyanı, bağımsız doğrulama bekliyor — tek kaynak üreticinin kendi sayfası; bu üreticinin bu benchmark’taki yayın doğruluğu sicili temiz olduğu için kabul edildi. Bağımsız bir kaynak doğrulayana kadar düşük güvenle kompozite sayılır."
+    },
+    "newReleases": {
+      "note": "Yakın zamanda çıktı — verileri dolmaya devam ediyor olabilir.",
+      "today": "bugün",
+      "daysAgo": "{n} gün önce"
+    }
   },
   "pricing": {
     "blended": "KARMA $/1M",

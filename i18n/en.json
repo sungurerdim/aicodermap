@@ -10,7 +10,8 @@
       "table": "Comparison Table",
       "models": "Model Cards",
       "export": "Export",
-      "privacy": "Privacy"
+      "privacy": "Privacy",
+      "newReleases": "New Releases"
     },
     "weights": {
       "total": "Total",
@@ -199,10 +200,22 @@
     },
     "badge": {
       "preliminary": "PRELIM",
-      "preliminaryTip": "Thin evidence: a critical bench is missing or profile coverage is below 50%. Score is provisional and updates as data lands."
+      "preliminaryTip": "Thin evidence: a critical bench is missing or profile coverage is below 50%. Score is provisional and updates as data lands.",
+      "new": "NEW",
+      "newTip": "Released recently — benchmark coverage is still filling in as independent leaderboards publish.",
+      "newGrace": "DATA FILLING",
+      "newGraceTip": "Ranked on a new-release grace: the benches it is missing are ones independent leaderboards have not run yet, not ones it failed. Score updates as they land."
     },
     "estimated": "estimated",
-    "estimatedTip": "These bench values are missing; the composite fills them via empirical-Bayes shrinkage toward the field median"
+    "estimatedTip": "These bench values are missing; the composite fills them via empirical-Bayes shrinkage toward the field median",
+    "provisional": {
+      "title": "Vendor-reported, awaiting independent verification — the only source is the vendor’s own page, admitted because this vendor has a clean published-accuracy record on this benchmark. Counts toward the composite at reduced confidence until an independent source confirms it."
+    },
+    "newReleases": {
+      "note": "Recently released — data may still be filling in.",
+      "today": "today",
+      "daysAgo": "{n} days ago"
+    }
   },
   "pricing": {
     "blended": "BLENDED $/1M",
