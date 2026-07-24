@@ -38,6 +38,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 from lib.constants import ELO_BENCH_KEYS, MIN_SOURCES_PER_FILLED_CELL  # noqa: E402
 from lib.util import extract_domain, today_iso  # noqa: E402
+from lib.whitelist import build_domain_publishes, elo_swe_misfile  # noqa: E402
 
 MIN_SOURCES = MIN_SOURCES_PER_FILLED_CELL  # SSOT: lib.constants
 K_MAD = 4.0  # robust-outlier threshold (modified z ~ 0.6745*|x-med|/MAD)
@@ -62,15 +63,11 @@ def main() -> int:
     core = set(schema.get("coreBenchKeys") or [])
     ranges = schema.get("benchRanges") or {}
 
-    # domain -> published benches (whitelist + known Arena Elo publishers)
-    dom_pub: dict[str, set] = {}
-    for cat in ("leaderboards", "aggregators", "local", "community", "registries"):
-        for e in wl.get(cat) or []:
-            pub, d = e.get("publishes") or [], _dom(e.get("url") or "")
-            if pub and d:
-                dom_pub.setdefault(d, set()).update(pub)
-    for ad in ("lmarena.ai", "arena.ai", "lmsys.org", "chatbot-arena.com"):
-        dom_pub.setdefault(ad, set()).update({"lmArenaElo", "webDevElo"})
+    # domain -> published benches (whitelist + known Arena Elo publishers).
+    # SSOT: lib.whitelist.build_domain_publishes (was a duplicated inline copy
+    # here, missing the independent-corroboration carve-out that
+    # elo_swe_misfile applies below — see that function's docstring).
+    dom_pub = build_domain_publishes(wl)
 
     # same-tier peer value pools per bench (for robust outlier detection).
     # 5.4: store (modelId, value) so the pool is filtered by IDENTITY, not value
@@ -99,15 +96,21 @@ def main() -> int:
             entries = srcs(mid, k)
             urls = {_dom(e.get("url")) for e in entries if e.get("url")}
 
-            # source-mismatch (Elo family)
+            # source-mismatch (Elo family) — only when NO independent (neutral)
+            # domain corroborates the cell (elo_swe_misfile's carve-out): a
+            # cell backed by e.g. arxiv.org/github.com/llm-stats.com alongside
+            # one sibling-flagged domain (huggingface.co hosting a different
+            # page's Elo family) is well-corroborated, not a misfile — see
+            # elo_swe_misfile docstring (deepseek-r1-14b.cfElo example).
             if k in ELO_FAMILY:
-                for d in urls:
-                    pub = dom_pub.get(d)
-                    if pub and (pub & ELO_FAMILY) and k not in pub:
-                        reasons.append(
-                            f"source {d} publishes {sorted(pub & ELO_FAMILY)}, not {k}"
-                        )
-                        break
+                source_urls = [e.get("url") for e in entries if e.get("url")]
+                sibling_hit, is_hard = elo_swe_misfile(k, source_urls, dom_pub)
+                if sibling_hit and is_hard:
+                    dom, siblings = sibling_hit[2:].split("(has ", 1)
+                    reasons.append(
+                        f"source {dom} publishes {siblings.rstrip(')')}, not {k} "
+                        "(no independent corroboration)"
+                    )
 
             # out-of-band (soft)
             r = ranges.get(k) or {}
