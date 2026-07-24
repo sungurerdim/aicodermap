@@ -1,13 +1,31 @@
 {
   "coldStartN": 10,
   "halfLifeCycles": 3,
-  "lastCycle": "2026-07-16",
+  "lastCycle": "2026-07-24",
   "schemaVersion": "v1",
   "sources": {
+    "9to5google.com": {
+      "byBench": {
+        "swePro": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-07-24",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-07-24"
+    },
     "abhs.in": {
       "byBench": {
         "aime26": {
-          "agree": 0.304754,
+          "agree": 0.23403,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -15,7 +33,7 @@
       },
       "firstSeen": "2026-06-10",
       "global": {
-        "agree": 0.304754,
+        "agree": 0.23403,
         "disagree": 0.0,
         "rawAgree": 1,
         "rawDisagree": 0
@@ -25,25 +43,25 @@
     "adam.holter.com": {
       "byBench": {
         "gpqa": {
-          "agree": 2.984347,
+          "agree": 2.291771,
           "disagree": 0.0,
           "rawAgree": 12,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.483767,
+          "agree": 0.371499,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 0.847865,
+          "agree": 0.651101,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 1.695728,
+          "agree": 1.302201,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
@@ -51,7 +69,7 @@
       },
       "firstSeen": "2026-05-30",
       "global": {
-        "agree": 6.011705,
+        "agree": 4.616572,
         "disagree": 0.0,
         "rawAgree": 25,
         "rawDisagree": 0
@@ -61,7 +79,7 @@
     "agiranker.com": {
       "byBench": {
         "arcAgi2": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -69,7 +87,7 @@
       },
       "firstSeen": "2026-07-16",
       "global": {
-        "agree": 1.0,
+        "agree": 0.76793,
         "disagree": 0.0,
         "rawAgree": 1,
         "rawDisagree": 0
@@ -79,49 +97,49 @@
     "ai.google.dev": {
       "byBench": {
         "aime26": {
-          "agree": 1.606804,
+          "agree": 1.233914,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
         },
         "cfElo": {
-          "agree": 0.304754,
+          "agree": 0.23403,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 0.875324,
-          "disagree": 0.285286,
+          "agree": 0.672188,
+          "disagree": 0.21908,
           "rawAgree": 5,
           "rawDisagree": 2
         },
         "hle": {
-          "agree": 0.359438,
+          "agree": 0.276023,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 3.209168,
+          "agree": 2.464418,
           "disagree": 0.0,
           "rawAgree": 12,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.688718,
+          "agree": 0.528888,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "mrcr": {
-          "agree": 1.9618,
+          "agree": 1.506526,
           "disagree": 0.0,
           "rawAgree": 7,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 1.640055,
+          "agree": 1.259448,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
@@ -129,8 +147,8 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 10.646059,
-        "disagree": 0.285286,
+        "agree": 8.175433,
+        "disagree": 0.21908,
         "rawAgree": 40,
         "rawDisagree": 2
       },
@@ -139,37 +157,37 @@
     "ai.meta.com": {
       "byBench": {
         "aime26": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "arcAgi2": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 0.442287,
+          "agree": 0.339646,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 0.488326,
+          "agree": 0.375,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 1.068242,
+          "agree": 0.820336,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -177,7 +195,7 @@
       },
       "firstSeen": "2026-05-19",
       "global": {
-        "agree": 3.868279,
+        "agree": 2.970569,
         "disagree": 0.0,
         "rawAgree": 13,
         "rawDisagree": 0
@@ -187,7 +205,7 @@
     "aicostcheck.com": {
       "byBench": {
         "swePro": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -195,7 +213,7 @@
       },
       "firstSeen": "2026-06-07",
       "global": {
-        "agree": 0.552045,
+        "agree": 0.423932,
         "disagree": 0.0,
         "rawAgree": 2,
         "rawDisagree": 0
@@ -205,37 +223,37 @@
     "aicybr.com": {
       "byBench": {
         "aime26": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "cfElo": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 1.353226,
+          "agree": 1.039183,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
         },
         "mrcr": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -243,7 +261,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 4.593799,
+        "agree": 3.527718,
         "disagree": 0.0,
         "rawAgree": 16,
         "rawDisagree": 0
@@ -253,31 +271,31 @@
     "aimadetools.com": {
       "byBench": {
         "aime26": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "arcAgi2": {
-          "agree": 3.0,
+          "agree": 2.303791,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 3.0,
+          "agree": 2.303791,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -285,7 +303,7 @@
       },
       "firstSeen": "2026-06-27",
       "global": {
-        "agree": 7.602363,
+        "agree": 5.838086,
         "disagree": 0.0,
         "rawAgree": 9,
         "rawDisagree": 0
@@ -295,19 +313,19 @@
     "ainewssilo.com": {
       "byBench": {
         "aime26": {
-          "agree": 1.380111,
+          "agree": 1.059829,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 1.380111,
+          "agree": 1.059829,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 1.656134,
+          "agree": 1.271796,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
@@ -315,7 +333,7 @@
       },
       "firstSeen": "2026-06-07",
       "global": {
-        "agree": 4.416358,
+        "agree": 3.391456,
         "disagree": 0.0,
         "rawAgree": 16,
         "rawDisagree": 0
@@ -325,7 +343,7 @@
     "aiproductivity.ai": {
       "byBench": {
         "gpqa": {
-          "agree": 4.0,
+          "agree": 3.071722,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
@@ -333,7 +351,7 @@
       },
       "firstSeen": "2026-07-16",
       "global": {
-        "agree": 4.0,
+        "agree": 3.071722,
         "disagree": 0.0,
         "rawAgree": 4,
         "rawDisagree": 0
@@ -343,7 +361,7 @@
     "aireleasetracker.com": {
       "byBench": {
         "sweV": {
-          "agree": 0.359438,
+          "agree": 0.276023,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -351,7 +369,7 @@
       },
       "firstSeen": "2026-06-15",
       "global": {
-        "agree": 0.359438,
+        "agree": 0.276023,
         "disagree": 0.0,
         "rawAgree": 1,
         "rawDisagree": 0
@@ -361,7 +379,7 @@
     "aitoolranked.com": {
       "byBench": {
         "gpqa": {
-          "agree": 0.383965,
+          "agree": 0.294858,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -369,7 +387,7 @@
       },
       "firstSeen": "2026-05-27",
       "global": {
-        "agree": 0.383965,
+        "agree": 0.294858,
         "disagree": 0.0,
         "rawAgree": 2,
         "rawDisagree": 0
@@ -380,7 +398,7 @@
       "byBench": {
         "hle": {
           "agree": 0.0,
-          "disagree": 0.855856,
+          "disagree": 0.657238,
           "rawAgree": 0,
           "rawDisagree": 6
         }
@@ -388,7 +406,7 @@
       "firstSeen": "2026-05-18",
       "global": {
         "agree": 0.0,
-        "disagree": 0.855856,
+        "disagree": 0.657238,
         "rawAgree": 0,
         "rawDisagree": 6
       },
@@ -397,7 +415,7 @@
     "alexlavaee.me": {
       "byBench": {
         "tb2": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
@@ -405,7 +423,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 2.136483,
+        "agree": 1.64067,
         "disagree": 0.0,
         "rawAgree": 8,
         "rawDisagree": 0
@@ -415,7 +433,7 @@
     "alhertech.com": {
       "byBench": {
         "tb2": {
-          "agree": 3.0,
+          "agree": 2.303791,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -423,7 +441,7 @@
       },
       "firstSeen": "2026-07-16",
       "global": {
-        "agree": 3.0,
+        "agree": 2.303791,
         "disagree": 0.0,
         "rawAgree": 3,
         "rawDisagree": 0
@@ -433,7 +451,7 @@
     "alibabacloud.com": {
       "byBench": {
         "mrcr": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -441,7 +459,7 @@
       },
       "firstSeen": "2026-06-27",
       "global": {
-        "agree": 0.534121,
+        "agree": 0.410168,
         "disagree": 0.0,
         "rawAgree": 1,
         "rawDisagree": 0
@@ -451,7 +469,7 @@
     "allclaw.org": {
       "byBench": {
         "aime26": {
-          "agree": 0.847865,
+          "agree": 0.651101,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
@@ -459,7 +477,7 @@
       },
       "firstSeen": "2026-05-30",
       "global": {
-        "agree": 0.847865,
+        "agree": 0.651101,
         "disagree": 0.0,
         "rawAgree": 4,
         "rawDisagree": 0
@@ -469,7 +487,7 @@
     "almcorp.com": {
       "byBench": {
         "tb2": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -477,7 +495,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 0.142643,
+        "agree": 0.10954,
         "disagree": 0.0,
         "rawAgree": 1,
         "rawDisagree": 0
@@ -487,19 +505,19 @@
     "analyticsvidhya.com": {
       "byBench": {
         "aaIdx": {
-          "agree": 6.793415,
+          "agree": 5.21687,
           "disagree": 0.0,
           "rawAgree": 26,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 0.383965,
+          "agree": 0.294858,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -507,7 +525,7 @@
       },
       "firstSeen": "2026-05-27",
       "global": {
-        "agree": 9.313864,
+        "agree": 7.1524,
         "disagree": 0.0,
         "rawAgree": 36,
         "rawDisagree": 0
@@ -517,43 +535,43 @@
     "anthropic.com": {
       "byBench": {
         "aime26": {
-          "agree": 0.285286,
+          "agree": 0.21908,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 2.416932,
+          "agree": 1.856036,
           "disagree": 0.0,
           "rawAgree": 15,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 3.057247,
+          "agree": 2.347753,
           "disagree": 0.0,
           "rawAgree": 14,
           "rawDisagree": 0
         },
         "mcpA": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 8.819495,
+          "agree": 6.772759,
           "disagree": 0.0,
           "rawAgree": 23,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 5.8478650000000005,
+          "agree": 4.490754,
           "disagree": 0.0,
           "rawAgree": 9,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 10.895938000000001,
+          "agree": 8.367323,
           "disagree": 0.0,
           "rawAgree": 33,
           "rawDisagree": 0
@@ -561,7 +579,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 31.465404,
+        "agree": 24.163243,
         "disagree": 0.0,
         "rawAgree": 97,
         "rawDisagree": 0
@@ -571,7 +589,7 @@
     "api-docs.deepseek.com": {
       "byBench": {
         "gpqa": {
-          "agree": 0.427927,
+          "agree": 0.328618,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -579,7 +597,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 0.427927,
+        "agree": 0.328618,
         "disagree": 0.0,
         "rawAgree": 3,
         "rawDisagree": 0
@@ -589,7 +607,7 @@
     "api.minimax.io": {
       "byBench": {
         "lcb": {
-          "agree": 2.992339,
+          "agree": 2.297908,
           "disagree": 0.0,
           "rawAgree": 14,
           "rawDisagree": 0
@@ -597,7 +615,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 2.992339,
+        "agree": 2.297908,
         "disagree": 0.0,
         "rawAgree": 14,
         "rawDisagree": 0
@@ -607,37 +625,37 @@
     "apidog.com": {
       "byBench": {
         "aime26": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "arcAgi2": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "mcpA": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "nl2Repo": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -645,7 +663,7 @@
       },
       "firstSeen": "2026-06-27",
       "global": {
-        "agree": 3.294344,
+        "agree": 2.529827,
         "disagree": 0.0,
         "rawAgree": 6,
         "rawDisagree": 0
@@ -655,19 +673,19 @@
     "appwrite.io": {
       "byBench": {
         "hle": {
-          "agree": 6.735001,
+          "agree": 5.172013,
           "disagree": 0.0,
           "rawAgree": 26,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 0.325551,
+          "agree": 0.250001,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 0.325551,
+          "agree": 0.250001,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -675,7 +693,7 @@
       },
       "firstSeen": "2026-05-22",
       "global": {
-        "agree": 7.386101,
+        "agree": 5.672012,
         "disagree": 0.0,
         "rawAgree": 30,
         "rawDisagree": 0
@@ -685,7 +703,7 @@
     "arcprize.org": {
       "byBench": {
         "arcAgi2": {
-          "agree": 5.087184,
+          "agree": 3.906604,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
@@ -693,7 +711,7 @@
       },
       "firstSeen": "2026-07-11",
       "global": {
-        "agree": 5.087184,
+        "agree": 3.906604,
         "disagree": 0.0,
         "rawAgree": 6,
         "rawDisagree": 0
@@ -703,103 +721,103 @@
     "artificialanalysis.ai": {
       "byBench": {
         "aaAgentic": {
-          "agree": 46.960465,
+          "agree": 38.062372,
           "disagree": 0.0,
-          "rawAgree": 144,
+          "rawAgree": 146,
           "rawDisagree": 0
         },
         "aaCoding": {
-          "agree": 96.915836,
+          "agree": 74.424625,
           "disagree": 0.0,
           "rawAgree": 308,
           "rawDisagree": 0
         },
         "aaIdx": {
-          "agree": 559.229001,
+          "agree": 438.448996,
           "disagree": 0.0,
-          "rawAgree": 1771,
+          "rawAgree": 1780,
           "rawDisagree": 0
         },
         "aaOmni": {
           "agree": 0.0,
-          "disagree": 0.285286,
+          "disagree": 0.21908,
           "rawAgree": 0,
           "rawDisagree": 2
         },
         "aime26": {
-          "agree": 2.136483,
-          "disagree": 0.442287,
+          "agree": 1.64067,
+          "disagree": 0.339646,
           "rawAgree": 7,
           "rawDisagree": 3
         },
         "arcAgi2": {
-          "agree": 1.93403,
+          "agree": 1.485201,
           "disagree": 0.0,
           "rawAgree": 7,
           "rawDisagree": 0
         },
         "cfElo": {
-          "agree": 0.630969,
+          "agree": 0.48454,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 34.087727,
-          "disagree": 0.97665,
-          "rawAgree": 150,
+          "agree": 27.177005,
+          "disagree": 0.749999,
+          "rawAgree": 151,
           "rawDisagree": 6
         },
         "hle": {
-          "agree": 93.873932,
+          "agree": 72.088654,
           "disagree": 0.0,
           "rawAgree": 331,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 14.73786,
+          "agree": 11.317652,
           "disagree": 0.0,
           "rawAgree": 62,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 15.265802,
+          "agree": 11.723075,
           "disagree": 0.0,
           "rawAgree": 43,
           "rawDisagree": 0
         },
         "mrcr": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 7,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 0.552045,
-          "disagree": 0.285286,
+          "agree": 0.423932,
+          "disagree": 0.21908,
           "rawAgree": 2,
           "rawDisagree": 2
         },
         "sweV": {
-          "agree": 7.959584,
+          "agree": 6.112407,
           "disagree": 0.0,
           "rawAgree": 38,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 44.623632,
+          "agree": 34.267847,
           "disagree": 0.0,
           "rawAgree": 111,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 6.327821999999999,
+          "agree": 4.859327,
           "disagree": 0.0,
           "rawAgree": 14,
           "rawDisagree": 0
         },
         "tbHard": {
-          "agree": 119.453778,
+          "agree": 91.732197,
           "disagree": 0.0,
           "rawAgree": 443,
           "rawDisagree": 0
@@ -807,107 +825,107 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 1046.825449,
-        "disagree": 1.989509,
-        "rawAgree": 3442,
+        "agree": 815.889171,
+        "disagree": 1.527805,
+        "rawAgree": 3454,
         "rawDisagree": 13
       },
-      "lastSeen": "2026-07-16"
+      "lastSeen": "2026-07-24"
     },
     "arxiv.org": {
       "byBench": {
         "aime26": {
-          "agree": 4.296542,
+          "agree": 3.299446,
           "disagree": 0.0,
           "rawAgree": 16,
           "rawDisagree": 0
         },
         "bfcl": {
-          "agree": 0.304754,
+          "agree": 0.23403,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "browseComp": {
-          "agree": 2.937666,
+          "agree": 2.255923,
           "disagree": 0.0,
           "rawAgree": 11,
           "rawDisagree": 0
         },
         "cfElo": {
-          "agree": 6.5111229999999995,
+          "agree": 5.00009,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 27.885387,
+          "agree": 21.414039,
           "disagree": 0.0,
           "rawAgree": 88,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 3.439713,
+          "agree": 2.64146,
           "disagree": 0.0,
           "rawAgree": 9,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 8.442313,
-          "disagree": 0.488326,
+          "agree": 6.483109,
+          "disagree": 0.375,
           "rawAgree": 29,
           "rawDisagree": 3
         },
         "mmluPro": {
-          "agree": 28.491304,
+          "agree": 21.879341,
           "disagree": 0.0,
           "rawAgree": 63,
           "rawDisagree": 0
         },
         "mrcr": {
-          "agree": 1.649045,
+          "agree": 1.266352,
           "disagree": 0.0,
           "rawAgree": 7,
           "rawDisagree": 0
         },
         "nl2Repo": {
-          "agree": 3.801181,
+          "agree": 2.919043,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
         },
         "sweMulti": {
-          "agree": 3.263214,
+          "agree": 2.505921,
           "disagree": 0.0,
           "rawAgree": 13,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 4.984893,
+          "agree": 3.828051,
           "disagree": 0.0,
           "rawAgree": 20,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 6.936058,
+          "agree": 5.32641,
           "disagree": 0.0,
           "rawAgree": 27,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 1.303261,
+          "agree": 1.000814,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
         },
         "tbHard": {
-          "agree": 4.700789,
+          "agree": 3.609879,
           "disagree": 0.0,
           "rawAgree": 17,
           "rawDisagree": 0
@@ -915,8 +933,8 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 109.947242,
-        "disagree": 0.488326,
+        "agree": 84.431838,
+        "disagree": 0.375,
         "rawAgree": 321,
         "rawDisagree": 3
       },
@@ -925,7 +943,7 @@
     "assets.anthropic.com": {
       "byBench": {
         "tb2": {
-          "agree": 1.14114,
+          "agree": 0.876316,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
@@ -933,7 +951,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 1.14114,
+        "agree": 0.876316,
         "disagree": 0.0,
         "rawAgree": 8,
         "rawDisagree": 0
@@ -943,25 +961,25 @@
     "aurigait.com": {
       "byBench": {
         "aime26": {
-          "agree": 2.904415,
+          "agree": 2.230389,
           "disagree": 0.0,
           "rawAgree": 12,
           "rawDisagree": 0
         },
         "cfElo": {
-          "agree": 2.801181,
+          "agree": 2.151112,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 2.52045,
+          "agree": 1.93553,
           "disagree": 0.0,
           "rawAgree": 10,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.998497,
+          "agree": 0.766776,
           "disagree": 0.0,
           "rawAgree": 7,
           "rawDisagree": 0
@@ -969,7 +987,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 9.224541,
+        "agree": 7.083806,
         "disagree": 0.0,
         "rawAgree": 34,
         "rawDisagree": 0
@@ -979,25 +997,25 @@
     "automatio.ai": {
       "byBench": {
         "lcb": {
-          "agree": 0.93601,
+          "agree": 0.718791,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.483767,
+          "agree": 0.371499,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 2.279126,
+          "agree": 1.75021,
           "disagree": 0.0,
           "rawAgree": 9,
           "rawDisagree": 0
@@ -1005,7 +1023,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 5.835386,
+        "agree": 4.481171,
         "disagree": 0.0,
         "rawAgree": 22,
         "rawDisagree": 0
@@ -1015,31 +1033,31 @@
     "awesomeagents.ai": {
       "byBench": {
         "aime26": {
-          "agree": 0.595275,
+          "agree": 0.45713,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 8.871484,
+          "agree": 6.812683,
           "disagree": 0.0,
           "rawAgree": 34,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 0.595275,
+          "agree": 0.45713,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "mcpA": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.847865,
+          "agree": 0.651101,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
@@ -1047,7 +1065,7 @@
       },
       "firstSeen": "2026-05-22",
       "global": {
-        "agree": 13.046383,
+        "agree": 10.018715,
         "disagree": 0.0,
         "rawAgree": 52,
         "rawDisagree": 0
@@ -1057,7 +1075,7 @@
     "benchable.ai": {
       "byBench": {
         "sweV": {
-          "agree": 5.0,
+          "agree": 3.839652,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
@@ -1065,7 +1083,7 @@
       },
       "firstSeen": "2026-07-16",
       "global": {
-        "agree": 5.0,
+        "agree": 3.839652,
         "disagree": 0.0,
         "rawAgree": 5,
         "rawDisagree": 0
@@ -1075,109 +1093,109 @@
     "benchlm.ai": {
       "byBench": {
         "aaAgentic": {
-          "agree": 7.0,
+          "agree": 7.375513,
           "disagree": 0.0,
-          "rawAgree": 7,
+          "rawAgree": 9,
           "rawDisagree": 0
         },
         "aaCoding": {
-          "agree": 10.0,
+          "agree": 7.679305,
           "disagree": 0.0,
           "rawAgree": 10,
           "rawDisagree": 0
         },
         "aaIdx": {
-          "agree": 59.361452,
+          "agree": 45.585468,
           "disagree": 0.0,
           "rawAgree": 100,
           "rawDisagree": 0
         },
         "aaOmni": {
-          "agree": 0.285286,
+          "agree": 0.21908,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "aime26": {
-          "agree": 10.811144,
+          "agree": 8.302207,
           "disagree": 0.0,
           "rawAgree": 19,
           "rawDisagree": 0
         },
         "arcAgi2": {
-          "agree": 8.890895,
+          "agree": 6.827589,
           "disagree": 0.0,
           "rawAgree": 18,
           "rawDisagree": 0
         },
         "cfElo": {
-          "agree": 0.488326,
+          "agree": 0.375,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 18.012624000000002,
-          "disagree": 0.488326,
-          "rawAgree": 29,
+          "agree": 14.832443,
+          "disagree": 0.375,
+          "rawAgree": 30,
           "rawDisagree": 3
         },
         "hle": {
-          "agree": 13.178401000000001,
+          "agree": 10.120096,
           "disagree": 0.0,
           "rawAgree": 32,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 2.583676,
+          "agree": 1.984084,
           "disagree": 0.0,
           "rawAgree": 14,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 13.212032,
+          "agree": 10.145922,
           "disagree": 0.0,
           "rawAgree": 17,
           "rawDisagree": 0
         },
         "mrcr": {
-          "agree": 10.0,
+          "agree": 7.679305,
           "disagree": 0.0,
           "rawAgree": 10,
           "rawDisagree": 0
         },
         "nl2Repo": {
-          "agree": 3.0,
+          "agree": 2.303791,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 22.595799,
+          "agree": 17.352003,
           "disagree": 0.0,
           "rawAgree": 44,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 18.058388,
-          "disagree": 0.488326,
-          "rawAgree": 53,
+          "agree": 14.867587,
+          "disagree": 0.375,
+          "rawAgree": 54,
           "rawDisagree": 3
         },
         "tau2": {
-          "agree": 1.086466,
-          "disagree": 0.488326,
+          "agree": 0.83433,
+          "disagree": 0.375,
           "rawAgree": 5,
           "rawDisagree": 3
         },
         "tb2": {
-          "agree": 29.773716,
+          "agree": 23.864144,
           "disagree": 0.0,
-          "rawAgree": 38,
+          "rawAgree": 39,
           "rawDisagree": 0
         },
         "tbHard": {
-          "agree": 16.267281,
+          "agree": 12.492141,
           "disagree": 0.0,
           "rawAgree": 53,
           "rawDisagree": 0
@@ -1185,17 +1203,17 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 244.605483,
-        "disagree": 1.464976,
-        "rawAgree": 457,
+        "agree": 192.840006,
+        "disagree": 1.125,
+        "rawAgree": 462,
         "rawDisagree": 9
       },
-      "lastSeen": "2026-07-16"
+      "lastSeen": "2026-07-24"
     },
     "benchmarklist.com": {
       "byBench": {
         "tau2": {
-          "agree": 2.0,
+          "agree": 1.535861,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -1203,7 +1221,7 @@
       },
       "firstSeen": "2026-07-16",
       "global": {
-        "agree": 2.0,
+        "agree": 1.535861,
         "disagree": 0.0,
         "rawAgree": 2,
         "rawDisagree": 0
@@ -1213,7 +1231,7 @@
     "blog.4sapi.com": {
       "byBench": {
         "sweMulti": {
-          "agree": 4.540028,
+          "agree": 3.486426,
           "disagree": 0.0,
           "rawAgree": 17,
           "rawDisagree": 0
@@ -1221,7 +1239,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 4.540028,
+        "agree": 3.486426,
         "disagree": 0.0,
         "rawAgree": 17,
         "rawDisagree": 0
@@ -1232,7 +1250,7 @@
       "byBench": {
         "gpqa": {
           "agree": 0.0,
-          "disagree": 0.442287,
+          "disagree": 0.339646,
           "rawAgree": 0,
           "rawDisagree": 3
         }
@@ -1240,7 +1258,7 @@
       "firstSeen": "2026-05-19",
       "global": {
         "agree": 0.0,
-        "disagree": 0.442287,
+        "disagree": 0.339646,
         "rawAgree": 0,
         "rawDisagree": 3
       },
@@ -1249,31 +1267,31 @@
     "blog.google": {
       "byBench": {
         "aime26": {
-          "agree": 3.801181,
+          "agree": 2.919043,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
         },
         "cfElo": {
-          "agree": 0.595275,
+          "agree": 0.45713,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 7.594596,
+          "agree": 5.832122,
           "disagree": 0.0,
           "rawAgree": 29,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 2.7996790000000003,
+          "agree": 2.149959,
           "disagree": 0.0,
           "rawAgree": 11,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 0.811893,
+          "agree": 0.623477,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
@@ -1281,7 +1299,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 15.602625,
+        "agree": 11.981731,
         "disagree": 0.0,
         "rawAgree": 54,
         "rawDisagree": 0
@@ -1292,7 +1310,7 @@
       "byBench": {
         "sweV": {
           "agree": 0.0,
-          "disagree": 0.442287,
+          "disagree": 0.339646,
           "rawAgree": 0,
           "rawDisagree": 3
         }
@@ -1300,7 +1318,7 @@
       "firstSeen": "2026-05-19",
       "global": {
         "agree": 0.0,
-        "disagree": 0.442287,
+        "disagree": 0.339646,
         "rawAgree": 0,
         "rawDisagree": 3
       },
@@ -1309,7 +1327,7 @@
     "blog.wentuo.ai": {
       "byBench": {
         "mrcr": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -1317,7 +1335,7 @@
       },
       "firstSeen": "2026-06-27",
       "global": {
-        "agree": 0.534121,
+        "agree": 0.410168,
         "disagree": 0.0,
         "rawAgree": 1,
         "rawDisagree": 0
@@ -1328,7 +1346,7 @@
       "byBench": {
         "gpqa": {
           "agree": 0.0,
-          "disagree": 0.427927,
+          "disagree": 0.328618,
           "rawAgree": 0,
           "rawDisagree": 3
         }
@@ -1336,7 +1354,7 @@
       "firstSeen": "2026-05-18",
       "global": {
         "agree": 0.0,
-        "disagree": 0.427927,
+        "disagree": 0.328618,
         "rawAgree": 0,
         "rawDisagree": 3
       },
@@ -1345,13 +1363,13 @@
     "build.nvidia.com": {
       "byBench": {
         "mmluPro": {
-          "agree": 14.434695,
+          "agree": 11.084842,
           "disagree": 0.0,
           "rawAgree": 56,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 1.335302,
+          "agree": 1.025419,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
@@ -1359,7 +1377,7 @@
       },
       "firstSeen": "2026-05-27",
       "global": {
-        "agree": 15.769998,
+        "agree": 12.110262,
         "disagree": 0.0,
         "rawAgree": 61,
         "rawDisagree": 0
@@ -1369,67 +1387,67 @@
     "buildfastwithai.com": {
       "byBench": {
         "aaIdx": {
-          "agree": 14.370908,
+          "agree": 11.035858,
           "disagree": 0.0,
           "rawAgree": 53,
           "rawDisagree": 0
         },
         "aime26": {
-          "agree": 2.181293,
+          "agree": 1.675081,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "arcAgi2": {
-          "agree": 2.3532260000000003,
+          "agree": 1.807114,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
         },
         "bfcl": {
-          "agree": 0.304754,
+          "agree": 0.23403,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 2.96455,
+          "agree": 2.276568,
           "disagree": 0.0,
           "rawAgree": 11,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "nl2Repo": {
-          "agree": 8.0,
+          "agree": 6.143444,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 0.383965,
+          "agree": 0.294858,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 11.651862999999999,
+          "agree": 8.947821,
           "disagree": 0.0,
           "rawAgree": 24,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 10.937666,
+          "agree": 9.399367,
           "disagree": 0.0,
-          "rawAgree": 19,
+          "rawAgree": 20,
           "rawDisagree": 0
         },
         "tbHard": {
-          "agree": 8.675092,
+          "agree": 6.661868,
           "disagree": 0.0,
           "rawAgree": 31,
           "rawDisagree": 0
@@ -1437,17 +1455,17 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 62.624496,
+        "agree": 49.091259,
         "disagree": 0.0,
-        "rawAgree": 166,
+        "rawAgree": 167,
         "rawDisagree": 0
       },
-      "lastSeen": "2026-07-16"
+      "lastSeen": "2026-07-24"
     },
     "buildmvpfast.com": {
       "byBench": {
         "tbHard": {
-          "agree": 2.0,
+          "agree": 1.535861,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -1455,7 +1473,7 @@
       },
       "firstSeen": "2026-07-16",
       "global": {
-        "agree": 2.0,
+        "agree": 1.535861,
         "disagree": 0.0,
         "rawAgree": 2,
         "rawDisagree": 0
@@ -1464,14 +1482,20 @@
     },
     "businesswire.com": {
       "byBench": {
+        "aime26": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
         "lcb": {
-          "agree": 0.383965,
+          "agree": 0.294858,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 1.14114,
+          "agree": 0.876316,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
@@ -1479,41 +1503,41 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 1.525106,
+        "agree": 2.171175,
         "disagree": 0.0,
-        "rawAgree": 10,
+        "rawAgree": 11,
         "rawDisagree": 0
       },
-      "lastSeen": "2026-05-27"
+      "lastSeen": "2026-07-24"
     },
     "chatforest.com": {
       "byBench": {
         "arcAgi2": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 5.0,
+          "agree": 4.839652,
           "disagree": 0.0,
-          "rawAgree": 5,
+          "rawAgree": 6,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-06-27",
       "global": {
-        "agree": 5.534121,
+        "agree": 5.24982,
         "disagree": 0.0,
-        "rawAgree": 6,
+        "rawAgree": 7,
         "rawDisagree": 0
       },
-      "lastSeen": "2026-07-16"
+      "lastSeen": "2026-07-24"
     },
     "chatlyai.app": {
       "byBench": {
         "swePro": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
@@ -1521,7 +1545,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 2.136483,
+        "agree": 1.64067,
         "disagree": 0.0,
         "rawAgree": 8,
         "rawDisagree": 0
@@ -1531,13 +1555,13 @@
     "claudefa.st": {
       "byBench": {
         "gpqa": {
-          "agree": 4.0,
+          "agree": 3.071722,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 3.0,
+          "agree": 2.303791,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -1545,7 +1569,7 @@
       },
       "firstSeen": "2026-07-16",
       "global": {
-        "agree": 7.0,
+        "agree": 5.375513,
         "disagree": 0.0,
         "rawAgree": 7,
         "rawDisagree": 0
@@ -1555,7 +1579,7 @@
     "cloudvyn.com": {
       "byBench": {
         "gpqa": {
-          "agree": 3.0,
+          "agree": 2.303791,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -1563,7 +1587,7 @@
       },
       "firstSeen": "2026-07-16",
       "global": {
-        "agree": 3.0,
+        "agree": 2.303791,
         "disagree": 0.0,
         "rawAgree": 3,
         "rawDisagree": 0
@@ -1573,7 +1597,7 @@
     "codeforces.com": {
       "byBench": {
         "cfElo": {
-          "agree": 0.855856,
+          "agree": 0.657238,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
@@ -1581,7 +1605,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 0.855856,
+        "agree": 0.657238,
         "disagree": 0.0,
         "rawAgree": 6,
         "rawDisagree": 0
@@ -1591,55 +1615,55 @@
     "codersera.com": {
       "byBench": {
         "aaAgentic": {
-          "agree": 6.409451,
+          "agree": 4.922013,
           "disagree": 0.0,
           "rawAgree": 24,
           "rawDisagree": 0
         },
         "aime26": {
-          "agree": 5.875329,
+          "agree": 4.511844,
           "disagree": 0.0,
           "rawAgree": 22,
           "rawDisagree": 0
         },
         "cfElo": {
-          "agree": 7.621417,
+          "agree": 5.852718,
           "disagree": 0.0,
           "rawAgree": 26,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 1.602363,
+          "agree": 1.230503,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 6.961495,
+          "agree": 5.345944,
           "disagree": 0.0,
           "rawAgree": 26,
           "rawDisagree": 0
         },
         "mcpA": {
-          "agree": 4.540028,
+          "agree": 3.486426,
           "disagree": 0.0,
           "rawAgree": 17,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 5.0,
+          "agree": 3.839652,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 0.718874,
+          "agree": 0.552045,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -1647,7 +1671,7 @@
       },
       "firstSeen": "2026-05-30",
       "global": {
-        "agree": 39.280998,
+        "agree": 30.165076,
         "disagree": 0.0,
         "rawAgree": 130,
         "rawDisagree": 0
@@ -1657,25 +1681,25 @@
     "codingfleet.com": {
       "byBench": {
         "cfElo": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 2.2599210000000003,
+          "agree": 1.735462,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 1.869428,
+          "agree": 1.435591,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -1683,7 +1707,7 @@
       },
       "firstSeen": "2026-07-01",
       "global": {
-        "agree": 6.1293489999999995,
+        "agree": 4.706914,
         "disagree": 0.0,
         "rawAgree": 8,
         "rawDisagree": 0
@@ -1693,7 +1717,7 @@
     "cometapi.com": {
       "byBench": {
         "mcpA": {
-          "agree": 2.543592,
+          "agree": 1.953302,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -1701,7 +1725,7 @@
       },
       "firstSeen": "2026-07-11",
       "global": {
-        "agree": 2.543592,
+        "agree": 1.953302,
         "disagree": 0.0,
         "rawAgree": 3,
         "rawDisagree": 0
@@ -1711,97 +1735,115 @@
     "community-blog.example": {
       "byBench": {
         "gpqa": {
-          "agree": 0.427927,
+          "agree": 0.328618,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "sweV": {
           "agree": 0.0,
-          "disagree": 0.427927,
+          "disagree": 0.328618,
           "rawAgree": 0,
           "rawDisagree": 3
         },
         "tau2": {
           "agree": 0.0,
-          "disagree": 0.427927,
+          "disagree": 0.328618,
           "rawAgree": 0,
           "rawDisagree": 3
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 0.427927,
-        "disagree": 0.855856,
+        "agree": 0.328618,
+        "disagree": 0.657238,
         "rawAgree": 3,
         "rawDisagree": 6
       },
       "lastSeen": "2026-05-18"
     },
+    "cryptobriefing.com": {
+      "byBench": {
+        "aaIdx": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-07-24",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-07-24"
+    },
     "datacamp.com": {
       "byBench": {
         "aaIdx": {
-          "agree": 0.609507,
+          "agree": 0.468059,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "aime26": {
-          "agree": 1.068242,
+          "agree": 0.820336,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "arcAgi2": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "bfcl": {
-          "agree": 0.371498,
+          "agree": 0.285285,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 14.0262,
+          "agree": 10.771147,
           "disagree": 0.0,
           "rawAgree": 53,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 0.325551,
+          "agree": 0.250001,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 1.212032,
+          "agree": 0.930756,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 3.717006,
+          "agree": 2.854402,
           "disagree": 0.0,
           "rawAgree": 18,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 1.14114,
+          "agree": 0.876316,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 0.483767,
+          "agree": 0.371499,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 2.880949,
+          "agree": 2.212369,
           "disagree": 0.0,
           "rawAgree": 13,
           "rawDisagree": 0
@@ -1809,7 +1851,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 26.370013,
+        "agree": 20.250337,
         "disagree": 0.0,
         "rawAgree": 105,
         "rawDisagree": 0
@@ -1819,13 +1861,13 @@
     "datalearner.com": {
       "byBench": {
         "sweV": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 0.847865,
+          "agree": 0.651101,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
@@ -1833,7 +1875,7 @@
       },
       "firstSeen": "2026-05-30",
       "global": {
-        "agree": 1.847865,
+        "agree": 1.419032,
         "disagree": 0.0,
         "rawAgree": 5,
         "rawDisagree": 0
@@ -1843,13 +1885,13 @@
     "deepinfra.com": {
       "byBench": {
         "cfElo": {
-          "agree": 6.409451,
+          "agree": 4.922013,
           "disagree": 0.0,
           "rawAgree": 24,
           "rawDisagree": 0
         },
         "mcpA": {
-          "agree": 4.540028,
+          "agree": 3.486426,
           "disagree": 0.0,
           "rawAgree": 17,
           "rawDisagree": 0
@@ -1857,7 +1899,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 10.949477,
+        "agree": 8.408437,
         "disagree": 0.0,
         "rawAgree": 41,
         "rawDisagree": 0
@@ -1867,73 +1909,73 @@
     "deepmind.google": {
       "byBench": {
         "aime26": {
-          "agree": 0.694687,
+          "agree": 0.533471,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "arcAgi2": {
-          "agree": 22.190652,
+          "agree": 17.040878,
           "disagree": 0.0,
           "rawAgree": 63,
           "rawDisagree": 0
         },
         "cfElo": {
-          "agree": 3.095637,
+          "agree": 2.377234,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 1.506581,
+          "agree": 1.156949,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 21.523612,
+          "agree": 16.528638,
           "disagree": 0.0,
           "rawAgree": 43,
           "rawDisagree": 0
         },
         "mcpA": {
-          "agree": 9.347115,
+          "agree": 7.177935,
           "disagree": 0.0,
           "rawAgree": 35,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "mrcr": {
-          "agree": 18.53741,
+          "agree": 14.235442,
           "disagree": 0.0,
           "rawAgree": 27,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 5.383965,
+          "agree": 4.134511,
           "disagree": 0.0,
           "rawAgree": 7,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 5.951532,
+          "agree": 4.570363,
           "disagree": 0.0,
           "rawAgree": 23,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 0.483767,
+          "agree": 0.371499,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 5.896121,
+          "agree": 4.527811,
           "disagree": 0.0,
           "rawAgree": 11,
           "rawDisagree": 0
@@ -1941,7 +1983,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 95.16312099999999,
+        "agree": 73.078661,
         "disagree": 0.0,
         "rawAgree": 228,
         "rawDisagree": 0
@@ -1951,7 +1993,7 @@
     "deepseek.com": {
       "byBench": {
         "sweV": {
-          "agree": 0.488326,
+          "agree": 0.375,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -1959,7 +2001,7 @@
       },
       "firstSeen": "2026-05-22",
       "global": {
-        "agree": 0.488326,
+        "agree": 0.375,
         "disagree": 0.0,
         "rawAgree": 3,
         "rawDisagree": 0
@@ -1969,13 +2011,13 @@
     "deepseekai.guide": {
       "byBench": {
         "cfElo": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -1983,7 +2025,7 @@
       },
       "firstSeen": "2026-06-27",
       "global": {
-        "agree": 1.5341209999999998,
+        "agree": 1.178098,
         "disagree": 0.0,
         "rawAgree": 2,
         "rawDisagree": 0
@@ -1993,55 +2035,55 @@
     "designforonline.com": {
       "byBench": {
         "aaAgentic": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "aaCoding": {
-          "agree": 19.118753,
+          "agree": 14.681873,
           "disagree": 0.0,
           "rawAgree": 66,
           "rawDisagree": 0
         },
         "aaIdx": {
-          "agree": 2.745991,
+          "agree": 2.10873,
           "disagree": 0.0,
           "rawAgree": 9,
           "rawDisagree": 0
         },
         "cfElo": {
-          "agree": 0.967532,
+          "agree": 0.742997,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 11.857804,
+          "agree": 9.105969,
           "disagree": 0.0,
           "rawAgree": 34,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 12.236775,
+          "agree": 9.396993,
           "disagree": 0.0,
           "rawAgree": 46,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 4.825012,
+          "agree": 3.705274,
           "disagree": 0.0,
           "rawAgree": 18,
           "rawDisagree": 0
         },
         "tbHard": {
-          "agree": 12.403479,
+          "agree": 9.52501,
           "disagree": 0.0,
           "rawAgree": 43,
           "rawDisagree": 0
@@ -2049,7 +2091,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 66.825948,
+        "agree": 51.317682,
         "disagree": 0.0,
         "rawAgree": 227,
         "rawDisagree": 0
@@ -2059,43 +2101,43 @@
     "dev.to": {
       "byBench": {
         "aime26": {
-          "agree": 6.409451,
+          "agree": 4.922013,
           "disagree": 0.0,
           "rawAgree": 24,
           "rawDisagree": 0
         },
         "arcAgi2": {
-          "agree": 3.0,
+          "agree": 2.303791,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "cfElo": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 2.743503,
+          "agree": 2.10682,
           "disagree": 0.0,
           "rawAgree": 14,
           "rawDisagree": 0
@@ -2103,7 +2145,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 16.642664,
+        "agree": 12.780409,
         "disagree": 0.0,
         "rawAgree": 55,
         "rawDisagree": 0
@@ -2113,31 +2155,31 @@
     "developer.nvidia.com": {
       "byBench": {
         "aime26": {
-          "agree": 0.847865,
+          "agree": 0.651101,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 1.316056,
+          "agree": 1.01064,
           "disagree": 0.0,
           "rawAgree": 7,
           "rawDisagree": 0
         },
         "sweMulti": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
@@ -2145,7 +2187,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 4.585689,
+        "agree": 3.52149,
         "disagree": 0.0,
         "rawAgree": 21,
         "rawDisagree": 0
@@ -2155,25 +2197,25 @@
     "digitalapplied.com": {
       "byBench": {
         "sweMulti": {
-          "agree": 4.540028,
+          "agree": 3.486426,
           "disagree": 0.0,
           "rawAgree": 17,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 2.731758,
+          "agree": 2.0978,
           "disagree": 0.0,
           "rawAgree": 11,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -2181,7 +2223,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 7.557071,
+        "agree": 5.803305,
         "disagree": 0.0,
         "rawAgree": 30,
         "rawDisagree": 0
@@ -2191,7 +2233,7 @@
     "docs.api.nvidia.com": {
       "byBench": {
         "tb2": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -2199,7 +2241,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 0.142643,
+        "agree": 0.10954,
         "disagree": 0.0,
         "rawAgree": 1,
         "rawDisagree": 0
@@ -2209,37 +2251,37 @@
     "docs.z.ai": {
       "byBench": {
         "aime26": {
-          "agree": 0.57057,
+          "agree": 0.438158,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 0.855856,
+          "agree": 0.657238,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 0.57057,
+          "agree": 0.438158,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
         },
         "sweMulti": {
-          "agree": 5.608269,
+          "agree": 4.306761,
           "disagree": 0.0,
           "rawAgree": 21,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 2.543592,
+          "agree": 1.953302,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 4.255303,
+          "agree": 3.267777,
           "disagree": 0.0,
           "rawAgree": 15,
           "rawDisagree": 0
@@ -2247,7 +2289,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 14.404159,
+        "agree": 11.061393,
         "disagree": 0.0,
         "rawAgree": 53,
         "rawDisagree": 0
@@ -2257,7 +2299,7 @@
     "emelia.io": {
       "byBench": {
         "mmluPro": {
-          "agree": 0.304754,
+          "agree": 0.23403,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -2265,7 +2307,7 @@
       },
       "firstSeen": "2026-06-10",
       "global": {
-        "agree": 0.304754,
+        "agree": 0.23403,
         "disagree": 0.0,
         "rawAgree": 1,
         "rawDisagree": 0
@@ -2275,7 +2317,7 @@
     "emergent.sh": {
       "byBench": {
         "swePro": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -2283,7 +2325,7 @@
       },
       "firstSeen": "2026-07-16",
       "global": {
-        "agree": 1.0,
+        "agree": 0.76793,
         "disagree": 0.0,
         "rawAgree": 1,
         "rawDisagree": 0
@@ -2293,7 +2335,7 @@
     "essamamdani.com": {
       "byBench": {
         "tb2": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
@@ -2301,7 +2343,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 2.136483,
+        "agree": 1.64067,
         "disagree": 0.0,
         "rawAgree": 8,
         "rawDisagree": 0
@@ -2311,7 +2353,7 @@
     "evolink.ai": {
       "byBench": {
         "tb2": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -2319,7 +2361,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 0.801181,
+        "agree": 0.615251,
         "disagree": 0.0,
         "rawAgree": 3,
         "rawDisagree": 0
@@ -2330,12 +2372,12 @@
       "byBench": {
         "hle": {
           "agree": 0.0,
-          "disagree": 0.488326,
+          "disagree": 0.375,
           "rawAgree": 0,
           "rawDisagree": 3
         },
         "mrcr": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -2343,8 +2385,8 @@
       },
       "firstSeen": "2026-05-22",
       "global": {
-        "agree": 0.552045,
-        "disagree": 0.488326,
+        "agree": 0.423932,
+        "disagree": 0.375,
         "rawAgree": 2,
         "rawDisagree": 3
       },
@@ -2353,13 +2395,13 @@
     "felloai.com": {
       "byBench": {
         "mcpA": {
-          "agree": 0.304754,
+          "agree": 0.23403,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "mrcr": {
-          "agree": 5.087184,
+          "agree": 3.906604,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
@@ -2367,7 +2409,7 @@
       },
       "firstSeen": "2026-06-10",
       "global": {
-        "agree": 5.391938,
+        "agree": 4.140634,
         "disagree": 0.0,
         "rawAgree": 7,
         "rawDisagree": 0
@@ -2377,7 +2419,7 @@
     "forum.moonshot.ai": {
       "byBench": {
         "aime26": {
-          "agree": 0.828066,
+          "agree": 0.635897,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -2385,7 +2427,7 @@
       },
       "firstSeen": "2026-06-07",
       "global": {
-        "agree": 0.828066,
+        "agree": 0.635897,
         "disagree": 0.0,
         "rawAgree": 3,
         "rawDisagree": 0
@@ -2395,7 +2437,7 @@
     "futureagi.com": {
       "byBench": {
         "gpqa": {
-          "agree": 0.828066,
+          "agree": 0.635897,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -2403,7 +2445,7 @@
       },
       "firstSeen": "2026-06-07",
       "global": {
-        "agree": 0.828066,
+        "agree": 0.635897,
         "disagree": 0.0,
         "rawAgree": 3,
         "rawDisagree": 0
@@ -2413,13 +2455,13 @@
     "gemma4.wiki": {
       "byBench": {
         "lcb": {
-          "agree": 2.543592,
+          "agree": 1.953302,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 5.471149,
+          "agree": 4.201462,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
@@ -2427,7 +2469,7 @@
       },
       "firstSeen": "2026-05-27",
       "global": {
-        "agree": 8.014741,
+        "agree": 6.154764,
         "disagree": 0.0,
         "rawAgree": 11,
         "rawDisagree": 0
@@ -2437,25 +2479,25 @@
     "gemma4all.com": {
       "byBench": {
         "aime26": {
-          "agree": 0.595275,
+          "agree": 0.45713,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "cfElo": {
-          "agree": 3.595275,
+          "agree": 2.760921,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 0.595275,
+          "agree": 0.45713,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -2463,7 +2505,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 4.928469,
+        "agree": 3.784722,
         "disagree": 0.0,
         "rawAgree": 13,
         "rawDisagree": 0
@@ -2473,7 +2515,7 @@
     "gitautoreview.com": {
       "byBench": {
         "tb2": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -2481,7 +2523,7 @@
       },
       "firstSeen": "2026-06-07",
       "global": {
-        "agree": 0.552045,
+        "agree": 0.423932,
         "disagree": 0.0,
         "rawAgree": 2,
         "rawDisagree": 0
@@ -2491,67 +2533,67 @@
     "github.com": {
       "byBench": {
         "aime26": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 0.870215,
+          "agree": 0.668265,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 2.937666,
+          "agree": 2.255923,
           "disagree": 0.0,
           "rawAgree": 11,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.57057,
+          "agree": 0.438158,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
         },
         "nl2Repo": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "sweMulti": {
-          "agree": 2.996155,
+          "agree": 2.300839,
           "disagree": 0.0,
           "rawAgree": 11,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 5.8775949999999995,
+          "agree": 4.513584,
           "disagree": 0.0,
           "rawAgree": 9,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 1.398637,
+          "agree": 1.074056,
           "disagree": 0.0,
           "rawAgree": 7,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 6.562804,
+          "agree": 5.039777,
           "disagree": 0.0,
           "rawAgree": 27,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 5.8478650000000005,
+          "agree": 4.490754,
           "disagree": 0.0,
           "rawAgree": 9,
           "rawDisagree": 0
         },
         "tbHard": {
-          "agree": 0.325551,
+          "agree": 0.250001,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -2559,7 +2601,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 31.660023,
+        "agree": 24.312697,
         "disagree": 0.0,
         "rawAgree": 102,
         "rawDisagree": 0
@@ -2569,7 +2611,7 @@
     "gmicloud.ai": {
       "byBench": {
         "aime26": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
@@ -2577,7 +2619,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 2.136483,
+        "agree": 1.64067,
         "disagree": 0.0,
         "rawAgree": 8,
         "rawDisagree": 0
@@ -2587,19 +2629,19 @@
     "groundy.com": {
       "byBench": {
         "aime26": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "arcAgi2": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -2607,7 +2649,7 @@
       },
       "firstSeen": "2026-06-27",
       "global": {
-        "agree": 1.620287,
+        "agree": 1.244268,
         "disagree": 0.0,
         "rawAgree": 3,
         "rawDisagree": 0
@@ -2617,25 +2659,25 @@
     "help.apiyi.com": {
       "byBench": {
         "cfElo": {
-          "agree": 4.540028,
+          "agree": 3.486426,
           "disagree": 0.0,
           "rawAgree": 17,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "mcpA": {
-          "agree": 0.285286,
+          "agree": 0.21908,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "mrcr": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -2643,7 +2685,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 5.502075,
+        "agree": 4.225211,
         "disagree": 0.0,
         "rawAgree": 21,
         "rawDisagree": 0
@@ -2653,13 +2695,13 @@
     "help.mistral.ai": {
       "byBench": {
         "gdpr": {
-          "agree": 0.14743,
+          "agree": 0.113216,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "soc2": {
-          "agree": 0.14743,
+          "agree": 0.113216,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -2667,7 +2709,7 @@
       },
       "firstSeen": "2026-05-19",
       "global": {
-        "agree": 0.294858,
+        "agree": 0.22643,
         "disagree": 0.0,
         "rawAgree": 2,
         "rawDisagree": 0
@@ -2677,91 +2719,91 @@
     "huggingface.co": {
       "byBench": {
         "aaIdx": {
-          "agree": 2.937666,
+          "agree": 2.255923,
           "disagree": 0.0,
           "rawAgree": 11,
           "rawDisagree": 0
         },
         "aime26": {
-          "agree": 5.324334,
+          "agree": 5.088718,
           "disagree": 0.0,
-          "rawAgree": 17,
+          "rawAgree": 18,
           "rawDisagree": 0
         },
         "cfElo": {
-          "agree": 4.011782999999999,
+          "agree": 3.08077,
           "disagree": 0.0,
           "rawAgree": 14,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 7.45004,
-          "disagree": 0.773611,
+          "agree": 5.721113,
+          "disagree": 0.594079,
           "rawAgree": 32,
           "rawDisagree": 5
         },
         "hle": {
-          "agree": 2.49592,
+          "agree": 1.916693,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 11.7605,
+          "agree": 9.031246,
           "disagree": 0.0,
           "rawAgree": 41,
           "rawDisagree": 0
         },
         "mcpA": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 17.124432,
+          "agree": 13.150373,
           "disagree": 0.0,
           "rawAgree": 48,
           "rawDisagree": 0
         },
         "mrcr": {
-          "agree": 4.216661,
+          "agree": 3.238103,
           "disagree": 0.0,
           "rawAgree": 16,
           "rawDisagree": 0
         },
         "nl2Repo": {
-          "agree": 2.688528,
+          "agree": 2.064603,
           "disagree": 0.0,
           "rawAgree": 9,
           "rawDisagree": 0
         },
         "sweMulti": {
-          "agree": 4.825012,
+          "agree": 3.705274,
           "disagree": 0.0,
           "rawAgree": 18,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 2.439391,
+          "agree": 1.873283,
           "disagree": 0.0,
           "rawAgree": 7,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 4.134422,
+          "agree": 3.174949,
           "disagree": 0.0,
           "rawAgree": 18,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 4.656932,
+          "agree": 3.5762,
           "disagree": 0.0,
           "rawAgree": 18,
           "rawDisagree": 0
         },
         "tbHard": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -2769,17 +2811,17 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 75.418848,
-        "disagree": 0.773611,
-        "rawAgree": 261,
+        "agree": 58.916432,
+        "disagree": 0.594079,
+        "rawAgree": 262,
         "rawDisagree": 5
       },
-      "lastSeen": "2026-07-16"
+      "lastSeen": "2026-07-24"
     },
     "humiris.substack.com": {
       "byBench": {
         "swePro": {
-          "agree": 1.14114,
+          "agree": 0.876316,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
@@ -2787,7 +2829,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 1.14114,
+        "agree": 0.876316,
         "disagree": 0.0,
         "rawAgree": 8,
         "rawDisagree": 0
@@ -2797,7 +2839,7 @@
     "hyperstack.cloud": {
       "byBench": {
         "aime26": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -2805,7 +2847,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 0.801181,
+        "agree": 0.615251,
         "disagree": 0.0,
         "rawAgree": 3,
         "rawDisagree": 0
@@ -2815,13 +2857,13 @@
     "infoq.com": {
       "byBench": {
         "hle": {
-          "agree": 0.325551,
+          "agree": 0.250001,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 0.325551,
+          "agree": 0.250001,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -2829,7 +2871,7 @@
       },
       "firstSeen": "2026-05-22",
       "global": {
-        "agree": 0.6511,
+        "agree": 0.5,
         "disagree": 0.0,
         "rawAgree": 4,
         "rawDisagree": 0
@@ -2839,7 +2881,7 @@
     "kilo.ai": {
       "byBench": {
         "aaCoding": {
-          "agree": 6.409451,
+          "agree": 4.922013,
           "disagree": 0.0,
           "rawAgree": 24,
           "rawDisagree": 0
@@ -2847,7 +2889,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 6.409451,
+        "agree": 4.922013,
         "disagree": 0.0,
         "rawAgree": 24,
         "rawDisagree": 0
@@ -2857,13 +2899,13 @@
     "kimi.com": {
       "byBench": {
         "aime26": {
-          "agree": 3.0,
+          "agree": 2.303791,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 5.0,
+          "agree": 3.839652,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
@@ -2871,7 +2913,7 @@
       },
       "firstSeen": "2026-07-16",
       "global": {
-        "agree": 8.0,
+        "agree": 6.143444,
         "disagree": 0.0,
         "rawAgree": 8,
         "rawDisagree": 0
@@ -2881,25 +2923,25 @@
     "kingy.ai": {
       "byBench": {
         "arcAgi2": {
-          "agree": 1.595275,
+          "agree": 1.22506,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 3.0,
+          "agree": 2.303791,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 3.0,
+          "agree": 2.303791,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -2907,7 +2949,7 @@
       },
       "firstSeen": "2026-05-28",
       "global": {
-        "agree": 8.129396,
+        "agree": 6.242811,
         "disagree": 0.0,
         "rawAgree": 11,
         "rawDisagree": 0
@@ -2918,25 +2960,25 @@
       "byBench": {
         "gpqa": {
           "agree": 0.0,
-          "disagree": 1.711711,
+          "disagree": 1.314475,
           "rawAgree": 0,
           "rawDisagree": 12
         },
         "lcb": {
           "agree": 0.0,
-          "disagree": 1.711711,
+          "disagree": 1.314475,
           "rawAgree": 0,
           "rawDisagree": 12
         },
         "sweV": {
           "agree": 0.0,
-          "disagree": 0.855856,
+          "disagree": 0.657238,
           "rawAgree": 0,
           "rawDisagree": 6
         },
         "tb2": {
           "agree": 0.0,
-          "disagree": 0.855856,
+          "disagree": 0.657238,
           "rawAgree": 0,
           "rawDisagree": 6
         }
@@ -2944,7 +2986,7 @@
       "firstSeen": "2026-05-18",
       "global": {
         "agree": 0.0,
-        "disagree": 5.135132,
+        "disagree": 3.943424,
         "rawAgree": 0,
         "rawDisagree": 36
       },
@@ -2953,25 +2995,25 @@
     "labellerr.com": {
       "byBench": {
         "aime26": {
-          "agree": 3.383965,
+          "agree": 2.59865,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
         },
         "arcAgi2": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -2979,7 +3021,7 @@
       },
       "firstSeen": "2026-05-27",
       "global": {
-        "agree": 5.986328,
+        "agree": 4.597084,
         "disagree": 0.0,
         "rawAgree": 12,
         "rawDisagree": 0
@@ -2989,7 +3031,7 @@
     "labs.scale.com": {
       "byBench": {
         "swePro": {
-          "agree": 0.595275,
+          "agree": 0.45713,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -2997,7 +3039,7 @@
       },
       "firstSeen": "2026-05-28",
       "global": {
-        "agree": 0.595275,
+        "agree": 0.45713,
         "disagree": 0.0,
         "rawAgree": 3,
         "rawDisagree": 0
@@ -3007,7 +3049,7 @@
     "langbase.com": {
       "byBench": {
         "tb2": {
-          "agree": 3.0,
+          "agree": 2.303791,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -3015,7 +3057,7 @@
       },
       "firstSeen": "2026-07-16",
       "global": {
-        "agree": 3.0,
+        "agree": 2.303791,
         "disagree": 0.0,
         "rawAgree": 3,
         "rawDisagree": 0
@@ -3025,7 +3067,7 @@
     "latenode.com": {
       "byBench": {
         "gpqa": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -3033,7 +3075,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 0.142643,
+        "agree": 0.10954,
         "disagree": 0.0,
         "rawAgree": 1,
         "rawDisagree": 0
@@ -3043,13 +3085,13 @@
     "latent.space": {
       "byBench": {
         "mrcr": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 5.0,
+          "agree": 3.839652,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
@@ -3057,7 +3099,7 @@
       },
       "firstSeen": "2026-06-27",
       "global": {
-        "agree": 5.534121,
+        "agree": 4.24982,
         "disagree": 0.0,
         "rawAgree": 6,
         "rawDisagree": 0
@@ -3067,25 +3109,25 @@
     "layerlens.ai": {
       "byBench": {
         "aime26": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "sweMulti": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 0.359438,
+          "agree": 0.276023,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -3093,7 +3135,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 2.49592,
+        "agree": 1.916693,
         "disagree": 0.0,
         "rawAgree": 8,
         "rawDisagree": 0
@@ -3103,7 +3145,7 @@
     "leanware.co": {
       "byBench": {
         "cfElo": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -3111,7 +3153,7 @@
       },
       "firstSeen": "2026-06-27",
       "global": {
-        "agree": 0.534121,
+        "agree": 0.410168,
         "disagree": 0.0,
         "rawAgree": 1,
         "rawDisagree": 0
@@ -3121,7 +3163,7 @@
     "legal.mistral.ai": {
       "byBench": {
         "gdpr": {
-          "agree": 0.294858,
+          "agree": 0.22643,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -3129,7 +3171,7 @@
       },
       "firstSeen": "2026-05-19",
       "global": {
-        "agree": 0.294858,
+        "agree": 0.22643,
         "disagree": 0.0,
         "rawAgree": 2,
         "rawDisagree": 0
@@ -3139,7 +3181,7 @@
     "lesswrong.com": {
       "byBench": {
         "sweV": {
-          "agree": 1.259921,
+          "agree": 0.967532,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -3147,7 +3189,7 @@
       },
       "firstSeen": "2026-07-02",
       "global": {
-        "agree": 1.259921,
+        "agree": 0.967532,
         "disagree": 0.0,
         "rawAgree": 2,
         "rawDisagree": 0
@@ -3157,7 +3199,7 @@
     "livecodebench.com": {
       "byBench": {
         "lcb": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -3165,7 +3207,7 @@
       },
       "firstSeen": "2026-06-27",
       "global": {
-        "agree": 0.534121,
+        "agree": 0.410168,
         "disagree": 0.0,
         "rawAgree": 1,
         "rawDisagree": 0
@@ -3175,7 +3217,7 @@
     "livecodebench.github.io": {
       "byBench": {
         "lcb": {
-          "agree": 4.054388,
+          "agree": 3.113488,
           "disagree": 0.0,
           "rawAgree": 28,
           "rawDisagree": 0
@@ -3183,7 +3225,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 4.054388,
+        "agree": 3.113488,
         "disagree": 0.0,
         "rawAgree": 28,
         "rawDisagree": 0
@@ -3194,7 +3236,7 @@
       "byBench": {
         "lcb": {
           "agree": 0.0,
-          "disagree": 0.488326,
+          "disagree": 0.375,
           "rawAgree": 0,
           "rawDisagree": 3
         }
@@ -3202,7 +3244,7 @@
       "firstSeen": "2026-05-22",
       "global": {
         "agree": 0.0,
-        "disagree": 0.488326,
+        "disagree": 0.375,
         "rawAgree": 0,
         "rawDisagree": 3
       },
@@ -3211,7 +3253,7 @@
     "llama.com": {
       "byBench": {
         "aime26": {
-          "agree": 0.943824,
+          "agree": 0.724791,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
@@ -3219,7 +3261,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 0.943824,
+        "agree": 0.724791,
         "disagree": 0.0,
         "rawAgree": 4,
         "rawDisagree": 0
@@ -3229,121 +3271,121 @@
     "llm-stats.com": {
       "byBench": {
         "aaAgentic": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "aaCoding": {
-          "agree": 4.136483,
+          "agree": 3.176531,
           "disagree": 0.0,
           "rawAgree": 10,
           "rawDisagree": 0
         },
         "aaIdx": {
-          "agree": 8.688576,
+          "agree": 6.672222,
           "disagree": 0.0,
           "rawAgree": 33,
           "rawDisagree": 0
         },
         "aime26": {
-          "agree": 11.404508,
-          "disagree": 0.488326,
+          "agree": 8.757869,
+          "disagree": 0.375,
           "rawAgree": 49,
           "rawDisagree": 3
         },
         "arcAgi2": {
-          "agree": 9.555512,
+          "agree": 7.337969,
           "disagree": 0.0,
           "rawAgree": 36,
           "rawDisagree": 0
         },
         "bfcl": {
-          "agree": 0.285286,
+          "agree": 0.21908,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "browseComp": {
-          "agree": 3.344773,
+          "agree": 2.568553,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
         },
         "cfElo": {
-          "agree": 0.304754,
+          "agree": 0.23403,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 12.940515000000001,
-          "disagree": 0.855856,
+          "agree": 9.937416,
+          "disagree": 0.657238,
           "rawAgree": 53,
           "rawDisagree": 6
         },
         "hle": {
-          "agree": 8.744138,
+          "agree": 6.71489,
           "disagree": 0.0,
           "rawAgree": 38,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 22.398671,
-          "disagree": 0.285286,
+          "agree": 17.200622,
+          "disagree": 0.21908,
           "rawAgree": 96,
           "rawDisagree": 2
         },
         "mcpA": {
-          "agree": 11.216538,
+          "agree": 8.613521,
           "disagree": 0.0,
           "rawAgree": 42,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 6.694263,
+          "agree": 5.140729,
           "disagree": 0.0,
           "rawAgree": 34,
           "rawDisagree": 0
         },
         "mrcr": {
-          "agree": 5.488326,
+          "agree": 4.214653,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "sweMulti": {
-          "agree": 13.620082,
+          "agree": 10.459276,
           "disagree": 0.0,
           "rawAgree": 51,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 8.918063,
+          "agree": 6.848452,
           "disagree": 0.0,
           "rawAgree": 15,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 13.298163,
+          "agree": 10.212065,
           "disagree": 0.0,
           "rawAgree": 46,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 8.850331,
+          "agree": 6.796439,
           "disagree": 0.0,
           "rawAgree": 37,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 4.055243,
+          "agree": 3.114145,
           "disagree": 0.0,
           "rawAgree": 18,
           "rawDisagree": 0
         },
         "tbHard": {
-          "agree": 3.801181,
+          "agree": 2.919043,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
@@ -3351,8 +3393,8 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 159.881885,
-        "disagree": 1.629466,
+        "agree": 122.778173,
+        "disagree": 1.251317,
         "rawAgree": 589,
         "rawDisagree": 11
       },
@@ -3361,7 +3403,7 @@
     "llmreference.com": {
       "byBench": {
         "lcb": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -3369,7 +3411,7 @@
       },
       "firstSeen": "2026-06-27",
       "global": {
-        "agree": 0.534121,
+        "agree": 0.410168,
         "disagree": 0.0,
         "rawAgree": 1,
         "rawDisagree": 0
@@ -3379,16 +3421,16 @@
     "lmcouncil.ai": {
       "byBench": {
         "sweV": {
-          "agree": 2.52045,
-          "disagree": 0.488326,
+          "agree": 1.93553,
+          "disagree": 0.375,
           "rawAgree": 10,
           "rawDisagree": 3
         }
       },
       "firstSeen": "2026-05-22",
       "global": {
-        "agree": 2.52045,
-        "disagree": 0.488326,
+        "agree": 1.93553,
+        "disagree": 0.375,
         "rawAgree": 10,
         "rawDisagree": 3
       },
@@ -3397,7 +3439,7 @@
     "localaimaster.com": {
       "byBench": {
         "aime26": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
@@ -3405,7 +3447,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 2.136483,
+        "agree": 1.64067,
         "disagree": 0.0,
         "rawAgree": 8,
         "rawDisagree": 0
@@ -3415,55 +3457,55 @@
     "lushbinary.com": {
       "byBench": {
         "aime26": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "arcAgi2": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "mcpA": {
-          "agree": 0.304754,
+          "agree": 0.23403,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -3471,7 +3513,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 9.135671,
+        "agree": 7.01556,
         "disagree": 0.0,
         "rawAgree": 34,
         "rawDisagree": 0
@@ -3481,7 +3523,7 @@
     "macaron.im": {
       "byBench": {
         "mmluPro": {
-          "agree": 0.57057,
+          "agree": 0.438158,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
@@ -3489,7 +3531,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 0.57057,
+        "agree": 0.438158,
         "disagree": 0.0,
         "rawAgree": 4,
         "rawDisagree": 0
@@ -3499,7 +3541,7 @@
     "marc0.dev": {
       "byBench": {
         "sweV": {
-          "agree": 2.52045,
+          "agree": 1.93553,
           "disagree": 0.0,
           "rawAgree": 10,
           "rawDisagree": 0
@@ -3507,7 +3549,7 @@
       },
       "firstSeen": "2026-05-27",
       "global": {
-        "agree": 2.52045,
+        "agree": 1.93553,
         "disagree": 0.0,
         "rawAgree": 10,
         "rawDisagree": 0
@@ -3517,79 +3559,85 @@
     "marktechpost.com": {
       "byBench": {
         "aaCoding": {
-          "agree": 5.087184,
+          "agree": 3.906604,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
         },
         "aaIdx": {
-          "agree": 15.261552,
+          "agree": 11.719811,
           "disagree": 0.0,
           "rawAgree": 18,
           "rawDisagree": 0
         },
         "aime26": {
-          "agree": 0.383965,
+          "agree": 1.294858,
           "disagree": 0.0,
-          "rawAgree": 2,
+          "rawAgree": 3,
+          "rawDisagree": 0
+        },
+        "gpqa": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "mcpA": {
-          "agree": 2.543592,
+          "agree": 1.953302,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 5.136483,
+          "agree": 3.944462,
           "disagree": 0.0,
           "rawAgree": 11,
           "rawDisagree": 0
         },
         "nl2Repo": {
-          "agree": 0.383965,
+          "agree": 0.294858,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 18.092809000000003,
+          "agree": 13.89402,
           "disagree": 0.0,
           "rawAgree": 27,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 0.609507,
+          "agree": 1.468059,
           "disagree": 0.0,
-          "rawAgree": 1,
+          "rawAgree": 2,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 8.240283,
+          "agree": 7.327964,
           "disagree": 0.0,
-          "rawAgree": 10,
+          "rawAgree": 11,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-05-22",
       "global": {
-        "agree": 57.875825,
+        "agree": 48.44461,
         "disagree": 0.0,
-        "rawAgree": 88,
+        "rawAgree": 92,
         "rawDisagree": 0
       },
-      "lastSeen": "2026-07-16"
+      "lastSeen": "2026-07-24"
     },
     "mcpatlas.com": {
       "byBench": {
         "mcpA": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -3597,7 +3645,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 0.142643,
+        "agree": 0.10954,
         "disagree": 0.0,
         "rawAgree": 1,
         "rawDisagree": 0
@@ -3607,43 +3655,49 @@
     "medium.com": {
       "byBench": {
         "bfcl": {
-          "agree": 0.294858,
+          "agree": 0.22643,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "cfElo": {
-          "agree": 1.649045,
+          "agree": 1.266352,
           "disagree": 0.0,
           "rawAgree": 7,
           "rawDisagree": 0
         },
         "gdpr": {
-          "agree": 0.14743,
+          "agree": 0.113216,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 4.598518,
+          "agree": 3.531342,
           "disagree": 0.0,
           "rawAgree": 18,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 4.173414,
+          "agree": 3.204892,
           "disagree": 0.0,
           "rawAgree": 9,
           "rawDisagree": 0
         },
         "sweMulti": {
-          "agree": 0.142643,
+          "agree": 0.10954,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "sweV": {
+          "agree": 1.0,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -3651,35 +3705,59 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 11.14855,
+        "agree": 9.561311,
         "disagree": 0.0,
-        "rawAgree": 39,
+        "rawAgree": 40,
         "rawDisagree": 0
       },
-      "lastSeen": "2026-07-16"
+      "lastSeen": "2026-07-24"
+    },
+    "memeburn.com": {
+      "byBench": {
+        "swePro": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "tb2": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-07-24",
+      "global": {
+        "agree": 2.0,
+        "disagree": 0.0,
+        "rawAgree": 2,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-07-24"
     },
     "mimo.xiaomi.com": {
       "byBench": {
         "browseComp": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 6.409451,
+          "agree": 4.922013,
           "disagree": 0.0,
           "rawAgree": 24,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "tbHard": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -3687,7 +3765,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 10.148296,
+        "agree": 7.793186,
         "disagree": 0.0,
         "rawAgree": 38,
         "rawDisagree": 0
@@ -3697,7 +3775,7 @@
     "mindstudio.ai": {
       "byBench": {
         "gpqa": {
-          "agree": 0.371498,
+          "agree": 0.285285,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -3705,7 +3783,7 @@
       },
       "firstSeen": "2026-06-16",
       "global": {
-        "agree": 0.371498,
+        "agree": 0.285285,
         "disagree": 0.0,
         "rawAgree": 1,
         "rawDisagree": 0
@@ -3715,7 +3793,7 @@
     "mindwiredai.com": {
       "byBench": {
         "gpqa": {
-          "agree": 0.828066,
+          "agree": 0.635897,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -3723,7 +3801,7 @@
       },
       "firstSeen": "2026-06-07",
       "global": {
-        "agree": 0.828066,
+        "agree": 0.635897,
         "disagree": 0.0,
         "rawAgree": 3,
         "rawDisagree": 0
@@ -3733,73 +3811,73 @@
     "minimax.io": {
       "byBench": {
         "aime26": {
-          "agree": 0.954535,
+          "agree": 0.733017,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
         },
         "browseComp": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 3.032603,
-          "disagree": 0.488326,
+          "agree": 2.328828,
+          "disagree": 0.375,
           "rawAgree": 14,
           "rawDisagree": 3
         },
         "hle": {
-          "agree": 0.998497,
-          "disagree": 0.488326,
+          "agree": 0.766776,
+          "disagree": 0.375,
           "rawAgree": 7,
           "rawDisagree": 3
         },
         "lcb": {
-          "agree": 0.325551,
-          "disagree": 0.285286,
+          "agree": 0.250001,
+          "disagree": 0.21908,
           "rawAgree": 2,
           "rawDisagree": 2
         },
         "mcpA": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.896121,
+          "agree": 0.688159,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
         },
         "nl2Repo": {
-          "agree": 1.383965,
+          "agree": 1.062789,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 3.136483,
+          "agree": 2.408601,
           "disagree": 0.0,
           "rawAgree": 9,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 0.57057,
-          "disagree": 0.285286,
+          "agree": 0.438158,
+          "disagree": 0.21908,
           "rawAgree": 4,
           "rawDisagree": 2
         },
         "tb2": {
-          "agree": 3.136483,
+          "agree": 2.408601,
           "disagree": 0.0,
           "rawAgree": 9,
           "rawDisagree": 0
@@ -3807,8 +3885,8 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 20.84426,
-        "disagree": 1.547221,
+        "agree": 16.006943,
+        "disagree": 1.188158,
         "rawAgree": 84,
         "rawDisagree": 10
       },
@@ -3818,7 +3896,7 @@
       "byBench": {
         "tb2": {
           "agree": 0.0,
-          "disagree": 0.427927,
+          "disagree": 0.328618,
           "rawAgree": 0,
           "rawDisagree": 3
         }
@@ -3826,7 +3904,7 @@
       "firstSeen": "2026-05-18",
       "global": {
         "agree": 0.0,
-        "disagree": 0.427927,
+        "disagree": 0.328618,
         "rawAgree": 0,
         "rawDisagree": 3
       },
@@ -3835,31 +3913,31 @@
     "minimaxm3.com": {
       "byBench": {
         "browseComp": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "mcpA": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
@@ -3867,7 +3945,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 10.682417,
+        "agree": 8.203354,
         "disagree": 0.0,
         "rawAgree": 40,
         "rawDisagree": 0
@@ -3877,7 +3955,7 @@
     "miraflow.ai": {
       "byBench": {
         "swePro": {
-          "agree": 0.325551,
+          "agree": 0.250001,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -3885,7 +3963,7 @@
       },
       "firstSeen": "2026-05-22",
       "global": {
-        "agree": 0.325551,
+        "agree": 0.250001,
         "disagree": 0.0,
         "rawAgree": 2,
         "rawDisagree": 0
@@ -3895,19 +3973,19 @@
     "mistral.ai": {
       "byBench": {
         "mmluPro": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 0.855856,
+          "agree": 0.657238,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 4.272967,
+          "agree": 3.281342,
           "disagree": 0.0,
           "rawAgree": 16,
           "rawDisagree": 0
@@ -3915,7 +3993,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 7.265305,
+        "agree": 5.579249,
         "disagree": 0.0,
         "rawAgree": 30,
         "rawDisagree": 0
@@ -3925,85 +4003,85 @@
     "morphllm.com": {
       "byBench": {
         "aaIdx": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "aime26": {
-          "agree": 1.745005,
+          "agree": 1.340043,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
         },
         "arcAgi2": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "browseComp": {
-          "agree": 2.543592,
+          "agree": 1.953302,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 1.638812,
+          "agree": 1.258494,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 1.638812,
+          "agree": 1.258494,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 1.401852,
+          "agree": 1.076525,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
         },
         "nl2Repo": {
-          "agree": 0.359438,
+          "agree": 0.276023,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "sweMulti": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 2.602363,
+          "agree": 1.998434,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 0.893557,
-          "disagree": 0.488326,
+          "agree": 0.68619,
+          "disagree": 0.375,
           "rawAgree": 2,
           "rawDisagree": 3
         },
         "tau2": {
-          "agree": 1.068242,
+          "agree": 0.820336,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 2.209382,
+          "agree": 1.696652,
           "disagree": 0.0,
           "rawAgree": 10,
           "rawDisagree": 0
         },
         "tbHard": {
-          "agree": 1.602363,
+          "agree": 1.230503,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -4011,8 +4089,8 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 18.9143,
-        "disagree": 0.488326,
+        "agree": 14.524868,
+        "disagree": 0.375,
         "rawAgree": 48,
         "rawDisagree": 3
       },
@@ -4021,7 +4099,7 @@
     "nerova.ai": {
       "byBench": {
         "aime26": {
-          "agree": 3.0,
+          "agree": 2.303791,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -4029,7 +4107,7 @@
       },
       "firstSeen": "2026-07-16",
       "global": {
-        "agree": 3.0,
+        "agree": 2.303791,
         "disagree": 0.0,
         "rawAgree": 3,
         "rawDisagree": 0
@@ -4039,7 +4117,7 @@
     "neuralcoretech.com": {
       "byBench": {
         "sweV": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -4047,7 +4125,7 @@
       },
       "firstSeen": "2026-06-07",
       "global": {
-        "agree": 0.552045,
+        "agree": 0.423932,
         "disagree": 0.0,
         "rawAgree": 2,
         "rawDisagree": 0
@@ -4057,7 +4135,7 @@
     "news.ycombinator.com": {
       "byBench": {
         "sweV": {
-          "agree": 0.325551,
+          "agree": 0.250001,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -4065,7 +4143,7 @@
       },
       "firstSeen": "2026-05-22",
       "global": {
-        "agree": 0.325551,
+        "agree": 0.250001,
         "disagree": 0.0,
         "rawAgree": 2,
         "rawDisagree": 0
@@ -4075,7 +4153,7 @@
     "nitromediagroup.com": {
       "byBench": {
         "aime26": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -4083,7 +4161,7 @@
       },
       "firstSeen": "2026-06-27",
       "global": {
-        "agree": 0.534121,
+        "agree": 0.410168,
         "disagree": 0.0,
         "rawAgree": 1,
         "rawDisagree": 0
@@ -4093,37 +4171,37 @@
     "nxcode.io": {
       "byBench": {
         "arcAgi2": {
-          "agree": 1.67593,
+          "agree": 1.286998,
           "disagree": 0.0,
           "rawAgree": 7,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 0.359438,
+          "agree": 0.276023,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 0.483767,
+          "agree": 0.371499,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "mrcr": {
-          "agree": 1.399909,
+          "agree": 1.075033,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 5.462033,
+          "agree": 4.194462,
           "disagree": 0.0,
           "rawAgree": 13,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 0.877595,
+          "agree": 0.673932,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
@@ -4131,7 +4209,7 @@
       },
       "firstSeen": "2026-05-22",
       "global": {
-        "agree": 10.258671,
+        "agree": 7.877946,
         "disagree": 0.0,
         "rawAgree": 32,
         "rawDisagree": 0
@@ -4141,37 +4219,37 @@
     "o-mega.ai": {
       "byBench": {
         "arcAgi2": {
-          "agree": 0.918086,
+          "agree": 0.705026,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 1.243638,
+          "agree": 0.955028,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
         },
         "mrcr": {
-          "agree": 1.068242,
+          "agree": 0.820336,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -4179,7 +4257,7 @@
       },
       "firstSeen": "2026-05-22",
       "global": {
-        "agree": 4.832327,
+        "agree": 3.710891,
         "disagree": 0.0,
         "rawAgree": 13,
         "rawDisagree": 0
@@ -4189,25 +4267,25 @@
     "officechai.com": {
       "byBench": {
         "aaIdx": {
-          "agree": 0.943824,
+          "agree": 1.724791,
           "disagree": 0.0,
-          "rawAgree": 4,
+          "rawAgree": 5,
           "rawDisagree": 0
         },
         "aime26": {
-          "agree": 0.767931,
+          "agree": 0.589718,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
         },
         "arcAgi2": {
-          "agree": 0.304754,
+          "agree": 0.23403,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 3.0,
+          "agree": 2.303791,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -4215,53 +4293,53 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 5.016507,
+        "agree": 4.852329,
         "disagree": 0.0,
-        "rawAgree": 12,
+        "rawAgree": 13,
         "rawDisagree": 0
       },
-      "lastSeen": "2026-07-16"
+      "lastSeen": "2026-07-24"
     },
     "ollama.com": {
       "byBench": {
         "aime26": {
-          "agree": 2.96455,
+          "agree": 2.276568,
           "disagree": 0.0,
           "rawAgree": 11,
           "rawDisagree": 0
         },
         "cfElo": {
-          "agree": 0.609507,
+          "agree": 0.468059,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "sweMulti": {
-          "agree": 5.608269,
+          "agree": 4.306761,
           "disagree": 0.0,
           "rawAgree": 21,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 2.543592,
+          "agree": 1.953302,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 0.483767,
+          "agree": 0.371499,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 3.717006,
+          "agree": 2.854402,
           "disagree": 0.0,
           "rawAgree": 9,
           "rawDisagree": 0
@@ -4269,7 +4347,7 @@
       },
       "firstSeen": "2026-05-22",
       "global": {
-        "agree": 16.727872,
+        "agree": 12.845843,
         "disagree": 0.0,
         "rawAgree": 50,
         "rawDisagree": 0
@@ -4279,79 +4357,79 @@
     "openai.com": {
       "byBench": {
         "aime26": {
-          "agree": 2.153998,
+          "agree": 1.654121,
           "disagree": 0.0,
           "rawAgree": 15,
           "rawDisagree": 0
         },
         "arcAgi2": {
-          "agree": 0.595275,
+          "agree": 0.45713,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "browseComp": {
-          "agree": 0.967532,
+          "agree": 0.742997,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "cfElo": {
           "agree": 0.0,
-          "disagree": 0.97665,
+          "disagree": 0.749999,
           "rawAgree": 0,
           "rawDisagree": 6
         },
         "gpqa": {
-          "agree": 0.855856,
+          "agree": 0.657238,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 0.488326,
-          "disagree": 0.488326,
+          "agree": 0.375,
+          "disagree": 0.375,
           "rawAgree": 3,
           "rawDisagree": 3
         },
         "mmluPro": {
-          "agree": 0.626408,
+          "agree": 0.481038,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "mrcr": {
-          "agree": 0.534121,
-          "disagree": 0.488326,
+          "agree": 0.410168,
+          "disagree": 0.375,
           "rawAgree": 1,
           "rawDisagree": 3
         },
         "soc2": {
-          "agree": 0.737146,
+          "agree": 0.566077,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 3.0,
+          "agree": 2.303791,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 1.868713,
+          "agree": 1.435042,
           "disagree": 0.0,
           "rawAgree": 13,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 0.483767,
+          "agree": 0.371499,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 1.631419,
+          "agree": 1.252816,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -4359,8 +4437,8 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 13.942562,
-        "disagree": 1.953301,
+        "agree": 10.706918,
+        "disagree": 1.499999,
         "rawAgree": 57,
         "rawDisagree": 12
       },
@@ -4369,43 +4447,43 @@
     "openrouter.ai": {
       "byBench": {
         "aaIdx": {
-          "agree": 1.284946,
+          "agree": 0.986749,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
         },
         "aime26": {
-          "agree": 2.52045,
+          "agree": 1.93553,
           "disagree": 0.0,
           "rawAgree": 10,
           "rawDisagree": 0
         },
         "arcAgi2": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.595275,
+          "agree": 0.45713,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "mrcr": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
@@ -4413,7 +4491,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 7.783887,
+        "agree": 5.977484,
         "disagree": 0.0,
         "rawAgree": 30,
         "rawDisagree": 0
@@ -4423,7 +4501,7 @@
     "overchat.ai": {
       "byBench": {
         "swePro": {
-          "agree": 0.847865,
+          "agree": 0.651101,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
@@ -4431,7 +4509,7 @@
       },
       "firstSeen": "2026-05-30",
       "global": {
-        "agree": 0.847865,
+        "agree": 0.651101,
         "disagree": 0.0,
         "rawAgree": 4,
         "rawDisagree": 0
@@ -4441,31 +4519,31 @@
     "pricepertoken.com": {
       "byBench": {
         "aaCoding": {
-          "agree": 6.409451,
+          "agree": 4.922013,
           "disagree": 0.0,
           "rawAgree": 24,
           "rawDisagree": 0
         },
         "aaIdx": {
-          "agree": 14.514628,
+          "agree": 11.146225,
           "disagree": 0.0,
           "rawAgree": 56,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 4.45445,
+          "agree": 3.420708,
           "disagree": 0.0,
           "rawAgree": 17,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 0.847865,
+          "agree": 0.651101,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
@@ -4473,7 +4551,7 @@
       },
       "firstSeen": "2026-05-27",
       "global": {
-        "agree": 27.027574,
+        "agree": 20.755298,
         "disagree": 0.0,
         "rawAgree": 104,
         "rawDisagree": 0
@@ -4483,55 +4561,55 @@
     "qwen.ai": {
       "byBench": {
         "gpqa": {
-          "agree": 6.409451,
+          "agree": 4.922013,
           "disagree": 0.0,
           "rawAgree": 24,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 6.552093,
+          "agree": 5.031552,
           "disagree": 0.0,
           "rawAgree": 25,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 0.837329,
-          "disagree": 0.442287,
+          "agree": 0.64301,
+          "disagree": 0.339646,
           "rawAgree": 4,
           "rawDisagree": 3
         },
         "mmluPro": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "sweMulti": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 0.595275,
+          "agree": 0.45713,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 3.0,
+          "agree": 2.303791,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -4539,8 +4617,8 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 19.231478,
-        "disagree": 0.442287,
+        "agree": 14.768438,
+        "disagree": 0.339646,
         "rawAgree": 64,
         "rawDisagree": 3
       },
@@ -4549,46 +4627,46 @@
     "qwenlm.github.io": {
       "byBench": {
         "aime26": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "bfcl": {
-          "agree": 0.285286,
+          "agree": 0.21908,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "gpqa": {
           "agree": 0.0,
-          "disagree": 0.727572,
+          "disagree": 0.558725,
           "rawAgree": 0,
           "rawDisagree": 5
         },
         "lcb": {
-          "agree": 2.813247,
-          "disagree": 1.583428,
+          "agree": 2.160378,
+          "disagree": 1.215963,
           "rawAgree": 11,
           "rawDisagree": 11
         },
         "mmluPro": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 0.427927,
-          "disagree": 0.488326,
+          "agree": 0.328618,
+          "disagree": 0.375,
           "rawAgree": 3,
           "rawDisagree": 3
         }
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 4.470283,
-        "disagree": 2.799326,
+        "agree": 3.432867,
+        "disagree": 2.149688,
         "rawAgree": 20,
         "rawDisagree": 19
       },
@@ -4597,13 +4675,13 @@
     "rdworldonline.com": {
       "byBench": {
         "gpqa": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 0.359438,
+          "agree": 0.276023,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -4611,7 +4689,7 @@
       },
       "firstSeen": "2026-06-15",
       "global": {
-        "agree": 0.893557,
+        "agree": 0.68619,
         "disagree": 0.0,
         "rawAgree": 2,
         "rawDisagree": 0
@@ -4621,13 +4699,13 @@
     "redreamality.com": {
       "byBench": {
         "cfElo": {
-          "agree": 4.540028,
+          "agree": 3.486426,
           "disagree": 0.0,
           "rawAgree": 17,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -4635,7 +4713,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 5.341208,
+        "agree": 4.101676,
         "disagree": 0.0,
         "rawAgree": 20,
         "rawDisagree": 0
@@ -4645,19 +4723,19 @@
     "renovateqr.com": {
       "byBench": {
         "gpqa": {
-          "agree": 6.409451,
+          "agree": 4.922013,
           "disagree": 0.0,
           "rawAgree": 24,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 6.409451,
+          "agree": 4.922013,
           "disagree": 0.0,
           "rawAgree": 24,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 0.847865,
+          "agree": 0.651101,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
@@ -4665,7 +4743,7 @@
       },
       "firstSeen": "2026-05-30",
       "global": {
-        "agree": 13.666765,
+        "agree": 10.495125,
         "disagree": 0.0,
         "rawAgree": 52,
         "rawDisagree": 0
@@ -4675,25 +4753,25 @@
     "requesty.ai": {
       "byBench": {
         "aaIdx": {
-          "agree": 5.0,
+          "agree": 3.839652,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
         },
         "cfElo": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 0.371498,
+          "agree": 0.285285,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 0.359438,
+          "agree": 0.276023,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -4701,7 +4779,7 @@
       },
       "firstSeen": "2026-06-15",
       "global": {
-        "agree": 6.730935000000001,
+        "agree": 5.16889,
         "disagree": 0.0,
         "rawAgree": 8,
         "rawDisagree": 0
@@ -4711,37 +4789,37 @@
     "research.nvidia.com": {
       "byBench": {
         "gpqa": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 1.142643,
+          "agree": 0.87747,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.877595,
+          "agree": 0.673932,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 1.5520450000000001,
+          "agree": 1.191863,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tbHard": {
-          "agree": 1.5520450000000001,
+          "agree": 1.191863,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -4749,7 +4827,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 7.124327,
+        "agree": 5.470988,
         "disagree": 0.0,
         "rawAgree": 14,
         "rawDisagree": 0
@@ -4759,13 +4837,13 @@
     "researchgate.net": {
       "byBench": {
         "gpqa": {
-          "agree": 7.781202,
+          "agree": 5.975422,
           "disagree": 0.0,
           "rawAgree": 31,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 0.427927,
+          "agree": 0.328618,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -4773,7 +4851,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 8.209129,
+        "agree": 6.30404,
         "disagree": 0.0,
         "rawAgree": 34,
         "rawDisagree": 0
@@ -4783,7 +4861,7 @@
     "rootly.com": {
       "byBench": {
         "tb2": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -4791,7 +4869,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 0.142643,
+        "agree": 0.10954,
         "disagree": 0.0,
         "rawAgree": 1,
         "rawDisagree": 0
@@ -4801,19 +4879,19 @@
     "safeguard.sh": {
       "byBench": {
         "gpqa": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -4821,7 +4899,7 @@
       },
       "firstSeen": "2026-07-16",
       "global": {
-        "agree": 3.0,
+        "agree": 2.303791,
         "disagree": 0.0,
         "rawAgree": 3,
         "rawDisagree": 0
@@ -4831,13 +4909,13 @@
     "scale.com": {
       "byBench": {
         "swePro": {
-          "agree": 2.282281,
+          "agree": 1.752633,
           "disagree": 0.0,
           "rawAgree": 16,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 0.57057,
+          "agree": 0.438158,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
@@ -4845,23 +4923,53 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 2.852851,
+        "agree": 2.190791,
         "disagree": 0.0,
         "rawAgree": 20,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-18"
     },
+    "sebastianraschka.com": {
+      "byBench": {
+        "hle": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "swePro": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "tb2": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-07-24",
+      "global": {
+        "agree": 3.0,
+        "disagree": 0.0,
+        "rawAgree": 3,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-07-24"
+    },
     "siliconflow.com": {
       "byBench": {
         "cfElo": {
-          "agree": 1.847865,
+          "agree": 1.419032,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 2.543592,
+          "agree": 1.953302,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -4869,7 +4977,7 @@
       },
       "firstSeen": "2026-05-30",
       "global": {
-        "agree": 4.391457,
+        "agree": 3.372334,
         "disagree": 0.0,
         "rawAgree": 8,
         "rawDisagree": 0
@@ -4879,7 +4987,7 @@
     "siliconreport.com": {
       "byBench": {
         "gpqa": {
-          "agree": 2.0,
+          "agree": 1.535861,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -4887,7 +4995,7 @@
       },
       "firstSeen": "2026-07-16",
       "global": {
-        "agree": 2.0,
+        "agree": 1.535861,
         "disagree": 0.0,
         "rawAgree": 2,
         "rawDisagree": 0
@@ -4897,7 +5005,7 @@
     "sltcreative.com": {
       "byBench": {
         "aaIdx": {
-          "agree": 6.409451,
+          "agree": 4.922013,
           "disagree": 0.0,
           "rawAgree": 24,
           "rawDisagree": 0
@@ -4905,7 +5013,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 6.409451,
+        "agree": 4.922013,
         "disagree": 0.0,
         "rawAgree": 24,
         "rawDisagree": 0
@@ -4915,37 +5023,37 @@
     "smartchunks.com": {
       "byBench": {
         "aaIdx": {
-          "agree": 0.847865,
+          "agree": 0.651101,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
         },
         "aime26": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "arcAgi2": {
-          "agree": 9.409451,
+          "agree": 7.225804,
           "disagree": 0.0,
           "rawAgree": 27,
           "rawDisagree": 0
         },
         "hle": {
-          "agree": 3.57057,
+          "agree": 2.74195,
           "disagree": 0.0,
           "rawAgree": 7,
           "rawDisagree": 0
         },
         "mrcr": {
-          "agree": 3.552045,
+          "agree": 2.727724,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 3.142643,
+          "agree": 2.413331,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
@@ -4953,7 +5061,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 20.665214,
+        "agree": 15.869448,
         "disagree": 0.0,
         "rawAgree": 48,
         "rawDisagree": 0
@@ -4963,43 +5071,43 @@
     "static.stepfun.com": {
       "byBench": {
         "hle": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "sweMulti": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 5.136483,
+          "agree": 3.944462,
           "disagree": 0.0,
           "rawAgree": 11,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 1.335302,
+          "agree": 1.025419,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 7.744753,
+          "agree": 5.947432,
           "disagree": 0.0,
           "rawAgree": 29,
           "rawDisagree": 0
@@ -5007,7 +5115,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 18.439187,
+        "agree": 14.160014,
         "disagree": 0.0,
         "rawAgree": 57,
         "rawDisagree": 0
@@ -5017,7 +5125,7 @@
     "stepfun.com": {
       "byBench": {
         "mmluPro": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -5025,7 +5133,7 @@
       },
       "firstSeen": "2026-06-07",
       "global": {
-        "agree": 0.552045,
+        "agree": 0.423932,
         "disagree": 0.0,
         "rawAgree": 2,
         "rawDisagree": 0
@@ -5035,7 +5143,7 @@
     "superconductor.com": {
       "byBench": {
         "sweV": {
-          "agree": 5.0,
+          "agree": 3.839652,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
@@ -5043,7 +5151,7 @@
       },
       "firstSeen": "2026-07-16",
       "global": {
-        "agree": 5.0,
+        "agree": 3.839652,
         "disagree": 0.0,
         "rawAgree": 5,
         "rawDisagree": 0
@@ -5053,7 +5161,7 @@
     "swebench.com": {
       "byBench": {
         "sweV": {
-          "agree": 2.424922,
+          "agree": 1.862172,
           "disagree": 0.0,
           "rawAgree": 17,
           "rawDisagree": 0
@@ -5061,7 +5169,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 2.424922,
+        "agree": 1.862172,
         "disagree": 0.0,
         "rawAgree": 17,
         "rawDisagree": 0
@@ -5071,7 +5179,7 @@
     "tau-bench.github.io": {
       "byBench": {
         "tau2": {
-          "agree": 0.427927,
+          "agree": 0.328618,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -5079,7 +5187,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 0.427927,
+        "agree": 0.328618,
         "disagree": 0.0,
         "rawAgree": 3,
         "rawDisagree": 0
@@ -5089,7 +5197,7 @@
     "tbench.ai": {
       "byBench": {
         "tb2": {
-          "agree": 1.068242,
+          "agree": 0.820336,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -5097,7 +5205,7 @@
       },
       "firstSeen": "2026-06-27",
       "global": {
-        "agree": 1.068242,
+        "agree": 0.820336,
         "disagree": 0.0,
         "rawAgree": 2,
         "rawDisagree": 0
@@ -5107,31 +5215,31 @@
     "tech-insider.org": {
       "byBench": {
         "aime26": {
-          "agree": 1.14732,
+          "agree": 0.881062,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
         },
         "cfElo": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 0.694687,
+          "agree": 0.533471,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 0.595275,
+          "agree": 0.45713,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 1.693185,
+          "agree": 1.300248,
           "disagree": 0.0,
           "rawAgree": 10,
           "rawDisagree": 0
@@ -5139,7 +5247,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 4.682513,
+        "agree": 3.595844,
         "disagree": 0.0,
         "rawAgree": 23,
         "rawDisagree": 0
@@ -5149,25 +5257,25 @@
     "techcrunch.com": {
       "byBench": {
         "tb2": {
-          "agree": 4.0,
+          "agree": 4.071721999999999,
           "disagree": 0.0,
-          "rawAgree": 4,
+          "rawAgree": 5,
           "rawDisagree": 0
         }
       },
       "firstSeen": "2026-07-16",
       "global": {
-        "agree": 4.0,
+        "agree": 4.071721999999999,
         "disagree": 0.0,
-        "rawAgree": 4,
+        "rawAgree": 5,
         "rawDisagree": 0
       },
-      "lastSeen": "2026-07-16"
+      "lastSeen": "2026-07-24"
     },
     "techie007.substack.com": {
       "byBench": {
         "aime26": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -5175,17 +5283,35 @@
       },
       "firstSeen": "2026-06-07",
       "global": {
-        "agree": 0.552045,
+        "agree": 0.423932,
         "disagree": 0.0,
         "rawAgree": 2,
         "rawDisagree": 0
       },
       "lastSeen": "2026-06-07"
     },
+    "techmeme.com": {
+      "byBench": {
+        "aaIdx": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-07-24",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-07-24"
+    },
     "techstartups.com": {
       "byBench": {
         "gpqa": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -5193,7 +5319,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 0.801181,
+        "agree": 0.615251,
         "disagree": 0.0,
         "rawAgree": 3,
         "rawDisagree": 0
@@ -5203,7 +5329,7 @@
     "techtimes.com": {
       "byBench": {
         "tb2": {
-          "agree": 3.0,
+          "agree": 2.303791,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -5211,7 +5337,7 @@
       },
       "firstSeen": "2026-07-16",
       "global": {
-        "agree": 3.0,
+        "agree": 2.303791,
         "disagree": 0.0,
         "rawAgree": 3,
         "rawDisagree": 0
@@ -5221,13 +5347,13 @@
     "tensoria.fr": {
       "byBench": {
         "gpqa": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 3.0,
+          "agree": 2.303791,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -5235,7 +5361,7 @@
       },
       "firstSeen": "2026-06-27",
       "global": {
-        "agree": 3.534121,
+        "agree": 2.713959,
         "disagree": 0.0,
         "rawAgree": 4,
         "rawDisagree": 0
@@ -5245,7 +5371,7 @@
     "terminal-bench.com": {
       "byBench": {
         "tb2": {
-          "agree": 2.139637,
+          "agree": 1.643092,
           "disagree": 0.0,
           "rawAgree": 15,
           "rawDisagree": 0
@@ -5253,7 +5379,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 2.139637,
+        "agree": 1.643092,
         "disagree": 0.0,
         "rawAgree": 15,
         "rawDisagree": 0
@@ -5263,7 +5389,7 @@
     "terminalbench.io": {
       "byBench": {
         "tb2": {
-          "agree": 0.57057,
+          "agree": 0.438158,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
@@ -5271,7 +5397,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 0.57057,
+        "agree": 0.438158,
         "disagree": 0.0,
         "rawAgree": 4,
         "rawDisagree": 0
@@ -5281,13 +5407,13 @@
     "the-agent-report.com": {
       "byBench": {
         "swePro": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 2.0,
+          "agree": 1.535861,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -5295,7 +5421,7 @@
       },
       "firstSeen": "2026-07-16",
       "global": {
-        "agree": 3.0,
+        "agree": 2.303791,
         "disagree": 0.0,
         "rawAgree": 3,
         "rawDisagree": 0
@@ -5305,7 +5431,7 @@
     "thenextweb.com": {
       "byBench": {
         "sweV": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -5313,35 +5439,83 @@
       },
       "firstSeen": "2026-06-27",
       "global": {
-        "agree": 0.534121,
+        "agree": 0.410168,
         "disagree": 0.0,
         "rawAgree": 1,
         "rawDisagree": 0
       },
       "lastSeen": "2026-06-27"
     },
+    "thinkingmachines.ai": {
+      "byBench": {
+        "aime26": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
+          "rawDisagree": 0
+        },
+        "gpqa": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
+          "rawDisagree": 0
+        },
+        "hle": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
+          "rawDisagree": 0
+        },
+        "swePro": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
+          "rawDisagree": 0
+        },
+        "sweV": {
+          "agree": 2.0,
+          "disagree": 0.0,
+          "rawAgree": 2,
+          "rawDisagree": 0
+        },
+        "tb2": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-07-24",
+      "global": {
+        "agree": 11.0,
+        "disagree": 0.0,
+        "rawAgree": 11,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-07-24"
+    },
     "tokenmix.ai": {
       "byBench": {
         "hle": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 0.595275,
+          "agree": 0.45713,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -5349,7 +5523,7 @@
       },
       "firstSeen": "2026-05-28",
       "global": {
-        "agree": 3.197638,
+        "agree": 2.455564,
         "disagree": 0.0,
         "rawAgree": 10,
         "rawDisagree": 0
@@ -5359,13 +5533,13 @@
     "tosea.ai": {
       "byBench": {
         "swePro": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tbHard": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -5373,17 +5547,35 @@
       },
       "firstSeen": "2026-07-16",
       "global": {
-        "agree": 2.0,
+        "agree": 1.535861,
         "disagree": 0.0,
         "rawAgree": 2,
         "rawDisagree": 0
       },
       "lastSeen": "2026-07-16"
     },
+    "trilogyai.substack.com": {
+      "byBench": {
+        "aaIdx": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-07-24",
+      "global": {
+        "agree": 1.0,
+        "disagree": 0.0,
+        "rawAgree": 1,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-07-24"
+    },
     "trust.mistral.ai": {
       "byBench": {
         "soc2": {
-          "agree": 0.14743,
+          "agree": 0.113216,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -5391,7 +5583,7 @@
       },
       "firstSeen": "2026-05-19",
       "global": {
-        "agree": 0.14743,
+        "agree": 0.113216,
         "disagree": 0.0,
         "rawAgree": 1,
         "rawDisagree": 0
@@ -5401,7 +5593,7 @@
     "trust.openai.com": {
       "byBench": {
         "soc2": {
-          "agree": 0.737146,
+          "agree": 0.566077,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
@@ -5409,7 +5601,7 @@
       },
       "firstSeen": "2026-05-19",
       "global": {
-        "agree": 0.737146,
+        "agree": 0.566077,
         "disagree": 0.0,
         "rawAgree": 5,
         "rawDisagree": 0
@@ -5419,37 +5611,37 @@
     "unsloth.ai": {
       "byBench": {
         "aime26": {
-          "agree": 0.304754,
+          "agree": 0.23403,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "cfElo": {
-          "agree": 0.609507,
+          "agree": 0.468059,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 0.304754,
+          "agree": 0.23403,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 0.304754,
+          "agree": 0.23403,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.304754,
+          "agree": 0.23403,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 0.304754,
+          "agree": 0.23403,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -5457,7 +5649,7 @@
       },
       "firstSeen": "2026-06-10",
       "global": {
-        "agree": 2.133274,
+        "agree": 1.638206,
         "disagree": 0.0,
         "rawAgree": 7,
         "rawDisagree": 0
@@ -5467,25 +5659,25 @@
     "vals.ai": {
       "byBench": {
         "gpqa": {
-          "agree": 0.57057,
+          "agree": 1.438158,
           "disagree": 0.0,
-          "rawAgree": 4,
+          "rawAgree": 5,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 4.0,
+          "agree": 3.071722,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 2.52045,
-          "disagree": 0.727572,
+          "agree": 1.93553,
+          "disagree": 0.558725,
           "rawAgree": 10,
           "rawDisagree": 5
         },
         "tb2": {
-          "agree": 0.442287,
+          "agree": 0.339646,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -5493,77 +5685,77 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 7.533307000000001,
-        "disagree": 0.727572,
-        "rawAgree": 21,
+        "agree": 6.785056,
+        "disagree": 0.558725,
+        "rawAgree": 22,
         "rawDisagree": 5
       },
-      "lastSeen": "2026-07-16"
+      "lastSeen": "2026-07-24"
     },
     "vellum.ai": {
       "byBench": {
         "aime26": {
-          "agree": 1.0,
-          "disagree": 0.855856,
+          "agree": 0.76793,
+          "disagree": 0.657238,
           "rawAgree": 1,
           "rawDisagree": 6
         },
         "arcAgi2": {
-          "agree": 1.741421,
+          "agree": 1.33729,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
         },
         "browseComp": {
-          "agree": 0.967532,
+          "agree": 0.742997,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 7.441881,
-          "disagree": 0.855856,
+          "agree": 5.714847,
+          "disagree": 0.657238,
           "rawAgree": 18,
           "rawDisagree": 6
         },
         "hle": {
-          "agree": 1.331631,
+          "agree": 1.0226,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
         },
         "mcpA": {
-          "agree": 5.750912,
+          "agree": 4.416301,
           "disagree": 0.0,
           "rawAgree": 22,
           "rawDisagree": 0
         },
         "mrcr": {
-          "agree": 1.068242,
+          "agree": 0.820336,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "swePro": {
-          "agree": 17.117452,
+          "agree": 13.145013,
           "disagree": 0.0,
           "rawAgree": 26,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 6.272538,
-          "disagree": 1.629466,
+          "agree": 4.816873,
+          "disagree": 1.251317,
           "rawAgree": 23,
           "rawDisagree": 11
         },
         "tau2": {
-          "agree": 1.427678,
+          "agree": 1.096357,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 18.149244,
+          "agree": 13.937358,
           "disagree": 0.0,
           "rawAgree": 29,
           "rawDisagree": 0
@@ -5571,8 +5763,8 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 62.26853,
-        "disagree": 3.341176,
+        "agree": 47.817902,
+        "disagree": 2.565791,
         "rawAgree": 137,
         "rawDisagree": 23
       },
@@ -5581,13 +5773,13 @@
     "venturebeat.com": {
       "byBench": {
         "sweV": {
-          "agree": 1.0,
+          "agree": 0.76793,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 1.259921,
+          "agree": 0.967532,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -5595,7 +5787,7 @@
       },
       "firstSeen": "2026-07-02",
       "global": {
-        "agree": 2.2599210000000003,
+        "agree": 1.735462,
         "disagree": 0.0,
         "rawAgree": 3,
         "rawDisagree": 0
@@ -5605,13 +5797,13 @@
     "vertu.com": {
       "byBench": {
         "bfcl": {
-          "agree": 0.294858,
+          "agree": 0.22643,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.595275,
+          "agree": 0.45713,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -5619,41 +5811,71 @@
       },
       "firstSeen": "2026-05-19",
       "global": {
-        "agree": 0.890134,
+        "agree": 0.683561,
         "disagree": 0.0,
         "rawAgree": 5,
         "rawDisagree": 0
       },
       "lastSeen": "2026-05-28"
     },
-    "wandb.ai": {
+    "wan27.org": {
       "byBench": {
-        "aime26": {
-          "agree": 0.359438,
-          "disagree": 0.0,
-          "rawAgree": 1,
-          "rawDisagree": 0
-        },
-        "bfcl": {
-          "agree": 0.371498,
-          "disagree": 0.0,
-          "rawAgree": 1,
-          "rawDisagree": 0
-        },
         "gpqa": {
-          "agree": 0.371498,
-          "disagree": 0.0,
-          "rawAgree": 1,
-          "rawDisagree": 0
-        },
-        "mrcr": {
-          "agree": 0.534121,
+          "agree": 1.0,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 0.552045,
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "tb2": {
+          "agree": 1.0,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        }
+      },
+      "firstSeen": "2026-07-24",
+      "global": {
+        "agree": 3.0,
+        "disagree": 0.0,
+        "rawAgree": 3,
+        "rawDisagree": 0
+      },
+      "lastSeen": "2026-07-24"
+    },
+    "wandb.ai": {
+      "byBench": {
+        "aime26": {
+          "agree": 0.276023,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "bfcl": {
+          "agree": 0.285285,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "gpqa": {
+          "agree": 0.285285,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "mrcr": {
+          "agree": 0.410168,
+          "disagree": 0.0,
+          "rawAgree": 1,
+          "rawDisagree": 0
+        },
+        "sweV": {
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
@@ -5661,7 +5883,7 @@
       },
       "firstSeen": "2026-06-07",
       "global": {
-        "agree": 2.188599,
+        "agree": 1.680692,
         "disagree": 0.0,
         "rawAgree": 6,
         "rawDisagree": 0
@@ -5671,43 +5893,43 @@
     "wavespeed.ai": {
       "byBench": {
         "aime26": {
-          "agree": 0.595275,
+          "agree": 0.45713,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 0.595275,
+          "agree": 0.45713,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 5.0,
+          "agree": 3.839652,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
         },
         "mrcr": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "nl2Repo": {
-          "agree": 5.0,
+          "agree": 3.839652,
           "disagree": 0.0,
           "rawAgree": 5,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 2.96455,
+          "agree": 2.276568,
           "disagree": 0.0,
           "rawAgree": 11,
           "rawDisagree": 0
         },
         "tbHard": {
-          "agree": 6.409451,
+          "agree": 4.922013,
           "disagree": 0.0,
           "rawAgree": 24,
           "rawDisagree": 0
@@ -5715,7 +5937,7 @@
       },
       "firstSeen": "2026-05-28",
       "global": {
-        "agree": 21.098672,
+        "agree": 16.202313,
         "disagree": 0.0,
         "rawAgree": 52,
         "rawDisagree": 0
@@ -5725,31 +5947,31 @@
     "whatllm.org": {
       "byBench": {
         "arcAgi2": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 0.552045,
+          "agree": 0.423932,
           "disagree": 0.0,
           "rawAgree": 2,
           "rawDisagree": 0
         },
         "tb2": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -5757,7 +5979,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 7.495615,
+        "agree": 5.756111,
         "disagree": 0.0,
         "rawAgree": 27,
         "rawDisagree": 0
@@ -5767,7 +5989,7 @@
     "winbuzzer.com": {
       "byBench": {
         "nl2Repo": {
-          "agree": 0.359438,
+          "agree": 0.276023,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -5775,7 +5997,7 @@
       },
       "firstSeen": "2026-06-15",
       "global": {
-        "agree": 0.359438,
+        "agree": 0.276023,
         "disagree": 0.0,
         "rawAgree": 1,
         "rawDisagree": 0
@@ -5785,7 +6007,7 @@
     "www-cdn.anthropic.com": {
       "byBench": {
         "mcpA": {
-          "agree": 2.136483,
+          "agree": 1.64067,
           "disagree": 0.0,
           "rawAgree": 8,
           "rawDisagree": 0
@@ -5793,7 +6015,7 @@
       },
       "firstSeen": "2026-06-06",
       "global": {
-        "agree": 2.136483,
+        "agree": 1.64067,
         "disagree": 0.0,
         "rawAgree": 8,
         "rawDisagree": 0
@@ -5803,43 +6025,43 @@
     "x.ai": {
       "byBench": {
         "aime26": {
-          "agree": 0.57057,
+          "agree": 0.438158,
           "disagree": 0.0,
           "rawAgree": 4,
           "rawDisagree": 0
         },
         "cfElo": {
-          "agree": 0.534121,
+          "agree": 0.410168,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "gpqa": {
-          "agree": 1.382463,
-          "disagree": 0.442287,
+          "agree": 1.061635,
+          "disagree": 0.339646,
           "rawAgree": 9,
           "rawDisagree": 3
         },
         "hle": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "lcb": {
-          "agree": 4.272967,
+          "agree": 3.281342,
           "disagree": 0.0,
           "rawAgree": 16,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.801181,
+          "agree": 0.615251,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
         },
         "sweV": {
-          "agree": 2.071148,
+          "agree": 1.590498,
           "disagree": 0.0,
           "rawAgree": 13,
           "rawDisagree": 0
@@ -5847,8 +6069,8 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 10.43363,
-        "disagree": 0.442287,
+        "agree": 8.012303,
+        "disagree": 0.339646,
         "rawAgree": 49,
         "rawDisagree": 3
       },
@@ -5857,13 +6079,13 @@
     "x.com": {
       "byBench": {
         "aaIdx": {
-          "agree": 1.638812,
+          "agree": 1.258494,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
         },
         "arcAgi2": {
-          "agree": 5.087184,
+          "agree": 3.906604,
           "disagree": 0.0,
           "rawAgree": 6,
           "rawDisagree": 0
@@ -5871,7 +6093,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 6.725996,
+        "agree": 5.165097,
         "disagree": 0.0,
         "rawAgree": 12,
         "rawDisagree": 0
@@ -5881,13 +6103,13 @@
     "xda-developers.com": {
       "byBench": {
         "gpqa": {
-          "agree": 11.545933,
+          "agree": 8.866474,
           "disagree": 0.0,
           "rawAgree": 35,
           "rawDisagree": 0
         },
         "mmluPro": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
@@ -5895,7 +6117,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 11.688576,
+        "agree": 8.976014,
         "disagree": 0.0,
         "rawAgree": 36,
         "rawDisagree": 0
@@ -5905,13 +6127,13 @@
     "zhipuai.cn": {
       "byBench": {
         "sweV": {
-          "agree": 0.142643,
+          "agree": 0.10954,
           "disagree": 0.0,
           "rawAgree": 1,
           "rawDisagree": 0
         },
         "tau2": {
-          "agree": 0.427927,
+          "agree": 0.328618,
           "disagree": 0.0,
           "rawAgree": 3,
           "rawDisagree": 0
@@ -5919,7 +6141,7 @@
       },
       "firstSeen": "2026-05-18",
       "global": {
-        "agree": 0.57057,
+        "agree": 0.438158,
         "disagree": 0.0,
         "rawAgree": 4,
         "rawDisagree": 0

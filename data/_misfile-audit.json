@@ -1,10 +1,10 @@
 {
   "_summary": {
     "compositeMisfiles": 0,
-    "measuredCandidates": 47,
+    "measuredCandidates": 48,
     "bandViolations": 0,
     "crossBenchDups": 7,
-    "aaRowsLoaded": 538
+    "aaRowsLoaded": 590
   },
   "compositeMisfiles": [],
   "measuredCandidates": [
@@ -322,6 +322,13 @@
       "current": 43.94,
       "aa": 34.85,
       "delta": 9.09
+    },
+    {
+      "modelId": "inkling",
+      "benchKey": "tb2",
+      "current": 63.8,
+      "aa": 55.06,
+      "delta": 8.74
     },
     {
       "modelId": "mimo-v2-5",
