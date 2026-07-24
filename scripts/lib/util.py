@@ -115,6 +115,115 @@ def extract_domain(url: str | None) -> str:
         return ""
 
 
+# ── Publisher identity (SSOT — 2026-07-25) ────────────────────────────────────
+# Cross-source agreement is only meaningful between DISTINCT PUBLISHERS. Before
+# this, "distinct sources" was counted over full URLs, so one publisher's three
+# pages counted as three independent confirmations:
+#
+#   artificialanalysis.ai/leaderboards/models
+#   artificialanalysis.ai/models/claude-fable-5     -> 3 "independent" sources
+#   artificialanalysis.ai/models/capabilities/agentic
+#
+# Every ≥2-source verification gate, the contradiction detector and trustScore's
+# verification factor read that count, so a single publisher could satisfy all
+# of them alone. Measured on the 2026-07-25 snapshot: 62 hosts carried more than
+# one source LABEL for the same publisher on top of the multi-URL problem.
+#
+# Subdomains of one operator collapse to the operator; everything else keeps its
+# registrable host, which is the honest publisher boundary.
+_PUBLISHER_HOST_ALIASES: dict[str, str] = {
+    "labs.scale.com": "scale.com",
+    "seal.scale.com": "scale.com",
+    "platform.claude.com": "anthropic.com",
+    "docs.claude.com": "anthropic.com",
+    "ai.google.dev": "google.com",
+    "deepmind.google": "google.com",
+    "blog.google": "google.com",
+    "cloud.google.com": "google.com",
+    "platform.openai.com": "openai.com",
+    "help.openai.com": "openai.com",
+    "deepswe.datacurve.ai": "datacurve.ai",
+    "tbench.ai": "tbench.ai",
+    "kimi.com": "moonshot.cn",
+    "moonshotai.github.io": "moonshot.cn",
+    "gorilla.cs.berkeley.edu": "berkeley.edu",
+}
+
+# Label-only observations (no URL) that name a publisher in prose. Anything not
+# listed keeps a `label:` prefix so it can never silently merge with a real host.
+_PUBLISHER_LABEL_ALIASES: dict[str, str] = {
+    "artificial analysis": "artificialanalysis.ai",
+    "artificial analysis via aggregator": "artificialanalysis.ai",
+    "benchlm": "benchlm.ai",
+    "llm-stats": "llm-stats.com",
+    "scale seal": "scale.com",
+    "scale-seal": "scale.com",
+    "vellum": "vellum.ai",
+    "vellum llm leaderboard": "vellum.ai",
+    "openrouter": "openrouter.ai",
+    "huggingface card": "huggingface.co",
+    "ollama library": "ollama.com",
+}
+
+
+def publisher_id(url: str | None, label: str | None = None) -> str:
+    """Canonical publisher identity for a source observation.
+
+    Prefers the URL host (collapsed via `_PUBLISHER_HOST_ALIASES`); falls back
+    to the free-text source label, which may itself be a bare URL. Unknown
+    labels return `label:<slug>` — distinct from any host, so an unrecognised
+    label never merges into a publisher it does not belong to. Empty input
+    returns "".
+    """
+    host = extract_domain(url)
+    if not host and label:
+        lab = str(label).strip()
+        host = extract_domain(lab) if "//" in lab or lab.startswith("http") else ""
+        if not host:
+            key = lab.lower().rstrip("/")
+            alias = _PUBLISHER_LABEL_ALIASES.get(key)
+            if alias:
+                return alias
+            return f"label:{slug_norm(lab)}" if lab else ""
+    if not host:
+        return ""
+    return _PUBLISHER_HOST_ALIASES.get(host, host)
+
+
+def distinct_publishers(observations, *, tiers: set[str] | None = None) -> set[str]:
+    """Distinct publisher ids across observations, optionally tier-filtered.
+
+    `observations` is any iterable of dicts carrying `url`/`sourceUrl` and
+    `source`/`sourceLabel`. When `tiers` is given, only observations whose tier
+    is in that set are counted — the caller decides whether community reruns of
+    someone else's number may count as independent confirmation.
+    """
+    out: set[str] = set()
+    for o in observations or []:
+        if not isinstance(o, dict):
+            continue
+        if tiers is not None and str(o.get("tier") or "C").upper() not in tiers:
+            continue
+        pid = publisher_id(
+            o.get("url") or o.get("sourceUrl"),
+            o.get("source") or o.get("sourceLabel"),
+        )
+        if pid:
+            out.add(pid)
+    return out
+
+
+# Tiers that may count as INDEPENDENT confirmation of a benchmark value.
+# C (community/3rd-party blog) and U (forum) are excluded: measured on the
+# 2026-07-25 snapshot, the community long tail is dominated by sites that
+# republish Artificial Analysis figures verbatim (designforonline.com alone
+# backed 214 cells), so counting them as confirmation manufactured agreement
+# with the very source they copied. They still contribute trust weight and
+# still render in the provenance trail — they just cannot satisfy a
+# ≥N-independent-sources gate on their own.
+VERIFYING_TIERS: frozenset[str] = frozenset({"I", "S"})
+
+
 def safe_json_load(path: str | Path, default: Any = None) -> Any:
     """Load JSON from path; return default on any error (file missing, parse error)."""
     try:

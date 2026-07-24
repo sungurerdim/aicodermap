@@ -204,33 +204,36 @@ Every value the tracker shows comes from one of the sources below. Each value ca
 
 ### I-tier — Independent benchmarks & leaderboards
 
+Generated from `data/sources-whitelist.json → leaderboards` (2026-07-25). Several
+pages of one publisher count as **one** independent source — see
+[docs/METHODOLOGY.md](docs/METHODOLOGY.md) on publisher identity.
+
 | Source | URL | Authority for |
 |--------|-----|---------------|
-| Scale SEAL | [labs.scale.com/leaderboard](https://labs.scale.com/leaderboard) | SWE-bench Pro (1865 tasks), HLE |
-| SWE-bench (canonical) | [swebench.com](https://www.swebench.com/) · [github.com/SWE-bench/experiments](https://github.com/SWE-bench/experiments) | SWE-bench Verified, full SWE-bench |
-| LiveCodeBench | [livecodebench.github.io](https://livecodebench.github.io/leaderboard.html) · [livecodebench.com](https://livecodebench.com/) | LCB v6 (contamination-free) |
-| Terminal-Bench | [tbench.ai](https://tbench.ai/leaderboard) · [terminal-bench.io](https://terminal-bench.io/) | TB2 agentic execution |
-| tau-bench | [tau-bench.dev](https://tau-bench.dev/) | tau2 agentic API-use |
-| Aider Polyglot | [aider.chat/docs/leaderboards](https://aider.chat/docs/leaderboards/) | aider (warn: stale since Nov 2025) |
-| MCP-Atlas | mcp-atlas.dev | mcpA tool-chain quality |
-| Artificial Analysis | [artificialanalysis.ai/leaderboards](https://artificialanalysis.ai/leaderboards/models) | aaIdx, aaCoding, aaAgentic, throughput, pricing |
-| Vellum Leaderboard | [vellum.ai/llm-leaderboard](https://www.vellum.ai/llm-leaderboard) | independent SWE-V, GPQA, cost+latency |
-| llm-stats | [llm-stats.com](https://llm-stats.com/) | broad model catalog |
-| LMArena | [lmarena.ai](https://lmarena.ai/) | blind human preference (formerly LMSYS) |
-| LiveBench | [livebench.ai](https://livebench.ai/) | contamination-resistant rotating evals |
-| Berkeley BFCL | [gorilla.cs.berkeley.edu](https://gorilla.cs.berkeley.edu/leaderboard.html) | function-calling v3/v4 |
-| BigCodeBench | [bigcode-bench.github.io](https://bigcode-bench.github.io/) · [HF leaderboard](https://huggingface.co/spaces/bigcode/bigcode-models-leaderboard) | code generation gold standard |
-| EvalPlus | [evalplus.github.io](https://evalplus.github.io/leaderboard.html) | HumanEval+ / MBPP+ rigorous |
+| Scale SEAL | [labs.scale.com/leaderboard](https://labs.scale.com/leaderboard) | swePro (1865 tasks), sweV, sweMulti, nl2Repo, gpqa, hle |
+| Scale SEAL SWE-bench Pro public | [labs.scale.com/leaderboard/swe_bench_pro_public](https://labs.scale.com/leaderboard/swe_bench_pro_public) | swePro under the standardized SEAL harness |
+| MCP-Atlas | [labs.scale.com/leaderboard/mcp_atlas](https://labs.scale.com/leaderboard/mcp_atlas) | mcpA — 1000 tasks over 36 real MCP servers |
+| SWE-bench (canonical) | [swebench.com](https://www.swebench.com/) | sweV, swePro, sweMulti |
+| DeepSWE (Datacurve) | [deepswe.datacurve.ai](https://deepswe.datacurve.ai/) | deepSwe — from-scratch tasks, one shared harness ([arXiv 2607.07946](https://arxiv.org/abs/2607.07946)) |
+| LiveCodeBench | [livecodebench.github.io](https://livecodebench.github.io/leaderboard.html) | lcb (time-windowed, contamination-resistant) |
+| Terminal-Bench (2.1 track) | [tbench.ai/leaderboard](https://www.tbench.ai/leaderboard) | tb2, tbHard — 89 curated terminal tasks |
+| tau-bench (canonical) | [github.com/sierra-research/tau-bench](https://github.com/sierra-research/tau-bench) | tau2 multi-turn agentic API use |
+| Artificial Analysis | [artificialanalysis.ai/leaderboards](https://artificialanalysis.ai/leaderboards/models) | aaIdx, aaCoding, aaAgentic, aaOmni, sciCode, ifBench, aaLcr, tau3, gpqa, hle, throughput, pricing |
+| Berkeley BFCL | [gorilla.cs.berkeley.edu](https://gorilla.cs.berkeley.edu/leaderboard.html) | bfcl function calling (v4) |
+| Vellum LLM Leaderboard | [vellum.ai/llm-leaderboard](https://www.vellum.ai/llm-leaderboard) | independent sweV, gpqa, cost + latency |
+| llm-stats.com | [llm-stats.com](https://llm-stats.com/) | broad model catalog incl. deepSwe, arcAgi2 |
+| BenchLM | [benchlm.ai](https://benchlm.ai/) | verified vs provisional transparency across 300+ evals |
+| Epoch AI Benchmarks | [epoch.ai/benchmarks](https://epoch.ai/benchmarks) | sweV, lcb, gpqa, hle, cfElo, mmluPro, arcAgi2 |
+| LMCouncil Benchmarks | [lmcouncil.ai/benchmarks](https://lmcouncil.ai/benchmarks) | aime26, browseComp, gpqa, hle, mmluPro, tau2, tb2 |
+| Vals.ai | [vals.ai/benchmarks](https://www.vals.ai/benchmarks/) | enterprise-gated benchmark sets |
+| marc0.dev SWE-bench Leaderboard | [marc0.dev/en/leaderboard](https://www.marc0.dev/en/leaderboard) | swePro, sweV, tb2, mrcr |
 | HF Open LLM Leaderboard | [huggingface.co/spaces/open-llm-leaderboard](https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard) | open-weight canonical aggregation |
 | Klu.ai | [klu.ai/llm-leaderboard](https://klu.ai/llm-leaderboard) | broader benchmark aggregator |
-| Papers with Code | [paperswithcode.com/area/code-generation](https://paperswithcode.com/area/code-generation) | peer-reviewed leaderboards |
+| LMArena WebDev Arena | [lmarena.ai/leaderboard/webdev](https://lmarena.ai/leaderboard/webdev) | webDevElo (retired to zero weight) |
+| MathArena | [matharena.ai](https://matharena.ai/) | aime26 math reasoning (auxiliary) |
+| OpenRouter Rankings | [openrouter.ai/rankings](https://openrouter.ai/rankings) | multi-provider adoption + price signal |
 | arXiv | [arxiv.org](https://arxiv.org/) | original benchmark papers |
-| BenchLM | [benchlm.ai](https://benchlm.ai/) | verified vs provisional transparency; ProgramBench tracker |
-| ProgramBench | [programbench.com](https://programbench.com/) · [arXiv 2605.03546](https://arxiv.org/abs/2605.03546) | cleanroom program reconstruction (Meta + Stanford + Harvard, 2026-05-05) |
-| AgentBench | agentbench.ai | multi-domain agentic |
-| MathArena | [matharena.ai](https://matharena.ai/) | AIME math reasoning (auxiliary) |
-| Vals.ai | [vals.ai/benchmarks](https://www.vals.ai/benchmarks/) | enterprise-gated benchmark sets |
-| LMMarketCap | [lmmarketcap.com](https://lmmarketcap.com/) | hourly market table |
+| *Mirrors* (LMSYS Arena, LiveCodeBench, BFCL on HF Spaces) | huggingface.co/spaces | fallback fetch only — **not** counted as independent of the source they mirror |
 
 ### I-tier — Multi-provider pricing & availability
 

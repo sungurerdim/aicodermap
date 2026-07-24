@@ -39,6 +39,7 @@ from .tiers import (
     tier_rank,
     vendor_update_interval,
 )
+from .util import VERIFYING_TIERS, distinct_publishers, publisher_id
 
 # Phase R4 thresholds for the exceptional-source override. When a single
 # I-tier observation has enough Bayesian evidence (n >= 20, accuracy >= 0.90)
@@ -118,9 +119,10 @@ def _cluster(
                     sum(m["value"] * m["trustScore"] for m in cl["members"]) / total_ts
                 )
                 cl["sum_trust"] = round(total_ts, 4)
-                urls = {(m.get("sourceUrl") or "").lower() for m in cl["members"]}
-                urls.discard("")
-                cl["distinct_sources"] = len(urls) if urls else len(cl["members"])
+                # Publisher identity, not URL: three pages of one leaderboard
+                # are one source of evidence, however many URLs they occupy.
+                pubs = distinct_publishers(cl["members"])
+                cl["distinct_sources"] = len(pubs) if pubs else len(cl["members"])
                 cl["latest_fetched"] = max(
                     cl.get("latest_fetched") or "",
                     s.get("fetched") or "",
@@ -128,13 +130,13 @@ def _cluster(
                 placed = True
                 break
         if not placed:
-            url = (s.get("sourceUrl") or "").lower()
+            pid = publisher_id(s.get("sourceUrl"), s.get("source"))
             clusters.append(
                 {
                     "centroid": s["value"],
                     "members": [s],
                     "sum_trust": round(s["trustScore"], 4),
-                    "distinct_sources": 1 if url else 0,
+                    "distinct_sources": 1 if pid else 0,
                     "latest_fetched": s.get("fetched") or "",
                 }
             )
@@ -158,10 +160,11 @@ def _i_tier_cluster(
         i_members = [m for m in cl["members"] if tier_rank(m.get("tier", "C")) == 3]
         if not i_members:
             continue
-        # Condition: ≥2 distinct I-tier sources OR average trust of I-tier ≥ threshold
-        i_urls = {(m.get("sourceUrl") or "").lower() for m in i_members}
-        i_urls.discard("")
-        n_distinct_i = len(i_urls) if i_urls else len(i_members)
+        # Condition: ≥2 distinct I-tier PUBLISHERS OR average I-tier trust ≥
+        # threshold. Counted per publisher so one leaderboard's several pages
+        # cannot clear the "two independent sources" bar by itself.
+        i_pubs = distinct_publishers(i_members)
+        n_distinct_i = len(i_pubs) if i_pubs else len(i_members)
         avg_trust = sum(m["trustScore"] for m in i_members) / len(i_members)
         # FAZ 8.A.3b: single-shot I-tier dampening
         if require_min_verifications:
@@ -603,9 +606,15 @@ def pick_winner(
     # verif_count=0 → verif_factor 0 → low trust until a real source arrives.
     # Equals the prior value whenever any primary source exists (valid==primary
     # in that case); only the pseudo-only fallback changes (1→0).
-    distinct_urls = {(o.get("sourceUrl") or "").strip().lower() for o in primary}
-    distinct_urls.discard("")
-    verif_count = len(distinct_urls) or len(primary)
+    # 2026-07-25: counted per PUBLISHER, and only tiers that may confirm a
+    # value independently (I/S). Community reruns still contribute tier weight
+    # and still show in the provenance trail, but five blogs republishing one
+    # leaderboard no longer read as five verifications. A cell backed solely by
+    # community sources floors at 1 rather than 0 — corroboration, not proof,
+    # and not an automatic wipe of the only evidence we have.
+    verifying_pubs = distinct_publishers(primary, tiers=VERIFYING_TIERS)
+    any_pubs = distinct_publishers(primary)
+    verif_count = len(verifying_pubs) or (1 if (any_pubs or primary) else 0)
 
     scored: list[dict[str, Any]] = []
     # Phase R5: resolve per-source recency curve when a whitelist is supplied.

@@ -193,12 +193,20 @@ def priority_cells(
             gap_hist = vm_entry.get("gapHistory") or []
             if len(gap_hist) >= 2:
                 starve_key = -1.0
-            elif model_filled[m["id"]] <= 3:
+            elif model_filled[m["id"]] <= 3 and model_filled[m["id"]] < len(keys) / 2:
                 # G2 (2026-07-15): freshly-admitted model (≤3 of the core keys
                 # filled — a lineup stub, possibly with a few official-bench
                 # extractions). Its whole core set jumps the queue so a new
                 # model gets a rankable profile in its FIRST cycle instead of
                 # its cells sorting behind popular-bench gaps of old models.
+                #
+                # 2026-07-25: the bare `<= 3` was an absolute count measured
+                # against a variable-size key universe, so it silently shadowed
+                # the rank-critical tier below whenever `keys` was small — a
+                # well-covered model was mislabelled a fresh stub. The relative
+                # guard restores the intended meaning ("sparse for this
+                # universe"); with the 22 core keys in production a 3-cell stub
+                # still qualifies exactly as before.
                 starve_key = -0.75
             elif k in req_keys and model_missing_required[m["id"]] <= 1:
                 starve_key = -0.5

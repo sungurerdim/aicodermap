@@ -790,16 +790,25 @@ The single biggest source of data loss in prior runs was a single mega-regex doi
      · GDPval-AA Elo (Artificial Analysis office-work) → belongs to NONE of these;
        do not file it as cfElo/lmArenaElo.
    - **SWE family (variant qualifier MANDATORY):** `sweV` (SWE-bench Verified) ≠
-     `swePro` (SWE-bench Pro) ≠ `sweMulti` (SWE-bench Multilingual/Multimodal).
+     `swePro` (SWE-bench Pro) ≠ `sweMulti` (SWE-bench Multilingual/Multimodal) ≠
+     `deepSwe` (DeepSWE, Datacurve — a SEPARATE dataset of from-scratch tasks,
+     not a SWE-bench variant despite the name; deepswe.datacurve.ai,
+     arXiv:2607.07946; 2026 frontier ~46-73%).
      A bare "SWE-bench: 70" with NO variant word (Verified / Pro / Multilingual)
      is AMBIGUOUS — you may NOT default it to `sweV`. Record it under your
      best-evidence variant but tag the observation `_variantAmbiguous: true`; the
      merge applies a −0.5 trustScore penalty and surfaces it as an anomaly for
      re-verification. If you cannot even guess the variant, emit a `gaps[]` entry
      `swe-variant-ambiguous:<modelId>` instead of filling a cell.
-   - **Terminal:** `tb2` (Terminal-Bench 2) ≠ `tbHard` (Terminal-Bench Hard).
-   - **Others:** `tau2`≠`tau3`; `aime26`≠`aime25`; `gpqa` = GPQA **Diamond**;
-     `lcb` ≠ deprecated `lcbV6`.
+   - **Terminal:** `tb2` (Terminal-Bench 2 — accepts BOTH the 2.0 and the 2.1
+     track, which is the live one as of 2026-07) ≠ `tbHard` (Terminal-Bench Hard).
+   - **Long-context:** `aaLcr` (Artificial Analysis AA-LCR, 100 questions over
+     10k-100k-token documents) ≠ `mrcr` (Google MRCR). Different publishers and
+     different scales — a bare "long context: 62" is ambiguous.
+   - **Others:** `tau2` (τ²-Bench Telecom) ≠ `tau3` (τ³-Banking — now a TRACKED
+     key, no longer discovery-only); `aime26`≠`aime25`; `gpqa` = GPQA **Diamond**;
+     `lcb` (LiveCodeBench) ≠ `lbCoding` (LiveBench coding) ≠ deprecated `lcbV6`;
+     `sciCode` = SciCode (scientist-curated, 80 problems / 338 subproblems).
    When a model/variant attribution is ambiguous (e.g. a 235B score copied onto a
    480B-Coder row), record under the EXACT id the source names, never a sibling.
 
@@ -1001,7 +1010,7 @@ Three shapes, never mixed:
         },
 
         // bench: every value MUST be number|null (Storage shape per DATA_CONTRACT). Wrapped {value, trustScore} belongs in sourcesAdded[], not here.
-        "bench"?: { swePro?:n, sweV?:n, tb2?:n, lcbV6?:n, aider?:n, tau2?:n, aaCoding?:n, aaAgentic?:n, mcpA?:n, bfcl?:n, aime26?:n, aaOmni?:n, gpqa?:n, sweMulti?:n, hle?:n, aaIdx?:n },
+        "bench"?: { swePro?:n, sweV?:n, sweMulti?:n, deepSwe?:n, lcb?:n, tb2?:n, tbHard?:n, sciCode?:n, tau2?:n, tau3?:n, mcpA?:n, bfcl?:n, ifBench?:n, browseComp?:n, gpqa?:n, aime26?:n, hle?:n, arcAgi2?:n, mmluPro?:n, aaLcr?:n, mrcr?:n, aaIdx?:n, aaCoding?:n, aaAgentic?:n, aaOmni?:n },
 
         "providers"?: number,
         "uptime"?: number,

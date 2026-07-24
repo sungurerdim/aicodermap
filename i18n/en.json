@@ -704,7 +704,7 @@
     "sweV": {
       "name": "SWE-bench Verified",
       "short": "SWE-V",
-      "desc": "Human-verified 500 tasks. Often contradicts Pro."
+      "desc": "Human-verified 500 tasks. OpenAI retired it in February 2026 over contamination and ranks 6-10 sit inside 0.4pp — deliberately held at low weight."
     },
     "sweMulti": {
       "name": "SWE-bench Multilingual",
@@ -714,7 +714,7 @@
     "tb2": {
       "name": "TerminalBench 2",
       "short": "TB2",
-      "desc": "Terminal CLI agentic execution; tool-use quality."
+      "desc": "Terminal CLI agentic execution; tool-use quality. The live track is now v2.1 (89 tasks, repaired environments) — both 2.0 and 2.1 values are accepted."
     },
     "tbHard": {
       "name": "Terminal-Bench Hard",
@@ -729,7 +729,7 @@
     "lbCoding": {
       "name": "LiveBench Coding",
       "short": "LB-CODE",
-      "desc": "LiveBench's own \"Coding\" category (code generation + code completion average) — a distinct benchmark from LiveCodeBench (lcb) despite the similar name."
+      "desc": "LiveBench coding subscore. RETIRED: present for 11 of 112 models — shown on the card, excluded from scoring."
     },
     "tau2": {
       "name": "τ²-bench",
@@ -774,12 +774,12 @@
     "cfElo": {
       "name": "Codeforces ELO",
       "short": "CF-ELO",
-      "desc": "Codeforces competitive-programming ELO rating; 1000-3500 raw scale."
+      "desc": "Codeforces Elo. Puzzle-style competitive programming is a weak proxy for repository work and none of its 22 cells came from a primary publisher — zero weight in the default coding lens."
     },
     "webDevElo": {
       "name": "LMArena WebDev Elo",
       "short": "WD-ELO",
-      "desc": "LMArena WebDev Arena Elo from blind human preference voting on front-end code outputs (React/HTML/CSS/JS); raw 950-1300 typical range."
+      "desc": "LMArena WebDev Arena Elo. RETIRED: present for 7 of 112 models with no primary-source backing — shown on the card, excluded from scoring."
     },
     "mmluPro": {
       "name": "MMLU-Pro",
@@ -814,37 +814,32 @@
     "nl2Repo": {
       "name": "NL2Repo",
       "short": "NL2REPO",
-      "desc": "Natural-language → full repository generation; multi-file structure + dependency resolution."
+      "desc": "Natural language to repository generation. RETIRED: present for 19 of 112 models and not one cell is backed by a primary publisher — shown on the card, excluded from scoring."
     },
-    "llmStatsIdx": {
-      "name": "LLM-Stats Composite",
-      "short": "LLM-Stats",
-      "desc": "llm-stats.com TrueSkill-style composite across published benchmarks. Vendor aggregate — independent reference, not part of AICoderMap composite."
+    "sciCode": {
+      "name": "SciCode",
+      "short": "SCICODE",
+      "desc": "Scientist-curated: 80 problems decomposed into 338 subproblems across 16 natural-science subfields, each needing recall, reasoning and code synthesis. One of the two AA Coding Index components."
     },
-    "vellumRank": {
-      "name": "Vellum Rank",
-      "short": "Vellum",
-      "desc": "Vellum LLM Leaderboard rank position (1=best). Normalized via inverse-rank. Vendor aggregate."
+    "ifBench": {
+      "name": "IFBench",
+      "short": "IFBENCH",
+      "desc": "Instruction-following generalization to unseen output constraints, via 58 new constraints. This is the failure class that breaks long agent loops."
     },
-    "benchlmIdx": {
-      "name": "BenchLM Composite",
-      "short": "BenchLM",
-      "desc": "BenchLM.ai composite score across many benchmarks. Vendor aggregate."
+    "aaLcr": {
+      "name": "AA-LCR",
+      "short": "AA-LCR",
+      "desc": "Artificial Analysis long-context reasoning. The reasoning axis that actually governs repository-scale work; an AA Intelligence Index v4.0 component."
     },
-    "lmArenaElo": {
-      "name": "LMArena Elo",
-      "short": "LMArena",
-      "desc": "LMArena head-to-head Elo rating (general chat). Normalized linear 1000-1500 → 0-100. Vendor aggregate."
+    "tau3": {
+      "name": "τ³-bench",
+      "short": "τ³",
+      "desc": "Knowledge-base navigation plus multi-step tool calls over banking workflows. Successor to τ² and one of the two AA Agentic Index components."
     },
-    "hfOpenAvg": {
-      "name": "HF Open LLM Avg",
-      "short": "HF Open",
-      "desc": "HuggingFace Open LLM Leaderboard average score. Open-weights models only. Vendor aggregate."
-    },
-    "kluRank": {
-      "name": "Klu Rank",
-      "short": "Klu",
-      "desc": "Klu.ai LLM leaderboard rank. Normalized via inverse-rank. Vendor aggregate."
+    "deepSwe": {
+      "name": "DeepSWE",
+      "short": "DEEPSWE",
+      "desc": "113 long-horizon tasks written from scratch across 5 languages, so no model saw the solutions in pretraining. Every model runs the same mini-swe-agent harness — contamination-free and genuinely discriminating at the frontier."
     }
   },
   "benchCategories": {

@@ -519,11 +519,16 @@ def filter_for_batch(
 # misfile (gemma-4-26b-moe, 2026-06-07) cost. One definition, two callers.
 CONFUSABLE_FAMILIES: list[set[str]] = [
     {"cfElo", "lmArenaElo", "webDevElo"},  # Elo (distinct scales)
-    {"sweV", "swePro", "sweMulti"},  # SWE-bench variants
+    # 2026-07-25: deepSwe joins the SWE family. Its name reads as another
+    # SWE-bench variant but it is a separate dataset on a separate difficulty
+    # curve (frontier ~73% vs sweV ~88% vs swePro ~69%), so a misfile silently
+    # moves a 28-weight cell in the default lens.
+    {"sweV", "swePro", "sweMulti", "deepSwe"},  # SWE-bench variants
     {"tb2", "tbHard"},  # Terminal-Bench
     {"tau2", "tau3"},  # tau-bench
     {"aaIdx", "aaCoding", "aaAgentic", "aaOmni"},  # AA composites
     {"lcb", "lbCoding"},  # LiveCodeBench vs LiveBench Coding — confusable names
+    {"aaLcr", "mrcr"},  # long-context reasoning, different publishers + scales
 ]
 # The two families whose misfile most corrupts the composite (distinct scales /
 # difficulty) → a cell supported ONLY by sibling-publishers is merge-BLOCKING.
@@ -534,6 +539,7 @@ HARD_CONFUSABLE: set[str] = {
     "sweV",
     "swePro",
     "sweMulti",
+    "deepSwe",
 }
 # Arena-family Elo publishers seeded even when a whitelist entry's scope is
 # incomplete (chat/webdev Elo, never Codeforces cfElo).

@@ -85,13 +85,13 @@ isn't gaming anything. So the gate is coverage-aware (2026-07-16):
   real but provisional.
 
 **New-release grace (2026-07-24).** Both gate arms measure evidence that only
-*exists* weeks after a launch: `swePro` comes from Scale SEAL, `sweMulti` and
-`cfElo` from independent harness runs that queue new models for days. Applied to
+*exists* weeks after a launch: `swePro` comes from Scale SEAL, `deepSwe` and
+`sciCode` from independent harness runs that queue new models for days. Applied to
 a model released this week, the gate stops measuring the model and starts
 measuring the calendar — every fresh flagship was demoted into the Limited
 Coverage band during exactly the window when readers came looking for it
 (Claude Opus 5 ranked #4 on its EB score but sat in the bottom band at 39%
-coverage on launch day). So inside `recency.newWindowDays` (default 30) a model
+coverage on launch day). So inside `recency.newWindowDays` (default 3) a model
 with at least `recency.graceMinCoverage` (default 0.25) real coverage ranks on
 its EB-shrunk score and carries a **DATA FILLING** chip stating why. Below that
 floor — a stub with nothing measured yet — the gate still applies: the grace
@@ -163,7 +163,7 @@ Every composite ships with an epistemic ±σ band
   `static` (frozen split). Static splits accumulate contamination risk as
   they age (the 2026 SWE-bench Verified controversy is the canonical
   example). The taxonomy is disclosed as a chip in the site glossary and is
-  a standing input to preset weight retunes (sweV's demotion to weight 9 is
+  a standing input to preset weight retunes (sweV's demotion to weight 6 is
   the precedent); it is deliberately *not* a trustScore multiplier, because
   all sources of one cell share the bench and a flat per-bench factor cannot
   change winner selection within that cell.
@@ -193,14 +193,51 @@ because AHP's O(n²) pairwise matrix is infeasible for 25+ criteria in a
 slider UI, and comparative MCDA studies find no consistent output-quality
 winner between the two (Pöyhönen et al.).
 
-| Preset | Anchor rationale (2026-05-18 retune, 2026-05-28 rebalance) |
+| Preset | Anchor rationale (2026-07-25 retune) |
 |---|---|
-| **swe-focused** (default) | SWE-bench Pro 32 (contamination-resistant gold standard) + TB2 17 + SWE-Multilingual 14 + LCB 13; sweV demoted to 9 (saturated, <1.3pp frontier spread + 2026 contamination findings) |
-| **agentic-focused** | τ²-Bench 21 (top multi-turn reliability) + TB2 18 + MCP-Atlas 17 + browsing/tool-use |
-| **reasoning-focused** | HLE 27 (non-saturated frontier) + GPQA 16 + AIME 13 + ARC-AGI-2 9 |
-| **balanced** | The site-wide default blend across coding/agentic/reasoning |
-| **benchmark-only** | Spread over every active bench, skewed to ≥70%-coverage benches to limit coverage-penalty distortion |
-| **consensus** | No atomic weights — pure vendor-composite median as an honest second opinion |
+| **swe-focused** (default) | SWE-bench Pro 28 (contamination-resistant gold standard) + TB2.1 18 + LCB 13 + DeepSWE 8 + SciCode 8 + TB-Hard 8; sweV held at 6 and cfElo dropped to 0 |
+| **agentic-focused** | τ²-Bench 18 + TB2.1 18 + MCP-Atlas 15 + TB-Hard 12 + τ³-Banking 8 + IFBench 8 |
+| **reasoning-focused** | HLE 26 (non-saturated frontier) + GPQA 17 + AIME 13 + MMLU-Pro 11 + ARC-AGI-2 9 + AA-LCR 8 |
+| **balanced** | The site-wide blend across coding / agentic / reasoning |
+| **benchmark-only** | Spread over all 22 weighted atomic benches for the raw scientific surface |
+| **consensus** | No atomic weights — mean of the four AA vendor composites as an honest second opinion |
+
+**What changed in the 2026-07-25 retune and why.** Four defects were measured
+across all 112 models in the snapshot, where *coverage* = models carrying a
+value and *primary%* = cells backed by the benchmark's own publisher rather
+than a republisher:
+
+1. **Vendor composites carried weight that was silently discarded.** The
+   composite skips vendor-aggregated keys before accumulating active weight, so
+   `balanced` actually ran at 91 of its nominal 100, `reasoning-focused` at 90
+   and `benchmark-only` at 92. Every preset is now atomic-only.
+2. **The default lens leaned on data most models lack.** `sweMulti` (26%
+   coverage, 28% primary) and `cfElo` (20% coverage, 0% primary) held 23 of 100
+   points, so most models were ranked largely on Empirical-Bayes fill rather
+   than measurement.
+3. **The "no double-counting" rationale did not hold.** We exclude the AA
+   Intelligence Index from our composite because its components are counted
+   atomically — but we tracked only about half of them. Adding SciCode, AA-LCR
+   and τ³-Banking (plus IFBench on its own merit) makes the claim true.
+4. **Six vendor-composite keys were dead.** `llmStatsIdx`, `vellumRank`,
+   `hfOpenAvg` and `kluRank` held zero values; `benchlmIdx` held 3 and
+   `lmArenaElo` 5. All six sat in the consensus preset's ten-entry view, so the
+   coverage denominator was 10 against an achievable maximum of about 4 and
+   every model took a systematic shrinkage penalty. The view is now the four
+   real AA composites.
+
+**Benchmarks added:** SciCode, IFBench, AA-LCR, τ³-Banking (all
+Artificial-Analysis-published, so coverage arrives broadly) and DeepSWE
+(Datacurve, arXiv 2607.07946) — original tasks written from scratch, one shared
+mini-swe-agent harness, and a frontier spread from 73% down to 46% where
+SWE-bench Pro has leaders clustered inside their confidence intervals.
+
+**Benchmarks rejected after review:** ARC-AGI-3 (every frontier model scores
+under 1% — no discriminating signal yet), SWE-Marathon and FrontierSWE (13 and
+fewer evaluated configurations; tracked as discovery candidates instead).
+
+**Benchmarks retired to zero weight** but still rendered on model cards for
+historical continuity: `nl2Repo`, `webDevElo`, `lbCoding`.
 
 Weights are user-editable; the published vectors are our editorial defaults,
 not ground truth. **No surveyed competitor (16 products, 2026-07) offers

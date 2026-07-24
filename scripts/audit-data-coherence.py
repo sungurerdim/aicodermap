@@ -38,6 +38,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lib.matrix import active_models as _active_models  # noqa: E402
 from lib.util import canonical_display_name as _canonical_name  # noqa: E402
 from lib.util import configure_utf8_output  # noqa: E402
+from lib.util import distinct_publishers, publisher_id  # noqa: E402
 from lib.util import read_json as load_json  # noqa: E402
 from lib.util import slug_norm  # noqa: E402
 from lib.whitelist import build_domain_publishes, elo_swe_misfile  # noqa: E402
@@ -558,23 +559,26 @@ def main():
             entries = sources.get(key) or []
             if not isinstance(entries, list):
                 continue
-            distinct_urls = {e.get("url") for e in entries if e.get("url")}
-            if len(distinct_urls) < 2:
+            # 2026-07-25: distinct PUBLISHERS, not distinct URLs. Counting URLs
+            # let one leaderboard's several pages read as several independent
+            # confirmations — 98 cells in the 2026-07-25 snapshot cleared this
+            # gate on a single publisher's pages alone.
+            if len(distinct_publishers(entries)) < 2:
                 weak_provenance.append(key)
                 if k in core_keys:
                     weak_core.append(key)
     if weak_provenance:
         msg = (
             f"MX5 — {len(weak_provenance)} filled bench cell(s) have <2 distinct "
-            f"source URLs ({len(weak_core)} core) (quarantine candidates): "
+            f"publishers ({len(weak_core)} core) (quarantine candidates): "
             f"{weak_provenance[:5]}{' ...' if len(weak_provenance) > 5 else ''}"
         )
         warnings.append(msg)
     if hard_block_core and weak_core:
         failures.append(
             f"MX5-CORE — {len(weak_core)} CORE-bench cell(s) single-sourced (<2 "
-            f"distinct URLs) flow into the composite at full weight, MERGE-BLOCKING: "
-            f"{weak_core[:8]}{' ...' if len(weak_core) > 8 else ''}"
+            f"distinct publishers) flow into the composite at full weight, "
+            f"MERGE-BLOCKING: {weak_core[:8]}{' ...' if len(weak_core) > 8 else ''}"
         )
 
     # === MX6 — bench-specific strict verification per
@@ -600,12 +604,17 @@ def main():
             entries = sources.get(f"{m['id']}.{bench_key}") or []
             if not isinstance(entries, list):
                 continue
+            # Collapse matched domains to publisher identity before counting:
+            # a rule may list several paths of one leaderboard (e.g. both
+            # "artificialanalysis.ai/evaluations/scicode" and
+            # "artificialanalysis.ai"), and matching two of them from one
+            # publisher is one independent source, not two.
             indep_domains = set()
             for e in entries:
                 u = (e.get("url") or "").lower()
                 for d in known_domains:
                     if d in u:
-                        indep_domains.add(d)
+                        indep_domains.add(publisher_id(f"https://{d}") or d)
                         break
             if len(indep_domains) < min_indep:
                 strict_violations.append(

@@ -14783,17 +14783,6 @@
       "verifications": 7
     }
   ],
-  "gemini-3-1-pro.lmArenaElo": [
-    {
-      "date": "2026-06-06",
-      "source": "smartchunks.com",
-      "tier": "C",
-      "trustScore": 0.1918,
-      "url": "https://smartchunks.com/gemini-3-1-pro-benchmarks-gpqa-hle-lmsys-frontiermath/",
-      "value": 1493.0,
-      "verifications": 1
-    }
-  ],
   "gemini-3-1-pro.mcpA": [
     {
       "date": "2026-05-09",
@@ -16962,55 +16951,6 @@
       "trustScore": 0.4208
     }
   ],
-  "gemma-3-27b.lmArenaElo": [
-    {
-      "date": "2026-06-16",
-      "source": "arxiv.org",
-      "tier": "I",
-      "trustScore": 0.4733,
-      "url": "https://arxiv.org/html/2503.19786v1",
-      "value": 1338.0,
-      "verifications": 3
-    },
-    {
-      "date": "2026-06-24",
-      "source": "ollama.com",
-      "tier": "I",
-      "trustScore": 0.4733,
-      "url": "https://ollama.com/library/gemma3",
-      "value": 1338.0,
-      "verifications": 3
-    },
-    {
-      "value": 1338.0,
-      "source": "arxiv.org",
-      "url": "https://arxiv.org/pdf/2503.19786",
-      "date": "2026-07-16",
-      "tier": "S",
-      "verifications": 3,
-      "trustScore": 0.4733
-    },
-    {
-      "value": 1338.0,
-      "source": "auto-resolution candidate",
-      "url": null,
-      "date": "2026-07-16",
-      "tier": "I",
-      "verifications": 3,
-      "trustScore": 0.4733,
-      "contradictionRole": "winner"
-    },
-    {
-      "value": 1365.0,
-      "source": "auto-resolution candidate",
-      "url": null,
-      "date": "2026-07-16",
-      "tier": "C",
-      "verifications": 1,
-      "trustScore": 0.2,
-      "contradictionRole": "loser"
-    }
-  ],
   "gemma-3-27b.mmluPro": [
     {
       "date": "2026-04-30",
@@ -18897,17 +18837,6 @@
       "trustScore": 0.487
     }
   ],
-  "gemma-4-26b-moe.lmArenaElo": [
-    {
-      "date": "2026-06-06",
-      "source": "codersera.com",
-      "tier": "C",
-      "trustScore": 0.1967,
-      "url": "https://codersera.com/blog/gemma-4-complete-guide-2026/",
-      "value": 1441.0,
-      "verifications": 1
-    }
-  ],
   "gemma-4-26b-moe.mmluPro": [
     {
       "date": "2026-05-09",
@@ -20241,17 +20170,6 @@
       "tier": "S",
       "verifications": 18,
       "trustScore": 0.425
-    }
-  ],
-  "gemma-4-31b.lmArenaElo": [
-    {
-      "date": "2026-06-06",
-      "source": "codersera.com",
-      "tier": "C",
-      "trustScore": 0.1967,
-      "url": "https://codersera.com/blog/gemma-4-complete-guide-2026/",
-      "value": 1452.0,
-      "verifications": 1
     }
   ],
   "gemma-4-31b.mmluPro": [
@@ -36921,37 +36839,6 @@
       "verifications": 2,
       "trustScore": 0.4204,
       "contradictionRole": "loser"
-    }
-  ],
-  "grok-4-20.lmArenaElo": [
-    {
-      "date": "2026-04-30",
-      "source": "aidevdayindia.org",
-      "tier": "C",
-      "trustScore": 0.17,
-      "url": "https://aidevdayindia.org/blogs/lmsys-chatbot-arena-current-rankings/lmsys-chatbot-arena-current-rankings.html",
-      "value": 1471.0,
-      "verifications": 1
-    },
-    {
-      "contradictionRole": "winner",
-      "date": "2026-06-28",
-      "source": "auto-resolution candidate",
-      "tier": "C",
-      "trustScore": 0.17,
-      "url": null,
-      "value": 1471.0,
-      "verifications": 1
-    },
-    {
-      "contradictionRole": "loser",
-      "date": "2026-06-28",
-      "source": "auto-resolution candidate",
-      "tier": "C",
-      "trustScore": 0.14,
-      "url": null,
-      "value": 1493.0,
-      "verifications": 1
     }
   ],
   "grok-4-20.mmluPro": [
@@ -80050,17 +79937,6 @@
       "trustScore": 0.3409
     }
   ],
-  "claude-fable-5.benchlmIdx": [
-    {
-      "value": 83.68,
-      "source": "benchlm.ai",
-      "url": "https://benchlm.ai/",
-      "date": "2026-07-24",
-      "tier": "I",
-      "verifications": 1,
-      "trustScore": 0.495
-    }
-  ],
   "gemini-3-6-flash.aaIdx": [
     {
       "value": 50.0,
@@ -81289,28 +81165,6 @@
       "tier": "I",
       "verifications": 1,
       "trustScore": 0.4875
-    }
-  ],
-  "claude-sonnet-5.benchlmIdx": [
-    {
-      "value": 65.32,
-      "source": "benchlm.ai",
-      "url": "https://benchlm.ai/",
-      "date": "2026-07-24",
-      "tier": "I",
-      "verifications": 1,
-      "trustScore": 0.495
-    }
-  ],
-  "claude-mythos-5.benchlmIdx": [
-    {
-      "value": 83.93,
-      "source": "benchlm.ai",
-      "url": "https://benchlm.ai/",
-      "date": "2026-07-24",
-      "tier": "I",
-      "verifications": 1,
-      "trustScore": 0.495
     }
   ],
   "qwen3-coder-next.tau2": [

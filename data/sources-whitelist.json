@@ -36,11 +36,15 @@
       "aime26",
       "tbHard",
       "cfElo",
-      "nl2Repo",
       "aaCoding",
       "aaAgentic",
       "arcAgi2",
-      "mrcr"
+      "mrcr",
+      "sciCode",
+      "ifBench",
+      "aaLcr",
+      "tau3",
+      "deepSwe"
     ],
     "benchCategories": [
       {
@@ -49,11 +53,13 @@
           "swePro",
           "sweV",
           "sweMulti",
+          "deepSwe",
           "nl2Repo",
           "lcb",
           "lbCoding",
           "tb2",
           "tbHard",
+          "sciCode",
           "cfElo",
           "webDevElo",
           "aaCoding"
@@ -63,8 +69,10 @@
         "id": "agentic",
         "keys": [
           "tau2",
+          "tau3",
           "mcpA",
           "bfcl",
+          "ifBench",
           "browseComp",
           "aaAgentic"
         ]
@@ -77,6 +85,7 @@
           "hle",
           "arcAgi2",
           "mmluPro",
+          "aaLcr",
           "mrcr"
         ]
       },
@@ -84,18 +93,12 @@
         "id": "general",
         "keys": [
           "aaIdx",
-          "aaOmni",
-          "llmStatsIdx",
-          "vellumRank",
-          "benchlmIdx",
-          "lmArenaElo",
-          "hfOpenAvg",
-          "kluRank"
+          "aaOmni"
         ]
       }
     ],
-    "_benchKeyNotes": "cfElo stores RAW Codeforces ELO (range 0-3500); webDevElo stores RAW LMArena WebDev Arena Elo (range 950-1300 typical, allowed up to 1500); every other bench key stores 0-100 percentage. compositeScore() in assets/js/data.js normalizes cfElo and webDevElo via core.js normalizeBenchScore() (linear map to 0-100) before weighting. audit-data-coherence.py allows cfElo cells in [0, 3500] and webDevElo cells in [0, 1500].",
-    "benchKeysUsage": "Universe of bench keys = coreBenchKeys ∪ leaderboards[].publishes[]. New leaderboards extending publishes[] auto-extend the universe. Frontend BENCH_KEYS in assets/js/core.js mirrors coreBenchKeys; if you add a new core key here, add it to assets/js/core.js too. NOTE 2026-04-29: dropped `aider` (Aider Polyglot leaderboard frozen 2025-08; no Opus 4.7 / Gemini 3.1 Pro / GPT-5.5 entries). Renamed `lcbV6` → `lcb` (rolling LiveCodeBench leaderboard supersedes pinned v6). Added: `tbHard`, `cfElo`, `mmluPro`, `simpleQa`, `mrcr`, `arcAgi2`, `browseComp` — all with strong 2026 vendor adoption.",
+    "_benchKeyNotes": "cfElo stores RAW Codeforces ELO (range 0-3500); webDevElo stores RAW LMArena WebDev Arena Elo (range 950-1300 typical, allowed up to 1500); every other bench key stores 0-100 percentage. compositeScore() in assets/js/data.js normalizes cfElo and webDevElo via core.js normalizeBenchScore() (linear map to 0-100) before weighting. audit-data-coherence.py allows cfElo cells in [0, 3500] and webDevElo cells in [0, 1500]. 2026-07-25: sciCode / ifBench / aaLcr / tau3 / deepSwe all store 0-100 percentages and need no normalization entry.",
+    "benchKeysUsage": "Universe of bench keys = coreBenchKeys ∪ leaderboards[].publishes[]. New leaderboards extending publishes[] auto-extend the universe. Frontend BENCH_KEYS in assets/js/core.js is regenerated from coreBenchKeys ∪ benchCategories by scripts/gen-bench-keys.py — run it after editing either. 2026-07-25 retune: added sciCode, ifBench, aaLcr, tau3, deepSwe (the first four align our atomic layer with AA Intelligence Index v4.0, whose components we previously excluded as 'already counted atomically' while tracking only half of them; deepSwe is the contamination-free frontier discriminator). Removed six zero-data vendor-composite keys. Retired nl2Repo / webDevElo / lbCoding to zero weight.",
     "newReleaseProbe": {
       "purpose": "WebSearch-based new-release net for Phase 0. Catches a vendor's new model even when its lineup docs page is broken (404/SPA/redirect). Model-agnostic: the agent expands each template per vendor at runtime, NEVER hardcodes a model name.",
       "appliesToScopes": [
@@ -671,8 +674,14 @@
       ],
       "tb2": [
         "Terminal-Bench 2",
+        "Terminal-Bench 2.0",
+        "Terminal-Bench 2.1",
+        "Terminal-Bench v2.1",
         "TB2",
-        "Terminal Bench v2"
+        "TB2.1",
+        "Terminal Bench v2",
+        "terminal-bench-2",
+        "terminal-bench-2-1"
       ],
       "tbHard": [
         "Terminal-Bench Hard",
@@ -684,9 +693,13 @@
         "tau-2"
       ],
       "tau3": [
+        "τ³-Bench",
+        "tau3-bench",
         "tau-bench v3",
-        "tau3",
-        "tau-3"
+        "Tau3",
+        "τ³-Banking",
+        "tau3-banking",
+        "T3 Banking"
       ],
       "mcpA": [
         "MCP-Atlas",
@@ -762,42 +775,39 @@
         "program_bench",
         "programBench"
       ],
-      "llmStatsIdx": [
-        "LLM-Stats Index",
-        "LLM Stats Index",
-        "llm-stats.com Index"
+      "sciCode": [
+        "SciCode",
+        "SciCode Benchmark",
+        "Sci-Code"
       ],
-      "vellumRank": [
-        "Vellum LLM Leaderboard",
-        "Vellum Rank",
-        "Vellum Ranking"
+      "ifBench": [
+        "IFBench",
+        "IF-Bench",
+        "Instruction Following Bench"
       ],
-      "benchlmIdx": [
-        "BenchLM Index",
-        "BenchLM Score",
-        "BenchLM Rank"
+      "aaLcr": [
+        "AA-LCR",
+        "AA Long Context Reasoning",
+        "Artificial Analysis Long Context Reasoning"
       ],
-      "lmArenaElo": [
-        "LMArena Elo",
-        "Chatbot Arena Elo",
-        "LM Arena Elo",
-        "Arena Elo"
-      ],
-      "hfOpenAvg": [
-        "Open LLM Leaderboard Average",
-        "HF Open LLM Average",
-        "Open LLM Avg"
-      ],
-      "kluRank": [
-        "Klu.ai Leaderboard",
-        "Klu Rank",
-        "Klu Ranking"
+      "deepSwe": [
+        "DeepSWE",
+        "Deep-SWE",
+        "DeepSWE Benchmark"
       ]
     },
     "deprecatedBenchKeys": [
       "lcbV6",
       "aider",
-      "aiderPoly"
+      "aiderPoly",
+      "programBench",
+      "simpleQa",
+      "llmStatsIdx",
+      "vellumRank",
+      "hfOpenAvg",
+      "kluRank",
+      "benchlmIdx",
+      "lmArenaElo"
     ],
     "huggingfaceExtraction": {
       "_purpose": "HF model card README scraping protocol — Phase 2 PER_MODEL_URL_EXPANSION priority chain",
@@ -821,22 +831,21 @@
       "addedDate": "2026-05-06"
     },
     "emergingBenchKeys": [
-      "mcpA",
-      "webDevElo",
-      "browseComp",
-      "sweMulti",
-      "bfcl",
+      "aaLcr",
       "aaOmni",
-      "llmStatsIdx",
-      "vellumRank",
-      "benchlmIdx",
-      "lmArenaElo",
-      "hfOpenAvg",
-      "kluRank",
-      "lbCoding"
+      "bfcl",
+      "browseComp",
+      "deepSwe",
+      "ifBench",
+      "lbCoding",
+      "mcpA",
+      "nl2Repo",
+      "sweMulti",
+      "tau3",
+      "webDevElo"
     ],
     "_recognizedNotTrackedNote": "4.5/2026-05-29 — `tau3` (tau-bench v3) is in benchAliases + the confusable Elo/tau family for MISFILE DETECTION ONLY (so a tau3 value is never silently filed as tau2). It is deliberately NEITHER core NOR emerging: promoting it to a tracked, scored bench requires a frontend PR (assets/js/core.js BENCH_KEYS + i18n tr/en labels), which is out of scope for the data pipeline. Until tau-bench v3 has real cross-model adoption, a genuine tau3 observation is recognized-but-not-stored; the agent emits a discoveries.benchmarks[] candidate instead.",
-    "_deprecatedBenchKeysNote": "FAZ 5.B/C 2026-05-09 split bench universe from 26 → 10 core keys. These 16 legacy keys still hold values in data/models.json (preserved for historical accuracy) but are no longer refreshed by gather agents and not surfaced in priorityCells. Audit accepts them as 'deprecated' rather than 'unknown'. Front-end may render them in a 'historical' section or hide entirely.",
+    "_deprecatedBenchKeysNote": "FAZ 5.B/C 2026-05-09 split bench universe from 26 → 10 core keys. These 16 legacy keys still hold values in data/models.json (preserved for historical accuracy) but are no longer refreshed by gather agents and not surfaced in priorityCells. Audit accepts them as 'deprecated' rather than 'unknown'. Front-end may render them in a 'historical' section or hide entirely. 2026-07-25: the six vendor-composite keys llmStatsIdx / vellumRank / hfOpenAvg / kluRank / benchlmIdx / lmArenaElo joined this list. They held 0, 0, 0, 0, 3 and 5 values across 112 models while sitting in the consensus preset's ten-entry vendorCompositeView, so the coverage denominator was 10 against an achievable maximum of ~4 — every model took a systematic shrinkage penalty and aaOmni presence alone swung the ranking. Their stray cells were deleted from models.json + sources.json in the same pass, so nothing is orphaned.",
     "normalization": {
       "_purpose": "Per-bench normalize to [0,100] composite scale. Loaded by assets/js/core.js normalizeBenchScore() with backward-compat fallback to hardcoded literals. Adding a new ELO-scale bench = data PR only.",
       "cfElo": {
@@ -869,25 +878,6 @@
         "max": 100,
         "_formula": "max(0, min(100, max - value))",
         "_note": "AA Omniscience: lower is better; inverted so higher composite = better"
-      },
-      "lmArenaElo": {
-        "type": "linear",
-        "origin": 1000,
-        "divisor": 5.0,
-        "clampMin": 0,
-        "clampMax": 100,
-        "_note": "LMArena Elo ~1000-1500 → 0-100"
-      },
-      "vellumRank": {
-        "type": "inverse-rank",
-        "topN": 50,
-        "_formula": "max(0, 100 * (topN - rank + 1) / topN)",
-        "_note": "Rank 1 = 100, rank topN = 2, rank>topN = 0"
-      },
-      "kluRank": {
-        "type": "inverse-rank",
-        "topN": 50,
-        "_formula": "max(0, 100 * (topN - rank + 1) / topN)"
       }
     },
     "confidence": {
@@ -915,38 +905,34 @@
         "swePro",
         "sweV",
         "sweMulti",
+        "deepSwe",
         "nl2Repo",
         "lcb",
         "lbCoding",
         "tb2",
         "tbHard",
+        "sciCode",
         "cfElo",
         "webDevElo",
-        "programBench",
         "tau2",
         "tau3",
         "mcpA",
         "bfcl",
+        "ifBench",
         "browseComp",
         "gpqa",
         "aime26",
         "hle",
         "arcAgi2",
         "mmluPro",
-        "simpleQa",
+        "aaLcr",
         "mrcr"
       ],
       "vendorComposite": [
         "aaIdx",
         "aaCoding",
         "aaAgentic",
-        "aaOmni",
-        "llmStatsIdx",
-        "vellumRank",
-        "benchlmIdx",
-        "lmArenaElo",
-        "hfOpenAvg",
-        "kluRank"
+        "aaOmni"
       ]
     },
     "vendorComposites": {
@@ -959,15 +945,15 @@
         "domain": "general",
         "scale": "0-100",
         "componentBenches": [
-          "gpqa",
-          "aime26",
-          "hle",
-          "mmluPro",
-          "simpleQa",
+          "tau3",
+          "tb2",
           "sciCode",
-          "aiderPoly"
+          "hle",
+          "gpqa",
+          "aaOmni",
+          "aaLcr"
         ],
-        "_componentNote": "Approximate — AA may add/remove components per index revision; sciCode + aiderPoly not in our coreBenchKeys"
+        "_componentNote": "AA Intelligence Index v4.1 aggregates nine evaluations: GDPval-AA v2, tau3-Banking, Terminal-Bench v2.1, SciCode, Humanity's Last Exam, GPQA Diamond, CritPt, AA-Omniscience and AA-LCR. componentBenches lists the seven we track atomically; GDPval-AA (occupational rather than coding) and CritPt (physics) are deliberately untracked. Verified 2026-07-25. NOTE: ifBench is NOT a v4.1 component — it was one in v4.0 and we track it on its own merit (AA-published, broad coverage, and instruction adherence is what breaks long agent loops), not as index alignment."
       },
       "aaCoding": {
         "label": "AA Coding Index",
@@ -977,11 +963,10 @@
         "domain": "coding",
         "scale": "0-100",
         "componentBenches": [
-          "sweV",
-          "sweMulti",
-          "lcb",
+          "tb2",
           "sciCode"
-        ]
+        ],
+        "_componentNote": "Equal-weighted Terminal-Bench v2.1 + SciCode; 28 of 198 AA-tracked models. Verified 2026-07-25 at artificialanalysis.ai/models/capabilities/coding."
       },
       "aaAgentic": {
         "label": "AA Agentic Index",
@@ -991,11 +976,9 @@
         "domain": "agentic",
         "scale": "0-100",
         "componentBenches": [
-          "tau2",
-          "tauBench",
-          "browseComp",
-          "tb2"
-        ]
+          "tau3"
+        ],
+        "_componentNote": "Equal-weighted GDPval-AA v2 + tau3-Banking; 28 of 171 AA-tracked models. Only tau3 is tracked atomically (GDPval-AA is occupational, not coding). Verified 2026-07-25 at artificialanalysis.ai/models/capabilities/agentic."
       },
       "aaOmni": {
         "label": "AA Omniscience",
@@ -1005,89 +988,8 @@
         "domain": "honesty",
         "scale": "0-100 inverted (lower raw = better, normalized via _schema.normalization.aaOmni)",
         "componentBenches": [
-          "simpleQa",
           "mrcr"
         ]
-      },
-      "llmStatsIdx": {
-        "label": "LLM-Stats Composite",
-        "labelShort": "LLM-Stats",
-        "publisher": "llm-stats.com",
-        "publisherUrl": "https://llm-stats.com",
-        "domain": "general",
-        "scale": "0-100",
-        "componentBenches": [
-          "sweV",
-          "gpqa",
-          "hle",
-          "lcb",
-          "aime26"
-        ],
-        "_note": "TrueSkill-style composite across published benches"
-      },
-      "vellumRank": {
-        "label": "Vellum Rank",
-        "labelShort": "Vellum",
-        "publisher": "vellum.ai",
-        "publisherUrl": "https://www.vellum.ai/llm-leaderboard",
-        "domain": "general",
-        "scale": "rank (1=best); normalized via inverse-rank to 0-100",
-        "scaleKind": "rank",
-        "componentBenches": [
-          "sweV",
-          "gpqa",
-          "aime26",
-          "hle"
-        ]
-      },
-      "benchlmIdx": {
-        "label": "BenchLM Composite",
-        "labelShort": "BenchLM",
-        "publisher": "benchlm.ai",
-        "publisherUrl": "https://benchlm.ai",
-        "domain": "general",
-        "scale": "0-100",
-        "componentBenches": [
-          "swePro",
-          "sweV",
-          "tb2",
-          "lcb",
-          "tau2",
-          "gpqa"
-        ]
-      },
-      "lmArenaElo": {
-        "label": "LMArena Elo",
-        "labelShort": "LMArena",
-        "publisher": "lmarena.ai",
-        "publisherUrl": "https://lmarena.ai",
-        "domain": "general",
-        "scale": "Elo ~1000-1500 → normalized 0-100",
-        "scaleKind": "elo",
-        "componentBenches": []
-      },
-      "hfOpenAvg": {
-        "label": "HF Open LLM Avg",
-        "labelShort": "HF Open",
-        "publisher": "huggingface.co",
-        "publisherUrl": "https://huggingface.co/spaces/HuggingFaceH4/open_llm_leaderboard",
-        "domain": "general",
-        "scale": "0-100",
-        "componentBenches": [
-          "mmluPro",
-          "gpqa",
-          "aime26"
-        ]
-      },
-      "kluRank": {
-        "label": "Klu.ai Rank",
-        "labelShort": "Klu",
-        "publisher": "klu.ai",
-        "publisherUrl": "https://klu.ai/llm-leaderboard",
-        "domain": "general",
-        "scale": "rank (1=best); normalized via inverse-rank to 0-100",
-        "scaleKind": "rank",
-        "componentBenches": []
       }
     },
     "composite": {
@@ -1158,16 +1060,10 @@
         "hardMax": 2000,
         "softMin": 900,
         "softMax": 1700
-      },
-      "lmArenaElo": {
-        "hardMin": 0,
-        "hardMax": 2500,
-        "softMin": 1000,
-        "softMax": 1850
       }
     },
     "presets": {
-      "_purpose": "Data-driven preset definitions. assets/js/core.js PRESETS literal loads from here with backward-compat fallback. 'consensus' preset is new — uses vendor composite median rather than atomic weighting. Per-preset tiered bench classification (required/critical/imputable) drives missing-data UI policy in data.js + render-card.js.",
+      "_purpose": "Data-driven preset definitions. assets/js/core.js PRESETS literal loads from here with backward-compat fallback. 'consensus' uses the vendor composite mean rather than atomic weighting. Per-preset tiered bench classification (required/critical/imputable) drives missing-data UI policy in data.js + render-card.js. CONTRACT (enforced by audit-data-coherence.py): atomicWeights may contain ONLY keys in benchKind.atomic and must sum to exactly 100 — a vendor-composite key placed here is silently discarded by compositeScore().",
       "_presetKindOptions": [
         "atomicComposite",
         "vendorConsensus"
@@ -1177,19 +1073,13 @@
           "tr": "Vendor Konsensüsü",
           "en": "Vendor Consensus"
         },
-        "description": "Mean rank across all 10 vendor composites (AA family + LLM-Stats + Vellum + BenchLM + LMArena + HuggingFace + Klu). Coverage-penalized: a model with only 1 of 10 vendor composites cannot outrank a model with 5.",
+        "description": "Mean of the four Artificial Analysis composites (Intelligence, Coding, Agentic, Omniscience). Coverage-penalized: a model carrying one of the four cannot outrank a model carrying all four. Narrowed from ten entries on 2026-07-25 — six of the ten publishers had 0-5 values across 112 models, so the denominator punished every model for data that was never collectable.",
         "kind": "vendorConsensus",
         "vendorCompositeView": [
           "aaIdx",
           "aaCoding",
           "aaAgentic",
-          "aaOmni",
-          "llmStatsIdx",
-          "vellumRank",
-          "benchlmIdx",
-          "lmArenaElo",
-          "hfOpenAvg",
-          "kluRank"
+          "aaOmni"
         ],
         "atomicWeights": {}
       },
@@ -1198,28 +1088,27 @@
           "tr": "Dengeli",
           "en": "Balanced"
         },
-        "description": "Coding-leaning portfolio across SWE coding + multi-turn agentic + reasoning frontier.",
+        "description": "Coding-leaning portfolio across SWE coding, multi-turn agentic work and the reasoning frontier.",
         "kind": "atomicComposite",
         "atomicWeights": {
-          "swePro": 18,
-          "tb2": 12,
-          "lcb": 10,
-          "hle": 10,
-          "sweV": 5,
+          "swePro": 16,
+          "tb2": 11,
+          "lcb": 9,
+          "hle": 9,
           "tau2": 8,
-          "mcpA": 4,
+          "sciCode": 7,
+          "tbHard": 6,
+          "sweV": 5,
           "sweMulti": 5,
-          "arcAgi2": 4,
-          "tbHard": 3,
-          "cfElo": 3,
-          "aaCoding": 3,
-          "aaAgentic": 3,
-          "gpqa": 4,
+          "gpqa": 5,
+          "mcpA": 4,
+          "ifBench": 4,
+          "deepSwe": 4,
           "aime26": 3,
-          "aaIdx": 3,
+          "aaLcr": 2,
           "browseComp": 2
         },
-        "_atomicNote": "Rebalanced 2026-05-18 to sum to 100. Atomic-only (vendor composites moved to vendorCompositeView).",
+        "_atomicNote": "Retuned 2026-07-25, atomic-only. The previous block spent 9 of its 100 points on aaCoding/aaAgentic/aaIdx, which compositeScore() discards as vendor composites — the lens actually ran at 91. IFBench added because instruction-following failure is what breaks long agent loops.",
         "vendorCompositeView": [
           "aaCoding",
           "aaAgentic",
@@ -1235,12 +1124,11 @@
           "lcb"
         ],
         "imputableBenches": [
-          "webDevElo",
-          "programBench",
-          "nl2Repo",
-          "cfElo",
-          "simpleQa",
-          "mrcr"
+          "deepSwe",
+          "sciCode",
+          "aaLcr",
+          "mrcr",
+          "cfElo"
         ]
       },
       "swe-focused": {
@@ -1248,18 +1136,20 @@
           "tr": "SWE Odaklı",
           "en": "SWE-Focused"
         },
-        "description": "Anchored on SWE-bench Pro + Terminal-Bench 2 + LiveCodeBench (contamination-resistant + agentic-coding + time-windowed code gen).",
+        "description": "Anchored on SWE-bench Pro + Terminal-Bench 2.1 + LiveCodeBench, extended 2026-07-25 with DeepSWE (contamination-free original tasks, one shared harness) and SciCode (Artificial Analysis' scientific-coding eval, half of AA's own Coding Index). Terminal-Bench Hard joins the lens it was missing from despite 72% coverage.",
         "kind": "atomicComposite",
         "atomicWeights": {
-          "swePro": 32,
-          "tb2": 17,
+          "swePro": 28,
+          "tb2": 18,
           "lcb": 13,
-          "sweMulti": 14,
-          "sweV": 9,
-          "cfElo": 9,
-          "mcpA": 6
+          "deepSwe": 8,
+          "sciCode": 8,
+          "tbHard": 8,
+          "sweV": 6,
+          "sweMulti": 6,
+          "mcpA": 5
         },
-        "_atomicNote": "Rebalanced 2026-05-18 to sum to 100. Atomic-only (vendor composites moved to vendorCompositeView).",
+        "_atomicNote": "Retuned 2026-07-25. cfElo dropped from 9 to 0: puzzle-style competitive programming is a weak proxy for repository work and 0 of its 22 filled cells were backed by a primary publisher. sweMulti cut 14 to 6 and sweV 9 to 6 (OpenAI retired SWE-bench Verified in February 2026 over contamination; ranks 6-10 sit inside 0.4pp). The freed weight went to tbHard, sciCode and deepSwe, which discriminate at the frontier.",
         "vendorCompositeView": [],
         "requiredBenches": [
           "swePro",
@@ -1271,9 +1161,9 @@
           "lcb"
         ],
         "imputableBenches": [
-          "webDevElo",
-          "programBench",
-          "nl2Repo",
+          "deepSwe",
+          "sciCode",
+          "sweMulti",
           "cfElo"
         ]
       },
@@ -1282,20 +1172,21 @@
           "tr": "Agentic Odaklı",
           "en": "Agentic-Focused"
         },
-        "description": "Weights τ²-Bench (multi-turn reliability) + Terminal-Bench 2 + MCP-Atlas + BFCL + browseComp.",
+        "description": "Weights tau2-Bench (multi-turn reliability), Terminal-Bench 2.1 and Hard, MCP-Atlas, tau3-Banking and IFBench.",
         "kind": "atomicComposite",
         "atomicWeights": {
-          "tau2": 21,
+          "tau2": 18,
           "tb2": 18,
-          "mcpA": 17,
-          "browseComp": 9,
-          "aaAgentic": 9,
-          "bfcl": 4,
-          "swePro": 10,
-          "tbHard": 8,
-          "lcb": 4
+          "mcpA": 15,
+          "tbHard": 12,
+          "tau3": 8,
+          "ifBench": 8,
+          "swePro": 8,
+          "browseComp": 7,
+          "bfcl": 3,
+          "lcb": 3
         },
-        "_atomicNote": "Rebalanced 2026-05-18 to sum to 100. Atomic-only (vendor composites moved to vendorCompositeView).",
+        "_atomicNote": "Retuned 2026-07-25, atomic-only (aaAgentic's 9 points were discarded weight). tau3-Banking enters as a tracked bench: it is one of the two components of AA's Agentic Index, so leaving it out meant our cross-validation panel compared against a composite we could not see inside. tbHard raised 8 to 12 on 72% coverage and 80% primary sourcing.",
         "vendorCompositeView": [
           "aaAgentic"
         ],
@@ -1306,13 +1197,14 @@
         "criticalBenches": [
           "tau2",
           "tb2",
-          "mcpA"
+          "tbHard"
         ],
         "imputableBenches": [
-          "bfcl",
-          "browseComp",
+          "mcpA",
           "tau3",
-          "nl2Repo"
+          "ifBench",
+          "bfcl",
+          "browseComp"
         ]
       },
       "reasoning-focused": {
@@ -1320,21 +1212,21 @@
           "tr": "Akıl Yürütme Odaklı",
           "en": "Reasoning-Focused"
         },
-        "description": "Anchored on HLE (frontier ~50% with tools) + ARC-AGI-2 (still discriminates).",
+        "description": "Anchored on Humanity's Last Exam plus GPQA Diamond, AIME 2026, MMLU-Pro and the long-context pair AA-LCR + MRCR.",
         "kind": "atomicComposite",
         "atomicWeights": {
-          "hle": 27,
-          "arcAgi2": 9,
-          "gpqa": 16,
+          "hle": 26,
+          "gpqa": 17,
           "aime26": 13,
-          "aaOmni": 4,
-          "mmluPro": 10,
-          "aaIdx": 6,
-          "mrcr": 7,
-          "swePro": 4,
-          "lcb": 4
+          "mmluPro": 11,
+          "arcAgi2": 9,
+          "aaLcr": 8,
+          "mrcr": 6,
+          "sciCode": 5,
+          "swePro": 3,
+          "lcb": 2
         },
-        "_atomicNote": "Rebalanced 2026-05-18 to sum to 100. Atomic-only (vendor composites moved to vendorCompositeView).",
+        "_atomicNote": "Retuned 2026-07-25, atomic-only — aaOmni (4) and aaIdx (6) were discarded weight, so this lens ran at 90. AA-LCR added at 8: long-context reasoning is the reasoning axis that actually governs repository-scale work, and AA publishes it broadly. ARC-AGI-3 was evaluated and rejected — every frontier model scores under 1%, so it cannot discriminate yet.",
         "vendorCompositeView": [
           "aaOmni",
           "aaIdx"
@@ -1345,13 +1237,14 @@
         ],
         "criticalBenches": [
           "hle",
-          "arcAgi2",
-          "gpqa"
+          "gpqa",
+          "mmluPro"
         ],
         "imputableBenches": [
-          "mmluPro",
-          "simpleQa",
-          "mrcr"
+          "arcAgi2",
+          "mrcr",
+          "aaLcr",
+          "sciCode"
         ]
       },
       "benchmark-only": {
@@ -1359,30 +1252,33 @@
           "tr": "Tüm Benchmarklar",
           "en": "All Benchmarks"
         },
-        "description": "Spread weight across every atomic bench key for the raw scientific surface.",
+        "description": "Spreads weight across every atomic bench that still earns weight, for the raw scientific surface. The three retired keys (nl2Repo, webDevElo, lbCoding) render on cards but score nothing.",
         "kind": "atomicComposite",
         "atomicWeights": {
-          "swePro": 12,
-          "tb2": 10,
-          "hle": 9,
+          "swePro": 10,
+          "tb2": 9,
           "lcb": 8,
-          "tau2": 8,
-          "sweV": 6,
-          "mmluPro": 6,
+          "hle": 8,
+          "tau2": 7,
           "gpqa": 6,
-          "aime26": 5,
-          "sweMulti": 4,
-          "aaIdx": 4,
-          "arcAgi2": 4,
+          "sciCode": 6,
+          "tbHard": 5,
+          "mmluPro": 5,
+          "sweV": 4,
+          "aime26": 4,
           "mcpA": 4,
-          "cfElo": 4,
-          "tbHard": 3,
-          "aaCoding": 2,
-          "aaAgentic": 2,
+          "deepSwe": 4,
+          "ifBench": 3,
+          "sweMulti": 3,
+          "aaLcr": 3,
+          "arcAgi2": 3,
+          "mrcr": 2,
+          "tau3": 2,
           "browseComp": 2,
-          "mrcr": 1
+          "bfcl": 1,
+          "cfElo": 1
         },
-        "_atomicNote": "Rebalanced 2026-05-18 to sum to 100. Atomic-only (vendor composites moved to vendorCompositeView).",
+        "_atomicNote": "Retuned 2026-07-25, atomic-only (aaIdx/aaCoding/aaAgentic held 8 points of discarded weight). Now genuinely covers every weighted atomic key — the previous block claimed full coverage while omitting bfcl entirely.",
         "vendorCompositeView": [
           "aaIdx",
           "aaCoding",
@@ -1395,11 +1291,12 @@
           "hle"
         ],
         "imputableBenches": [
-          "webDevElo",
-          "programBench",
-          "nl2Repo",
-          "simpleQa",
-          "mrcr"
+          "deepSwe",
+          "sciCode",
+          "aaLcr",
+          "mrcr",
+          "tau3",
+          "cfElo"
         ]
       }
     },
@@ -1446,7 +1343,65 @@
         "rationale": "Codeforces Elo is a raw score in the 1500-3500 range and feeds the composite at full weight via normalization; a single source is too easy to misfile (see 4.3 opus-4-7.cfElo). Require 2 distinct independent sources (5.3)."
       },
       "_coreSingleSourceHardBlock": false,
-      "_coreSingleSourceHardBlockNote": "5.3 — when true, MX5 escalates from WARN to merge-blocking FAILURE for any core-bench cell with <2 distinct source URLs (single-source core values flow into the composite at full weight). Kept false while the current snapshot still carries ~93 grandfathered single-source core cells; the next full refresh-all closes that gap (each gather adds a 2nd source), after which flip this to true to enforce. The audit MECHANISM is always present and unit-testable regardless of the flag."
+      "_coreSingleSourceHardBlockNote": "5.3 — when true, MX5 escalates from WARN to merge-blocking FAILURE for any core-bench cell with <2 distinct source URLs (single-source core values flow into the composite at full weight). Kept false while the current snapshot still carries ~93 grandfathered single-source core cells; the next full refresh-all closes that gap (each gather adds a 2nd source), after which flip this to true to enforce. The audit MECHANISM is always present and unit-testable regardless of the flag.",
+      "mcpA": {
+        "minDistinctIndependentSources": 2,
+        "knownIndependentDomains": [
+          "scale.com/leaderboard/mcp_atlas",
+          "labs.scale.com/leaderboard/mcp_atlas",
+          "arxiv.org/abs/2602.00933",
+          "github.com/scaleapi/mcp-atlas"
+        ],
+        "selfReportAllowedAs": "secondary-only",
+        "rationale": "Audit 2026-07-25: 0 of 23 filled mcpA cells carried a Scale-domain source — every value came from aggregators republishing it. Scale re-scored the whole leaderboard in April 2026 (judge upgrade, 100 tool-call budget replacing the 20-turn limit), so republished pre-April numbers are silently stale."
+      },
+      "deepSwe": {
+        "minDistinctIndependentSources": 2,
+        "preferredHarness": "deepswe.datacurve.ai",
+        "knownIndependentDomains": [
+          "deepswe.datacurve.ai",
+          "github.com/datacurve-ai/deep-swe",
+          "arxiv.org/abs/2607.07946"
+        ],
+        "selfReportAllowedAs": "never",
+        "rationale": "DeepSWE's value is that every model runs the SAME mini-swe-agent harness on tasks written from scratch. A vendor self-report under a different scaffold is not comparable and must not be filed here."
+      },
+      "sciCode": {
+        "minDistinctIndependentSources": 2,
+        "knownIndependentDomains": [
+          "artificialanalysis.ai/evaluations/scicode",
+          "artificialanalysis.ai"
+        ],
+        "selfReportAllowedAs": "secondary-only",
+        "rationale": "Artificial Analysis runs this evaluation itself under one harness; a vendor-reported number measures a different setup and is corroboration only."
+      },
+      "ifBench": {
+        "minDistinctIndependentSources": 2,
+        "knownIndependentDomains": [
+          "artificialanalysis.ai/evaluations/ifbench",
+          "artificialanalysis.ai"
+        ],
+        "selfReportAllowedAs": "secondary-only",
+        "rationale": "Artificial Analysis runs IFBench itself under one harness. It is not an Intelligence Index v4.1 component, so a vendor-reported number has no index cross-check behind it and is corroboration only."
+      },
+      "aaLcr": {
+        "minDistinctIndependentSources": 2,
+        "knownIndependentDomains": [
+          "artificialanalysis.ai/evaluations/artificial-analysis-long-context-reasoning",
+          "artificialanalysis.ai"
+        ],
+        "selfReportAllowedAs": "secondary-only",
+        "rationale": "Artificial Analysis runs this evaluation itself under one harness; a vendor-reported number measures a different setup and is corroboration only."
+      },
+      "tau3": {
+        "minDistinctIndependentSources": 2,
+        "knownIndependentDomains": [
+          "artificialanalysis.ai/evaluations/tau3-banking",
+          "artificialanalysis.ai"
+        ],
+        "selfReportAllowedAs": "secondary-only",
+        "rationale": "Artificial Analysis runs this evaluation itself under one harness; a vendor-reported number measures a different setup and is corroboration only."
+      }
     },
     "privacyFieldNormalize": {
       "trainingDataOptOut": {
@@ -1535,12 +1490,11 @@
       "mrcr": "static",
       "aaIdx": "rotating",
       "aaOmni": "rotating",
-      "llmStatsIdx": "rotating",
-      "vellumRank": "rotating",
-      "benchlmIdx": "rotating",
-      "lmArenaElo": "rotating",
-      "hfOpenAvg": "rotating",
-      "kluRank": "rotating"
+      "sciCode": "static",
+      "ifBench": "static",
+      "aaLcr": "static",
+      "tau3": "static",
+      "deepSwe": "static"
     },
     "unknownVendorProbe": {
       "_purpose": "Phase 0 unknown-vendor/unknown-model discovery sub-probe SSOT (2026-07-16). Concrete, data-driven source list so the agent scans a repeatable set every full cycle instead of ad-hoc web search alone -- procedure stays in agent.md, URLs live here per the project's data-vs-procedure invariant.",
@@ -1572,7 +1526,13 @@
       "procedure": "For each huggingfaceListings[].url: fetch, extract every repo id (org/model). For each org not already a key in sourcesWhitelist.vendors AND not a known non-vendor (dataset host, quantizer/GGUF-repacker, community finetuner with no distinct model family), and for each model whose family looks coding-relevant (name/README mentions code/SWE-bench/coding, or the org is already known to publish coding models), emit a discoveries.vendors[] candidate per the existing schema shape ({id, observedAt, modelCount, latestRelease, suggestedTier}). Cross-check the same org/model name against aggregatorIndexes[] for corroboration -- 2 distinct signals (e.g. HF trending + OpenRouter newest) raises evidenceConfidence. Never auto-add; discoveries.vendors[] stays a human-reviewed queue (scripts/promote-discovery.py).",
       "runEvery": "full",
       "addedDate": "2026-07-16"
-    }
+    },
+    "retiredBenchKeys": [
+      "nl2Repo",
+      "webDevElo",
+      "lbCoding"
+    ],
+    "_retiredBenchKeysNote": "2026-07-25: tracked and rendered for historical continuity but carry ZERO weight in every preset. nl2Repo (19/112 models, 0% of cells backed by a primary publisher), webDevElo (7/112, 0%) and lbCoding (11/112) never reached the coverage or provenance bar to move a composite honestly. Distinct from deprecatedBenchKeys: those keys are gone from BENCH_KEYS entirely, these still render on a model card."
   },
   "vendors": {
     "anthropic": {
@@ -1800,10 +1760,12 @@
         "pricing": "https://platform.kimi.com/pricing",
         "x": "https://x.com/Kimi_Moonshot",
         "hfOrg": "https://huggingface.co/moonshotai",
-        "githubOrg": "https://github.com/MoonshotAI"
+        "githubOrg": "https://github.com/MoonshotAI",
+        "postUrlPattern": "https://www.kimi.com/blog/{slug}"
       },
       "extracts": "Kimi K-series catalog",
-      "vendorUpdateInterval": "quarterly"
+      "vendorUpdateInterval": "quarterly",
+      "lastVerifiedDate": "2026-07-25"
     },
     "zai_glm": {
       "name": "Z.ai (GLM)",
@@ -2078,27 +2040,6 @@
       ]
     },
     {
-      "name": "SWE-bench experiments repo",
-      "url": "https://github.com/SWE-bench/experiments",
-      "tier": "I",
-      "authority": "SWE-bench raw data — verified 2026-07-16: it's a raw-prediction-log listing, not a scored table; the 16-key publishes[] was a copy-paste-bloated template (identical shape found on 2 other entries this cycle) that didn't match what this source actually reports.",
-      "format": "static_html_table",
-      "lastVerifiedDate": "2026-07-16",
-      "consecutiveFailures": 0,
-      "extractor": "html_table",
-      "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-07-16",
-      "publishes": [],
-      "phase": "leaderboard"
-    },
-    {
       "name": "LiveCodeBench",
       "url": "https://livecodebench.github.io/leaderboard.html",
       "tier": "I",
@@ -2137,14 +2078,14 @@
       ]
     },
     {
-      "name": "Terminal-Bench",
-      "url": "https://www.tbench.ai/leaderboard/terminal-bench/2.0",
+      "name": "Terminal-Bench (2.1 track)",
+      "url": "https://www.tbench.ai/leaderboard",
       "tier": "I",
-      "authority": "TB2 agentic execution",
+      "authority": "Terminal-Bench 2.1 is the live track as of 2026-07: a verified refresh of 2.0 with 89 curated tasks and repaired environments, so a score reflects agent capability rather than a broken environment. Read scores as agent+model pairs — the same model differs by harness. The 2.0 track remains published; both map to benchKey tb2 via _schema.benchAliases.",
       "phase": "leaderboard",
       "format": "spa_partial",
       "skipWebFetch": false,
-      "lastVerifiedDate": "2026-07-16",
+      "lastVerifiedDate": "2026-07-25",
       "consecutiveFailures": 0,
       "extractor": "regex_extract",
       "fallbacks": [
@@ -2155,7 +2096,7 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-07-16",
+      "format_lastVerified": "2026-07-25",
       "publishes": [
         "tb2",
         "tbHard"
@@ -2216,7 +2157,7 @@
       "authority": "aaIdx, aaCoding, aaAgentic, throughput, pricing for ~336 models",
       "phase": "leaderboard",
       "format": "spa_partial",
-      "lastVerifiedDate": "2026-04-27",
+      "lastVerifiedDate": "2026-07-25",
       "consecutiveFailures": 0,
       "extractor": "regex_extract",
       "evalSubpageUrl": "https://artificialanalysis.ai/evaluations/livecodebench",
@@ -2259,15 +2200,35 @@
         "aaAgentic",
         "aaCoding",
         "aaIdx",
+        "aaLcr",
+        "aaOmni",
+        "aime26",
         "gpqa",
         "hle",
+        "ifBench",
         "lcb",
         "mmluPro",
+        "sciCode",
         "tau2",
+        "tau3",
         "tb2",
         "tbHard"
       ],
-      "publishesNote": "Trimmed 2026-07-16: aaOmni/aime26/arcAgi2/browseComp/cfElo/mcpA/mrcr/sweMulti/swePro/sweV do NOT exist anywhere in AA's per-model data model — exhaustive key-scan of the ~140-key object on both the main page and the eval sub-page, twice. Listing them wasted agent fetch budget chasing data that isn't there."
+      "publishesNote": "Trimmed 2026-07-16: aaOmni/aime26/arcAgi2/browseComp/cfElo/mcpA/mrcr/sweMulti/swePro/sweV do NOT exist anywhere in AA's per-model data model — exhaustive key-scan of the ~140-key object on both the main page and the eval sub-page, twice. Listing them wasted agent fetch budget chasing data that isn't there.",
+      "benchUrls": {
+        "sciCode": "https://artificialanalysis.ai/evaluations/scicode",
+        "ifBench": "https://artificialanalysis.ai/evaluations/ifbench",
+        "aaLcr": "https://artificialanalysis.ai/evaluations/artificial-analysis-long-context-reasoning",
+        "tau3": "https://artificialanalysis.ai/evaluations/tau3-banking",
+        "tau2": "https://artificialanalysis.ai/evaluations/tau2-bench",
+        "tb2": "https://artificialanalysis.ai/evaluations/terminalbench-v2-1",
+        "tbHard": "https://artificialanalysis.ai/evaluations/terminalbench-hard",
+        "aaOmni": "https://artificialanalysis.ai/evaluations/omniscience",
+        "aaIdx": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+        "aaCoding": "https://artificialanalysis.ai/models/capabilities/coding",
+        "aaAgentic": "https://artificialanalysis.ai/models/capabilities/agentic"
+      },
+      "_benchUrlsNote": "Per-bench deep links for one publisher. They are NOT separate sources: publisher identity collapses them to artificialanalysis.ai so several of these pages still count as one independent source."
     },
     {
       "name": "Vellum LLM Leaderboard",
@@ -2306,8 +2267,7 @@
         "swePro",
         "sweV",
         "tau2",
-        "tb2",
-        "vellumRank"
+        "tb2"
       ]
     },
     {
@@ -2342,10 +2302,10 @@
         "bfcl",
         "browseComp",
         "cfElo",
+        "deepSwe",
         "gpqa",
         "hle",
         "lcb",
-        "llmStatsIdx",
         "mcpA",
         "mmluPro",
         "mrcr",
@@ -2375,50 +2335,7 @@
       "format_lastVerified": "2026-07-16",
       "publishes": [
         "lcb",
-        "lmArenaElo",
         "webDevElo"
-      ],
-      "phase": "leaderboard"
-    },
-    {
-      "name": "LiveBench",
-      "url": "https://livebench.ai/",
-      "tier": "I",
-      "authority": "contamination-resistant rotating evals",
-      "format": "spa_full",
-      "lastVerifiedDate": null,
-      "consecutiveFailures": 0,
-      "extractor": "websearch_snippet",
-      "fallbacks": [
-        {
-          "format": "github_raw_json",
-          "urlPattern": "https://datasets-server.huggingface.co/rows?dataset=livebench",
-          "note": "HF Datasets server rows API (structured JSON mirror)."
-        },
-        {
-          "format": "github_raw_json"
-        },
-        {
-          "format": "meta_tag_extract"
-        },
-        {
-          "format": "aggregator_mirror",
-          "mirrorDomains": [
-            "pricepertoken.com",
-            "llm-stats.com",
-            "vals.ai",
-            "benchlm.ai"
-          ],
-          "note": "Resolve each publishes[] bench on a mirror domain (model+bench path) before websearch_snippet. Real cascade, not advisory."
-        },
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-04-26",
-      "publishes": [
-        "gpqa",
-        "lbCoding"
       ],
       "phase": "leaderboard"
     },
@@ -2461,69 +2378,6 @@
       "publishes": [
         "bfcl"
       ],
-      "phase": "leaderboard"
-    },
-    {
-      "name": "BigCodeBench",
-      "url": "https://bigcode-bench.github.io/",
-      "tier": "I",
-      "authority": "code generation gold standard",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
-      "consecutiveFailures": 0,
-      "extractor": "html_table",
-      "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-04-26",
-      "publishes": [],
-      "phase": "leaderboard"
-    },
-    {
-      "name": "BigCodeBench HF Space",
-      "url": "https://huggingface.co/spaces/bigcode/bigcode-models-leaderboard",
-      "tier": "I",
-      "authority": "verified 2026-07-16: this is the old \"Big Code Models Leaderboard\" (open-source code-gen models) — totally unrelated to the 12 claimed keys (gpqa/hle/lcb/mcpA/tau2/tb2/...), same conflation bug as the main BigCodeBench entry fixed earlier today. Left unmapped, matching that fix's precedent.",
-      "format": "static_html_table",
-      "lastVerifiedDate": "2026-07-16",
-      "consecutiveFailures": 0,
-      "extractor": "html_table",
-      "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-07-16",
-      "publishes": [],
-      "phase": "leaderboard"
-    },
-    {
-      "name": "EvalPlus",
-      "url": "https://evalplus.github.io/leaderboard.html",
-      "tier": "I",
-      "authority": "HumanEval+ / MBPP+ rigorous",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
-      "consecutiveFailures": 0,
-      "extractor": "html_table",
-      "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-04-26",
-      "publishes": [],
       "phase": "leaderboard"
     },
     {
@@ -2570,7 +2424,6 @@
       "publishes": [
         "gpqa",
         "hle",
-        "kluRank",
         "lcb",
         "mmluPro",
         "sweV",
@@ -2630,29 +2483,31 @@
         "default": ""
       },
       "publishes": [
-        "swePro",
-        "sweV",
-        "tb2",
-        "lcb",
-        "tau2",
-        "aaCoding",
         "aaAgentic",
-        "mcpA",
-        "gpqa",
-        "sweMulti",
-        "hle",
+        "aaCoding",
         "aaIdx",
-        "bfcl",
-        "aime26",
         "aaOmni",
-        "tbHard",
+        "aime26",
+        "arcAgi2",
+        "bfcl",
+        "browseComp",
         "cfElo",
+        "deepSwe",
+        "gpqa",
+        "hle",
+        "lcb",
+        "mcpA",
         "mmluPro",
         "mrcr",
-        "arcAgi2",
-        "browseComp",
         "nl2Repo",
-        "benchlmIdx"
+        "sciCode",
+        "sweMulti",
+        "swePro",
+        "sweV",
+        "tau2",
+        "tau3",
+        "tb2",
+        "tbHard"
       ],
       "phase": "leaderboard"
     },
@@ -2711,113 +2566,6 @@
         "tb2"
       ],
       "phase": "leaderboard"
-    },
-    {
-      "name": "LMMarketCap",
-      "url": "https://lmmarketcap.com/",
-      "tier": "I",
-      "authority": "hourly market table",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
-      "consecutiveFailures": 0,
-      "extractor": "html_table",
-      "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-04-26",
-      "publishes": [],
-      "phase": "discovery"
-    },
-    {
-      "name": "llm-stats LiveCodeBench",
-      "url": "https://llm-stats.com/benchmarks/livecodebench",
-      "tier": "I",
-      "authority": "lcbV6 mirror — closes the SPA gap on livecodebench.github.io (71 models indexed)",
-      "phase": "leaderboard",
-      "format": "static_html_article",
-      "lastVerifiedDate": "2026-04-27",
-      "consecutiveFailures": 0,
-      "extractor": "regex_extract",
-      "fallbacks": [
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-04-26",
-      "perModelUrlTemplate": "https://llm-stats.com/models/{slug}",
-      "perModelFormat": "static_html_article",
-      "slugStrategy": "try_variations",
-      "slugVariations": [
-        "{id}",
-        "claude-{id}"
-      ],
-      "publishes": [
-        "aaIdx",
-        "aime26",
-        "arcAgi2",
-        "bfcl",
-        "browseComp",
-        "gpqa",
-        "hle",
-        "lcb",
-        "mcpA",
-        "mmluPro",
-        "mrcr",
-        "nl2Repo",
-        "sweMulti",
-        "swePro",
-        "sweV",
-        "tau2",
-        "tb2"
-      ]
-    },
-    {
-      "name": "llm-stats SWE-bench Verified",
-      "url": "https://llm-stats.com/benchmarks/swe-bench-verified",
-      "tier": "I",
-      "authority": "sweV mirror — alternative to SPA-broken swebench.com",
-      "phase": "leaderboard",
-      "format": "static_html_article",
-      "lastVerifiedDate": "2026-04-27",
-      "consecutiveFailures": 0,
-      "extractor": "regex_extract",
-      "fallbacks": [
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-04-26",
-      "perModelUrlTemplate": "https://llm-stats.com/models/{slug}",
-      "perModelFormat": "static_html_article",
-      "slugStrategy": "try_variations",
-      "slugVariations": [
-        "{id}",
-        "claude-{id}"
-      ],
-      "publishes": [
-        "aaIdx",
-        "aime26",
-        "arcAgi2",
-        "bfcl",
-        "browseComp",
-        "gpqa",
-        "hle",
-        "lcb",
-        "mcpA",
-        "mmluPro",
-        "mrcr",
-        "nl2Repo",
-        "sweMulti",
-        "swePro",
-        "sweV",
-        "tau2",
-        "tb2"
-      ]
     },
     {
       "name": "Epoch AI Benchmarks",
@@ -2912,42 +2660,6 @@
       "phase": "leaderboard"
     },
     {
-      "name": "BenchLM — ProgramBench tracker",
-      "url": "https://benchlm.ai/benchmarks/programBench",
-      "domain": "benchlm.ai",
-      "tier": "I",
-      "format": "static_html_table",
-      "publishes": [
-        "aaCoding",
-        "aaIdx",
-        "aaOmni",
-        "aime26",
-        "arcAgi2",
-        "benchlmIdx",
-        "bfcl",
-        "browseComp",
-        "cfElo",
-        "gpqa",
-        "hle",
-        "lcb",
-        "mcpA",
-        "mmluPro",
-        "nl2Repo",
-        "sweMulti",
-        "swePro",
-        "sweV",
-        "tau2",
-        "tb2"
-      ],
-      "authority": "aggregator tracking ProgramBench publication state across 9+ models",
-      "firstSeen": "2026-05-06",
-      "lastVerifiedDate": "2026-05-06",
-      "format_lastVerified": "2026-05-06",
-      "phase": "active",
-      "consecutiveFailures": 0,
-      "extractor": "static_html_table"
-    },
-    {
       "name": "OpenRouter Rankings",
       "url": "https://openrouter.ai/rankings",
       "domain": "openrouter.ai",
@@ -3028,7 +2740,9 @@
         {
           "format": "websearch_snippet"
         }
-      ]
+      ],
+      "verificationRole": "mirror",
+      "mirrorOf": "lmarena.ai"
     },
     {
       "name": "LiveCodeBench (HF Space mirror)",
@@ -3046,7 +2760,8 @@
         "consecutiveFailures": 0
       },
       "addedBy": "FAZ-5.A-2026-05-10",
-      "mirrorOf": "https://livecodebench.github.io/leaderboard.html"
+      "mirrorOf": "livecodebench.github.io",
+      "verificationRole": "mirror"
     },
     {
       "name": "Berkeley BFCL (HF Space mirror)",
@@ -3064,7 +2779,33 @@
         "consecutiveFailures": 0
       },
       "addedBy": "FAZ-5.A-2026-05-10",
-      "mirrorOf": "https://gorilla.cs.berkeley.edu/leaderboard.html"
+      "mirrorOf": "gorilla.cs.berkeley.edu",
+      "verificationRole": "mirror"
+    },
+    {
+      "name": "DeepSWE (Datacurve)",
+      "url": "https://deepswe.datacurve.ai/",
+      "tier": "I",
+      "authority": "113 long-horizon tasks written from scratch across TypeScript, Go, Python, JavaScript and Rust, with program-based verifiers and behaviour-based grading. Every model runs the same mini-swe-agent harness, so scores are comparable in a way vendor-scaffolded SWE-bench numbers are not. Paper: arxiv.org/abs/2607.07946.",
+      "phase": "leaderboard",
+      "format": "spa_partial",
+      "lastVerifiedDate": "2026-07-25",
+      "consecutiveFailures": 0,
+      "extractor": "regex_extract",
+      "fallbacks": [
+        {
+          "format": "github_raw_json",
+          "url": "https://github.com/datacurve-ai/deep-swe",
+          "note": "Dataset, trajectories and harness are published in full."
+        },
+        {
+          "format": "websearch_snippet"
+        }
+      ],
+      "format_lastVerified": "2026-07-25",
+      "publishes": [
+        "deepSwe"
+      ]
     }
   ],
   "aggregators": [
@@ -3172,26 +2913,6 @@
         }
       ],
       "format_lastVerified": "2026-04-26",
-      "publishes": []
-    },
-    {
-      "name": "Groq pricing",
-      "url": "https://groq.com/pricing",
-      "tier": "I",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
-      "consecutiveFailures": 0,
-      "extractor": "html_table",
-      "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-04-26",
-      "phase": "pricing",
       "publishes": []
     },
     {
@@ -3429,26 +3150,6 @@
       "publishes": []
     },
     {
-      "name": "OpenCode Go",
-      "url": "https://opencode.ai/docs/go",
-      "tier": "I",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
-      "consecutiveFailures": 0,
-      "extractor": "html_table",
-      "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-04-26",
-      "phase": "pricing",
-      "publishes": []
-    },
-    {
       "name": "Lambda Cloud",
       "url": "https://lambda.ai/inference",
       "tier": "I",
@@ -3490,44 +3191,6 @@
       "format_lastVerified": "2026-07-16",
       "phase": "pricing",
       "publishes": []
-    },
-    {
-      "name": "benchlm.ai",
-      "url": "https://benchlm.ai/models/gemini-3-1-pro",
-      "tier": "I",
-      "format": "static_html_article",
-      "lastVerifiedDate": "2026-04-27",
-      "consecutiveFailures": 0,
-      "rationale": "Independent leaderboard tracker with per-model benchmark pages, verified vs provisional score transparency",
-      "extractedFields": [
-        "gemini-3-1-pro.gpqa",
-        "llama-4-maverick.gpqa",
-        "deepseek-v3-2.gpqa"
-      ],
-      "phase": "discovery",
-      "publishes": [
-        "aaCoding",
-        "aaIdx",
-        "aaOmni",
-        "aime26",
-        "arcAgi2",
-        "benchlmIdx",
-        "bfcl",
-        "browseComp",
-        "cfElo",
-        "gpqa",
-        "hle",
-        "lcb",
-        "mcpA",
-        "mmluPro",
-        "nl2Repo",
-        "simpleQa",
-        "sweMulti",
-        "swePro",
-        "sweV",
-        "tau2",
-        "tb2"
-      ]
     }
   ],
   "local": [
@@ -3833,7 +3496,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "verificationRole": "corroboration"
     },
     {
       "name": "The Decoder",
@@ -3851,7 +3515,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "verificationRole": "corroboration"
     },
     {
       "name": "DataCamp Blog",
@@ -3867,7 +3532,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-07-16"
+      "format_lastVerified": "2026-07-16",
+      "verificationRole": "corroboration"
     },
     {
       "name": "Build Fast With AI",
@@ -3885,7 +3551,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "verificationRole": "corroboration"
     },
     {
       "name": "Simon Willison",
@@ -3903,7 +3570,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "verificationRole": "corroboration"
     },
     {
       "name": "Latent Space",
@@ -3921,25 +3589,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
-    },
-    {
-      "name": "Swyx",
-      "url": "https://www.swyx.io/",
-      "tier": "C",
-      "format": "static_html_table",
-      "lastVerifiedDate": null,
-      "consecutiveFailures": 0,
-      "extractor": "html_table",
-      "fallbacks": [
-        {
-          "format": "static_html_article"
-        },
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "verificationRole": "corroboration"
     },
     {
       "name": "Awesome-LLM",
@@ -3957,7 +3608,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "verificationRole": "corroboration"
     },
     {
       "name": "Awesome-Efficient-LLM",
@@ -3975,42 +3627,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
-    },
-    {
-      "name": "r/LocalLLaMA",
-      "url": "https://www.reddit.com/r/LocalLLaMA/",
-      "tier": "C",
-      "note": "community VRAM reports only",
-      "format": "bot_blocked",
-      "lastVerifiedDate": "2026-05-29",
-      "consecutiveFailures": 3,
-      "extractor": "websearch_snippet",
-      "fallbacks": [
-        {
-          "format": "websearch_snippet"
-        }
-      ],
       "format_lastVerified": "2026-04-26",
-      "skipWebFetch": true,
-      "_demote_note": "2026-05-29: 8.4KB bot-wall (login/robot check) was mis-read as healthy static_html_table. Reddit blocks automated fetch; community VRAM signal recoverable only via websearch_snippet."
-    },
-    {
-      "name": "Design Arena",
-      "url": "https://designarena.ai/leaderboard",
-      "tier": "C",
-      "note": "UI auxiliary",
-      "authority": "verified 2026-07-16: real Elo/Bradley-Terry leaderboard product confirmed (UI strings reference eloRating/winRate/rank), but the RSC stream only ships i18n labels — actual per-model rows are populated by a client-side fetch after hydration, no data in raw HTML.",
-      "format": "spa_partial",
-      "lastVerifiedDate": "2026-07-16",
-      "consecutiveFailures": 0,
-      "extractor": "websearch_snippet",
-      "fallbacks": [
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-07-16"
+      "verificationRole": "corroboration"
     },
     {
       "name": "Lushbinary",
@@ -4027,7 +3645,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "verificationRole": "corroboration"
     },
     {
       "name": "WhatLLM",
@@ -4044,7 +3663,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "verificationRole": "corroboration"
     },
     {
       "name": "ALMCorp",
@@ -4061,7 +3681,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "verificationRole": "corroboration"
     },
     {
       "name": "TokenMix",
@@ -4078,47 +3699,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
-    },
-    {
-      "name": "Vals AI",
-      "url": "https://www.vals.ai/",
-      "type": "independent_leaderboard",
-      "tier": "I",
-      "format": "spa_partial",
-      "lastVerifiedDate": "2026-04-26",
-      "consecutiveFailures": 0,
-      "note": "Independent benchmark tracker — per-model pages partially static; ranking tables visible",
-      "extractor": "regex_extract",
-      "fallbacks": [
-        {
-          "format": "meta_tag_extract"
-        },
-        {
-          "format": "static_html_article"
-        },
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-04-26"
-    },
-    {
-      "name": "BuildFastWithAI Blog",
-      "url": "https://www.buildfastwithai.com/blogs/",
-      "type": "aggregator_blog",
-      "tier": "C",
-      "format": "static_html_article",
-      "lastVerifiedDate": "2026-04-26",
-      "consecutiveFailures": 0,
-      "note": "Per-model review articles with full benchmarks (already used in C-tier elsewhere)",
-      "extractor": "regex_extract",
-      "fallbacks": [
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "verificationRole": "corroboration"
     },
     {
       "name": "Iternal LLM Selection Guide",
@@ -4135,7 +3717,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "verificationRole": "corroboration"
     },
     {
       "name": "Atlas Cloud Blog",
@@ -4152,7 +3735,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "verificationRole": "corroboration"
     },
     {
       "name": "AkitaOnRails LLM Coding Benchmarks",
@@ -4169,7 +3753,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-04-26"
+      "format_lastVerified": "2026-04-26",
+      "verificationRole": "corroboration"
     },
     {
       "name": "mindwiredai.com",
@@ -4184,7 +3769,8 @@
         "gpt-5-5.bench.gpqa",
         "gpt-5-5.bench.hle",
         "gpt-5-5.bench.tb2"
-      ]
+      ],
+      "verificationRole": "corroboration"
     },
     {
       "name": "gemma4.wiki",
@@ -4198,7 +3784,8 @@
         "gemma-4-31b.bench.sweV",
         "gemma-4-31b.bench.lcbV6",
         "gemma-4-26b-moe.bench.gpqa"
-      ]
+      ],
+      "verificationRole": "corroboration"
     },
     {
       "name": "designforonline.com",
@@ -4217,7 +3804,8 @@
         "qwen3-32b.bench.gpqa",
         "qwen3-32b.bench.hle",
         "qwen3-32b.bench.lcbV6"
-      ]
+      ],
+      "verificationRole": "corroboration"
     },
     {
       "name": "automatio.ai",
@@ -4231,7 +3819,8 @@
         "qwen3-6-max.bench.lcbV6",
         "qwen3-6-max.bench.gpqa",
         "qwen3-6-max.bench.hle"
-      ]
+      ],
+      "verificationRole": "corroboration"
     },
     {
       "name": "datalearner.com",
@@ -4244,7 +3833,8 @@
       "extractedFields": [
         "claude-haiku-4-5.bench.tb2",
         "claude-haiku-4-5.bench.aime26"
-      ]
+      ],
+      "verificationRole": "corroboration"
     },
     {
       "name": "Maxime Labonne (Medium)",
@@ -4259,7 +3849,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-07-25"
+      "format_lastVerified": "2026-07-25",
+      "verificationRole": "corroboration"
     },
     {
       "name": "CraftIQ Model Benchmarks",
@@ -4274,22 +3865,8 @@
           "format": "websearch_snippet"
         }
       ],
-      "format_lastVerified": "2026-07-25"
-    },
-    {
-      "name": "LM Marketcap",
-      "url": "https://lmmarketcap.com",
-      "tier": "C",
-      "format": "static_html_table",
-      "lastVerifiedDate": "2026-07-25",
-      "consecutiveFailures": 0,
-      "extractor": "html_table",
-      "fallbacks": [
-        {
-          "format": "websearch_snippet"
-        }
-      ],
-      "format_lastVerified": "2026-07-25"
+      "format_lastVerified": "2026-07-25",
+      "verificationRole": "corroboration"
     }
   ],
   "_runtime": {

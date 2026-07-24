@@ -124,6 +124,62 @@ class TestUtil(unittest.TestCase):
         self.assertEqual(util.normalize_anomaly_verdict(out), out)  # idempotent
 
 
+class TestPublisherIdentity(unittest.TestCase):
+    """2026-07-25: cross-source agreement counts PUBLISHERS, not URLs.
+
+    The regression these guard: one leaderboard's several pages used to satisfy
+    every "at least two independent sources" gate on its own, manufacturing
+    agreement with itself. 261 of 1713 cells in the 2026-07-25 snapshot claimed
+    two sources they did not have.
+    """
+
+    def test_multiple_pages_of_one_publisher_collapse_to_one(self):
+        entries = [
+            {"url": "https://artificialanalysis.ai/leaderboards/models", "tier": "I"},
+            {"url": "https://artificialanalysis.ai/models/claude-fable-5", "tier": "I"},
+            {"url": "https://artificialanalysis.ai/models/capabilities/agentic", "tier": "I"},
+        ]
+        self.assertEqual(len(util.distinct_publishers(entries)), 1)
+
+    def test_distinct_publishers_stay_distinct(self):
+        entries = [
+            {"url": "https://artificialanalysis.ai/evaluations/scicode", "tier": "I"},
+            {"url": "https://scale.com/leaderboard/swe_bench_pro_public", "tier": "I"},
+        ]
+        self.assertEqual(len(util.distinct_publishers(entries)), 2)
+
+    def test_subdomains_collapse_to_their_operator(self):
+        self.assertEqual(
+            util.publisher_id("https://labs.scale.com/leaderboard"),
+            util.publisher_id("https://scale.com/leaderboard/mcp_atlas"),
+        )
+
+    def test_label_aliases_resolve_to_the_same_publisher_as_the_url(self):
+        by_url = util.publisher_id("https://artificialanalysis.ai/leaderboards/models")
+        self.assertEqual(util.publisher_id(None, "Artificial Analysis"), by_url)
+        self.assertEqual(util.publisher_id("", "https://artificialanalysis.ai/"), by_url)
+
+    def test_unknown_label_never_merges_into_a_real_publisher(self):
+        pid = util.publisher_id(None, "some blog nobody mapped")
+        self.assertTrue(pid.startswith("label:"))
+        self.assertNotIn(".", pid.split(":", 1)[1])
+
+    def test_community_tier_does_not_count_as_independent_confirmation(self):
+        entries = [
+            {"url": "https://artificialanalysis.ai/evaluations/scicode", "tier": "I"},
+            {"url": "https://designforonline.com/ai-models/x/", "tier": "C"},
+            {"url": "https://lushbinary.com/post", "tier": "C"},
+        ]
+        self.assertEqual(len(util.distinct_publishers(entries)), 3)
+        verifying = util.distinct_publishers(entries, tiers=util.VERIFYING_TIERS)
+        self.assertEqual(len(verifying), 1)
+
+    def test_extract_domain_prefix_bug_stays_fixed(self):
+        # removeprefix, not lstrip — lstrip("www.") mangled openrouter.ai
+        self.assertEqual(util.publisher_id("https://openrouter.ai/rankings"), "openrouter.ai")
+        self.assertEqual(util.publisher_id("https://ollama.com/library"), "ollama.com")
+
+
 # ── cluster ──────────────────────────────────────────────────────────────────
 
 
@@ -373,18 +429,47 @@ class TestMatrix(unittest.TestCase):
         # already well-covered) must outrank a barely-covered model's cells
         # that aren't required by any preset, even though raw starve ratios
         # would sort the barely-covered model's cells first.
-        keys = ["swePro", "lcb", "other"]
-        active = [
-            {"id": "flagship", "bench": {"swePro": 90.0, "lcb": None, "other": 50.0}},
-            {"id": "poor", "bench": {"swePro": None, "lcb": None, "other": None}},
-        ]
-        pc = matrix.priority_cells(active, keys, limit=10, required_keys={"swePro", "lcb"})
+        #
+        # 2026-07-25: widened from a 3-key universe to 20. The G2 fresh-stub
+        # tier (added 2026-07-15) outranks rank-critical BY DESIGN, and in a
+        # 3-key universe every model trivially fell under its "few cells
+        # filled" proxy — so the old fixture pitted this rule against G2
+        # instead of against raw starvation, which is what it claims to test.
+        # `poor` now holds 4 of 20 cells: genuinely barely-covered, but past
+        # the stub threshold. Precedence between the two tiers is pinned
+        # separately in test_priority_cells_fresh_stub_outranks_rank_critical.
+        filler = [f"x{i}" for i in range(18)]
+        keys = ["swePro", "lcb"] + filler
+        flagship = {"swePro": 90.0, "lcb": None}
+        flagship.update({k: 50.0 for k in filler})
+        poor = {"swePro": None, "lcb": None}
+        poor.update({k: (30.0 if i < 4 else None) for i, k in enumerate(filler)})
+        active = [{"id": "flagship", "bench": flagship}, {"id": "poor", "bench": poor}]
+        pc = matrix.priority_cells(active, keys, limit=40, required_keys={"swePro", "lcb"})
         order = [(c["modelId"], c["benchKey"]) for c in pc]
         self.assertEqual(order[0], ("flagship", "lcb"))
         flagship_entry = next(c for c in pc if c["modelId"] == "flagship")
         self.assertTrue(flagship_entry.get("rankCritical"))
         poor_entries = [c for c in pc if c["modelId"] == "poor"]
         self.assertTrue(all(not c.get("rankCritical") for c in poor_entries))
+
+    def test_priority_cells_fresh_stub_outranks_rank_critical(self):
+        # G2 (2026-07-15) precedence, made explicit 2026-07-25: a freshly
+        # admitted stub must reach a rankable profile in its FIRST cycle, so
+        # its cells sort ahead of a well-covered model's rank-critical cell.
+        # Guards the elif ordering in priority_cells against a future reshuffle.
+        filler = [f"x{i}" for i in range(18)]
+        keys = ["swePro", "lcb"] + filler
+        flagship = {"swePro": 90.0, "lcb": None}
+        flagship.update({k: 50.0 for k in filler})
+        stub = {k: None for k in keys}
+        stub["swePro"] = 40.0
+        active = [{"id": "flagship", "bench": flagship}, {"id": "stub", "bench": stub}]
+        pc = matrix.priority_cells(active, keys, limit=40, required_keys={"swePro", "lcb"})
+        self.assertEqual(pc[0]["modelId"], "stub")
+        self.assertTrue(pc[0]["newModelCore"])
+        flagship_entry = next(c for c in pc if c["modelId"] == "flagship")
+        self.assertTrue(flagship_entry.get("rankCritical"))
 
     def test_priority_cells_starved_still_beats_rank_critical(self):
         # gapHistory-starved cells (-1.0) stay strictly ahead of the new

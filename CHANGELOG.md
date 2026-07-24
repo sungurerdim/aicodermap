@@ -1,3 +1,81 @@
+## [2026-07-25] — benchmark & source retune (manual)
+
+Full review of the benchmark universe, the preset weights and the source
+whitelist against the state of coding-LLM evaluation in July 2026.
+
+### Added
+- Bench keys `sciCode`, `ifBench`, `aaLcr`, `tau3` — Artificial Analysis runs
+  all four itself, so coverage arrives broadly. The first three plus `tau3` are
+  Intelligence Index v4.1 components we previously excluded from our composite
+  as "already counted atomically" while tracking only about half of them.
+- Bench key `deepSwe` (Datacurve, arXiv 2607.07946) — 113 long-horizon tasks
+  written from scratch across 5 languages, one shared mini-swe-agent harness,
+  frontier spread 73% down to 46% where SWE-bench Pro leaders sit inside their
+  confidence intervals.
+- Sources: DeepSWE leaderboard; per-bench deep links on the existing
+  Artificial Analysis entry (as `benchUrls`, deliberately NOT as sibling
+  entries); `kimi.com/blog` for the Moonshot vendor family.
+- `_schema.retiredBenchKeys` — keys that still render but never score.
+- Confusable-family guards for `deepSwe` (vs the SWE-bench variants, and
+  merge-blocking) and `aaLcr` vs `mrcr`.
+
+### Fixed
+- **Cross-source agreement counted URLs, not publishers.** One leaderboard's
+  several pages read as several independent confirmations, so a single
+  publisher could satisfy every ">= 2 independent sources" gate alone. 261 of
+  1713 cells claimed two sources they did not have. `lib/util.publisher_id`
+  is now the single definition, used by cluster distinct-source counting, the
+  I-tier override gate, the trust verification factor and audit MX5/MX6.
+- **Community sources no longer count as independent confirmation.** The long
+  tail republishes Artificial Analysis figures verbatim (designforonline.com
+  alone backed 267 cells), which manufactured agreement with the very source
+  it copied. C/U-tier entries keep their trust weight and stay in the
+  provenance trail as `verificationRole: corroboration`.
+- **Preset weights summed to 100 on paper but not in effect.** Vendor
+  composites sat inside `atomicWeights`, and the composite skips them before
+  accumulating active weight — `balanced` ran at 91, `reasoning-focused` at 90,
+  `benchmark-only` at 92. Every preset is now atomic-only and sums to 100.
+- **The consensus preset penalised every model.** Its `vendorCompositeView`
+  listed ten publishers, six of which held 0-5 values across 112 models, so the
+  coverage denominator was 10 against an achievable maximum of about 4.
+  Narrowed to the four real AA composites.
+- `tb2` missed Terminal-Bench 2.1 rows — the live track since 2026-07 — because
+  the alias list only matched 2.0 spellings.
+- `priority_cells` mislabelled well-covered models as fresh stubs: the G2 tier
+  compared an absolute filled-cell count against a variable-size key universe,
+  shadowing the rank-critical tier. Now relative to the universe.
+- Dead references in preset tiers (`programBench`, `simpleQa`) that could never
+  fire; corrected AA index composition to v4.1 and the AA-LCR leaderboard slug.
+- Published methodology said `newWindowDays` defaults to 30; the code says 3.
+
+### Removed
+- Bench keys `llmStatsIdx`, `vellumRank`, `hfOpenAvg`, `kluRank` (0 values
+  across 112 models), `benchlmIdx` (3) and `lmArenaElo` (5), along with their
+  8 stray cells in models.json / sources.json.
+- 18 whitelist entries: duplicates of a stronger sibling (llm-stats and BenchLM
+  sub-pages, benchlm.ai filed as an inference aggregator, Vals AI,
+  BuildFastWithAI Blog, OpenCode Go, Groq pricing, LM Marketcap) and dead ends
+  that produced nothing and publish nothing tracked (LiveBench, EvalPlus,
+  BigCodeBench and its HF space, LMMarketCap, SWE-bench experiments repo,
+  Swyx, r/LocalLLaMA, Design Arena). Leaderboards 34 -> 26, aggregators
+  21 -> 18, community 28 -> 22. The Terminal-Bench row was updated in place to
+  the 2.1 track rather than duplicated.
+
+### Changed
+- `swe-focused` (default lens) retuned: swePro 32 -> 28, tb2 17 -> 18, lcb 13,
+  sweMulti 14 -> 6, sweV 9 -> 6, cfElo 9 -> 0, mcpA 6 -> 5, plus deepSwe 8,
+  sciCode 8 and tbHard 8. The old vector spent 23 of 100 points on sweMulti
+  (26% coverage, 28% primary-sourced) and cfElo (20%, 0%), so most models were
+  ranked largely on Empirical-Bayes fill rather than measurement.
+- `nl2Repo`, `webDevElo`, `lbCoding` retired to zero weight; still rendered.
+- Evaluated and rejected: ARC-AGI-3 (every frontier model under 1% — no
+  discriminating signal), SWE-Marathon and FrontierSWE (too few evaluated
+  configurations; kept as discovery candidates).
+
+### Note
+The five new bench columns are empty until the next `/aicodermap` refresh
+populates them; coverage badges and EB shrinkage already show this honestly.
+
 
 ## [2026-07-25] — autonomous refresh-all [WARN: cumulative provenance coverage 65.8% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 614 new fills; 0 cells auto-gapped by orchestrator; 831 explicit agent gaps preserved]
 

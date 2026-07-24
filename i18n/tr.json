@@ -704,7 +704,7 @@
     "sweV": {
       "name": "SWE-bench Verified",
       "short": "SWE-V",
-      "desc": "İnsan doğrulamalı 500 task. Pro ile çelişki sık görülür."
+      "desc": "İnsan doğrulamalı 500 task. OpenAI Şubat 2026'da kontaminasyon nedeniyle bıraktı ve 6-10. sıralar 0.4pp içinde sıkıştı — ağırlığı bilinçli olarak düşük tutuldu."
     },
     "sweMulti": {
       "name": "SWE-bench Multilingual",
@@ -714,7 +714,7 @@
     "tb2": {
       "name": "TerminalBench 2",
       "short": "TB2",
-      "desc": "Terminal CLI agentic execution; tool kullanım kalitesi."
+      "desc": "Terminal CLI agentic yürütme; tool kullanım kalitesi. Canlı iz artık v2.1 (89 görev, düzeltilmiş ortamlar) — hem 2.0 hem 2.1 değerleri kabul edilir."
     },
     "tbHard": {
       "name": "Terminal-Bench Hard",
@@ -729,7 +729,7 @@
     "lbCoding": {
       "name": "LiveBench Coding",
       "short": "LB-CODE",
-      "desc": "LiveBench'in kendi \"Coding\" kategorisi (kod üretimi + kod tamamlama ortalaması) — benzer isme rağmen LiveCodeBench'ten (lcb) farklı bir benchmark."
+      "desc": "LiveBench kodlama alt skoru. EMEKLİ: 112 modelin 11'inde veri var — kartta gösterilir, skora girmez."
     },
     "tau2": {
       "name": "τ²-bench",
@@ -774,12 +774,12 @@
     "cfElo": {
       "name": "Codeforces ELO",
       "short": "CF-ELO",
-      "desc": "Codeforces yarışmacı kodlama ELO puanı; 1000-3500 ham skala."
+      "desc": "Codeforces Elo. Bulmaca tarzı yarışmacı programlama; depo işi için zayıf vekil ve 22 hücrenin hiçbiri birincil yayıncıdan gelmiyor — varsayılan kodlama merceğinde ağırlığı sıfır."
     },
     "webDevElo": {
       "name": "LMArena WebDev Elo",
       "short": "WD-ELO",
-      "desc": "LMArena WebDev Arena: ön-yüz kod çıktıları üzerinde insanların kör tercih oylamasıyla hesaplanan Elo; tipik ham aralık 950-1300."
+      "desc": "LMArena WebDev Arena Elo. EMEKLİ: 112 modelin 7'sinde veri var, birincil kaynak desteği yok — kartta gösterilir, skora girmez."
     },
     "mmluPro": {
       "name": "MMLU-Pro",
@@ -814,37 +814,32 @@
     "nl2Repo": {
       "name": "NL2Repo",
       "short": "NL2REPO",
-      "desc": "Doğal dil tarifinden tam repo üretimi; çok-dosyalı yapı + bağımlılık çözümleme."
+      "desc": "Doğal dilden depo üretimi. EMEKLİ: 112 modelin 19'unda veri var ve hiçbiri birincil yayıncıya dayanmıyor — kartta gösterilir, skora girmez."
     },
-    "llmStatsIdx": {
-      "name": "LLM-Stats Composite",
-      "short": "LLM-Stats",
-      "desc": "llm-stats.com yayıncısının yayımlanmış benchmarklar üzerinden TrueSkill tarzı composite skoru. Vendor agregatı — bağımsız referans, AICoderMap composite'ine dahil değil."
+    "sciCode": {
+      "name": "SciCode",
+      "short": "SCICODE",
+      "desc": "Bilim insanlarınca kurgulanmış 16 alt alanda 80 problem / 338 alt problem: bilgi hatırlama + akıl yürütme + kod sentezi. AA Coding Index'in iki bileşeninden biri."
     },
-    "vellumRank": {
-      "name": "Vellum Sırası",
-      "short": "Vellum",
-      "desc": "Vellum LLM Leaderboard sıralaması (1=en iyi). Inverse-rank ile normalize edilir. Vendor agregatı."
+    "ifBench": {
+      "name": "IFBench",
+      "short": "IFBENCH",
+      "desc": "Görülmemiş çıktı kısıtlarına uyum: 58 yeni kısıtla talimat takibinin genelleşmesini ölçer. Uzun agent döngülerini kıran hata sınıfı budur."
     },
-    "benchlmIdx": {
-      "name": "BenchLM Composite",
-      "short": "BenchLM",
-      "desc": "BenchLM.ai çoklu benchmark composite skoru. Vendor agregatı."
+    "aaLcr": {
+      "name": "AA-LCR",
+      "short": "AA-LCR",
+      "desc": "Artificial Analysis uzun bağlam akıl yürütme testi. Depo ölçeğinde çalışmayı fiilen belirleyen akıl yürütme ekseni; AA Intelligence Index v4.0 bileşeni."
     },
-    "lmArenaElo": {
-      "name": "LMArena Elo",
-      "short": "LMArena",
-      "desc": "LMArena baş-başa karşılaştırma Elo skoru (genel sohbet). 1000-1500 → 0-100 lineer normalize. Vendor agregatı."
+    "tau3": {
+      "name": "τ³-bench",
+      "short": "τ³",
+      "desc": "Bankacılık akışlarında bilgi tabanı gezinme + çok adımlı araç çağrısı. τ²'nin halefi ve AA Agentic Index'in iki bileşeninden biri."
     },
-    "hfOpenAvg": {
-      "name": "HF Open LLM Ort.",
-      "short": "HF Open",
-      "desc": "HuggingFace Open LLM Leaderboard ortalama skoru. Yalnız açık ağırlık modeller. Vendor agregatı."
-    },
-    "kluRank": {
-      "name": "Klu Sırası",
-      "short": "Klu",
-      "desc": "Klu.ai LLM leaderboard sıralaması. Inverse-rank ile normalize edilir. Vendor agregatı."
+    "deepSwe": {
+      "name": "DeepSWE",
+      "short": "DEEPSWE",
+      "desc": "5 dilde sıfırdan yazılmış 113 uzun ufuklu görev; çözümler hiçbir modelin eğitim verisinde yok. Tüm modeller aynı mini-swe-agent harness'ında koşar — kontaminasyonsuz ve frontier'da gerçekten ayırt edici."
     }
   },
   "benchCategories": {
