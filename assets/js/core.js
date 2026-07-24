@@ -333,7 +333,7 @@ export function getCompositePolicy() {
 export function getRecencyPolicy() {
   const rp = (State.schema && State.schema.recency) || {};
   return {
-    newWindowDays: (Number.isFinite(rp.newWindowDays) && rp.newWindowDays > 0) ? rp.newWindowDays : 30,
+    newWindowDays: (Number.isFinite(rp.newWindowDays) && rp.newWindowDays > 0) ? rp.newWindowDays : 3,
     graceMinCoverage: (Number.isFinite(rp.graceMinCoverage) && rp.graceMinCoverage >= 0) ? rp.graceMinCoverage : 0.25,
   };
 }
