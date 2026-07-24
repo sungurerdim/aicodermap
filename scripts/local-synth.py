@@ -284,6 +284,33 @@ def main() -> int:
             if rm.get("id"):
                 all_lineup_removed[rm["id"]] = rm
 
+    # gather-mode artifacts (GATHER_BATCH_GLOB) can never carry lineupChanges
+    # (agent.md HARD RULE 1 — FULL_SCHEMA_BLEED_KEYS rejects it on gather
+    # output), so the loop above never actually finds deprecated/renamed/
+    # removed entries despite the 2026-07-11 aggregation fix. The dedicated
+    # Step-0 lineup artifact is the ONLY channel that carries them; read it
+    # directly here so vendor deprecations reach merge.py's
+    # _process_lineup_changes (else confirmed vendor deprecations are
+    # silently dropped every cycle — observed 2026-07-25: 6 deprecations from
+    # Step 0 never applied to data/models.json).
+    lineup_artifact_path = ROOT / ".aicodermap-agent-out-lineup.json"
+    if lineup_artifact_path.is_file():
+        try:
+            with open(lineup_artifact_path, encoding="utf-8") as _f:
+                lineup_art = json.load(_f)
+            lc = lineup_art.get("lineupChanges") or {}
+            for d in lc.get("deprecated") or []:
+                if d.get("id"):
+                    all_lineup_deprecated[d["id"]] = d
+            for r in lc.get("renamed") or []:
+                if r.get("from"):
+                    all_lineup_renamed[r["from"]] = r
+            for rm in lc.get("removed") or []:
+                if rm.get("id"):
+                    all_lineup_removed[rm["id"]] = rm
+        except (OSError, json.JSONDecodeError) as e:
+            print(f"  ! skip lineup artifact {lineup_artifact_path.name}: {e}")
+
     print(
         f"Aggregated: {len(cells)} cells, "
         f"{runtime_total['observationsTotal']} obs, "
