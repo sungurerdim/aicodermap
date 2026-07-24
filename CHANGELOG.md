@@ -1,4 +1,286 @@
 
+## [2026-07-25] — autonomous refresh-all [WARN: cumulative provenance coverage 65.8% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 614 new fills; 0 cells auto-gapped by orchestrator; 831 explicit agent gaps preserved]
+
+[fillRatio:0.66 cells:1029/1564 contradictions:168 fetch:0.0min tools:None batches:None build:e373b57]
+
+### Added
+- `qwen3-5-omni-plus` (Alibaba Qwen, released 2026-03-30) — evidence: alibabacloud.com/help/en/model-studio/models
+- `gemini-3-5-flash-cyber` (Google DeepMind, released 2026-07-21, limited-access security pilot) — evidence: deepmind.google/blog/introducing-gemini-3-5-flash-cyber
+- `ling-3-0-flash` (inclusionai, released 2026-07-23) — evidence: designforonline.com/ai-models/ling-3-0-flash-free
+- `ternary-bonsai-8b` (prismml, released 2026-04-16) — evidence: prnewswire.com/news-releases/prismml-introduces-ternary-bonsai-model-family-302745151
+- 🔎 New vendor candidates: 6 this cycle (review queue; 10 pending total incl. prior cycles)
+- 🔎 New benchmark candidates: 0 this cycle (5 pending total incl. prior cycles, 0 AC6-ready)
+
+### Updated
+- 54 models: `deepseek-v4-flash`, `qwen25-coder-7b`, `nemotron-3-nano`, `gemma-4-26b-moe`, `qwen25-coder-32b`, `kimi-k3`, `gemini-3-6-flash`, `gemini-3-1-flash-lite`, `qwen3-5-omni-plus`, `claude-haiku-4-5`, `claude-fable-5`, `qwen3-32b`, `glm-4-5-air`, `qwen3-coder-next`, `llama-4-scout`, `gpt-5-6-luna`, `inkling`, `glm-4-7`, `minimax-m3`, `claude-opus-4-8`, `ling-3-0-flash`, `ling-2-6-1t`, `grok-4-5`, `glm-5`, `gemini-3-1-flash`, `qwen3-coder-30b`, `kimi-k2-7-code`, `mistral-large-3`, `grok-4-3`, `qwen3-5-9b`, `muse-spark`, `glm-5-turbo`, `mimo-v2-5-pro`, `gemini-3-1-pro`, `qwen3-7-max`, `gpt-5-6-terra`, `gpt-5-6-sol`, `llama-4-maverick`, `glm-5-2`, `qwen3-235b`, `gemini-3-5-flash-lite`, `ministral-3-14b`, `gemma-4-31b`, `qwen3-6-27b`, `step-3-7-flash`, `step-3-5-flash`, `grok-4-20`, `kimi-k2-6`, `mimo-v2-5`, `opus-4-7`, `gemini-3-flash-preview`, `claude-opus-5`, `gemma-3-27b`, `codestral`
+
+### Deprecated
+- `mimo-v2-flash` — vendor-marked deprecated
+- `mimo-v2-pro` — vendor-marked deprecated
+- `mimo-v2-omni` — vendor-marked deprecated
+
+### Resolved (auto via trustScore)
+- opus-4-7.sweV: winner={'value': 87.6, 'trustScore': 0.425, 'tier': 'I', 'verifications': 10, 'latestDate': '2026-06-06'} (severity=red, ΔNone)
+- opus-4-7.gpqa: winner={'value': 94.2, 'trustScore': 0.4659, 'tier': 'I', 'verifications': 17, 'latestDate': '2026-07-24'} (severity=yellow, ΔNone)
+- opus-4-7.tb2: winner={'value': 69.1, 'trustScore': 0.425, 'tier': 'I', 'verifications': 7, 'latestDate': '2026-06-06'} (severity=red, ΔNone)
+- opus-4-7.hle: winner={'value': 46.9, 'trustScore': 0.4659, 'tier': 'I', 'verifications': 8, 'latestDate': '2026-07-01'} (severity=red, ΔNone)
+- opus-4-7.swePro: winner={'value': 64.3, 'trustScore': 0.467, 'tier': 'I', 'verifications': 14, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- opus-4-7.aaIdx: winner={'value': 53.53, 'trustScore': 0.4989, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-24'} (severity=yellow, ΔNone)
+- sonnet-4-6.sweV: winner={'value': 79.6, 'trustScore': 0.4591, 'tier': 'I', 'verifications': 12, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- sonnet-4-6.gpqa: winner={'value': 74.1, 'trustScore': 0.425, 'tier': 'I', 'verifications': 11, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- sonnet-4-6.tb2: winner={'value': 59.1, 'trustScore': 0.4807, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- sonnet-4-6.hle: winner={'value': 51.0, 'trustScore': 0.4933, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- sonnet-4-6.tau2: winner={'value': 87.5, 'trustScore': 0.4204, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-05-09'} (severity=red, ΔNone)
+- sonnet-4-6.arcAgi2: winner={'value': 58.3, 'trustScore': 0.425, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-07-24'} (severity=yellow, ΔNone)
+- sonnet-4-6.aaIdx: winner={'value': 35.89, 'trustScore': 0.4989, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- sonnet-4-6.mmluPro: winner={'value': 79.2, 'trustScore': 0.4636, 'tier': 'I', 'verifications': 7, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- claude-haiku-4-5.sweV: winner={'value': 73.3, 'trustScore': 0.4591, 'tier': 'I', 'verifications': 11, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- claude-haiku-4-5.tau2: winner={'value': 83.0, 'trustScore': 0.491, 'tier': 'I', 'verifications': 6, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- claude-opus-4-8.aaIdx: winner={'value': 55.69, 'trustScore': 0.4989, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- claude-opus-4-8.tb2: winner={'value': 74.6, 'trustScore': 0.491, 'tier': 'I', 'verifications': 7, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- claude-fable-5.lcb: winner={'value': 89.78, 'trustScore': 0.5, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- claude-mythos-5.sweV: winner={'value': 93.9, 'trustScore': 0.4591, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-06-27'} (severity=yellow, ΔNone)
+- claude-sonnet-5.aaIdx: winner={'value': 53.0, 'trustScore': 0.4989, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-07-24'} (severity=yellow, ΔNone)
+- claude-opus-5.tb2: winner={'value': 84.64, 'trustScore': 0.5, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-07-24'} (severity=yellow, ΔNone)
+- claude-opus-5.hle: winner={'value': 52.59, 'trustScore': 0.4933, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- muse-spark.hle: winner={'value': 39.9, 'trustScore': 0.4933, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- kimi-k2-6.aaCoding: winner={'value': 61.8, 'trustScore': 0.4946, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- kimi-k2-7-code.hle: winner={'value': 32.8, 'trustScore': 0.4587, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- kimi-k2-7-code.sweV: winner={'value': 78.2, 'trustScore': 0.2, 'tier': 'C', 'verifications': 1, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- kimi-k3.hle: winner={'value': 56.0, 'trustScore': 0.4587, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- gemini-3-1-flash.sweV: winner={'value': 78.0, 'trustScore': 0.4237, 'tier': 'I', 'verifications': 9, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- gemini-3-1-flash.gpqa: winner={'value': 90.4, 'trustScore': 0.4001, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-07-16'} (severity=yellow, ΔNone)
+- gemini-3-1-flash.aaIdx: winner={'value': 71.0, 'trustScore': 0.4989, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- gemini-3-1-flash.hle: winner={'value': 35.0, 'trustScore': 0.4193, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- gemini-3-1-pro.gpqa: winner={'value': 94.1, 'trustScore': 0.425, 'tier': 'I', 'verifications': 7, 'latestDate': '2026-07-24'} (severity=yellow, ΔNone)
+- gemini-3-1-pro.aaIdx: winner={'value': 57.02, 'trustScore': 0.424, 'tier': 'I', 'verifications': 10, 'latestDate': '2026-07-16'} (severity=yellow, ΔNone)
+- gemini-3-1-pro.swePro: winner={'value': 54.2, 'trustScore': 0.425, 'tier': 'I', 'verifications': 6, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- gemma-3-27b.gpqa: winner={'value': 42.4, 'trustScore': 0.414, 'tier': 'I', 'verifications': 16, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- gemma-3-27b.lcb: winner={'value': 29.1, 'trustScore': 0.4204, 'tier': 'I', 'verifications': 11, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- gemma-4-26b-moe.gpqa: winner={'value': 82.3, 'trustScore': 0.487, 'tier': 'I', 'verifications': 16, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- gemma-4-26b-moe.aaIdx: winner={'value': 31.0, 'trustScore': 0.424, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-06-06'} (severity=red, ΔNone)
+- gemma-4-26b-moe.cfElo: winner={'value': 1718.0, 'trustScore': 0.3964, 'tier': 'I', 'verifications': 7, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- gemma-4-26b-moe.tau2: winner={'value': 85.5, 'trustScore': 0.3964, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- gemma-4-31b.gpqa: winner={'value': 84.3, 'trustScore': 0.425, 'tier': 'I', 'verifications': 18, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- gemma-4-31b.hle: winner={'value': 22.95, 'trustScore': 0.4193, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-05-10'} (severity=red, ΔNone)
+- gemma-4-e2b.gpqa: winner={'value': 43.4, 'trustScore': 0.4001, 'tier': 'I', 'verifications': 9, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- gemma-4-e2b.aime26: winner={'value': 37.5, 'trustScore': 0.4237, 'tier': 'I', 'verifications': 10, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- gemma-4-e4b.gpqa: winner={'value': 58.6, 'trustScore': 0.3964, 'tier': 'I', 'verifications': 11, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- gemma-4-e4b.aaCoding: winner={'value': 9.39, 'trustScore': 0.4934, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-07-24'} (severity=yellow, ΔNone)
+- gemma-4-e4b.aaAgentic: winner={'value': 1.79, 'trustScore': 0.4875, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- gemini-3-flash-preview.aaIdx: winner={'value': 38.0, 'trustScore': 0.4989, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- gemini-3-1-flash-lite.hle: winner={'value': 16.2, 'trustScore': 0.4587, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- gemini-3-1-flash-lite.gpqa: winner={'value': 86.9, 'trustScore': 0.3453, 'tier': 'S', 'verifications': 2, 'latestDate': '2026-07-24'} (severity=yellow, ΔNone)
+- gemini-3-1-flash-lite.tb2: winner={'value': 51.0, 'trustScore': 0.2, 'tier': 'C', 'verifications': 1, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- gemini-3-1-flash-lite.mmluPro: winner={'value': 78.0, 'trustScore': 0.2, 'tier': 'C', 'verifications': 1, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- mistral-large-3.lcb: winner={'value': 34.4, 'trustScore': 0.4686, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- mistral-large-3.mmluPro: winner={'value': 73.11, 'trustScore': 0.425, 'tier': 'I', 'verifications': 6, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- mistral-large-3.tau2: winner={'value': 70.2, 'trustScore': 0.4204, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-06-16'} (severity=red, ΔNone)
+- mistral-large-3.aaAgentic: winner={'value': 5.5, 'trustScore': 0.4946, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- mistral-medium-3-5.sweV: winner={'value': 77.6, 'trustScore': 0.4237, 'tier': 'I', 'verifications': 11, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- mistral-medium-3-5.gpqa: winner={'value': 71.22, 'trustScore': 0.4001, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-06-10'} (severity=yellow, ΔNone)
+- mistral-medium-3-5.hle: winner={'value': 9.5, 'trustScore': 0.4193, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-06-10'} (severity=yellow, ΔNone)
+- mistral-medium-3-5.tbHard: winner={'value': 20.45, 'trustScore': 0.4205, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-06-10'} (severity=red, ΔNone)
+- mistral-medium-3-5.tau2: winner={'value': 91.4, 'trustScore': 0.4204, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-06-06'} (severity=yellow, ΔNone)
+- ministral-3-14b.lcb: winner={'value': 64.6, 'trustScore': 0.4686, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- ministral-3-14b.aaAgentic: winner={'value': 2.2, 'trustScore': 0.4875, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- ministral-3-8b.lcb: winner={'value': 61.6, 'trustScore': 0.3445, 'tier': 'S', 'verifications': 3, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- codestral.sweV: winner={'value': 76.2, 'trustScore': 0.425, 'tier': 'I', 'verifications': 6, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- codestral.gpqa: winner={'value': 78.6, 'trustScore': 0.4001, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-06-24'} (severity=red, ΔNone)
+- codestral.mmluPro: winner={'value': 24.0, 'trustScore': 0.4174, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-06-16'} (severity=red, ΔNone)
+- qwen3-6-27b.gpqa: winner={'value': 87.8, 'trustScore': 0.4601, 'tier': 'I', 'verifications': 10, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- qwen3-6-27b.lcb: winner={'value': 83.9, 'trustScore': 0.4946, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- qwen3-6-max.gpqa: winner={'value': 86.0, 'trustScore': 0.4001, 'tier': 'I', 'verifications': 6, 'latestDate': '2026-06-10'} (severity=yellow, ΔNone)
+- qwen3-6-max.lcb: winner={'value': 77.8, 'trustScore': 0.3983, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-06-07'} (severity=red, ΔNone)
+- qwen3-6-max.tb2: winner={'value': 65.4, 'trustScore': 0.4237, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-06-24'} (severity=yellow, ΔNone)
+- qwen3-6-max.hle: winner={'value': 51.0, 'trustScore': 0.4193, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- qwen3-235b.gpqa: winner={'value': 81.1, 'trustScore': 0.4069, 'tier': 'I', 'verifications': 9, 'latestDate': '2026-06-10'} (severity=red, ΔNone)
+- qwen3-235b.lcb: winner={'value': 74.1, 'trustScore': 0.4921, 'tier': 'I', 'verifications': 7, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- qwen3-235b.hle: winner={'value': 42.0, 'trustScore': 0.4193, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-06-07'} (severity=red, ΔNone)
+- qwen3-32b.lcb: winner={'value': 54.54, 'trustScore': 0.4183, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-05-30'} (severity=red, ΔNone)
+- qwen3-32b.mmluPro: winner={'value': 79.1, 'trustScore': 0.4174, 'tier': 'I', 'verifications': 6, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- qwen3-32b.tbHard: winner={'value': 3.03, 'trustScore': 0.4946, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-24'} (severity=yellow, ΔNone)
+- qwen3-6-35b-moe.gpqa: winner={'value': 86.0, 'trustScore': 0.4601, 'tier': 'I', 'verifications': 7, 'latestDate': '2026-07-16'} (severity=yellow, ΔNone)
+- qwen3-6-35b-moe.lcb: winner={'value': 80.4, 'trustScore': 0.4946, 'tier': 'I', 'verifications': 6, 'latestDate': '2026-07-16'} (severity=yellow, ΔNone)
+- qwen3-6-35b-moe.tb2: winner={'value': 51.5, 'trustScore': 0.4807, 'tier': 'I', 'verifications': 6, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- qwen3-6-plus.mmluPro: winner={'value': 88.5, 'trustScore': 0.4588, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-07-16'} (severity=yellow, ΔNone)
+- qwen3-6-plus.aime26: winner={'value': 75.3, 'trustScore': 0.4237, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-05-30'} (severity=red, ΔNone)
+- qwen3-6-plus.aaAgentic: winner={'value': 27.55, 'trustScore': 0.4875, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- qwen3-coder-480b.swePro: winner={'value': 38.7, 'trustScore': 0.425, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- qwen3-coder-480b.aaIdx: winner={'value': 25.0, 'trustScore': 0.424, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-05-11'} (severity=red, ΔNone)
+- qwen3-coder-480b.lcb: winner={'value': 68.0, 'trustScore': 0.414, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-05-18'} (severity=red, ΔNone)
+- qwen3-coder-480b.mmluPro: winner={'value': 93.4, 'trustScore': 0.4588, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- qwen3-coder-480b.sweV: winner={'value': 69.6, 'trustScore': 0.5, 'tier': 'I', 'verifications': 11, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- qwen3-coder-30b.aaIdx: winner={'value': 20.0, 'trustScore': 0.424, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-05-11'} (severity=red, ΔNone)
+- qwen3-coder-30b.lcb: winner={'value': 56.53, 'trustScore': 0.3983, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-06-06'} (severity=red, ΔNone)
+- qwen3-coder-next.aaCoding: winner={'value': 22.89, 'trustScore': 0.4934, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-07-02'} (severity=red, ΔNone)
+- qwen25-coder-32b.lcb: winner={'value': 48.69, 'trustScore': 0.3983, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-06-06'} (severity=red, ΔNone)
+- qwen25-coder-7b.lcb: winner={'value': 12.59, 'trustScore': 0.4625, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- qwen25-coder-14b.mmluPro: winner={'value': 55.6, 'trustScore': 0.4636, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- glm-5.hle: winner={'value': 30.5, 'trustScore': 0.4183, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- glm-5.tau2: winner={'value': 98.2, 'trustScore': 0.4946, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- glm-5.mmluPro: winner={'value': 85.23, 'trustScore': 0.479, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-24'} (severity=yellow, ΔNone)
+- glm-5.lcb: winner={'value': 86.19, 'trustScore': 0.4921, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- glm-5.aime26: winner={'value': 92.7, 'trustScore': 0.4663, 'tier': 'I', 'verifications': 7, 'latestDate': '2026-07-24'} (severity=yellow, ΔNone)
+- deepseek-v4-flash.hle: winner={'value': 34.8, 'trustScore': 0.3409, 'tier': 'S', 'verifications': 2, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- deepseek-v4-flash.aaAgentic: winner={'value': 31.06, 'trustScore': 0.4875, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- ministral-3-3b.gpqa: winner={'value': 35.76, 'trustScore': 0.4708, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- ministral-3-3b.lcb: winner={'value': 24.66, 'trustScore': 0.4625, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- gpt-5-5.sweV: winner={'value': 88.59, 'trustScore': 0.4985, 'tier': 'I', 'verifications': 8, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- gpt-5-5.hle: winner={'value': 41.4, 'trustScore': 0.425, 'tier': 'I', 'verifications': 11, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- gpt-5-6-sol.aaCoding: winner={'value': 80.0, 'trustScore': 0.4934, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-07-24'} (severity=yellow, ΔNone)
+- qwen3-5-9b.hle: winner={'value': 13.3, 'trustScore': 0.4193, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-07-16'} (severity=yellow, ΔNone)
+- qwen3-5-9b.tbHard: winner={'value': 24.24, 'trustScore': 0.4205, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- qwen3-5-9b.lcb: winner={'value': 65.6, 'trustScore': 0.3983, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- qwen3-5-9b.aaCoding: winner={'value': 28.66, 'trustScore': 0.4934, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- qwen3-5-9b.aaAgentic: winner={'value': 7.41, 'trustScore': 0.4875, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- qwen3-7-max.aaIdx: winner={'value': 45.99, 'trustScore': 0.4989, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- qwen3-7-plus.hle: winner={'value': 34.7, 'trustScore': 0.4193, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- qwen3-7-plus.lcb: winner={'value': 91.6, 'trustScore': 0.3983, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-06-24'} (severity=yellow, ΔNone)
+- grok-4-20.sweV: winner={'value': 76.7, 'trustScore': 0.4602, 'tier': 'I', 'verifications': 8, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- grok-4-20.gpqa: winner={'value': 88.02, 'trustScore': 0.4001, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-06-15'} (severity=red, ΔNone)
+- grok-4-20.lcb: winner={'value': 79.28, 'trustScore': 0.3983, 'tier': 'I', 'verifications': 6, 'latestDate': '2026-06-24'} (severity=red, ΔNone)
+- grok-4-20.tb2: winner={'value': 47.1, 'trustScore': 0.4807, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- grok-4-20.hle: winner={'value': 24.29, 'trustScore': 0.4193, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-06-07'} (severity=red, ΔNone)
+- grok-4-20.swePro: winner={'value': 51.8, 'trustScore': 0.4742, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- grok-4-20.tau2: winner={'value': 93.0, 'trustScore': 0.4204, 'tier': 'I', 'verifications': 7, 'latestDate': '2026-06-15'} (severity=red, ΔNone)
+- grok-4-20.arcAgi2: winner={'value': 53.3, 'trustScore': 0.4946, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- grok-4-3.gpqa: winner={'value': 90.1, 'trustScore': 0.4601, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-07-24'} (severity=yellow, ΔNone)
+- grok-4-3.hle: winner={'value': 53.0, 'trustScore': 0.491, 'tier': 'I', 'verifications': 6, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- grok-4-3.tbHard: winner={'value': 18.9, 'trustScore': 0.4205, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-06-16'} (severity=red, ΔNone)
+- grok-4-3.tb2: winner={'value': 68.5, 'trustScore': 0.425, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-06-24'} (severity=red, ΔNone)
+- grok-4-3.sweV: winner={'value': 79.49, 'trustScore': 0.4237, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-06-24'} (severity=red, ΔNone)
+- grok-4-3.lcb: winner={'value': 79.0, 'trustScore': 0.3931, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-06-24'} (severity=red, ΔNone)
+- nemotron-3-super.sweV: winner={'value': 60.47, 'trustScore': 0.4591, 'tier': 'I', 'verifications': 12, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- nemotron-3-super.gpqa: winner={'value': 79.23, 'trustScore': 0.4787, 'tier': 'I', 'verifications': 12, 'latestDate': '2026-07-24'} (severity=yellow, ΔNone)
+- nemotron-3-super.lcb: winner={'value': 81.19, 'trustScore': 0.4686, 'tier': 'I', 'verifications': 7, 'latestDate': '2026-07-16'} (severity=yellow, ΔNone)
+- nemotron-3-super.aaIdx: winner={'value': 36.0, 'trustScore': 0.4989, 'tier': 'I', 'verifications': 8, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- nemotron-3-super.tau2: winner={'value': 67.8, 'trustScore': 0.4862, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- nemotron-3-super.tbHard: winner={'value': 28.96, 'trustScore': 0.4946, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-07-16'} (severity=yellow, ΔNone)
+- step-3-5-flash.sweV: winner={'value': 74.4, 'trustScore': 0.4602, 'tier': 'I', 'verifications': 14, 'latestDate': '2026-07-16'} (severity=yellow, ΔNone)
+- step-3-5-flash.tb2: winner={'value': 51.0, 'trustScore': 0.4807, 'tier': 'I', 'verifications': 8, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- nemotron-3-nano-omni.lcb: winner={'value': 68.25, 'trustScore': 0.4921, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- nemotron-3-ultra.aaIdx: winner={'value': 48.0, 'trustScore': 0.4989, 'tier': 'I', 'verifications': 8, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- minimax-m2-5.tb2: winner={'value': 52.0, 'trustScore': 0.425, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-07-16'} (severity=red, ΔNone)
+- minimax-m2-7.tb2: winner={'value': 57.0, 'trustScore': 0.4807, 'tier': 'I', 'verifications': 10, 'latestDate': '2026-07-25'} (severity=red, ΔNone)
+- mimo-v2-5.tbHard: winner={'value': 41.67, 'trustScore': 0.4946, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- mimo-v2-5.aaIdx: winner={'value': 37.0, 'trustScore': 0.4989, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-24'} (severity=yellow, ΔNone)
+- mimo-v2-5-pro.gpqa: winner={'value': 66.7, 'trustScore': 0.3409, 'tier': 'S', 'verifications': 7, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- mimo-v2-5-pro.aaIdx: winner={'value': 53.8, 'trustScore': 0.3409, 'tier': 'S', 'verifications': 3, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- mimo-v2-5-pro.hle: winner={'value': 33.78, 'trustScore': 0.4933, 'tier': 'I', 'verifications': 6, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- mimo-v2-5-pro.tb2: winner={'value': 68.4, 'trustScore': 0.491, 'tier': 'I', 'verifications': 10, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- mimo-v2-5-pro.mmluPro: winner={'value': 68.5, 'trustScore': 0.3269, 'tier': 'S', 'verifications': 3, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- mimo-v2-5-pro.lcb: winner={'value': 39.6, 'trustScore': 0.3409, 'tier': 'S', 'verifications': 2, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- mimo-v2-5-pro.tau2: winner={'value': 94.15, 'trustScore': 0.4862, 'tier': 'I', 'verifications': 5, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- mimo-v2-5.aaCoding: winner={'value': 56.8, 'trustScore': 0.4934, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- mimo-v2-5.aaAgentic: winner={'value': 23.71, 'trustScore': 0.4875, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- gpt-5-6-luna.aaCoding: winner={'value': 74.6, 'trustScore': 0.4934, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-07-16'} (severity=yellow, ΔNone)
+- gemma-4-e2b.aaCoding: winner={'value': 9.0, 'trustScore': 0.4194, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-06-15'} (severity=yellow, ΔNone)
+- qwen3-coder-next.aaAgentic: winner={'value': 42.1, 'trustScore': 0.4875, 'tier': 'I', 'verifications': 2, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- gemma-4-12b.aaCoding: winner={'value': 30.96, 'trustScore': 0.4934, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- gemma-4-12b.aaAgentic: winner={'value': 7.93, 'trustScore': 0.4875, 'tier': 'I', 'verifications': 1, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- llama-4-maverick.lcb: winner={'value': 43.4, 'trustScore': 0.425, 'tier': 'I', 'verifications': 9, 'latestDate': '2026-06-24'} (severity=red, ΔNone)
+- llama-4-scout.lcb: winner={'value': 32.8, 'trustScore': 0.3983, 'tier': 'I', 'verifications': 7, 'latestDate': '2026-06-27'} (severity=red, ΔNone)
+- deepseek-v3-2.lcb: winner={'value': 74.11, 'trustScore': 0.425, 'tier': 'I', 'verifications': 6, 'latestDate': '2026-06-06'} (severity=red, ΔNone)
+- deepseek-v3-2.mmluPro: winner={'value': 83.71, 'trustScore': 0.4636, 'tier': 'I', 'verifications': 9, 'latestDate': '2026-07-24'} (severity=red, ΔNone)
+- glm-4-5-air.lcb: winner={'value': 72.9, 'trustScore': 0.2928, 'tier': 'S', 'verifications': 2, 'latestDate': '2026-05-27'} (severity=red, ΔNone)
+- glm-4-7.lcb: winner={'value': 84.9, 'trustScore': 0.425, 'tier': 'I', 'verifications': 12, 'latestDate': '2026-07-01'} (severity=yellow, ΔNone)
+- qwen25-coder-32b.mmluPro: winner={'value': 78.2, 'trustScore': 0.4174, 'tier': 'I', 'verifications': 4, 'latestDate': '2026-06-24'} (severity=red, ΔNone)
+- qwen25-coder-7b.mmluPro: winner={'value': 45.6, 'trustScore': 0.394, 'tier': 'I', 'verifications': 3, 'latestDate': '2026-06-24'} (severity=yellow, ΔNone)
+- glm-5.gpqa: winner={'value': 85.35, 'trustScore': 0.4787, 'tier': 'I', 'verifications': 7, 'latestDate': '2026-07-24'} (severity=yellow, ΔNone)
+
+### Gaps (535 entries — agent:535 orchestrator:0 — see data/known-gaps.json or next refresh)
+- `opus-4-7.cfElo` *(agent)*: agent surveyed; value unavailable
+- `opus-4-7.nl2Repo` *(agent)*: agent surveyed; value unavailable
+- `sonnet-4-6.cfElo` *(agent)*: agent surveyed; value unavailable
+- `sonnet-4-6.nl2Repo` *(agent)*: agent surveyed; value unavailable
+- `claude-haiku-4-5.cfElo` *(agent)*: agent surveyed; value unavailable
+- `claude-haiku-4-5.nl2Repo` *(agent)*: agent surveyed; value unavailable
+- ... and 529 more
+
+### Chronically unfilled (674 cells across 81 models — agent has actively researched these for 3+ consecutive cycles with no result)
+- `claude-fable-5`: `arcAgi2`, `bfcl`, `browseComp`, `mcpA`, `mrcr`, `nl2Repo`, `sweMulti`
+- `claude-haiku-4-5`: `aaOmni`, `arcAgi2`, `browseComp`, `cfElo`, `nl2Repo`
+- `claude-mythos-5`: `aaAgentic`, `aaCoding`, `aaOmni`, `arcAgi2`, `bfcl`, `browseComp`, `mcpA`, `mrcr`, `nl2Repo`, `sweMulti`
+- `claude-mythos-preview`: `aaAgentic`, `aaCoding`, `aaIdx`, `aaOmni`, `aime26`, `arcAgi2`, `bfcl`, `lcb`, `mcpA`, `mmluPro`, `mrcr`, `nl2Repo`, `tbHard`
+- `claude-opus-4-8`: `aaOmni`, `bfcl`, `cfElo`, `webDevElo`
+- `claude-sonnet-5`: `aaOmni`, `aime26`, `bfcl`, `mcpA`, `mmluPro`, `mrcr`, `nl2Repo`
+- `codestral`: `aaAgentic`, `aaCoding`, `aaOmni`, `aime26`, `arcAgi2`, `bfcl`, `browseComp`, `cfElo`, `mcpA`, `mrcr`, `nl2Repo`, `sweMulti`, `tau2`, `tbHard`
+- `deepseek-coder-v2-16b`: `aaOmni`, `bfcl`, `browseComp`, `mcpA`, `sweMulti`
+- `deepseek-r1-14b`: `aaOmni`, `bfcl`, `browseComp`, `mcpA`, `sweMulti`
+- `deepseek-v3-2`: `aaOmni`, `bfcl`, `mcpA`
+- `deepseek-v4-flash`: `aaOmni`, `bfcl`
+- `deepseek-v4-pro`: `aaOmni`, `bfcl`
+- `gemini-3-1-flash`: `aaOmni`, `browseComp`, `cfElo`, `mcpA`, `nl2Repo`, `sweMulti`
+- `gemini-3-1-flash-lite`: `aaOmni`, `aime26`, `arcAgi2`, `bfcl`, `browseComp`, `cfElo`, `mcpA`, `nl2Repo`, `sweMulti`
+- `gemini-3-1-pro`: `nl2Repo`, `sweMulti`
+- `gemini-3-5-flash`: `aaOmni`, `aime26`, `bfcl`, `browseComp`, `cfElo`, `nl2Repo`, `sweMulti`
+- `gemini-3-flash-preview`: `aaOmni`, `aime26`, `arcAgi2`, `bfcl`, `browseComp`, `cfElo`, `mcpA`, `mrcr`, `nl2Repo`, `sweMulti`, `swePro`, `tau2`, `tbHard`
+- `gemini-omni-flash`: `aaAgentic`, `aaCoding`, `aaIdx`, `aaOmni`, `aime26`, `arcAgi2`, `bfcl`, `browseComp`, `cfElo`, `gpqa`, `hle`, `lcb`, `mcpA`, `mmluPro`, `mrcr`, `nl2Repo`, `sweMulti`, `swePro`, `sweV`, `tau2`, `tb2`, `tbHard`
+- `gemma-3-27b`: `aaOmni`, `arcAgi2`, `bfcl`, `browseComp`, `mcpA`, `nl2Repo`, `sweMulti`
+- `gemma-4-12b`: `aaOmni`, `arcAgi2`, `bfcl`, `browseComp`, `mcpA`, `nl2Repo`, `sweMulti`, `swePro`, `sweV`, `tb2`
+- `gemma-4-26b-moe`: `aaOmni`, `arcAgi2`, `bfcl`, `browseComp`, `mcpA`, `nl2Repo`, `sweMulti`, `swePro`, `tb2`
+- `gemma-4-31b`: `aaOmni`, `bfcl`, `browseComp`, `mcpA`, `nl2Repo`, `sweMulti`
+- `gemma-4-e2b`: `aaOmni`, `arcAgi2`, `bfcl`, `browseComp`, `hle`, `mcpA`, `nl2Repo`, `sweMulti`, `swePro`, `sweV`, `tb2`
+- `gemma-4-e4b`: `aaOmni`, `arcAgi2`, `bfcl`, `browseComp`, `hle`, `mcpA`, `nl2Repo`, `sweMulti`, `swePro`, `sweV`, `tb2`
+- `glm-4-5-air`: `arcAgi2`, `cfElo`, `mcpA`, `sweMulti`, `webDevElo`
+- `glm-4-7`: `bfcl`, `cfElo`, `mcpA`, `mrcr`, `webDevElo`
+- `glm-5`: `aaOmni`, `bfcl`, `cfElo`, `mrcr`
+- `glm-5-2`: `bfcl`, `browseComp`, `cfElo`, `mmluPro`, `mrcr`, `sweMulti`, `sweV`, `webDevElo`
+- `glm-5-turbo`: `aaOmni`, `aime26`, `arcAgi2`, `bfcl`, `browseComp`, `cfElo`, `mcpA`, `mrcr`, `nl2Repo`, `sweMulti`, `swePro`, `sweV`, `tb2`, `webDevElo`
+- `glm-5v-turbo`: `aaAgentic`, `aaCoding`, `aaOmni`, `aime26`, `arcAgi2`, `bfcl`, `browseComp`, `cfElo`, `lcb`, `mcpA`, `mmluPro`, `mrcr`, `nl2Repo`, `sweMulti`, `swePro`, `sweV`, `tb2`, `webDevElo`
+- `gpt-5-5-pro`: `aaAgentic`, `aaCoding`, `aaOmni`, `aime26`, `bfcl`, `cfElo`, `lcb`, `mmluPro`, `nl2Repo`, `sweMulti`
+- `gpt-5-6-luna`: `aaOmni`, `aime26`, `bfcl`, `cfElo`, `hle`, `lcb`, `mcpA`, `mmluPro`, `nl2Repo`, `sweMulti`, `tau2`, `tbHard`
+- `gpt-5-6-sol`: `aaOmni`, `aime26`, `bfcl`, `cfElo`, `hle`, `mcpA`, `mmluPro`, `nl2Repo`, `sweMulti`, `tau2`, `tbHard`
+- `gpt-5-6-terra`: `aaOmni`, `aime26`, `bfcl`, `cfElo`, `hle`, `mcpA`, `mmluPro`, `nl2Repo`, `sweMulti`, `sweV`, `tau2`, `tbHard`
+- `grok-4-20`: `aaOmni`, `bfcl`, `mrcr`, `nl2Repo`, `sweMulti`
+- `grok-4-20-multi-agent`: `aaOmni`, `aime26`, `bfcl`, `browseComp`, `cfElo`, `mcpA`, `mrcr`, `nl2Repo`, `sweMulti`, `swePro`, `tb2`
+- `grok-4-3`: `aaOmni`, `arcAgi2`, `bfcl`, `browseComp`, `mcpA`, `mrcr`, `nl2Repo`, `sweMulti`
+- `grok-4-5`: `aaOmni`, `aime26`, `bfcl`, `browseComp`, `cfElo`, `mcpA`, `mmluPro`, `mrcr`, `nl2Repo`, `sweMulti`, `sweV`, `tau2`, `tbHard`
+- `grok-build-0-1`: `aaOmni`, `aime26`, `bfcl`, `browseComp`, `cfElo`, `lcb`, `mcpA`, `mmluPro`, `mrcr`, `nl2Repo`, `sweMulti`, `swePro`, `tau2`, `tbHard`
+- `kimi-k2-6`: `aaOmni`, `arcAgi2`, `bfcl`, `cfElo`, `nl2Repo`
+- `kimi-k2-7-code`: `aaOmni`, `aime26`, `bfcl`, `browseComp`, `cfElo`, `mrcr`, `nl2Repo`, `sweMulti`, `webDevElo`
+- `kimi-k2-7-code-highspeed`: `aaAgentic`, `aaCoding`, `aaIdx`, `aaOmni`, `aime26`, `arcAgi2`, `bfcl`, `browseComp`, `cfElo`, `gpqa`, `hle`, `lcb`, `mcpA`, `mmluPro`, `mrcr`, `nl2Repo`, `sweMulti`, `swePro`, `sweV`, `tau2`, `tb2`, `tbHard`, `webDevElo`
+- `llama-4-maverick`: `aaOmni`, `bfcl`, `browseComp`, `cfElo`, `mcpA`, `nl2Repo`, `sweMulti`
+- `llama-4-scout`: `aaOmni`, `browseComp`, `cfElo`, `mcpA`, `nl2Repo`, `sweMulti`
+- `mimo-v2-5`: `aaOmni`, `aime26`, `arcAgi2`, `bfcl`, `browseComp`, `cfElo`, `mcpA`, `mrcr`, `nl2Repo`
+- `mimo-v2-5-pro`: `bfcl`, `browseComp`, `mcpA`, `nl2Repo`, `sweMulti`
+- `minimax-m2-5`: `aaOmni`, `cfElo`, `mcpA`
+- `minimax-m2-7`: `aaOmni`, `arcAgi2`, `bfcl`, `cfElo`, `mcpA`
+- `minimax-m2-7-highspeed`: `aaAgentic`, `aaCoding`, `aaIdx`, `aaOmni`, `aime26`, `arcAgi2`, `bfcl`, `browseComp`, `cfElo`, `gpqa`, `hle`, `lcb`, `mcpA`, `mmluPro`, `mrcr`, `nl2Repo`, `sweMulti`, `swePro`, `sweV`, `tau2`, `tb2`, `tbHard`
+- `minimax-m3`: `aaOmni`, `arcAgi2`, `bfcl`, `cfElo`, `sweMulti`
+- `ministral-3-14b`: `aaOmni`, `aime26`, `arcAgi2`, `bfcl`, `browseComp`, `cfElo`, `mcpA`, `mrcr`, `nl2Repo`, `sweMulti`, `swePro`, `sweV`, `tb2`
+- `ministral-3-3b`: `aaOmni`, `bfcl`, `browseComp`, `mcpA`, `sweMulti`
+- `ministral-3-8b`: `aaOmni`, `aime26`, `arcAgi2`, `bfcl`, `browseComp`, `cfElo`, `mcpA`, `mrcr`, `nl2Repo`, `sweMulti`, `swePro`, `sweV`, `tb2`
+- `mistral-large-3`: `aaOmni`, `arcAgi2`, `bfcl`, `browseComp`, `cfElo`, `mcpA`, `mrcr`, `nl2Repo`, `sweMulti`
+- `mistral-medium-3-5`: `aaOmni`, `arcAgi2`, `bfcl`, `browseComp`, `cfElo`, `mcpA`, `mmluPro`, `mrcr`, `nl2Repo`, `sweMulti`, `webDevElo`
+- `mistral-small-4`: `aaOmni`, `aime26`, `arcAgi2`, `bfcl`, `browseComp`, `cfElo`, `mcpA`, `mrcr`, `nl2Repo`, `sweMulti`, `swePro`, `sweV`, `tb2`, `webDevElo`
+- `muse-spark`: `aaOmni`, `bfcl`, `browseComp`, `cfElo`, `mcpA`, `nl2Repo`, `sweMulti`
+- `nemotron-3-nano`: `aaAgentic`, `aaOmni`, `aime26`, `arcAgi2`, `browseComp`, `cfElo`, `mcpA`, `mrcr`, `nl2Repo`, `sweMulti`, `swePro`
+- `nemotron-3-nano-omni`: `aaOmni`, `arcAgi2`, `browseComp`, `cfElo`, `mcpA`, `mrcr`, `nl2Repo`, `sweMulti`, `swePro`, `tb2`, `webDevElo`
+- `nemotron-3-super`: `aaOmni`, `arcAgi2`, `bfcl`, `cfElo`, `mcpA`, `nl2Repo`, `swePro`
+- `nemotron-3-ultra`: `aaOmni`, `aime26`, `arcAgi2`, `bfcl`, `cfElo`, `mcpA`, `nl2Repo`, `swePro`
+- `opus-4-7`: `bfcl`, `nl2Repo`
+- `qwen25-coder-14b`: `aaIdx`, `aaOmni`, `bfcl`, `browseComp`, `hle`, `mcpA`, `sweMulti`
+- `qwen25-coder-32b`: `aaOmni`, `bfcl`, `browseComp`, `mcpA`, `sweMulti`
+- `qwen25-coder-7b`: `aaOmni`, `bfcl`, `browseComp`, `mcpA`, `sweMulti`
+- `qwen3-235b`: `aaAgentic`, `aaCoding`, `aaOmni`, `browseComp`, `mcpA`, `mrcr`, `nl2Repo`, `sweMulti`
+- `qwen3-32b`: `aaOmni`, `arcAgi2`, `browseComp`, `mcpA`, `mrcr`, `nl2Repo`, `sweMulti`
+- `qwen3-5-9b`: `aaOmni`, `arcAgi2`, `browseComp`, `cfElo`, `mcpA`, `mrcr`, `nl2Repo`, `sweMulti`, `swePro`, `webDevElo`
+- `qwen3-6-27b`: `aaOmni`, `arcAgi2`, `bfcl`, `browseComp`, `cfElo`, `mcpA`, `mrcr`
+- `qwen3-6-35b-moe`: `aaOmni`, `arcAgi2`, `bfcl`, `browseComp`, `cfElo`, `mrcr`
+- `qwen3-6-flash`: `aaAgentic`, `aaCoding`, `aaOmni`, `arcAgi2`, `bfcl`, `browseComp`, `cfElo`, `mcpA`, `mrcr`, `sweMulti`, `tbHard`
+- `qwen3-6-max`: `aaOmni`, `arcAgi2`, `bfcl`, `browseComp`, `cfElo`, `mcpA`, `mrcr`, `sweMulti`
+- `qwen3-6-plus`: `aaOmni`, `arcAgi2`, `bfcl`, `browseComp`, `cfElo`, `mcpA`, `mrcr`, `sweMulti`
+- `qwen3-7-max`: `aaOmni`, `arcAgi2`, `browseComp`, `cfElo`
+- `qwen3-7-plus`: `aaOmni`, `aime26`, `arcAgi2`, `bfcl`, `browseComp`, `cfElo`, `sweMulti`
+- `qwen3-coder-30b`: `aaOmni`, `bfcl`, `browseComp`, `mcpA`, `sweMulti`
+- `qwen3-coder-480b`: `aaOmni`, `browseComp`, `mcpA`, `sweMulti`
+- `qwen3-coder-next`: `aaOmni`, `bfcl`, `browseComp`, `mcpA`
+- `sonnet-4-6`: `bfcl`, `cfElo`, `nl2Repo`
+- `step-3-5-flash`: `aaOmni`, `arcAgi2`, `bfcl`, `mcpA`, `mrcr`, `nl2Repo`
+- `step-3-7-flash`: `aaOmni`, `aime26`, `arcAgi2`, `bfcl`, `cfElo`, `mcpA`, `mmluPro`, `mrcr`, `nl2Repo`
+
 ## [2026-07-24] — autonomous refresh-all [WARN: cumulative provenance coverage 67.2% below 85% target] [WARN: runMetadata missing fields ['toolCallCount', 'fetchAttemptCount', 'batchCount']] [partial: gap-gen supplement: agent found 566 new fills; 88 cells auto-gapped by orchestrator; 705 explicit agent gaps preserved]
 
 [fillRatio:0.67 cells:1005/1496 contradictions:173 fetch:0.0min tools:None batches:None build:0b5e38e]

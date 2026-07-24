@@ -1,12 +1,12 @@
 {
-  "probedAt": "2026-07-24T17:46:12Z",
+  "probedAt": "2026-07-24T20:29:40Z",
   "total": 134,
   "counts": {
     "format-drift": 7,
     "redirect": 6,
-    "spa": 12,
-    "bot-block": 3,
-    "dead": 4
+    "spa": 13,
+    "bot-block": 2,
+    "dead": 3
   },
   "formatDrift": [
     {
@@ -60,7 +60,7 @@
     },
     {
       "url": "https://compliance.microsoft.com/compliancemanager",
-      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DNqoykJdzaTTdfp-ChtLUhE4JMYiqen4OfyxqH7yXBfjlPR_SPEb_18j9q3TuBW4mCS-eCX0WcHOAO7RN5S5sssO5M7AFPMaNiJQouXeD82IzDHtaGINELBiEfrIQX4lxo89NU4rql4pRvsNlg0m0i1Ea665fh_X3XlxYIwlgrAQ&response_mode=form_post&nonce=639205119326774143.NGJkMDEyN2ItMzQ3OC00NWRkLThlOWQtYTEzMTg2YjlmOWFhMjhlYjFiMTgtMDEyMy00ZDZmLWFkNDgtZWU4NGMyNjZmNzI4&client-request-id=fd847d59-0ee4-4c6e-82f9-d63d62362fa0&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
+      "to": "https://login.microsoftonline.com/common/oauth2/authorize?client_id=80ccca67-54bd-44ab-8625-4b79c4dc7775&response_type=code%20id_token&scope=openid%20profile&state=OpenIdConnect.AuthenticationProperties%3DBlNjV41jHAvF2WfNVY-fxGPROVgD07ofwoolS2fRNU99Gn90oMcZ9Q4eduWLom7wWzWD_lD1MlcNZKU14UPdsFNuZEejqdJUPgScG0cT8cZkvUSIl0INLNSKoKD3NZcgFxtV_f2OcwHBNyT3Btg6BR_XSJQ5faPAQxqp6M-zNQ8&response_mode=form_post&nonce=639205217545052790.Mjg3MDQxOWEtZWIzYy00MDc0LWEyNmUtMGZjYzc4MjY0MjE3NzJhYmNmYzMtNzUwNC00MzBlLWIyMzYtNjAxNjljMWI2ZWFk&client-request-id=00de26cb-1014-434c-81f1-925fc1285aec&redirect_uri=https%3A%2F%2Fcompliance.microsoft.com%2F&x-client-SKU=ID_NET472&x-client-ver=8.16.0.0"
     },
     {
       "url": "https://edpb.europa.eu/our-work-tools/consistency-findings/register-for-decisions_en",
@@ -80,6 +80,7 @@
     "https://www.anyscale.com/endpoints",
     "https://developers.cloudflare.com/workers-ai/models/",
     "https://ai.azure.com/explore/models",
+    "https://www.datacamp.com/blog",
     "https://tokenmix.ai/blog/",
     "https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-for-service-organizations",
     "https://trust.openai.com/",
@@ -87,7 +88,6 @@
   ],
   "botBlocked": [
     "https://klu.ai/llm-leaderboard",
-    "https://www.datacamp.com/blog",
     "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
   ],
   "dead": [
@@ -98,10 +98,6 @@
     {
       "url": "https://www.marc0.dev/en/leaderboard",
       "error": "HTTP 404 Not Found"
-    },
-    {
-      "url": "https://www.datacamp.com/blog",
-      "error": "HTTP 403 Forbidden"
     },
     {
       "url": "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html",
